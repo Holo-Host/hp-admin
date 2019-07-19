@@ -1,14 +1,14 @@
 import React from 'react'
-import './App.css'
 import { Route } from 'react-router-dom'
+import './App.css'
 import Btn from 'components/SpecificButton'
 
-function App () {
+export function App ({ data }) {
   return (
     <div className='App'>
       <header className='App-header'>
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          {data.myQuery && data.myQuery.myString}
         </p>
 
         <Route path='/' render={() =>
@@ -19,10 +19,7 @@ function App () {
           <div>You can only see me at "/test-route"</div>
         } />
 
-        <Btn
-        >
-          Learn React
-        </Btn>
+        <Btn>Learn React</Btn>
       </header>
     </div>
   )
