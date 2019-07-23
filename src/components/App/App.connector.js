@@ -32,10 +32,8 @@ const registerUser = graphql(RegisterUserMutation, {
         },
         update: (cache, { data: { registerUser } }) => {
           if (registerUser) {
-            // const { id, name, avatarUrl } = registerUser
             cache.writeQuery({
               query: MeQuery,
-              // data: { id, name, avatarUrl, isRegistered: true }
               data: {
                 me: { ...registerUser, isRegistered: true }
               }
