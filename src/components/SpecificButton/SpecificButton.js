@@ -3,9 +3,9 @@ import './SpecificButton.module.css'
 
 const BUTTON_LABEL = 'some domain specific button'
 
-function SpecificButton () {
+function SpecificButton ({ children = BUTTON_LABEL, onClick = () => {} }) {
   return (
-    <button styleName='specific-button'>{BUTTON_LABEL}</button>
+    <button onClick={onClick} styleName='specific-button'>{children}</button>
   )
 }
 

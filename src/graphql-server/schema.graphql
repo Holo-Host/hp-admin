@@ -1,11 +1,14 @@
-type Query {
-  myQuery: MyType
+type Me {
+  id: ID
+  name: String
+  avatarUrl: String
+  isRegistered: Boolean
 }
 
-type MyType {
-  myString: String
-}
+type Query {
+  me: Me
+} 
 
 type Mutation {
-  myMutation(myString: String): MyType
+  registerUser(name: String, avatarUrl: String): Me
 }

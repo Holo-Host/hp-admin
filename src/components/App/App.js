@@ -3,12 +3,12 @@ import { Route } from 'react-router-dom'
 import './App.css'
 import Btn from 'components/SpecificButton'
 
-export function App ({ data }) {
+export function App ({ data, registerUser }) {
   return (
     <div className='App'>
       <header className='App-header'>
         <p>
-          {data.myQuery && data.myQuery.myString}
+          {data.me && JSON.stringify(data.me)}
         </p>
 
         <Route path='/' render={() =>
@@ -19,7 +19,7 @@ export function App ({ data }) {
           <div>You can only see me at "/test-route"</div>
         } />
 
-        <Btn>Learn React</Btn>
+        <Btn onClick={() => registerUser('Test User', 'testuserface.png')}>Register a test user</Btn>
       </header>
     </div>
   )

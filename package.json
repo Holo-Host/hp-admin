@@ -1,20 +1,13 @@
 {
-  "name": "happ-boilerplate",
+  "name": "hp-admin",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@holochain/hc-web-client": "^0.5.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
   },
   "devDependencies": {
-    "apollo-boost": "^0.3.1",
-    "apollo-client": "^2.5.1",
-    "apollo-link-logger": "^1.2.3",
-    "apollo-link-retry": "^2.2.13",
-    "apollo-link-schema": "^1.2.2",
-    "babel-plugin-import-graphql": "^2.7.0",
-    "babel-plugin-module-resolver": "^3.2.0",
-
     "@babel/core": "7.4.3",
     "@babel/plugin-syntax-jsx": "^7.2.0",
     "@svgr/webpack": "4.1.0",
@@ -22,9 +15,16 @@
     "@testing-library/react": "^8.0.5",
     "@typescript-eslint/eslint-plugin": "1.6.0",
     "@typescript-eslint/parser": "1.6.0",
+    "apollo-boost": "^0.3.1",
+    "apollo-client": "^2.5.1",
+    "apollo-link-logger": "^1.2.3",
+    "apollo-link-retry": "^2.2.13",
+    "apollo-link-schema": "^1.2.2",
     "babel-eslint": "10.0.1",
     "babel-jest": "^24.8.0",
     "babel-loader": "8.0.5",
+    "babel-plugin-import-graphql": "^2.7.0",
+    "babel-plugin-module-resolver": "^3.2.0",
     "babel-plugin-named-asset-import": "^0.3.2",
     "babel-plugin-react-css-modules": "^5.2.6",
     "babel-preset-react-app": "^9.0.0",
@@ -43,11 +43,9 @@
     "eslint-plugin-react-hooks": "^1.5.0",
     "file-loader": "3.0.1",
     "fs-extra": "7.0.1",
-
     "graphql": "^14.2.1",
     "graphql-tag": "^2.10.1",
     "graphql-tools": "^4.0.4",
-
     "html-webpack-plugin": "4.0.0-beta.5",
     "identity-obj-proxy": "3.0.0",
     "is-wsl": "^1.1.0",
@@ -176,8 +174,12 @@
       [
         "module-resolver",
         {
-          "root": ["src"],
-          "extensions": [".graphql"]
+          "root": [
+            "src"
+          ],
+          "extensions": [
+            ".graphql"
+          ]
         }
       ],
       "import-graphql"

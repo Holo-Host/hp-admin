@@ -1,16 +1,16 @@
+import HyloDnaInterface from './HyloDnaInterface'
+import {
+  dataMappedCall,
+  toUiData
+} from './dataMapping'
+
 export const resolvers = {
   Mutation: {
-    myMutation (_, mutationData) {
-      return mutationData.myString + '-mutated'
-    }
+    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create)
   },
 
   Query: {
-    myQuery () {
-      return {
-        myString: 'data'
-      }
-    }
+    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get())
   }
 }
 
