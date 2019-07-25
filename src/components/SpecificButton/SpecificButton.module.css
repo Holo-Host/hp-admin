@@ -1,3 +1,5 @@
 .specific-button {
-  background-color: red;
+  padding: 5px;  
+  background-color: pink;
+  font-size: 14px;
 }

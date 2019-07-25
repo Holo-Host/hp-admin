@@ -22,6 +22,15 @@ const MeQuery = gql`
   }
 `
 
+const HappStoreUserQuery = gql`
+  query HappStoreUser {
+    happStoreUser {
+      name
+      hash
+    }
+  }
+`
+
 const registerUser = graphql(RegisterUserMutation, {
   props: ({ mutate }) => {
     return {
@@ -45,9 +54,15 @@ const registerUser = graphql(RegisterUserMutation, {
   }
 })
 
-const me = graphql(MeQuery)
+const me = graphql(MeQuery, {
+  props: ({ data: { me } }) => ({ me })
+})
+const happStoreUser = graphql(HappStoreUserQuery, {
+  props: ({ data: { happStoreUser } }) => ({ happStoreUser })
+})
 
 export default compose(
   me,
+  happStoreUser,
   registerUser
 )

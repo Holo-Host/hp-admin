@@ -5,8 +5,14 @@ type Me {
   isRegistered: Boolean
 }
 
+type HappStoreUser {
+  hash: String
+  name: String
+}
+
 type Query {
   me: Me
+  happStoreUser: HappStoreUser
 } 
 
 type Mutation {

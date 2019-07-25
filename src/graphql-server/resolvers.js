@@ -1,4 +1,6 @@
-import HyloDnaInterface from './HyloDnaInterface'
+import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
+import HappStoreDnaInterface from './dnaInterfaces/happStoreDnaInterface'
+
 import {
   dataMappedCall,
   toUiData
@@ -10,7 +12,8 @@ export const resolvers = {
   },
 
   Query: {
-    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get())
+    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
+    happStoreUser: () => HappStoreDnaInterface.currentUser.get()
   }
 }
 
