@@ -1,15 +1,15 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
-import dnaConfig from 'config/dnaconfig'
+import { HYLO_INSTANCE_ID, HAPP_STORE_INSTACE_ID } from 'config/dnaconfig'
 
 export const HOLOCHAIN_LOGGING = true
 const holochainClients = {}
 
-async function initAndGetHolochainClient (instanceId, port) {
+async function initAndGetHolochainClient (instanceId) {
   if (holochainClients[instanceId]) return holochainClients[instanceId]
   try {
     holochainClients[instanceId] = await hcWebClientConnect({
-      url: `ws://localhost:${port}`,
+      url: process.env.REACT_APP_DNA_INTERFACE_URL,
       wsClient: { max_reconnects: 0 }
     })
     if (HOLOCHAIN_LOGGING) {
@@ -24,7 +24,7 @@ async function initAndGetHolochainClient (instanceId, port) {
 }
 
 // this is a bad name. If anyone has something better, please fix it.
-export const createCreateZomeCall = ({ instanceId, port }) => (zomeCallPath, callOpts = {}) => {
+export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) => {
   const DEFAULT_OPTS = {
     instanceId,
     logging: HOLOCHAIN_LOGGING,
@@ -36,7 +36,7 @@ export const createCreateZomeCall = ({ instanceId, port }) => (zomeCallPath, cal
   }
   return async function (args = {}) {
     try {
-      await initAndGetHolochainClient(instanceId, port)
+      await initAndGetHolochainClient(instanceId)
 
       const { zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
       const zomeCall = holochainClients[instanceId].callZome(opts.instanceId, zome, zomeFunc)
@@ -78,9 +78,9 @@ export const createCreateZomeCall = ({ instanceId, port }) => (zomeCallPath, cal
   }
 }
 
-export const createHyloZomeCall = createCreateZomeCall(dnaConfig.hylo)
+export const createHyloZomeCall = createCreateZomeCall(HYLO_INSTANCE_ID)
 
-export const createHappStoreZomeCall = createCreateZomeCall(dnaConfig.happStore)
+export const createHappStoreZomeCall = createCreateZomeCall(HAPP_STORE_INSTACE_ID)
 
 export function parseZomeCallPath (zomeCallPath) {
   const [zomeFunc, zome, instanceId] = zomeCallPath.split('/').reverse()
