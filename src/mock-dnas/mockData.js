@@ -1,4 +1,5 @@
 // data is a tree organized by instanceId > zome > function
+// leaves can either be data, or a function which is called with the zome call args, so can update other parts of the tree.
 
 const data = {
   hylo: {
