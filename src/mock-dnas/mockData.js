@@ -4,9 +4,14 @@ const data = {
   hylo: {
     people: {
       get_me: {
-        id: 'fdkljsklj',
+        address: 'fdkljsklj',
         name: 'H.P. Owner',
-        avatarUrl: 'myface.png'
+        avatar_url: 'myface.png'
+      },
+      is_registered: true,
+      register_user: args => {
+        data.hylo.people.get_me = args
+        return args
       }
     }
   },
