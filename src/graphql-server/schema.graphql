@@ -13,7 +13,15 @@ type HappStoreUser {
 type Query {
   me: Me
   happStoreUser: HappStoreUser
+  allHapps: [Happ]
 } 
+
+type Happ {
+  id: ID
+  title: String
+  thumbnailUrl: String
+  homepageUrl: String
+}
 
 type Mutation {
   registerUser(name: String, avatarUrl: String): Me
