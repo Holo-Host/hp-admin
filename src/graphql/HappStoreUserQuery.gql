@@ -1,0 +1,6 @@
+query HappStoreUser {
+  happStoreUser {
+    name
+    hash
+  }
+}

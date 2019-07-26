@@ -1,35 +1,7 @@
 import { graphql, compose } from 'react-apollo'
-import gql from 'graphql-tag'
-
-const RegisterUserMutation = gql`
-  mutation RegisterUser ($name: String, $avatarUrl: String) {
-    registerUser(name: $name, avatarUrl: $avatarUrl) {
-      id
-      name
-      avatarUrl
-    }
-  }
-`
-
-const MeQuery = gql`
-  query Me {
-    me {
-      id
-      name
-      avatarUrl
-      isRegistered
-    }
-  }
-`
-
-const HappStoreUserQuery = gql`
-  query HappStoreUser {
-    happStoreUser {
-      name
-      hash
-    }
-  }
-`
+import RegisterUserMutation from 'graphql/RegisterUserMutation.gql'
+import HyloMeQuery from 'graphql/HyloMeQuery.gql'
+import HappStoreUserQuery from 'graphql/HappStoreUserQuery.gql'
 
 const registerUser = graphql(RegisterUserMutation, {
   props: ({ mutate }) => {
@@ -42,7 +14,7 @@ const registerUser = graphql(RegisterUserMutation, {
         update: (cache, { data: { registerUser } }) => {
           if (registerUser) {
             cache.writeQuery({
-              query: MeQuery,
+              query: HyloMeQuery,
               data: {
                 me: { ...registerUser, isRegistered: true }
               }
@@ -54,7 +26,7 @@ const registerUser = graphql(RegisterUserMutation, {
   }
 })
 
-const me = graphql(MeQuery, {
+const me = graphql(HyloMeQuery, {
   props: ({ data: { me } }) => ({ me })
 })
 const happStoreUser = graphql(HappStoreUserQuery, {
