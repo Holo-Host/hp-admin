@@ -11,8 +11,11 @@ const data = {
       },
       is_registered: true,
       register_user: args => {
-        data.hylo.people.get_me = args
-        return args
+        data.hylo.people.get_me = {
+          ...data.hylo.people.get_me,
+          ...args
+        }
+        return data.hylo.people.get_me
       }
     }
   },
