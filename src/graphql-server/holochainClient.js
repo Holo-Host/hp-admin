@@ -1,14 +1,17 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
-import { HYLO_INSTANCE_ID, HAPP_STORE_INSTACE_ID } from 'config/dnaconfig'
+import { HYLO_INSTANCE_ID, HAPP_STORE_INSTANCE_ID } from 'config/dnaconfig'
+import mockCallZome from 'mock-dnas/mockCallZome'
+
+const MOCK_DNA_CONNECTION = true
 
 export const HOLOCHAIN_LOGGING = true
-const holochainClients = {}
+let holochainClient
 
-async function initAndGetHolochainClient (instanceId) {
-  if (holochainClients[instanceId]) return holochainClients[instanceId]
+async function initAndGetHolochainClient () {
+  if (holochainClient) return holochainClient
   try {
-    holochainClients[instanceId] = await hcWebClientConnect({
+    holochainClient = await hcWebClientConnect({
       url: process.env.REACT_APP_DNA_INTERFACE_URL,
       wsClient: { max_reconnects: 0 }
     })
@@ -26,7 +29,6 @@ async function initAndGetHolochainClient (instanceId) {
 // this is a bad name. If anyone has something better, please fix it.
 export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) => {
   const DEFAULT_OPTS = {
-    instanceId,
     logging: HOLOCHAIN_LOGGING,
     resultParser: null
   }
@@ -36,10 +38,14 @@ export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) 
   }
   return async function (args = {}) {
     try {
-      await initAndGetHolochainClient(instanceId)
+      await initAndGetHolochainClient()
 
       const { zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
-      const zomeCall = holochainClients[instanceId].callZome(opts.instanceId, zome, zomeFunc)
+
+      const zomeCall = MOCK_DNA_CONNECTION
+        ? mockCallZome(instanceId, zome, zomeFunc)
+        : holochainClient.callZome(instanceId, zome, zomeFunc)
+
       const rawResult = await zomeCall(args)
       const jsonResult = JSON.parse(rawResult)
       const error = get('Err', jsonResult) || get('SerializationError', jsonResult)
@@ -53,7 +59,7 @@ export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) 
         const detailsFormat = 'font-weight: bold; color: rgb(220, 208, 120)'
 
         console.groupCollapsed(
-          `👍 ${opts.instanceId}/${zomeCallPath}%c zome call complete`,
+          `👍 ${instanceId}/${zomeCallPath}%c zome call complete`,
           'font-weight: normal; color: rgb(160, 160, 160)'
         )
         console.groupCollapsed('%cArgs', detailsFormat)
@@ -67,7 +73,7 @@ export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) 
       return result
     } catch (error) {
       console.log(
-        `👎 %c${opts.instanceId}/${zomeCallPath}%c zome call ERROR using args: `,
+        `👎 %c${instanceId}/${zomeCallPath}%c zome call ERROR using args: `,
         'font-weight: bold; color: rgb(220, 208, 120); color: red',
         'font-weight: normal; color: rgb(160, 160, 160)',
         args,
@@ -80,7 +86,7 @@ export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) 
 
 export const createHyloZomeCall = createCreateZomeCall(HYLO_INSTANCE_ID)
 
-export const createHappStoreZomeCall = createCreateZomeCall(HAPP_STORE_INSTACE_ID)
+export const createHappStoreZomeCall = createCreateZomeCall(HAPP_STORE_INSTANCE_ID)
 
 export function parseZomeCallPath (zomeCallPath) {
   const [zomeFunc, zome, instanceId] = zomeCallPath.split('/').reverse()
