@@ -1,3 +1,6 @@
+# HoloPort Admin
+> The entry point into the world of Holo as a Host.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

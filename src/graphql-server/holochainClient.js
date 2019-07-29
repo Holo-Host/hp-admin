@@ -1,6 +1,5 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
-import { HYLO_INSTANCE_ID, HAPP_STORE_INSTANCE_ID } from 'config/dnaconfig'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
 const MOCK_DNA_CONNECTION = true
@@ -26,8 +25,7 @@ async function initAndGetHolochainClient () {
   }
 }
 
-// this is a bad name. If anyone has something better, please fix it.
-export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) => {
+export function createZomeCall (zomeCallPath, callOpts = {}) {
   const DEFAULT_OPTS = {
     logging: HOLOCHAIN_LOGGING,
     resultParser: null
@@ -40,7 +38,7 @@ export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) 
     try {
       await initAndGetHolochainClient()
 
-      const { zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
+      const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
 
       const zomeCall = MOCK_DNA_CONNECTION
         ? mockCallZome(instanceId, zome, zomeFunc)
@@ -59,7 +57,7 @@ export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) 
         const detailsFormat = 'font-weight: bold; color: rgb(220, 208, 120)'
 
         console.groupCollapsed(
-          `👍 ${instanceId}/${zomeCallPath}%c zome call complete`,
+          `👍 ${zomeCallPath}%c zome call complete`,
           'font-weight: normal; color: rgb(160, 160, 160)'
         )
         console.groupCollapsed('%cArgs', detailsFormat)
@@ -73,7 +71,7 @@ export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) 
       return result
     } catch (error) {
       console.log(
-        `👎 %c${instanceId}/${zomeCallPath}%c zome call ERROR using args: `,
+        `👎 %c${zomeCallPath}%c zome call ERROR using args: `,
         'font-weight: bold; color: rgb(220, 208, 120); color: red',
         'font-weight: normal; color: rgb(160, 160, 160)',
         args,
@@ -84,9 +82,13 @@ export const createCreateZomeCall = instanceId => (zomeCallPath, callOpts = {}) 
   }
 }
 
-export const createHyloZomeCall = createCreateZomeCall(HYLO_INSTANCE_ID)
-
-export const createHappStoreZomeCall = createCreateZomeCall(HAPP_STORE_INSTANCE_ID)
+export function instanceCreateZomeCall (instanceId) {
+  return (partialZomeCallPath, callOpts = {}) => {
+    // regex removes leading slash
+    const zomeCallPath = `${instanceId}/${partialZomeCallPath.replace(/^\/+/, '')}`
+    return createZomeCall(zomeCallPath, callOpts)
+  }
+}
 
 export function parseZomeCallPath (zomeCallPath) {
   const [zomeFunc, zome, instanceId] = zomeCallPath.split('/').reverse()

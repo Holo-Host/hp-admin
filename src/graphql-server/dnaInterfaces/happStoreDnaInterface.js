@@ -1,6 +1,9 @@
-import { createHappStoreZomeCall as createZomeCall } from '../holochainClient'
+import { instanceCreateZomeCall } from '../holochainClient'
 
-export const HappStoreInterface = {
+export const INSTANCE_ID = 'happ-store'
+const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
+
+export const HappStoreDnaInterface = {
   currentUser: {
     get: () => createZomeCall('whoami/get_user')()
   },
@@ -9,4 +12,4 @@ export const HappStoreInterface = {
   }
 }
 
-export default HappStoreInterface
+export default HappStoreDnaInterface
