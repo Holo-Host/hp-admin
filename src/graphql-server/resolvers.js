@@ -1,5 +1,4 @@
-import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
-import HappStoreDnaInterface from './dnaInterfaces/happStoreDnaInterface'
+import { createZomeCall } from './holochainClient'
 
 import {
   dataMappedCall,
@@ -8,12 +7,12 @@ import {
 
 export const resolvers = {
   Mutation: {
-    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create)
+    registerUser: (_, userData) => dataMappedCall('person', userData, createZomeCall('hylo/people/register_user'))
   },
 
   Query: {
-    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
-    happStoreUser: () => HappStoreDnaInterface.currentUser.get()
+    me: async () => toUiData('person', await createZomeCall('hylo/people/get_me')()),
+    happStoreUser: () => createZomeCall('happ-store/whoami/get_user')()
   }
 }
 

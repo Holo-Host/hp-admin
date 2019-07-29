@@ -82,14 +82,6 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   }
 }
 
-export function instanceCreateZomeCall (instanceId) {
-  return (partialZomeCallPath, callOpts = {}) => {
-    // regex removes leading slash
-    const zomeCallPath = `${instanceId}/${partialZomeCallPath.replace(/^\/+/, '')}`
-    return createZomeCall(zomeCallPath, callOpts)
-  }
-}
-
 export function parseZomeCallPath (zomeCallPath) {
   const [zomeFunc, zome, instanceId] = zomeCallPath.split('/').reverse()
 
