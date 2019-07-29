@@ -1,5 +1,8 @@
-import { string } from 'prop-types'
-import React from 'react'
+import { string, number } from 'prop-types'
+import React, { useState } from 'react'
+import ReactTooltip from 'react-tooltip'
+import copy from 'copy-to-clipboard'
+import { Network as Identicon } from 'react-identicon-variety-pack'
 import './HashIcon.module.css'
 
 export default function HashIcon ({
@@ -7,17 +10,27 @@ export default function HashIcon ({
   size = 64,
   className
 }) {
-  const style = {
-    width: size,
-    height: size
+  const [copied, setCopied] = useState(false)
+  const copyHash = () => {
+    copy(hash)
+    setCopied(true)
   }
-  return <div style={style} className={className}>
-    {hash}
+
+  return <div data-tip={hash} onClick={copyHash}>
+    <Identicon
+      seed={hash}
+      size={size}
+      className={className}
+      circle />
+    <ReactTooltip
+      delayShow={250}
+      afterHide={() => setCopied(false)}
+      getContent={dataTip => dataTip === hash ? `${hash} - ${copied ? 'Copied to clipboard' : 'Click to copy'}` : null} />
   </div>
 }
 
 HashIcon.propTypes = {
   hash: string,
-  size: string,
+  size: number,
   className: string
 }

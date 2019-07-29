@@ -1,4 +1,4 @@
-import { string, func } from 'prop-types'
+import { string, number, func } from 'prop-types'
 import React from 'react'
 import { bgImageStyle } from 'utils/index'
 import './RoundImage.module.css'
@@ -25,6 +25,6 @@ RoundImage.propTypes = {
   url: string,
   className: string,
   square: string,
-  size: string,
+  size: number,
   onClick: func
 }
