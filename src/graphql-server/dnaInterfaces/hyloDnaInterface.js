@@ -1,4 +1,7 @@
-import { createHyloZomeCall as createZomeCall } from '../holochainClient'
+import { instanceCreateZomeCall } from '../holochainClient'
+
+export const INSTANCE_ID = 'hylo'
+const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 export const HyloDnaInterface = {
   currentUser: {
