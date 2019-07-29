@@ -3,7 +3,7 @@ import { get } from 'lodash/fp'
 import { HYLO_INSTANCE_ID, HAPP_STORE_INSTANCE_ID } from 'config/dnaconfig'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-const MOCK_DNA_CONNECTION = false
+const MOCK_DNA_CONNECTION = true
 
 export const HOLOCHAIN_LOGGING = true
 let holochainClient

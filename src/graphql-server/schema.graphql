@@ -21,6 +21,7 @@ type Happ {
   title: String
   thumbnailUrl: String
   homepageUrl: String
+  hash: String
 }
 
 type Mutation {

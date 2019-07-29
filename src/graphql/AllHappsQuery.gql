@@ -4,5 +4,6 @@ query AllHapps {
     title
     thumbnailUrl
     homepageUrl
+    hash
   }
 }
