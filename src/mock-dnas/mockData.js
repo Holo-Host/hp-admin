@@ -25,6 +25,58 @@ const data = {
         hash: 'browns',
         name: 'H.P. Owner'
       }
+    },
+    happs: {
+      get_all_apps: [
+        {
+          address: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT',
+          appEntry: {
+            title: 'Holofuel',
+            author: 'Holo ltd',
+            description: 'The holofuel hApp',
+            thumbnailUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cMFvYqaw7TtcTkPFcwE8pupKWqLFMCFu2opap9jqUoqIcAKB',
+            homepageUrl: 'https://holo.host/faq/what-is-holo-fuel/',
+            dnas: [
+              {
+                location: 'someurl.com/dna',
+                hash: 'foiyuoiyZXBVNBVCuibce',
+                handle: 'bars'
+              }
+            ],
+            ui: {
+              location: 'someurl.com/ui',
+              hash: 'flkjdflksdjfldskjf',
+              handle: null
+            }
+          },
+          upvotes: 0,
+          upvotedByMe: false
+        },
+        {
+          address: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH',
+          appEntry: {
+            title: 'Holo Community',
+            author: 'Holo ltd',
+            description: 'The community chat and message board hApp',
+            thumbnailUrl: 'https://d3ngex8q79bk55.cloudfront.net/misc/default_community_avatar.png',
+            homepageUrl: 'https://hylo.com',
+            dnas: [
+              {
+                location: 'someurl.com/dna',
+                hash: 'QMdlkfmpodlskffldksldsk',
+                handle: 'bars'
+              }
+            ],
+            ui: {
+              location: 'someurl.com/ui',
+              hash: 'flkjdflksdjfldskjf',
+              handle: null
+            }
+          },
+          upvotes: 0,
+          upvotedByMe: false
+        }
+      ]
     }
   }
 }

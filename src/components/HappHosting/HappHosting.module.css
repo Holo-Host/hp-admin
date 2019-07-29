@@ -1,0 +1,22 @@
+.happ-list {
+  border-bottom: 1px solid lightgray;
+  max-width: 700px;
+}
+
+.happ-row {
+  display: flex;
+  border-top: 1px solid lightgray;
+  border-left: 1px solid lightgray;  
+  border-right: 1px solid lightgray;    
+  padding: 5px 15px;
+  align-items: center;
+}
+
+.thumbnail {
+  margin-right: 20px;
+}
+
+.homepage {
+  margin-left: auto;
+  margin-right: 20px;
+}

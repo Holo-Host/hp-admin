@@ -1,0 +1,9 @@
+query AllHapps {
+  allHapps {
+    id
+    title
+    thumbnailUrl
+    homepageUrl
+    hash
+  }
+}

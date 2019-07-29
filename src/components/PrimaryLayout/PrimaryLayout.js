@@ -3,6 +3,7 @@ import { Route, Link } from 'react-router-dom'
 import './PrimaryLayout.module.css'
 import Dashboard from 'components/Dashboard'
 import MainMenu from 'components/MainMenu'
+import HappHosting from 'components/HappHosting'
 
 export function PrimaryLayout () {
   return (
@@ -14,6 +15,7 @@ export function PrimaryLayout () {
 
         <Route path='/(|dashboard)' exact component={Dashboard} />
         <Route path='/menu' component={MainMenu} />
+        <Route path='/happ-hosting' component={HappHosting} />
 
       </header>
     </div>
