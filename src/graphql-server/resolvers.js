@@ -11,7 +11,14 @@ export const resolvers = {
   },
 
   Query: {
-    me: async () => toUiData('person', await createZomeCall('hylo/people/get_me')()),
+    me: async () => {
+      const me = toUiData('person', await createZomeCall('hylo/people/get_me')())
+      const isRegistered = await createZomeCall('hylo/people/is_registered')()
+      return {
+        ...me,
+        isRegistered
+      }
+    },
     happStoreUser: () => createZomeCall('happ-store/whoami/get_user')()
   }
 }
