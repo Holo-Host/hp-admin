@@ -63,7 +63,7 @@ const data = {
             dnas: [
               {
                 location: 'someurl.com/dna',
-                hash: 'QMdlkfmpodlskffldksldsk',
+                hash: 'sd;lmsdl;masd;lmds;lmasdlsadm;ldmo',
                 handle: 'bars'
               }
             ],
