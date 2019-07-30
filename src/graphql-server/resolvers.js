@@ -1,6 +1,5 @@
 import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
 import HappStoreDnaInterface from './dnaInterfaces/happStoreDnaInterface'
-import { pick } from 'lodash/fp'
 
 import {
   dataMappedCall,
@@ -17,15 +16,7 @@ export const resolvers = {
 
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    allHapps: async () => {
-      const result = await HappStoreDnaInterface.happs.all()
-      return result.map(happ => ({
-        id: happ.address,
-        ...pick(['title', 'thumbnailUrl', 'homepageUrl'], happ.appEntry),
-        // this is a kludge. need to clarify how we handle multiple dnas
-        hash: happ.appEntry.dnas[0].hash
-      }))
-    }
+    allHapps: () => HappStoreDnaInterface.happs.all()
   }
 }
 
