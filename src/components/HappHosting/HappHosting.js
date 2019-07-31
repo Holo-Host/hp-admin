@@ -4,12 +4,12 @@ import RoundImage from 'components/RoundImage'
 import HashIcon from 'components/HashIcon'
 
 export default function HappHosting (props) {
-  console.log('HAPP HOSTING', props)
   const { allHapps } = props
+
   return <div>
-    {allHapps && <div styleName='happ-list'>
+    {allHapps && (console.log('rendering') || <div styleName='happ-list'>
       {allHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
-    </div>}
+    </div>)}
   </div>
 }
 
