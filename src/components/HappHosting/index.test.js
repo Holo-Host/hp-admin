@@ -10,7 +10,7 @@ describe('ConnectedHappHosting', () => {
     const { getByText, getAllByText } = render(<ApolloProvider client={apolloClient}>
       <ConnectedHappHosting />
     </ApolloProvider>)
-    await wait(100)
+    await wait(25)
     expect(getByText('Holofuel')).toBeTruthy()
     expect(getByText('Holo Community')).toBeTruthy()
     expect(getAllByText('Home Page').length).toEqual(2)
