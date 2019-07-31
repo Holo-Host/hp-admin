@@ -2,7 +2,7 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-const MOCK_DNA_CONNECTION = true || process.env.NODE_ENV === 'test'
+const MOCK_DNA_CONNECTION = false || process.env.NODE_ENV === 'test'
 
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
@@ -36,13 +36,15 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   }
   return async function (args = {}) {
     try {
-      await initAndGetHolochainClient()
-
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
+      let zomeCall
 
-      const zomeCall = MOCK_DNA_CONNECTION
-        ? mockCallZome(instanceId, zome, zomeFunc)
-        : holochainClient.callZome(instanceId, zome, zomeFunc)
+      if (MOCK_DNA_CONNECTION) {
+        zomeCall = mockCallZome(instanceId, zome, zomeFunc)
+      } else {
+        await initAndGetHolochainClient()
+        zomeCall = holochainClient.callZome(instanceId, zome, zomeFunc)
+      }
 
       const rawResult = await zomeCall(args)
       const jsonResult = JSON.parse(rawResult)
