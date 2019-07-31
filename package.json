@@ -6,8 +6,6 @@
     "@holochain/hc-web-client": "^0.5.0",
     "canvas": "^2.5.0",
     "copy-to-clipboard": "^3.2.0",
-    "enzyme": "^3.10.0",
-    "enzyme-adapter-react-16": "^1.14.0",
     "lodash": "^4.17.15",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -132,8 +130,7 @@
     ],
     "setupFiles": [
       "react-app-polyfill/jsdom",
-      "regenerator-runtime/runtime",
-      "<rootDir>/config/jest/setupTests.js"
+      "regenerator-runtime/runtime"
     ],
     "setupFilesAfterEnv": [],
     "testMatch": [
