@@ -132,8 +132,7 @@
     ],
     "setupFiles": [
       "react-app-polyfill/jsdom",
-      "regenerator-runtime/runtime",
-      "<rootDir>/config/jest/setupTests.js"
+      "regenerator-runtime/runtime"
     ],
     "setupFilesAfterEnv": [],
     "testMatch": [
