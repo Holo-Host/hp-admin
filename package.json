@@ -4,12 +4,16 @@
   "private": true,
   "dependencies": {
     "@holochain/hc-web-client": "^0.5.0",
+    "canvas": "^2.5.0",
     "copy-to-clipboard": "^3.2.0",
     "lodash": "^4.17.15",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-identicon-variety-pack": "^0.2.0",
-    "react-tooltip": "^3.10.0"
+    "react-identicon-variety-pack": "^0.2.1",
+    "react-test-renderer": "^16.8.6",
+    "react-tooltip": "^3.10.0",
+    "regenerator-runtime": "^0.13.3",
+    "waait": "^1.0.5"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",
@@ -125,7 +129,8 @@
       "!src/**/*.d.ts"
     ],
     "setupFiles": [
-      "react-app-polyfill/jsdom"
+      "react-app-polyfill/jsdom",
+      "regenerator-runtime/runtime"
     ],
     "setupFilesAfterEnv": [],
     "testMatch": [
@@ -142,7 +147,10 @@
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
     ],
-    "modulePaths": [],
+    "modulePaths": [
+      "<rootDir>/src/",
+      "<rootDir>"
+    ],    
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
