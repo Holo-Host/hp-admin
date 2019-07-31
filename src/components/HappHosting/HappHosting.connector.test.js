@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 import { MockedProvider } from 'react-apollo/test-utils'
 import wait from 'waait'
 import AllHappsQuery from 'graphql/AllHappsQuery.gql'
-import ConnectedHappHosting from './index'
+import connector from './HappHosting.connector'
 
 const mocks = [
   {
@@ -18,14 +18,14 @@ const mocks = [
             title: 'Holofuel',
             thumbnailUrl: 'thumb.png',
             homepageUrl: 'home.com',
-            hash: 'fklmdf'
+            hash: 'hash1'
           },
           {
             id: 2,
             title: 'Holo Community',
             thumbnailUrl: 'thumb.png',
             homepageUrl: 'home.com',
-            hash: 'fklmdf'
+            hash: 'hash2'
           }
         ]
       }
@@ -33,14 +33,24 @@ const mocks = [
   }
 ]
 
-describe('ConnectedHappHosting', () => {
-  it('renders', async () => {
-    const { getByText, getAllByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-      <ConnectedHappHosting />
+describe('connector', () => {
+  it('runs the AllHapsQuery', async () => {
+    let allHapps
+
+    const MockComponent = props => {
+      allHapps = props.allHapps
+      return null
+    }
+
+    const ConnectedMockComponent = connector(MockComponent)
+
+    render(<MockedProvider mocks={mocks} addTypename={false}>
+      <ConnectedMockComponent />
     </MockedProvider>)
-    await wait(0)
-    expect(getByText('Holofuel')).toBeTruthy()
-    expect(getByText('Holo Community')).toBeTruthy()
-    expect(getAllByText('Home Page').length).toEqual(2)
+    await wait(1)
+    expect(allHapps).toHaveLength(2)
+    expect(allHapps[0].title).toEqual('Holofuel')
+    expect(allHapps[1].title).toEqual('Holo Community')
+    expect(allHapps[0].hash).toEqual('hash1')
   })
 })
