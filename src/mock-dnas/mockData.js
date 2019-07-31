@@ -78,6 +78,13 @@ const data = {
         }
       ]
     }
+  },
+  hha: {
+    host: {
+      register_as_host: {
+        address: 'QmMockAddressHash'
+      }
+    }
   }
 }
 

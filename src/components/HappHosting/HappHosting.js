@@ -2,9 +2,15 @@ import React from 'react'
 import './HappHosting.module.css'
 import RoundImage from 'components/RoundImage'
 import HashIcon from 'components/HashIcon'
+import SpecificButton from 'components/SpecificButton'
 
-export default function HappHosting ({ allHapps }) {
+export default function HappHosting ({ allHapps, registerHostingUser }) {
+
+  console.log("registerHostingUser > ", registerHostingUser)
+
   return <div>
+  <SpecificButton onClick={registerHostingUser} >Register</SpecificButton>
+
     {allHapps && <div styleName='happ-list'>
       {allHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
     </div>}
