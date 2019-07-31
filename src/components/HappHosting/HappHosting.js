@@ -7,9 +7,9 @@ export default function HappHosting (props) {
   const { allHapps } = props
 
   return <div>
-    {allHapps && (console.log('rendering') || <div styleName='happ-list'>
+    {allHapps && <div styleName='happ-list'>
       {allHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
-    </div>)}
+    </div>}
   </div>
 }
 
