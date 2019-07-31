@@ -3,9 +3,7 @@ import './HappHosting.module.css'
 import RoundImage from 'components/RoundImage'
 import HashIcon from 'components/HashIcon'
 
-export default function HappHosting (props) {
-  const { allHapps } = props
-
+export default function HappHosting ({ allHapps }) {
   return <div>
     {allHapps && <div styleName='happ-list'>
       {allHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
