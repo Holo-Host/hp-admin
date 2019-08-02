@@ -9,6 +9,11 @@ id = "happ_store_dna"
 file = "/home/lisa/Documents/gitrepos/holochain/holo/envoy-intrceptr/envoy/src/config/.envoy-deps/happ-store.dna.json"
 hash = "Qm328wyq38924x"
 
+[[dnas]]
+id = "hha_dna"
+file = "/home/lisa/Documents/gitrepos/holochain/holo/holo-hosting/Holo-Hosting-App/dna-src/dist/dna-src.dna.json"
+hash = "QmWVCiHf5GfoUHDcV9JSrUC1UZk1dcP9SECBTgoTKHpzZA"
+
 [[instances]]
 id = "happ-store"
 dna = "happ_store_dna"
@@ -18,15 +23,38 @@ type = "simple"
 file = "app_spec.log"
 [instances.storage]
 type = "file"
-path = "tmp-storage"
+path = "tmp/tmp-storage-1"
+
+[[instances]]
+id = "hha"
+dna = "hha_dna"
+agent = "hApp-agent"
+[instances.logger]
+type = "simple"
+file = "app_spec.log"
+[instances.storage]
+type = "file"
+path = "tmp/tmp-storage-2"
 
 [[interfaces]]
 id = "websocket_interface"
 [interfaces.driver]
 type = "websocket"
-port = 4000
+port = 9000
 [[interfaces.instances]]
 id = "happ-store"
+[[interfaces.instances]]
+id = "hha"
+
+[[interfaces]]
+id = "http_interface"
+[interfaces.driver]
+type = "http"
+port = 3300
+[[interfaces.instances]]
+id = "happ-store"
+[[interfaces.instances]]
+id = "hha"
 
 [[ui_bundles]]
 id = "main"

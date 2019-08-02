@@ -1,1 +1,0 @@
-{"AgentId":{"nick":"hAppStore Agent","pub_sign_key":"HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a"}}
