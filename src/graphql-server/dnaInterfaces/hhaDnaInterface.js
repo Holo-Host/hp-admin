@@ -7,7 +7,7 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 const axiosConfig = {
   headers: {
      'Content-Type': 'application/json',
-     "Access-Control-Allow-Origin": "*"
+     'Access-Control-Allow-Origin': "*"
   }
 }
 

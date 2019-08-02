@@ -14,7 +14,7 @@ type HostingUser {
   result: String
 }
 
-type: HhaHappListing {
+type HhaHappListing {
   id: ID
   happStoreAddress: String
 }
@@ -25,7 +25,6 @@ type Happ {
   thumbnailUrl: String
   homepageUrl: String
   hash: String
-  dna: [{ dnaHandle: { hash: String } }]
   ui: String
 }
 
