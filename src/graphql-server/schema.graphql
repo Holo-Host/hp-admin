@@ -10,12 +10,6 @@ type HappStoreUser {
   name: String
 }
 
-type Query {
-  me: Me
-  happStoreUser: HappStoreUser
-  allHapps: [Happ]
-} 
-
 type Happ {
   id: ID
   title: String
@@ -24,6 +18,12 @@ type Happ {
   hash: String
 }
 
-type Mutation {
+type Query {
+  me: Me
+  happStoreUser: HappStoreUser
+  allHapps: [Happ]
+} 
+
+type hyloMutation {
   registerUser(name: String, avatarUrl: String): Me
 }

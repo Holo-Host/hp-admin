@@ -7,16 +7,16 @@ import {
 } from './dataMapping'
 
 export const resolvers = {
-  Mutation: {
-    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create)
-  },
-
   Query: {
     me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
 
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
     allHapps: () => HappStoreDnaInterface.happs.all()
+  },
+
+  Mutation: {
+    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create)
   }
 }
 
