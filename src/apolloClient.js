@@ -6,10 +6,12 @@ import { SchemaLink } from 'apollo-link-schema'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import schema from 'graphql-server'
 
-const link = ApolloLink.from([
-  apolloLogger,
-  new SchemaLink({ schema })
-])
+let links = [new SchemaLink({ schema })]
+if (process.env.NODE_ENV !== 'test') {
+  links = [apolloLogger].concat(links)
+}
+
+const link = ApolloLink.from(links)
 
 const apolloClient = new ApolloClient({
   link,
