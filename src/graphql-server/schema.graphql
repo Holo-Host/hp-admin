@@ -19,17 +19,13 @@ type: HhaHappListing {
   happStoreAddress: String
 }
 
-type DnaList {
-  dna1Handle: { hash: String }
-}
-
 type Happ {
   id: ID
   title: String
   thumbnailUrl: String
   homepageUrl: String
   hash: String
-  dna: [DnaList]
+  dna: [{ dnaHandle: { hash: String } }]
   ui: String
 }
 

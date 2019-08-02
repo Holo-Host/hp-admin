@@ -1,5 +1,5 @@
-mutation EnableHappMutation {
-  enableHappMutation(app_hash: $app_hash)  {
+mutation EnableHapp ($app_hash:String) {
+  enableHapp(app_hash: $app_hash) {
     result
   }
 }

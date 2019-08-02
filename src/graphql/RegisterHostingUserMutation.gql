@@ -1,4 +1,4 @@
-mutation RegisterHostingUserMutation {
+mutation RegisterHostingUser {
   registerHostingUser(host_doc: $host_doc)  {
     result
   }
