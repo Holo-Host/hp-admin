@@ -1,0 +1,6 @@
+query AllAvailableHapps {
+  allAvailableHapps {
+    id
+    happStoreAddress
+  }
+}

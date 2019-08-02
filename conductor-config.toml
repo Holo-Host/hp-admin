@@ -38,6 +38,7 @@ path = "tmp/tmp-storage-2"
 
 [[interfaces]]
 id = "websocket_interface"
+admin = false
 [interfaces.driver]
 type = "websocket"
 port = 9000
@@ -48,6 +49,7 @@ id = "hha"
 
 [[interfaces]]
 id = "http_interface"
+admin = true
 [interfaces.driver]
 type = "http"
 port = 3300

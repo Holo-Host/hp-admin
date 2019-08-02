@@ -11,7 +11,12 @@ export const resolvers = {
   Mutation: {
     registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
-    registerHostingUser: () => HhaDnaInterface.currentUser.create()
+    registerHostingUser: ({ host_doc }) => HhaDnaInterface.currentUser.create(host_doc),
+
+    enableHapp: async ({ app_hash }) => {
+      await HhaDnaInterface.happs.install(app_hash);
+      await HhaDnaInterface.happs.enable(app_hash)
+    }
   },
 
   Query: {
@@ -19,8 +24,16 @@ export const resolvers = {
 
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    allHapps: () => HappStoreDnaInterface.happs.all()
+    hostingUser: () => HhaDnaInterface.currentUser.get(),
+
+    allHapps: () => HappStoreDnaInterface.happs.all(),
+
+    allAvailableHapps: () => HhaDnaInterface.happs.allAvailable(),
+
+    allHostedHapps: () => HhaDnaInterface.happs.allHosted()
   }
 }
 
 export default resolvers
+
+// axios.post('http://localhost:9999/holo/happs/install', postData, axiosConfig)

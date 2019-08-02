@@ -6,10 +6,16 @@
 .happ-row {
   display: flex;
   border-top: 1px solid lightgray;
-  border-left: 1px solid lightgray;  
-  border-right: 1px solid lightgray;    
+  border-left: 1px solid lightgray;
+  border-right: 1px solid lightgray;
   padding: 5px 15px;
   align-items: center;
+}
+
+.center-items {
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 0 auto;
 }
 
 .thumbnail {

@@ -1,5 +1,5 @@
 mutation RegisterHostingUserMutation {
-  registerHostingUser {
-    address
+  registerHostingUser(host_doc: $host_doc)  {
+    result
   }
 }

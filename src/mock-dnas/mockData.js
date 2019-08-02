@@ -46,7 +46,7 @@ const data = {
             ui: {
               location: 'someurl.com/ui',
               hash: 'flkjdflksdjfldskjf',
-              handle: null
+              handle: null // Currently ui handles are not being used and will return null. (ex. of desired: handle: = 'QmHHAHappHandle1')
             }
           },
           upvotes: 0,
@@ -82,8 +82,25 @@ const data = {
   hha: {
     host: {
       register_as_host: {
-        address: 'QmMockAddressHash'
-      }
+        result: 'QmHostRegistrationAddressHash'
+      },
+      is_registered_as_host:{
+        result: 'QmHostRegistrationAddressHash'
+      },
+      get_all_apps: [
+        {
+          id: 'QmHHAHappEntryAddressHash1',
+          happStoreAddress: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT'
+        },
+        {
+          id: 'QmHHAHappEntryAddressHash2',
+          happStoreAddress: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH'
+        }
+      ],
+      get_enabled_app_list: [
+        { id: 'QmHHAHappEntryAddressHash1' },
+        { id: 'QmHHAHappEntryAddressHash2' },
+        { id: 'QmHHAHappEntryAddressHash3' }]
     }
   }
 }

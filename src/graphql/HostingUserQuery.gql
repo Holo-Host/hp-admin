@@ -1,0 +1,5 @@
+query HostingUser {
+  hostingUser {
+    result
+  }
+}

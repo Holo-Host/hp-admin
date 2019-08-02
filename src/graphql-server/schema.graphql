@@ -11,7 +11,16 @@ type HappStoreUser {
 }
 
 type HostingUser {
-  address: String
+  result: String
+}
+
+type: HhaHappListing {
+  id: ID
+  happStoreAddress: String
+}
+
+type DnaList {
+  dna1Handle: { hash: String }
 }
 
 type Happ {
@@ -20,15 +29,21 @@ type Happ {
   thumbnailUrl: String
   homepageUrl: String
   hash: String
+  dna: [DnaList]
+  ui: String
 }
 
 type Query {
   me: Me
   happStoreUser: HappStoreUser
+  hostingUser: HostingUser
   allHapps: [Happ]
+  allAvailableHapps: [HhaHappListing]
+  allHostedHapps: [HhaHappListing]
 }
 
 type Mutation {
   registerUser(name: String, avatarUrl: String): Me
-  registerHostingUser: HostingUser
+  registerHostingUser(host_doc: String): HostingUser
+  enableHapp(app_hash: String): HhaHappListing
 }
