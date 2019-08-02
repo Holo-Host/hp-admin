@@ -96,7 +96,7 @@
     "test": "npm run test:lint && node scripts/test.js",
     "test:lint": "standard",
     "hc:start": "mkdir -p tmp-storage && holochain -c ./conductor-config.toml",
-    "provider-script": "node scripts/HHAProviderFlow/index.js"
+    "provider-flow": "node scripts/HHAProviderFlow/index.js"
   },
   "eslintConfig": {
     "extends": "react-app"
