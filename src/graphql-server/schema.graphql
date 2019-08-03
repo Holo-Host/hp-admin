@@ -24,6 +24,6 @@ type Query {
   allHapps: [Happ]
 } 
 
-type hyloMutation {
+type Mutation {
   registerUser(name: String, avatarUrl: String): Me
 }
