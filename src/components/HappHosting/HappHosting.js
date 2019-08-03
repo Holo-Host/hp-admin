@@ -9,6 +9,10 @@ export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHap
   console.log("registerHostingUser > ", registerHostingUser)
   console.log("hostingUser > ", hostingUser)
 
+  console.log("allHapps : ", allHapps);
+  console.log("allAvailableHapps : ", allAvailableHapps);
+  console.log("allHostedHapps : ", allHostedHapps);
+
   return <div>
     <SpecificButton styleName='center-items' onClick={registerHostingUser} >Register as Host</SpecificButton>
 
@@ -25,6 +29,7 @@ export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHap
         <h3 styleName='center-items'>hApps Available to Host</h3>
         <div styleName='happ-list'>
           {allAvailableHapps.map(availHapp => {
+            // Define happ for each of the happs are both in hApp Store and the HHA.
             const happ = allHapps.find(hasHapp => availHapp.happListing === hasHapp.id)
             console.log("available happ for hosting : ", happ)
 
@@ -46,6 +51,7 @@ export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHap
             const happIsHosted = allAvailableHapps.find(hhaHapp => hostedHapp.id === hhaHapp.id)
             console.log("happIsHosted : ", happIsHosted)
 
+            // Define happ for each of the happs that are in HAS, HHA, & are enabled by Host for hosting.
             const happ = allHapps.find(hasHapp => happIsHosted.happListing === hasHapp.id)
             console.log("hosted happ to be displayed : ", happ)
 

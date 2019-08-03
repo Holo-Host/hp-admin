@@ -19,6 +19,14 @@ type HhaHappListing {
   happStoreAddress: String
 }
 
+type DnaHash {
+  hash: String
+}
+
+type dnaObject {
+  dnaHandle: DnaHash
+}
+
 type Happ {
   id: ID
   title: String
@@ -26,6 +34,7 @@ type Happ {
   homepageUrl: String
   hash: String
   ui: String
+  dna: [dnaObject]
 }
 
 type Query {

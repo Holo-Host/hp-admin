@@ -14,8 +14,10 @@ export const resolvers = {
     registerHostingUser: ({ host_doc }) => HhaDnaInterface.currentUser.create(host_doc),
 
     enableHapp: async ({ app_hash }) => {
-      await HhaDnaInterface.happs.install(app_hash);
-      await HhaDnaInterface.happs.enable(app_hash)
+      const installedHapp = await HhaDnaInterface.happs.install(app_hash)
+      console.log(" !! installedHapp !! > ", installedHapp)
+      const enabledHapp = await HhaDnaInterface.happs.enable(app_hash)
+      console.log(" !! enabledHapp !! > ", enabledHapp);
     }
   },
 
