@@ -1,0 +1,5 @@
+mutation DisableHapp ($app_hash:String) {
+  disableHapp(app_hash: $app_hash) {
+    result
+  }
+}

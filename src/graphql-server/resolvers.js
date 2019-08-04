@@ -18,7 +18,9 @@ export const resolvers = {
       console.log(" !! installedHapp !! > ", installedHapp)
       const enabledHapp = await HhaDnaInterface.happs.enable(app_hash)
       console.log(" !! enabledHapp !! > ", enabledHapp);
-    }
+    },
+
+    disableHapp: ({ app_hash }) => HhaDnaInterface.happs.disable(app_hash)
   },
 
   Query: {
@@ -30,7 +32,11 @@ export const resolvers = {
 
     allHapps: () => HappStoreDnaInterface.happs.all(),
 
-    allAvailableHapps: () => HhaDnaInterface.happs.allAvailable(),
+    allAvailableHapps: async() => {
+      const allAvail = await HhaDnaInterface.happs.allAvailable()
+      console.log("allAvail >>>>> ", allAvail)
+      return allAvail
+    },
 
     allHostedHapps: () => HhaDnaInterface.happs.allHosted()
   }

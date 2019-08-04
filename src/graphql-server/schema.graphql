@@ -10,20 +10,20 @@ type HappStoreUser {
   name: String
 }
 
-type HostingUser {
-  result: String
-}
-
 type HhaHappListing {
   id: ID
   happStoreAddress: String
+}
+
+type AddressResult {
+ result: String
 }
 
 type DnaHash {
   hash: String
 }
 
-type dnaObject {
+type DnaObject {
   dnaHandle: DnaHash
 }
 
@@ -34,13 +34,13 @@ type Happ {
   homepageUrl: String
   hash: String
   ui: String
-  dna: [dnaObject]
+  dna: [DnaObject]
 }
 
 type Query {
   me: Me
   happStoreUser: HappStoreUser
-  hostingUser: HostingUser
+  hostingUser: AddressResult
   allHapps: [Happ]
   allAvailableHapps: [HhaHappListing]
   allHostedHapps: [HhaHappListing]
@@ -48,6 +48,7 @@ type Query {
 
 type Mutation {
   registerUser(name: String, avatarUrl: String): Me
-  registerHostingUser(host_doc: String): HostingUser
-  enableHapp(app_hash: String): HhaHappListing
+  registerHostingUser(host_doc: String): AddressResult
+  enableHapp(app_hash: String): AddressResult
+  disableHapp(app_hash: String): AddressResult
 }

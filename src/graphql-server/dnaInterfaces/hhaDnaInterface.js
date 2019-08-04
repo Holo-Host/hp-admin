@@ -27,22 +27,19 @@ export const HhaDnaInterface = {
       .catch(e=> console.log(" >>>>>>>>> Error when installing hApp via envoy! <<<<<<<<<  ERROR: ", e))
     },
     enable: (app_hash) => createZomeCall('host/enable_app')({app_hash}),
+    disable: (app_hash) => console.log("We need to plug in and disableHapp", app_hash),
     allAvailable: () => createZomeCall('host/get_all_apps')()
-      .then(happListings => {
-        console.log("Available hApps to host in HHA_INTERFACE >>>> ", happListings);
-        happListings.map(happListing => ({
+      .then(happListings => happListings.map(happListing => ({
         // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).
         id: happListing.hash,
         happStoreAddress: happListing.details
-      }))}
+      }))
     ),
     allHosted: () => createZomeCall('host/get_enabled_app_list')()
-      .then(happListings => {
-        console.log("hosted hApps from HHA_INTERFACE >>>> ", happListings);
-        happListings.map(happListing => ({
+      .then(hostedHapps => hostedHapps.map(hostedHapp => ({
         // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).
-        id: happListing.happ_hash
-      }))}
+        id: hostedHapp.happ_hash
+      }))
     ),
   }
 }

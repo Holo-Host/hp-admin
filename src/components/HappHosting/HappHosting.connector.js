@@ -5,6 +5,7 @@ import AllHostedHappsQuery from 'graphql/AllHostedHappsQuery.gql'
 import HostingUserQuery from 'graphql/HostingUserQuery.gql'
 import RegisterHostingUserMutation from 'graphql/RegisterHostingUserMutation.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
+import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 
 
 const allHapps = graphql(AllHappsQuery, {
@@ -48,10 +49,23 @@ const enableHapp = graphql( EnableHappMutation, {
   }
 })
 
+const disableHapp = graphql( DisableHappMutation, {
+  props: ({ mutate }) => {
+    return {
+      enableHapp: (app_hash) => mutate({
+        variables: {
+          app_hash
+        }
+      })
+    }
+  }
+})
+
 export default compose(
   allHapps,
   allAvailableHapps,
   enableHapp,
+  disableHapp,
   allHostedHapps,
   registerHostingUser,
   hostingUser

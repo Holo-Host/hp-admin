@@ -89,18 +89,17 @@ const data = {
       },
       get_all_apps: [
         {
-          id: 'QmHHAHappEntryAddressHash1',
-          happStoreAddress: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT'
+          hash: 'QmHHAHappEntryAddressHash1',
+          details: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT'
         },
         {
-          id: 'QmHHAHappEntryAddressHash2',
-          happStoreAddress: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH'
+          hash: 'QmHHAHappEntryAddressHash2',
+          details: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH'
         }
       ],
       get_enabled_app_list: [
-        { id: 'QmHHAHappEntryAddressHash1' },
-        { id: 'QmHHAHappEntryAddressHash2' },
-        { id: 'QmHHAHappEntryAddressHash3' }]
+        { happ_hash: 'QmHHAHappEntryAddressHash1' }
+      ]
     }
   }
 }
