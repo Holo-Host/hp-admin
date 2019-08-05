@@ -6,11 +6,16 @@ import SpecificButton from 'components/SpecificButton'
 
 export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHapps, registerHostingUser, hostingUser, enableHapp, disableHapp }) {
 
-  console.log("disableHapp > ", disableHapp)
-  console.log("hostingUser > ", hostingUser)
+  console.log("Host WHOAMI Result >> ", hostingUser)
 
   return <div>
-    <SpecificButton styleName='center-items' onClick={()=>registerHostingUser({host_doc:"asdf"})} >Register as Host</SpecificButton>
+    {hostingUser && hostingUser.result ?
+       <h2>Current Host: {hostingUser.result}</h2>
+    :
+       <SpecificButton styleName='center-items' onClick={()=>registerHostingUser({host_doc:"info to register host"})} >Register as Host</SpecificButton>
+     }
+
+    <hr/>
 
     {allHapps &&
     <main>
@@ -36,17 +41,15 @@ export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHap
             {allAvailableHapps.map(availHapp => {
               // Determine whether the happ is unhosted.
               const hostedHapp = allHostedHapps.find(hostedHapp => availHapp.id === hostedHapp.id) || null
-              console.log("hostedHapp RESULT >>>>", hostedHapp)
 
               const happCurrentlyHosted = hostedHapp ? true : false
-              console.log("hosted happ in hha? >>", happCurrentlyHosted)
+              console.log("hosted happ in hha? , happInfo >>", happCurrentlyHosted, availHapp)
 
               if(happCurrentlyHosted){return(<div key={availHapp.id}/>)}
               else{}
 
               // Define happ based on happ with HAS entry details
               const happ = allHapps.find(hasHapp => availHapp.happStoreAddress === hasHapp.id)
-              console.log("happs in both HAS and HHA, hhaHapp : ", happ)
 
               if(happ){
                 return(<HappRow happ={happ} key={happ.id} enableHapp={enableHapp} disableHapp={disableHapp} dataIshosted={false} hhaId={availHapp.id} dataHhaHapp={true}/>)
@@ -61,11 +64,9 @@ export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHap
           <div styleName='happ-list'>
             {allHostedHapps.map(hostedHapp => {
               const happIsHosted = allAvailableHapps.find(hhaHapp => hostedHapp.id === hhaHapp.id) || null
-              console.log("happIsHosted : ", happIsHosted)
 
               // Define happ for each of the happs that are in HAS, HHA, & are enabled by Host for hosting.
               const happ = happIsHosted && allHapps.find(hasHapp => happIsHosted.happStoreAddress === hasHapp.id)
-              console.log("hosted happ to be displayed : ", happ)
 
               if(happ){
                 return(<HappRow happ={happ} hhaId={hostedHapp.id} enableHapp={enableHapp} disableHapp={disableHapp} key={happ.id} dataIshosted={true} dataHhaHapp={true}/>)
@@ -85,6 +86,7 @@ export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHap
 }
 
 export function HappRow ({ happ, hhaId, dataIshosted, dataHhaHapp, enableHapp, disableHapp }) {
+  console.log("happName, hhaId : ", happ.title, hhaId);
   const { title, thumbnailUrl, homepageUrl, hash } = happ
   return <div styleName='happ-row'>
     <RoundImage url={thumbnailUrl} size={60} styleName='thumbnail' />
@@ -92,7 +94,7 @@ export function HappRow ({ happ, hhaId, dataIshosted, dataHhaHapp, enableHapp, d
     <a styleName='homepage' href={homepageUrl}>Home Page</a>
     <HashIcon hash={hash} size={64} />
     {dataHhaHapp && dataIshosted ?
-      <SpecificButton onClick={()=> disableHapp(hhaId)}>Disable</SpecificButton>
+      <SpecificButton onClick={()=>disableHapp({app_hash: hhaId})}>Disable</SpecificButton>
     : dataHhaHapp &&
       <SpecificButton onClick={()=>enableHapp(hhaId)}>Enable</SpecificButton>
     }

@@ -37,6 +37,14 @@ type Happ {
   dna: [DnaObject]
 }
 
+type HostDocParm {
+  host_doc: String
+}
+
+type AppHashParm {
+  app_hash: String
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser

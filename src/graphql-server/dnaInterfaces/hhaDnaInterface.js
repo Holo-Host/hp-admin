@@ -1,6 +1,6 @@
 import { instanceCreateZomeCall, installHapp } from '../holochainClient'
 
-export const INSTANCE_ID = 'hha'
+export const INSTANCE_ID = 'hha' // holo-hosting-app
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 export const HhaDnaInterface = {
@@ -21,7 +21,7 @@ export const HhaDnaInterface = {
 
     },
     enable: (app_hash) => createZomeCall('host/enable_app')({app_hash}),
-    disable: (app_hash) => console.log("We need to plug in and disableHapp", app_hash),
+    disable: (app_hash) => console.log("We need to plug in disableHapp and disable this app : ", app_hash),
     allAvailable: () => createZomeCall('host/get_all_apps')()
       .then(happListings => happListings.map(happListing => ({
         // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).

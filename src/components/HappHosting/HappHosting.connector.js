@@ -28,7 +28,7 @@ const registerHostingUser = graphql( RegisterHostingUserMutation, {
   props: ({ mutate }) => {
     return {
       // NOTE: Currently host_doc is not validated and the content is irrelevant to the dna...
-      registerHostingUser: (host_doc = '') => mutate({
+      registerHostingUser: ({host_doc}) => mutate({
         variables: {
           host_doc
         }
@@ -52,7 +52,7 @@ const enableHapp = graphql( EnableHappMutation, {
 const disableHapp = graphql( DisableHappMutation, {
   props: ({ mutate }) => {
     return {
-      disableHapp: (app_hash = '') => mutate({
+      disableHapp: ({app_hash}) => mutate({
         variables: {
           app_hash
         }

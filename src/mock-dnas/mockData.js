@@ -27,6 +27,18 @@ const data = {
       }
     },
     happs: {
+      get_app: arg => {
+        const happ_entry = data['happ-store'].happs.get_all_apps.find(entry => entry.address === arg)
+        console.log("happ_entry");
+        const result = {
+          address : happ_entry.address,
+          app_entry : happ_entry.appEntry,
+          upvotes: 0, // fake data placeholder; here solely for mock struct accuracy
+          upvotedByMe: false // fake data placeholder; here solely for mock struct accuracy
+        }
+        console.log("HAPP-STORE: get_app result : xxx for arg: xxx : ", result, arg)
+        return result
+      },
       get_all_apps: [
         {
           address: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT',
@@ -81,11 +93,14 @@ const data = {
   },
   hha: {
     host: {
-      register_as_host: {
-        result: 'QmHostRegistrationAddressHash'
+      register_as_host: args => {
+        console.log(" `host_doc` args passed when registering host; reqs for host registaration are currently being disregarded.) : ", args)
+        
+        data.hha.host.is_registered_as_host = { result: 'QmHHAHostRegistrationAddress' }
+        return data.hha.host.is_registered_as_host
       },
       is_registered_as_host:{
-        result: 'QmHostRegistrationAddressHash'
+        result: null
       },
       get_all_apps: [
         {
@@ -98,6 +113,38 @@ const data = {
         }
       ],
       get_enabled_app_list: [
+        { happ_hash: 'QmHHAHappEntryAddressHash1' }
+      ]
+    },
+    provider: {
+      get_app_details: arg => {
+        const happ_entry = data.hha.host.get_all_apps.find(entry => entry.hash === arg) || null
+        console.log("happ_entry: ", happ_entry)
+        let result = null
+        if(happ_entry) {
+          result = {
+            app_bundle : happ_entry.hash,
+            app_details : happ_entry.details,
+            payment_pref: ["N/A : This is just a placeholder for mock data..."]
+          }
+          console.log("HHA: get_app_details result : xxx for arg: xxx : ", result, arg)
+        }
+        else{}
+        return result
+      }
+    }
+  },
+  conductor : {
+    admin: {
+      install_app: arg => {
+        console.log("arg passed (should be happ_hash) : ", arg)
+        data.conductor.admin.get_installed_app_list = {
+          ...data.conductor.admin.get_installed_app_list,
+          ...arg
+        }
+        return data.conductor.admin.get_installed_app_list
+      },
+      get_installed_app_list: [
         { happ_hash: 'QmHHAHappEntryAddressHash1' }
       ]
     }
