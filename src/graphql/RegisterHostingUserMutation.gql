@@ -1,4 +1,4 @@
-mutation RegisterHostingUser {
+mutation RegisterHostingUser($host_doc: String) {
   registerHostingUser(host_doc: $host_doc)  {
     result
   }

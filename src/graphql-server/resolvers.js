@@ -11,16 +11,22 @@ export const resolvers = {
   Mutation: {
     registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
-    registerHostingUser: ({ host_doc }) => HhaDnaInterface.currentUser.create(host_doc),
+    registerHostingUser: (host_doc) => HhaDnaInterface.currentUser.create(host_doc),
 
-    enableHapp: async ({ app_hash }) => {
+    enableHapp: async (app_hash) => // HhaDnaInterface.happs.install(app_hash),
+    {
+      console.log("CALLING ENABLEHAPP INSIDE of the Reducer; app_hash >> ", app_hash)
       const installedHapp = await HhaDnaInterface.happs.install(app_hash)
       console.log(" !! installedHapp !! > ", installedHapp)
-      const enabledHapp = await HhaDnaInterface.happs.enable(app_hash)
+      const enabledHapp = HhaDnaInterface.happs.enable(app_hash)
       console.log(" !! enabledHapp !! > ", enabledHapp);
+      return enabledHapp;
     },
 
-    disableHapp: ({ app_hash }) => HhaDnaInterface.happs.disable(app_hash)
+    disableHapp: ( app_hash ) => {
+      console.log("CALLING DISABLEHAPP INSIDE of the Reducer; app_hash >> ", app_hash)
+      HhaDnaInterface.happs.disable(app_hash)
+    }
   },
 
   Query: {
@@ -32,16 +38,10 @@ export const resolvers = {
 
     allHapps: () => HappStoreDnaInterface.happs.all(),
 
-    allAvailableHapps: async() => {
-      const allAvail = await HhaDnaInterface.happs.allAvailable()
-      console.log("allAvail >>>>> ", allAvail)
-      return allAvail
-    },
+    allAvailableHapps: () => HhaDnaInterface.happs.allAvailable(),
 
     allHostedHapps: () => HhaDnaInterface.happs.allHosted()
   }
 }
 
 export default resolvers
-
-// axios.post('http://localhost:9999/holo/happs/install', postData, axiosConfig)

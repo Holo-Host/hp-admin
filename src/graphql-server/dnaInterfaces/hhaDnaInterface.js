@@ -1,15 +1,7 @@
-import axios from 'axios'
-import { instanceCreateZomeCall } from '../holochainClient'
-// import { pick } from 'lodash/fp'
+import { instanceCreateZomeCall, installHapp } from '../holochainClient'
 
 export const INSTANCE_ID = 'hha'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
-const axiosConfig = {
-  headers: {
-     'Content-Type': 'application/json',
-     'Access-Control-Allow-Origin': "*"
-  }
-}
 
 export const HhaDnaInterface = {
   currentUser: {
@@ -18,13 +10,15 @@ export const HhaDnaInterface = {
   },
   happs: {
     install: (app_hash) => {
-      console.log("About to install the following HAPP !! : ", app_hash)
+      console.log("Happ to trigger for install : ", app_hash)
+      installHapp(app_hash)
 
-      return new Promise((resolve, reject) => {
-        const installHappViaEnvoy = axios.post('http://localhost:9999/holo/happs/install', {happId: app_hash}, axiosConfig)
-        resolve(installHappViaEnvoy)
-      })
-      .catch(e=> console.log(" >>>>>>>>> Error when installing hApp via envoy! <<<<<<<<<  ERROR: ", e))
+      // return new Promise((resolve, reject) => {
+      //   const installHappViaEnvoy = axios.post('http://localhost:9999/holo/happs/install', {happId: app_hash}, axiosConfig)
+      //   resolve(installHappViaEnvoy)
+      // })
+      // .catch(e=> console.log(" >>>>>>>>> Error when installing hApp via envoy! <<<<<<<<<  ERROR: ", e))
+
     },
     enable: (app_hash) => createZomeCall('host/enable_app')({app_hash}),
     disable: (app_hash) => console.log("We need to plug in and disableHapp", app_hash),

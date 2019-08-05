@@ -1,4 +1,5 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
+import axios from 'axios'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
@@ -22,6 +23,32 @@ async function initAndGetHolochainClient () {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
     throw (error)
+  }
+}
+
+const axiosConfig = {
+  headers: {
+     'Content-Type': 'application/json',
+     'Access-Control-Allow-Origin': "*"
+  }
+}
+
+export function installHapp(app_hash) {
+
+  if (MOCK_DNA_CONNECTION) {
+    console.log("About to MOCK INSTALL the following HAPP !! : ", app_hash)
+    return new Promise((resolve, reject) => {
+      const mockInstallHapp = axios.post('/*jsonServerDNS*/', {happId: app_hash}, axiosConfig)
+      resolve(mockInstallHapp)
+    })
+    .catch(e=> console.log(" >>>>>>>>> Error during mock installation <<<<<<<<<  ERROR: ", e))
+  } else {
+    console.log("About to INSTALL the following HAPP VIA ENVOY !! : ", app_hash)
+    return new Promise((resolve, reject) => {
+      const installHappViaEnvoy = axios.post('http://localhost:9999/holo/happs/install', {happId: app_hash}, axiosConfig)
+      resolve(installHappViaEnvoy)
+    })
+    .catch(e=> console.log(" >>>>>>>>> Error when installing hApp via envoy! <<<<<<<<<  ERROR: ", e))
   }
 }
 

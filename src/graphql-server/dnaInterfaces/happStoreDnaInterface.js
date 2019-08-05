@@ -20,7 +20,7 @@ export const HappStoreDnaInterface = {
         // The following proposes having an array of obj, wherein each obj represents a DNA which includes information about the handle, hash, and (potentially version).
         // dna: [
         //   {happ.appEntry.dnas[0].handle: { hash: happ.appEntry.dnas[0].hash }},
-        //   {happ.appEntry.dnas[0].handle: { hash: happ.appEntry.dnas[1].hash }}
+        //   {happ.appEntry.dnas[1].handle: { hash: happ.appEntry.dnas[1].hash }}
         // ]
 
         // TODO: We might also wish to include ui references, when available in the happ...
