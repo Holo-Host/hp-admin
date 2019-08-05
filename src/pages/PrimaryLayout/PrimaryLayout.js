@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react'
 import { Route, Link } from 'react-router-dom'
 import './PrimaryLayout.module.css'
-import Dashboard from 'components/Dashboard'
-import MainMenu, { Menu } from 'components/MainMenu'
-import HappHosting from 'components/HappHosting'
+import Dashboard from 'pages/Dashboard'
+import MainMenu, { Menu } from 'pages/MainMenu'
+import HappHosting from 'pages/HappHosting'
 import ScreenWidthContext from 'contexts/screenWidth'
 import SpecificButton from 'components/SpecificButton'
 

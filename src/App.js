@@ -3,7 +3,7 @@ import { ApolloProvider } from 'react-apollo'
 import { BrowserRouter as Router } from 'react-router-dom'
 import apolloClient from 'apolloClient'
 import { useMediaPredicate } from 'react-media-hook'
-import PrimaryLayout from 'components/PrimaryLayout'
+import PrimaryLayout from 'pages/PrimaryLayout'
 import ScreenWidthContext from 'contexts/screenWidth'
 
 export default function App () {

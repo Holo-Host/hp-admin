@@ -1,6 +1,7 @@
 .primary-layout {
   padding: 50px;
   display: flex;
+  word-break: break-word;
 }
 
 .menu-link {
