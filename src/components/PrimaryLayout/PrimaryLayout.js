@@ -6,20 +6,19 @@ import MainMenu from 'components/MainMenu'
 import HappHosting from 'components/HappHosting'
 
 export function PrimaryLayout () {
-  return (
-    <div styleName='primary-layout'>
-      <header>
-        <div styleName='menu-link'>
-          <Link to='/menu' >Menu</Link>
-        </div>
 
-        <Route path='/(|dashboard)' exact component={Dashboard} />
-        <Route path='/menu' component={MainMenu} />
-        <Route path='/happ-hosting' component={HappHosting} />
+  return <div styleName='primary-layout'>
+    <header>
+      <div styleName='menu-link'>
+        <Link to='/menu' >Menu</Link>
+      </div>
 
-      </header>
-    </div>
-  )
+      <Route path='/(|dashboard)' exact component={Dashboard} />
+      <Route path='/menu' component={MainMenu} />
+      <Route path='/happ-hosting' component={HappHosting} />
+
+    </header>
+  </div>
 }
 
 export default PrimaryLayout
