@@ -12,6 +12,7 @@ type HappStoreUser {
 
 type HhaHappListing {
   id: ID
+  hash: String
   happStoreAddress: String
 }
 
@@ -19,12 +20,10 @@ type AddressResult {
  result: String
 }
 
-type DnaHash {
-  hash: String
-}
-
-type DnaObject {
-  dnaHandle: DnaHash
+type SourceCodeObject {
+  codeHandle: String,
+  codeHash: String,
+  codeLink: String
 }
 
 type Happ {
@@ -33,8 +32,8 @@ type Happ {
   thumbnailUrl: String
   homepageUrl: String
   hash: String
-  ui: String
-  dna: [DnaObject]
+  ui: SourceCodeObject
+  dna: [SourceCodeObject]
 }
 
 type HostDocParm {

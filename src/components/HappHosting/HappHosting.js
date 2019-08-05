@@ -4,9 +4,16 @@ import RoundImage from 'components/RoundImage'
 import HashIcon from 'components/HashIcon'
 import SpecificButton from 'components/SpecificButton'
 
-export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHapps, registerHostingUser, hostingUser, enableHapp, disableHapp }) {
-
-  console.log("Host WHOAMI Result >> ", hostingUser)
+export default function HappHosting ({
+  allHapps,
+  allAvailableHapps,
+  allHostedHapps,
+  registerHostingUser,
+  hostingUser,
+  enableHapp,
+  disableHapp
+}) {
+  // console.log("Host WHOAMI Result >> ", hostingUser)
 
   return <div>
     {hostingUser && hostingUser.result ?
@@ -86,7 +93,7 @@ export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHap
 }
 
 export function HappRow ({ happ, hhaId, dataIshosted, dataHhaHapp, enableHapp, disableHapp }) {
-  console.log("happName, hhaId : ", happ.title, hhaId);
+  // console.log("happName, hhaId : ", happ.title, hhaId);
   const { title, thumbnailUrl, homepageUrl, hash } = happ
   return <div styleName='happ-row'>
     <RoundImage url={thumbnailUrl} size={60} styleName='thumbnail' />

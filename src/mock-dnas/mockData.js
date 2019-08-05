@@ -27,8 +27,8 @@ const data = {
       }
     },
     happs: {
-      get_app: arg => {
-        const happ_entry = data['happ-store'].happs.get_all_apps.find(entry => entry.address === arg)
+      get_app: happStoreHapp => {
+        const happ_entry = data['happ-store'].happs.get_all_apps.find(entry => entry.address === happStoreHapp)
         console.log("happ_entry");
         const result = {
           address : happ_entry.address,
@@ -36,7 +36,7 @@ const data = {
           upvotes: 0, // fake data placeholder; here solely for mock struct accuracy
           upvotedByMe: false // fake data placeholder; here solely for mock struct accuracy
         }
-        console.log("HAPP-STORE: get_app result : xxx for arg: xxx : ", result, arg)
+        console.log("HAPP-STORE: get_app result, happStoreHapp : ", result, happStoreHapp)
         return result
       },
       get_all_apps: [
@@ -93,9 +93,9 @@ const data = {
   },
   hha: {
     host: {
-      register_as_host: args => {
-        console.log(" `host_doc` args passed when registering host; reqs for host registaration are currently being disregarded.) : ", args)
-        
+      register_as_host: host_doc => {
+        // console.log(" `host_doc` args passed when registering host; reqs for host registaration are currently being disregarded.) : ", host_doc)
+
         data.hha.host.is_registered_as_host = { result: 'QmHHAHostRegistrationAddress' }
         return data.hha.host.is_registered_as_host
       },
@@ -112,43 +112,58 @@ const data = {
           details: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH'
         }
       ],
+      enable_app: happ => {
+        data.hha.host.get_enabled_app_list = {
+          ...data.hha.host.get_enabled_app_list,
+          ...happ
+        }
+        return data.hha.host.get_enabled_app_list
+      },
+      disable_app: (happ) => {
+        console.log("***data.hha.host.get_enabled_app_list: ",data.hha.host.get_enabled_app_list)
+        const newObj = data.hha.host.get_enabled_app_list.filter(happ => happ.happ_hash === happ)
+        data.hha.host.get_enabled_app_list = newObj
+        console.log("***data.hha.host.get_enabled_app_list: ",data.hha.host.get_enabled_app_list)
+        return data.hha.host.get_enabled_app_list
+      },
       get_enabled_app_list: [
         { happ_hash: 'QmHHAHappEntryAddressHash1' }
       ]
-    },
-    provider: {
-      get_app_details: arg => {
-        const happ_entry = data.hha.host.get_all_apps.find(entry => entry.hash === arg) || null
-        console.log("happ_entry: ", happ_entry)
-        let result = null
-        if(happ_entry) {
-          result = {
-            app_bundle : happ_entry.hash,
-            app_details : happ_entry.details,
-            payment_pref: ["N/A : This is just a placeholder for mock data..."]
-          }
-          console.log("HHA: get_app_details result : xxx for arg: xxx : ", result, arg)
-        }
-        else{}
-        return result
-      }
     }
-  },
-  conductor : {
-    admin: {
-      install_app: arg => {
-        console.log("arg passed (should be happ_hash) : ", arg)
-        data.conductor.admin.get_installed_app_list = {
-          ...data.conductor.admin.get_installed_app_list,
-          ...arg
-        }
-        return data.conductor.admin.get_installed_app_list
-      },
-      get_installed_app_list: [
-        { happ_hash: 'QmHHAHappEntryAddressHash1' }
-      ]
-    }
+    // ,
+    // provider: {
+    //   get_app_details: provided_happ => {
+    //     const happ_entry = data.hha.host.get_all_apps.find(entry => entry.hash === provided_happ) || null
+    //     let result = null
+    //     if(happ_entry) {
+    //       result = {
+    //         app_bundle : happ_entry.hash,
+    //         app_details : happ_entry.details,
+    //         payment_pref: ["N/A : This is just a placeholder for mock data..."]
+    //       }
+    //       console.log("HHA: get_app_details result, provided_happ : ", result, provided_happ)
+    //     }
+    //     else{}
+    //     return result
+    //   }
+    // }
   }
+  // ,
+  // conductor : {
+  //   admin: {
+  //     install_app: happ_hash => {
+  //       console.log("happ_hash passed : ", happ_hash)
+  //       data.conductor.admin.get_installed_app_list = {
+  //         ...data.conductor.admin.get_installed_app_list,
+  //         ...happ_hash
+  //       }
+  //       return data.conductor.admin.get_installed_app_list
+  //     }
+  //   },
+  //   get_installed_app_list: [
+  //     { happ_hash: 'QmHHAHappEntryAddressHash1' }
+  //   ]
+  // }
 }
 
 export default data

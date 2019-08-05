@@ -14,14 +14,13 @@ export const resolvers = {
     registerHostingUser: (host_doc) => HhaDnaInterface.currentUser.create(host_doc),
 
     enableHapp: (app_hash) => HhaDnaInterface.happs.install(app_hash),
-    // async
-    // {
+    // enableHapp: async (app_hash) => {
     //   console.log("CALLING ENABLEHAPP INSIDE of the Reducer; app_hash >> ", app_hash)
     //   const installedHapp = await HhaDnaInterface.happs.install(app_hash)
     //   console.log(" !! installedHapp !! > ", installedHapp)
-    //   // const enabledHapp = HhaDnaInterface.happs.enable({app_hash})
-    //   // console.log(" !! enabledHapp !! > ", enabledHapp);
-    //   return installedHapp // enableHapp
+    //   const enabledHapp = HhaDnaInterface.happs.enable({app_hash})
+    //   console.log(" !! enabledHapp !! > ", enabledHapp);
+    //   return enableHapp
     // },
 
     disableHapp: (app_hash) => {
