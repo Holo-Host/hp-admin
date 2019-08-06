@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './HappHosting.module.css'
 import RoundImage from 'components/RoundImage'
 import HashIcon from 'components/HashIcon'
+import ScreenWidthContext from 'contexts/screenWidth'
 
 export default function HappHosting ({ allHapps }) {
+  const isWide = useContext(ScreenWidthContext)
   return <div>
+    {!isWide ? 'MOBILE' : 'DESKTOP'}
     {allHapps && <div styleName='happ-list'>
       {allHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
     </div>}

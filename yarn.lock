@@ -7692,6 +7692,10 @@ react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4, react-is
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"
 
+react-media-hook@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/react-media-hook/-/react-media-hook-0.4.4.tgz#21e685bdb3233c1de6eb391de4907b4b410dbcd6"
+
 react-router-dom@~5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-5.0.1.tgz#ee66f4a5d18b6089c361958e443489d6bab714be"
