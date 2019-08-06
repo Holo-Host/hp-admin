@@ -27,12 +27,11 @@ const registerHostingUser = graphql(RegisterHostingUserMutation, {
   props: ({ mutate }) => {
     return {
       // NOTE: Currently hostDoc is not validated and the content is irrelevant to the dna...
-      registerHostingUser: (hostDoc) => mutate({
+      registerHostingUser: hostDoc => mutate({
         variables: {
           hostDoc
         },
-        update: (cache, { data, data: { registerHostingUser } }) => {
-          console.log('data', data)
+        update: (cache, { data: { registerHostingUser } }) => {
           if (registerHostingUser) {
             cache.writeQuery({
               query: HostingUserQuery,
