@@ -1,5 +1,11 @@
 query AllHostedHapps {
   allHostedHapps {
     id
+    title
+    thumbnailUrl
+    homepageUrl
+    dnaHash
+    ui
+    happStoreAddress
   }
 }

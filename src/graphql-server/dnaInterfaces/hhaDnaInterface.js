@@ -7,7 +7,7 @@ const HhaDnaInterface = {
   currentUser: {
     // create is getting passed a variable (hostDoc) but is currently ignoring it
     create: async () => {
-      const result = await createZomeCall('host/register_as_host')({ kyc_proof: 'this value is ignored by dna' })
+      const result = await createZomeCall('host/register_as_host')({ host_doc: { kyc_proof: 'this value is ignored by dna' } })
       return {
         id: result
       }
@@ -27,18 +27,22 @@ const HhaDnaInterface = {
     enable: (app_hash) => createZomeCall('host/enable_app')({app_hash}),
     disable: (app_hash) => console.log("We need to plug in disableHapp and disable this app : ", app_hash),
     allAvailable: () => createZomeCall('host/get_all_apps')()
-      .then(happListings => happListings.map(happListing => ({
+      .then(happListings => happListings.map(({ hash, details }) => {
+        const { Ok: { app_bundle: { happ_hash: happStoreAddress } } } = JSON.parse(details)
+        return {
         // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).
-        id: happListing.hash,
-        happStoreAddress: happListing.details
-      }))
-    ),
+          id: hash,
+          happStoreAddress
+        }
+      })),
+
     allHosted: () => createZomeCall('host/get_enabled_app_list')()
-      .then(hostedHapps => hostedHapps.map(hostedHapp => ({
+      .then(hostedHapps => hostedHapps.map(({ address, entry: { happ_hash: happStoreAddress } }) => ({
         // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).
-        id: hostedHapp.happ_hash
-      }))
-    ),
+        id: address,
+        happStoreAddress,
+        enabled: true
+      })))
   }
 }
 

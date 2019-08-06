@@ -14,35 +14,15 @@ type HhaUser {
   id: ID
 }
 
-type HhaHappListing {
-  id: ID
-  happStoreAddress: String
-}
-
-type AddressResult {
- result: String
-}
-
-type DnaHash {
-  hash: String
-}
-
-type DnaObject {
-  dnaHandle: DnaHash
-}
-
 type Happ {
   id: ID
   title: String
   thumbnailUrl: String
   homepageUrl: String
-  hash: String
+  dnaHash: String
   ui: String
-  dna: [DnaObject]
-}
-
-type AppHashParm {
-  app_hash: String
+  happStoreAddress: String
+  enabled: Boolean
 }
 
 type Query {
@@ -50,13 +30,13 @@ type Query {
   happStoreUser: HappStoreUser
   hostingUser: HhaUser
   allHapps: [Happ]
-  allAvailableHapps: [HhaHappListing]
-  allHostedHapps: [HhaHappListing]
+  allAvailableHapps: [Happ]
+  allHostedHapps: [Happ]
 }
 
 type Mutation {
   registerUser(name: String, avatarUrl: String): Me
   registerHostingUser(hostDoc: String): HhaUser
-  enableHapp(app_hash: String): AddressResult
-  disableHapp(app_hash: String): AddressResult
+  enableHapp(appId: String): Boolean
+  disableHapp(app_hash: String): Boolean
 }

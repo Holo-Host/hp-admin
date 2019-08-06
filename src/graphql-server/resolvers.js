@@ -1,6 +1,8 @@
+import * as Promise from 'bluebird'
 import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
-import HappStoreDnaInterface from './dnaInterfaces/happStoreDnaInterface'
+import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/happStoreDnaInterface'
 import HhaDnaInterface from './dnaInterfaces/hhaDnaInterface'
+import EnvoyInterface from './dnaInterfaces/envoyInterface'
 
 import {
   dataMappedCall,
@@ -13,16 +15,14 @@ export const resolvers = {
 
     registerHostingUser: (_, hostDoc) => HhaDnaInterface.currentUser.create(hostDoc),
 
-    enableHapp: (app_hash) => HhaDnaInterface.happs.install(app_hash),
-    // async
-    // {
-    //   console.log("CALLING ENABLEHAPP INSIDE of the Reducer; app_hash >> ", app_hash)
-    //   const installedHapp = await HhaDnaInterface.happs.install(app_hash)
-    //   console.log(" !! installedHapp !! > ", installedHapp)
-    //   // const enabledHapp = HhaDnaInterface.happs.enable({app_hash})
-    //   // console.log(" !! enabledHapp !! > ", enabledHapp);
-    //   return installedHapp // enableHapp
-    // },
+    enableHapp: async appId => {
+      console.log('enabling happ', appId)
+      const success = await EnvoyInterface.happs.install(appId)
+      console.log('envoy success', success)
+      if (!success) throw new Error('Failed to install app in Envoy')
+      await HhaDnaInterface.happs.enable(appId)
+      return true
+    },
 
     disableHapp: (app_hash) => {
       console.log("CALLING DISABLEHAPP INSIDE of the Resolver; app_hash >> ", app_hash)
@@ -39,9 +39,9 @@ export const resolvers = {
 
     allHapps: () => HappStoreDnaInterface.happs.all(),
 
-    allAvailableHapps: () => HhaDnaInterface.happs.allAvailable(),
+    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
 
-    allHostedHapps: () => HhaDnaInterface.happs.allHosted()
+    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails)
   }
 }
 

@@ -1,6 +1,11 @@
 query AllAvailableHapps {
   allAvailableHapps {
     id
+    title
+    thumbnailUrl
+    homepageUrl
+    dnaHash
+    ui
     happStoreAddress
   }
 }

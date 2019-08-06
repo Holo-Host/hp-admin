@@ -47,15 +47,13 @@ const registerHostingUser = graphql(RegisterHostingUserMutation, {
 })
 
 const enableHapp = graphql(EnableHappMutation, {
-  props: ({ mutate }) => {
-    return {
-      enableHapp: (app_hash = '') => mutate({
-        variables: {
-          app_hash
-        }
-      })
-    }
-  }
+  props: ({ mutate }) => ({
+    enableHapp: appId => mutate({
+      variables: {
+        appId
+      }
+    })
+  })
 })
 
 const disableHapp = graphql( DisableHappMutation, {

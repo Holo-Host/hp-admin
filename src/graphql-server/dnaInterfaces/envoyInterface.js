@@ -8,14 +8,14 @@ const axiosConfig = {
   }
 }
 
-export function installHapp (appHash) {
-  console.log('installingHapp', appHash)
+export function installHapp (appId) {
+  console.log('installingHapp', appId)
   if (MOCK_DNA_CONNECTION) {
     console.log('Mock envoy call')
-    return new Promise(true)
+    return Promise.resolve(true)
   } else {
     console.log('real envoy call')
-    return new Promise(true)
+    return Promise.resolve(true)
   }
 }
 
@@ -29,34 +29,33 @@ export default EnvoyInterface
 
 export async function previousInstallHapp (app_hash) {
   if (MOCK_DNA_CONNECTION) {
-    console.log("About to MOCK INSTALL the following HAPP !! : ", app_hash)
+    //   console.log("About to MOCK INSTALL the following HAPP !! : ", app_hash)
 
-    // Call provided_happ and fetch address of happ in has
-    let mockZomeCall = instanceCreateZomeCall('hha')
-    const hhaAppDetails = await mockZomeCall('provider/get_app_details')({app_hash})
-    console.log("hhaAppDetails", hhaAppDetails);
+    //   // Call provided_happ and fetch address of happ in has
+    //   let mockZomeCall = instanceCreateZomeCall('hha')
+    //   const hhaAppDetails = await mockZomeCall('provider/get_app_details')({app_hash})
+    //   console.log("hhaAppDetails", hhaAppDetails);
 
-    if(!hhaAppDetails){return console.log("ERROR: Unable to complete MOCK CALL to `hha/provider/get_app_details`")}
+    //   if(!hhaAppDetails){return console.log("ERROR: Unable to complete MOCK CALL to `hha/provider/get_app_details`")}
 
-    // Use address of happ in has to Fetch happ data
-    mockZomeCall = instanceCreateZomeCall('happ-store')
-    const HasAppDetails = await mockZomeCall('happs/get_app')({app_hash: hhaAppDetails.app_details})
-    console.log(" RETURNED HasAppDetails : ", HasAppDetails)
+    //   // Use address of happ in has to Fetch happ data
+    //   mockZomeCall = instanceCreateZomeCall('happ-store')
+    //   const HasAppDetails = await mockZomeCall('happs/get_app')({app_hash: hhaAppDetails.app_details})
+    //   console.log(" RETURNED HasAppDetails : ", HasAppDetails)
 
-    // Mock Install > add happ as hha hApp to mock data's installedHappList (fyi: At this point, envoy would run integrity check on dna hashes and validate dna/ui links when installing.)
-    mockZomeCall = instanceCreateZomeCall('conductor')
-    // Note: the below admin call is NOT a real zome call.
-    await mockZomeCall('admin/install_app')({happ_hash: app_hash})
+    //   // Mock Install > add happ as hha hApp to mock data's installedHappList (fyi: At this point, envoy would run integrity check on dna hashes and validate dna/ui links when installing.)
+    //   mockZomeCall = instanceCreateZomeCall('conductor')
+    //   // Note: the below admin call is NOT a real zome call.
+    //   await mockZomeCall('admin/install_app')({happ_hash: app_hash})
 
-    // Confirm happ was successfully enabled
-    // Note: the below admin call is NOT a real zome call.
-    const installedHappList = await mockZomeCall('admin/get_installed_app_list')()
-    console.log("PRINT OUT OF installedHappList : ", installedHappList)
-    const happCheck = installedHappList.find(entry => entry.happ_hash === app_hash) || null
+    //   // Confirm happ was successfully enabled
+    //   // Note: the below admin call is NOT a real zome call.
+    //   const installedHappList = await mockZomeCall('admin/get_installed_app_list')()
+    //   console.log("PRINT OUT OF installedHappList : ", installedHappList)
+    //   const happCheck = installedHappList.find(entry => entry.happ_hash === app_hash) || null
 
-    if(installedHappList && happCheck){return true}
-    else {return false}
-
+    //   if(installedHappList && happCheck){return true}
+    //   else {return false}
   } else {
     console.log("About to INSTALL the following HAPP VIA ENVOY !! : ", app_hash)
     return new Promise((resolve, reject) => {
