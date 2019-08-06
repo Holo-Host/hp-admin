@@ -5,17 +5,15 @@ import HashIcon from 'components/HashIcon'
 import SpecificButton from 'components/SpecificButton'
 
 export default function HappHosting ({ allHapps, allAvailableHapps, allHostedHapps, registerHostingUser, hostingUser, enableHapp, disableHapp }) {
-
-  console.log("Host WHOAMI Result >> ", hostingUser)
+  console.log('Host WHOAMI Result >> ', hostingUser)
 
   return <div>
-    {hostingUser && hostingUser.result ?
-       <h2>Current Host: {hostingUser.result}</h2>
-    :
-       <SpecificButton styleName='center-items' onClick={()=>registerHostingUser({host_doc:"info to register host"})} >Register as Host</SpecificButton>
-     }
+    {hostingUser && hostingUser.id
+      ? <h2>Current Host: {hostingUser.id}</h2>
+      : <SpecificButton styleName='center-items' onClick={() => registerHostingUser('info to register host')} >Register as Host</SpecificButton>
+    }
 
-    <hr/>
+    <hr />
 
     {allHapps &&
     <main>

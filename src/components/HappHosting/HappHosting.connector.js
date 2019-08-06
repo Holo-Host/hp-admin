@@ -7,7 +7,6 @@ import RegisterHostingUserMutation from 'graphql/RegisterHostingUserMutation.gql
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 
-
 const allHapps = graphql(AllHappsQuery, {
   props: ({ data: { allHapps } }) => ({ allHapps })
 })
@@ -24,20 +23,31 @@ const hostingUser = graphql(HostingUserQuery, {
   props: ({ data: { hostingUser } }) => ({ hostingUser })
 })
 
-const registerHostingUser = graphql( RegisterHostingUserMutation, {
+const registerHostingUser = graphql(RegisterHostingUserMutation, {
   props: ({ mutate }) => {
     return {
-      // NOTE: Currently host_doc is not validated and the content is irrelevant to the dna...
-      registerHostingUser: ({host_doc}) => mutate({
+      // NOTE: Currently hostDoc is not validated and the content is irrelevant to the dna...
+      registerHostingUser: (hostDoc) => mutate({
         variables: {
-          host_doc
+          hostDoc
+        },
+        update: (cache, { data, data: { registerHostingUser } }) => {
+          console.log('data', data)
+          if (registerHostingUser) {
+            cache.writeQuery({
+              query: HostingUserQuery,
+              data: {
+                hostingUser: registerHostingUser
+              }
+            })
+          }
         }
       })
     }
   }
 })
 
-const enableHapp = graphql( EnableHappMutation, {
+const enableHapp = graphql(EnableHappMutation, {
   props: ({ mutate }) => {
     return {
       enableHapp: (app_hash = '') => mutate({

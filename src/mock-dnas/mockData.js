@@ -93,14 +93,13 @@ const data = {
   },
   hha: {
     host: {
-      register_as_host: args => {
-        console.log(" `host_doc` args passed when registering host; reqs for host registaration are currently being disregarded.) : ", args)
-        
-        data.hha.host.is_registered_as_host = { result: 'QmHHAHostRegistrationAddress' }
-        return data.hha.host.is_registered_as_host
+      register_as_host: () => {
+        const address = 'QmHHAHostRegistrationAddress'
+        data.hha.host.is_registered_as_host = { links: [{ address }] }
+        return address
       },
-      is_registered_as_host:{
-        result: null
+      is_registered_as_host: {
+        links: []
       },
       get_all_apps: [
         {
@@ -132,21 +131,6 @@ const data = {
         else{}
         return result
       }
-    }
-  },
-  conductor : {
-    admin: {
-      install_app: arg => {
-        console.log("arg passed (should be happ_hash) : ", arg)
-        data.conductor.admin.get_installed_app_list = {
-          ...data.conductor.admin.get_installed_app_list,
-          ...arg
-        }
-        return data.conductor.admin.get_installed_app_list
-      },
-      get_installed_app_list: [
-        { happ_hash: 'QmHHAHappEntryAddressHash1' }
-      ]
     }
   }
 }

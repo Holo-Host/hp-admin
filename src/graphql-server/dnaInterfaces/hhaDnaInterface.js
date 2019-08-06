@@ -1,25 +1,29 @@
-import { instanceCreateZomeCall, installHapp } from '../holochainClient'
+import { instanceCreateZomeCall } from '../holochainClient'
 
 export const INSTANCE_ID = 'hha' // holo-hosting-app
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
-export const HhaDnaInterface = {
+const HhaDnaInterface = {
   currentUser: {
-    create: (host_doc) => createZomeCall('host/register_as_host')({host_doc}),
-    get: () => createZomeCall('host/is_registered_as_host')(),
+    // create is getting passed a variable (hostDoc) but is currently ignoring it
+    create: async () => {
+      const result = await createZomeCall('host/register_as_host')({ kyc_proof: 'this value is ignored by dna' })
+      return {
+        id: result
+      }
+    },
+    get: async () => {
+      const { links } = await createZomeCall('host/is_registered_as_host')()
+      if (links.length === 0) {
+        return null
+      } else {
+        return {
+          id: links[0].address
+        }
+      }
+    }
   },
   happs: {
-    install: (app_hash) => {
-      console.log("Happ to trigger for install : ", app_hash)
-      installHapp(app_hash)
-
-      // return new Promise((resolve, reject) => {
-      //   const installHappViaEnvoy = axios.post('http://localhost:9999/holo/happs/install', {happId: app_hash}, axiosConfig)
-      //   resolve(installHappViaEnvoy)
-      // })
-      // .catch(e=> console.log(" >>>>>>>>> Error when installing hApp via envoy! <<<<<<<<<  ERROR: ", e))
-
-    },
     enable: (app_hash) => createZomeCall('host/enable_app')({app_hash}),
     disable: (app_hash) => console.log("We need to plug in disableHapp and disable this app : ", app_hash),
     allAvailable: () => createZomeCall('host/get_all_apps')()

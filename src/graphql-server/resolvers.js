@@ -11,7 +11,7 @@ export const resolvers = {
   Mutation: {
     registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
-    registerHostingUser: (host_doc) => HhaDnaInterface.currentUser.create(host_doc),
+    registerHostingUser: (_, hostDoc) => HhaDnaInterface.currentUser.create(hostDoc),
 
     enableHapp: (app_hash) => HhaDnaInterface.happs.install(app_hash),
     // async

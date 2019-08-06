@@ -4,8 +4,11 @@ import './PrimaryLayout.module.css'
 import Dashboard from 'components/Dashboard'
 import MainMenu from 'components/MainMenu'
 import HappHosting from 'components/HappHosting'
+import mockData from 'mock-dnas/mockData'
 
 export function PrimaryLayout () {
+  console.log('***** mockData *****', mockData)
+
   return (
     <div styleName='primary-layout'>
       <header>
