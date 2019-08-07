@@ -15,13 +15,12 @@ export const resolvers = {
 
     registerHostingUser: (_, hostDoc) => HhaDnaInterface.currentUser.create(hostDoc),
 
-    enableHapp: async appId => {
-      console.log('enabling happ', appId)
+    enableHapp: async (_, { appId }) => {
       const success = await EnvoyInterface.happs.install(appId)
-      console.log('envoy success', success)
       if (!success) throw new Error('Failed to install app in Envoy')
       await HhaDnaInterface.happs.enable(appId)
-      return true
+      const happ = await HhaDnaInterface.happs.get(appId)
+      return getHappDetails(happ)
     },
 
     disableHapp: (app_hash) => {

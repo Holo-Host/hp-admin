@@ -1,3 +1,7 @@
 mutation EnableHapp ($appId: String) {
-  enableHapp(appId: $appId)
+  enableHapp(appId: $appId) {
+    id
+    title
+    happStoreAddress
+  }
 }

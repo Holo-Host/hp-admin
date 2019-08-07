@@ -6,7 +6,6 @@ import HashIcon from 'components/HashIcon'
 import SpecificButton from 'components/SpecificButton'
 
 export default function HappHosting ({ allAvailableHapps, allHostedHapps, registerHostingUser, hostingUser, enableHapp, disableHapp }) {
-
   const hostedHappIds = (allHostedHapps || []).map(({ id }) => id)
   const unhostedHapps = (allAvailableHapps || []).filter(({ id }) => !hostedHappIds.includes(id))
 
@@ -41,12 +40,12 @@ export default function HappHosting ({ allAvailableHapps, allHostedHapps, regist
 }
 
 export function HappRow ({ happ, enableHapp, disableHapp, hosted }) {
-  const { id, title, thumbnailUrl, homepageUrl, hash } = happ
+  const { id, title, thumbnailUrl, homepageUrl, dnaHash } = happ
   return <div styleName='happ-row'>
     <RoundImage url={thumbnailUrl} size={60} styleName='thumbnail' />
     <div>{title}</div>
     <a styleName='homepage' href={homepageUrl}>Home Page</a>
-    <HashIcon hash={hash} size={64} />
+    <HashIcon hash={dnaHash} size={64} />
     {hosted && <SpecificButton onClick={() => disableHapp(id)}>Disable</SpecificButton>}
     {!hosted && <SpecificButton onClick={() => enableHapp(id)}>Enable</SpecificButton>}
   </div>

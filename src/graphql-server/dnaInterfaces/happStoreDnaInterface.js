@@ -21,7 +21,7 @@ export function presentHapp (happ) {
     id: happ.address,
     ...pick(['title', 'thumbnailUrl', 'homepageUrl'], happ.appEntry),
     // this is a kludge. need to clarify how we handle multiple dnas
-    hash: happ.appEntry.dnas[0].hash
+    dnaHash: happ.appEntry.dnas[0].hash
   }
 }
 
@@ -29,7 +29,7 @@ export async function getHappDetails (happ) {
   const details = await HappStoreDnaInterface.happs.get(happ.happStoreAddress)
   return {
     ...happ,
-    ...pick(['title', 'thumbnailUrl', 'homepageUrl', 'hash'], details)
+    ...pick(['title', 'thumbnailUrl', 'homepageUrl', 'dnaHash'], details)
   }
 }
 

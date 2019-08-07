@@ -1,19 +1,19 @@
 const happs = [
   {
     id: 'QmHHAHappEntryAddressHash1',
-    happstoreHash: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT'
+    happstoreId: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT'
   },
   {
     id: 'QmHHAHappEntryAddressHash2',
-    happstoreHash: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH'
+    happstoreId: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH'
   }
 ]
 
-function presentHappForGetAllApps ({ id, happstoreHash }) {
+function presentHappForGetAllApps ({ id, happstoreId }) {
   const details = JSON.stringify({
     Ok: {
       app_bundle: {
-        happ_hash: happstoreHash
+        happ_hash: happstoreId
       }
     }
   })
@@ -23,11 +23,19 @@ function presentHappForGetAllApps ({ id, happstoreHash }) {
   }
 }
 
-function presentHappForGetEnabledAppList ({ id, happstoreHash }) {
+function presentHappForGetEnabledAppList ({ id, happstoreId }) {
   return {
     address: id,
     entry: {
-      happ_hash: happstoreHash
+      happ_hash: happstoreId
+    }
+  }
+}
+
+function presentHappForGetAppDetails ({ happstoreId }) {
+  return {
+    app_bundle: {
+      happ_hash: happstoreId
     }
   }
 }
@@ -46,6 +54,12 @@ const hha = {
     get_enabled_app_list: [
       presentHappForGetEnabledAppList(happs[0])
     ]
+  },
+  provider: {
+    get_app_details: ({ app_hash: appHash }) => {
+      const happ = happs.find(h => h.id === appHash)
+      return presentHappForGetAppDetails(happ)
+    }
   }
 }
 

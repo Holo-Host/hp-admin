@@ -24,7 +24,12 @@ const HhaDnaInterface = {
     }
   },
   happs: {
-    enable: (app_hash) => createZomeCall('host/enable_app')({app_hash}),
+    get: appId => createZomeCall('provider/get_app_details')({ app_hash: appId })
+      .then(happ => ({
+        id: appId,
+        happStoreAddress: happ.app_bundle.happ_hash
+      })),
+    enable: appId => createZomeCall('host/enable_app')({ app_hash: appId }),
     disable: (app_hash) => console.log("We need to plug in disableHapp and disable this app : ", app_hash),
     allAvailable: () => createZomeCall('host/get_all_apps')()
       .then(happListings => happListings.map(({ hash, details }) => {
@@ -42,7 +47,7 @@ const HhaDnaInterface = {
         id: address,
         happStoreAddress,
         enabled: true
-      })))
+      }))),
   }
 }
 

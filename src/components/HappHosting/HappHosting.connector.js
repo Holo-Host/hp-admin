@@ -1,15 +1,10 @@
 import { graphql, compose } from 'react-apollo'
-import AllHappsQuery from 'graphql/AllHappsQuery.gql'
 import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
 import AllHostedHappsQuery from 'graphql/AllHostedHappsQuery.gql'
 import HostingUserQuery from 'graphql/HostingUserQuery.gql'
 import RegisterHostingUserMutation from 'graphql/RegisterHostingUserMutation.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
-
-const allHapps = graphql(AllHappsQuery, {
-  props: ({ data: { allHapps } }) => ({ allHapps })
-})
 
 const allAvailableHapps = graphql(AllAvailableHappsQuery, {
   props: ({ data: { allAvailableHapps } }) => ({ allAvailableHapps })
@@ -69,7 +64,6 @@ const disableHapp = graphql( DisableHappMutation, {
 })
 
 export default compose(
-  allHapps,
   allAvailableHapps,
   enableHapp,
   disableHapp,
