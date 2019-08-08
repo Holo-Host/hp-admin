@@ -19,7 +19,10 @@ export const resolvers = {
       const success = await EnvoyInterface.happs.install(appId)
       if (!success) throw new Error('Failed to install app in Envoy')
       await HhaDnaInterface.happs.enable(appId)
-      const happ = await HhaDnaInterface.happs.get(appId)
+      const happ = {
+        ...await HhaDnaInterface.happs.get(appId),
+        isEnabled: true
+      }
       return getHappDetails(happ)
     },
 

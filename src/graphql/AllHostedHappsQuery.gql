@@ -7,5 +7,6 @@ query AllHostedHapps {
     dnaHash
     ui
     happStoreAddress
+    isEnabled
   }
 }

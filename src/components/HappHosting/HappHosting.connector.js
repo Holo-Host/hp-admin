@@ -64,10 +64,11 @@ const disableHapp = graphql( DisableHappMutation, {
 })
 
 export default compose(
+  // the order of these first two is important. We use allHostedHapps to update the cache, but don't actually use it in the component.
+  allHostedHapps,
   allAvailableHapps,
   enableHapp,
   disableHapp,
-  allHostedHapps,
   registerHostingUser,
   hostingUser
 )

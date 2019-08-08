@@ -22,7 +22,7 @@ type Happ {
   dnaHash: String
   ui: String
   happStoreAddress: String
-  enabled: Boolean
+  isEnabled: Boolean
 }
 
 type Query {

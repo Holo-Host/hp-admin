@@ -3,5 +3,6 @@ mutation EnableHapp ($appId: String) {
     id
     title
     happStoreAddress
+    isEnabled
   }
 }

@@ -46,8 +46,8 @@ const HhaDnaInterface = {
         // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).
         id: address,
         happStoreAddress,
-        enabled: true
-      }))),
+        isEnabled: true
+      })))
   }
 }
 

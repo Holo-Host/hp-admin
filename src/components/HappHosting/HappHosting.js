@@ -5,9 +5,9 @@ import RoundImage from 'components/RoundImage'
 import HashIcon from 'components/HashIcon'
 import SpecificButton from 'components/SpecificButton'
 
-export default function HappHosting ({ allAvailableHapps, allHostedHapps, registerHostingUser, hostingUser, enableHapp, disableHapp }) {
-  const hostedHappIds = (allHostedHapps || []).map(({ id }) => id)
-  const unhostedHapps = (allAvailableHapps || []).filter(({ id }) => !hostedHappIds.includes(id))
+export default function HappHosting ({ allAvailableHapps = [], registerHostingUser, hostingUser, enableHapp, disableHapp }) {
+  const unHostedHapps = allAvailableHapps.filter(h => !h.isEnabled)
+  const hostedHapps = allAvailableHapps.filter(h => h.isEnabled)
 
   return <div>
     {hostingUser && hostingUser.id
@@ -17,18 +17,18 @@ export default function HappHosting ({ allAvailableHapps, allHostedHapps, regist
 
     <hr />
 
-    {!isEmpty(unhostedHapps) && <div>
+    {!isEmpty(unHostedHapps) && <div>
       <h3>Available Happs</h3>
-      {unhostedHapps.map(happ => <HappRow
+      {unHostedHapps.map(happ => <HappRow
         happ={happ}
         enableHapp={enableHapp}
         key={happ.id}
       />)}
     </div>}
 
-    {!isEmpty(allHostedHapps) && <div>
+    {!isEmpty(hostedHapps) && <div>
       <h3>Currently Hosted Happs</h3>
-      {allHostedHapps.map(happ => <HappRow
+      {hostedHapps.map(happ => <HappRow
         happ={happ}
         disableHapp={disableHapp}
         hosted
@@ -46,7 +46,7 @@ export function HappRow ({ happ, enableHapp, disableHapp, hosted }) {
     <div>{title}</div>
     <a styleName='homepage' href={homepageUrl}>Home Page</a>
     <HashIcon hash={dnaHash} size={64} />
-    {hosted && <SpecificButton onClick={() => disableHapp(id)}>Disable</SpecificButton>}
-    {!hosted && <SpecificButton onClick={() => enableHapp(id)}>Enable</SpecificButton>}
+    {hosted && <SpecificButton onClick={() => disableHapp(id)}>Stop hosting</SpecificButton>}
+    {!hosted && <SpecificButton onClick={() => enableHapp(id)}>Start hosting</SpecificButton>}
   </div>
 }
