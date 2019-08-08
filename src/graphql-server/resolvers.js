@@ -26,9 +26,14 @@ export const resolvers = {
       return getHappDetails(happ)
     },
 
-    disableHapp: (app_hash) => {
-      console.log("CALLING DISABLEHAPP INSIDE of the Resolver; app_hash >> ", app_hash)
-      HhaDnaInterface.happs.disable(app_hash)
+    disableHapp: async (_, data) => {
+      const { appId } = data
+      await HhaDnaInterface.happs.disable(appId)
+      const happ = {
+        ...await HhaDnaInterface.happs.get(appId),
+        isEnabled: false
+      }
+      return getHappDetails(happ)
     }
   },
 
