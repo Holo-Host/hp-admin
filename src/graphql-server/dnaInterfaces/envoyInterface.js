@@ -27,13 +27,13 @@ const EnvoyInterface = {
 
 export default EnvoyInterface
 
-export async function previousInstallHapp (app_hash) {
+export async function previousInstallHapp (appHash) {
   if (MOCK_DNA_CONNECTION) {
-    //   console.log("About to MOCK INSTALL the following HAPP !! : ", app_hash)
+    //   console.log("About to MOCK INSTALL the following HAPP !! : ", appHash)
 
     //   // Call provided_happ and fetch address of happ in has
     //   let mockZomeCall = instanceCreateZomeCall('hha')
-    //   const hhaAppDetails = await mockZomeCall('provider/get_app_details')({app_hash})
+    //   const hhaAppDetails = await mockZomeCall('provider/get_app_details')({app_hash: appHash})
     //   console.log("hhaAppDetails", hhaAppDetails);
 
     //   if(!hhaAppDetails){return console.log("ERROR: Unable to complete MOCK CALL to `hha/provider/get_app_details`")}
@@ -46,20 +46,20 @@ export async function previousInstallHapp (app_hash) {
     //   // Mock Install > add happ as hha hApp to mock data's installedHappList (fyi: At this point, envoy would run integrity check on dna hashes and validate dna/ui links when installing.)
     //   mockZomeCall = instanceCreateZomeCall('conductor')
     //   // Note: the below admin call is NOT a real zome call.
-    //   await mockZomeCall('admin/install_app')({happ_hash: app_hash})
+    //   await mockZomeCall('admin/install_app')({happ_hash: appHash})
 
     //   // Confirm happ was successfully enabled
     //   // Note: the below admin call is NOT a real zome call.
     //   const installedHappList = await mockZomeCall('admin/get_installed_app_list')()
     //   console.log("PRINT OUT OF installedHappList : ", installedHappList)
-    //   const happCheck = installedHappList.find(entry => entry.happ_hash === app_hash) || null
+    //   const happCheck = installedHappList.find(entry => entry.happ_hash === appHash) || null
 
     //   if(installedHappList && happCheck){return true}
     //   else {return false}
   } else {
-    console.log('About to INSTALL the following HAPP VIA ENVOY !! : ', app_hash)
+    console.log('About to INSTALL the following HAPP VIA ENVOY !! : ', appHash)
     return new Promise((resolve, reject) => {
-      const installHappViaEnvoy = axios.post('http://localhost:9999/holo/happs/install', { happId: app_hash }, axiosConfig)
+      const installHappViaEnvoy = axios.post('http://localhost:9999/holo/happs/install', { happId: appHash }, axiosConfig)
       resolve(installHappViaEnvoy)
     })
       .catch(e => console.log(' >>>>>>>>> Error when installing hApp via envoy! <<<<<<<<<  ERROR: ', e))
