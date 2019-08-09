@@ -1,4 +1,4 @@
-const happs = [
+let happs = [
   {
     id: 'QmHHAHappEntryAddressHash1',
     happstoreId: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT'
@@ -55,7 +55,24 @@ const hha = {
     get_all_apps: happs.map(presentHappForGetAllApps),
     get_enabled_app_list: [
       presentHappForGetEnabledAppList(happs[0])
-    ]
+    ],
+    enable_app: happ => {
+      happs = {
+        ...happs,
+        ...happ
+      }
+      const newHapp = presentHappForGetEnabledAppList(happ)
+      hha.host.get_enabled_app_list = {
+        ...hha.host.get_enabled_app_list,
+        newHapp
+      }
+      return hha.host.get_enabled_app_list
+    },
+    disable_app: happ => {
+      const newEnabledAppList = hha.host.get_enabled_app_list.filter(happ => happ.entry.happ_hash === happ)
+      hha.host.get_enabled_app_list = newEnabledAppList
+      return hha.host.get_enabled_app_list
+    }
   },
   provider: {
     get_app_details: ({ app_hash: appHash }) => {
