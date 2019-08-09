@@ -54,9 +54,9 @@ const enableHapp = graphql(EnableHappMutation, {
 const disableHapp = graphql(DisableHappMutation, {
   props: ({ mutate }) => {
     return {
-      disableHapp: ({ appHash }) => mutate({
+      disableHapp: appId => mutate({
         variables: {
-          app_hash: appHash
+          appId
         }
       })
     }

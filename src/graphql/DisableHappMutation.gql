@@ -1,5 +1,5 @@
-mutation DisableHapp ($app_hash:String) {
-  disableHapp(app_hash: $app_hash) {
+mutation DisableHapp ($appId:String) {
+  disableHapp(appId: $appId) {
     result
   }
 }
