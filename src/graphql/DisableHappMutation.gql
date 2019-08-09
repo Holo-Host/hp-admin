@@ -1,5 +1,8 @@
-mutation DisableHapp ($appId:String) {
+mutation DisableHapp ($appId: String) {
   disableHapp(appId: $appId) {
-    result
+    id
+    title
+    happStoreAddress
+    isEnabled
   }
 }

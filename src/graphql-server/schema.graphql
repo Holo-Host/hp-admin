@@ -55,5 +55,5 @@ type Mutation {
   registerUser(name: String, avatarUrl: String): Me
   registerHostingUser(hostDoc: String): HhaUser
   enableHapp(appId: String): Happ
-  disableHapp(appId: String): Boolean
+  disableHapp(appId: String): Happ
 }

@@ -40,7 +40,6 @@ const HhaDnaInterface = {
           happStoreAddress
         }
       })),
-
     allHosted: () => createZomeCall('host/get_enabled_app_list')()
       .then(hostedHapps => hostedHapps.map(({ address, entry: { happ_hash: happStoreAddress } }) => ({
         // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).

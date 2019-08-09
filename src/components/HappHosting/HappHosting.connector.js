@@ -52,15 +52,13 @@ const enableHapp = graphql(EnableHappMutation, {
 })
 
 const disableHapp = graphql(DisableHappMutation, {
-  props: ({ mutate }) => {
-    return {
-      disableHapp: appId => mutate({
-        variables: {
-          appId
-        }
-      })
-    }
-  }
+  props: ({ mutate }) => ({
+    disableHapp: appId => mutate({
+      variables: {
+        appId
+      }
+    })
+  })
 })
 
 export default compose(

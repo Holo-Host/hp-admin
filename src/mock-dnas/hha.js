@@ -47,6 +47,8 @@ const hha = {
       hha.host.is_registered_as_host = { links: [{ address }] }
       return address
     },
+    enable_app: appId => appId,
+    disable_app: appId => appId,
     is_registered_as_host: {
       links: []
     },
