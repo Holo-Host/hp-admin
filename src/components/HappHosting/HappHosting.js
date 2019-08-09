@@ -5,22 +5,9 @@ import RoundImage from 'components/RoundImage'
 import HashIcon from 'components/HashIcon'
 import SpecificButton from 'components/SpecificButton'
 
-<<<<<<< HEAD
 export default function HappHosting ({ allAvailableHapps = [], registerHostingUser, hostingUser, enableHapp, disableHapp }) {
   const unHostedHapps = allAvailableHapps.filter(h => !h.isEnabled)
   const hostedHapps = allAvailableHapps.filter(h => h.isEnabled)
-=======
-export default function HappHosting ({
-  allHapps,
-  allAvailableHapps,
-  allHostedHapps,
-  registerHostingUser,
-  hostingUser,
-  enableHapp,
-  disableHapp
-}) {
-  // console.log("Host WHOAMI Result >> ", hostingUser)
->>>>>>> 89f33349ab424961da7a74994044e69c7f1c6f8a
 
   return <div>
     {hostingUser && hostingUser.id
@@ -52,14 +39,8 @@ export default function HappHosting ({
   </div>
 }
 
-<<<<<<< HEAD
 export function HappRow ({ happ, enableHapp, disableHapp, hosted }) {
   const { id, title, thumbnailUrl, homepageUrl, dnaHash } = happ
-=======
-export function HappRow ({ happ, hhaId, dataIshosted, dataHhaHapp, enableHapp, disableHapp }) {
-  // console.log("happName, hhaId : ", happ.title, hhaId);
-  const { title, thumbnailUrl, homepageUrl, hash } = happ
->>>>>>> 89f33349ab424961da7a74994044e69c7f1c6f8a
   return <div styleName='happ-row'>
     <RoundImage url={thumbnailUrl} size={60} styleName='thumbnail' />
     <div>{title}</div>
