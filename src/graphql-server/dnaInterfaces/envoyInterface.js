@@ -57,11 +57,11 @@ export async function previousInstallHapp (app_hash) {
     //   if(installedHappList && happCheck){return true}
     //   else {return false}
   } else {
-    console.log("About to INSTALL the following HAPP VIA ENVOY !! : ", app_hash)
+    console.log('About to INSTALL the following HAPP VIA ENVOY !! : ', app_hash)
     return new Promise((resolve, reject) => {
-      const installHappViaEnvoy = axios.post('http://localhost:9999/holo/happs/install', {happId: app_hash}, axiosConfig)
+      const installHappViaEnvoy = axios.post('http://localhost:9999/holo/happs/install', { happId: app_hash }, axiosConfig)
       resolve(installHappViaEnvoy)
     })
-    .catch(e=> console.log(" >>>>>>>>> Error when installing hApp via envoy! <<<<<<<<<  ERROR: ", e))
+      .catch(e => console.log(' >>>>>>>>> Error when installing hApp via envoy! <<<<<<<<<  ERROR: ', e))
   }
 }

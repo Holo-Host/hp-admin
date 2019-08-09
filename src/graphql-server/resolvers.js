@@ -26,9 +26,9 @@ export const resolvers = {
       return getHappDetails(happ)
     },
 
-    disableHapp: (app_hash) => {
-      console.log("CALLING DISABLEHAPP INSIDE of the Resolver; app_hash >> ", app_hash)
-      HhaDnaInterface.happs.disable(app_hash)
+    disableHapp: (appHash) => {
+      console.log('CALLING DISABLEHAPP INSIDE of the Resolver; app_hash >> ', appHash)
+      HhaDnaInterface.happs.disable({ app_hash: appHash })
     }
   },
 
