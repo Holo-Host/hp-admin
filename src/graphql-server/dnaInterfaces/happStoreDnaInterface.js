@@ -9,7 +9,7 @@ export const HappStoreDnaInterface = {
     get: () => createZomeCall('whoami/get_user')()
   },
   happs: {
-    get: id => createZomeCall('happs/get_app')(id)
+    get: id => createZomeCall('happs/get_app')({ app_hash: id })
       .then(happ => presentHapp(happ)),
     all: () => createZomeCall('happs/get_all_apps')()
       .then(happs => happs.map(presentHapp))

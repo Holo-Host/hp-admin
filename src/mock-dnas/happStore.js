@@ -56,7 +56,7 @@ const happStore = {
     }
   },
   happs: {
-    get_app: id => [appOne, appTwo].find(app => app.address === id),
+    get_app: ({ app_hash: appHash }) => [appOne, appTwo].find(app => app.address === appHash),
     get_all_apps: [appOne, appTwo]
   }
 }
