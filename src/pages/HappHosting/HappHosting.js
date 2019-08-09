@@ -12,7 +12,7 @@ export default function HappHosting ({ allAvailableHapps = [], registerHostingUs
   return <div>
     {hostingUser && hostingUser.id
       ? <h2>Current Host: {hostingUser.id}</h2>
-      : <SpecificButton styleName='center-items' onClick={() => registerHostingUser('info to register host')} >Register as Host</SpecificButton>
+      : <SpecificButton styleName='center-items' onClick={() => registerHostingUser()} >Register as Host</SpecificButton>
     }
 
     <hr />

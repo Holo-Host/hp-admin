@@ -20,7 +20,7 @@ export function presentHapp (happ) {
   return {
     id: happ.address,
     ...pick(['title', 'thumbnailUrl', 'homepageUrl'], happ.appEntry),
-    // this is a kludge. need to clarify how we handle multiple dnas
+    // we currently only support a single dna
     dnaHash: happ.appEntry.dnas[0].hash
   }
 }

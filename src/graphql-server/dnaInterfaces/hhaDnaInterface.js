@@ -5,7 +5,6 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const HhaDnaInterface = {
   currentUser: {
-    // create is getting passed a variable (hostDoc) but is currently ignoring it
     create: async () => {
       const result = await createZomeCall('host/register_as_host')({ host_doc: { kyc_proof: 'this value is ignored by dna' } })
       return {

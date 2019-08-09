@@ -1,5 +1,5 @@
-mutation RegisterHostingUser($hostDoc: String) {
-  registerHostingUser(hostDoc: $hostDoc)  {
+mutation RegisterHostingUser {
+  registerHostingUser {
     id
   }
 }

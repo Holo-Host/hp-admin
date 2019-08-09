@@ -19,26 +19,20 @@ const hostingUser = graphql(HostingUserQuery, {
 })
 
 const registerHostingUser = graphql(RegisterHostingUserMutation, {
-  props: ({ mutate }) => {
-    return {
-      // NOTE: Currently hostDoc is not validated and the content is irrelevant to the dna...
-      registerHostingUser: hostDoc => mutate({
-        variables: {
-          hostDoc
-        },
-        update: (cache, { data: { registerHostingUser } }) => {
-          if (registerHostingUser) {
-            cache.writeQuery({
-              query: HostingUserQuery,
-              data: {
-                hostingUser: registerHostingUser
-              }
-            })
-          }
+  props: ({ mutate }) => ({
+    registerHostingUser: () => mutate({
+      update: (cache, { data: { registerHostingUser } }) => {
+        if (registerHostingUser) {
+          cache.writeQuery({
+            query: HostingUserQuery,
+            data: {
+              hostingUser: registerHostingUser
+            }
+          })
         }
-      })
-    }
-  }
+      }
+    })
+  })
 })
 
 const enableHapp = graphql(EnableHappMutation, {

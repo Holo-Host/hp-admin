@@ -36,7 +36,7 @@ type Query {
 
 type Mutation {
   registerUser(name: String, avatarUrl: String): Me
-  registerHostingUser(hostDoc: String): HhaUser
+  registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
 }
