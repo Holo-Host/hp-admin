@@ -3,7 +3,7 @@ import Btn from 'components/SpecificButton'
 
 export default function Dashboard ({ me, happStoreUser, registerUser }) {
   return <div>
-    `Here's the dashboard. It will have more information than this later.`
+    Here's the dashboard. It will have more information than this later.
 
     <p>
       User data: {me && JSON.stringify(me)}
