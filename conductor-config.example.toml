@@ -71,6 +71,10 @@ agent = "hp_admin_agent"
 [[interfaces]]
 id = "websocket-interface"
 
+    [interfaces.driver]
+    type = "websocket"
+    port = 3400
+
     [[interfaces.instances]]
     id = "hylo"
 
@@ -79,7 +83,23 @@ id = "websocket-interface"
 
     [[interfaces.instances]]
     id = "hha"
-    
+
+# -- HTTP admin interface (currently only used for testing the conductor is running in setup script)
+
+[[interfaces]]
+id = 'http-admin-interface'
+admin = true
+
     [interfaces.driver]
     type = "websocket"
-    port = 3400
+    port = 3300
+
+    [[interfaces.instances]]
+    id = "hylo"
+
+    [[interfaces.instances]]
+    id = "happ-store"
+
+    [[interfaces.instances]]
+    id = "hha"
+

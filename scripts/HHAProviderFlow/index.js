@@ -2,40 +2,41 @@ const { connect } = require('@holochain/hc-web-client')
 const axios = require('axios')
 const HAPP_CONFIG = require('./HappConfig.js')
 
-function testConductor() {
+function testConductor () {
   return new Promise((resolve, reject) => {
-    const callToHC = axios.post('http://localhost:3300/admin/agent/list',{})
+    const callToHC = axios.post('http://localhost:3300/admin/agent/list', {})
     resolve(callToHC)
   })
-  .catch(e=> console.log(" >>>>>>>>> Make sure your HC conductor is running! <<<<<<<<<  "))
+    .catch(e => console.log(' >>>>>>>>> Make sure your HC conductor is running! <<<<<<<<<  '))
 }
 testConductor()
 
-connect("ws://localhost:9000").then(({callZome, close}) => {
+connect('ws://localhost:3400').then(({ callZome }) => {
   const holochainZomeCall = (instance, zomeName, zomeFuncName, args) => {
     try {
-      return  callZome(instance, zomeName, zomeFuncName)(args).then(r=>{
+      return callZome(instance, zomeName, zomeFuncName)(args).then(r => {
         console.log(`${zomeFuncName} SUCCESS!  Entry address : `, r)
         return r
       })
-      .catch(e=>console.log("HC ZomeCall error occured. >> ERROR :  ", e))
-    }
-    catch(e) {
-      console.log(`Error occured when connecting to HC conductor. >> ERROR: (${e})`);
+        .catch(e => console.log('HC ZomeCall error occured. >> ERROR :  ', e))
+    } catch (e) {
+      console.log(`Error occured when connecting to HC conductor. >> ERROR: (${e})`)
     }
   }
 
   const PROVIDER_SHIMS = {
     // 1. registerProvider
     registerAsProvider: () => {
+      console.log('calling registerAsProvider')
+
       return new Promise((resolve, reject) => {
         const regProviderCall = holochainZomeCall(
-          instance= 'hha',
-          zomeName= 'provider',
-          zomeFuncName= 'register_as_provider',
-          args= {
+          'hha',
+          'provider',
+          'register_as_provider',
+          {
             provider_doc: {
-              kyc_proof: "TODO: This info is currently not required.",
+              kyc_proof: 'TODO: This info is currently not required.',
             }
           }
         )
@@ -46,13 +47,13 @@ connect("ws://localhost:9000").then(({callZome, close}) => {
     // 2. create App in has
     createHapp: (happId) => {
       const happ = HAPP_CONFIG[happId]
-      console.log("happ received : ", happ.title)
+      console.log('happ received : ', happ.title)
 
       return holochainZomeCall(
-        instance= 'happ-store',
-        zomeName= 'happs',
-        zomeFuncName= 'create_app',
-        args= {
+        'happ-store',
+        'happs',
+        'create_app',
+        {
           title: happ.title,
           description: happ.description,
           thumbnail_url: happ.thumbnail_url,
@@ -63,22 +64,22 @@ connect("ws://localhost:9000").then(({callZome, close}) => {
       )
     },
 
-  // 3. register App in hha
+    // 3. register App in hha
     registerHapp: (happHash, happId) => {
       const happ = HAPP_CONFIG[happId]
 
       return holochainZomeCall(
-        instance= 'hha',
-        zomeName= 'provider',
-        zomeFuncName= 'register_app',
-        args= {
+        'hha',
+        'provider',
+        'register_app',
+        {
           app_bundle: {
             happ_hash: happHash
           },
           domain_name: happ.domain
         }
       )
-    },
+    }
   }
 
   const registerProvider = new Promise((resolve, reject) => resolve(PROVIDER_SHIMS.registerAsProvider()))
@@ -94,5 +95,4 @@ connect("ws://localhost:9000").then(({callZome, close}) => {
   registerProvider
     .then(r => fillHappStore())
     .catch(e => console.log(`Error when registering Provider. >> ERROR : ${e}`))
-
-}) //end of SHIMS
+}) // end of SHIMS
