@@ -21,6 +21,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-identicon-variety-pack": "^0.2.1",
+    "react-media-hook": "^0.4.4",
     "react-test-renderer": "^16.8.6",
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",

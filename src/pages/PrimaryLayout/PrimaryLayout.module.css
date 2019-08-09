@@ -1,0 +1,14 @@
+.primary-layout {
+  padding: 50px;
+  display: flex;
+  word-break: break-word;
+}
+
+.menu-link {
+  padding-bottom: 20px;
+  cursor: pointer;
+}
+
+.side-menu {
+  padding-right: 10px;
+}
