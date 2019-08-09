@@ -1,23 +1,23 @@
 [[agents]]
-id = 'hApp-agent'
-name = 'hAppStore Agent'
-keystore_file = '/home/lisa/.config/holochain/keys/HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
-public_address = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
+id = "hosting-agent-1"
+name = "Hosting Agent 1"
+keystore_file = "./agent-1.keystore"
+public_address = "HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a"
 
 [[dnas]]
 id = "happ_store_dna"
-file = "/home/lisa/Documents/gitrepos/holochain/holo/envoy-intrceptr/envoy/src/config/.envoy-deps/happ-store.dna.json"
+file = "home/<YOUR_USER_NAME>/.config/holochain/dnas/happ-store.dna.json"
 hash = "Qm328wyq38924x"
 
 [[dnas]]
 id = "hha_dna"
-file = "/home/lisa/Documents/gitrepos/holochain/holo/holo-hosting/Holo-Hosting-App/dna-src/dist/dna-src.dna.json"
+file = "home/<YOUR_USER_NAME>/.config/holochain/dnas/hha.dna.json"
 hash = "QmWVCiHf5GfoUHDcV9JSrUC1UZk1dcP9SECBTgoTKHpzZA"
 
 [[instances]]
 id = "happ-store"
 dna = "happ_store_dna"
-agent = "hApp-agent"
+agent = "hosting-agent-1"
 [instances.logger]
 type = "simple"
 file = "app_spec.log"
@@ -28,7 +28,7 @@ path = "tmp/tmp-storage-1"
 [[instances]]
 id = "hha"
 dna = "hha_dna"
-agent = "hApp-agent"
+agent = "hosting-agent-1"
 [instances.logger]
 type = "simple"
 file = "app_spec.log"
