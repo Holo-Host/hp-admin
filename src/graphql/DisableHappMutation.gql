@@ -2,7 +2,7 @@ mutation DisableHapp ($appId: String) {
   disableHapp(appId: $appId) {
     id
     title
-    happStoreAddress
+    happStoreId
     isEnabled
   }
 }

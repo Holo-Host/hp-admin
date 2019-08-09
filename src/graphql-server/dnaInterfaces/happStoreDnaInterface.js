@@ -26,7 +26,7 @@ export function presentHapp (happ) {
 }
 
 export async function getHappDetails (happ) {
-  const details = await HappStoreDnaInterface.happs.get(happ.happStoreAddress)
+  const details = await HappStoreDnaInterface.happs.get(happ.happStoreId)
   return {
     ...happ,
     ...pick(['title', 'thumbnailUrl', 'homepageUrl', 'dnaHash'], details)

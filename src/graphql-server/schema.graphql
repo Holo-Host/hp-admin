@@ -21,7 +21,7 @@ type Happ {
   homepageUrl: String
   dnaHash: String
   ui: String
-  happStoreAddress: String
+  happStoreId: String
   isEnabled: Boolean
 }
 
