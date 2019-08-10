@@ -6,9 +6,7 @@ import HashIcon from 'components/HashIcon'
 import Button from 'components/Button'
 
 export default function HappHosting ({ allAvailableHapps = [], enableHapp, disableHapp, history: { push } }) {
-  const unHostedHapps = allAvailableHapps.filter(h => !h.isEnabled)
-  const hostedHapps = allAvailableHapps.filter(h => h.isEnabled)
-
+  const sortedHapps = allAvailableHapps.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToMenu = () => push('/menu')
 
   return <div>
@@ -17,36 +15,25 @@ export default function HappHosting ({ allAvailableHapps = [], enableHapp, disab
       <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
     </div>
 
-    {!isEmpty(unHostedHapps) && <div>
-      <h3>Available Happs</h3>
-      {unHostedHapps.map(happ => <HappRow
+    {!isEmpty(sortedHapps) && <div>
+      {sortedHapps.map(happ => <HappRow
         happ={happ}
+        disableHapp={disableHapp}
         enableHapp={enableHapp}
         key={happ.id}
       />)}
     </div>}
-
-    {!isEmpty(hostedHapps) && <div>
-      <h3>Currently Hosted Happs</h3>
-      {hostedHapps.map(happ => <HappRow
-        happ={happ}
-        disableHapp={disableHapp}
-        hosted
-        key={happ.id}
-      />)}
-    </div>}
-
   </div>
 }
 
-export function HappRow ({ happ, enableHapp, disableHapp, hosted }) {
-  const { id, title, thumbnailUrl, homepageUrl, dnaHash } = happ
+export function HappRow ({ happ, enableHapp, disableHapp }) {
+  const { id, title, thumbnailUrl, homepageUrl, dnaHash, isEnabled } = happ
   return <div styleName='happ-row'>
     <RoundImage url={thumbnailUrl} size={60} styleName='thumbnail' />
     <div>{title}</div>
     <a styleName='homepage' href={homepageUrl}>Home Page</a>
     <HashIcon hash={dnaHash} size={64} />
-    {hosted && <Button onClick={() => disableHapp(id)}>Stop hosting</Button>}
-    {!hosted && <Button onClick={() => enableHapp(id)}>Start hosting</Button>}
+    {isEnabled && <Button onClick={() => disableHapp(id)}>Stop hosting</Button>}
+    {!isEnabled && <Button onClick={() => enableHapp(id)}>Start hosting</Button>}
   </div>
 }
