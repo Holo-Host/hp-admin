@@ -47,11 +47,11 @@ const hha = {
       hha.host.is_registered_as_host = { links: [{ address }] }
       return address
     },
-    enable_app: appId => appId,
-    disable_app: appId => appId,
     is_registered_as_host: {
       links: []
     },
+    enable_app: appId => appId,
+    disable_app: appId => appId,
     get_all_apps: happs.map(presentHappForGetAllApps),
     get_enabled_app_list: [
       presentHappForGetEnabledAppList(happs[0])
