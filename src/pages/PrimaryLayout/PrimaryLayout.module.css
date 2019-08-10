@@ -1,7 +1,16 @@
 .primary-layout {
-  padding: 50px;
   display: flex;
   word-break: break-word;
+}
+
+.wide {
+  padding: 50px;
+
+  /* empty */
+}
+
+.narrow {
+  padding: 25px 20px;  
 }
 
 .menu-link {

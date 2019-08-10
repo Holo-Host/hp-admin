@@ -3,19 +3,19 @@ import { isEmpty } from 'lodash'
 import './HappHosting.module.css'
 import RoundImage from 'components/RoundImage'
 import HashIcon from 'components/HashIcon'
-import SpecificButton from 'components/SpecificButton'
+import Button from 'components/Button'
 
-export default function HappHosting ({ allAvailableHapps = [], registerHostingUser, hostingUser, enableHapp, disableHapp }) {
+export default function HappHosting ({ allAvailableHapps = [], enableHapp, disableHapp, history: { push } }) {
   const unHostedHapps = allAvailableHapps.filter(h => !h.isEnabled)
   const hostedHapps = allAvailableHapps.filter(h => h.isEnabled)
 
-  return <div>
-    {hostingUser && hostingUser.id
-      ? <h2>Current Host: {hostingUser.id}</h2>
-      : <SpecificButton styleName='center-items' onClick={() => registerHostingUser()} >Register as Host</SpecificButton>
-    }
+  const goToMenu = () => push('/menu')
 
-    <hr />
+  return <div>
+    <div styleName='header'>
+      <span styleName='title'>hApps</span>
+      <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
+    </div>
 
     {!isEmpty(unHostedHapps) && <div>
       <h3>Available Happs</h3>
@@ -46,7 +46,7 @@ export function HappRow ({ happ, enableHapp, disableHapp, hosted }) {
     <div>{title}</div>
     <a styleName='homepage' href={homepageUrl}>Home Page</a>
     <HashIcon hash={dnaHash} size={64} />
-    {hosted && <SpecificButton onClick={() => disableHapp(id)}>Stop hosting</SpecificButton>}
-    {!hosted && <SpecificButton onClick={() => enableHapp(id)}>Start hosting</SpecificButton>}
+    {hosted && <Button onClick={() => disableHapp(id)}>Stop hosting</Button>}
+    {!hosted && <Button onClick={() => enableHapp(id)}>Start hosting</Button>}
   </div>
 }

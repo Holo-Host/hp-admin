@@ -1,8 +1,14 @@
 import React from 'react'
-import Btn from 'components/SpecificButton'
+import { Link } from 'react-router-dom'
+import Btn from 'components/Button'
 
 export default function Dashboard ({ me, happStoreUser, registerUser }) {
   return <div>
+
+    <div>
+      <Link to='/menu' >Menu</Link>
+    </div>
+
     Here's the dashboard. It will have more information than this later.
 
     <p>
