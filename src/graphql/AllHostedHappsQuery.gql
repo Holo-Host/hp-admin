@@ -2,6 +2,7 @@ query AllHostedHapps {
   allHostedHapps {
     id
     title
+    description
     thumbnailUrl
     homepageUrl
     dnaHash

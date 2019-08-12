@@ -19,7 +19,7 @@ export const HappStoreDnaInterface = {
 export function presentHapp (happ) {
   return {
     id: happ.address,
-    ...pick(['title', 'thumbnailUrl', 'homepageUrl'], happ.appEntry),
+    ...pick(['title', 'description', 'thumbnailUrl', 'homepageUrl'], happ.appEntry),
     // we currently only support a single dna
     dnaHash: happ.appEntry.dnas[0].hash
   }
@@ -29,7 +29,7 @@ export async function getHappDetails (happ) {
   const details = await HappStoreDnaInterface.happs.get(happ.happStoreId)
   return {
     ...happ,
-    ...pick(['title', 'thumbnailUrl', 'homepageUrl', 'dnaHash'], details)
+    ...pick(['title', 'description', 'thumbnailUrl', 'homepageUrl', 'dnaHash'], details)
   }
 }
 

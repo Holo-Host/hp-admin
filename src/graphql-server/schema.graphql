@@ -18,6 +18,7 @@ type HhaUser {
 type Happ {
   id: ID
   title: String
+  description: String  
   thumbnailUrl: String
   homepageUrl: String
   dnaHash: String

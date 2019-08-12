@@ -3,7 +3,7 @@ const appOne = {
   appEntry: {
     title: 'Holofuel',
     author: 'Holo ltd',
-    description: 'The holofuel hApp',
+    description: 'Manage and redeem payments for hosting',
     thumbnailUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cMFvYqaw7TtcTkPFcwE8pupKWqLFMCFu2opap9jqUoqIcAKB',
     homepageUrl: 'https://holo.host/faq/what-is-holo-fuel/',
     dnas: [
@@ -28,7 +28,7 @@ const appTwo = {
   appEntry: {
     title: 'Holo Community',
     author: 'Holo ltd',
-    description: 'The community chat and message board hApp',
+    description: 'Connect with other hosts in the Holo network',
     thumbnailUrl: 'https://d3ngex8q79bk55.cloudfront.net/misc/default_community_avatar.png',
     homepageUrl: 'https://hylo.com',
     dnas: [

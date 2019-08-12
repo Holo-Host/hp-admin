@@ -2,6 +2,7 @@ query AllAvailableHapps {
   allAvailableHapps {
     id
     title
+    description
     thumbnailUrl
     homepageUrl
     dnaHash
