@@ -2,6 +2,10 @@ import { graphql, compose } from 'react-apollo'
 import HostingUserQuery from 'graphql/HostingUserQuery.gql'
 import RegisterHostingUserMutation from 'graphql/RegisterHostingUserMutation.gql'
 
+const hostingUser = graphql(HostingUserQuery, {
+  props: ({ data: { hostingUser } }) => ({ hostingUser })
+})
+
 const registerHostingUser = graphql(RegisterHostingUserMutation, {
   props: ({ mutate, result: { loading, called } }) => ({
     registerHostingUser: () => mutate({
@@ -22,5 +26,6 @@ const registerHostingUser = graphql(RegisterHostingUserMutation, {
 })
 
 export default compose(
-  registerHostingUser
+  registerHostingUser,
+  hostingUser
 )

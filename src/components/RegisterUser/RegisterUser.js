@@ -1,18 +1,21 @@
 import React, { useEffect } from 'react'
+import { get } from 'lodash/fp'
 
 export function RegisterUser (props) {
-  const { children, registerHostingUser, loading } = props
+  const { children, registerHostingUser, hostingUser } = props
+
+  const isRegistered = get('isRegistered', hostingUser)
 
   useEffect(() => {
+    if (!hostingUser) return
+    if (isRegistered) return
     registerHostingUser()
   })
 
-  if (loading) {
-    return <h1>
-      REGISTERING HOSTING USER
-    </h1>
-  } else {
+  if (hostingUser && isRegistered) {
     return children
+  } else {
+    return <h1>Registering User</h1>
   }
 }
 

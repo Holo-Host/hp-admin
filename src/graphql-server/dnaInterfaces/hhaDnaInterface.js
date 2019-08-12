@@ -6,19 +6,23 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 const HhaDnaInterface = {
   currentUser: {
     create: async () => {
-      const result = await createZomeCall('host/register_as_host')({ host_doc: { kyc_proof: 'this value is ignored by dna' } })
+      const { hash } = await createZomeCall('whoami/get_user')()
+      await createZomeCall('host/register_as_host')({ host_doc: { kyc_proof: 'this value is ignored by dna' } })
       return {
-        id: result
+        id: hash,
+        isRegistered: true
       }
     },
     get: async () => {
+      const { hash } = await createZomeCall('whoami/get_user')()
       const { links } = await createZomeCall('host/is_registered_as_host')()
-      if (links.length === 0) {
-        return null
-      } else {
-        return {
-          id: links[0].address
-        }
+      let isRegistered = false
+      if (links.length > 0) {
+        isRegistered = true
+      }
+      return {
+        id: hash,
+        isRegistered
       }
     }
   },

@@ -62,6 +62,11 @@ const hha = {
       const happ = happs.find(h => h.id === appHash)
       return presentHappForGetAppDetails(happ)
     }
+  },
+  whoami: {
+    get_user: {
+      hash: 'HcUserAgentId'
+    }
   }
 }
 

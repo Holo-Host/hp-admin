@@ -12,6 +12,7 @@ type HappStoreUser {
 
 type HhaUser {
   id: ID
+  isRegistered: Boolean
 }
 
 type Happ {
