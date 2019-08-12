@@ -9,6 +9,8 @@ const happs = [
   }
 ]
 
+export const hostingUserId = 'HcUserAgentId'
+
 function presentHappForGetAllApps ({ id, happstoreId }) {
   const details = JSON.stringify({
     Ok: {
@@ -65,7 +67,7 @@ const hha = {
   },
   whoami: {
     get_user: {
-      hash: 'HcUserAgentId'
+      hash: hostingUserId
     }
   }
 }
