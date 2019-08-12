@@ -35,7 +35,7 @@ testConductor()
               'register_as_provider',
               {
                 provider_doc: {
-                  kyc_proof: 'TODO: This info is currently not required.',
+                  kyc_proof: 'TODO: This info is currently not required.'
                 }
               }
             )
@@ -95,5 +95,5 @@ testConductor()
       registerProvider
         .then(r => fillHappStore())
         .catch(e => console.log(`Error when registering Provider. >> ERROR : ${e}`))
-    }) // end of SHIMS    
+    }) // end of SHIMS
   })

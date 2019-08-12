@@ -13,7 +13,7 @@ export function installHapp (appId) {
     console.log('Envoy installing happ with id', appId)
     return Promise.resolve(true)
   } else {
-    return axios.post('http://localhost:9999/holo/happs/install', {happId: appId}, axiosConfig)
+    return axios.post('http://localhost:9999/holo/happs/install', { happId: appId }, axiosConfig)
   }
 }
 
