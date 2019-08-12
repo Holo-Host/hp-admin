@@ -5,10 +5,12 @@
   "scripts": {
     "start": "rm -rf ./node_modules/.cache/babel-loader && node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "npm run test:lint && node scripts/test.js",
-    "test:lint": "standard",
     "hc:start": "mkdir -p tmp && holochain -c ./conductor-config.toml",
-    "provider-flow": "node scripts/HHAProviderFlow/index.js"
+    "provider-flow": "node scripts/HHAProviderFlow/index.js",
+    "test": "npm run test:lint && npm run test:unit",
+    "test:lint": "standard",
+    "test:unit": "node scripts/test.js",
+    "ci": "CI=1 npm run test:unit"
   },
   "dependencies": {
     "@holochain/hc-web-client": "^0.5.0",
