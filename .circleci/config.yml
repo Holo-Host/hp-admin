@@ -31,7 +31,7 @@ commands:
       - setup-nodejs
       - run:
           name: Test
-          command: yarn test
+          command: yarn ci
   run-lint:
     steps:
       - prepare-env
