@@ -1,4 +1,4 @@
-const appOne = {
+export const appOne = {
   address: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT',
   appEntry: {
     title: 'Holofuel',
@@ -23,7 +23,7 @@ const appOne = {
   upvotedByMe: false
 }
 
-const appTwo = {
+export const appTwo = {
   address: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH',
   appEntry: {
     title: 'Holo Community',

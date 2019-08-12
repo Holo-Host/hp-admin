@@ -13,7 +13,7 @@ export default function HappHosting ({ allAvailableHapps = [], history: { push }
       <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
     </div>
 
-    {!isEmpty(sortedHapps) && <div styleName='happ-list'>
+    {!isEmpty(sortedHapps) && <div styleName='happ-list' role='list'>
       {sortedHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
     </div>}
   </div>
@@ -21,7 +21,7 @@ export default function HappHosting ({ allAvailableHapps = [], history: { push }
 
 export function HappRow ({ happ }) {
   const { title, description, thumbnailUrl, homepageUrl, isEnabled } = happ
-  return <div styleName='happ-row'>
+  return <div styleName='happ-row' role='listitem'>
     <img src={thumbnailUrl} styleName='icon' alt={`${title} icon`} />
     <div styleName='details'>
       <div styleName='title-row'>
