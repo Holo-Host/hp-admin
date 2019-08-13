@@ -1,5 +1,8 @@
+import * as Promise from 'bluebird'
 import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
-import HappStoreDnaInterface from './dnaInterfaces/happStoreDnaInterface'
+import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/happStoreDnaInterface'
+import HhaDnaInterface from './dnaInterfaces/hhaDnaInterface'
+import EnvoyInterface from './dnaInterfaces/envoyInterface'
 
 import {
   dataMappedCall,
@@ -7,16 +10,45 @@ import {
 } from './dataMapping'
 
 export const resolvers = {
+  Mutation: {
+    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
+
+    registerHostingUser: () => HhaDnaInterface.currentUser.create(),
+
+    enableHapp: async (_, { appId }) => {
+      const success = await EnvoyInterface.happs.install(appId)
+      if (!success) throw new Error('Failed to install app in Envoy')
+      await HhaDnaInterface.happs.enable(appId)
+      const happ = {
+        ...await HhaDnaInterface.happs.get(appId),
+        isEnabled: true
+      }
+      return getHappDetails(happ)
+    },
+
+    disableHapp: async (_, data) => {
+      const { appId } = data
+      await HhaDnaInterface.happs.disable(appId)
+      const happ = {
+        ...await HhaDnaInterface.happs.get(appId),
+        isEnabled: false
+      }
+      return getHappDetails(happ)
+    }
+  },
+
   Query: {
     me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
 
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    allHapps: () => HappStoreDnaInterface.happs.all()
-  },
+    hostingUser: () => HhaDnaInterface.currentUser.get(),
 
-  Mutation: {
-    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create)
+    allHapps: () => HappStoreDnaInterface.happs.all(),
+
+    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
+
+    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails)
   }
 }
 

@@ -10,20 +10,35 @@ type HappStoreUser {
   name: String
 }
 
+type HhaUser {
+  id: ID
+  isRegistered: Boolean
+}
+
 type Happ {
   id: ID
   title: String
+  description: String  
   thumbnailUrl: String
   homepageUrl: String
-  hash: String
+  dnaHash: String
+  ui: String
+  happStoreId: String
+  isEnabled: Boolean
 }
 
 type Query {
   me: Me
   happStoreUser: HappStoreUser
+  hostingUser: HhaUser
   allHapps: [Happ]
-} 
+  allAvailableHapps: [Happ]
+  allHostedHapps: [Happ]
+}
 
 type Mutation {
   registerUser(name: String, avatarUrl: String): Me
+  registerHostingUser: HhaUser
+  enableHapp(appId: String): Happ
+  disableHapp(appId: String): Happ
 }

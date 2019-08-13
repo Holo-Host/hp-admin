@@ -5,6 +5,8 @@
   "scripts": {
     "start": "rm -rf ./node_modules/.cache/babel-loader && node scripts/start.js",
     "build": "node scripts/build.js",
+    "hc:start": "mkdir -p tmp && holochain -c ./conductor-config.toml",
+    "provider-flow": "node scripts/HHAProviderFlow/index.js",
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js",
@@ -12,7 +14,11 @@
   },
   "dependencies": {
     "@holochain/hc-web-client": "^0.5.0",
+    "apollo-server-express": "^2.8.1",
+    "axios": "^0.19.0",
+    "bluebird": "^3.5.5",
     "canvas": "^2.5.0",
+    "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
     "lodash": "^4.17.15",
     "react": "^16.8.6",
@@ -22,7 +28,9 @@
     "react-test-renderer": "^16.8.6",
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",
-    "waait": "^1.0.5"
+    "rpc-websockets": "^4.5.1",
+    "waait": "^1.0.5",
+    "ws": "^7.1.1"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",
@@ -135,7 +143,10 @@
       "react-app-polyfill/jsdom",
       "regenerator-runtime/runtime"
     ],
-    "setupFilesAfterEnv": [],
+    "setupFilesAfterEnv": [
+      "@testing-library/react/cleanup-after-each",
+      "@testing-library/jest-dom/extend-expect"
+    ],
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
       "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"

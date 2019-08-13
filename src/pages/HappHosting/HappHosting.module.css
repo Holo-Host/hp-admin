@@ -1,22 +1,71 @@
-.happ-list {
+.header {
+  display: flex;
+  padding-bottom: 6px;
   border-bottom: 1px solid lightgray;
-  max-width: 700px;
+}
+
+.title {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #484848;
+}
+
+.menu-button {
+  margin-left: auto;
+}
+
+.happ-list {
+  padding-top: 20px;
 }
 
 .happ-row {
   display: flex;
-  border-top: 1px solid lightgray;
-  border-left: 1px solid lightgray;  
-  border-right: 1px solid lightgray;    
-  padding: 5px 15px;
-  align-items: center;
+  margin-bottom: 50px;
 }
 
-.thumbnail {
-  margin-right: 20px;
+.icon {
+  display: block;
+  flex: 0 0 140px;  
+  height: 140px;
+  box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.5);
+  border-radius: 10px;
+}
+
+.details {
+  padding-top: 8px;
+  padding-left: 25px;
+}
+
+.title-row {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.title {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #484848;  
+}
+
+.is-hosted {
+  margin-left: auto;
+  font-size: 16px;
+  line-height: 19px;
+  color: #787878;  
 }
 
 .homepage {
-  margin-left: auto;
-  margin-right: 20px;
+  /* empty */
+}
+
+.description {
+  margin-top: 25px;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 19px;
+  color: #939393;
 }

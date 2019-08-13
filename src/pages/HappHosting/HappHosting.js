@@ -1,25 +1,35 @@
-import React, { useContext } from 'react'
+import React from 'react'
+import { isEmpty } from 'lodash'
 import './HappHosting.module.css'
-import RoundImage from 'components/RoundImage'
-import HashIcon from 'components/HashIcon'
-import ScreenWidthContext from 'contexts/screenWidth'
+import Button from 'components/Button'
 
-export default function HappHosting ({ allHapps }) {
-  const isWide = useContext(ScreenWidthContext)
+export default function HappHosting ({ allAvailableHapps = [], history: { push } }) {
+  const sortedHapps = allAvailableHapps.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
+  const goToMenu = () => push('/menu')
+
   return <div>
-    {!isWide ? 'MOBILE' : 'DESKTOP'}
-    {allHapps && <div styleName='happ-list'>
-      {allHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
+    <div styleName='header'>
+      <span styleName='title'>hApps</span>
+      <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
+    </div>
+
+    {!isEmpty(sortedHapps) && <div styleName='happ-list' role='list'>
+      {sortedHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
     </div>}
   </div>
 }
 
 export function HappRow ({ happ }) {
-  const { title, thumbnailUrl, homepageUrl, hash } = happ
-  return <div styleName='happ-row'>
-    <RoundImage url={thumbnailUrl} size={60} styleName='thumbnail' />
-    <div>{title}</div>
-    <a styleName='homepage' href={homepageUrl}>Home Page</a>
-    <HashIcon hash={hash} size={64} />
+  const { title, description, thumbnailUrl, homepageUrl, isEnabled } = happ
+  return <div styleName='happ-row' role='listitem'>
+    <img src={thumbnailUrl} styleName='icon' alt={`${title} icon`} />
+    <div styleName='details'>
+      <div styleName='title-row'>
+        <span styleName='title'>{title}</span>
+        {isEnabled && <span styleName='is-hosted'>Hosted</span>}
+      </div>
+      <a styleName='homepage' href={homepageUrl}>Home Page</a>
+      <div styleName='description'>{description}</div>
+    </div>
   </div>
 }
