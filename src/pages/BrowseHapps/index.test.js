@@ -30,6 +30,34 @@ describe('ConnectedBrowseHapps', () => {
     })
   })
 
+  describe('HostButton', () => {
+    it('enables and disables happs', async () => {
+      const { getAllByRole, queryAllByText } = render(<ApolloProvider client={apolloClient}>
+        <ConnectedBrowseHapps history={{}} />
+      </ApolloProvider>)
+      await wait(15)
+      const listItems = getAllByRole('listitem')
+
+      expect(queryAllByText('Un-Host')).toHaveLength(1)
+      expect(queryAllByText('Host')).toHaveLength(1)
+
+      const { getByText: getByTextFromListItem } = within(listItems[0])
+      fireEvent.click(getByTextFromListItem('Un-Host'))
+
+      await wait(0)
+
+      expect(queryAllByText('Un-Host')).toHaveLength(0)
+      expect(queryAllByText('Host')).toHaveLength(2)
+
+      fireEvent.click(getByTextFromListItem('Host'))
+
+      await wait(0)
+
+      expect(queryAllByText('Un-Host')).toHaveLength(1)
+      expect(queryAllByText('Host')).toHaveLength(1)
+    })
+  })
+
   describe('menu button', () => {
     it("calls history.push with '/menu'", async () => {
       const mockHistory = {
