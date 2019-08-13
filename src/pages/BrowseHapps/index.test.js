@@ -18,14 +18,14 @@ describe('ConnectedBrowseHapps', () => {
     const apps = [appHoloFuel, appHylo]
 
     listItems.forEach((item, index) => {
-      const { getByText, queryByText } = within(item)
+      const { getByText } = within(item)
       expect(getByText(apps[index].appEntry.title)).toBeInTheDocument()
       expect(getByText(apps[index].appEntry.description)).toBeInTheDocument()
       if (index === 0) {
-        expect(queryByText('Hosted')).toBeInTheDocument()
+        expect(getByText('Un-Host')).toBeInTheDocument()
       }
       if (index === 1) {
-        expect(queryByText('Hosted')).not.toBeInTheDocument()
+        expect(getByText('Host')).toBeInTheDocument()
       }
     })
   })

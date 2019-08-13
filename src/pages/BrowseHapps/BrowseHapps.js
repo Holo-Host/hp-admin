@@ -45,6 +45,6 @@ export function HappRow ({ happ, enableHapp, disableHapp }) {
 export function HostButton ({ isEnabled, enableHapp, disableHapp }) {
   const onClick = isEnabled ? disableHapp : enableHapp
   return <Button onClick={onClick} styleName={cx('host-button', { unhost: isEnabled })}>
-    {isEnabled ? 'Un-host' : 'host' }
+    {isEnabled ? 'Un-Host' : 'Host' }
   </Button>
 }
