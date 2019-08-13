@@ -16,7 +16,8 @@ const mockedData = {
   hcAdminPort: '8800',
   hcNetworkPort: '35353',
   hostingPort: '8080',
-  factoryReset: () => {}
+  factoryReset: () => {},
+  toggleSshAccess: () => {}
 }
 
 const withMockedData = ComponentToBeWrapped => props =>
