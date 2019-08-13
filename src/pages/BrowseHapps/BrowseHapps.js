@@ -2,8 +2,9 @@ import React from 'react'
 import { isEmpty } from 'lodash'
 import './BrowseHapps.module.css'
 import Button from 'components/Button'
+import cx from 'classnames'
 
-export default function BrowseHapps ({ allAvailableHapps = [], history: { push } }) {
+export default function BrowseHapps ({ allAvailableHapps = [], enableHapp, disableHapp, history: { push } }) {
   const sortedHapps = allAvailableHapps.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToMenu = () => push('/menu')
 
@@ -14,22 +15,36 @@ export default function BrowseHapps ({ allAvailableHapps = [], history: { push }
     </div>
 
     {!isEmpty(sortedHapps) && <div styleName='happ-list' role='list'>
-      {sortedHapps.map(happ => <HappRow happ={happ} key={happ.id} />)}
+      {sortedHapps.map(happ =>
+        <HappRow
+          happ={happ}
+          enableHapp={enableHapp}
+          disableHapp={disableHapp}
+          key={happ.id} />)}
     </div>}
   </div>
 }
 
-export function HappRow ({ happ }) {
-  const { title, description, thumbnailUrl, homepageUrl, isEnabled } = happ
+export function HappRow ({ happ, enableHapp, disableHapp }) {
+  const { id, title, description, thumbnailUrl, isEnabled } = happ
   return <div styleName='happ-row' role='listitem'>
     <img src={thumbnailUrl} styleName='icon' alt={`${title} icon`} />
     <div styleName='details'>
       <div styleName='title-row'>
         <span styleName='title'>{title}</span>
-        {isEnabled && <span styleName='is-hosted'>Hosted</span>}
+        <HostButton
+          isEnabled={isEnabled}
+          enableHapp={() => enableHapp(id)}
+          disableHapp={() => disableHapp(id)} />
       </div>
-      <a styleName='homepage' href={homepageUrl}>Home Page</a>
       <div styleName='description'>{description}</div>
     </div>
   </div>
+}
+
+export function HostButton ({ isEnabled, enableHapp, disableHapp }) {
+  const onClick = isEnabled ? disableHapp : enableHapp
+  return <Button onClick={onClick} styleName={cx('host-button', { unhost: isEnabled })}>
+    {isEnabled ? 'Un-host' : 'host' }
+  </Button>
 }

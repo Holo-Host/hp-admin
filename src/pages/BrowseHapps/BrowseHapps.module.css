@@ -51,21 +51,27 @@
   color: #484848;  
 }
 
-.is-hosted {
-  margin-left: auto;
-  font-size: 16px;
-  line-height: 19px;
-  color: #787878;  
-}
-
-.homepage {
-  /* empty */
-}
-
 .description {
   margin-top: 25px;
   font-weight: normal;
   font-size: 16px;
   line-height: 19px;
   color: #939393;
+}
+
+.host-button {
+  margin-left: auto;
+  color: white;
+  background-color: #484848;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 14px;
+  text-transform: uppercase;
+  min-width: 67px;
+  height: 26px;
+}
+
+.unhost {
+  color: #484848;
+  background-color: #CDCDCD;
 }
