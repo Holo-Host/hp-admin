@@ -4,6 +4,7 @@ import './PrimaryLayout.module.css'
 import Dashboard from 'pages/Dashboard'
 import MainMenu, { Menu } from 'pages/MainMenu'
 import HappHosting from 'pages/HappHosting'
+import Settings from 'pages/Settings'
 import ScreenWidthContext from 'contexts/screenWidth'
 import Button from 'components/Button'
 import cx from 'classnames'
@@ -16,6 +17,7 @@ export function PrimaryLayout () {
       <Route path='/(|dashboard)' exact component={Dashboard} />
       <Route path='/menu' component={MainMenu} />
       <Route path='/happ-hosting' component={HappHosting} />
+      <Route path='/settings' component={Settings} />
     </div>
   </div>
 }
