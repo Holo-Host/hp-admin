@@ -4,7 +4,6 @@ import './PrimaryLayout.module.css'
 import Dashboard from 'pages/Dashboard'
 import MainMenu, { Menu } from 'pages/MainMenu'
 import BrowseHapps from 'pages/BrowseHapps'
-import HostingOverview from 'pages/HostingOverview'
 import ScreenWidthContext from 'contexts/screenWidth'
 import Button from 'components/Button'
 import cx from 'classnames'
@@ -16,7 +15,6 @@ export function PrimaryLayout () {
     <Route path='/(|dashboard)' exact component={Dashboard} />
     <Route path='/menu' component={MainMenu} />
     <Route path='/browse-happs' component={BrowseHapps} />
-    <Route path='/hosting-overview' component={HostingOverview} />
   </div>
 }
 
