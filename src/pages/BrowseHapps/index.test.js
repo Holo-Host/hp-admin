@@ -2,14 +2,14 @@ import React from 'react'
 import { render, fireEvent, within } from '@testing-library/react'
 import { ApolloProvider } from 'react-apollo'
 import apolloClient from 'apolloClient'
-import ConnectedHappHosting from './index'
+import ConnectedBrowseHapps from './index'
 import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
 import wait from 'waait'
 
-describe('ConnectedHappHosting', () => {
+describe('ConnectedBrowseHapps', () => {
   it('renders', async () => {
     const { getAllByRole } = render(<ApolloProvider client={apolloClient}>
-      <ConnectedHappHosting history={{}} />
+      <ConnectedBrowseHapps history={{}} />
     </ApolloProvider>)
     await wait(15)
     const listItems = getAllByRole('listitem')
@@ -36,7 +36,7 @@ describe('ConnectedHappHosting', () => {
         push: jest.fn()
       }
       const { getByText } = render(<ApolloProvider client={apolloClient}>
-        <ConnectedHappHosting history={mockHistory} />
+        <ConnectedBrowseHapps history={mockHistory} />
       </ApolloProvider>)
       fireEvent.click(getByText('Menu'))
       expect(mockHistory.push).toHaveBeenCalledWith('/menu')

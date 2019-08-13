@@ -1,9 +1,9 @@
 import React from 'react'
 import { isEmpty } from 'lodash'
-import './HappHosting.module.css'
+import './BrowseHapps.module.css'
 import Button from 'components/Button'
 
-export default function HappHosting ({ allAvailableHapps = [], history: { push } }) {
+export default function BrowseHapps ({ allAvailableHapps = [], history: { push } }) {
   const sortedHapps = allAvailableHapps.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToMenu = () => push('/menu')
 
