@@ -5,8 +5,9 @@ import Dashboard from 'pages/Dashboard'
 import MainMenu, { Menu } from 'pages/MainMenu'
 import HappHosting from 'pages/HappHosting'
 import Settings from 'pages/Settings'
-import ScreenWidthContext from 'contexts/screenWidth'
+import Tos from 'pages/Tos'
 import Button from 'components/Button'
+import ScreenWidthContext from 'contexts/screenWidth'
 import cx from 'classnames'
 
 export function PrimaryLayout () {
@@ -18,6 +19,7 @@ export function PrimaryLayout () {
       <Route path='/menu' component={MainMenu} />
       <Route path='/happ-hosting' component={HappHosting} />
       <Route path='/settings' component={Settings} />
+      <Route path='/tos' component={Tos} />
     </div>
   </div>
 }

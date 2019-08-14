@@ -1,0 +1,21 @@
+/* form */
+
+.form-row {
+  margin-top: 10px;
+  flex: 0 0 20px; 
+}
+
+.form-label {
+  font-style: normal;
+  font-size: 12px;
+  line-height: 10px;
+  letter-spacing: 0.002em;
+  margin-bottom: 8px;
+  display: block;
+  color: #2b2e4a;
+}
+
+.checkbox {
+  margin-top: 10px;
+  margin-right: 8px;
+}
