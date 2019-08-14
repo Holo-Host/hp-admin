@@ -15,17 +15,22 @@ keystore_file = "keystores/myagent.keystore"
 [[dnas]]
 id = "happ_store_dna"
 file = "/PATH/TO/happ-store.dna.json"
-hash = "Qm328wyq38924x"
+hash = "currently unused"
 
 [[dnas]]
 id = "hylo_dna"
 file = "/PATH/TO/hylo.dna.json"
-hash = "Qm328wyq38924y"
+hash = "currently unused"
 
 [[dnas]]
 id = "hha_dna"
-file = "//PATH/TO/HHA/dna-src.dna.json"
-hash = "Qm328wyq38924y"
+file = "/PATH/TO/HHA/dna-src.dna.json"
+hash = "currently unused"
+
+[[dnas]]
+id = "holofuel_dna"
+file = "/PATH/TO/holofuel.dna.json"
+hash = "currently unused"
 
 [[instances]]
 id = "happ-store"
@@ -66,6 +71,19 @@ agent = "hp_admin_agent"
   type = "file"
   path = "tmp/tmp-storage-3"
 
+[[instances]]
+id = "holofuel"
+dna = "holofuel_dna"
+agent = "hp_admin_agent"
+
+  [instances.logger]
+  type = "simple"
+  file = "app_spec.log"
+
+  [instances.storage]
+  type = "file"
+  path = "tmp/tmp-storage-4"
+
 # -- WS-RPC interface
 
 [[interfaces]]
@@ -83,6 +101,9 @@ id = "websocket-interface"
 
     [[interfaces.instances]]
     id = "hha"
+
+    [[interfaces.instances]]
+    id = "holofuel"
 
 # -- HTTP admin interface (currently only used for testing the conductor is running in setup script)
 
