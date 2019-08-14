@@ -1,4 +1,5 @@
 import React from 'react'
+import CloseIcon from 'utils/icons/CloseIcon'
 import './FormInput.module.css'
 
 export default function FormInput ({
@@ -15,17 +16,25 @@ export default function FormInput ({
   dataFor,
   checked,
   value,
-  onChange
+  onChange,
+  onClickHandler
 }) {
   return (
     <fieldset styleName='form-row'>
       {hasLabel && type !== 'checkbox' &&
-        <label
-          html-for={htmlFor}
-          data-for={dataFor}
-          styleName='form-label'>
-          {label}
-        </label>
+        <div>
+          <label
+            html-for={htmlFor}
+            data-for={dataFor}
+            styleName='form-label'>
+            {label}
+          </label>
+          <span
+            onClick={() => onClickHandler()}
+            styleName='side-icon'>
+            <CloseIcon width={10} height={10} />
+          </span>
+        </div>
       }
 
       {type === 'text' &&
