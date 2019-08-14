@@ -1,5 +1,6 @@
 import resolvers from './resolvers'
-import hha, { hostingUserId } from 'mock-dnas/hha'
+import { hostingUserId } from 'mock-dnas/hha'
+import mockData from 'mock-dnas/mockData'
 
 describe('resolvers', () => {
   describe('Query', () => {
@@ -18,7 +19,7 @@ describe('resolvers', () => {
   describe('Mutation', () => {
     describe('.registerHostingUser', () => {
       it('returns expected results', async () => {
-        const spy = jest.spyOn(hha.host, 'register_as_host')
+        const spy = jest.spyOn(mockData.hha.host, 'register_as_host')
         const hostingUser = await resolvers.Mutation.registerHostingUser()
 
         expect(hostingUser).toMatchObject({

@@ -145,7 +145,8 @@
     ],
     "setupFilesAfterEnv": [
       "@testing-library/react/cleanup-after-each",
-      "@testing-library/jest-dom/extend-expect"
+      "@testing-library/jest-dom/extend-expect",
+      "<rootDir>/src/mock-dnas/resetMockDataAfterEach"
     ],
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
