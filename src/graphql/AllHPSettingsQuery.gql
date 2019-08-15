@@ -1,0 +1,11 @@
+query AllHPSettings {
+  allHPSettings {
+    hostName
+    hostPubKey
+    hostEmail
+    deviceName
+    networkId
+    sshAccess
+    ports
+  }
+}

@@ -18,8 +18,8 @@ export function PrimaryLayout () {
       <Route path='/(|dashboard)' exact component={Dashboard} />
       <Route path='/menu' component={MainMenu} />
       <Route path='/happ-hosting' component={HappHosting} />
-      <Route path='/settings' component={Settings} />
-      <Route path='/tos' component={Tos} />
+      <Route path='/settings' exact component={Settings} />
+      <Route path='/tos' exact component={Tos} />
     </div>
   </div>
 }

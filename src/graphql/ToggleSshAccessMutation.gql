@@ -1,0 +1,5 @@
+mutation ToggleSshAccess {
+  toggleSshAccess {
+    sshAccessBool
+  }
+}

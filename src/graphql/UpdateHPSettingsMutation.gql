@@ -1,0 +1,11 @@
+mutation UpdateHPSettings ($HpSettings:HpSettings ) {
+  updateHPSettings(allHPSettings: $HpSettings) {
+    hostName
+    hostPubKey
+    hostEmail
+    deviceName
+    networkId
+    sshAccess
+    ports
+  }
+}

@@ -6,7 +6,7 @@ import Button from 'components/Button'
 export default function HappHosting ({ allAvailableHapps = [], history: { push } }) {
   const sortedHapps = allAvailableHapps.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToMenu = () => push('/menu')
-
+  
   return <div>
     <div styleName='header'>
       <span styleName='title'>hApps</span>

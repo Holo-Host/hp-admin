@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
+// import React, { useEffect } from 'react'
 import { get } from 'lodash/fp'
 
 export function RegisterUser (props) {
@@ -12,11 +13,14 @@ export function RegisterUser (props) {
     registerHostingUser()
   })
 
-  if (hostingUser && isRegistered) {
-    return children
-  } else {
-    return <h1>Registering User</h1>
-  }
+  return children
+
+  // TODO: Figure out why removing cache value, makes hostingUser and isReg Calls FAIL !!
+  // if (hostingUser && isRegistered) {
+  //   return children
+  // } else {
+  //   return <h1>Registering User</h1>
+  // }
 }
 
 export default RegisterUser

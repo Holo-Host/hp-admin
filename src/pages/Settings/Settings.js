@@ -6,24 +6,29 @@ import FormInput from 'components/FormInput'
 import EditIcon from 'utils/icons/EditIcon'
 
 export default function Settings ({
-  hostName,
-  hostPubKey,
-  hostEmail,
-  deviceName,
-  networkId,
-  sshAccess,
-  ports,
+  allHPSettings,
+  updateHPSettings,
   factoryReset,
   toggleSshAccess,
   history: { push }
 }) {
+  console.log('allHPSettings : ', allHPSettings)
+  console.log('updateHPSettings : ', updateHPSettings)
+  console.log('factoryReset : ', factoryReset)
+  console.log('toggleSshAccess : ', toggleSshAccess)
+  
   const goToMenu = () => push('/menu')
+  const { hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess, ports } = allHPSettings
   const [sshAccessVal, setSshAccess] = useState(false)
-  const { value: registrationEmail, bind: bindRegistrationEmail, reset: resetRegistrationEmail } = useInput(hostEmail)
   const { value: hostNameVal, bind: bindhostName, reset: resethostName } = useInput(hostName)
   const { value: hostPubKeyVal, bind: bindHostPubKey, reset: resetHostPubKey } = useInput(hostPubKey)
+  const { value: registrationEmail, bind: bindRegistrationEmail, reset: resetRegistrationEmail } = useInput(hostEmail)
   const { value: deviceNameVal, bind: bindDeviceName, reset: resetDeviceName } = useInput(deviceName)
   const { value: networkIdVal, bind: bindNetworkId, reset: resetNetworkId } = useInput(networkId)
+  const { value: deviceAdminPortVal, bind: bindDeviceAdminPort, reset: resetDeviceAdminPort } = useInput(ports.deviceAdminPort)
+  const { value: hcAdminPortVal, bind: bindHcAdminPort, reset: resetHcAdminPort } = useInput(ports.hcAdminPort)
+  const { value: hcNetworkPortVal, bind: bindHcNetworkPort, reset: resetHcNetworkPort } = useInput(ports.hcNetworkPort)
+  const { value: hostingPortVal, bind: bindHostingPort, reset: resetHostingPort } = useInput(ports.hostingPort)
 
   const handleViewTos = (e) => {
     e.preventDefault()
@@ -35,11 +40,31 @@ export default function Settings ({
     console.log(`Submitting form > INITIAL values from props : `, hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess)
     console.log(`Submitting form > UPDATED values `, hostNameVal, hostPubKeyVal, registrationEmail, deviceNameVal, networkIdVal, sshAccessVal)
 
+    const newSettings = {
+      hostName: hostNameVal,
+      hostPubKey: hostPubKeyVal,
+      hostEmail: registrationEmail,
+      deviceName: deviceNameVal,
+      networkId: networkIdVal,
+      sshAccess: sshAccessVal,
+      ports: {
+        deviceAdminPort: deviceAdminPortVal,
+        hcAdminPort: hcAdminPortVal,
+        hcNetworkPort: hcNetworkPortVal,
+        hostingPort: hostingPortVal
+      }
+    }
+    updateHPSettings(newSettings)
+
     resetRegistrationEmail()
     resethostName()
     resetHostPubKey()
     resetDeviceName()
     resetNetworkId()
+    resetDeviceAdminPort()
+    resetHcAdminPort()
+    resetHcNetworkPort()
+    resetHostingPort()
   }
 
   return <div>
@@ -51,7 +76,7 @@ export default function Settings ({
     <div>
       <form styleName='settings-form' onSubmit={handleSubmit}>
         <SettingInput
-          value={hostName}
+          value={hostNameVal}
           label='Host Name'
           dataFor='hostName'
           type='text'
@@ -59,7 +84,7 @@ export default function Settings ({
           bindFnName={bindhostName} />
 
         <SettingInput
-          value={hostPubKey}
+          value={hostPubKeyVal}
           label='Host ID (Host Public Key)'
           dataFor='hostPubKey'
           type='text'
@@ -67,7 +92,7 @@ export default function Settings ({
           bindFnName={bindHostPubKey} />
 
         <SettingInput
-          value={hostEmail}
+          value={registrationEmail}
           label='Registration Email'
           dataFor='registration-email'
           type='text'
@@ -75,7 +100,7 @@ export default function Settings ({
           bindFnName={bindRegistrationEmail} />
 
         <SettingInput
-          value={deviceName}
+          value={deviceNameVal}
           label='Device Name'
           dataFor='deviceName'
           type='text'
@@ -83,7 +108,7 @@ export default function Settings ({
           bindFnName={bindDeviceName} />
 
         <SettingInput
-          value={networkId}
+          value={networkIdVal}
           label='Network Id'
           dataFor='networkId'
           type='text'
@@ -91,36 +116,36 @@ export default function Settings ({
           bindFnName={bindNetworkId} />
 
         <SettingInput
-          value={ports.deviceAdminPort}
+          value={deviceAdminPortVal}
           label='HoloPort Admin Port Id'
           dataFor='hpAdminPortId'
           type='text'
           name='hpAdminPortId'
-          bindFnName={bindNetworkId} />
+          bindFnName={bindDeviceAdminPort} />
 
         <SettingInput
-          value={ports.hcAdminPort}
+          value={hcAdminPortVal}
           label='Holochain Admin Port Id'
           dataFor='hcAdminPort'
           type='text'
           name='hcAdminPort'
-          bindFnName={bindNetworkId} />
+          bindFnName={bindHcAdminPort} />
 
         <SettingInput
-          value={ports.hcNetworkPort}
+          value={hcNetworkPortVal}
           label='Holochain Networking Port Id'
           dataFor='hcNetworkPort'
           type='text'
           name='hcNetworkPort'
-          bindFnName={bindNetworkId} />
+          bindFnName={bindHcNetworkPort} />
          
         <SettingInput
-          value={ports.hostingPort}
+          value={hostingPortVal}
           label='Holo Hosting Port Id'
           dataFor='hostingPort'
           type='text'
           name='hostingPort'
-          bindFnName={bindNetworkId} />
+          bindFnName={bindHostingPort} />
 
         <FormInput hasLabel
           label='SSH Access'
@@ -138,7 +163,7 @@ export default function Settings ({
       </form>
       <Button name='factory-reset' onClick={() => console.log('You pressed factoryReset : ', factoryReset)}>Factory Reset</Button>
 
-      <Button styleName='tos-button' name='tos' onClick={handleViewTos}>Review Terms of Service</Button>
+      <Button name='tos' onClick={handleViewTos} styleName='tos-button'>Review Terms of Service</Button>
     </div>
   </div>
 }

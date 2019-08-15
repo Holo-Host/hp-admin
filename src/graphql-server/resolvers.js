@@ -2,7 +2,8 @@ import * as Promise from 'bluebird'
 import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/happStoreDnaInterface'
 import HhaDnaInterface from './dnaInterfaces/hhaDnaInterface'
-import EnvoyInterface from './dnaInterfaces/envoyInterface'
+import EnvoyInterface from './nonHcInterfaces/envoyInterface'
+import HoloPortInterface from './nonHcInterfaces/holoportInterface'
 
 import {
   dataMappedCall,
@@ -34,7 +35,17 @@ export const resolvers = {
         isEnabled: false
       }
       return getHappDetails(happ)
-    }
+    },
+
+    updateHPSettings: async (HpSettings) => {
+      const newHPSettings = await HoloPortInterface.deviceSettings.update(HpSettings)
+      // console.log('newHPSettings : ', newHPSettings)
+      return newHPSettings
+    },
+
+    toggleSshAccess: () => HoloPortInterface.deviceSettings.updateSSH(),
+
+    factoryReset: () => HoloPortInterface.deviceSettings.factoryReset()
   },
 
   Query: {
@@ -48,7 +59,14 @@ export const resolvers = {
 
     allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
 
-    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails)
+    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails),
+
+    allHPSettings: async () => {
+      console.log('deviceSettings called... ')
+      HoloPortInterface.deviceSettings.all()
+    },
+
+    hpTermsOfService: () => HoloPortInterface.deviceSettings.tos()
   }
 }
 

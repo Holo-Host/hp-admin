@@ -4,9 +4,11 @@ import { string } from 'prop-types'
 import './Tos.module.css'
 
 export default function Tos ({
-  tos,
+  hpTermsOfService,
   history: { push }
 }) {
+  console.log('hpTermsOfService IN Tos : ', hpTermsOfService)
+  
   const returnToSettings = () => push('/settings')
   const goToMenu = () => push('/menu')
 
@@ -18,7 +20,7 @@ export default function Tos ({
 
     <main>
       <h1>Terms of Service</h1>
-      <p>{tos}</p>
+      <p>{hpTermsOfService}</p>
     </main>
 
     <Button onClick={returnToSettings}>Return to Settings</Button>
@@ -26,5 +28,5 @@ export default function Tos ({
 }
 
 Tos.propTypes = {
-  tos: string
+  hpTermsOfService: string
 }

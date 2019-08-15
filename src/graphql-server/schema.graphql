@@ -27,6 +27,27 @@ type Happ {
   isEnabled: Boolean
 }
 
+type OpenHpPorts {
+  deviceAdminPort: String
+  hcAdminPort: String
+  hcNetworkPort: String
+  hostingPort: String
+}
+
+type HpSettings {
+  hostName: String
+  hostPubKey: String
+  hostEmail: String
+  deviceName: String
+  networkId: String
+  sshAccess: Boolean
+  ports: OpenHpPorts
+}
+
+type Tos {
+  tos: String
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser
@@ -34,6 +55,8 @@ type Query {
   allHapps: [Happ]
   allAvailableHapps: [Happ]
   allHostedHapps: [Happ]
+  allHPSettings: HpSettings
+  hpTermsOfService: String
 }
 
 type Mutation {
@@ -41,4 +64,7 @@ type Mutation {
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
+  updateHPSettings(settings: HpSettings): HpSettings
+  factoryReset: Boolean
+  toggleSshAccess: Boolean
 }
