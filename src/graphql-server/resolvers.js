@@ -34,7 +34,9 @@ export const resolvers = {
         isEnabled: false
       }
       return getHappDetails(happ)
-    }
+    },
+    // setHostPricing also gets passed 'units', but we don't currently use that in the dna
+    updateHostPricing: (_, { fuelPerUnit }) => HhaDnaInterface.hostPricing.update(fuelPerUnit)
   },
 
   Query: {
@@ -48,7 +50,9 @@ export const resolvers = {
 
     allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
 
-    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails)
+    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails),
+
+    hostPricing: () => HhaDnaInterface.hostPricing.get()
   }
 }
 

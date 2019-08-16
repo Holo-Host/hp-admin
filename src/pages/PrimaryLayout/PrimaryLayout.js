@@ -1,11 +1,11 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { Route } from 'react-router-dom'
 import './PrimaryLayout.module.css'
 import Dashboard from 'pages/Dashboard'
-import MainMenu, { Menu } from 'pages/MainMenu'
+import MainMenu from 'pages/MainMenu'
 import BrowseHapps from 'pages/BrowseHapps'
+import ManagePricing from 'pages/ManagePricing'
 import ScreenWidthContext from 'contexts/screenWidth'
-import Button from 'components/Button'
 import cx from 'classnames'
 
 export function PrimaryLayout () {
@@ -15,17 +15,9 @@ export function PrimaryLayout () {
     <Route path='/(|dashboard)' exact component={Dashboard} />
     <Route path='/menu' component={MainMenu} />
     <Route path='/browse-happs' component={BrowseHapps} />
-  </div>
-}
+    <Route path='/pricing' component={ManagePricing} />
 
-export function SideMenu () {
-  const [expanded, setExpanded] = useState(false)
-  return <div styleName='side-menu'>
-    <div styleName='menu-link'>
-      <Button onClick={() => setExpanded(!expanded)}>Menu</Button>
-    </div>
-    {expanded && <Menu />}
   </div>
-}
 
+}
 export default PrimaryLayout

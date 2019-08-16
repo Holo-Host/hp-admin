@@ -7,6 +7,7 @@ import cx from 'classnames'
 export default function BrowseHapps ({ allAvailableHapps = [], enableHapp, disableHapp, history: { push } }) {
   const sortedHapps = allAvailableHapps.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToMenu = () => push('/menu')
+  const goToPricing = () => push('/pricing')
 
   return <div>
     <div styleName='header'>

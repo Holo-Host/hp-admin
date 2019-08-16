@@ -1,0 +1,6 @@
+mutation UpdateHostPricing ($units: String, $fuelPerUnit: String) {
+  updateHostPricing(units: $units, fuelPerUnit: $fuelPerUnit) {
+    units
+    fuelPerUnit
+  }
+}

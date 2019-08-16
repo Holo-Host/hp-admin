@@ -76,7 +76,10 @@ testConductor()
               domain_name: happ.domain
             }
           )
-        }
+        },
+
+        // currently adds dummy data
+        addHolofuelAccount: () => holochainZomeCall('hha', 'provider', 'add_holofuel_account', { account_number: 'not currently used' })
       }
 
       const registerProvider = new Promise((resolve, reject) => resolve(PROVIDER_SHIMS.registerAsProvider()))
@@ -92,8 +95,9 @@ testConductor()
         })
       }
 
-      registerProvider
-        .then(r => fillHappStore())
+      return registerProvider
+        .then(_ => fillHappStore())
+        .then(_ => PROVIDER_SHIMS.addHolofuelAccount())
         .catch(e => console.log(`Error when registering Provider. >> ERROR : ${e}`))
     }) // end of SHIMS
   })
