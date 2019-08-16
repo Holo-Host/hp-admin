@@ -3,13 +3,27 @@ import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/happStoreDnaInterface'
 import HhaDnaInterface from './dnaInterfaces/hhaDnaInterface'
 import EnvoyInterface from './dnaInterfaces/envoyInterface'
-
 import {
   dataMappedCall,
   toUiData
 } from './dataMapping'
+// TODO: dataMapping should probably be happening in the dnainterfaces
 
 export const resolvers = {
+  Query: {
+    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
+
+    happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
+
+    hostingUser: () => HhaDnaInterface.currentUser.get(),
+
+    allHapps: () => HappStoreDnaInterface.happs.all(),
+
+    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
+
+    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails)
+  },
+
   Mutation: {
     registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
@@ -35,20 +49,6 @@ export const resolvers = {
       }
       return getHappDetails(happ)
     }
-  },
-
-  Query: {
-    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
-
-    happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
-
-    hostingUser: () => HhaDnaInterface.currentUser.get(),
-
-    allHapps: () => HappStoreDnaInterface.happs.all(),
-
-    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
-
-    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails)
   }
 }
 
