@@ -34,6 +34,13 @@ type OpenHpPorts {
   hostingPort: String
 }
 
+input OpenHpPortsInput {
+  deviceAdminPort: String
+  hcAdminPort: String
+  hcNetworkPort: String
+  hostingPort: String
+}
+
 type HpSettings {
   hostName: String
   hostPubKey: String
@@ -42,6 +49,16 @@ type HpSettings {
   networkId: String
   sshAccess: Boolean
   ports: OpenHpPorts
+}
+
+input HpSettingsInput {
+  hostName: String
+  hostPubKey: String
+  hostEmail: String
+  deviceName: String
+  networkId: String
+  sshAccess: Boolean
+  ports: OpenHpPortsInput
 }
 
 type Tos {
@@ -64,7 +81,7 @@ type Mutation {
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
-  updateHPSettings(settings: HpSettings): HpSettings
+  updateHPSettings(settings: HpSettingsInput): HpSettings
   factoryReset: Boolean
   toggleSshAccess: Boolean
 }
