@@ -62,23 +62,23 @@ const HhaDnaInterface = {
       const allAvailable = await HhaDnaInterface.happs.allAvailable()
       if (isEmpty(allAvailable)) throw new Error("Can't set Host Pricing: no happs available to host.")
       return createZomeCall('provider/get_service_log_details')({ app_hash: allAvailable[0].id })
-        .then(({ price_per_unit: fuelPerUnit }) => ({
-          fuelPerUnit,
+        .then(({ price_per_unit: pricePerUnit }) => ({
+          pricePerUnit,
           units: UNITS.bandwidth
         }))
     },
-    update: async (fuelPerUnit) => {
+    update: async (pricePerUnit) => {
       const allAvailable = await HhaDnaInterface.happs.allAvailable()
       // set price_per_unit the same for all happs
       await Promise.map(allAvailable, ({ id }) => createZomeCall('provider/add_service_log_details')({
         app_hash: id,
         max_fuel_per_invoice: 1,
         max_unpaid_value: 1,
-        price_per_unit: fuelPerUnit
+        price_per_unit: pricePerUnit
       }))
 
       return {
-        fuelPerUnit,
+        pricePerUnit,
         units: UNITS.bandwidth
       }
     }

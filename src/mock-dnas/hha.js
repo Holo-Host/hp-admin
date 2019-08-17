@@ -65,7 +65,7 @@ const hha = {
       return presentHappForGetAppDetails(happ)
     },
     get_service_log_details: {
-      price_per_unit: 5
+      price_per_unit: '5'
     },
     add_service_log_details: (details) => {
       hha.provider.get_service_log_details = details

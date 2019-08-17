@@ -32,8 +32,10 @@
   text-align: center;
 }
 
-.unit-dropdown {
+.units-dropdown {
   margin-bottom: 10px;
+  display: inline-block;
+  border: 1px solid lightgray;
 }
 
 .price-input-wrapper {

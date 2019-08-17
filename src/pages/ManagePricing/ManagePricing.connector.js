@@ -9,10 +9,10 @@ const hostPricing = graphql(HostPricingQuery, {
 
 const updateHostPricing = graphql(UpdateHostPricingMutation, {
   props: ({ mutate }) => ({
-    updateHostPricing: ({ units, fuelPerUnit }) => mutate({
+    updateHostPricing: ({ units, pricePerUnit }) => mutate({
       variables: {
         units,
-        fuelPerUnit
+        pricePerUnit
       }
     })
   })

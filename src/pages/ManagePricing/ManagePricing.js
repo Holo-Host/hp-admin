@@ -1,36 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import './ManagePricing.module.css'
 import Button from 'components/Button'
-import Dropdown from 'react-dropdown'
 import { UNITS } from 'models/HostPricing'
 
 export default function ManagePricing ({ hostPricing, updateHostPricing, history: { push } }) {
   const goToMenu = () => push('/menu')
 
   const [units, setUnits] = useState('')
-  const [fuelPerUnit, setFuelPerUnit] = useState('')
+  const [pricePerUnit, setPricePerUnit] = useState('')
 
   useEffect(() => {
     if (!hostPricing) return
-    const { units, fuelPerUnit } = hostPricing
+    const { units, pricePerUnit } = hostPricing
     setUnits(units)
-    setFuelPerUnit(fuelPerUnit)
+    setPricePerUnit(pricePerUnit)
   }, [hostPricing])
 
   const dropdownOptions = [
-    { value: UNITS.cpu, label: `CPU = ${fuelPerUnit} HF per second` },
-    { value: UNITS.bandwidth, label: `Bandwidth = ${fuelPerUnit} HF per KB` },
-    { value: UNITS.storage, label: `Storage = ${fuelPerUnit} HF per MB` },
-    { value: UNITS.ram, label: `RAM = ${fuelPerUnit} HF per MB` }
+    { value: UNITS.cpu, label: `CPU = ${pricePerUnit} HF per second` },
+    { value: UNITS.bandwidth, label: `Bandwidth = ${pricePerUnit} HF per KB` },
+    { value: UNITS.storage, label: `Storage = ${pricePerUnit} HF per MB` },
+    { value: UNITS.ram, label: `RAM = ${pricePerUnit} HF per MB` }
   ]
 
   const onFuelInputChange = ({ target: { value } }) => {
     if (isNaN(value)) return
-    setFuelPerUnit(value)
+    setPricePerUnit(value)
   }
 
   const save = () => {
-    updateHostPricing({ units, fuelPerUnit })
+    updateHostPricing({ units, pricePerUnit })
   }
 
   return <div styleName='container'>
@@ -41,15 +40,21 @@ export default function ManagePricing ({ hostPricing, updateHostPricing, history
 
     <div styleName='subtitle'>Price Settings</div>
 
-    <Dropdown
-      options={dropdownOptions}
-      onChange={({ value }) => setUnits(value)} value={units}
-      styleName='unit-dropdown' />
+    <div styleName='units-dropdown'>
+      <select value={units}
+        onChange={({ target: { value } }) => setUnits(value)}
+        data-testid='units-dropdown'>
+        {dropdownOptions.map(({ value, label }) =>
+          <option value={value} key={value}>
+            {label}
+          </option>)}
+      </select>
+    </div>
 
     <div styleName='price-input-wrapper'>
       <label styleName='price-input-label'>
         Holofuel per unit
-        <input type='text' value={fuelPerUnit} onChange={onFuelInputChange} styleName='price-input' />
+        <input type='text' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' />
       </label>
     </div>
 

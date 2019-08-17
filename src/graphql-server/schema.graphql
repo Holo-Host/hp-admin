@@ -29,7 +29,7 @@ type Happ {
 
 type HostPricing {
   units: String
-  fuelPerUnit: Int
+  pricePerUnit: String
 }
 
 type Query {
@@ -47,5 +47,5 @@ type Mutation {
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
-  updateHostPricing(units: String, fuelPerUnit: String): HostPricing
+  updateHostPricing(units: String, pricePerUnit: String): HostPricing
 }

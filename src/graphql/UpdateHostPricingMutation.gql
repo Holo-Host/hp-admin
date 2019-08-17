@@ -1,6 +1,6 @@
-mutation UpdateHostPricing ($units: String, $fuelPerUnit: String) {
-  updateHostPricing(units: $units, fuelPerUnit: $fuelPerUnit) {
+mutation UpdateHostPricing ($units: String, $pricePerUnit: String) {
+  updateHostPricing(units: $units, pricePerUnit: $pricePerUnit) {
     units
-    fuelPerUnit
+    pricePerUnit
   }
 }
