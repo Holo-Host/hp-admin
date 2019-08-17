@@ -39,7 +39,7 @@ export const resolvers = {
 
     updateHPSettings: async (HpSettings) => {
       const newHPSettings = await HoloPortInterface.deviceSettings.update(HpSettings)
-      // console.log('newHPSettings : ', newHPSettings)
+      console.log('calling updateHPSettings; data passed : ', HpSettings)
       return newHPSettings
     },
 

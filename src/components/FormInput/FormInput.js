@@ -32,14 +32,14 @@ export default function FormInput ({
             {label}
           </label>
           <span
-            onClick={() => onCloseHandler()}
-            styleName='side-icon'>
-            <CloseIcon width={10} height={10} />
-          </span>
-          <span
             onClick={() => onCheckHandler()}
             styleName='side-icon'>
             <CheckMarkIcon width={10} height={10} />
+          </span>
+          <span
+            onClick={() => onCloseHandler()}
+            styleName='side-icon'>
+            <CloseIcon width={8} height={8} />
           </span>
         </div>
       }

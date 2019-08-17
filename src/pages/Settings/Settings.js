@@ -5,15 +5,22 @@ import { useInput } from '../../utils/index'
 import FormInput from 'components/FormInput'
 import EditIcon from 'utils/icons/EditIcon'
 
-export default function Settings ({
+export default function Settings (props) {
+  console.log('inside Settings Wrapper : ', props.allHPSettings)
+  if (props.allHPSettings) {
+    return <SettingsDisplay {...props} />
+  } else {
+    return <h4>Loading Settings</h4>
+  }
+}
+
+function SettingsDisplay ({
   allHPSettings,
   updateHPSettings,
   factoryReset,
   toggleSshAccess,
   history: { push }
 }) {
-  console.log('allHPSettings : ', allHPSettings)
-  
   const goToMenu = () => push('/menu')
   const { hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess, ports } = allHPSettings
   const [sshAccessVal, setSshAccess] = useState(false)
@@ -34,25 +41,28 @@ export default function Settings ({
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(`Submitting form > INITIAL values from props : `, hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess)
-    console.log(`Submitting form > UPDATED values `, hostNameVal, hostPubKeyVal, registrationEmail, deviceNameVal, networkIdVal, sshAccessVal)
+    console.log('allHPSettings : ', allHPSettings)
+    console.log(`Submitting form > INITIAL values (from props): `, hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess)
+    console.log(`Submitting form > UPDATED values: `, hostNameVal, hostPubKeyVal, registrationEmail, deviceNameVal, networkIdVal, sshAccessVal)
 
     const newSettings = {
-      hostName: hostNameVal,
-      hostPubKey: hostPubKeyVal,
-      hostEmail: registrationEmail,
-      deviceName: deviceNameVal,
-      networkId: networkIdVal,
-      sshAccess: sshAccessVal,
+      hostName: hostNameVal || hostName,
+      hostPubKey: hostPubKeyVal || hostPubKey,
+      hostEmail: registrationEmail || hostEmail,
+      deviceName: deviceNameVal || deviceName,
+      networkId: networkIdVal || networkId,
+      sshAccess: sshAccessVal || sshAccess,
       ports: {
-        deviceAdminPort: deviceAdminPortVal,
-        hcAdminPort: hcAdminPortVal,
-        hcNetworkPort: hcNetworkPortVal,
-        hostingPort: hostingPortVal
+        deviceAdminPort: deviceAdminPortVal || ports.deviceAdminPort,
+        hcAdminPort: hcAdminPortVal || ports.hcAdminPort,
+        hcNetworkPort: hcNetworkPortVal || ports.hcNetworkPort,
+        hostingPort: hostingPortVal || ports.hostingPort
       }
     }
-    // submit all/new setting values
+    // Submit all/new setting values
     updateHPSettings(newSettings)
+    // For Testing >> updateHPSettings(newSettings)
+
     // Reset all inputs
     resetRegistrationEmail()
     resethostName()
@@ -144,7 +154,7 @@ export default function Settings ({
           name='hcNetworkPort'
           propValue={ports.hcNetworkPort}
           bindFnName={bindHcNetworkPort} />
-         
+
         <SettingInput
           value={hostingPortVal}
           label='Holo Hosting Port Id'
@@ -158,7 +168,6 @@ export default function Settings ({
           label='SSH Access'
           dataFor='ssh-access'
           type='checkbox'
-          // defaultChecked will return the sshAccess boolean value as default
           defaultChecked={sshAccess}
           checked={sshAccessVal}
           // onChange={toggleSshAccess} />

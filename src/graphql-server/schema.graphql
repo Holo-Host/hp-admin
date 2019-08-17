@@ -81,7 +81,7 @@ type Mutation {
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
-  updateHPSettings(settings: HpSettingsInput): HpSettings
+  updateHPSettings(newHPSettings: HpSettingsInput): HpSettings
   factoryReset: Boolean
   toggleSshAccess: Boolean
 }

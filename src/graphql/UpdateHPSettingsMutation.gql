@@ -1,5 +1,5 @@
-mutation UpdateHPSettings ($HpSettings:HpSettings ) {
-  updateHPSettings(allHPSettings: $HpSettings) {
+mutation UpdateHPSettings ($HpSettingsInput: HpSettingsInput ) {
+  updateHPSettings(newHPSettings: $HpSettingsInput) {
     hostName
     hostPubKey
     hostEmail

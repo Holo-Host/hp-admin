@@ -14,7 +14,7 @@ export default function Tos ({
 
   return <div styleName='tos-container'>
     <div styleName='header'>
-      <span styleName='title'>hApps</span>
+      <span styleName='title'>Legal Contracts</span>
       <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
     </div>
 

@@ -31,6 +31,14 @@ const toggleSshAccess = graphql(ToggleSshAccessMutation, {
   })
 })
 
+export default compose(
+  allHPSettings,
+  updateHPSettings,
+  factoryReset,
+  toggleSshAccess
+)
+
+// Previous Mocked Data
 // const mockedData = {
 //   hostName: 'My Host',
 //   hostPubKey: 'hcsFAkeHashSTring2443223ee',
@@ -50,10 +58,3 @@ const toggleSshAccess = graphql(ToggleSshAccessMutation, {
 
 // const withMockedData = ComponentToBeWrapped => props =>
 //   <ComponentToBeWrapped {...mockedData} {...props} />
-
-export default compose(
-  allHPSettings,
-  updateHPSettings,
-  factoryReset,
-  toggleSshAccess
-)

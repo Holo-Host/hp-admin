@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import Btn from 'components/Button'
 
-export default function Dashboard ({ me, happStoreUser, registerUser }) {
+export default function Dashboard ({ me, happStoreUser, registerUser, allHPSettings }) { // allHPSettings
   return <div>
 
     <div>
@@ -17,6 +17,10 @@ export default function Dashboard ({ me, happStoreUser, registerUser }) {
 
     <p>
       Happ Store User data: {happStoreUser && JSON.stringify(happStoreUser)}
+    </p>
+
+    <p>
+      HP Settings data: {allHPSettings && JSON.stringify(allHPSettings)}
     </p>
 
     <p>
