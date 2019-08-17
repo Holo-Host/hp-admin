@@ -27,14 +27,24 @@ type Happ {
   isEnabled: Boolean
 }
 
-type OpenHpPorts {
+input OpenHpPortsInput {
   deviceAdminPort: String
   hcAdminPort: String
   hcNetworkPort: String
   hostingPort: String
 }
 
-input OpenHpPortsInput {
+input HpSettingsInput {
+  hostName: String
+  hostPubKey: String
+  hostEmail: String
+  deviceName: String
+  networkId: String
+  sshAccess: Boolean
+  ports: OpenHpPortsInput
+}
+
+type OpenHpPorts {
   deviceAdminPort: String
   hcAdminPort: String
   hcNetworkPort: String
@@ -49,16 +59,6 @@ type HpSettings {
   networkId: String
   sshAccess: Boolean
   ports: OpenHpPorts
-}
-
-input HpSettingsInput {
-  hostName: String
-  hostPubKey: String
-  hostEmail: String
-  deviceName: String
-  networkId: String
-  sshAccess: Boolean
-  ports: OpenHpPortsInput
 }
 
 type Tos {

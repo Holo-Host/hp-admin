@@ -42,7 +42,7 @@ function updateSshAccess () {
 
 export function hpApiWrapper (fnToInvoke) {
   if (MOCK_HP_CONNECTION) {
-    fnToInvoke()
+    return fnToInvoke()
   } else {
     return console.warn('You are trying to make a live API call to the HoloPort. HP APIs are still a WIP.')
   }
@@ -50,10 +50,7 @@ export function hpApiWrapper (fnToInvoke) {
 
 const HoloPortInterface = {
   deviceSettings: {
-    all: hpApiWrapper(() => {
-      console.log('IN HP INTERFACE - hpAdminSettings : ', hpAdminSettings)
-      Promise.resolve(hpAdminSettings)
-    }),
+    all: () => hpApiWrapper(() => hpAdminSettings),
     tos: hpApiWrapper(() => Promise.resolve(tos)),
     update: newSettingsObject => hpApiWrapper(updateHPSettings(newSettingsObject)),
     updateSSH: () => hpApiWrapper(updateSshAccess),

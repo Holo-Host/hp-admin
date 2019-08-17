@@ -1,5 +1,6 @@
 import React from 'react'
 import CloseIcon from 'utils/icons/CloseIcon'
+import CheckMarkIcon from 'utils/icons/CheckMarkIcon'
 import './FormInput.module.css'
 
 export default function FormInput ({
@@ -17,7 +18,8 @@ export default function FormInput ({
   checked,
   value,
   onChange,
-  onClickHandler
+  onCloseHandler,
+  onCheckHandler
 }) {
   return (
     <fieldset styleName='form-row'>
@@ -30,9 +32,14 @@ export default function FormInput ({
             {label}
           </label>
           <span
-            onClick={() => onClickHandler()}
+            onClick={() => onCloseHandler()}
             styleName='side-icon'>
             <CloseIcon width={10} height={10} />
+          </span>
+          <span
+            onClick={() => onCheckHandler()}
+            styleName='side-icon'>
+            <CheckMarkIcon width={10} height={10} />
           </span>
         </div>
       }

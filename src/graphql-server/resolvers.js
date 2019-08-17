@@ -61,10 +61,7 @@ export const resolvers = {
 
     allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails),
 
-    allHPSettings: async () => {
-      console.log('deviceSettings called... ')
-      HoloPortInterface.deviceSettings.all()
-    },
+    allHPSettings: () => HoloPortInterface.deviceSettings.all(),
 
     hpTermsOfService: () => HoloPortInterface.deviceSettings.tos()
   }

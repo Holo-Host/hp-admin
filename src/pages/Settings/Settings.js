@@ -13,9 +13,6 @@ export default function Settings ({
   history: { push }
 }) {
   console.log('allHPSettings : ', allHPSettings)
-  console.log('updateHPSettings : ', updateHPSettings)
-  console.log('factoryReset : ', factoryReset)
-  console.log('toggleSshAccess : ', toggleSshAccess)
   
   const goToMenu = () => push('/menu')
   const { hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess, ports } = allHPSettings
@@ -54,8 +51,9 @@ export default function Settings ({
         hostingPort: hostingPortVal
       }
     }
+    // submit all/new setting values
     updateHPSettings(newSettings)
-
+    // Reset all inputs
     resetRegistrationEmail()
     resethostName()
     resetHostPubKey()
@@ -81,6 +79,7 @@ export default function Settings ({
           dataFor='hostName'
           type='text'
           name='hostName'
+          propValue={hostName}
           bindFnName={bindhostName} />
 
         <SettingInput
@@ -89,6 +88,7 @@ export default function Settings ({
           dataFor='hostPubKey'
           type='text'
           name='hostPubKey'
+          propValue={hostPubKey}
           bindFnName={bindHostPubKey} />
 
         <SettingInput
@@ -97,6 +97,7 @@ export default function Settings ({
           dataFor='registration-email'
           type='text'
           name='registration-email'
+          propValue={hostEmail}
           bindFnName={bindRegistrationEmail} />
 
         <SettingInput
@@ -105,6 +106,7 @@ export default function Settings ({
           dataFor='deviceName'
           type='text'
           name='deviceName'
+          propValue={deviceName}
           bindFnName={bindDeviceName} />
 
         <SettingInput
@@ -113,6 +115,7 @@ export default function Settings ({
           dataFor='networkId'
           type='text'
           name='networkId'
+          propValue={networkId}
           bindFnName={bindNetworkId} />
 
         <SettingInput
@@ -121,6 +124,7 @@ export default function Settings ({
           dataFor='hpAdminPortId'
           type='text'
           name='hpAdminPortId'
+          propValue={ports.hpAdminPortId}
           bindFnName={bindDeviceAdminPort} />
 
         <SettingInput
@@ -129,6 +133,7 @@ export default function Settings ({
           dataFor='hcAdminPort'
           type='text'
           name='hcAdminPort'
+          propValue={ports.hcAdminPort}
           bindFnName={bindHcAdminPort} />
 
         <SettingInput
@@ -137,6 +142,7 @@ export default function Settings ({
           dataFor='hcNetworkPort'
           type='text'
           name='hcNetworkPort'
+          propValue={ports.hcNetworkPort}
           bindFnName={bindHcNetworkPort} />
          
         <SettingInput
@@ -145,6 +151,7 @@ export default function Settings ({
           dataFor='hostingPort'
           type='text'
           name='hostingPort'
+          propValue={ports.hostingPort}
           bindFnName={bindHostingPort} />
 
         <FormInput hasLabel
@@ -168,12 +175,21 @@ export default function Settings ({
   </div>
 }
 
-export function SettingInput ({ value, label, dataFor, type, name, bindFnName }) {
+export function SettingInput ({ value, label, dataFor, type, name, bindFnName, propValue }) {
+  const [currentValue, setcurrentValue] = useState(propValue)
+  const [revertText, setRevertText] = useState(propValue)
   const [clickAmend, setClickAmend] = useState(false)
   const renderInput = () => {
     setClickAmend(true)
   }
-  const displayText = () => {
+  const resetText = () => {
+    console.log('input propValue: ', propValue)
+    setRevertText(true)
+    setClickAmend(false)
+  }
+  const displayNewText = () => {
+    setcurrentValue(value)
+    setRevertText(false)
     setClickAmend(false)
   }
   return (
@@ -188,11 +204,12 @@ export function SettingInput ({ value, label, dataFor, type, name, bindFnName })
           max='100'
           step='0.5'
           {...bindFnName}
-          onClickHandler={displayText} />
+          onCloseHandler={resetText}
+          onCheckHandler={displayNewText} />
         : <div styleName='form-row'>
           <h6 styleName='form-label-header'>{label}</h6>
           <span onClick={renderInput} styleName='side-icon'><EditIcon width={10} height={10} /></span>
-          <p styleName='form-label'>{value}</p>
+          <p styleName='form-label'>{revertText ? currentValue : value}</p>
         </div>
       }
     </div>
