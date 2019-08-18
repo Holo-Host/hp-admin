@@ -10,13 +10,27 @@ const allHPSettings = graphql(AllHPSettingsQuery, {
 })
 
 const updateHPSettings = graphql(UpdateHPSettingsMutation, {
-  props: ({ mutate }) => ({
-    updateHPSettings: newHpSettings => mutate({
-      variables: {
-        newHpSettings
+  props: ({ mutate }) => {
+    return {
+      updateHPSettings: ({ newHPSettings }) => {
+        mutate({
+          variables: {
+            newHPSettings
+          },
+          update: (cache, { data: { updateHPSettings } }) => {
+            if (updateHPSettings) {
+              cache.writeQuery({
+                query: AllHPSettingsQuery,
+                data: {
+                  allHPSettings: updateHPSettings
+                }
+              })
+            }
+          }
+        })
       }
-    })
-  })
+    }
+  }
 })
 
 const factoryReset = graphql(FactoryResetMutation, {

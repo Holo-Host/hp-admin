@@ -11,6 +11,7 @@ export function Menu () {
   return <ul>
     <li><Link to='/'>Dashboard</Link></li>
     <li><Link to='happ-hosting'>Happ Hosting</Link></li>
+    <li><Link to='holofuel'>HoloFuel</Link></li>
     <li><Link to='settings'>Settings</Link></li>
   </ul>
 }

@@ -4,6 +4,7 @@ import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/happStore
 import HhaDnaInterface from './dnaInterfaces/hhaDnaInterface'
 import EnvoyInterface from './nonHcInterfaces/envoyInterface'
 import HoloPortInterface from './nonHcInterfaces/holoportInterface'
+import HoloFuelInterface from './dnaInterfaces/holofuelDnaInterface'
 
 import {
   dataMappedCall,
@@ -37,10 +38,11 @@ export const resolvers = {
       return getHappDetails(happ)
     },
 
-    updateHPSettings: async (HpSettings) => {
-      const newHPSettings = await HoloPortInterface.deviceSettings.update(HpSettings)
-      console.log('calling updateHPSettings; data passed : ', HpSettings)
-      return newHPSettings
+    updateHPSettings: async (_, HPSettings) => {
+      console.log('calling updateHPSettings; data passed : ', HPSettings)
+      const newHPSettingsReply = await HoloPortInterface.deviceSettings.update(HPSettings.newHPSettings)
+      console.log('CHECKING:>> ',newHPSettingsReply);
+      return newHPSettingsReply
     },
 
     toggleSshAccess: () => HoloPortInterface.deviceSettings.updateSSH(),
@@ -61,9 +63,19 @@ export const resolvers = {
 
     allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails),
 
-    allHPSettings: () => HoloPortInterface.deviceSettings.all(),
+    allHPSettings: () => {
+      const value = HoloPortInterface.deviceSettings.all()
+      console.log('Checking: Value', value)
+      return value
+    },
 
-    hpTermsOfService: () => HoloPortInterface.deviceSettings.tos()
+    hpTermsOfService: () => HoloPortInterface.deviceSettings.tos(),
+
+    allHoloFuelPendingTransaction: () => HoloFuelInterface.transactions.getAllPending(),
+
+    allHoloFuelCompleteTransations: () => HoloFuelInterface.transactions.getAllComplete(),
+  
+    allHoloFuelTransations: () => HoloFuelInterface.transactions.getAll()
   }
 }
 

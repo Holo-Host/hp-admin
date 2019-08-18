@@ -7,12 +7,10 @@ const hpAdminSettings = {
   deviceName: 'My Very First HoloPort',
   networkId: 'my-holoport',
   sshAccess: false,
-  ports: {
-    deviceAdminPort: '6609',
-    hcAdminPort: '8800',
-    hcNetworkPort: '35353',
-    hostingPort: '8080'
-  }
+  deviceAdminPort: "6609",
+  hcAdminPort: "8800",
+  hcNetworkPort: "35353",
+  hostingPort: "8080"
 }
 
 const tos = 'O Lorem Ipsum é um texto modelo da indústria tipográfica e de impressão. O Lorem Ipsum tem vindo a ser o texto padrão usado por estas indústrias desde o ano de 1500, quando uma misturou os caracteres de um texto para criar um espécime de livro. Este texto não só sobreviveu 5 séculos, mas também o salto para a tipografia electrónica, mantendo-se essencialmente inalterada. Foi popularizada nos anos 60 com a disponibilização das folhas de Letraset, que continham passagens com Lorem Ipsum, e mais recentemente com os programas de publicação como o Aldus PageMaker que incluem versões do Lorem Ipsum.'
@@ -21,6 +19,7 @@ function updateHPSettings (newSettingsObject) {
   console.log('PREVIOUS hpAdminSettings: ', hpAdminSettings)
   console.log('PASSED IN newSettingsObject : ', newSettingsObject)
   const newSettings = Object.getOwnPropertyNames(newSettingsObject)
+  console.log("+++++++> ",newSettings);
   for (const setting of newSettings) {
     console.log('setting : ', setting)
     if (hpAdminSettings[setting] !== newSettingsObject[setting]) {
@@ -50,9 +49,11 @@ export function hpApiWrapper (fnToInvoke) {
 
 const HoloPortInterface = {
   deviceSettings: {
-    all: () => hpApiWrapper(() => hpAdminSettings),
+    all: () => hpApiWrapper(() => {
+      console.log("Checking: hpAdminSettings",hpAdminSettings);
+      return hpAdminSettings}),
     tos: hpApiWrapper(() => Promise.resolve(tos)),
-    update: newSettingsObject => hpApiWrapper(updateHPSettings(newSettingsObject)),
+    update: newSettingsObject => hpApiWrapper(()=>updateHPSettings(newSettingsObject)),
     updateSSH: () => hpApiWrapper(updateSshAccess),
     factoryReset: () => hpApiWrapper(() => Promise.resolve(true))
   }

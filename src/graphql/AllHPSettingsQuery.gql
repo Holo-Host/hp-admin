@@ -6,6 +6,9 @@ query AllHPSettings {
     deviceName
     networkId
     sshAccess
-    ports
+    deviceAdminPort
+    hcAdminPort
+    hostingPort
+    hcNetworkPort
   }
 }

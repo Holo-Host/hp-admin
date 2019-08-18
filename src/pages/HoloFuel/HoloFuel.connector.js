@@ -1,26 +1,22 @@
 import { graphql, compose } from 'react-apollo'
-// import AllHPSettingsQuery from 'graphql/AllHPSettingsQuery.gql'
-import UpdateHPSettingsMutation from 'graphql/UpdateHPSettingsMutation.gql'
+import AllHoloFuelTransactionsQuery from 'graphql/AllHoloFuelTransactionsQuery.gql'
+import AllHoloFuelPendingTransactionQuery from 'graphql/AllHoloFuelPendingTransactionQuery.gql'
+import AllHoloFuelCompleteTransactionsQuery from 'graphql/AllHoloFuelCompleteTransactionsQuery.gql'
 
-// // Note: Query Example
-// const allHPSettings = graphql(AllHPSettingsQuery, {
-//   props: ({ data: { allHPSettings } }) => ({ allHPSettings })
-// })
+const allHoloFuelTransations = graphql(AllHoloFuelTransactionsQuery, {
+  props: ({ data: { allHoloFuelTransactions } }) => ({ allHoloFuelTransactions })
+})
 
-// // Note: Mutation Example
-// const updateHPSettings = graphql(UpdateHPSettingsMutation, {
-//   props: ({ mutate }) => ({
-//     updateHPSettings: newHpSettings => mutate({
-//       variables: {
-//         newHpSettings
-//       }
-//     })
-//   })
-// })
+const allHoloFuelPendingTransaction = graphql(AllHoloFuelPendingTransactionQuery, {
+  props: ({ data: { allHoloFuelPendingTransactions } }) => ({ allHoloFuelPendingTransactions })
+})
+
+const allHoloFuelCompleteTransations = graphql(AllHoloFuelCompleteTransactionsQuery, {
+  props: ({ data: { allHoloFuelCompleteTransactions } }) => ({ allHoloFuelCompleteTransactions })
+})
 
 export default compose(
-  allPastTransactions,
-  allPendingTransactions,
-  offerHoloFuel,
-  receiveHoloFuel
+  allHoloFuelTransations,
+  allHoloFuelPendingTransaction,
+  allHoloFuelCompleteTransations
 )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Button from 'components/Button'
 import './Settings.module.css'
 import { useInput } from '../../utils/index'
@@ -22,17 +22,17 @@ function SettingsDisplay ({
   history: { push }
 }) {
   const goToMenu = () => push('/menu')
-  const { hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess, ports } = allHPSettings
+  const { hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess, deviceAdminPort,hcAdminPort, hcNetworkPort, hostingPort } = allHPSettings
   const [sshAccessVal, setSshAccess] = useState(false)
   const { value: hostNameVal, bind: bindhostName, reset: resethostName } = useInput(hostName)
   const { value: hostPubKeyVal, bind: bindHostPubKey, reset: resetHostPubKey } = useInput(hostPubKey)
   const { value: registrationEmail, bind: bindRegistrationEmail, reset: resetRegistrationEmail } = useInput(hostEmail)
   const { value: deviceNameVal, bind: bindDeviceName, reset: resetDeviceName } = useInput(deviceName)
   const { value: networkIdVal, bind: bindNetworkId, reset: resetNetworkId } = useInput(networkId)
-  const { value: deviceAdminPortVal, bind: bindDeviceAdminPort, reset: resetDeviceAdminPort } = useInput(ports.deviceAdminPort)
-  const { value: hcAdminPortVal, bind: bindHcAdminPort, reset: resetHcAdminPort } = useInput(ports.hcAdminPort)
-  const { value: hcNetworkPortVal, bind: bindHcNetworkPort, reset: resetHcNetworkPort } = useInput(ports.hcNetworkPort)
-  const { value: hostingPortVal, bind: bindHostingPort, reset: resetHostingPort } = useInput(ports.hostingPort)
+  const { value: deviceAdminPortVal, bind: bindDeviceAdminPort, reset: resetDeviceAdminPort } = useInput(deviceAdminPort)
+  const { value: hcAdminPortVal, bind: bindHcAdminPort, reset: resetHcAdminPort } = useInput(hcAdminPort)
+  const { value: hcNetworkPortVal, bind: bindHcNetworkPort, reset: resetHcNetworkPort } = useInput(hcNetworkPort)
+  const { value: hostingPortVal, bind: bindHostingPort, reset: resetHostingPort } = useInput(hostingPort)
 
   const handleViewTos = (e) => {
     e.preventDefault()
@@ -52,15 +52,13 @@ function SettingsDisplay ({
       deviceName: deviceNameVal || deviceName,
       networkId: networkIdVal || networkId,
       sshAccess: sshAccessVal || sshAccess,
-      ports: {
-        deviceAdminPort: deviceAdminPortVal || ports.deviceAdminPort,
-        hcAdminPort: hcAdminPortVal || ports.hcAdminPort,
-        hcNetworkPort: hcNetworkPortVal || ports.hcNetworkPort,
-        hostingPort: hostingPortVal || ports.hostingPort
-      }
+      deviceAdminPort: deviceAdminPortVal || deviceAdminPort,
+      hcAdminPort: hcAdminPortVal || hcAdminPort,
+      hcNetworkPort: hcNetworkPortVal || hcNetworkPort,
+      hostingPort: hostingPortVal || hostingPort
     }
     // Submit all/new setting values
-    updateHPSettings(newSettings)
+    updateHPSettings({ newHPSettings: newSettings })
     // For Testing >> updateHPSettings(newSettings)
 
     // Reset all inputs
@@ -130,11 +128,11 @@ function SettingsDisplay ({
 
         <SettingInput
           value={deviceAdminPortVal}
-          label='HoloPort Admin Port Id'
-          dataFor='hpAdminPortId'
+          label='Device Admin Port Id'
+          dataFor='deviceAdminPort'
           type='text'
-          name='hpAdminPortId'
-          propValue={ports.hpAdminPortId}
+          name='deviceAdminPort'
+          propValue={hcAdminPort}
           bindFnName={bindDeviceAdminPort} />
 
         <SettingInput
@@ -143,16 +141,16 @@ function SettingsDisplay ({
           dataFor='hcAdminPort'
           type='text'
           name='hcAdminPort'
-          propValue={ports.hcAdminPort}
+          propValue={hcAdminPort}
           bindFnName={bindHcAdminPort} />
-
+          
         <SettingInput
           value={hcNetworkPortVal}
           label='Holochain Networking Port Id'
           dataFor='hcNetworkPort'
           type='text'
           name='hcNetworkPort'
-          propValue={ports.hcNetworkPort}
+          propValue={hcNetworkPort}
           bindFnName={bindHcNetworkPort} />
 
         <SettingInput
@@ -161,7 +159,7 @@ function SettingsDisplay ({
           dataFor='hostingPort'
           type='text'
           name='hostingPort'
-          propValue={ports.hostingPort}
+          propValue={hostingPort}
           bindFnName={bindHostingPort} />
 
         <FormInput hasLabel
@@ -188,6 +186,13 @@ export function SettingInput ({ value, label, dataFor, type, name, bindFnName, p
   const [currentValue, setcurrentValue] = useState(propValue)
   const [revertText, setRevertText] = useState(propValue)
   const [clickAmend, setClickAmend] = useState(false)
+
+  // TODO: review the implementation of useEffect
+  useEffect(() => {
+    if (value) return
+    setRevertText(true)
+  })
+
   const renderInput = () => {
     setClickAmend(true)
   }

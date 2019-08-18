@@ -18,7 +18,7 @@ type HhaUser {
 type Happ {
   id: ID
   title: String
-  description: String  
+  description: String
   thumbnailUrl: String
   homepageUrl: String
   dnaHash: String
@@ -27,12 +27,6 @@ type Happ {
   isEnabled: Boolean
 }
 
-input OpenHpPortsInput {
-  deviceAdminPort: String
-  hcAdminPort: String
-  hcNetworkPort: String
-  hostingPort: String
-}
 
 input HpSettingsInput {
   hostName: String
@@ -41,10 +35,6 @@ input HpSettingsInput {
   deviceName: String
   networkId: String
   sshAccess: Boolean
-  ports: OpenHpPortsInput
-}
-
-type OpenHpPorts {
   deviceAdminPort: String
   hcAdminPort: String
   hcNetworkPort: String
@@ -58,11 +48,60 @@ type HpSettings {
   deviceName: String
   networkId: String
   sshAccess: Boolean
-  ports: OpenHpPorts
+  deviceAdminPort: String
+  hcAdminPort: String
+  hostingPort: String
+  hcNetworkPort: String
 }
 
 type Tos {
   tos: String
+}
+
+type Ledger {
+  balance: Int
+  credit: Int
+  payable: Int
+  receivable: Int
+  fees: Int
+}
+
+enum Status {
+  pending
+  spender
+  recipient
+}
+
+enum Event {
+  Request
+  Reject
+  Invoice
+  Return
+  Receipt
+  Refund
+  Promise
+  Cheque 
+  Decline
+  Recover
+  Failure
+}
+
+type HfTransaction {
+  originTimeStamp: String
+  originEvent: Event
+  counterparty: String
+  txAuthor: String
+  amount: String
+  fee: String
+  event: Event,
+  status: Status
+  transactionTimestamp: String
+  eventCommitHash: String
+  dueDate: String
+  notes: String
+  originCommitHash: String
+  promiseCommitSignature: String
+  inResponseToTX: String
 }
 
 type Query {
@@ -74,6 +113,9 @@ type Query {
   allHostedHapps: [Happ]
   allHPSettings: HpSettings
   hpTermsOfService: String
+  allHoloFuelPendingTransaction:[HfTransaction]
+  allHoloFuelCompleteTransations:[HfTransaction]
+  allHoloFuelTransations:[HfTransaction]
 }
 
 type Mutation {

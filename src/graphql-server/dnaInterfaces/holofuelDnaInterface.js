@@ -1,61 +1,60 @@
 import { instanceCreateZomeCall } from '../holochainClient'
+import { pick } from 'lodash/fp'
 
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
-// TODO : Finish Mocking below :
-const HoloFuelDnaInterface = {
+// TODO : Finish Mocking below & optimize
+export const HoloFuelDnaInterface = {
   transactions: {
-    holofuelPendingTransactions: () => createZomeCall('transactions/list_transactions')({})
+    getAllPending: () => createZomeCall('transactions/list_of_pending')({})
       .then(hfTx => hfTx.map(shapePendingTransactionBody)),
-    holofuelCompleteTransations: () => createZomeCall('transactions/list_transactions')({})
-      .then(hfTx => hfTx.transactions.map(shapeCompleteTransactionBody))
+    getAllComplete: () => createZomeCall('transactions/list_transactions')({})
+      .then(hfTx => hfTx.transactions.map(shapeCompleteTransactionBody)),
+    getAll: async () => {
+      const pendingTx = await HoloFuelDnaInterface.transactions.getAllPending()
+      const completedTx = await HoloFuelDnaInterface.transactions.getAllComplete()
+      return dataRefactor(pendingTx.concat(completedTx))
+    }
   },
   ledger: {
-    balance: async () => {
-      const { hash } = await createZomeCall('get_ledger/balance')()
-      await createZomeCall('host/register_as_host')({ host_doc: { kyc_proof: 'this value is ignored by dna' } })
-      return {
-        id: hash,
-        isRegistered: true
-      }
-    }
+    balance: () => {}
   }
 }
 
 export function shapePendingTransactionBody (tx) {
-  const list_of_promises = tx.promises.map((p) => {
+  const promiseList = tx.promises.map((p) => {
     return {
       originTimeStamp: p.event[1],
       amount: p.event[2].Promise.tx.amount,
       fee: p.event[2].Promise.tx.fee,
-      originEvent:p.event[2].Promise.request ? 'Request' : 'Promise',
+      originEvent: p.event[2].Promise.request ? 'Request' : 'Promise',
       event: 'Promise',
       counterparty: p.event[2].Promise.tx.from,
       txAuthor: p.event[2].Promise.tx.to,
       status: 'pending/recipient',
       dueDate: p.event[2].Promise.tx.deadline,
-      notes:  p.event[2].Promise.tx.notes,
+      notes: p.event[2].Promise.tx.notes,
       originCommitHash: p.event[2].Promise.request ? p.event[2].Promise.request : p.event[0], // the tx origin commit hash
       eventCommitHash: p.event[0], // the 'origin' promise commit hash
-      inResponseToTX:p.event[2].Promise.request || undefined, // the request hash that the promise is in response to, should it exist...
+      inResponseToTX: p.event[2].Promise.request || undefined, // the request hash that the promise is in response to, should it exist...
       transactionTimestamp: p.event[1],
       promiseCommitSignature: p.provenance[1]
     }
   })
 
-  const list_of_requests = tx.requests.map((r) => {
+  const requestList = tx.requests.map((r) => {
     return {
       originTimeStamp: r.event[1],
       amount: r.event[2].Request.amount,
       fee: r.event[2].Request.fee,
-      originEvent:'Request',
+      originEvent: 'Request',
       event: 'Request',
-      counterparty:r.event[2].Request.to,
+      counterparty: r.event[2].Request.to,
       txAuthor: r.event[2].Request.from,
       status: 'pending/spender',
       dueDate: r.event[2].Request.deadline,
-      notes:  r.event[2].Request.notes,
+      notes: r.event[2].Request.notes,
       originCommitHash: r.event[0],
       eventCommitHash: r.event[0], // commit hash for the currently displayed Transaction === the origin commit hash in this cirumstance
       inResponseToTX: undefined,
@@ -63,6 +62,7 @@ export function shapePendingTransactionBody (tx) {
       requestCommitSignature: r.provenance[1]
     }
   })
+  return dataRefactor(promiseList.concat(requestList))
 }
 
 export function shapeCompleteTransactionBody (tx) {
@@ -129,7 +129,7 @@ export function shapeCompleteTransactionBody (tx) {
     originCommitHash = event.Cheque.invoice.promise.request ? event.Cheque.invoice.promise.request : tx.timestamp.origin // tx origin commit hash
   }
 
-  return {
+  const completedTransactionList = {
     originCommitHash, // tx origin commit hash
     eventCommitHash: tx.origin, // 'origin' commit hash for the currently displayed Transaction
     amount,
@@ -144,6 +144,54 @@ export function shapeCompleteTransactionBody (tx) {
     inResponseToTX,
     transactionTimestamp: tx.timestamp.event
   }
+  return dataRefactor(completedTransactionList)
+}
+
+// DATA STRUCTURE FOR TRANSACTION TYPES
+const dataRefactor = (transactionDetails) => {
+  const APP_LIST_LENGTH = transactionDetails.length
+
+  const range = (length) => {
+    const lengthArray = []
+    for (let i = 0; i < length; i++) {
+      lengthArray.push(i)
+    }
+    return lengthArray
+  }
+
+  const insertAppDetails = (transaction) => {
+    if (transaction !== parseInt(transaction, 10)) {
+      return {
+        originEvent: transaction.originEvent === 'Request' ? 'Requested' : 'Sent',
+        txAuthor: transaction.txAuthor || null,
+        promiseCommitSignature: transaction.promiseCommitSignature || null,
+        ...pick([
+          'originTimeStamp',
+          'transactionTimestamp',
+          'counterparty',
+          'amount',
+          'fee',
+          'event',
+          'status',
+          'eventCommitHash',
+          'dueDate',
+          'notes',
+          'originCommitHash',
+          'inResponseToTX'
+        ], transaction)
+      }
+    }
+  }
+
+  const dataGenerate = (length = APP_LIST_LENGTH) => {
+    return transactionDetails.map((transaction) => {
+      return {
+        ...insertAppDetails(transaction),
+        children: range(length - 1).map(insertAppDetails) // # per page...
+      }
+    })
+  }
+  return dataGenerate()
 }
 
 export default HoloFuelDnaInterface

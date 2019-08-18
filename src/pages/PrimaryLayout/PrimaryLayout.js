@@ -4,6 +4,7 @@ import './PrimaryLayout.module.css'
 import Dashboard from 'pages/Dashboard'
 import MainMenu, { Menu } from 'pages/MainMenu'
 import HappHosting from 'pages/HappHosting'
+import HoloFuel from 'pages/HoloFuel'
 import Settings from 'pages/Settings'
 import Tos from 'pages/Tos'
 import Button from 'components/Button'
@@ -18,6 +19,7 @@ export function PrimaryLayout () {
       <Route path='/(|dashboard)' exact component={Dashboard} />
       <Route path='/menu' component={MainMenu} />
       <Route path='/happ-hosting' component={HappHosting} />
+      <Route path='/holofuel' exact component={HoloFuel} />
       <Route path='/settings' exact component={Settings} />
       <Route path='/tos' exact component={Tos} />
     </div>

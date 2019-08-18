@@ -1,11 +1,14 @@
-mutation UpdateHPSettings ($HpSettingsInput: HpSettingsInput ) {
-  updateHPSettings(newHPSettings: $HpSettingsInput) {
+mutation UpdateHPSettings ($newHPSettings: HpSettingsInput ) {
+  updateHPSettings(newHPSettings: $newHPSettings) {
     hostName
     hostPubKey
     hostEmail
     deviceName
     networkId
     sshAccess
-    ports
+    deviceAdminPort
+    hcAdminPort
+    hostingPort
+    hcNetworkPort
   }
 }
