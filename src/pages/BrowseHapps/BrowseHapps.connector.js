@@ -1,4 +1,5 @@
-import { graphql, compose } from 'react-apollo'
+import { graphql } from '@apollo/react-hoc'
+import { flow as compose } from 'lodash'
 import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
 import AllHostedHappsQuery from 'graphql/AllHostedHappsQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'

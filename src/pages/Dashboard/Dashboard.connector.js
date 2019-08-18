@@ -1,4 +1,5 @@
-import { graphql, compose } from 'react-apollo'
+import { graphql } from '@apollo/react-hoc'
+import { flowRight as compose } from 'lodash'
 import RegisterUserMutation from 'graphql/RegisterUserMutation.gql'
 import HyloMeQuery from 'graphql/HyloMeQuery.gql'
 import HappStoreUserQuery from 'graphql/HappStoreUserQuery.gql'

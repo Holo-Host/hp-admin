@@ -1,6 +1,6 @@
 import React from 'react'
-import { render } from '@testing-library/react'
-import { MockedProvider } from 'react-apollo/test-utils'
+import { render, act } from '@testing-library/react'
+import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
 import HostingUserQuery from 'graphql/HostingUserQuery.gql'
 import connector from './RegisterUser.connector'
@@ -34,10 +34,12 @@ describe('connector', () => {
 
     const ConnectedMockComponent = connector(MockComponent)
 
-    render(<MockedProvider mocks={mocks} addTypename={false}>
-      <ConnectedMockComponent />
-    </MockedProvider>)
-    await wait(1)
+    await act(async () => {
+      render(<MockedProvider mocks={mocks} addTypename={false}>
+        <ConnectedMockComponent />
+      </MockedProvider>)
+      await wait(1)
+    })
 
     expect(hostingUser).toMatchObject(mockHostingUser)
   })
