@@ -1,3 +1,9 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;  
+}
+
 .header {
   display: flex;
   padding-bottom: 6px;
@@ -19,6 +25,19 @@
 
 .happ-list {
   padding-top: 20px;
+}
+
+.pricing-button {
+  /* this margin-bottom value is to stop the button being pushed off the screen. there's a better way to do this' */
+  margin-bottom: 40px;
+  margin-top: auto;
+  padding: 15px;
+  width: 100%;
+  background-color: #484848;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+  color: #FFFFFF;
 }
 
 .happ-row {

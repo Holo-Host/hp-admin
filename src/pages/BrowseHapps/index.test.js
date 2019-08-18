@@ -70,4 +70,17 @@ describe('ConnectedBrowseHapps', () => {
       expect(mockHistory.push).toHaveBeenCalledWith('/menu')
     })
   })
+
+  describe('pricing button', () => {
+    it("calls history.push with '/pricing'", async () => {
+      const mockHistory = {
+        push: jest.fn()
+      }
+      const { getByText } = render(<ApolloProvider client={apolloClient}>
+        <ConnectedBrowseHapps history={mockHistory} />
+      </ApolloProvider>)
+      fireEvent.click(getByText('Manage Pricing'))
+      expect(mockHistory.push).toHaveBeenCalledWith('/pricing')
+    })
+  })
 })
