@@ -1,5 +1,5 @@
-
-import { graphql, compose } from 'react-apollo'
+import { graphql } from '@apollo/react-hoc'
+import { flow as compose } from 'lodash'
 import HostPricingQuery from 'graphql/HostPricingQuery.gql'
 import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 
