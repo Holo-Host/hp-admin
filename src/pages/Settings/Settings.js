@@ -39,6 +39,12 @@ function SettingsDisplay ({
     push('/tos')
   }
 
+  const handleToggleSshAccess = (e) => {
+    e.preventDefault()
+    setSshAccess(e.target.checked)
+    toggleSshAccess()
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('allHPSettings : ', allHPSettings)
@@ -59,7 +65,6 @@ function SettingsDisplay ({
     }
     // Submit all/new setting values
     updateHPSettings({ newHPSettings: newSettings })
-    // For Testing >> updateHPSettings(newSettings)
 
     // Reset all inputs
     resetRegistrationEmail()
@@ -143,7 +148,7 @@ function SettingsDisplay ({
           name='hcAdminPort'
           propValue={hcAdminPort}
           bindFnName={bindHcAdminPort} />
-          
+
         <SettingInput
           value={hcNetworkPortVal}
           label='Holochain Networking Port Id'
@@ -168,14 +173,13 @@ function SettingsDisplay ({
           type='checkbox'
           defaultChecked={sshAccess}
           checked={sshAccessVal}
-          // onChange={toggleSshAccess} />
-          onChange={e => setSshAccess(e.target.checked)} />
+          onChange={handleToggleSshAccess} />
 
         <hr />
         <Button type='submit' name='update-settngs' value='Submit'>Update</Button>
 
       </form>
-      <Button name='factory-reset' onClick={() => console.log('You pressed factoryReset : ', factoryReset)}>Factory Reset</Button>
+      <Button name='factory-reset' onClick={() => factoryReset()}>Factory Reset</Button>
 
       <Button name='tos' onClick={handleViewTos} styleName='tos-button'>Review Terms of Service</Button>
     </div>
