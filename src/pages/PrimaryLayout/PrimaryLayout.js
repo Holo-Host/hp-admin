@@ -12,12 +12,13 @@ export function PrimaryLayout () {
   const isWide = useContext(ScreenWidthContext)
 
   return <div styleName={cx('primary-layout', { wide: isWide }, { narrow: !isWide })}>
+
     <Route path='/(|dashboard)' exact component={Dashboard} />
     <Route path='/menu' component={MainMenu} />
     <Route path='/browse-happs' component={BrowseHapps} />
     <Route path='/pricing' component={ManagePricing} />
 
   </div>
-
 }
+
 export default PrimaryLayout

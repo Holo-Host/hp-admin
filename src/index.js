@@ -8,7 +8,6 @@ import PrimaryLayout from 'pages/PrimaryLayout'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
 import './index.css'
-import 'react-dropdown/style.css'
 
 export function App () {
   const isWide = useMediaPredicate('(min-width: 550px)')

@@ -23,7 +23,6 @@
     "lodash": "^4.17.15",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-dropdown": "^1.6.4",
     "react-identicon-variety-pack": "^0.2.1",
     "react-media-hook": "^0.4.4",
     "react-test-renderer": "^16.8.6",
