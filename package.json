@@ -136,6 +136,7 @@
     ]
   },
   "jest": {
+    "clearMocks": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts"
