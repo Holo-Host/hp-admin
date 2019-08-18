@@ -18,7 +18,7 @@ type HhaUser {
 type Happ {
   id: ID
   title: String
-  description: String  
+  description: String
   thumbnailUrl: String
   homepageUrl: String
   dnaHash: String
@@ -32,6 +32,52 @@ type HostPricing {
   pricePerUnit: String
 }
 
+type Ledger {
+  balance: Int
+  credit: Int
+  payable: Int
+  receivable: Int
+  fees: Int
+}
+
+enum Status {
+  pending
+  spender
+  recipient
+}
+
+enum Event {
+  Request
+  Reject
+  Invoice
+  Return
+  Receipt
+  Refund
+  Promise
+  Cheque 
+  Decline
+  Recover
+  Failure
+}
+
+type HfTransaction {
+  originTimeStamp: String
+  originEvent: Event
+  counterparty: String
+  txAuthor: String
+  amount: String
+  fee: String
+  event: Event,
+  status: Status
+  transactionTimestamp: String
+  eventCommitHash: String
+  dueDate: String
+  notes: String
+  originCommitHash: String
+  promiseCommitSignature: String
+  inResponseToTX: String
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser
@@ -39,6 +85,9 @@ type Query {
   allHapps: [Happ]
   allAvailableHapps: [Happ]
   allHostedHapps: [Happ]
+  allHoloFuelPendingTransaction:[HfTransaction]
+  allHoloFuelCompleteTransations:[HfTransaction]
+  allHoloFuelTransations:[HfTransaction]
   hostPricing: HostPricing
 }
 

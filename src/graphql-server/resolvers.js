@@ -2,6 +2,8 @@ import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
 import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
 import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
+import HoloFuelInterface from './dnaInterfaces/HolofuelDnaInterface'
+
 import { promiseMap } from 'utils'
 import {
   dataMappedCall,
@@ -23,7 +25,13 @@ export const resolvers = {
 
     allHostedHapps: () => promiseMap(HhaDnaInterface.happs.allHosted(), getHappDetails),
 
-    hostPricing: () => HhaDnaInterface.hostPricing.get()
+    hostPricing: () => HhaDnaInterface.hostPricing.get(),
+
+    allHoloFuelPendingTransaction: () => HoloFuelInterface.transactions.getAllPending(),
+
+    allHoloFuelCompleteTransations: () => HoloFuelInterface.transactions.getAllComplete(),
+  
+    allHoloFuelTransations: () => HoloFuelInterface.transactions.getAll()
   },
 
   Mutation: {

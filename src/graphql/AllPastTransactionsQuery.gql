@@ -1,6 +1,0 @@
-query AllPastTransactions {
-  allPastTransactions {
-    id
-    etc...
-  }
-}

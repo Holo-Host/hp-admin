@@ -12,5 +12,6 @@ export function Menu () {
     <li><Link to='/'>Dashboard</Link></li>
     <li><Link to='/browse-happs'>Browse Happs</Link></li>
     <li><Link to='/pricing'>Manage Pricing</Link></li>
+    <li><Link to='/holofuel'>HoloFuel</Link></li>
   </ul>
 }
