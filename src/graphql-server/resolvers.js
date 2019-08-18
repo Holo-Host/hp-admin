@@ -1,8 +1,8 @@
 import * as Promise from 'bluebird'
-import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
-import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/happStoreDnaInterface'
-import HhaDnaInterface from './dnaInterfaces/hhaDnaInterface'
-import EnvoyInterface from './dnaInterfaces/envoyInterface'
+import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
+import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
+import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
+import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
 
 import {
   dataMappedCall,
@@ -10,6 +10,22 @@ import {
 } from './dataMapping'
 
 export const resolvers = {
+  Query: {
+    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
+
+    happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
+
+    hostingUser: () => HhaDnaInterface.currentUser.get(),
+
+    allHapps: () => HappStoreDnaInterface.happs.all(),
+
+    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
+
+    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails),
+
+    hostPricing: () => HhaDnaInterface.hostPricing.get()
+  },
+
   Mutation: {
     registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
@@ -37,22 +53,6 @@ export const resolvers = {
     },
     // setHostPricing also gets passed 'units', but we don't currently use that in the dna
     updateHostPricing: (_, { pricePerUnit }) => HhaDnaInterface.hostPricing.update(pricePerUnit)
-  },
-
-  Query: {
-    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
-
-    happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
-
-    hostingUser: () => HhaDnaInterface.currentUser.get(),
-
-    allHapps: () => HappStoreDnaInterface.happs.all(),
-
-    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
-
-    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails),
-
-    hostPricing: () => HhaDnaInterface.hostPricing.get()
   }
 }
 

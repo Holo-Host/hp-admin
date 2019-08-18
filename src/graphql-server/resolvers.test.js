@@ -1,9 +1,9 @@
 import resolvers from './resolvers'
 import { hostingUserId } from 'mock-dnas/hha'
 import mockData from 'mock-dnas/mockData'
-import mockHhaDnaInterface from 'graphql-server/dnaInterfaces/hhaDnaInterface'
+import mockHhaDnaInterface from 'graphql-server/dnaInterfaces/HhaDnaInterface'
 
-jest.mock('graphql-server/dnaInterfaces/hhaDnaInterface')
+jest.mock('graphql-server/dnaInterfaces/HhaDnaInterface')
 
 describe('resolvers', () => {
   describe('Query', () => {
@@ -18,7 +18,7 @@ describe('resolvers', () => {
     })
 
     describe('.hostPricing', () => {
-      it('calls hhaDnaInterface.hostPricing.get', async () => {
+      it('calls HhaDnaInterface.hostPricing.get', async () => {
         resolvers.Query.hostPricing()
         expect(mockHhaDnaInterface.hostPricing.get).toHaveBeenCalled()
       })
@@ -41,7 +41,7 @@ describe('resolvers', () => {
     })
 
     describe('.updateHostPricing', () => {
-      it('calls hhaDnaInterface.hostPricing.update', async () => {
+      it('calls HhaDnaInterface.hostPricing.update', async () => {
         const pricePerUnit = '12'
         resolvers.Mutation.updateHostPricing(null, { pricePerUnit })
         expect(mockHhaDnaInterface.hostPricing.update).toHaveBeenCalledWith(pricePerUnit)
