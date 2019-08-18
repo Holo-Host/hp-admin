@@ -38,7 +38,7 @@ describe('connector', () => {
       render(<MockedProvider mocks={mocks} addTypename={false}>
         <ConnectedMockComponent />
       </MockedProvider>)
-      await wait(1)  
+      await wait(1)
     })
 
     expect(hostPricing).toMatchObject(mockHostPricing)

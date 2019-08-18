@@ -1,5 +1,5 @@
 import { graphql } from '@apollo/react-hoc'
-import { flowRight as compose } from 'lodash'
+import { flow as compose } from 'lodash'
 import HostingUserQuery from 'graphql/HostingUserQuery.gql'
 import RegisterHostingUserMutation from 'graphql/RegisterHostingUserMutation.gql'
 
