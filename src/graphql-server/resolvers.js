@@ -8,6 +8,7 @@ import {
   dataMappedCall,
   toUiData
 } from './dataMapping'
+// TODO: dataMapping should probably be happening in the dnainterfaces
 
 export const resolvers = {
   Query: {
