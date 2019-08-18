@@ -9,12 +9,12 @@ import wait from 'waait'
 describe('ConnectedBrowseHapps', () => {
   it('renders', async () => {
     let getAllByRole
-    act(() => {
+    await act(async () => {
       ({ getAllByRole } = render(<ApolloProvider client={apolloClient}>
         <ConnectedBrowseHapps history={{}} />
       </ApolloProvider>))
+      await wait(15)
     })
-    await wait(15)
 
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)
@@ -37,12 +37,12 @@ describe('ConnectedBrowseHapps', () => {
   describe('HostButton', () => {
     it('enables and disables happs', async () => {
       let getAllByRole, queryAllByText
-      act(() => {
+      await act(async () => {
         ({ getAllByRole, queryAllByText } = render(<ApolloProvider client={apolloClient}>
           <ConnectedBrowseHapps history={{}} />
         </ApolloProvider>))
+        await wait(15)
       })
-      await wait(15)
 
       const listItems = getAllByRole('listitem')
       expect(queryAllByText('Un-Host')).toHaveLength(1)
@@ -51,14 +51,14 @@ describe('ConnectedBrowseHapps', () => {
       const { getByText: getByTextFromListItem } = within(listItems[0])
       fireEvent.click(getByTextFromListItem('Un-Host'))
 
-      await wait(0)
+      await act(() => wait(0))
 
       expect(queryAllByText('Un-Host')).toHaveLength(0)
       expect(queryAllByText('Host')).toHaveLength(2)
 
       fireEvent.click(getByTextFromListItem('Host'))
 
-      await wait(0)
+      await act(() => wait(0))
 
       expect(queryAllByText('Un-Host')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)

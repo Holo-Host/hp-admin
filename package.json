@@ -27,11 +27,11 @@
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
     "lodash": "^4.17.15",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
     "react-identicon-variety-pack": "^0.2.1",
     "react-media-hook": "^0.4.4",
-    "react-test-renderer": "^16.8.6",
+    "react-test-renderer": "^16.9.0",
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",
     "rpc-websockets": "^4.5.1",
@@ -43,7 +43,7 @@
     "@babel/plugin-syntax-jsx": "^7.2.0",
     "@svgr/webpack": "4.1.0",
     "@testing-library/jest-dom": "^4.0.0",
-    "@testing-library/react": "^8.0.5",
+    "@testing-library/react": "^9.1.3",
     "@typescript-eslint/eslint-plugin": "1.6.0",
     "@typescript-eslint/parser": "1.6.0",
     "babel-eslint": "10.0.1",
@@ -144,7 +144,6 @@
       "regenerator-runtime/runtime"
     ],
     "setupFilesAfterEnv": [
-      "@testing-library/react/cleanup-after-each",
       "@testing-library/jest-dom/extend-expect"
     ],
     "testMatch": [

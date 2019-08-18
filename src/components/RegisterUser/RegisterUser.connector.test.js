@@ -33,13 +33,14 @@ describe('connector', () => {
     }
 
     const ConnectedMockComponent = connector(MockComponent)
-    act(() => {
+
+    await act(async () => {
       render(<MockedProvider mocks={mocks} addTypename={false}>
         <ConnectedMockComponent />
       </MockedProvider>)
+      await wait(1)
     })
 
-    await wait(1)
     expect(hostingUser).toMatchObject(mockHostingUser)
   })
 })
