@@ -1,8 +1,8 @@
 import * as Promise from 'bluebird'
-import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
-import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/happStoreDnaInterface'
-import HhaDnaInterface from './dnaInterfaces/hhaDnaInterface'
-import EnvoyInterface from './dnaInterfaces/envoyInterface'
+import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
+import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
+import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
+import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
 import {
   dataMappedCall,
   toUiData
