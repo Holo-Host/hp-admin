@@ -1,9 +1,8 @@
-import Promise from 'bluebird'
 import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
 import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
 import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
-
+import { promiseMap } from 'utils'
 import {
   dataMappedCall,
   toUiData
@@ -20,9 +19,9 @@ export const resolvers = {
 
     allHapps: () => HappStoreDnaInterface.happs.all(),
 
-    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
+    allAvailableHapps: () => promiseMap(HhaDnaInterface.happs.allAvailable(), getHappDetails),
 
-    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails),
+    allHostedHapps: () => promiseMap(HhaDnaInterface.happs.allHosted(), getHappDetails),
 
     hostPricing: () => HhaDnaInterface.hostPricing.get()
   },
