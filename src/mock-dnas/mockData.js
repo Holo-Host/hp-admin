@@ -1,6 +1,5 @@
 import happStore from './happStore'
 import hha from './hha'
-import holofuel from './holofuel'
 
 // data is a tree organized by instanceId > zome > function
 // leaves can either be an object, or a function which is called with the zome call args, so can update other parts of the tree.
@@ -24,8 +23,7 @@ const data = {
     }
   },
   'happ-store': happStore,
-  hha,
-  holofuel
+  hha
 }
 
 export default data
