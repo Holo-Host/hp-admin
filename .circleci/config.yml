@@ -35,7 +35,7 @@ commands:
       - setup-nodejs
       - run:
           name: Test
-          command: npm test
+          command: npm test:unit
   run-lint:
     steps:
       - prepare-env
