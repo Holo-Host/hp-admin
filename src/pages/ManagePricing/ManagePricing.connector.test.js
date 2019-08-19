@@ -1,13 +1,28 @@
 import React from 'react'
-import { render, act } from '@testing-library/react'
+import { render, act, fireEvent } from '@testing-library/react'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
-import HostPricingQuery from 'graphql/HostPricingQuery.gql'
 import connector from './ManagePricing.connector'
+import HostPricingQuery from 'graphql/HostPricingQuery.gql'
+import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
+import { UNITS } from 'models/HostPricing'
 
 const mockHostPricing = {
   units: 'cpu',
   pricePerUnit: '12'
+}
+
+const newPrice = '9'
+
+const updateHostPricingMock = {
+  request: {
+    query: UpdateHostPricingMutation,
+    variables: { units: UNITS.storage, pricePerUnit: newPrice }
+  },
+  result: {
+    data: { updateHostPricing: { units: 'not', pricePerUnit: 'used' } }
+  },
+  newData: jest.fn()
 }
 
 const mocks = [
@@ -20,7 +35,8 @@ const mocks = [
         hostPricing: mockHostPricing
       }
     }
-  }
+  },
+  updateHostPricingMock
 ]
 
 describe('connector', () => {
@@ -42,5 +58,24 @@ describe('connector', () => {
     })
 
     expect(hostPricing).toMatchObject(mockHostPricing)
+  })
+
+  it('passes updateHostPricing mutation as a prop', async () => {
+    const MockComponent = ({ updateHostPricing }) => {
+      return <button onClick={() => updateHostPricing(updateHostPricingMock.request.variables)}>update</button>
+    }
+
+    const ConnectedMockComponent = connector(MockComponent)
+
+    let getByText
+    await act(async () => {
+      ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        <ConnectedMockComponent />
+      </MockedProvider>))
+      await wait(1)
+    })
+
+    fireEvent.click(getByText('update'))
+    expect(updateHostPricingMock.newData).toHaveBeenCalled()
   })
 })
