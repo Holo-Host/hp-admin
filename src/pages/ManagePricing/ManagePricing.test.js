@@ -12,10 +12,12 @@ const mockHostPricing = {
   pricePerUnit: '12'
 }
 
+const newPrice = '9'
+
 const updateHostPricingMock = {
   request: {
     query: UpdateHostPricingMutation,
-    variables: { units: UNITS.storage, pricePerUnit: '9' }
+    variables: { units: UNITS.storage, pricePerUnit: newPrice }
   },
   result: {
     data: { updateHostPricing: { units: 'not', pricePerUnit: 'used' } }
@@ -34,7 +36,16 @@ const mocks = [
       }
     }
   },
-  updateHostPricingMock
+  updateHostPricingMock,
+  {
+    request: {
+      query: UpdateHostPricingMutation,
+      variables: { units: UNITS.cpu, pricePerUnit: newPrice }
+    },
+    result: {
+      data: { updateHostPricing: { units: 'not', pricePerUnit: 'used' } }
+    }
+  }
 ]
 
 describe('ManagePricing', () => {
@@ -58,10 +69,6 @@ describe('ManagePricing', () => {
 
   it('allows you to set and save units and pricePerUnit', async () => {
     const props = {
-      hostPricing: {
-        units: UNITS.cpu,
-        pricePerUnit: '7'
-      },
       history: {}
     }
     let getByLabelText, getByText, getByTestId
@@ -70,17 +77,49 @@ describe('ManagePricing', () => {
       ({ getByLabelText, getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
         <ManagePricing {...props} />
       </MockedProvider>))
-      await wait(15)
+      await wait(1)
     })
 
     fireEvent.change(getByTestId('units-dropdown'), { target: { value: UNITS.storage } })
-
-    const newPrice = '9'
 
     fireEvent.change(getByLabelText('Holofuel per unit'), { target: { value: newPrice } })
 
     fireEvent.click(getByText('Save'))
 
     expect(updateHostPricingMock.newData).toHaveBeenCalled()
+  })
+
+  it('changes button state based on user actions', async () => {
+    const props = {
+      history: {}
+    }
+
+    let getByText, getByLabelText
+    await act(async () => {
+      ({ getByText, getByLabelText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        <ManagePricing {...props} />
+      </MockedProvider>))
+      await wait(1)
+    })
+
+    expect(getByText('Save')).toHaveAttribute('disabled')
+
+    fireEvent.change(getByLabelText('Holofuel per unit'), { target: { value: newPrice } })
+
+    expect(getByText('Save')).not.toHaveAttribute('disabled')
+
+    act(() => {
+      fireEvent.click(getByText('Save'))
+    })
+
+    expect(getByText('Saving')).toHaveAttribute('disabled')
+
+    await act(() => wait(1))
+
+    expect(getByText('Saved')).toHaveAttribute('disabled')
+
+    fireEvent.change(getByLabelText('Holofuel per unit'), { target: { value: '123' } })
+
+    expect(getByText('Save')).not.toHaveAttribute('disabled')
   })
 })
