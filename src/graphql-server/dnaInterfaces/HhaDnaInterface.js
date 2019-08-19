@@ -1,4 +1,6 @@
+import { isEmpty } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
+import { UNITS } from 'models/HostPricing'
 
 export const INSTANCE_ID = 'hha' // holo-hosting-app
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
@@ -26,6 +28,7 @@ const HhaDnaInterface = {
       }
     }
   },
+
   happs: {
     get: appId => createZomeCall('provider/get_app_details')({ app_hash: appId })
       .then(happ => ({
@@ -50,6 +53,34 @@ const HhaDnaInterface = {
         happStoreId,
         isEnabled: true
       })))
+  },
+
+  hostPricing: {
+    get: async () => {
+      // we need an id to call get_service_log_details, and because we set all apps the same in add_service_log_details, it doesn't matter which app the id comes from
+      const allAvailable = await HhaDnaInterface.happs.allAvailable()
+      if (isEmpty(allAvailable)) throw new Error("Can't set Host Pricing: no happs available to host.")
+      return createZomeCall('provider/get_service_log_details')({ app_hash: allAvailable[0].id })
+        .then(({ price_per_unit: pricePerUnit }) => ({
+          pricePerUnit,
+          units: UNITS.bandwidth
+        }))
+    },
+    update: async (pricePerUnit) => {
+      const allAvailable = await HhaDnaInterface.happs.allAvailable()
+      // set price_per_unit the same for all happs
+      await Promise.all(allAvailable, ({ id }) => createZomeCall('provider/add_service_log_details')({
+        app_hash: id,
+        max_fuel_per_invoice: 1,
+        max_unpaid_value: 1,
+        price_per_unit: pricePerUnit
+      }))
+
+      return {
+        pricePerUnit,
+        units: UNITS.bandwidth
+      }
+    }
   }
 }
 

@@ -22,7 +22,6 @@
     "apollo-link-logger": "^1.2.3",
     "apollo-link-schema": "^1.2.3",
     "axios": "^0.19.0",
-    "bluebird": "^3.5.5",
     "canvas": "^2.5.0",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
@@ -135,6 +134,7 @@
     ]
   },
   "jest": {
+    "clearMocks": true,
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts"

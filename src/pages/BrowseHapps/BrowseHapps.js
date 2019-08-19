@@ -7,8 +7,9 @@ import cx from 'classnames'
 export default function BrowseHapps ({ allAvailableHapps = [], enableHapp, disableHapp, history: { push } }) {
   const sortedHapps = allAvailableHapps.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToMenu = () => push('/menu')
+  const goToPricing = () => push('/pricing')
 
-  return <div>
+  return <div styleName='container'>
     <div styleName='header'>
       <span styleName='title'>hApps</span>
       <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
@@ -22,6 +23,9 @@ export default function BrowseHapps ({ allAvailableHapps = [], enableHapp, disab
           disableHapp={disableHapp}
           key={happ.id} />)}
     </div>}
+
+    <Button onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
+
   </div>
 }
 

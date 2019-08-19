@@ -27,6 +27,11 @@ type Happ {
   isEnabled: Boolean
 }
 
+type HostPricing {
+  units: String
+  pricePerUnit: String
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser
@@ -34,6 +39,7 @@ type Query {
   allHapps: [Happ]
   allAvailableHapps: [Happ]
   allHostedHapps: [Happ]
+  hostPricing: HostPricing
 }
 
 type Mutation {
@@ -41,4 +47,5 @@ type Mutation {
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
+  updateHostPricing(units: String, pricePerUnit: String): HostPricing
 }

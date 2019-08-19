@@ -1,8 +1,8 @@
-import * as Promise from 'bluebird'
 import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
 import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
 import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
+import { promiseMap } from 'utils'
 import {
   dataMappedCall,
   toUiData
@@ -19,9 +19,11 @@ export const resolvers = {
 
     allHapps: () => HappStoreDnaInterface.happs.all(),
 
-    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
+    allAvailableHapps: () => promiseMap(HhaDnaInterface.happs.allAvailable(), getHappDetails),
 
-    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails)
+    allHostedHapps: () => promiseMap(HhaDnaInterface.happs.allHosted(), getHappDetails),
+
+    hostPricing: () => HhaDnaInterface.hostPricing.get()
   },
 
   Mutation: {
@@ -48,7 +50,9 @@ export const resolvers = {
         isEnabled: false
       }
       return getHappDetails(happ)
-    }
+    },
+    // setHostPricing also gets passed 'units', but we don't currently use that in the dna
+    updateHostPricing: (_, { pricePerUnit }) => HhaDnaInterface.hostPricing.update(pricePerUnit)
   }
 }
 
