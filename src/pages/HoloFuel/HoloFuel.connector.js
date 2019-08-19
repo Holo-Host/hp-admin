@@ -1,4 +1,5 @@
-import { graphql, compose } from 'react-apollo'
+import { graphql } from '@apollo/react-hoc'
+import { flow as compose } from 'lodash'
 import AllHoloFuelTransactionsQuery from 'graphql/AllHoloFuelTransactionsQuery.gql'
 import AllHoloFuelPendingTransactionQuery from 'graphql/AllHoloFuelPendingTransactionQuery.gql'
 import AllHoloFuelCompleteTransactionsQuery from 'graphql/AllHoloFuelCompleteTransactionsQuery.gql'
