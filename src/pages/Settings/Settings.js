@@ -33,9 +33,10 @@ export function Settings ({
     deviceName,
     networkId,
     sshAccess,
-    deviceAdminPort,hcAdminPort,
+    deviceAdminPort,
+    hcAdminPort,
     hcNetworkPort,
-    hostingPort 
+    hostingPort
   } = mockedProps.settings,
   updateSettings = mockedProps.updateSettings,
   factoryReset = mockedProps.factoryReset,
@@ -69,9 +70,6 @@ export function Settings ({
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(`Submitting form > INITIAL values (from props): `, hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess)
-    console.log(`Submitting form > UPDATED values: `, hostNameVal, hostPubKeyVal, registrationEmail, deviceNameVal, networkIdVal, sshAccessVal)
-
     const newSettings = {
       hostName: hostNameVal || hostName,
       hostPubKey: hostPubKeyVal || hostPubKey,
@@ -84,6 +82,7 @@ export function Settings ({
       hcNetworkPort: hcNetworkPortVal || hcNetworkPort,
       hostingPort: hostingPortVal || hostingPort
     }
+
     // Submit all/new setting values
     updateSettings({ newSettings })
 

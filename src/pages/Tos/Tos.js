@@ -21,8 +21,6 @@ export function Tos ({
   tos,
   history: { push }
 }) {
-  console.log('tos IN Tos : ', tos)
-  
   const returnToSettings = () => push('/settings')
   const goToMenu = () => push('/menu')
 
