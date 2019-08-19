@@ -27,7 +27,7 @@ export const resolvers = {
 
     hostPricing: () => HhaDnaInterface.hostPricing.get(),
 
-    allHoloFuelPendingTransaction: () => HoloFuelInterface.transactions.getAllPending(),
+    allHoloFuelPendingTransactions: () => HoloFuelInterface.transactions.getAllPending(),
 
     allHoloFuelCompleteTransations: () => HoloFuelInterface.transactions.getAllComplete(),
   
