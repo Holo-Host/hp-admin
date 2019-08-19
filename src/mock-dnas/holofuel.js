@@ -22,7 +22,17 @@ const transactionList = [
         timestamp: '2018-07-19',
         state: 'outgoing/completed',
         origin: '1GxHKZ8HCxKUBN7tQHTu75FN82g4sx2zP6',
-        event: 'request',
+        event: {
+          Request : {
+            from: "HScQcbifkviyfvbkdf",
+            to: "HSvlniudbvskhfv",
+            amount: "5",
+            fee: "0.1",
+            deadline: "12/09/2019",
+            notes: "Note",
+            synchronous: false,
+          }
+        },
         adjustment: {
           balance: 13,
           payable: 80,
@@ -33,7 +43,17 @@ const transactionList = [
         timestamp: '2019-05-09',
         state: 'incoming/completed',
         origin: 'asdfas8HCijlkmxKUBN7tQHTu75FNp439joi',
-        event: 'request',
+        event: {
+          Request : {
+            from: "HScQcbifkviyfvbkdf",
+            to: "HSvlniudbvskhfv",
+            amount: "50",
+            fee: "1",
+            deadline: "12/09/2019",
+            notes: "Note",
+            synchronous: false,
+          }
+        },
         adjustment: {
           balance: 59,
           payable: 68,
@@ -44,7 +64,17 @@ const transactionList = [
         timestamp: '2018-12-11',
         state: 'outgoing/approved',
         origin: '1DEiFZ1kThW4AVtDmL1w2oDyEKYKcqBcRB',
-        event: 'request',
+        event: {
+          Request : {
+            from: "HScQcbifkviyfvbkdf",
+            to: "HSvlniudbvskhfv",
+            amount: "25",
+            fee: "0.21",
+            deadline: "12/09/2019",
+            notes: "Note",
+            synchronous: false,
+          }
+        },
         adjustment: {
           balance: 84,
           payable: 8,
@@ -55,7 +85,17 @@ const transactionList = [
         timestamp: '2018-04-27',
         state: 'incoming/approved',
         origin: '1MNMQcEsd3BkQpaFUyZrViQ26axooErWtc',
-        event: 'request',
+        event: {
+          Request : {
+            from: "HScQcbifkviyfvbkdf",
+            to: "HSvlniudbvskhfv",
+            amount: "15",
+            fee: "0.11",
+            deadline: "12/09/2019",
+            notes: "Note",
+            synchronous: false,
+          }
+        },
         adjustment: {
           balance: 47,
           payable: 79,
