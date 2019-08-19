@@ -8,11 +8,13 @@ import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 
 export default function ManagePricing ({ history: { push } }) {
   const { data: { hostPricing } } = useQuery(HostPricingQuery)
-  const [updateHostPricing] = useMutation(UpdateHostPricingMutation)
+  const [updateHostPricing, { loading }] = useMutation(UpdateHostPricingMutation)
   const goToMenu = () => push('/menu')
 
   const [units, setUnits] = useState('')
   const [pricePerUnit, setPricePerUnit] = useState('')
+  const [changed, setChanged] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     if (!hostPricing) return
@@ -30,10 +32,20 @@ export default function ManagePricing ({ history: { push } }) {
 
   const onFuelInputChange = ({ target: { value } }) => {
     if (isNaN(value)) return
+    setChanged(true)
+    setSaved(false)
     setPricePerUnit(value)
   }
 
+  const onUnitsChange = ({ target: { value } }) => {
+    setChanged(true)
+    setSaved(false)
+    setUnits(value)
+  }
+
   const save = () => {
+    setChanged(false)
+    setSaved(true)
     updateHostPricing({ variables: { units, pricePerUnit } })
   }
 
@@ -47,7 +59,7 @@ export default function ManagePricing ({ history: { push } }) {
 
     <div styleName='units-dropdown'>
       <select value={units}
-        onChange={({ target: { value } }) => setUnits(value)}
+        onChange={onUnitsChange}
         data-testid='units-dropdown'>
         {dropdownOptions.map(({ value, label }) =>
           <option value={value} key={value}>
@@ -64,8 +76,9 @@ export default function ManagePricing ({ history: { push } }) {
     </div>
 
     <div>
-      <Button onClick={save}>Save</Button>
+      <Button onClick={save} disabled={loading || saved || !changed}>
+        {loading ? 'Saving' : (saved ? 'Saved' : 'Save')}
+      </Button>
     </div>
-
   </div>
 }
