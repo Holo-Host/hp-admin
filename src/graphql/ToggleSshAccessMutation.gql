@@ -1,5 +1,0 @@
-mutation ToggleSshAccess {
-  toggleSshAccess {
-    sshAccessBool
-  }
-}

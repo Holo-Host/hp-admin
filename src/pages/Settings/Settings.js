@@ -5,24 +5,46 @@ import FormInput from 'components/FormInput'
 import EditIcon from 'utils/icons/EditIcon'
 import './Settings.module.css'
 
-export default function Settings (props) {
-  console.log('inside Settings Wrapper : ', props.allHPSettings)
-  if (props.allHPSettings) {
-    return <SettingsDisplay {...props} />
-  } else {
-    return <h4>Loading Settings</h4>
-  }
+const mockedProps = {
+  settings: {
+    hostName: 'My Host',
+    hostPubKey: 'hcsFAkeHashSTring2443223ee',
+    hostEmail: 'iamahost@hosting.com',
+    deviceName: 'My Very First HoloPort',
+    networkId: 'my-holoport',
+    sshAccess: false,
+    deviceAdminPort: '6609',
+    hcAdminPort: '8800',
+    hcNetworkPort: '35353',
+    hostingPort: '8080'
+  },
+  updateSettings: () => Promise.resolve(true),
+  factoryReset: () => Promise.resolve(true),
+  toggleSshAccess: () => Promise.resolve(true)
 }
 
-function SettingsDisplay ({
-  allHPSettings,
-  updateHPSettings,
-  factoryReset,
-  toggleSshAccess,
+export default props => <Settings {...mockedProps} {...props} />
+
+export function Settings ({
+  settings: {
+    hostName,
+    hostPubKey,
+    hostEmail,
+    deviceName,
+    networkId,
+    sshAccess,
+    deviceAdminPort,hcAdminPort,
+    hcNetworkPort,
+    hostingPort 
+  } = mockedProps.settings,
+  updateSettings = mockedProps.updateSettings,
+  factoryReset = mockedProps.factoryReset,
+  toggleSshAccess = mockedProps.toggleSshAccess,
   history: { push }
 }) {
+  // if (props.loading) return <h4>Loading Settings</h4>
+
   const goToMenu = () => push('/menu')
-  const { hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess, deviceAdminPort,hcAdminPort, hcNetworkPort, hostingPort } = allHPSettings
   const [sshAccessVal, setSshAccess] = useState(false)
   const { value: hostNameVal, bind: bindhostName, reset: resethostName } = useInput(hostName)
   const { value: hostPubKeyVal, bind: bindHostPubKey, reset: resetHostPubKey } = useInput(hostPubKey)
@@ -47,7 +69,6 @@ function SettingsDisplay ({
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('allHPSettings : ', allHPSettings)
     console.log(`Submitting form > INITIAL values (from props): `, hostName, hostPubKey, hostEmail, deviceName, networkId, sshAccess)
     console.log(`Submitting form > UPDATED values: `, hostNameVal, hostPubKeyVal, registrationEmail, deviceNameVal, networkIdVal, sshAccessVal)
 
@@ -64,7 +85,7 @@ function SettingsDisplay ({
       hostingPort: hostingPortVal || hostingPort
     }
     // Submit all/new setting values
-    updateHPSettings({ newHPSettings: newSettings })
+    updateSettings({ newSettings })
 
     // Reset all inputs
     resetRegistrationEmail()

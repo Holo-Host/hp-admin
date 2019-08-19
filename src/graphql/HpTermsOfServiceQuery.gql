@@ -1,5 +1,0 @@
-query HpTermsOfService {
-  hpTermsOfService {
-    tos
-  }
-}
