@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react'
 import { get } from 'lodash/fp'
 
-export function RegisterUser (props) {
-  const { children, registerHostingUser, hostingUser } = props
+export function RegisterUser ({ children, registerHostingUser, hostingUser }) {
   const isRegistered = get('isRegistered', hostingUser)
 
   useEffect(() => {

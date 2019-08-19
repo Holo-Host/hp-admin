@@ -1,0 +1,54 @@
+.container {
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  padding-bottom: 6px;
+  border-bottom: 1px solid lightgray;
+  margin-bottom: 10px;
+}
+
+.menu-button {
+  margin-left: auto;
+}
+
+.title {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #484848;
+}
+
+.subtitle {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #484848;
+  text-align: center;
+}
+
+.units-dropdown {
+  margin-bottom: 10px;
+  display: inline-block;
+  border: 1px solid lightgray;
+}
+
+.price-input-wrapper {
+  margin-bottom: 10px;
+}
+
+.price-input-label {
+  font-size: 14px;
+}
+
+.price-input {
+  margin-left: 5px;
+  border: 1px solid lightgray;
+}
+
+

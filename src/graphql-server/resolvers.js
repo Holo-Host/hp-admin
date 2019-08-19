@@ -1,17 +1,31 @@
-import * as Promise from 'bluebird'
-import HyloDnaInterface from './dnaInterfaces/hyloDnaInterface'
-import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/happStoreDnaInterface'
-import HhaDnaInterface from './dnaInterfaces/hhaDnaInterface'
-import EnvoyInterface from './nonHcInterfaces/envoyInterface'
-import HoloPortInterface from './nonHcInterfaces/holoportInterface'
-import HoloFuelInterface from './dnaInterfaces/holofuelDnaInterface'
-
+import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
+import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
+import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
+import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
+import { promiseMap } from 'utils'
 import {
   dataMappedCall,
   toUiData
 } from './dataMapping'
+// TODO: dataMapping should probably be happening in the dnainterfaces
 
 export const resolvers = {
+  Query: {
+    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
+
+    happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
+
+    hostingUser: () => HhaDnaInterface.currentUser.get(),
+
+    allHapps: () => HappStoreDnaInterface.happs.all(),
+
+    allAvailableHapps: () => promiseMap(HhaDnaInterface.happs.allAvailable(), getHappDetails),
+
+    allHostedHapps: () => promiseMap(HhaDnaInterface.happs.allHosted(), getHappDetails),
+
+    hostPricing: () => HhaDnaInterface.hostPricing.get()
+  },
+
   Mutation: {
     registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
@@ -37,45 +51,8 @@ export const resolvers = {
       }
       return getHappDetails(happ)
     },
-
-    updateHPSettings: async (_, HPSettings) => {
-      console.log('calling updateHPSettings; data passed : ', HPSettings)
-      const newHPSettingsReply = await HoloPortInterface.deviceSettings.update(HPSettings.newHPSettings)
-      console.log('CHECKING:>> ',newHPSettingsReply);
-      return newHPSettingsReply
-    },
-
-    toggleSshAccess: () => HoloPortInterface.deviceSettings.updateSSH(),
-
-    factoryReset: () => HoloPortInterface.deviceSettings.factoryReset()
-  },
-
-  Query: {
-    me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
-
-    happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
-
-    hostingUser: () => HhaDnaInterface.currentUser.get(),
-
-    allHapps: () => HappStoreDnaInterface.happs.all(),
-
-    allAvailableHapps: () => Promise.map(HhaDnaInterface.happs.allAvailable(), getHappDetails),
-
-    allHostedHapps: () => Promise.map(HhaDnaInterface.happs.allHosted(), getHappDetails),
-
-    allHPSettings: () => {
-      const value = HoloPortInterface.deviceSettings.all()
-      console.log('Checking: Value', value)
-      return value
-    },
-
-    hpTermsOfService: () => HoloPortInterface.deviceSettings.tos(),
-
-    allHoloFuelPendingTransaction: () => HoloFuelInterface.transactions.getAllPending(),
-
-    allHoloFuelCompleteTransations: () => HoloFuelInterface.transactions.getAllComplete(),
-  
-    allHoloFuelTransations: () => HoloFuelInterface.transactions.getAll()
+    // setHostPricing also gets passed 'units', but we don't currently use that in the dna
+    updateHostPricing: (_, { pricePerUnit }) => HhaDnaInterface.hostPricing.update(pricePerUnit)
   }
 }
 

@@ -20,3 +20,10 @@ export const useInput = initialValue => {
     }
   }
 }
+
+export async function promiseMap (array, fn) {
+  const resolvedArray = await array
+  const promiseArray = resolvedArray.map(fn)
+  const resolved = await Promise.all(promiseArray)
+  return resolved
+}

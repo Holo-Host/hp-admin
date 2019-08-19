@@ -63,6 +63,12 @@ const hha = {
     get_app_details: ({ app_hash: appHash }) => {
       const happ = happs.find(h => h.id === appHash)
       return presentHappForGetAppDetails(happ)
+    },
+    get_service_log_details: {
+      price_per_unit: '5'
+    },
+    add_service_log_details: (details) => {
+      hha.provider.get_service_log_details = details
     }
   },
   whoami: {

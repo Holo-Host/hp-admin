@@ -3,9 +3,11 @@ import './Button.module.css'
 
 const BUTTON_LABEL = 'some domain specific button'
 
-function Button ({ children = BUTTON_LABEL, onClick = () => {}, className }) {
+function Button ({ children = BUTTON_LABEL, onClick = () => {}, className, disabled }) {
   return (
-    <button onClick={onClick} className={className} styleName='button'>{children}</button>
+    <button onClick={disabled ? () => {} : onClick} className={className} styleName='button' disabled={disabled}>
+      {children}
+    </button>
   )
 }
 

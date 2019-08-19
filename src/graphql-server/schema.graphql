@@ -27,81 +27,9 @@ type Happ {
   isEnabled: Boolean
 }
 
-
-input HpSettingsInput {
-  hostName: String
-  hostPubKey: String
-  hostEmail: String
-  deviceName: String
-  networkId: String
-  sshAccess: Boolean
-  deviceAdminPort: String
-  hcAdminPort: String
-  hcNetworkPort: String
-  hostingPort: String
-}
-
-type HpSettings {
-  hostName: String
-  hostPubKey: String
-  hostEmail: String
-  deviceName: String
-  networkId: String
-  sshAccess: Boolean
-  deviceAdminPort: String
-  hcAdminPort: String
-  hostingPort: String
-  hcNetworkPort: String
-}
-
-type Tos {
-  tos: String
-}
-
-type Ledger {
-  balance: Int
-  credit: Int
-  payable: Int
-  receivable: Int
-  fees: Int
-}
-
-enum Status {
-  pending
-  spender
-  recipient
-}
-
-enum Event {
-  Request
-  Reject
-  Invoice
-  Return
-  Receipt
-  Refund
-  Promise
-  Cheque 
-  Decline
-  Recover
-  Failure
-}
-
-type HfTransaction {
-  originTimeStamp: String
-  originEvent: Event
-  counterparty: String
-  txAuthor: String
-  amount: String
-  fee: String
-  event: Event,
-  status: Status
-  transactionTimestamp: String
-  eventCommitHash: String
-  dueDate: String
-  notes: String
-  originCommitHash: String
-  promiseCommitSignature: String
-  inResponseToTX: String
+type HostPricing {
+  units: String
+  pricePerUnit: String
 }
 
 type Query {
@@ -111,11 +39,7 @@ type Query {
   allHapps: [Happ]
   allAvailableHapps: [Happ]
   allHostedHapps: [Happ]
-  allHPSettings: HpSettings
-  hpTermsOfService: String
-  allHoloFuelPendingTransaction:[HfTransaction]
-  allHoloFuelCompleteTransations:[HfTransaction]
-  allHoloFuelTransations:[HfTransaction]
+  hostPricing: HostPricing
 }
 
 type Mutation {
@@ -123,7 +47,5 @@ type Mutation {
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
-  updateHPSettings(newHPSettings: HpSettingsInput): HpSettings
-  factoryReset: Boolean
-  toggleSshAccess: Boolean
+  updateHostPricing(units: String, pricePerUnit: String): HostPricing
 }
