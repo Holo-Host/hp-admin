@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import Button from 'components/Button'
-import './Settings.module.css'
-import { useInput } from '../../utils/index'
+import { useInput } from 'utils'
 import FormInput from 'components/FormInput'
 import EditIcon from 'utils/icons/EditIcon'
+import './Settings.module.css'
 
 export default function Settings (props) {
   console.log('inside Settings Wrapper : ', props.allHPSettings)

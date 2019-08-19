@@ -1,5 +1,5 @@
-// import React from 'react'
-import { graphql, compose } from 'react-apollo'
+import { graphql } from '@apollo/react-hoc'
+import { flow as compose } from 'lodash'
 import AllHPSettingsQuery from 'graphql/AllHPSettingsQuery.gql'
 import UpdateHPSettingsMutation from 'graphql/UpdateHPSettingsMutation.gql'
 import FactoryResetMutation from 'graphql/FactoryResetMutation.gql'
