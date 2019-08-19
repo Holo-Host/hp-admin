@@ -30,7 +30,7 @@ export default function ManagePricing ({ history: { push } }) {
     { value: UNITS.ram, label: `RAM = ${pricePerUnit} HF per MB` }
   ]
 
-  const onFuelInputChange = ({ target: { value } }) => {    
+  const onFuelInputChange = ({ target: { value } }) => {
     setChanged(true)
     setSaved(false)
     setPricePerUnit(value)
