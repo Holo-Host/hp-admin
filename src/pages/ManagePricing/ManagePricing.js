@@ -54,7 +54,7 @@ export default function ManagePricing ({ hostPricing, updateHostPricing, history
     <div styleName='price-input-wrapper'>
       <label styleName='price-input-label'>
         Holofuel per unit
-        <input type='text' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' />
+        <input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' />
       </label>
     </div>
 

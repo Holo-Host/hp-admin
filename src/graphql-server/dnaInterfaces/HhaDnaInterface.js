@@ -1,6 +1,5 @@
 import { isEmpty } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
-import Promise from 'bluebird'
 import { UNITS } from 'models/HostPricing'
 
 export const INSTANCE_ID = 'hha' // holo-hosting-app
@@ -70,7 +69,7 @@ const HhaDnaInterface = {
     update: async (pricePerUnit) => {
       const allAvailable = await HhaDnaInterface.happs.allAvailable()
       // set price_per_unit the same for all happs
-      await Promise.map(allAvailable, ({ id }) => createZomeCall('provider/add_service_log_details')({
+      await Promise.all(allAvailable, ({ id }) => createZomeCall('provider/add_service_log_details')({
         app_hash: id,
         max_fuel_per_invoice: 1,
         max_unpaid_value: 1,

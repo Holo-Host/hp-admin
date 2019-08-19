@@ -1,4 +1,4 @@
-import * as Promise from 'bluebird'
+import Promise from 'bluebird'
 import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
 import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
