@@ -1,14 +1,26 @@
 import React from 'react'
-import ManagePricing from './ManagePricing'
 import { render, fireEvent, act } from '@testing-library/react'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
+import ManagePricing from './ManagePricing'
 import HostPricingQuery from 'graphql/HostPricingQuery.gql'
+import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 import { UNITS } from 'models/HostPricing'
 
 const mockHostPricing = {
   units: 'cpu',
   pricePerUnit: '12'
+}
+
+const updateHostPricingMock = {
+  request: {
+    query: UpdateHostPricingMutation,
+    variables: { units: UNITS.storage, pricePerUnit: '9' }
+  },
+  result: {
+    data: { updateHostPricing: { units: 'not', pricePerUnit: 'used' } }
+  },
+  newData: jest.fn()
 }
 
 const mocks = [
@@ -21,7 +33,8 @@ const mocks = [
         hostPricing: mockHostPricing
       }
     }
-  }
+  },
+  updateHostPricingMock
 ]
 
 describe('ManagePricing', () => {
@@ -43,17 +56,22 @@ describe('ManagePricing', () => {
     expect(getByLabelText('Holofuel per unit').value).toEqual(mockHostPricing.pricePerUnit)
   })
 
-  it.skip('allows you to set and save units and pricePerUnit', () => {
-    // this is skipped while we figure out the best way to test apollo mutations
+  it('allows you to set and save units and pricePerUnit', async () => {
     const props = {
       hostPricing: {
         units: UNITS.cpu,
         pricePerUnit: '7'
       },
-      history: {},
-      updateHostPricing: jest.fn()
+      history: {}
     }
-    const { getByLabelText, getByText, getByTestId } = render(<ManagePricing {...props} />)
+    let getByLabelText, getByText, getByTestId
+
+    await act(async () => {
+      ({ getByLabelText, getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        <ManagePricing {...props} />
+      </MockedProvider>))
+      await wait(15)
+    })
 
     fireEvent.change(getByTestId('units-dropdown'), { target: { value: UNITS.storage } })
 
@@ -63,9 +81,6 @@ describe('ManagePricing', () => {
 
     fireEvent.click(getByText('Save'))
 
-    expect(props.updateHostPricing).toHaveBeenCalledWith({
-      units: UNITS.storage,
-      pricePerUnit: newPrice
-    })
+    expect(updateHostPricingMock.newData).toHaveBeenCalled()
   })
 })
