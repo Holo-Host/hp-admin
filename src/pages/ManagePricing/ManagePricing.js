@@ -30,8 +30,7 @@ export default function ManagePricing ({ history: { push } }) {
     { value: UNITS.ram, label: `RAM = ${pricePerUnit} HF per MB` }
   ]
 
-  const onFuelInputChange = ({ target: { value } }) => {
-    if (isNaN(value)) return
+  const onFuelInputChange = ({ target: { value } }) => {    
     setChanged(true)
     setSaved(false)
     setPricePerUnit(value)
@@ -71,7 +70,7 @@ export default function ManagePricing ({ history: { push } }) {
     <div styleName='price-input-wrapper'>
       <label styleName='price-input-label'>
         Holofuel per unit
-        <input type='text' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' />
+        <input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' />
       </label>
     </div>
 
