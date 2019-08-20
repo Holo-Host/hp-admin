@@ -2,16 +2,16 @@ import React from 'react'
 import { render, fireEvent, within, act } from '@testing-library/react'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
-import ConnectedBrowseHapps from './index'
+import BrowseHapps from './BrowseHapps'
 import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
 import wait from 'waait'
 
-describe('ConnectedBrowseHapps', () => {
+describe('BrowseHapps Connected', () => {
   it('renders', async () => {
     let getAllByRole
     await act(async () => {
       ({ getAllByRole } = render(<ApolloProvider client={apolloClient}>
-        <ConnectedBrowseHapps history={{}} />
+        <BrowseHapps history={{}} />
       </ApolloProvider>))
       await wait(15)
     })
@@ -39,7 +39,7 @@ describe('ConnectedBrowseHapps', () => {
       let getAllByRole, queryAllByText
       await act(async () => {
         ({ getAllByRole, queryAllByText } = render(<ApolloProvider client={apolloClient}>
-          <ConnectedBrowseHapps history={{}} />
+          <BrowseHapps history={{}} />
         </ApolloProvider>))
         await wait(15)
       })
@@ -62,32 +62,6 @@ describe('ConnectedBrowseHapps', () => {
 
       expect(queryAllByText('Un-Host')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)
-    })
-  })
-
-  describe('menu button', () => {
-    it("calls history.push with '/menu'", async () => {
-      const mockHistory = {
-        push: jest.fn()
-      }
-      const { getByText } = render(<ApolloProvider client={apolloClient}>
-        <ConnectedBrowseHapps history={mockHistory} />
-      </ApolloProvider>)
-      fireEvent.click(getByText('Menu'))
-      expect(mockHistory.push).toHaveBeenCalledWith('/menu')
-    })
-  })
-
-  describe('pricing button', () => {
-    it("calls history.push with '/pricing'", async () => {
-      const mockHistory = {
-        push: jest.fn()
-      }
-      const { getByText } = render(<ApolloProvider client={apolloClient}>
-        <ConnectedBrowseHapps history={mockHistory} />
-      </ApolloProvider>)
-      fireEvent.click(getByText('Manage Pricing'))
-      expect(mockHistory.push).toHaveBeenCalledWith('/pricing')
     })
   })
 })
