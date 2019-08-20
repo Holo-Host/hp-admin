@@ -29,9 +29,9 @@ export const resolvers = {
 
     allHoloFuelPendingTransactions: () => HoloFuelInterface.transactions.getAllPending(),
 
-    allHoloFuelCompleteTransations: () => HoloFuelInterface.transactions.getAllComplete(),
+    allHoloFuelCompleteTransactions: () => HoloFuelInterface.transactions.getAllComplete(),
   
-    allHoloFuelTransations: () => HoloFuelInterface.transactions.getAll()
+    allHoloFuelTransactions: () => HoloFuelInterface.transactions.getAll()
   },
 
   Mutation: {

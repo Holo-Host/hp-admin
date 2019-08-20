@@ -4,7 +4,7 @@ import AllHoloFuelTransactionsQuery from 'graphql/AllHoloFuelTransactionsQuery.g
 import AllHoloFuelPendingTransactionQuery from 'graphql/AllHoloFuelPendingTransactionQuery.gql'
 import AllHoloFuelCompleteTransactionsQuery from 'graphql/AllHoloFuelCompleteTransactionsQuery.gql'
 
-const allHoloFuelTransations = graphql(AllHoloFuelTransactionsQuery, {
+const allHoloFuelTransactions = graphql(AllHoloFuelTransactionsQuery, {
   props: ({ data: { allHoloFuelTransactions } }) => ({ allHoloFuelTransactions })
 })
 
@@ -12,12 +12,12 @@ const allHoloFuelPendingTransaction = graphql(AllHoloFuelPendingTransactionQuery
   props: ({ data: { allHoloFuelPendingTransactions } }) => ({ allHoloFuelPendingTransactions })
 })
 
-const allHoloFuelCompleteTransations = graphql(AllHoloFuelCompleteTransactionsQuery, {
+const allHoloFuelCompleteTransactions = graphql(AllHoloFuelCompleteTransactionsQuery, {
   props: ({ data: { allHoloFuelCompleteTransactions } }) => ({ allHoloFuelCompleteTransactions })
 })
 
 export default compose(
-  allHoloFuelTransations,
+  allHoloFuelTransactions,
   allHoloFuelPendingTransaction,
-  allHoloFuelCompleteTransations
+  allHoloFuelCompleteTransactions
 )

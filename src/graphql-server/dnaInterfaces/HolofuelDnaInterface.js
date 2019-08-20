@@ -7,9 +7,9 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 // TODO : Finish Mocking below & optimize
 export const HoloFuelDnaInterface = {
   transactions: {
-    getAllPending: () => createZomeCall('transactions/list_of_pending')({})
+    getAllPending: () => createZomeCall('transactions/list_pending')()
       .then(hfTx => hfTx.map(shapePendingTransactionBody)),
-    getAllComplete: () => createZomeCall('transactions/list_transactions')({})
+    getAllComplete: () => createZomeCall('transactions/list_transactions')()
       .then(hfTx => hfTx.transactions.map(shapeCompleteTransactionBody)),
     getAll: async () => {
       const pendingTx = await HoloFuelDnaInterface.transactions.getAllPending()
@@ -149,7 +149,7 @@ export function shapeCompleteTransactionBody (tx) {
 
 // DATA STRUCTURE FOR TRANSACTION TYPES
 const dataRefactor = (transactionDetails) => {
-  const APP_LIST_LENGTH = transactionDetails.length
+  const appListLength = transactionDetails.length
 
   const range = (length) => {
     const lengthArray = []
@@ -183,7 +183,7 @@ const dataRefactor = (transactionDetails) => {
     }
   }
 
-  const dataGenerate = (length = APP_LIST_LENGTH) => {
+  const dataGenerate = (length = appListLength) => {
     return transactionDetails.map((transaction) => {
       return {
         ...insertAppDetails(transaction),

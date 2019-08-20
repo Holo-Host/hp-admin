@@ -86,8 +86,8 @@ type Query {
   allAvailableHapps: [Happ]
   allHostedHapps: [Happ]
   allHoloFuelPendingTransactions:[HfTransaction]
-  allHoloFuelCompleteTransations:[HfTransaction]
-  allHoloFuelTransations:[HfTransaction]
+  allHoloFuelCompleteTransactions:[HfTransaction]
+  allHoloFuelTransactions:[HfTransaction]
   hostPricing: HostPricing
 }
 

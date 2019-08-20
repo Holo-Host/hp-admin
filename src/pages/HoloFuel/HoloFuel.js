@@ -5,7 +5,7 @@ import './HoloFuel.module.css'
 export default function HoloFuel (props) {
   console.log(' =========== HOLOFUEL PROPS ================= : ', props)
   const goToMenu = () => props.history.push('/menu')
-  const { allHoloFuelCompleteTransations } = props
+  const { allHoloFuelCompleteTransactions } = props
 
   if (props) {
     return <div>
@@ -14,7 +14,7 @@ export default function HoloFuel (props) {
         <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
       </div>
       <h4>HoloFuel Page Loaded with Props</h4>
-      <p>HF Completed Tx Props: { props && JSON.stringify(allHoloFuelCompleteTransations) }</p>
+      <p>HF Completed Tx Props: { props && JSON.stringify(allHoloFuelCompleteTransactions) }</p>
     </div>
   } else {
     return <div>
