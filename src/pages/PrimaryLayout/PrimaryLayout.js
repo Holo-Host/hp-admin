@@ -1,12 +1,14 @@
 import React, { useContext } from 'react'
 import { Route } from 'react-router-dom'
+import cx from 'classnames'
 import './PrimaryLayout.module.css'
 import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
 import BrowseHapps from 'pages/BrowseHapps'
+import HappDetails from 'pages/HappDetails'
 import ManagePricing from 'pages/ManagePricing'
+import Button from 'components/Button'
 import ScreenWidthContext from 'contexts/screenWidth'
-import cx from 'classnames'
 
 export function PrimaryLayout () {
   const isWide = useContext(ScreenWidthContext)
@@ -15,8 +17,11 @@ export function PrimaryLayout () {
 
     <Route path='/(|dashboard)' exact component={Dashboard} />
     <Route path='/menu' component={MainMenu} />
-    <Route path='/browse-happs' component={BrowseHapps} />
+    <Route path='/browse-happs' exact component={BrowseHapps} />
+    <Route path='/browse-happs/:address' component={HappDetails} />
     <Route path='/pricing' component={ManagePricing} />
+  </div>
+}
 
   </div>
 }
