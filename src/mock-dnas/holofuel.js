@@ -22,13 +22,13 @@ const transactionList = {
       state: 'outgoing/completed',
       origin: '1GxHKZ8HCxKUBN7tQHTu75FN82g4sx2zP6',
       event: {
-        Request : {
-          from: "HScQcbifkviyfvbkdf",
-          to: "HSvlniudbvskhfv",
-          amount: "5",
-          fee: "0.1",
-          deadline: "12/09/2019",
-          notes: "Note",
+        Request: {
+          from: 'HScQcbifkviyfvbkdf',
+          to: 'HSvlniudbvskhfv',
+          amount: '5',
+          fee: '0.1',
+          deadline: '12/09/2019',
+          notes: 'Note',
           synchronous: false
         }
       },
@@ -43,13 +43,13 @@ const transactionList = {
       state: 'incoming/completed',
       origin: 'asdfas8HCijlkmxKUBN7tQHTu75FNp439joi',
       event: {
-        Request : {
-          from: "HScQcbifkviyfvbkdf",
-          to: "HSvlniudbvskhfv",
-          amount: "50",
-          fee: "1",
-          deadline: "12/09/2019",
-          notes: "Note",
+        Request: {
+          from: 'HScQcbifkviyfvbkdf',
+          to: 'HSvlniudbvskhfv',
+          amount: '50',
+          fee: '1',
+          deadline: '12/09/2019',
+          notes: 'Note',
           synchronous: false
         }
       },
@@ -64,13 +64,13 @@ const transactionList = {
       state: 'outgoing/approved',
       origin: '1DEiFZ1kThW4AVtDmL1w2oDyEKYKcqBcRB',
       event: {
-        Request : {
-          from: "HScQcbifkviyfvbkdf",
-          to: "HSvlniudbvskhfv",
-          amount: "25",
-          fee: "0.21",
-          deadline: "12/09/2019",
-          notes: "Note",
+        Request: {
+          from: 'HScQcbifkviyfvbkdf',
+          to: 'HSvlniudbvskhfv',
+          amount: '25',
+          fee: '0.21',
+          deadline: '12/09/2019',
+          notes: 'Note',
           synchronous: false
         }
       },
@@ -85,13 +85,13 @@ const transactionList = {
       state: 'incoming/approved',
       origin: '1MNMQcEsd3BkQpaFUyZrViQ26axooErWtc',
       event: {
-        Request : {
-          from: "HScQcbifkviyfvbkdf",
-          to: "HSvlniudbvskhfv",
-          amount: "15",
-          fee: "0.11",
-          deadline: "12/09/2019",
-          notes: "Note",
+        Request: {
+          from: 'HScQcbifkviyfvbkdf',
+          to: 'HSvlniudbvskhfv',
+          amount: '15',
+          fee: '0.11',
+          deadline: '12/09/2019',
+          notes: 'Note',
           synchronous: false
         }
       },

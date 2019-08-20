@@ -30,7 +30,7 @@ export const resolvers = {
     allHoloFuelPendingTransactions: () => HoloFuelInterface.transactions.getAllPending(),
 
     allHoloFuelCompleteTransactions: () => HoloFuelInterface.transactions.getAllComplete(),
-  
+
     allHoloFuelTransactions: () => HoloFuelInterface.transactions.getAll()
   },
 
