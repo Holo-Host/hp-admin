@@ -37,15 +37,20 @@ const HhaDnaInterface = {
       })),
     enable: appId => createZomeCall('host/enable_app')({ app_hash: appId }),
     disable: appId => createZomeCall('host/disable_app')({ app_hash: appId }),
-    allAvailable: () => createZomeCall('host/get_all_apps')()
-      .then(happListings => happListings.map(({ hash, details }) => {
+    allAvailable: async () => {
+      const allHapps = await createZomeCall('host/get_all_apps')()
+      const hostedHapps = await createZomeCall('host/get_enabled_app_list')()
+      const hostedHappIds = hostedHapps.map(({ address }) => address)
+
+      return allHapps.map(({ hash, details }) => {
         const { Ok: { app_bundle: { happ_hash: happStoreId } } } = JSON.parse(details)
         return {
-        // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).
           id: hash,
-          happStoreId
+          happStoreId,
+          isEnabled: hostedHappIds.includes(hash)
         }
-      })),
+      })
+    },
     allHosted: () => createZomeCall('host/get_enabled_app_list')()
       .then(hostedHapps => hostedHapps.map(({ address, entry: { happ_hash: happStoreId } }) => ({
         // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).

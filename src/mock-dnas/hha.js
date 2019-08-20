@@ -1,4 +1,4 @@
-const happs = [
+export const happs = [
   {
     id: 'QmHHAHappEntryAddressHash1',
     happstoreId: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT'
