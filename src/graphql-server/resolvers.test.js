@@ -1,10 +1,12 @@
+import wait from 'waait'
 import resolvers from './resolvers'
 import mockHhaDnaInterface from 'graphql-server/dnaInterfaces/HhaDnaInterface'
 import { getHappDetails as mockGetHappDetails } from 'graphql-server/dnaInterfaces/HappStoreDnaInterface'
-import wait from 'waait'
+import mockEnvoyInterface from 'graphql-server/dnaInterfaces/EnvoyInterface'
 
 jest.mock('graphql-server/dnaInterfaces/HhaDnaInterface')
 jest.mock('graphql-server/dnaInterfaces/HappStoreDnaInterface')
+jest.mock('graphql-server/dnaInterfaces/EnvoyInterface')
 
 describe('resolvers', () => {
   describe('Query', () => {
@@ -30,15 +32,6 @@ describe('resolvers', () => {
         expect(mockGetHappDetails.mock.calls.map(c => c[0])).toEqual(['mockHappOne', 'mockHappTwo'])
       })
     })
-
-    describe('.enableHapp', () => {
-      it('calls envoy, enable, and constructs the result happ', async () => {
-        resolvers.Query.allAvailableHapps()
-        await wait(0)
-        expect(mockHhaDnaInterface.happs.allAvailable).toHaveBeenCalled()
-        expect(mockGetHappDetails.mock.calls.map(c => c[0])).toEqual(['mockHappOne', 'mockHappTwo'])
-      })
-    })
   })
 
   describe('Mutation', () => {
@@ -54,6 +47,35 @@ describe('resolvers', () => {
         const pricePerUnit = '12'
         resolvers.Mutation.updateHostPricing(null, { pricePerUnit })
         expect(mockHhaDnaInterface.hostPricing.update).toHaveBeenCalledWith(pricePerUnit)
+      })
+    })
+
+    describe('.enableHapp', () => {
+      it('calls envoy, enable, and constructs the result happ', async () => {
+        const appId = 'idOfAppToEnable'
+        resolvers.Mutation.enableHapp(null, { appId })
+        await wait(0)
+        expect(mockEnvoyInterface.happs.install).toHaveBeenCalledWith(appId)
+        expect(mockHhaDnaInterface.happs.enable).toHaveBeenCalledWith(appId)
+        expect(mockHhaDnaInterface.happs.get).toHaveBeenCalledWith(appId)
+        expect(mockGetHappDetails).toHaveBeenCalledWith({
+          appId,
+          isEnabled: true
+        })
+      })
+    })
+
+    describe('.disableHapp', () => {
+      it('calls disable and constructs the result happ', async () => {
+        const appId = 'idOfAppToEnable'
+        resolvers.Mutation.disableHapp(null, { appId })
+        await wait(0)
+        expect(mockHhaDnaInterface.happs.disable).toHaveBeenCalledWith(appId)
+        expect(mockHhaDnaInterface.happs.get).toHaveBeenCalledWith(appId)
+        expect(mockGetHappDetails).toHaveBeenCalledWith({
+          appId,
+          isEnabled: false
+        })
       })
     })
   })
