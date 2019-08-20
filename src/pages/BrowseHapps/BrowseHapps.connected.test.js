@@ -63,7 +63,7 @@ describe('BrowseHapps Connected', () => {
       fireEvent.click(getByTextFromListItem('Host'))
 
       await act(() => wait(0))
-    
+
       expect(queryAllByText('Un-Host')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)
       expect(mockEnvoyInterface.happs.install).toHaveBeenCalledWith(hhaHapps[0].id)
