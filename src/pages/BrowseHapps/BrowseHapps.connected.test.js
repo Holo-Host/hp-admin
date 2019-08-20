@@ -1,10 +1,14 @@
 import React from 'react'
 import { render, fireEvent, within, act } from '@testing-library/react'
 import { ApolloProvider } from '@apollo/react-hooks'
+import wait from 'waait'
 import apolloClient from 'apolloClient'
 import BrowseHapps from './BrowseHapps'
 import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
-import wait from 'waait'
+import { happs as hhaHapps } from 'mock-dnas/hha'
+import mockEnvoyInterface from 'graphql-server/dnaInterfaces/EnvoyInterface'
+
+jest.mock('graphql-server/dnaInterfaces/EnvoyInterface')
 
 describe('BrowseHapps Connected', () => {
   it('renders', async () => {
@@ -59,9 +63,10 @@ describe('BrowseHapps Connected', () => {
       fireEvent.click(getByTextFromListItem('Host'))
 
       await act(() => wait(0))
-
+    
       expect(queryAllByText('Un-Host')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)
+      expect(mockEnvoyInterface.happs.install).toHaveBeenCalledWith(hhaHapps[0].id)
     })
   })
 })

@@ -30,6 +30,15 @@ describe('resolvers', () => {
         expect(mockGetHappDetails.mock.calls.map(c => c[0])).toEqual(['mockHappOne', 'mockHappTwo'])
       })
     })
+
+    describe('.enableHapp', () => {
+      it('calls envoy, enable, and constructs the result happ', async () => {
+        resolvers.Query.allAvailableHapps()
+        await wait(0)
+        expect(mockHhaDnaInterface.happs.allAvailable).toHaveBeenCalled()
+        expect(mockGetHappDetails.mock.calls.map(c => c[0])).toEqual(['mockHappOne', 'mockHappTwo'])
+      })
+    })
   })
 
   describe('Mutation', () => {

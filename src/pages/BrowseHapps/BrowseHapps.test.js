@@ -75,7 +75,7 @@ describe('BrowseHapps', () => {
       ({ getAllByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
         <BrowseHapps history={{}} />
       </MockedProvider>))
-      await wait(15)
+      await wait(0)
     })
 
     const listItems = getAllByRole('listitem')
@@ -103,7 +103,7 @@ describe('BrowseHapps', () => {
         ({ getAllByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
           <BrowseHapps history={{}} />
         </MockedProvider>))
-        await wait(15)
+        await wait(0)
       })
 
       expect(enableHappMock.newData).not.toHaveBeenCalled()
