@@ -23,7 +23,6 @@ export default function BrowseHapps ({
   const [isModalOpen, setModalOpen] = useState(false)
 
   const happ = allAvailableHapps.find(findAppByID(params.address))
-  console.log('happ', happ)
 
   if (!happ) {
     return null
