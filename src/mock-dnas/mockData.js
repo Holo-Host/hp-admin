@@ -13,13 +13,10 @@ const data = {
         avatar_url: 'myface.png'
       },
       is_registered: true,
-      register_user: args => {
-        data.hylo.people.get_me = {
-          ...data.hylo.people.get_me,
-          ...args
-        }
-        return data.hylo.people.get_me
-      }
+      register_user: args => ({
+        ...data.hylo.people.get_me,
+        ...args
+      })
     }
   },
   'happ-store': happStore,
