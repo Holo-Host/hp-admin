@@ -144,4 +144,35 @@ describe('HappDetails', () => {
       expect(disableHappMock.newData).not.toHaveBeenCalled()
     })
   })
+
+  describe('Modal', () => {
+    it('shows modal after enabling hApp', async () => {
+      let getByText
+      await act(async () => {
+        ({ getByText } = await renderHoloFuelApp('QmHHAHappEntryAddressHash2'))
+      })
+
+      fireEvent.click(getByText('Host'))
+      await act(() => wait(0))
+
+      expect(getByText('now being hosted', { exact: false })).toBeInTheDocument()
+    })
+
+    it('"Back to hApps" in modal navigates to /browse-apps', async () => {
+      const mockHistory = { push: jest.fn() }
+      const { getByText } = await renderWithRouter(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <HappDetails history={mockHistory} match={{ params: { address: 'QmHHAHappEntryAddressHash2' } }} />
+        </MockedProvider>
+      )
+      await wait(0)
+      fireEvent.click(getByText('Host'))
+      await act(() => wait(0))
+
+      fireEvent.click(getByText('Back to hApps'))
+      await act(() => wait(0))
+
+      expect(mockHistory.push).toHaveBeenCalledWith('/browse-happs')
+    })
+  })
 })

@@ -68,6 +68,8 @@ export default function BrowseHapps ({
         >
           Back to hApps
         </Button>
+
+        {/* TODO: Implement this action */}
         <Button wide>Hosting Overview</Button>
       </footer>
     </Modal>
