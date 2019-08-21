@@ -2,7 +2,8 @@ import happStore from './happStore'
 import hha from './hha'
 
 // data is a tree organized by instanceId > zome > function
-// leaves can either be an object, or a function which is called with the zome call args, so can update other parts of the tree.
+// leaves can either be an object, or a function which is called with the zome call args.
+// DON'T use this function to update the tree, just to construct return values.
 
 const data = {
   hylo: {
