@@ -59,7 +59,7 @@ describe('ManagePricing', () => {
       ({ getByLabelText, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
         <ManagePricing {...props} />
       </MockedProvider>))
-      await wait(1)
+      await wait(0)
     })
 
     expect(getByText('Price Settings')).toBeInTheDocument()
@@ -77,7 +77,7 @@ describe('ManagePricing', () => {
       ({ getByLabelText, getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
         <ManagePricing {...props} />
       </MockedProvider>))
-      await wait(1)
+      await wait(0)
     })
 
     fireEvent.change(getByTestId('units-dropdown'), { target: { value: UNITS.storage } })
@@ -99,7 +99,7 @@ describe('ManagePricing', () => {
       ({ getByText, getByLabelText } = render(<MockedProvider mocks={mocks} addTypename={false}>
         <ManagePricing {...props} />
       </MockedProvider>))
-      await wait(1)
+      await wait(0)
     })
 
     expect(getByText('Save')).toHaveAttribute('disabled')
@@ -114,7 +114,7 @@ describe('ManagePricing', () => {
 
     expect(getByText('Saving')).toHaveAttribute('disabled')
 
-    await act(() => wait(1))
+    await act(() => wait(0))
 
     expect(getByText('Saved')).toHaveAttribute('disabled')
 
