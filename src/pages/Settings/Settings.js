@@ -62,9 +62,7 @@ export function Settings ({
     toggleSshAccess()
   }
 
-  const onSubmit = values => {
-    // e.preventDefault()
-    console.log('!!! New settings:', values, errors)
+  const onSubmit = settings => {
     updateSettings(settings)
   }
 
