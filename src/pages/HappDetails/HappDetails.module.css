@@ -6,7 +6,6 @@
 
 .summary {
   display: flex;
-  flex-grow: 1;
 }
 
 .thumbnail {

@@ -1,6 +1,10 @@
 import React from 'react'
 import { isEmpty } from 'lodash/fp'
 import { Link } from 'react-router-dom'
+import HappThumbnail from 'components/HappThumbnail'
+import HostButton from 'components/HostButton'
+import './BrowseHapps.module.css'
+
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import Button from 'components/Button'
 import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
@@ -33,7 +37,7 @@ export default function BrowseHapps ({ history: { push } }) {
           key={happ.id} />)}
     </div>}
 
-    <Button onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
+    <Button primary wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
 
   </div>
 }

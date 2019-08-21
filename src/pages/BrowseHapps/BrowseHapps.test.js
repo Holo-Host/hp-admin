@@ -1,5 +1,7 @@
 import React from 'react'
 import { render, fireEvent, within, act } from '@testing-library/react'
+import { Router } from 'react-router-dom'
+import { createMemoryHistory } from 'history'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
 import BrowseHapps from './BrowseHapps'
@@ -68,11 +70,24 @@ const mocks = [
   disableHappMock
 ]
 
+function renderWithRouter (
+  ui,
+  {
+    route = '/',
+    history = createMemoryHistory({ initialEntries: [route] })
+  } = {}
+) {
+  return {
+    ...render(<Router history={history}>{ui}</Router>),
+    history
+  }
+}
+
 describe('BrowseHapps', () => {
   it('renders', async () => {
     let getAllByRole
     await act(async () => {
-      ({ getAllByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
+      ({ getAllByRole } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
         <BrowseHapps history={{}} />
       </MockedProvider>))
       await wait(0)
@@ -100,7 +115,7 @@ describe('BrowseHapps', () => {
     it('calls enableHapp and disableHapp', async () => {
       let getAllByRole
       await act(async () => {
-        ({ getAllByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        ({ getAllByRole } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
           <BrowseHapps history={{}} />
         </MockedProvider>))
         await wait(0)
@@ -130,7 +145,7 @@ describe('BrowseHapps', () => {
       const mockHistory = {
         push: jest.fn()
       }
-      const { getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByText } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
         <BrowseHapps history={mockHistory} />
       </MockedProvider>)
       fireEvent.click(getByText('Menu'))
@@ -143,11 +158,26 @@ describe('BrowseHapps', () => {
       const mockHistory = {
         push: jest.fn()
       }
-      const { getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByText } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
         <BrowseHapps history={mockHistory} />
       </MockedProvider>)
       fireEvent.click(getByText('Manage Pricing'))
       expect(mockHistory.push).toHaveBeenCalledWith('/pricing')
+    })
+  })
+
+  describe('hApp entry', () => {
+    it("navigates to '/browse-happs/APP_HASH' on click", async () => {
+      let getByText, history
+      await act(async () => {
+        ({ getByText, history } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
+          <BrowseHapps history={{}} />
+        </MockedProvider>))
+        await wait(0)
+      })
+
+      fireEvent.click(getByText('HoloFuel'))
+      expect(history.location.pathname).toBe('/browse-happs/QmHHAHappEntryAddressHash1')
     })
   })
 })
