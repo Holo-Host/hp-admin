@@ -18,7 +18,14 @@ function Button ({
   })
 
   return (
-    <button onClick={disabled ? () => {} : onClick} className={className} styleName={classes}>{children}</button>
+    <button
+      onClick={disabled ? () => {} : onClick}
+      className={className}
+      styleName={classes}
+      disabled={disabled}
+    >
+      {children}
+    </button>
   )
 }
 
