@@ -1,11 +1,11 @@
 import React from 'react'
-import { render, fireEvent, within, act } from '@testing-library/react'
+import { render, fireEvent, act } from '@testing-library/react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
 import HappDetails from './HappDetails'
-import { appOne as appHoloFuel} from 'mock-dnas/happStore'
+import { appOne as appHoloFuel } from 'mock-dnas/happStore'
 import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
@@ -93,7 +93,6 @@ async function renderHoloFuelApp (address = 'QmHHAHappEntryAddressHash1') {
 }
 
 describe('HappDetails', () => {
-
   describe('rendering', () => {
     let getByText
 
