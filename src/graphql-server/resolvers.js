@@ -1,7 +1,7 @@
 import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
 import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
-import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
+import EnvoyInterface from './dnaInterfaces/envoyInterface'
 import { promiseMap } from 'utils'
 import {
   dataMappedCall,
