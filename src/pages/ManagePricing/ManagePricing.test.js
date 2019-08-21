@@ -64,7 +64,7 @@ describe('ManagePricing', () => {
 
     expect(getByText('Price Settings')).toBeInTheDocument()
     expect(getByText('CPU = 12 HF per second')).toBeInTheDocument()
-    expect(getByLabelText('Holofuel per unit').value).toEqual(mockHostPricing.pricePerUnit)
+    expect(getByLabelText('HoloFuel per unit').value).toEqual(mockHostPricing.pricePerUnit)
   })
 
   it('allows you to set and save units and pricePerUnit', async () => {
@@ -82,7 +82,7 @@ describe('ManagePricing', () => {
 
     fireEvent.change(getByTestId('units-dropdown'), { target: { value: UNITS.storage } })
 
-    fireEvent.change(getByLabelText('Holofuel per unit'), { target: { value: newPrice } })
+    fireEvent.change(getByLabelText('HoloFuel per unit'), { target: { value: newPrice } })
 
     fireEvent.click(getByText('Save'))
 
@@ -104,7 +104,7 @@ describe('ManagePricing', () => {
 
     expect(getByText('Save')).toHaveAttribute('disabled')
 
-    fireEvent.change(getByLabelText('Holofuel per unit'), { target: { value: newPrice } })
+    fireEvent.change(getByLabelText('HoloFuel per unit'), { target: { value: newPrice } })
 
     expect(getByText('Save')).not.toHaveAttribute('disabled')
 
@@ -118,7 +118,7 @@ describe('ManagePricing', () => {
 
     expect(getByText('Saved')).toHaveAttribute('disabled')
 
-    fireEvent.change(getByLabelText('Holofuel per unit'), { target: { value: '123' } })
+    fireEvent.change(getByLabelText('HoloFuel per unit'), { target: { value: '123' } })
 
     expect(getByText('Save')).not.toHaveAttribute('disabled')
   })

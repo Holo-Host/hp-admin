@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { get } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import Button from 'components/Button'
@@ -12,7 +11,7 @@ export const EMAIL_REGEX = /^\S+@\S+$/i
 const SettingsValidationSchema = yup.object().shape({
   hostName: yup.string().required(),
   hostPubKey: yup.string().required(),
-  hostEmail: yup.string()
+  registrationEmail: yup.string()
     .email()
     .required(),
   deviceName: yup.string().required(),
@@ -87,17 +86,17 @@ export function Settings ({
           label='Host ID (Host Public Key)'
           name='hostPubKey'
           register={register} />
-        
+
         <SettingsFormInput
           label='Registration Email'
-          name='hostEmail'
+          name='registrationEmail'
           register={register} />
 
         <SettingsFormInput
           label='Device Name'
           name='deviceName'
           register={register} />
-        
+
         <SettingsFormInput
           label='Network ID'
           name='networkId'
@@ -125,9 +124,10 @@ export function Settings ({
 
         <SettingsFormInput
           label='SSH Access'
-          name='hostingPort'
+          name='sshAccess'
           type='checkbox'
-          onClick={handleToggleSshAccess} />
+          checked={sshAccessVal}
+          onChange={handleToggleSshAccess} />
 
         <hr />
 
@@ -156,7 +156,7 @@ const mockedProps = {
   settings: {
     hostName: 'My Host',
     hostPubKey: 'hcsFAkeHashSTring2443223ee',
-    hostEmail: 'iamahost@hosting.com',
+    registrationEmail: 'iamahost@hosting.com',
     deviceName: 'My Very First HoloPort',
     networkId: 'my-holoport',
     sshAccess: false,

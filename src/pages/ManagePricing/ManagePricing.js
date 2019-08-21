@@ -69,7 +69,7 @@ export default function ManagePricing ({ history: { push } }) {
 
     <div styleName='price-input-wrapper'>
       <label styleName='price-input-label'>
-        Holofuel per unit
+        HoloFuel per unit
         <input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' />
       </label>
     </div>
