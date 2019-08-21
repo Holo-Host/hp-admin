@@ -1,61 +1,56 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { get } from 'lodash/fp'
+import useForm from 'react-hook-form'
+import * as yup from 'yup'
 import Button from 'components/Button'
-import { useInput } from 'utils'
-import FormInput from 'components/FormInput'
-import EditIcon from 'utils/icons/EditIcon'
+
 import './Settings.module.css'
 
-const mockedProps = {
-  settings: {
-    hostName: 'My Host',
-    hostPubKey: 'hcsFAkeHashSTring2443223ee',
-    hostEmail: 'iamahost@hosting.com',
-    deviceName: 'My Very First HoloPort',
-    networkId: 'my-holoport',
-    sshAccess: false,
-    deviceAdminPort: '6609',
-    hcAdminPort: '8800',
-    hcNetworkPort: '35353',
-    hostingPort: '8080'
-  },
-  updateSettings: () => Promise.resolve(true),
-  factoryReset: () => Promise.resolve(true),
-  toggleSshAccess: () => Promise.resolve(true)
-}
+export const PORT_NUMBER_REGEX = /^\d{4,6}$/
+export const EMAIL_REGEX = /^\S+@\S+$/i
 
-export default props => <Settings {...mockedProps} {...props} />
+const SettingsValidationSchema = yup.object().shape({
+  hostName: yup.string().required(),
+  hostPubKey: yup.string().required(),
+  hostEmail: yup.string()
+    .email()
+    .required(),
+  deviceName: yup.string().required(),
+  networkId: yup.string().required(),
+  deviceAdminPort: yup.number()
+    .min(1000)
+    .max(65000)
+    .required(),
+  hcAdminPort: yup.number()
+    .min(1000)
+    .max(65000)
+    .required(),
+  hcNetworkPort: yup.number()
+    .min(1000)
+    .max(65000)
+    .required(),
+  hostingPort: yup.number()
+    .min(1000)
+    .max(65000)
+    .required()
+})
 
 export function Settings ({
-  settings: {
-    hostName,
-    hostPubKey,
-    hostEmail,
-    deviceName,
-    networkId,
-    sshAccess,
-    deviceAdminPort,
-    hcAdminPort,
-    hcNetworkPort,
-    hostingPort
-  } = mockedProps.settings,
-  updateSettings = mockedProps.updateSettings,
-  factoryReset = mockedProps.factoryReset,
-  toggleSshAccess = mockedProps.toggleSshAccess,
+  settings,
+  updateSettings,
+  factoryReset,
+  toggleSshAccess,
   history: { push }
 }) {
   // if (props.loading) return <h4>Loading Settings</h4>
 
   const goToMenu = () => push('/menu')
+  const { register, handleSubmit, errors } = useForm({
+    defaultValues: settings,
+    validationSchema: SettingsValidationSchema
+  })
+
   const [sshAccessVal, setSshAccess] = useState(false)
-  const { value: hostNameVal, bind: bindhostName, reset: resethostName } = useInput(hostName)
-  const { value: hostPubKeyVal, bind: bindHostPubKey, reset: resetHostPubKey } = useInput(hostPubKey)
-  const { value: registrationEmail, bind: bindRegistrationEmail, reset: resetRegistrationEmail } = useInput(hostEmail)
-  const { value: deviceNameVal, bind: bindDeviceName, reset: resetDeviceName } = useInput(deviceName)
-  const { value: networkIdVal, bind: bindNetworkId, reset: resetNetworkId } = useInput(networkId)
-  const { value: deviceAdminPortVal, bind: bindDeviceAdminPort, reset: resetDeviceAdminPort } = useInput(deviceAdminPort)
-  const { value: hcAdminPortVal, bind: bindHcAdminPort, reset: resetHcAdminPort } = useInput(hcAdminPort)
-  const { value: hcNetworkPortVal, bind: bindHcNetworkPort, reset: resetHcNetworkPort } = useInput(hcNetworkPort)
-  const { value: hostingPortVal, bind: bindHostingPort, reset: resetHostingPort } = useInput(hostingPort)
 
   const handleViewTos = (e) => {
     e.preventDefault()
@@ -68,188 +63,111 @@ export function Settings ({
     toggleSshAccess()
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const newSettings = {
-      hostName: hostNameVal || hostName,
-      hostPubKey: hostPubKeyVal || hostPubKey,
-      hostEmail: registrationEmail || hostEmail,
-      deviceName: deviceNameVal || deviceName,
-      networkId: networkIdVal || networkId,
-      sshAccess: sshAccessVal || sshAccess,
-      deviceAdminPort: deviceAdminPortVal || deviceAdminPort,
-      hcAdminPort: hcAdminPortVal || hcAdminPort,
-      hcNetworkPort: hcNetworkPortVal || hcNetworkPort,
-      hostingPort: hostingPortVal || hostingPort
-    }
-
-    // Submit all/new setting values
-    updateSettings({ newSettings })
-
-    // Reset all inputs
-    resetRegistrationEmail()
-    resethostName()
-    resetHostPubKey()
-    resetDeviceName()
-    resetNetworkId()
-    resetDeviceAdminPort()
-    resetHcAdminPort()
-    resetHcNetworkPort()
-    resetHostingPort()
+  const onSubmit = values => {
+    // e.preventDefault()
+    console.log('!!! New settings:', values, errors)
+    updateSettings(settings)
   }
+
+  console.log('!!! errors: ', errors)
 
   return <div>
     <div styleName='header'>
       <span styleName='title'>HoloPort Settings</span>
       <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
     </div>
-
     <div>
-      <form styleName='settings-form' onSubmit={handleSubmit}>
-        <SettingInput
-          value={hostNameVal}
+      <form styleName='settings-form' onSubmit={handleSubmit(onSubmit)}>
+        <SettingsFormInput
           label='Host Name'
-          dataFor='hostName'
-          type='text'
           name='hostName'
-          propValue={hostName}
-          bindFnName={bindhostName} />
+          register={register} />
 
-        <SettingInput
-          value={hostPubKeyVal}
+        <SettingsFormInput
           label='Host ID (Host Public Key)'
-          dataFor='hostPubKey'
-          type='text'
           name='hostPubKey'
-          propValue={hostPubKey}
-          bindFnName={bindHostPubKey} />
-
-        <SettingInput
-          value={registrationEmail}
+          register={register} />
+        
+        <SettingsFormInput
           label='Registration Email'
-          dataFor='registration-email'
-          type='text'
-          name='registration-email'
-          propValue={hostEmail}
-          bindFnName={bindRegistrationEmail} />
+          name='hostEmail'
+          register={register} />
 
-        <SettingInput
-          value={deviceNameVal}
+        <SettingsFormInput
           label='Device Name'
-          dataFor='deviceName'
-          type='text'
           name='deviceName'
-          propValue={deviceName}
-          bindFnName={bindDeviceName} />
-
-        <SettingInput
-          value={networkIdVal}
-          label='Network Id'
-          dataFor='networkId'
-          type='text'
+          register={register} />
+        
+        <SettingsFormInput
+          label='Network ID'
           name='networkId'
-          propValue={networkId}
-          bindFnName={bindNetworkId} />
+          register={register} />
 
-        <SettingInput
-          value={deviceAdminPortVal}
-          label='Device Admin Port Id'
-          dataFor='deviceAdminPort'
-          type='text'
+        <SettingsFormInput
+          label='Device Admin Port'
           name='deviceAdminPort'
-          propValue={hcAdminPort}
-          bindFnName={bindDeviceAdminPort} />
+          register={register} />
 
-        <SettingInput
-          value={hcAdminPortVal}
-          label='Holochain Admin Port Id'
-          dataFor='hcAdminPort'
-          type='text'
+        <SettingsFormInput
+          label='Holochain Admin Port'
           name='hcAdminPort'
-          propValue={hcAdminPort}
-          bindFnName={bindHcAdminPort} />
+          register={register} />
 
-        <SettingInput
-          value={hcNetworkPortVal}
-          label='Holochain Networking Port Id'
-          dataFor='hcNetworkPort'
-          type='text'
+        <SettingsFormInput
+          label='Holochain Networking Port'
           name='hcNetworkPort'
-          propValue={hcNetworkPort}
-          bindFnName={bindHcNetworkPort} />
+          register={register} />
 
-        <SettingInput
-          value={hostingPortVal}
-          label='Holo Hosting Port Id'
-          dataFor='hostingPort'
-          type='text'
+        <SettingsFormInput
+          label='Holo Hosting Port'
           name='hostingPort'
-          propValue={hostingPort}
-          bindFnName={bindHostingPort} />
+          register={register} />
 
-        <FormInput hasLabel
+        <SettingsFormInput
           label='SSH Access'
-          dataFor='ssh-access'
+          name='hostingPort'
           type='checkbox'
-          defaultChecked={sshAccess}
-          checked={sshAccessVal}
-          onChange={handleToggleSshAccess} />
+          onClick={handleToggleSshAccess} />
 
         <hr />
-        <Button type='submit' name='update-settngs' value='Submit'>Update</Button>
 
+        <Button type='submit' name='update-settings' value='Submit'>Update</Button>
       </form>
       <Button name='factory-reset' onClick={() => factoryReset()}>Factory Reset</Button>
-
       <Button name='tos' onClick={handleViewTos} styleName='tos-button'>Review Terms of Service</Button>
     </div>
   </div>
 }
 
-export function SettingInput ({ value, label, dataFor, type, name, bindFnName, propValue }) {
-  const [currentValue, setcurrentValue] = useState(propValue)
-  const [revertText, setRevertText] = useState(propValue)
-  const [clickAmend, setClickAmend] = useState(false)
-
-  // TODO: review the implementation of useEffect
-  useEffect(() => {
-    if (value) return
-    setRevertText(true)
-  })
-
-  const renderInput = () => {
-    setClickAmend(true)
-  }
-  const resetText = () => {
-    console.log('input propValue: ', propValue)
-    setRevertText(true)
-    setClickAmend(false)
-  }
-  const displayNewText = () => {
-    setcurrentValue(value)
-    setRevertText(false)
-    setClickAmend(false)
-  }
-  return (
-    <div>
-      {clickAmend
-        ? <FormInput hasLabel
-          label={label}
-          dataFor={dataFor}
-          type={type}
-          name={name}
-          min='0.5'
-          max='100'
-          step='0.5'
-          {...bindFnName}
-          onCloseHandler={resetText}
-          onCheckHandler={displayNewText} />
-        : <div styleName='form-row'>
-          <h6 styleName='form-label-header'>{label}</h6>
-          <span onClick={renderInput} styleName='side-icon'><EditIcon width={10} height={10} /></span>
-          <p styleName='form-label'>{revertText ? currentValue : value}</p>
-        </div>
-      }
-    </div>
-  )
+export function SettingsFormInput ({
+  name,
+  label,
+  type = 'text',
+  register,
+  ...inputProps
+}) {
+  return <React.Fragment>
+    {label && <label data-for={name}>{label}</label>}
+    <input name={name} id={name} type={type} ref={register} {...inputProps} />
+  </React.Fragment>
 }
+
+const mockedProps = {
+  settings: {
+    hostName: 'My Host',
+    hostPubKey: 'hcsFAkeHashSTring2443223ee',
+    hostEmail: 'iamahost@hosting.com',
+    deviceName: 'My Very First HoloPort',
+    networkId: 'my-holoport',
+    sshAccess: false,
+    deviceAdminPort: 6609,
+    hcAdminPort: 8800,
+    hcNetworkPort: 35353,
+    hostingPort: 8080
+  },
+  updateSettings: () => Promise.resolve(true),
+  factoryReset: () => Promise.resolve(true),
+  toggleSshAccess: () => Promise.resolve(true)
+}
+
+export default props => <Settings {...mockedProps} {...props} />

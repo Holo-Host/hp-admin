@@ -28,6 +28,7 @@
     "lodash": "^4.17.15",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
+    "react-hook-form": "^3.21.20",
     "react-identicon-variety-pack": "^0.2.1",
     "react-media-hook": "^0.4.4",
     "react-test-renderer": "^16.9.0",
@@ -35,7 +36,8 @@
     "regenerator-runtime": "^0.13.3",
     "rpc-websockets": "^4.5.1",
     "waait": "^1.0.5",
-    "ws": "^7.1.1"
+    "ws": "^7.1.1",
+    "yup": "0.27.0"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",

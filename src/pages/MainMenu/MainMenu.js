@@ -10,7 +10,8 @@ export default function MainMenu () {
 export function Menu () {
   return <ul>
     <li><Link to='/'>Dashboard</Link></li>
-    <li><Link to='happ-hosting'>Happ Hosting</Link></li>
+    <li><Link to='/browse-happs'>Browse Happs</Link></li>
+    <li><Link to='/pricing'>Manage Pricing</Link></li>
     <li><Link to='settings'>Settings</Link></li>
   </ul>
 }
