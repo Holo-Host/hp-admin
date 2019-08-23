@@ -8,9 +8,9 @@ import HappsQuery from 'graphql/HappsQuery.gql'
 import BrowseHapps from './BrowseHapps'
 import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
 import { happs as hhaHapps } from 'mock-dnas/hha'
-import mockEnvoyInterface from 'graphql-server/dnaInterfaces/EnvoyInterface'
+import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 
-jest.mock('graphql-server/dnaInterfaces/EnvoyInterface')
+jest.mock('data-interfaces/EnvoyInterface')
 
 describe('BrowseHapps Connected', () => {
   it('renders', async () => {

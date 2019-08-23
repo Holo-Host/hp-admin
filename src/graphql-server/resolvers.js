@@ -1,13 +1,13 @@
-import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
-import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
-import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
-import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
+import HyloDnaInterface from 'data-interfaces/HyloDnaInterface'
+import HappStoreDnaInterface, { getHappDetails } from 'data-interfaces/HappStoreDnaInterface'
+import HhaDnaInterface from 'data-interfaces/HhaDnaInterface'
+import EnvoyInterface from 'data-interfaces/EnvoyInterface'
 import { promiseMap } from 'utils'
 import {
   dataMappedCall,
   toUiData
 } from './dataMapping'
-// TODO: dataMapping should probably be happening in the dnainterfaces
+// TODO: dataMapping should probably be happening in the data-interfaces
 
 export const resolvers = {
   Query: {

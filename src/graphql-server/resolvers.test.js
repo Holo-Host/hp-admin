@@ -1,12 +1,12 @@
 import wait from 'waait'
 import resolvers from './resolvers'
-import mockHhaDnaInterface from 'graphql-server/dnaInterfaces/HhaDnaInterface'
-import { getHappDetails as mockGetHappDetails } from 'graphql-server/dnaInterfaces/HappStoreDnaInterface'
-import mockEnvoyInterface from 'graphql-server/dnaInterfaces/EnvoyInterface'
+import mockHhaDnaInterface from 'data-interfaces/HhaDnaInterface'
+import { getHappDetails as mockGetHappDetails } from 'data-interfaces/HappStoreDnaInterface'
+import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 
-jest.mock('graphql-server/dnaInterfaces/HhaDnaInterface')
-jest.mock('graphql-server/dnaInterfaces/HappStoreDnaInterface')
-jest.mock('graphql-server/dnaInterfaces/EnvoyInterface')
+jest.mock('data-interfaces/HhaDnaInterface')
+jest.mock('data-interfaces/HappStoreDnaInterface')
+jest.mock('data-interfaces/EnvoyInterface')
 
 describe('resolvers', () => {
   describe('Query', () => {
