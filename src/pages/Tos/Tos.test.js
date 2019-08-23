@@ -1,7 +1,7 @@
 // import React from 'react'
-// import Settings from './Settings'
+// import Tos from './Tos'
 // import { render } from '@testing-library/react'
 
-describe('Settings', () => {
+describe('Tos', () => {
   it("isn't tested", () => {})
 })

@@ -1,7 +1,6 @@
 .primary-layout {
   display: flex;
   word-break: break-word;
-  justify-content: center;
   height: 100%;
 }
 

@@ -41,8 +41,6 @@ export function Settings ({
   toggleSshAccess,
   history: { push }
 }) {
-  // if (props.loading) return <h4>Loading Settings</h4>
-
   const goToMenu = () => push('/menu')
   const { register, handleSubmit, errors } = useForm({
     defaultValues: settings,
@@ -66,6 +64,7 @@ export function Settings ({
     updateSettings(settings)
   }
 
+  // Leaving error logging until error states designed and implemented on form
   console.log('!!! errors: ', errors)
 
   return <div>
