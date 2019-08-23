@@ -7,9 +7,7 @@ import HostPricingQuery from 'graphql/HostPricingQuery.gql'
 import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 
 export default function ManagePricing ({ history: { push } }) {
-  const { data } = useQuery(HostPricingQuery)
-  console.log('data', data)
-  const hostPricing = data ? data.hostPricing : {}
+  const { data: { hostPricing } } = useQuery(HostPricingQuery)
   const [updateHostPricing, { loading }] = useMutation(UpdateHostPricingMutation)
   const goToMenu = () => push('/menu')
 

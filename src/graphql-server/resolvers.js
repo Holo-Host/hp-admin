@@ -47,8 +47,8 @@ export const resolvers = {
       }
       return getHappDetails(happ)
     },
-    // setHostPricing also gets passed 'units', but we don't currently use that in the dna
-    updateHostPricing: (_, { pricePerUnit }) => HhaDnaInterface.hostPricing.update(pricePerUnit)
+
+    updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit)
   }
 }
 
