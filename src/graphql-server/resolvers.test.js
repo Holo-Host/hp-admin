@@ -44,9 +44,10 @@ describe('resolvers', () => {
 
     describe('.updateHostPricing', () => {
       it('calls HhaDnaInterface.hostPricing.update', () => {
+        const units = 'storage'
         const pricePerUnit = '12'
-        resolvers.Mutation.updateHostPricing(null, { pricePerUnit })
-        expect(mockHhaDnaInterface.hostPricing.update).toHaveBeenCalledWith(pricePerUnit)
+        resolvers.Mutation.updateHostPricing(null, { units, pricePerUnit })
+        expect(mockHhaDnaInterface.hostPricing.update).toHaveBeenCalledWith(units, pricePerUnit)
       })
     })
 
