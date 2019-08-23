@@ -24,11 +24,11 @@ describe('resolvers', () => {
       })
     })
 
-    describe('.allAvailableHapps', () => {
-      it('calls HhaDnaInterface.happs.allAvailable', async () => {
-        resolvers.Query.allAvailableHapps()
+    describe('.happs', () => {
+      it('calls HhaDnaInterface.happs.all', async () => {
+        resolvers.Query.happs()
         await wait(0)
-        expect(mockHhaDnaInterface.happs.allAvailable).toHaveBeenCalled()
+        expect(mockHhaDnaInterface.happs.all).toHaveBeenCalled()
         expect(mockGetHappDetails.mock.calls.map(c => c[0])).toEqual(['mockHappOne', 'mockHappTwo'])
       })
     })

@@ -36,9 +36,7 @@ type Query {
   me: Me
   happStoreUser: HappStoreUser
   hostingUser: HhaUser
-  allHapps: [Happ]
-  allAvailableHapps: [Happ]
-  allHostedHapps: [Happ]
+  happs: [Happ]
   hostPricing: HostPricing
 }
 
