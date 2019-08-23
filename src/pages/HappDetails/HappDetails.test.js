@@ -1,7 +1,5 @@
 import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory } from 'history'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
 import HappDetails from './HappDetails'
@@ -70,26 +68,13 @@ const mocks = [
   disableHappMock
 ]
 
-function renderWithRouter (
-  ui,
-  {
-    route = '/',
-    history = createMemoryHistory({ initialEntries: [route] })
-  } = {}
-) {
-  return {
-    ...render(<Router history={history}>{ui}</Router>),
-    history
-  }
-}
-
 async function renderHoloFuelApp (address = 'QmHHAHappEntryAddressHash1') {
-  const render = await renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
+  const app = await render(<MockedProvider mocks={mocks} addTypename={false}>
     <HappDetails history={{}} match={{ params: { address } }} />
   </MockedProvider>)
 
   await wait(0)
-  return render
+  return app
 }
 
 describe('HappDetails', () => {
@@ -160,7 +145,7 @@ describe('HappDetails', () => {
 
     it('"Back to hApps" in modal navigates to /browse-apps', async () => {
       const mockHistory = { push: jest.fn() }
-      const { getByText } = await renderWithRouter(
+      const { getByText } = render(
         <MockedProvider mocks={mocks} addTypename={false}>
           <HappDetails history={mockHistory} match={{ params: { address: 'QmHHAHappEntryAddressHash2' } }} />
         </MockedProvider>

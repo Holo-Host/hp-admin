@@ -12,8 +12,8 @@ import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 const findAppByID = id => happ => happ.id === id
 
 export default function BrowseHapps ({
-  history: { push } = {},
-  match: { params } = {}
+  history: { push },
+  match: { params }
 } = {}) {
   const { data: { allAvailableHapps = [] } } = useQuery(AllAvailableHappsQuery)
   const [enableHappMutation] = useMutation(EnableHappMutation)

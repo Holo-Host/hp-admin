@@ -37,7 +37,7 @@ export default function BrowseHapps ({ history: { push } }) {
           key={happ.id} />)}
     </div>}
 
-    <Button primary wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
+    <Button variant='primary' wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
 
   </div>
 }
