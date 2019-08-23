@@ -4,13 +4,13 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
 import apolloClient from 'apolloClient'
-import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
+import HappsQuery from 'graphql/HappsQuery.gql'
 import BrowseHapps from './BrowseHapps'
 import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
 import { happs as hhaHapps } from 'mock-dnas/hha'
-import mockEnvoyInterface from 'graphql-server/dnaInterfaces/EnvoyInterface'
+import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 
-jest.mock('graphql-server/dnaInterfaces/EnvoyInterface')
+jest.mock('data-interfaces/EnvoyInterface')
 
 describe('BrowseHapps Connected', () => {
   it('renders', async () => {
@@ -75,11 +75,11 @@ describe('BrowseHapps Connected', () => {
   const mocks = [
     {
       request: {
-        query: AllAvailableHappsQuery
+        query: HappsQuery
       },
       result: {
         data: {
-          allAvailableHapps: []
+          happs: []
         }
       }
     }

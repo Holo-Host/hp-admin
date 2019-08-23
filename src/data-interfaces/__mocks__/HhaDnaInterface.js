@@ -6,7 +6,7 @@ const mockHhaDnaInterface = {
 
   happs: {
     get: jest.fn(appId => ({ appId })),
-    allAvailable: jest.fn(() => ['mockHappOne', 'mockHappTwo']),
+    all: jest.fn(() => ['mockHappOne', 'mockHappTwo']),
     enable: jest.fn(appId => appId),
     disable: jest.fn(appId => appId)
   },

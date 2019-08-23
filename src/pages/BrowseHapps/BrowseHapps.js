@@ -4,18 +4,18 @@ import { isEmpty } from 'lodash/fp'
 import cx from 'classnames'
 import './BrowseHapps.module.css'
 import Button from 'components/Button'
-import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
+import HappsQuery from 'graphql/HappsQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 
 export default function BrowseHapps ({ history: { push } }) {
-  const { data: { allAvailableHapps = [] } } = useQuery(AllAvailableHappsQuery)
+  const { data: { happs = [] } } = useQuery(HappsQuery)
   const [enableHappMutation] = useMutation(EnableHappMutation)
   const [disableHappMutation] = useMutation(DisableHappMutation)
   const enableHapp = appId => enableHappMutation({ variables: { appId } })
   const disableHapp = appId => disableHappMutation({ variables: { appId } })
 
-  const sortedHapps = allAvailableHapps.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
+  const sortedHapps = happs.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToMenu = () => push('/menu')
   const goToPricing = () => push('/pricing')
 
