@@ -44,11 +44,7 @@ function presentHappForGetAppDetails ({ happstoreId }) {
 
 const hha = {
   host: {
-    register_as_host: () => {
-      const address = 'QmHHAHostRegistrationAddress'
-      hha.host.is_registered_as_host = { links: [{ address }] }
-      return address
-    },
+    register_as_host: () => 'QmHHAHostRegistrationAddress',
     is_registered_as_host: {
       links: []
     },
@@ -67,9 +63,7 @@ const hha = {
     get_service_log_details: {
       price_per_unit: '5'
     },
-    add_service_log_details: (details) => {
-      hha.provider.get_service_log_details = details
-    }
+    add_service_log_details: details => details
   },
   whoami: {
     get_user: {

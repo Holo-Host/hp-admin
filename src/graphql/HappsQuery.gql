@@ -1,5 +1,5 @@
-query AllAvailableHapps {
-  allAvailableHapps {
+query HappsQuery {
+  happs {
     id
     title
     description

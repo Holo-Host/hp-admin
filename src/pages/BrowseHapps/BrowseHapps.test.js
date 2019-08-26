@@ -2,8 +2,11 @@ import React from 'react'
 import { render, fireEvent, within, act } from '@testing-library/react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
+import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
+import apolloClient from 'apolloClient'
+import HappsQuery from 'graphql/HappsQuery.gql'
 import BrowseHapps from './BrowseHapps'
 import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
 import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
@@ -87,10 +90,10 @@ describe('BrowseHapps', () => {
   it('renders', async () => {
     let getAllByRole
     await act(async () => {
-      ({ getAllByRole } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
+      ({ getAllByRole } = render(<ApolloProvider client={apolloClient}>
         <BrowseHapps history={{}} />
-      </MockedProvider>))
-      await wait(0)
+      </ApolloProvider>))
+      await wait(15)
     })
 
     const listItems = getAllByRole('listitem')
@@ -112,33 +115,49 @@ describe('BrowseHapps', () => {
   })
 
   describe('HostButton', () => {
-    it('calls enableHapp and disableHapp', async () => {
-      let getAllByRole
+    it('enables and disables happs', async () => {
+      let getAllByRole, queryAllByText
       await act(async () => {
-        ({ getAllByRole } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
+        ({ getAllByRole, queryAllByText } = render(<ApolloProvider client={apolloClient}>
           <BrowseHapps history={{}} />
-        </MockedProvider>))
-        await wait(0)
+        </ApolloProvider>))
+        await wait(15)
       })
 
-      expect(enableHappMock.newData).not.toHaveBeenCalled()
-      expect(disableHappMock.newData).not.toHaveBeenCalled()
-
       const listItems = getAllByRole('listitem')
-      const { getByText: getByTextFromListItemZero } = within(listItems[0])
-      fireEvent.click(getByTextFromListItemZero('Un-Host'))
+      expect(queryAllByText('Un-Host')).toHaveLength(1)
+      expect(queryAllByText('Host')).toHaveLength(1)
+
+      const { getByText: getByTextFromListItem } = within(listItems[0])
+      fireEvent.click(getByTextFromListItem('Un-Host'))
+
       await act(() => wait(0))
 
-      expect(enableHappMock.newData).not.toHaveBeenCalled()
-      expect(disableHappMock.newData).toHaveBeenCalled()
+      expect(queryAllByText('Un-Host')).toHaveLength(0)
+      expect(queryAllByText('Host')).toHaveLength(2)
 
-      const { getByText: getByTextFromListItemOne } = within(listItems[1])
-      fireEvent.click(getByTextFromListItemOne('Host'))
+      fireEvent.click(getByTextFromListItem('Host'))
+
       await act(() => wait(0))
 
-      expect(enableHappMock.newData).toHaveBeenCalled()
+      expect(queryAllByText('Un-Host')).toHaveLength(1)
+      expect(queryAllByText('Host')).toHaveLength(1)
+      expect(mockEnvoyInterface.happs.install).toHaveBeenCalledWith(hhaHapps[0].id)
     })
   })
+
+  const mocks = [
+    {
+      request: {
+        query: HappsQuery
+      },
+      result: {
+        data: {
+          happs: []
+        }
+      }
+    }
+  ]
 
   describe('menu button', () => {
     it("calls history.push with '/menu'", async () => {

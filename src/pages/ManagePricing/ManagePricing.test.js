@@ -1,11 +1,14 @@
 import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
+import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
+import apolloClient from 'apolloClient'
 import ManagePricing from './ManagePricing'
 import HostPricingQuery from 'graphql/HostPricingQuery.gql'
 import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 import { UNITS } from 'models/HostPricing'
+import mockHha from 'mock-dnas/hha'
 
 const mockHostPricing = {
   units: 'cpu',
@@ -56,15 +59,15 @@ describe('ManagePricing', () => {
 
     let getByLabelText, getByText
     await act(async () => {
-      ({ getByLabelText, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+      ({ getByLabelText, getByText } = render(<ApolloProvider client={apolloClient}>
         <ManagePricing {...props} />
-      </MockedProvider>))
+      </ApolloProvider>))
       await wait(0)
     })
 
     expect(getByText('Price Settings')).toBeInTheDocument()
-    expect(getByText('CPU = 12 HF per second')).toBeInTheDocument()
-    expect(getByLabelText('Holofuel per unit').value).toEqual(mockHostPricing.pricePerUnit)
+    expect(getByText('CPU = 5 HF per second')).toBeInTheDocument()
+    expect(getByLabelText('Holofuel per unit').value).toEqual(mockHha.provider.get_service_log_details.price_per_unit)
   })
 
   it('allows you to set and save units and pricePerUnit', async () => {
