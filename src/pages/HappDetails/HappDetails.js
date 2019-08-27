@@ -6,7 +6,7 @@ import Modal from 'components/Modal'
 import './HappDetails.module.css'
 
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
+import HappsQuery from 'graphql/HappsQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 const findAppByID = id => happ => happ.id === id
@@ -15,14 +15,14 @@ export default function BrowseHapps ({
   history: { push },
   match: { params }
 } = {}) {
-  const { data: { allAvailableHapps = [] } } = useQuery(AllAvailableHappsQuery)
+  const { data: { happs = [] } } = useQuery(HappsQuery)
   const [enableHappMutation] = useMutation(EnableHappMutation)
   const [disableHappMutation] = useMutation(DisableHappMutation)
   const enableHapp = appId => enableHappMutation({ variables: { appId } })
   const disableHapp = appId => disableHappMutation({ variables: { appId } })
   const [isModalOpen, setModalOpen] = useState(false)
 
-  const happ = allAvailableHapps.find(findAppByID(params.address))
+  const happ = happs.find(findAppByID(params.address))
 
   if (!happ) {
     return null

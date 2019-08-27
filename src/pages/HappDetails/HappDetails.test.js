@@ -1,77 +1,23 @@
 import React from 'react'
-import { render, fireEvent, act } from '@testing-library/react'
-import { MockedProvider } from '@apollo/react-testing'
+import { render, fireEvent, act, cleanup } from '@testing-library/react'
+import { ApolloProvider } from '@apollo/react-hooks'
+import apolloClient from 'apolloClient'
 import wait from 'waait'
 import HappDetails from './HappDetails'
 import { appOne as appHoloFuel } from 'mock-dnas/happStore'
-import AllAvailableHappsQuery from 'graphql/AllAvailableHappsQuery.gql'
-import EnableHappMutation from 'graphql/EnableHappMutation.gql'
-import DisableHappMutation from 'graphql/DisableHappMutation.gql'
+import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
+import hhaInterface from 'data-interfaces/HhaDnaInterface'
 
-const enableHappMock = {
-  request: {
-    query: EnableHappMutation,
-    variables: { appId: 'QmHHAHappEntryAddressHash2' }
-  },
-  result: {
-    data: { enableHapp: { id: 'not', title: 'used', happStoreId: 'at', isEnabled: 'all' } }
-  },
-  newData: jest.fn()
-}
+jest.mock('data-interfaces/EnvoyInterface')
 
-const disableHappMock = {
-  request: {
-    query: DisableHappMutation,
-    variables: { appId: 'QmHHAHappEntryAddressHash1' }
-  },
-  result: {
-    data: { disableHapp: { id: 'not', title: 'used', happStoreId: 'at', isEnabled: 'all' } }
-  },
-  newData: jest.fn()
-}
-
-const mocks = [
-  {
-    request: {
-      query: AllAvailableHappsQuery
-    },
-    result: {
-      data: {
-        allAvailableHapps: [
-          {
-            id: 'QmHHAHappEntryAddressHash1',
-            title: 'HoloFuel',
-            description: 'Manage and redeem payments for hosting',
-            dnaHash: 'foiyuoiyZXBVNBVCuibce',
-            happStoreId: 'QmXxiimzfcSHYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoT',
-            homepageUrl: 'https://holo.host/faq/what-is-holo-fuel/',
-            isEnabled: true,
-            thumbnailUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cMFvYqaw7TtcTkPFcwE8pupKWqLFMCFu2opap9jqUoqIcAKB',
-            ui: null
-          },
-          {
-            id: 'QmHHAHappEntryAddressHash2',
-            title: 'Holo Community',
-            description: 'Connect with other hosts in the Holo network',
-            dnaHash: 'sd;lmsdl;masd;lmds;lmasdlsadm;ldmo',
-            happStoreId: 'QmXx7imYqHXV2z6WNopeiFnPBx9YKnHzPcq9o8VoTzfcSH',
-            homepageUrl: 'https://hylo.com',
-            isEnabled: false,
-            thumbnailUrl: 'https://d3ngex8q79bk55.cloudfront.net/misc/default_community_avatar.png',
-            ui: null
-          }
-        ]
-      }
-    }
-  },
-  enableHappMock,
-  disableHappMock
-]
+afterEach(() => {
+  apolloClient.resetStore()
+})
 
 async function renderHoloFuelApp (address = 'QmHHAHappEntryAddressHash1') {
-  const app = await render(<MockedProvider mocks={mocks} addTypename={false}>
+  const app = await render(<ApolloProvider client={apolloClient}>
     <HappDetails history={{}} match={{ params: { address } }} />
-  </MockedProvider>)
+  </ApolloProvider>)
 
   await wait(0)
   return app
@@ -97,40 +43,38 @@ describe('HappDetails', () => {
   })
 
   describe('HostButton', () => {
-    it('calls disableHapp', async () => {
-      let getByText
-      await act(async () => {
-        ({ getByText } = await renderHoloFuelApp())
-      })
-
-      expect(enableHappMock.newData).not.toHaveBeenCalled()
-      expect(disableHappMock.newData).not.toHaveBeenCalled()
-
-      fireEvent.click(getByText('Un-Host'))
-      await act(() => wait(0))
-
-      expect(enableHappMock.newData).not.toHaveBeenCalled()
-      expect(disableHappMock.newData).toHaveBeenCalled()
-    })
-
-    it('calls enableHapp', async () => {
+    it('enables apps', async () => {
+      hhaInterface.happs.enable = jest.fn()
       let getByText
       await act(async () => {
         ({ getByText } = await renderHoloFuelApp('QmHHAHappEntryAddressHash2'))
       })
 
-      expect(enableHappMock.newData).not.toHaveBeenCalled()
-      expect(disableHappMock.newData).not.toHaveBeenCalled()
-
       fireEvent.click(getByText('Host'))
       await act(() => wait(0))
 
-      expect(enableHappMock.newData).toHaveBeenCalled()
-      expect(disableHappMock.newData).not.toHaveBeenCalled()
+      expect(hhaInterface.happs.enable).toHaveBeenCalledWith('QmHHAHappEntryAddressHash2')
+      expect(mockEnvoyInterface.happs.install).toHaveBeenCalledWith('QmHHAHappEntryAddressHash2')
+    })
+
+    it('calls disableHapp', async () => {
+      hhaInterface.happs.disable = jest.fn()
+      let getByText
+      await act(async () => {
+        ({ getByText } = await renderHoloFuelApp())
+      })
+
+      expect(hhaInterface.happs.disable).not.toHaveBeenCalled()
+
+      fireEvent.click(getByText('Un-Host'))
+      await act(() => wait(0))
+
+      expect(hhaInterface.happs.disable).toHaveBeenCalledWith('QmHHAHappEntryAddressHash1')
     })
   })
 
   describe('Modal', () => {
+    beforeEach(cleanup)
     it('shows modal after enabling hApp', async () => {
       let getByText
       await act(async () => {
@@ -145,11 +89,14 @@ describe('HappDetails', () => {
 
     it('"Back to hApps" in modal navigates to /browse-apps', async () => {
       const mockHistory = { push: jest.fn() }
-      const { getByText } = render(
-        <MockedProvider mocks={mocks} addTypename={false}>
-          <HappDetails history={mockHistory} match={{ params: { address: 'QmHHAHappEntryAddressHash2' } }} />
-        </MockedProvider>
-      )
+      let getByText
+      await act(async () => {
+        ({ getByText } = render(
+          <ApolloProvider client={apolloClient}>
+            <HappDetails history={mockHistory} match={{ params: { address: 'QmHHAHappEntryAddressHash2' } }} />
+          </ApolloProvider>
+        ))
+      })
       await wait(0)
       fireEvent.click(getByText('Host'))
       await act(() => wait(0))
