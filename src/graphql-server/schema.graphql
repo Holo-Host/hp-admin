@@ -18,7 +18,7 @@ type HhaUser {
 type Happ {
   id: ID
   title: String
-  description: String  
+  description: String
   thumbnailUrl: String
   homepageUrl: String
   dnaHash: String
@@ -37,6 +37,7 @@ type Query {
   happStoreUser: HappStoreUser
   hostingUser: HhaUser
   happs: [Happ]
+  happByStoreId(storeId: String!): Happ
   hostPricing: HostPricing
 }
 

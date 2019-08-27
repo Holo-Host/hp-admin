@@ -19,6 +19,8 @@ export const resolvers = {
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
+    happByStoreId: (_, { storeId }) => HappStoreDnaInterface.happs.get(storeId),
+
     hostPricing: () => HhaDnaInterface.hostPricing.get()
   },
 

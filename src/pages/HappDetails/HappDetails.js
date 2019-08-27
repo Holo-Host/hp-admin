@@ -6,36 +6,50 @@ import Modal from 'components/Modal'
 import './HappDetails.module.css'
 
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import HappsQuery from 'graphql/HappsQuery.gql'
+import HappByStoreIdQuery from 'graphql/HappByStoreIdQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
-const findAppByID = id => happ => happ.id === id
 
 export default function BrowseHapps ({
   history: { push },
   match: { params }
 } = {}) {
-  const { data: { happs = [] } } = useQuery(HappsQuery)
+  const q = useQuery(HappByStoreIdQuery, {
+    variables: {
+      storeId: params.happStoreId || ''
+    }
+  })
+  console.log('hbi', params.happStoreId,  q)
+  const { data: { happByStoreId = [] } = {} } = q
   const [enableHappMutation] = useMutation(EnableHappMutation)
   const [disableHappMutation] = useMutation(DisableHappMutation)
   const enableHapp = appId => enableHappMutation({ variables: { appId } })
   const disableHapp = appId => disableHappMutation({ variables: { appId } })
   const [isModalOpen, setModalOpen] = useState(false)
+  const [error, setError] = useState({})
 
-  const happ = happs.find(findAppByID(params.address))
-
-  if (!happ) {
+  if (!happByStoreId) {
     return null
   }
 
-  const { id, title, description, thumbnailUrl, isEnabled } = happ
+  const { id, title, description, thumbnailUrl, isEnabled } = happByStoreId
+  const { summary: errorSummary, details: errorDetails } = error
 
   const handleEnableHapp = () => {
     enableHapp(id)
-    setModalOpen(true)
+      .then(() => setModalOpen(true))
+      .catch(errorDetails => setError({
+        summary: 'Couldn\'t enable this hApp',
+        details: errorDetails
+      }))
   }
 
   return <article styleName='container'>
+    {errorSummary && <div styleName='error'>
+      {errorSummary}
+      {errorDetails && <code>{errorDetails.message}</code>}
+    </div>}
+
     <summary styleName='summary'>
       <HappThumbnail url={thumbnailUrl} title={title} styleName='thumbnail' />
       <div styleName='details'>

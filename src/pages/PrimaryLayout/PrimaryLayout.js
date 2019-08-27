@@ -17,7 +17,7 @@ export function PrimaryLayout () {
     <Route path='/(|dashboard)' exact component={Dashboard} />
     <Route path='/menu' component={MainMenu} />
     <Route path='/browse-happs' exact component={BrowseHapps} />
-    <Route path='/browse-happs/:address' component={HappDetails} />
+    <Route path='/browse-happs/:happStoreId' component={HappDetails} />
     <Route path='/pricing' component={ManagePricing} />
   </div>
 }

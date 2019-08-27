@@ -1,0 +1,13 @@
+query HappByStoreId($storeId: String!) {
+  happByStoreId(storeId: $storeId) {
+    id
+    title
+    description
+    thumbnailUrl
+    homepageUrl
+    dnaHash
+    ui
+    happStoreId
+    isEnabled
+  }
+}
