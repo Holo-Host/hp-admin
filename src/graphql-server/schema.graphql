@@ -37,7 +37,7 @@ type Query {
   happStoreUser: HappStoreUser
   hostingUser: HhaUser
   happs: [Happ]
-  happByStoreId(storeId: String!): Happ
+  happById(id: String!): Happ
   hostPricing: HostPricing
 }
 

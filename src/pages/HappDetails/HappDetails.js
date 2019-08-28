@@ -6,7 +6,7 @@ import Modal from 'components/Modal'
 import './HappDetails.module.css'
 
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import HappByStoreIdQuery from 'graphql/HappByStoreIdQuery.gql'
+import HappByIdQuery from 'graphql/HappByIdQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 
@@ -14,13 +14,11 @@ export default function BrowseHapps ({
   history: { push },
   match: { params }
 } = {}) {
-  const q = useQuery(HappByStoreIdQuery, {
+  const { data: { happById = [] } = {} } = useQuery(HappByIdQuery, {
     variables: {
-      storeId: params.happStoreId || ''
+      id: params.appId || ''
     }
   })
-  console.log('hbi', params.happStoreId,  q)
-  const { data: { happByStoreId = [] } = {} } = q
   const [enableHappMutation] = useMutation(EnableHappMutation)
   const [disableHappMutation] = useMutation(DisableHappMutation)
   const enableHapp = appId => enableHappMutation({ variables: { appId } })
@@ -28,11 +26,11 @@ export default function BrowseHapps ({
   const [isModalOpen, setModalOpen] = useState(false)
   const [error, setError] = useState({})
 
-  if (!happByStoreId) {
+  if (!happById) {
     return null
   }
 
-  const { id, title, description, thumbnailUrl, isEnabled } = happByStoreId
+  const { id, title, description, thumbnailUrl, isEnabled } = happById
   const { summary: errorSummary, details: errorDetails } = error
 
   const handleEnableHapp = () => {

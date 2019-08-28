@@ -19,7 +19,11 @@ export const resolvers = {
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
-    happByStoreId: (_, { storeId }) => HappStoreDnaInterface.happs.get(storeId),
+    happById: (_, { id }) => {
+      const happ = HhaDnaInterface.happs.get(id)
+      const happmapped = happ.then(getHappDetails)
+      return happmapped
+    },
 
     hostPricing: () => HhaDnaInterface.hostPricing.get()
   },

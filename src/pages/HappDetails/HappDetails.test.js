@@ -14,9 +14,9 @@ afterEach(() => {
   apolloClient.resetStore()
 })
 
-async function renderHoloFuelApp (address = 'QmHHAHappEntryAddressHash1') {
+async function renderHoloFuelApp (appId = 'QmHHAHappEntryAddressHash1') {
   const app = await render(<ApolloProvider client={apolloClient}>
-    <HappDetails history={{}} match={{ params: { address } }} />
+    <HappDetails history={{}} match={{ params: { appId } }} />
   </ApolloProvider>)
 
   await wait(0)
@@ -93,7 +93,7 @@ describe('HappDetails', () => {
       await act(async () => {
         ({ getByText } = render(
           <ApolloProvider client={apolloClient}>
-            <HappDetails history={mockHistory} match={{ params: { address: 'QmHHAHappEntryAddressHash2' } }} />
+            <HappDetails history={mockHistory} match={{ params: { appId: 'QmHHAHappEntryAddressHash2' } }} />
           </ApolloProvider>
         ))
       })

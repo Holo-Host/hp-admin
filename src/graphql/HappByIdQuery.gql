@@ -1,5 +1,5 @@
-query HappByStoreId($storeId: String!) {
-  happByStoreId(storeId: $storeId) {
+query HappById($id: String!) {
+  happById(id: $id) {
     id
     title
     description

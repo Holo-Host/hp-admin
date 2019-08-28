@@ -43,8 +43,8 @@ export default function BrowseHapps ({ history: { push } }) {
 }
 
 export function HappRow ({ happ, enableHapp, disableHapp }) {
-  const { id, happStoreId, title, description, thumbnailUrl, isEnabled } = happ
-  return <Link to={'/browse-happs/' + happStoreId} styleName='happ-row' role='listitem'>
+  const { id, title, description, thumbnailUrl, isEnabled } = happ
+  return <Link to={'/browse-happs/' + id} styleName='happ-row' role='listitem'>
     <HappThumbnail url={thumbnailUrl} title={title} />
     <div styleName='details'>
       <div styleName='title-row'>
