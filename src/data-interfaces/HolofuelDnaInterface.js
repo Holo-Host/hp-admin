@@ -4,19 +4,25 @@ const DEADLINE = '4019-01-01'
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
-const presentOffer = ({origin, event}) = {
-  const typeKey = event.Request ? 'Request' : 'Promise'
+const presentOffer = ({ origin, event }) => {
   return {
     id: origin,
     amount: event.Promise.tx.amount,
     counterparty: event.Promise.tx.to,
     status: 'pending',
-    type: offer
+    type: 'offer'
   }
 }
 
-// const presentRequest = () => {
-// }
+const presentRequest = ({ origin, event }) => {
+  return {
+    id: origin,
+    amount: event.Request.amount,
+    counterparty: event.Request.from,
+    status: 'pending',
+    type: 'request'
+  }
+}
 
 const presentTransaction = (transaction) => transaction.event.Request ? presentRequest(transaction) : presentOffer(transaction)
 
@@ -26,7 +32,7 @@ const HolofuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       return transactions.map(presentTransaction)
     },
-    allPending: () => {
+    allPending: async () => {
       const transactions = await createZomeCall('transactions/list_pending')()
 
       // TODO: Parse Pending Transaction obj.  Currently we're returning an empty array.
