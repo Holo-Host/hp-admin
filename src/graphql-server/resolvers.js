@@ -2,6 +2,7 @@ import HyloDnaInterface from 'data-interfaces/HyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from 'data-interfaces/HappStoreDnaInterface'
 import HhaDnaInterface from 'data-interfaces/HhaDnaInterface'
 import EnvoyInterface from 'data-interfaces/EnvoyInterface'
+import HolofuelDnaInterface from 'data-interfaces/HolofuelDnaInterface'
 import { promiseMap } from 'utils'
 import {
   dataMappedCall,
@@ -19,7 +20,11 @@ export const resolvers = {
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
-    hostPricing: () => HhaDnaInterface.hostPricing.get()
+    hostPricing: () => HhaDnaInterface.hostPricing.get(),
+
+    holofuelCompleteTransactions: () => HolofuelDnaInterface.transactions.allComplete(),
+
+    holofuelPendingTransactions: () => HolofuelDnaInterface.transactions.allPending()
   },
 
   Mutation: {
@@ -48,7 +53,14 @@ export const resolvers = {
       return getHappDetails(happ)
     },
 
-    updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit)
+    updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit),
+
+    holofuelRequest: (_, { counterparty, amount }) => HolofuelDnaInterface.requests.create(counterparty, amount),
+
+    holofuelOffer: (_, { counterparty, amount, requestId }) => HolofuelDnaInterface.offers.create(counterparty, amount, requestId),
+
+    holofuelAcceptOffer: (_, { transactionId }) => HolofuelDnaInterface.offers.accept(transactionId)
+
   }
 }
 
