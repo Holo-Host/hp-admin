@@ -12,5 +12,8 @@ export default function StyleDemo () {
     <div styleName='nonlocal-compose'>
       This composes its typography from the global typography file.
     </div>
+    <div styleName='circle-div'>
+      This uses a mixin for shape.
+    </div>
   </div>
 }
