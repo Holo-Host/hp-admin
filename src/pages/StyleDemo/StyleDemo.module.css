@@ -20,7 +20,6 @@
 
 .nonlocal-compose{
   composes: big-and-bold from '../../global-styles/typography.css';
-  /* composes: big-and-bold from 'global-styles/typography.css'; */
   background-color: lightgoldenrodyellow;
   padding: 15px;
   margin: 15px;
