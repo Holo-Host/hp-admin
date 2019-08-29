@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--second-color);
+}
+
+.transaction-list {
+  padding-top: 20px;
+}
+
+.transaction-row {
+  display: flex;
+  margin-bottom: 50px;
+  text-decoration: none;
+}
