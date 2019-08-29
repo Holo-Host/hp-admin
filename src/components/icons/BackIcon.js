@@ -6,10 +6,10 @@ const path = 'M145 239L361 23c5-5 5-14 0-19s-14-5-19 0L116 229c-5 5-5 14 0 19l22
 const viewBox = '0 0 477 477'
 
 export default function BackIcon ({ className, color = '#000000' }) {
-  return <Icon
-    path={path}
-    viewBox={viewBox}
+  return <Icon viewBox={viewBox}
     color={color}
     title={title}
-    className={className} />
+    className={className} >
+    <path d={path} />
+  </Icon>
 }
