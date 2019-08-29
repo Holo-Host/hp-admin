@@ -1,24 +1,40 @@
 import React from 'react'
 import { render, fireEvent, within, act } from '@testing-library/react'
+import wait from 'waait'
+import { Router } from 'react-router-dom'
+import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
-import wait from 'waait'
 import apolloClient from 'apolloClient'
 import HappsQuery from 'graphql/HappsQuery.gql'
-import BrowseHapps from './BrowseHapps'
-import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
-import { happs as hhaHapps } from 'mock-dnas/hha'
 import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
+import hhaInterface from 'data-interfaces/HhaDnaInterface'
+import { happs as hhaHapps } from 'mock-dnas/hha'
+import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
+import BrowseHapps from './BrowseHapps'
 
 jest.mock('data-interfaces/EnvoyInterface')
 // mocking Header because it depends on Router
 jest.mock('components/Header')
 
+function renderWithRouter (
+  ui,
+  {
+    route = '/',
+    history = createMemoryHistory({ initialEntries: [route] })
+  } = {}
+) {
+  return {
+    ...render(<Router history={history}>{ui}</Router>),
+    history
+  }
+}
+
 describe('BrowseHapps Connected', () => {
   it('renders', async () => {
     let getAllByRole
     await act(async () => {
-      ({ getAllByRole } = render(<ApolloProvider client={apolloClient}>
+      ({ getAllByRole } = renderWithRouter(<ApolloProvider client={apolloClient}>
         <BrowseHapps history={{}} />
       </ApolloProvider>))
       await wait(15)
@@ -44,9 +60,10 @@ describe('BrowseHapps Connected', () => {
 
   describe('HostButton', () => {
     it('enables and disables happs', async () => {
+      hhaInterface.happs.enable = jest.fn()
       let getAllByRole, queryAllByText
       await act(async () => {
-        ({ getAllByRole, queryAllByText } = render(<ApolloProvider client={apolloClient}>
+        ({ getAllByRole, queryAllByText } = renderWithRouter(<ApolloProvider client={apolloClient}>
           <BrowseHapps history={{}} />
         </ApolloProvider>))
         await wait(15)
@@ -70,6 +87,7 @@ describe('BrowseHapps Connected', () => {
 
       expect(queryAllByText('Un-Host')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)
+      expect(hhaInterface.happs.enable).toHaveBeenCalledWith(hhaHapps[0].id)
       expect(mockEnvoyInterface.happs.install).toHaveBeenCalledWith(hhaHapps[0].id)
     })
   })
@@ -92,11 +110,26 @@ describe('BrowseHapps Connected', () => {
       const mockHistory = {
         push: jest.fn()
       }
-      const { getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByText } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
         <BrowseHapps history={mockHistory} />
       </MockedProvider>)
       fireEvent.click(getByText('Manage Pricing'))
       expect(mockHistory.push).toHaveBeenCalledWith('/pricing')
+    })
+  })
+
+  describe('hApp entry', () => {
+    it("navigates to '/browse-happs/APP_HASH' on click", async () => {
+      let getByText, history
+      await act(async () => {
+        ({ getByText, history } = renderWithRouter(<ApolloProvider client={apolloClient}>
+          <BrowseHapps history={{}} />
+        </ApolloProvider>))
+        await wait(0)
+      })
+
+      fireEvent.click(getByText('HoloFuel'))
+      expect(history.location.pathname).toBe('/browse-happs/QmHHAHappEntryAddressHash1')
     })
   })
 })

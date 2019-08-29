@@ -4,6 +4,7 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
+import ReactModal from 'react-modal'
 import PrimaryLayout from 'pages/PrimaryLayout'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
@@ -26,3 +27,4 @@ export function App () {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'))
+ReactModal.setAppElement('#root')

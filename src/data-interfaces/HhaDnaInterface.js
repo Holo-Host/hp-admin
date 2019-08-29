@@ -30,11 +30,16 @@ const HhaDnaInterface = {
   },
 
   happs: {
-    get: appId => createZomeCall('provider/get_app_details')({ app_hash: appId })
-      .then(happ => ({
-        id: appId,
-        happStoreId: happ.app_bundle.happ_hash
-      })),
+    get: async appId => {
+      const hostedHapps = await createZomeCall('host/get_enabled_app_list')()
+      const hostedHappIds = hostedHapps.map(({ address }) => address)
+      return createZomeCall('provider/get_app_details')({ app_hash: appId })
+        .then(happ => ({
+          id: appId,
+          happStoreId: happ.app_bundle.happ_hash,
+          isEnabled: hostedHappIds.includes(appId)
+        }))
+    },
     enable: appId => createZomeCall('host/enable_app')({ app_hash: appId }),
     disable: appId => createZomeCall('host/disable_app')({ app_hash: appId }),
     all: async () => {

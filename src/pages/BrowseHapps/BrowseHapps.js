@@ -1,7 +1,9 @@
 import React from 'react'
-import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
-import cx from 'classnames'
+import { Link } from 'react-router-dom'
+import HappThumbnail from 'components/HappThumbnail'
+import HostButton from 'components/HostButton'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import './BrowseHapps.module.css'
 import Header from 'components/Header'
 import Button from 'components/Button'
@@ -31,15 +33,15 @@ export default function BrowseHapps ({ history: { push } }) {
           key={happ.id} />)}
     </div>}
 
-    <Button onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
+    <Button variant='primary' wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
 
   </div>
 }
 
 export function HappRow ({ happ, enableHapp, disableHapp }) {
   const { id, title, description, thumbnailUrl, isEnabled } = happ
-  return <div styleName='happ-row' role='listitem'>
-    <img src={thumbnailUrl} styleName='icon' alt={`${title} icon`} />
+  return <Link to={'/browse-happs/' + id} styleName='happ-row' role='listitem'>
+    <HappThumbnail url={thumbnailUrl} title={title} />
     <div styleName='details'>
       <div styleName='title-row'>
         <span styleName='title'>{title}</span>
@@ -50,12 +52,5 @@ export function HappRow ({ happ, enableHapp, disableHapp }) {
       </div>
       <div styleName='description'>{description}</div>
     </div>
-  </div>
-}
-
-export function HostButton ({ isEnabled, enableHapp, disableHapp }) {
-  const onClick = isEnabled ? disableHapp : enableHapp
-  return <Button onClick={onClick} styleName={cx('host-button', { unhost: isEnabled })}>
-    {isEnabled ? 'Un-Host' : 'Host' }
-  </Button>
+  </Link>
 }

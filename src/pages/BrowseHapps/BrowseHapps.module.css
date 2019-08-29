@@ -5,12 +5,36 @@
   background-color: var(--second-color);
 }
 
+.header {
+  display: flex;
+  padding-bottom: 6px;
+  border-bottom: 1px solid lightgray;
+}
+
+.title {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #484848;
+}
+
+.menu-button {
+  margin-left: auto;
+  padding: 5px;
+  font-size: 14px;
+  background: white;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+}
+
 .happ-list {
   padding-top: 20px;
 }
 
 .pricing-button {
-  /* this margin-bottom value is to stop the button being pushed off the screen. there's a better way to do this' */
+  /* this margin-bottom value is to stop the button being pushed off the screen. there's a better way to do this */
   margin-bottom: 40px;
   margin-top: auto;
   padding: 15px;
@@ -25,17 +49,11 @@
 .happ-row {
   display: flex;
   margin-bottom: 50px;
-}
-
-.icon {
-  display: block;
-  flex: 0 0 140px;  
-  height: 140px;
-  box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.5);
-  border-radius: 10px;
+  text-decoration: none;
 }
 
 .details {
+  flex-grow: 1;
   padding-top: 8px;
   padding-left: 25px;
 }
@@ -58,21 +76,4 @@
   font-size: 16px;
   line-height: 19px;
   color: #939393;
-}
-
-.host-button {
-  margin-left: auto;
-  color: white;
-  background-color: var(--color-tundora);
-  font-weight: bold;
-  font-size: 12px;
-  line-height: 14px;
-  text-transform: uppercase;
-  min-width: 67px;
-  height: 26px;
-}
-
-.unhost {
-  color: var(--color-tundora);
-  background-color: #CDCDCD;
 }
