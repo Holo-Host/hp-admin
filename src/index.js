@@ -10,7 +10,6 @@ import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
 import './index.css'
 import './global-styles/colors.css'
-import './global-styles/typography.css'
 
 export function App () {
   const isWide = useMediaPredicate('(min-width: 550px)')
