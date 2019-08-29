@@ -4,6 +4,7 @@ import './Header.module.css'
 import { withRouter } from 'react-router'
 import MenuIcon from 'components/icons/MenuIcon'
 import BackIcon from 'components/icons/BackIcon'
+import { gray } from 'utils/colors'
 
 export function Header ({ title = 'Untitled', backTo, history: { push } }) {
   const goToMenu = () => push('/menu')
@@ -11,7 +12,7 @@ export function Header ({ title = 'Untitled', backTo, history: { push } }) {
 
   const leftNav = backTo
     ? <Button onClick={goBack} styleName='back-button' dataTestId='back-button'>
-      <BackIcon styleName='back-icon' />
+      <BackIcon styleName='back-icon' color={gray} />
       <span styleName='back-text'>Back</span>
     </Button>
     : <Button onClick={goToMenu} styleName='menu-button' dataTestId='menu-button'>
