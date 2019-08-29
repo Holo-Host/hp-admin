@@ -1,0 +1,42 @@
+.container {
+  max-width: 250px;
+  margin: 0 auto;
+  top: 30%;
+  background-color: #fff;
+  border: 1px solid #000;
+  border-radius: 8px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, .5);
+  padding: 32px;
+  position: relative;
+}
+
+/* TODO: Handle focus properly */
+.container:focus {
+  outline: none;
+}
+
+.close-btn {
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  text-indent: -9999px;
+  width: 36px;
+  height: 36px;
+}
+
+.close-btn::after {
+  content: '✕';
+  display: block;
+  position: absolute;
+  top: 50%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-indent: 0;
+  font-size: 18px;
+  line-height: 1;
+}

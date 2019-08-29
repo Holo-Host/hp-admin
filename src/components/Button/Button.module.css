@@ -1,7 +1,27 @@
 .button {
-  padding: 5px;  
   font-size: 14px;
   background: white;
   border: 1px solid lightgray;
   border-radius: 4px;
+  padding: 1em 1.5em;
+  font-weight: 600;
+  margin: 16px 0;
+}
+
+.wide {
+  display: block;
+  width: 100%;
+}
+
+.primary {
+  background-color: #222;
+  color: #fff;
+}
+
+.secondary {
+  background-color: #aaa;
+}
+
+.mini {
+  padding: 0;
 }

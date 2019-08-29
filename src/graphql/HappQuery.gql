@@ -1,0 +1,13 @@
+query Happ($id: String!) {
+  happ(id: $id) {
+    id
+    title
+    description
+    thumbnailUrl
+    homepageUrl
+    dnaHash
+    ui
+    happStoreId
+    isEnabled
+  }
+}

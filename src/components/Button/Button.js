@@ -1,11 +1,29 @@
 import React from 'react'
+import cx from 'classnames'
 import './Button.module.css'
 
-const BUTTON_LABEL = 'some domain specific button'
+function Button ({
+  disabled = false,
+  wide = false,
+  variant = 'secondary',
+  className,
+  onClick = () => {},
+  children
+}) {
+  const classes = cx('button', {
+    wide,
+    primary: (variant === 'primary'),
+    secondary: (variant === 'secondary'),
+    mini: (variant === 'mini')
+  })
 
-function Button ({ children = BUTTON_LABEL, onClick = () => {}, className, disabled }) {
   return (
-    <button onClick={disabled ? () => {} : onClick} className={className} styleName='button' disabled={disabled}>
+    <button
+      onClick={disabled ? () => {} : onClick}
+      className={className}
+      styleName={classes}
+      disabled={disabled}
+    >
       {children}
     </button>
   )
