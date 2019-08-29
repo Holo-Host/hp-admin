@@ -8,7 +8,8 @@ function Button ({
   variant = 'secondary',
   className,
   onClick = () => {},
-  children
+  children,
+  dataTestId
 }) {
   const classes = cx('button', {
     wide,
@@ -23,6 +24,7 @@ function Button ({
       className={className}
       styleName={classes}
       disabled={disabled}
+      data-testid={dataTestId}
     >
       {children}
     </button>

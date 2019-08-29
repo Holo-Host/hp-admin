@@ -10,6 +10,9 @@ import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 import { UNITS } from 'models/HostPricing'
 import mockHha from 'mock-dnas/hha'
 
+// mocking Header because it depends on Router
+jest.mock('components/Header')
+
 const mockHostPricing = {
   units: 'cpu',
   pricePerUnit: '12'

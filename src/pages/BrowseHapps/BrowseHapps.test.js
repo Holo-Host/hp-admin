@@ -14,6 +14,8 @@ import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
 import BrowseHapps from './BrowseHapps'
 
 jest.mock('data-interfaces/EnvoyInterface')
+// mocking Header because it depends on Router
+jest.mock('components/Header')
 
 function renderWithRouter (
   ui,
@@ -102,19 +104,6 @@ describe('BrowseHapps Connected', () => {
       }
     }
   ]
-
-  describe('menu button', () => {
-    it("calls history.push with '/menu'", async () => {
-      const mockHistory = {
-        push: jest.fn()
-      }
-      const { getByText } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
-        <BrowseHapps history={mockHistory} />
-      </MockedProvider>)
-      fireEvent.click(getByText('Menu'))
-      expect(mockHistory.push).toHaveBeenCalledWith('/menu')
-    })
-  })
 
   describe('pricing button', () => {
     it("calls history.push with '/pricing'", async () => {

@@ -3,9 +3,9 @@ import { isEmpty } from 'lodash/fp'
 import { Link } from 'react-router-dom'
 import HappThumbnail from 'components/HappThumbnail'
 import HostButton from 'components/HostButton'
-import './BrowseHapps.module.css'
-
 import { useQuery, useMutation } from '@apollo/react-hooks'
+import './BrowseHapps.module.css'
+import Header from 'components/Header'
 import Button from 'components/Button'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
@@ -19,14 +19,10 @@ export default function BrowseHapps ({ history: { push } }) {
   const disableHapp = appId => disableHappMutation({ variables: { appId } })
 
   const sortedHapps = happs.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
-  const goToMenu = () => push('/menu')
   const goToPricing = () => push('/pricing')
 
   return <div styleName='container'>
-    <div styleName='header'>
-      <span styleName='title'>hApps</span>
-      <button onClick={goToMenu} styleName='menu-button'>Menu</button>
-    </div>
+    <Header title='hApps' />
 
     {!isEmpty(sortedHapps) && <div styleName='happ-list' role='list'>
       {sortedHapps.map(happ =>

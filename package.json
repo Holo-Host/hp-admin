@@ -26,6 +26,9 @@
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
     "lodash": "^4.17.15",
+    "postcss-custom-properties": "^9.0.2",
+    "postcss-import": "^12.0.1",
+    "postcss-sassy-mixins": "^2.1.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-identicon-variety-pack": "^0.2.1",
@@ -142,7 +145,8 @@
       [
         "react-css-modules",
         {
-          "generateScopedName": "[name]__[local]___[hash:base64:5]"
+          "generateScopedName": "[name]__[local]___[hash:base64:5]",
+          "exclude": "node_modules"
         }
       ],
       [
