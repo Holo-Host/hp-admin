@@ -11,6 +11,8 @@ import { happs as hhaHapps } from 'mock-dnas/hha'
 import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 
 jest.mock('data-interfaces/EnvoyInterface')
+// mocking Header because it depends on Router
+jest.mock('components/Header')
 
 describe('BrowseHapps Connected', () => {
   it('renders', async () => {
@@ -84,19 +86,6 @@ describe('BrowseHapps Connected', () => {
       }
     }
   ]
-
-  describe('menu button', () => {
-    it("calls history.push with '/menu'", async () => {
-      const mockHistory = {
-        push: jest.fn()
-      }
-      const { getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <BrowseHapps history={mockHistory} />
-      </MockedProvider>)
-      fireEvent.click(getByText('Menu'))
-      expect(mockHistory.push).toHaveBeenCalledWith('/menu')
-    })
-  })
 
   describe('pricing button', () => {
     it("calls history.push with '/pricing'", async () => {
