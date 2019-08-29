@@ -1,5 +1,5 @@
-query HappById($id: String!) {
-  happById(id: $id) {
+query Happ($id: String!) {
+  happ(id: $id) {
     id
     title
     description

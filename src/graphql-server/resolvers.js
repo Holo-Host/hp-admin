@@ -19,7 +19,7 @@ export const resolvers = {
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
-    happById: (_, { id }) => {
+    happ: (_, { id }) => {
       const happ = HhaDnaInterface.happs.get(id)
       const happmapped = happ.then(getHappDetails)
       return happmapped

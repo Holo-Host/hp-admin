@@ -6,7 +6,7 @@ import Modal from 'components/Modal'
 import './HappDetails.module.css'
 
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import HappByIdQuery from 'graphql/HappByIdQuery.gql'
+import HappQuery from 'graphql/HappQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 
@@ -14,7 +14,7 @@ export default function BrowseHapps ({
   history: { push },
   match: { params }
 } = {}) {
-  const { data: { happById = [] } = {} } = useQuery(HappByIdQuery, {
+  const { data: { happ = [] } = {} } = useQuery(HappQuery, {
     variables: {
       id: params.appId || ''
     }
@@ -26,11 +26,11 @@ export default function BrowseHapps ({
   const [isModalOpen, setModalOpen] = useState(false)
   const [error, setError] = useState({})
 
-  if (!happById) {
+  if (!happ) {
     return null
   }
 
-  const { id, title, description, thumbnailUrl, isEnabled } = happById
+  const { id, title, description, thumbnailUrl, isEnabled } = happ
   const { summary: errorSummary, details: errorDetails } = error
 
   const handleEnableHapp = () => {
