@@ -1,17 +1,17 @@
 import React from 'react'
 import { render, fireEvent, within, act } from '@testing-library/react'
+import wait from 'waait'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
-import wait from 'waait'
 import apolloClient from 'apolloClient'
 import HappsQuery from 'graphql/HappsQuery.gql'
-import BrowseHapps from './BrowseHapps'
-import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
-import { happs as hhaHapps } from 'mock-dnas/hha'
 import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 import hhaInterface from 'data-interfaces/HhaDnaInterface'
+import { happs as hhaHapps } from 'mock-dnas/hha'
+import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
+import BrowseHapps from './BrowseHapps'
 
 jest.mock('data-interfaces/EnvoyInterface')
 

@@ -3,10 +3,10 @@ import { render, fireEvent, act, cleanup } from '@testing-library/react'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
-import HappDetails from './HappDetails'
-import { appOne as appHoloFuel } from 'mock-dnas/happStore'
 import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 import hhaInterface from 'data-interfaces/HhaDnaInterface'
+import { appOne as appHoloFuel } from 'mock-dnas/happStore'
+import HappDetails from './HappDetails'
 
 jest.mock('data-interfaces/EnvoyInterface')
 
@@ -14,7 +14,7 @@ afterEach(() => {
   apolloClient.resetStore()
 })
 
-async function renderHoloFuelApp (appId = 'QmHHAHappEntryAddressHash1') {
+async function renderHappDetails (appId = 'QmHHAHappEntryAddressHash1') {
   const app = await render(<ApolloProvider client={apolloClient}>
     <HappDetails history={{}} match={{ params: { appId } }} />
   </ApolloProvider>)
@@ -29,7 +29,7 @@ describe('HappDetails', () => {
 
     beforeEach(async () => {
       await act(async () => {
-        ({ getByText } = await renderHoloFuelApp())
+        ({ getByText } = await renderHappDetails())
       })
     })
 
@@ -47,7 +47,7 @@ describe('HappDetails', () => {
       hhaInterface.happs.enable = jest.fn()
       let getByText
       await act(async () => {
-        ({ getByText } = await renderHoloFuelApp('QmHHAHappEntryAddressHash2'))
+        ({ getByText } = await renderHappDetails('QmHHAHappEntryAddressHash2'))
       })
 
       fireEvent.click(getByText('Host'))
@@ -61,7 +61,7 @@ describe('HappDetails', () => {
       hhaInterface.happs.disable = jest.fn()
       let getByText
       await act(async () => {
-        ({ getByText } = await renderHoloFuelApp())
+        ({ getByText } = await renderHappDetails())
       })
 
       expect(hhaInterface.happs.disable).not.toHaveBeenCalled()
@@ -78,7 +78,7 @@ describe('HappDetails', () => {
     it('shows modal after enabling hApp', async () => {
       let getByText
       await act(async () => {
-        ({ getByText } = await renderHoloFuelApp('QmHHAHappEntryAddressHash2'))
+        ({ getByText } = await renderHappDetails('QmHHAHappEntryAddressHash2'))
       })
 
       fireEvent.click(getByText('Host'))
