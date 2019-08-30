@@ -5,7 +5,7 @@ import './Button.module.css'
 function Button ({
   disabled = false,
   wide = false,
-  variant = 'secondary',
+  variant = 'plain',
   className,
   onClick = () => {},
   children,
@@ -15,6 +15,7 @@ function Button ({
     wide,
     primary: (variant === 'primary'),
     secondary: (variant === 'secondary'),
+    plain: (variant === 'plain'),
     mini: (variant === 'mini')
   })
 

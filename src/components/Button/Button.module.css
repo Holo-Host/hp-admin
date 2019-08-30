@@ -4,14 +4,17 @@
   border: 1px solid lightgray;
   border-radius: 4px;
   cursor: pointer;
-  padding: 1em 1.5em;
   font-weight: 600;
-  margin: 16px 0;
 }
 
 .wide {
   display: block;
   width: 100%;
+}
+
+.plain {
+  background-color: white;
+  color: black;  
 }
 
 .primary {
