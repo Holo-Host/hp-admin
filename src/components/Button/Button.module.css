@@ -14,6 +14,11 @@
   width: 100%;
 }
 
+.plain {
+  background-color: white;
+  color: black;  
+}
+
 .primary {
   background-color: #222;
   color: #fff;

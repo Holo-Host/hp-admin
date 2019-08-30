@@ -72,7 +72,7 @@ export default function ManagePricing () {
     </div>
 
     <div>
-      <Button onClick={save} disabled={loading || saved || !changed}>
+      <Button variant='primary' onClick={save} disabled={loading || saved || !changed}>
         {loading ? 'Saving' : (saved ? 'Saved' : 'Save')}
       </Button>
     </div>
