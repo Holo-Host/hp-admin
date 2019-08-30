@@ -108,7 +108,7 @@ const HoloFuelDnaInterface = {
     allComplete: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfAlreadyActionedTransactions = transactions.map(presentTransaction)     
-      return listOfAlreadyActionedTransactions.filter(tx => tx.status === "complete")
+      return listOfAlreadyActionedTransactions.filter(tx => tx.status === "complete").sort((a, b) => a.timestamp<b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const {requests, promises} = await createZomeCall('transactions/list_pending')()
@@ -118,7 +118,7 @@ const HoloFuelDnaInterface = {
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfAlreadyActionedTransactions = transactions.map(presentTransaction)
-      return listOfAlreadyActionedTransactions.filter(tx => tx.status === "pending")
+      return listOfAlreadyActionedTransactions.filter(tx => tx.status === "pending").sort((a, b) => a.timestamp<b.timestamp ? -1 : 1)
     }
   },
   requests: {
@@ -151,7 +151,14 @@ const HoloFuelDnaInterface = {
     // NOTE: Below we reflect our current change to the receive_payment API; the only param will be thte transaction's origin id
 
     accept: async (transactionId) => {
-      await createZomeCall('transactions/receive_payment')({ origin: transactionId })
+      await createZomeCall('transactions/receive_payment')({ origin: transactionId })      
+      const newObj =  {
+        id: transactionId,
+        status: 'complete',
+        type: 'offer'
+      }
+      console.log('newObj : ', newObj);
+      
       return {
         id: transactionId,
         status: 'complete',

@@ -1,5 +1,5 @@
-mutation HolofuelAcceptOfferMutation ($requestId: ID) {
-  holofuelAcceptOffer(requestId: $requestId) {
+mutation HolofuelAcceptOfferMutation ($transactionId: ID) {
+  holofuelAcceptOffer(transactionId: $transactionId) {
     id
     amount
     counterparty

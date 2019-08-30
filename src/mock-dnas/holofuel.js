@@ -286,8 +286,8 @@ const pendingList = {
 
 const holofuel = {
   transactions: {
-    list_transactions: transactionList,
-    list_pending: pendingList,
+    list_transactions: () => transactionList,
+    list_pending: () => pendingList,
     request: ({ from, amount, deadline }) => '1MNMQcEsd3BkQpaFUyZrViQ26axooErWtc', // NOTE: import a encryption to hash these for deterministic testing
     promise: ({ to, amount, request, deadline }) => '1DEiFZ1kThW4AVtDmL1w2oDyEKYKcqBcRB',
     receive_payment: ({ origin }) => 'asdfas8HCijlkmxKUBN7tQHTu75FNp439joi'
