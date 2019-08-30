@@ -11,6 +11,7 @@ export function Menu () {
   return <ul>
     <li><Link to='/'>Dashboard</Link></li>
     <li><Link to='/browse-happs'>Browse Happs</Link></li>
+    <li><Link to='/earnings'>Hosting Earnings</Link></li>
     <li><Link to='/pricing'>Manage Pricing</Link></li>
   </ul>
 }

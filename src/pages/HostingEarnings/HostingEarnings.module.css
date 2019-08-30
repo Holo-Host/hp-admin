@@ -5,6 +5,33 @@
   background-color: var(--second-color);
 }
 
+.day-buttons {
+  display: flex;
+  margin-top: 50px;
+}
+
+.day-button {
+  margin: 0px 5px;
+}
+
+.one-button {
+  composes: day-button;
+  margin-left: auto;
+}
+
+.seven-button {
+  composes: day-button;
+}
+
+.thirty-button {
+  composes: day-button;
+  margin-right: auto;
+}
+
+.selected {
+  background-color: var(--color-gray);
+}
+
 .transaction-list {
   padding-top: 20px;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { isEmpty } from 'lodash/fp'
+import cx from 'classnames'
 import './HostingEarnings.module.css'
 import Header from 'components/Header'
 import Button from 'components/Button'
@@ -174,13 +175,18 @@ export default function HostingEarnings () {
       break
   }
 
+  const buttons = [{ buttonDays: 'one', label: '1 Day' }, { buttonDays: 'seven', label: '7 Days' }, { buttonDays: 'thirty', label: '30 Days' }]
+
   return <div styleName='container'>
     <Header title='Earnings' />
 
     <div styleName='day-buttons'>
-      <button onClick={() => setDays(DAYS.one)}>1 Day</button>
-      <button onClick={() => setDays(DAYS.seven)}>7 Days</button>
-      <button onClick={() => setDays(DAYS.thirty)}>30 Days</button>
+      {buttons.map(({ buttonDays, label }) =>
+        <Button
+          onClick={() => setDays(DAYS[buttonDays])}
+          styleName={cx(`${buttonDays}-button`, { 'selected': buttonDays === days })}>  {/* eslint-disable-line quote-props */}
+          {label}
+        </Button>)}
     </div>
 
     {!isEmpty(transactions) && <div styleName='transaction-list' role='list'>

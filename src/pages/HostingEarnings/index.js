@@ -1,3 +1,3 @@
-import Component from './BrowseHapps'
+import Component from './HostingEarnings'
 
 export default Component
