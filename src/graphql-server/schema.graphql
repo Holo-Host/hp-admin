@@ -42,12 +42,19 @@ enum TransactionStatus {
   complete
 }
 
+enum TransactionDirection {
+  incoming # indicates the recipient of funds
+  outgoing # indicates the spender of funds
+}
+
 type Transaction {
   id: ID # ID will be the originCommitHash
   amount: Float
   counterparty: String
+  direction: TransactionDirection
   status: TransactionStatus
   type: TransactionType
+  timestamp: String # QUESTION: Can we use GraphQLDateTime here instead? This timestamp is actually received as an ISO8601...
 }
 
 type Query {
@@ -57,7 +64,8 @@ type Query {
   happs: [Happ]
   hostPricing: HostPricing
   holofuelCompleteTransactions: [Transaction]
-  holofuelPendingTransactions: [Transaction]
+  holofuelWaitingTransactions: [Transaction]
+  holofuelActionableTransactions: [Transaction]
 }
 
 type Mutation {

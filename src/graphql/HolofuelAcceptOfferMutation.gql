@@ -1,0 +1,11 @@
+mutation HolofuelAcceptOfferMutation ($requestId: ID) {
+  holofuelAcceptOffer(requestId: $requestId) {
+    id
+    amount
+    counterparty
+    direction
+    status
+    type
+    timestamp
+  }
+}
