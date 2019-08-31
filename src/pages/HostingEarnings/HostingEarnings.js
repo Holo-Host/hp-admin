@@ -176,18 +176,18 @@ export default function HostingEarnings () {
       break
   }
 
-  const buttons = [{ buttonDays: 'one', label: '1 Day' }, { buttonDays: 'seven', label: '7 Days' }, { buttonDays: 'thirty', label: '30 Days' }]
+  const buttons = [{ days: 'one', label: '1 Day' }, { days: 'seven', label: '7 Days' }, { days: 'thirty', label: '30 Days' }]
 
   return <div styleName='container'>
     <Header title='Earnings' />
 
     <div styleName='day-buttons'>
-      {buttons.map(({ buttonDays, label }) =>
+      {buttons.map(button =>
         <Button
-          onClick={() => setDays(DAYS[buttonDays])}
-          styleName={cx(`${buttonDays}-button`, { 'selected': buttonDays === days })} /* eslint-disable-line quote-props */
-          key={buttonDays}>
-          {label}
+          onClick={() => setDays(DAYS[button.days])}
+          styleName={cx(`${button.days}-button`, { 'selected': button.days === days })} /* eslint-disable-line quote-props */
+          key={button.days}>
+          {button.label}
         </Button>)}
     </div>
 
