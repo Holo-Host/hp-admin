@@ -21,7 +21,7 @@ export function PrimaryLayout () {
     <Route path='/browse-happs' exact component={BrowseHapps} />
     <Route path='/browse-happs/:appId' component={HappDetails} />
     <Route path='/pricing' component={ManagePricing} />
-    <Route path='/earnings' component={HostingEarnings} />    
+    <Route path='/earnings' component={HostingEarnings} />
 
     <Route path='/style-demo' component={StyleDemo} />
 

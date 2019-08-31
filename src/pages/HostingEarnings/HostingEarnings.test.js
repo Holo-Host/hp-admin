@@ -1,25 +1,10 @@
 import React from 'react'
-import { render, fireEvent, within, act } from '@testing-library/react'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory } from 'history'
+import { render, fireEvent } from '@testing-library/react'
 import HostingEarnings from './HostingEarnings'
 
 jest.mock('data-interfaces/EnvoyInterface')
 // mocking Header because it depends on Router
 jest.mock('components/Header')
-
-function renderWithRouter (
-  ui,
-  {
-    route = '/',
-    history = createMemoryHistory({ initialEntries: [route] })
-  } = {}
-) {
-  return {
-    ...render(<Router history={history}>{ui}</Router>),
-    history
-  }
-}
 
 describe('HostingEarnings', () => {
   it('renders', () => {
@@ -31,7 +16,7 @@ describe('HostingEarnings', () => {
   })
 
   describe('Day Buttons', () => {
-    it('switches between different transaction lists', async () => {
+    it('switches between different transaction lists', () => {
       const { getByText, getAllByTestId } = render(<HostingEarnings />)
       expect(getAllByTestId('transaction-row')).toHaveLength(3)
 
