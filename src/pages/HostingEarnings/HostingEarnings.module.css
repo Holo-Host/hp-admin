@@ -34,10 +34,18 @@
 
 .transaction-list {
   padding-top: 20px;
+  font-size: 12px;
 }
 
-.transaction-row {
-  display: flex;
-  margin-bottom: 50px;
-  text-decoration: none;
+table {
+  border-bottom: 1px solid black;
+}
+
+th, td {
+  border-top: 1px solid black;
+  border-left: 1px solid black;  
+}
+
+th:last-child, td:last-child {
+  border-right: 1px solid black;
 }
