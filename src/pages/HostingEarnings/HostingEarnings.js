@@ -215,7 +215,7 @@ export function TransactionRow ({ transaction }) {
   const { timestamp, amount, pricePerUnit, units, happName } = transaction
   const prettyDate = moment(timestamp).format('D MMM YYYY')
   const prettyTime = moment(timestamp).format('kk:mm')
-  return <tr>
+  return <tr data-testid='transaction-row'>
     <td>{prettyDate}<br />{prettyTime}</td>
     <td>{amount} HF</td>
     <td>{pricePerUnit} / {units}</td>
