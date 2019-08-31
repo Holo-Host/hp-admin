@@ -7,6 +7,7 @@ import MainMenu from 'pages/MainMenu'
 import BrowseHapps from 'pages/BrowseHapps'
 import HappDetails from 'pages/HappDetails'
 import ManagePricing from 'pages/ManagePricing'
+import HostingEarnings from 'pages/HostingEarnings'
 import StyleDemo from 'pages/StyleDemo'
 import ScreenWidthContext from 'contexts/screenWidth'
 
@@ -20,6 +21,7 @@ export function PrimaryLayout () {
     <Route path='/browse-happs' exact component={BrowseHapps} />
     <Route path='/browse-happs/:appId' component={HappDetails} />
     <Route path='/pricing' component={ManagePricing} />
+    <Route path='/earnings' component={HostingEarnings} />
 
     <Route path='/style-demo' component={StyleDemo} />
 
