@@ -30,14 +30,19 @@ const HhaDnaInterface = {
   },
 
   happs: {
-    get: appId => createZomeCall('provider/get_app_details')({ app_hash: appId })
-      .then(happ => ({
-        id: appId,
-        happStoreId: happ.app_bundle.happ_hash
-      })),
+    get: async appId => {
+      const hostedHapps = await createZomeCall('host/get_enabled_app_list')()
+      const hostedHappIds = hostedHapps.map(({ address }) => address)
+      return createZomeCall('provider/get_app_details')({ app_hash: appId })
+        .then(happ => ({
+          id: appId,
+          happStoreId: happ.app_bundle.happ_hash,
+          isEnabled: hostedHappIds.includes(appId)
+        }))
+    },
     enable: appId => createZomeCall('host/enable_app')({ app_hash: appId }),
     disable: appId => createZomeCall('host/disable_app')({ app_hash: appId }),
-    allAvailable: async () => {
+    all: async () => {
       const allHapps = await createZomeCall('host/get_all_apps')()
       const hostedHapps = await createZomeCall('host/get_enabled_app_list')()
       const hostedHappIds = hostedHapps.map(({ address }) => address)
@@ -50,31 +55,24 @@ const HhaDnaInterface = {
           isEnabled: hostedHappIds.includes(hash)
         }
       })
-    },
-    allHosted: () => createZomeCall('host/get_enabled_app_list')()
-      .then(hostedHapps => hostedHapps.map(({ address, entry: { happ_hash: happStoreId } }) => ({
-        // The 'id' below is the hha-id (ie. the hash of the hApp entry into HHA).
-        id: address,
-        happStoreId,
-        isEnabled: true
-      })))
+    }
   },
 
   hostPricing: {
     get: async () => {
       // we need an id to call get_service_log_details, and because we set all apps the same in add_service_log_details, it doesn't matter which app the id comes from
-      const allAvailable = await HhaDnaInterface.happs.allAvailable()
-      if (isEmpty(allAvailable)) throw new Error("Can't set Host Pricing: no happs available to host.")
-      return createZomeCall('provider/get_service_log_details')({ app_hash: allAvailable[0].id })
+      const happs = await HhaDnaInterface.happs.all()
+      if (isEmpty(happs)) throw new Error("Can't set Host Pricing: no happs available to host.")
+      return createZomeCall('provider/get_service_log_details')({ app_hash: happs[0].id })
         .then(({ price_per_unit: pricePerUnit }) => ({
           pricePerUnit,
           units: UNITS.bandwidth
         }))
     },
-    update: async (pricePerUnit) => {
-      const allAvailable = await HhaDnaInterface.happs.allAvailable()
+    update: async (units, pricePerUnit) => {
+      const happs = await HhaDnaInterface.happs.all()
       // set price_per_unit the same for all happs
-      await Promise.all(allAvailable, ({ id }) => createZomeCall('provider/add_service_log_details')({
+      await Promise.all(happs, ({ id }) => createZomeCall('provider/add_service_log_details')({
         app_hash: id,
         max_fuel_per_invoice: 1,
         max_unpaid_value: 1,
@@ -83,7 +81,7 @@ const HhaDnaInterface = {
 
       return {
         pricePerUnit,
-        units: UNITS.bandwidth
+        units
       }
     }
   }

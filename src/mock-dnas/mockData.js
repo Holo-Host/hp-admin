@@ -2,7 +2,8 @@ import happStore from './happStore'
 import hha from './hha'
 
 // data is a tree organized by instanceId > zome > function
-// leaves can either be an object, or a function which is called with the zome call args, so can update other parts of the tree.
+// leaves can either be an object, or a function which is called with the zome call args.
+// DON'T use this function to update the tree, just to construct return values.
 
 const data = {
   hylo: {
@@ -13,13 +14,10 @@ const data = {
         avatar_url: 'myface.png'
       },
       is_registered: true,
-      register_user: args => {
-        data.hylo.people.get_me = {
-          ...data.hylo.people.get_me,
-          ...args
-        }
-        return data.hylo.people.get_me
-      }
+      register_user: args => ({
+        ...data.hylo.people.get_me,
+        ...args
+      })
     }
   },
   'happ-store': happStore,

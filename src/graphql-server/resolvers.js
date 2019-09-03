@@ -1,13 +1,13 @@
-import HyloDnaInterface from './dnaInterfaces/HyloDnaInterface'
-import HappStoreDnaInterface, { getHappDetails } from './dnaInterfaces/HappStoreDnaInterface'
-import HhaDnaInterface from './dnaInterfaces/HhaDnaInterface'
-import EnvoyInterface from './dnaInterfaces/EnvoyInterface'
+import HyloDnaInterface from 'data-interfaces/HyloDnaInterface'
+import HappStoreDnaInterface, { getHappDetails } from 'data-interfaces/HappStoreDnaInterface'
+import HhaDnaInterface from 'data-interfaces/HhaDnaInterface'
+import EnvoyInterface from 'data-interfaces/EnvoyInterface'
 import { promiseMap } from 'utils'
 import {
   dataMappedCall,
   toUiData
 } from './dataMapping'
-// TODO: dataMapping should probably be happening in the dnainterfaces
+// TODO: dataMapping should probably be happening in the data-interfaces
 
 export const resolvers = {
   Query: {
@@ -17,11 +17,13 @@ export const resolvers = {
 
     hostingUser: () => HhaDnaInterface.currentUser.get(),
 
-    allHapps: () => HappStoreDnaInterface.happs.all(),
+    happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
-    allAvailableHapps: () => promiseMap(HhaDnaInterface.happs.allAvailable(), getHappDetails),
-
-    allHostedHapps: () => promiseMap(HhaDnaInterface.happs.allHosted(), getHappDetails),
+    happ: (_, { id }) => {
+      const happ = HhaDnaInterface.happs.get(id)
+      const happmapped = happ.then(getHappDetails)
+      return happmapped
+    },
 
     hostPricing: () => HhaDnaInterface.hostPricing.get()
   },
@@ -51,8 +53,8 @@ export const resolvers = {
       }
       return getHappDetails(happ)
     },
-    // setHostPricing also gets passed 'units', but we don't currently use that in the dna
-    updateHostPricing: (_, { pricePerUnit }) => HhaDnaInterface.hostPricing.update(pricePerUnit)
+
+    updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit)
   }
 }
 

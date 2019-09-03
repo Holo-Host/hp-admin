@@ -1,0 +1,33 @@
+/* I'm aware of the irony of the duplicated padding and margin styles. I wanted each class to demonstrate one thing only */
+@import '../../global-styles/mixins.css';
+
+.colored-div {
+  background-color: var(--color-shocking);
+  padding: 15px;
+  margin: 15px;
+}
+
+.dashed-border {
+  border: 1px dashed black;
+}
+
+.local-compose {
+  composes: dashed-border;
+  background-color: lightskyblue;
+  padding: 15px;
+  margin: 15px;
+}
+
+.nonlocal-compose{
+  composes: big-and-bold from '../../global-styles/typography.css';
+  background-color: lightgoldenrodyellow;
+  padding: 15px;
+  margin: 15px;
+}
+
+.circle-div {
+  @include circle(60px);
+  background-color: lightseagreen;
+  padding: 15px;
+  margin: 15px;
+}

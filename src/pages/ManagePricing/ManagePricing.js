@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import './ManagePricing.module.css'
+import Header from 'components/Header'
 import Button from 'components/Button'
 import { UNITS } from 'models/HostPricing'
 import HostPricingQuery from 'graphql/HostPricingQuery.gql'
 import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 
-export default function ManagePricing ({ history: { push } }) {
+export default function ManagePricing () {
   const { data: { hostPricing } } = useQuery(HostPricingQuery)
   const [updateHostPricing, { loading }] = useMutation(UpdateHostPricingMutation)
-  const goToMenu = () => push('/menu')
 
   const [units, setUnits] = useState('')
   const [pricePerUnit, setPricePerUnit] = useState('')
@@ -49,10 +49,7 @@ export default function ManagePricing ({ history: { push } }) {
   }
 
   return <div styleName='container'>
-    <div styleName='header'>
-      <span styleName='title'>Manage Pricing</span>
-      <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
-    </div>
+    <Header title='Manage Pricing' backTo='/browse-happs' />
 
     <div styleName='subtitle'>Price Settings</div>
 
@@ -75,7 +72,7 @@ export default function ManagePricing ({ history: { push } }) {
     </div>
 
     <div>
-      <Button onClick={save} disabled={loading || saved || !changed}>
+      <Button variant='primary' onClick={save} disabled={loading || saved || !changed}>
         {loading ? 'Saving' : (saved ? 'Saved' : 'Save')}
       </Button>
     </div>

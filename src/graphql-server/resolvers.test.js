@@ -1,12 +1,12 @@
 import wait from 'waait'
 import resolvers from './resolvers'
-import mockHhaDnaInterface from 'graphql-server/dnaInterfaces/HhaDnaInterface'
-import { getHappDetails as mockGetHappDetails } from 'graphql-server/dnaInterfaces/HappStoreDnaInterface'
-import mockEnvoyInterface from 'graphql-server/dnaInterfaces/EnvoyInterface'
+import mockHhaDnaInterface from 'data-interfaces/HhaDnaInterface'
+import { getHappDetails as mockGetHappDetails } from 'data-interfaces/HappStoreDnaInterface'
+import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 
-jest.mock('graphql-server/dnaInterfaces/HhaDnaInterface')
-jest.mock('graphql-server/dnaInterfaces/HappStoreDnaInterface')
-jest.mock('graphql-server/dnaInterfaces/EnvoyInterface')
+jest.mock('data-interfaces/HhaDnaInterface')
+jest.mock('data-interfaces/HappStoreDnaInterface')
+jest.mock('data-interfaces/EnvoyInterface')
 
 describe('resolvers', () => {
   describe('Query', () => {
@@ -24,11 +24,11 @@ describe('resolvers', () => {
       })
     })
 
-    describe('.allAvailableHapps', () => {
-      it('calls HhaDnaInterface.happs.allAvailable', async () => {
-        resolvers.Query.allAvailableHapps()
+    describe('.happs', () => {
+      it('calls HhaDnaInterface.happs.all', async () => {
+        resolvers.Query.happs()
         await wait(0)
-        expect(mockHhaDnaInterface.happs.allAvailable).toHaveBeenCalled()
+        expect(mockHhaDnaInterface.happs.all).toHaveBeenCalled()
         expect(mockGetHappDetails.mock.calls.map(c => c[0])).toEqual(['mockHappOne', 'mockHappTwo'])
       })
     })
@@ -44,9 +44,10 @@ describe('resolvers', () => {
 
     describe('.updateHostPricing', () => {
       it('calls HhaDnaInterface.hostPricing.update', () => {
+        const units = 'storage'
         const pricePerUnit = '12'
-        resolvers.Mutation.updateHostPricing(null, { pricePerUnit })
-        expect(mockHhaDnaInterface.hostPricing.update).toHaveBeenCalledWith(pricePerUnit)
+        resolvers.Mutation.updateHostPricing(null, { units, pricePerUnit })
+        expect(mockHhaDnaInterface.hostPricing.update).toHaveBeenCalledWith(units, pricePerUnit)
       })
     })
 
