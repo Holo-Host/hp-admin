@@ -33,8 +33,10 @@ export default function HoloFuelDashboard ({ history: { push } }) {
       }
 
       <section className='make-holofuel-transaction'>
-        <Button styleName='small-btn' onClick={() => holofuelRequest('HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', 333.33)}>Request 333.33</Button>
-        <Button styleName='small-btn' onClick={() => holofuelOffer('HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', 777.77)}>Offer 777.77</Button>
+        <h3 styleName='holofuel-action'>Initiate HoloFuel Transaction</h3>
+        {/* NOTE: The below buttons act as a form 'submit' button.  Currently, as we await design specs, the values are hard coded in lieu of a form. */}
+        <Button styleName='action-btn' onClick={() => holofuelRequest('HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', 333.33)}>Request 333.33</Button>
+        <Button styleName='action-btn' onClick={() => holofuelOffer('HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', 777.77)}>Offer 777.77</Button>
       </section>
     </main>
   </div>

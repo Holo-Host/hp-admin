@@ -57,6 +57,7 @@ export default function HoloFuelTxOverview ({ history: { push } }) {
             if (actionableTx.status === 'pending') {
               return <ActionableTransactionsTable
                 transaction={actionableTx}
+                holofuelRejectOffer={holofuelRejectOffer}
                 holofuelOffer={holofuelOffer}
                 holofuelAcceptOffer={holofuelAcceptOffer}
                 key={actionableTx.id} />
@@ -88,7 +89,7 @@ export default function HoloFuelTxOverview ({ history: { push } }) {
         <TransactionTableHeader />
         <tbody>
           {!isEmpty(holofuelCompleteTransactions) && holofuelCompleteTransactions.concat(filterDuplicates(updatedTx)).map(completeTx => {
-            if (completeTx.status === 'complete') {
+            if (completeTx.status === 'complete' || completeTx.status === 'rejected') {
               return <UnactionableTransactionsTable
                 transaction={completeTx}
                 key={completeTx.id} />
@@ -112,7 +113,7 @@ function UnactionableTransactionsTable ({ transaction }) {
   </tr>
 }
 
-function ActionableTransactionsTable ({ transaction, holofuelOffer, holofuelAcceptOffer }) {
+function ActionableTransactionsTable ({ transaction, holofuelRejectOffer, holofuelOffer, holofuelAcceptOffer }) {
   const { id, timestamp, amount, counterparty, status, type } = transaction
   return <tr key={id}>
     <td className='date-time'>{timestamp && formatDateTime(timestamp)}</td>
@@ -127,9 +128,7 @@ function ActionableTransactionsTable ({ transaction, holofuelOffer, holofuelAcce
       : type === 'offer' && status === 'pending'
         ? <td className='action'>
           <Button onClick={() => holofuelAcceptOffer(id)} className='holofuel-accept-offer'>Accept Payment</Button>
-          {/* NOTE: Deteremine why definition error occurs with holofuelRejectOffer const below */}
-          <Button onClick={() => holofuelAcceptOffer(id)} className='holofuel-reject-offer'>Reject Payment</Button>
-          {/* <Button onClick={() => holofuelRejectOffer(id)} className='holofuel-reject-offer'>Reject Payment</Button> */}
+          <Button onClick={() => holofuelRejectOffer(id)} className='holofuel-reject-offer'>Reject Payment</Button>
         </td>
         : null}
   </tr>

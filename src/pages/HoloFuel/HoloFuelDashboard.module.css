@@ -36,7 +36,12 @@
   margin-bottom: 0px;
 }
 
-.small-btn {
-  margin-top: 50px;
+.action-btn {
+  margin-top: 20px;
+  margin-left: 20px;
   width: 200px;
+}
+
+.holofuel-action {
+  margin-bottom: 0px;
 }
