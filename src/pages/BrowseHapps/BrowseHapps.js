@@ -21,7 +21,7 @@ export default function BrowseHapps ({ history: { push } }) {
   const sortedHapps = happs.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToPricing = () => push('/pricing')
 
-  return <div styleName='container'>
+  return <>
     <Header title='hApps' />
 
     {!isEmpty(sortedHapps) && <div styleName='happ-list' role='list'>
@@ -34,8 +34,7 @@ export default function BrowseHapps ({ history: { push } }) {
     </div>}
 
     <Button variant='primary' wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
-
-  </div>
+  </>
 }
 
 export function HappRow ({ happ, enableHapp, disableHapp }) {

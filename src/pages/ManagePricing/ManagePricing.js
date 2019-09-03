@@ -48,7 +48,7 @@ export default function ManagePricing () {
     updateHostPricing({ variables: { units, pricePerUnit } })
   }
 
-  return <div styleName='container'>
+  return <>
     <Header title='Manage Pricing' backTo='/browse-happs' />
 
     <div styleName='subtitle'>Price Settings</div>
@@ -76,5 +76,5 @@ export default function ManagePricing () {
         {loading ? 'Saving' : (saved ? 'Saved' : 'Save')}
       </Button>
     </div>
-  </div>
+  </>
 }

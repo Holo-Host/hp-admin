@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Btn from 'components/Button'
 
 export default function Dashboard ({ me, happStoreUser, registerUser }) {
-  return <div>
+  return <>
 
     <div>
       <Link to='/menu' >Menu</Link>
@@ -22,5 +22,5 @@ export default function Dashboard ({ me, happStoreUser, registerUser }) {
     <p>
       <Btn variant='primary' onClick={() => registerUser('Test User', 'testuserface.png')}>Register a test user</Btn>
     </p>
-  </div>
+  </>
 }
