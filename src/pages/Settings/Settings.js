@@ -49,11 +49,6 @@ export function Settings ({
 
   const [sshAccessVal, setSshAccess] = useState(false)
 
-  const handleViewTos = (e) => {
-    e.preventDefault()
-    push('/tos')
-  }
-
   const handleToggleSshAccess = (e) => {
     e.preventDefault()
     setSshAccess(e.target.checked)
@@ -73,65 +68,53 @@ export function Settings ({
       <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
     </div>
     <div>
+      <label>Name</label>
+      <p>{settings.deviceName}</p>
+
+      <label>URL</label>
+      <p>{settings.hostUrl}</p>
+
+      <label>URL</label>
+      <p>{settings.networkId}</p>
+
+      <h2>Access Port Numbers</h2>
+
       <form styleName='settings-form' onSubmit={handleSubmit(onSubmit)}>
         <SettingsFormInput
-          label='Host Name'
-          name='hostName'
-          register={register} />
-
-        <SettingsFormInput
-          label='Host ID (Host Public Key)'
-          name='hostPubKey'
-          register={register} />
-
-        <SettingsFormInput
-          label='Registration Email'
-          name='registrationEmail'
-          register={register} />
-
-        <SettingsFormInput
-          label='Device Name'
-          name='deviceName'
-          register={register} />
-
-        <SettingsFormInput
-          label='Network ID'
-          name='networkId'
-          register={register} />
-
-        <SettingsFormInput
-          label='Device Admin Port'
+          label='Device Admin'
           name='deviceAdminPort'
           register={register} />
 
         <SettingsFormInput
-          label='Holochain Admin Port'
+          label='HC Admin'
           name='hcAdminPort'
           register={register} />
 
         <SettingsFormInput
-          label='Holochain Networking Port'
+          label='HC Network'
           name='hcNetworkPort'
           register={register} />
 
         <SettingsFormInput
-          label='Holo Hosting Port'
+          label='Hosting'
           name='hostingPort'
           register={register} />
 
-        <SettingsFormInput
-          label='SSH Access'
-          name='sshAccess'
-          type='checkbox'
-          checked={sshAccessVal}
-          onChange={handleToggleSshAccess} />
-
-        <hr />
-
         <Button type='submit' name='update-settings' value='Submit'>Update</Button>
       </form>
+
+      <hr />
+
+      <h2 >Support Access and Factory Reset</h2>
+
+      <SettingsFormInput
+        label='Turn on access for HoloPort support (SSH)'
+        name='sshAccess'
+        type='checkbox'
+        checked={sshAccessVal}
+        onChange={handleToggleSshAccess} />
+
       <Button name='factory-reset' onClick={() => factoryReset()}>Factory Reset</Button>
-      <Button name='tos' onClick={handleViewTos} styleName='tos-button'>Review Terms of Service</Button>
     </div>
   </div>
 }
