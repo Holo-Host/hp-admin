@@ -1,0 +1,55 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.avatar-image {
+  display: block;
+  margin: 20px auto 30px;
+  width: 96px;
+  height: 96px;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.field {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: .5em 0;
+  line-height: 1.5;
+  flex-wrap: wrap;
+}
+
+.field-name {
+  margin-right: 3%;
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1 1 36%;
+  text-align: right;
+  height: 1.5em;
+  align-self: center;
+}
+
+.field-input {
+  box-sizing: border-box;
+  flex: 1 1 60%;
+  padding: .4em .6em;
+}
+
+.field-error {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: .8em;
+  font-weight: 500;
+  color: #a00;
+  margin: .3em 0 .0;
+}
+
+.save-button {
+  padding: .8em 1.5em;
+  margin-top: auto;
+  align-self: flex-end;
+}
