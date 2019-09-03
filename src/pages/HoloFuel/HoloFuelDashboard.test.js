@@ -1,10 +1,10 @@
 import React from 'react'
-import { render, within, act } from '@testing-library/react'
+import { render, act } from '@testing-library/react'
 import { ApolloProvider } from '@apollo/react-hooks'
 import wait from 'waait'
 import apolloClient from 'apolloClient'
 import HoloFuelDashboard from './HoloFuelDashboard'
-import { transactionList } from 'mock-dnas/holofuel'
+// import { transactionList } from 'mock-dnas/holofuel'
 
 describe('HoloFuel Dashboard is connected', () => {
   it('renders', async () => {
