@@ -1,0 +1,7 @@
+.image {
+    display: block;
+    overflow: hidden;
+    border-radius: 999px;
+    text-indent: -9999px;
+    background: #eee;
+}

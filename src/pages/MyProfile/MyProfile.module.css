@@ -7,10 +7,6 @@
 .avatar-image {
   display: block;
   margin: 20px auto 30px;
-  width: 96px;
-  height: 96px;
-  overflow: hidden;
-  border-radius: 999px;
 }
 
 .field {

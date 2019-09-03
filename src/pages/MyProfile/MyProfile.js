@@ -3,7 +3,7 @@ import useForm from 'react-hook-form'
 
 import Header from 'components/Header'
 import Button from 'components/Button'
-import HashIcon from 'components/HashIcon'
+import HashAvatar from 'components/HashAvatar'
 import './MyProfile.module.css'
 
 // eslint-disable-next-line no-useless-escape
@@ -17,16 +17,13 @@ const MyProfile = ({
     push('/dashboard')
   }
   const avatarUrl = watch('avatar')
-  const emailSeed = watch('email') || 'default-seed'
+  const email = watch('email')
 
   return [
-    <Header title='Edit Profile' key='header' />,
+    <Header title='Edit Profile' key='header' avatarUrl={avatarUrl} email={email} />,
 
-    <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
-      {avatarUrl
-        ? <img src={avatarUrl} alt='Avatar' styleName='avatar-image' />
-        : <HashIcon hash={emailSeed} styleName='avatar-image' size={96} />
-      }
+    <form onSubmit={handleSubmit(onSubmit)} styleName='form' key='form'>
+      <HashAvatar avatarUrl={avatarUrl} email={email} styleName='avatar-image' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
         <input

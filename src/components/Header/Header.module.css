@@ -28,10 +28,10 @@
 
 .menu-icon {
   width: 22px;
-  height: 22px;  
+  height: 22px;
 }
 
-.header { 
+.header {
   display: flex;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--color-gray);
@@ -48,4 +48,5 @@
   line-height: 28px;
   letter-spacing: 0.02em;
   color: var(--color-tundora);
+  flex-grow: 1;
 }
