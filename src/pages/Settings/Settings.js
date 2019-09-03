@@ -60,7 +60,7 @@ export function Settings ({
   }
 
   // Leaving error logging until error states designed and implemented on form
-  console.log('!!! errors: ', errors)
+  console.log('Login form errors (leave here until proper error handling is implemented):', errors)
 
   return <div>
     <div styleName='header'>
