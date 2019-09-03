@@ -5,30 +5,6 @@
   background-color: var(--second-color);
 }
 
-.header {
-  display: flex;
-  padding-bottom: 6px;
-  border-bottom: 1px solid lightgray;
-}
-
-.title {
-  font-style: normal;
-  font-weight: bold;
-  font-size: 24px;
-  line-height: 28px;
-  letter-spacing: 0.02em;
-  color: #484848;
-}
-
-.menu-button {
-  margin-left: auto;
-  padding: 5px;
-  font-size: 14px;
-  background: white;
-  border: 1px solid lightgray;
-  border-radius: 4px;
-}
-
 .happ-list {
   padding-top: 20px;
 }

@@ -9,6 +9,7 @@ function Button ({
   className,
   onClick = () => {},
   children,
+  type,
   dataTestId
 }) {
   const classes = cx('button', {
@@ -25,6 +26,7 @@ function Button ({
       className={className}
       styleName={classes}
       disabled={disabled}
+      type={type}
       data-testid={dataTestId}
     >
       {children}
