@@ -26,7 +26,9 @@ export const resolvers = {
 
     holofuelActionableTransactions: () => HoloFuelDnaInterface.transactions.allActionable(),
 
-    holofuelCompleteTransactions: () => HoloFuelDnaInterface.transactions.allComplete()
+    holofuelCompleteTransactions: () => HoloFuelDnaInterface.transactions.allComplete(),
+
+    holofuelLedgerState: () => HoloFuelDnaInterface.ledger.all()
   },
 
   Mutation: {
@@ -61,8 +63,9 @@ export const resolvers = {
 
     holofuelOffer: (_, { counterparty, amount, requestId }) => HoloFuelDnaInterface.offers.create(counterparty, amount, requestId),
 
-    holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId)
+    holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
+    holofuelRejectOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.reject(transactionId)
   }
 }
 

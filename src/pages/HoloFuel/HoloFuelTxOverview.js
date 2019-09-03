@@ -3,107 +3,119 @@ import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import Button from 'components/Button'
 import './HoloFuelTxOverview.module.css'
+import { formatDateTime } from 'utils'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelCompleteTransactionsQuery from 'graphql/HolofuelCompleteTransactionsQuery.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
+import HolofuelRejectOfferMutation from 'graphql/HolofuelRejectOfferMutation.gql'
 
 export default function HoloFuelTxOverview ({ history: { push } }) {
   const { data: { holofuelWaitingTransactions = [] } } = useQuery(HolofuelWaitingTransactionsQuery)
-  const { data: { holofuelActionableTransactions = [] } } = useQuery(HolofuelActionableTransactionsQuery)
+  const { data: { holofuelActionableTransactions = [] }, refetch } = useQuery(HolofuelActionableTransactionsQuery)
   const { data: { holofuelCompleteTransactions = [] } } = useQuery(HolofuelCompleteTransactionsQuery)
 
   const [holofuelOfferMutation] = useMutation(HolofuelOfferMutation)
   const [holofuelAcceptOfferMutation] = useMutation(HolofuelAcceptOfferMutation)
+  const [holofuelRejectOfferMutation] = useMutation(HolofuelRejectOfferMutation)
   const holofuelOffer = (counterparty, amount, requestId) => holofuelOfferMutation({ variables: { counterparty, amount, requestId } })
   const holofuelAcceptOffer = transactionId => holofuelAcceptOfferMutation({ variables: { transactionId } })
+  const holofuelRejectOffer = transactionId => holofuelRejectOfferMutation({ variables: { transactionId } })
+
+  const goToHfDash = () => push('/holofuel/dashboard')
+
+  // NOTE: This array will update the displayed data before the next query refetch.  In testing enviornments, it also helps track/maintain the visual display of data updates .
+  const updatedTx = []
+  // Filtering by ID to prevent display of duplicate transactions - purely for mock data / testing scenarios.
+  const filterDuplicates = (array) => {
+    const updatedArray = []
+    return [...new Set(array)].filter((item) => {
+      for (let tx of array) {
+        if (item.id === tx.id && !updatedArray.includes(tx.id)) {
+          updatedArray.push(tx.id)
+          return item
+        }
+      }
+    })
+  }
 
   return <div styleName='container'>
-    <div>
-      <span styleName='title'>HoloFuel Transaction Overview</span>
-    </div>
     <div styleName='header'>
-      <main className='complete-transactions-table' role='main'>
-        <h3 className='pending-transactions'> Pending Transactions</h3>
-        <table>
-          <thead>
-            <tr>
-              <th className='date-time'>Date/Time</th>
-              <th className='amount'>Amount</th>
-              <th className='counterparty'>Counterparty</th>
-              <th className='status'>Status</th>
-              <th className='type'>Type</th>
-              <th className='action'>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!isEmpty(holofuelActionableTransactions) && holofuelActionableTransactions.map(actionableTx =>
-              <ActionableTransactionsTable
+      <span styleName='title'>HoloFuel Transaction Overview</span>
+      <Button onClick={goToHfDash} styleName='menu-button'>HoloFuel Dashboard</Button>
+    </div>
+
+    <Button styleName='refresh-btn' onClick={() => refetch()}>Refetch Actionable Tx</Button>
+
+    <section className='actionable-transactions-table'>
+      <h3 className='actionable-transactions'> Actionable Transactions</h3>
+      <table>
+        <TransactionTableHeader incomplete />
+        <tbody>
+          {!isEmpty(holofuelActionableTransactions) && holofuelActionableTransactions.map(actionableTx => {
+            if (actionableTx.status === 'pending') {
+              return <ActionableTransactionsTable
                 transaction={actionableTx}
                 holofuelOffer={holofuelOffer}
                 holofuelAcceptOffer={holofuelAcceptOffer}
-                key={actionableTx.id} />)}
-
-            {!isEmpty(holofuelWaitingTransactions) && holofuelWaitingTransactions.map(waitingTx =>
-              <TransactionsTable
-                transaction={waitingTx}
-                key={waitingTx.id} />)}
-          </tbody>
-        </table>
-      </main>
-    </div>
-
-    <main className='complete-transactions-table' role='main'>
-      <h3 className='complete-transactions'>Complete Transactions</h3>
-      <table>
-        <thead>
-          <tr>
-            <th className='date-time'>Date/Time</th>
-            <th className='amount'>Amount</th>
-            <th className='counterparty'>Counterparty</th>
-            <th className='status'>Status</th>
-            <th className='type'>Type</th>
-            <th className='action' />
-          </tr>
-        </thead>
-        <tbody>
-          {!isEmpty(holofuelCompleteTransactions) && holofuelCompleteTransactions.map(completeTx =>
-            <TransactionsTable
-              transaction={completeTx}
-              key={completeTx.id} />)}
+                key={actionableTx.id} />
+            } else updatedTx.push(actionableTx)
+          })}
         </tbody>
       </table>
-    </main>
+    </section>
+
+    <section className='waiting-transactions-table'>
+      <h3 className='waiting-transactions'> Waiting Transactions</h3>
+      <table>
+        <TransactionTableHeader incomplete />
+        <tbody>
+          {!isEmpty(holofuelWaitingTransactions) && holofuelWaitingTransactions.map(waitingTx => {
+            if (waitingTx.status === 'pending') {
+              return <UnactionableTransactionsTable
+                transaction={waitingTx}
+                key={waitingTx.id} />
+            } else updatedTx.push(waitingTx)
+          })}
+        </tbody>
+      </table>
+    </section>
+
+    <section className='complete-transactions-table'>
+      <h3 className='complete-transactions'>Complete Transactions</h3>
+      <table>
+        <TransactionTableHeader />
+        <tbody>
+          {!isEmpty(holofuelCompleteTransactions) && holofuelCompleteTransactions.concat(filterDuplicates(updatedTx)).map(completeTx => {
+            if (completeTx.status === 'complete') {
+              return <UnactionableTransactionsTable
+                transaction={completeTx}
+                key={completeTx.id} />
+            }
+          })}
+        </tbody>
+      </table>
+    </section>
   </div>
 }
 
-function separateDateTime (isoDate) {
-  const dateString = isoDate.toString().substring(0, 10)
-  const timeString = isoDate.toString().substring(11)
-  return <div>
-    {dateString}
-    <br />
-    {timeString}
-  </div>
-}
-
-function TransactionsTable ({ transaction }) {
-  const { id, timestamp, amount, counterparty, status, type } = transaction
+function UnactionableTransactionsTable ({ transaction }) {
+  const { id, timestamp, amount, counterparty, status, type, direction } = transaction
   return <tr key={id}>
-    <td className='date-time'>{timestamp && separateDateTime(timestamp)}</td>
+    <td className='date-time'>{timestamp && formatDateTime(timestamp)}</td>
     <td className='amount'>{amount}</td>
     <td className='counterparty'>{counterparty}</td>
     <td className='status'>{status}</td>
     <td className='type'>{type}</td>
-    <td className='action'>{status === `pending` ? `Awaiting counterparty` : null}</td>
+    <td className='action'>{status === `pending` ? `Awaiting counterparty` : direction === 'incoming' ? 'Recipient' : 'Spender' }</td>
   </tr>
 }
 
 function ActionableTransactionsTable ({ transaction, holofuelOffer, holofuelAcceptOffer }) {
   const { id, timestamp, amount, counterparty, status, type } = transaction
   return <tr key={id}>
-    <td className='date-time'>{timestamp && separateDateTime(timestamp)}</td>
+    <td className='date-time'>{timestamp && formatDateTime(timestamp)}</td>
     <td className='amount'>{amount}</td>
     <td className='counterparty'>{counterparty}</td>
     <td className='status'>{status}</td>
@@ -115,7 +127,23 @@ function ActionableTransactionsTable ({ transaction, holofuelOffer, holofuelAcce
       : type === 'offer' && status === 'pending'
         ? <td className='action'>
           <Button onClick={() => holofuelAcceptOffer(id)} className='holofuel-accept-offer'>Accept Payment</Button>
+          {/* NOTE: Deteremine why definition error occurs with holofuelRejectOffer const below */}
+          <Button onClick={() => holofuelAcceptOffer(id)} className='holofuel-reject-offer'>Reject Payment</Button>
+          {/* <Button onClick={() => holofuelRejectOffer(id)} className='holofuel-reject-offer'>Reject Payment</Button> */}
         </td>
         : null}
   </tr>
+}
+
+const TransactionTableHeader = ({ incomplete }) => {
+  return <thead>
+    <tr>
+      <th className='date-time'>Date/Time</th>
+      <th className='amount'>Amount</th>
+      <th className='counterparty'>Counterparty</th>
+      <th className='status'>Status</th>
+      <th className='type'>Type</th>
+      <th className='action'>{incomplete ? 'Action' : 'Role'}</th>
+    </tr>
+  </thead>
 }

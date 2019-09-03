@@ -17,8 +17,18 @@
   line-height: 28px;
   letter-spacing: 0.02em;
   color: #484848;
+  margin-right: 10px;
+}
+
+.menu-button {
+  margin-left: auto;
 }
 
 th {
   min-width: 100px;
+}
+
+.refresh-btn {
+  margin-top: 50px;
+  width: 200px;
 }

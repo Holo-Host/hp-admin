@@ -6,6 +6,6 @@ query HolofuelWaitingTransactionsQuery {
     direction
     status
     type
-    timestamp    
+    timestamp
   }
 }

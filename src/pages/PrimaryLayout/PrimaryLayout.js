@@ -5,7 +5,7 @@ import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
 import BrowseHapps from 'pages/BrowseHapps'
 import ManagePricing from 'pages/ManagePricing'
-import HoloFuel from 'pages/HoloFuel'
+import HoloFuelTxOverview, { HoloFuelDashboard } from 'pages/HoloFuel'
 import ScreenWidthContext from 'contexts/screenWidth'
 import cx from 'classnames'
 
@@ -18,7 +18,8 @@ export function PrimaryLayout () {
     <Route path='/menu' component={MainMenu} />
     <Route path='/browse-happs' component={BrowseHapps} />
     <Route path='/pricing' component={ManagePricing} />
-    <Route path='/holofuel' component={HoloFuel} />
+    <Route path='/holofuel' exact component={HoloFuelTxOverview} />
+    <Route path='/holofuel/dashboard' component={HoloFuelDashboard} />
 
   </div>
 }

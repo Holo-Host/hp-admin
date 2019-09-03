@@ -1,0 +1,9 @@
+query HolofuelLedgerState {
+  holofuelLedgerState {
+    balance
+    credit
+    payable
+    receivable
+    fees
+  }
+}

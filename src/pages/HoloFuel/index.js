@@ -1,3 +1,8 @@
-import Component from './HoloFuelTxOverview'
+// import Component from './HoloFuelTxOverview';
+// export Component
 
-export default Component
+import HoloFuelTxOverview from './HoloFuelTxOverview'
+import HoloFuelDashboard from './HoloFuelDashboard'
+
+export default HoloFuelTxOverview
+export { HoloFuelDashboard }
