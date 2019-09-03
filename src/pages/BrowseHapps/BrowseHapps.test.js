@@ -119,7 +119,8 @@ describe('BrowseHapps Connected', () => {
   })
 
   describe('hApp entry', () => {
-    it("navigates to '/browse-happs/APP_HASH' on click", async () => {
+    // we don't currently link to happ description.
+    it.skip("navigates to '/browse-happs/APP_HASH' on click", async () => {
       let getByText, history
       await act(async () => {
         ({ getByText, history } = renderWithRouter(<ApolloProvider client={apolloClient}>

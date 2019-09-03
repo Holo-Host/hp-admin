@@ -18,14 +18,13 @@ export default function BrowseHapps ({ history: { push } }) {
   const enableHapp = appId => enableHappMutation({ variables: { appId } })
   const disableHapp = appId => disableHappMutation({ variables: { appId } })
 
-  const sortedHapps = happs.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToPricing = () => push('/pricing')
 
   return <>
     <Header title='hApps' />
 
-    {!isEmpty(sortedHapps) && <div styleName='happ-list' role='list'>
-      {sortedHapps.map(happ =>
+    {!isEmpty(happs) && <div styleName='happ-list' role='list'>
+      {happs.map(happ =>
         <HappRow
           happ={happ}
           enableHapp={enableHapp}
@@ -39,7 +38,7 @@ export default function BrowseHapps ({ history: { push } }) {
 
 export function HappRow ({ happ, enableHapp, disableHapp }) {
   const { id, title, description, thumbnailUrl, isEnabled } = happ
-  return <Link to={'/browse-happs/' + id} styleName='happ-row' role='listitem'>
+  return <div styleName='happ-row' role='listitem'>
     <HappThumbnail url={thumbnailUrl} title={title} />
     <div styleName='details'>
       <div styleName='title-row'>
@@ -51,5 +50,5 @@ export function HappRow ({ happ, enableHapp, disableHapp }) {
       </div>
       <div styleName='description'>{description}</div>
     </div>
-  </Link>
+  </div>
 }
