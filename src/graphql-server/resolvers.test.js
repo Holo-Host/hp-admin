@@ -3,11 +3,12 @@ import resolvers from './resolvers'
 import mockHhaDnaInterface from 'data-interfaces/HhaDnaInterface'
 import { getHappDetails as mockGetHappDetails } from 'data-interfaces/HappStoreDnaInterface'
 import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
+import mockHoloFuelInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 jest.mock('data-interfaces/HhaDnaInterface')
 jest.mock('data-interfaces/HappStoreDnaInterface')
 jest.mock('data-interfaces/EnvoyInterface')
-jest.mock('data-interfaces/HoloFuelInterface')
+jest.mock('data-interfaces/HoloFuelDnaInterface')
 
 describe('resolvers', () => {
   describe('Query', () => {

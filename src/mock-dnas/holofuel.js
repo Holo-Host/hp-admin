@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 
-const transactionList = {
+export const transactionList = {
   ledger: {
     balance: '1000.00',
     credit: '0',
@@ -234,7 +234,7 @@ const transactionList = {
   ]
 }
 
-const pendingList = {
+export const pendingList = {
   requests: [
     {
       event: [
