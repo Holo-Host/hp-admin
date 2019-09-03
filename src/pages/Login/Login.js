@@ -14,12 +14,14 @@ export default function Login ({ history: { push } }) {
     <Header title='HoloPort' />
 
     <form styleName='login-form' onSubmit={handleSubmit(onSubmit)}>
+      <label htmlFor='email'>Email</label>
       <input
         type='email'
         name='email'
         placeholder='Email address'
         styleName='form-input'
         ref={register} />
+      <label htmlFor='email'>Password</label>
       <input
         type='password'
         name='password'
