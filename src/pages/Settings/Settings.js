@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
+import Header from 'components/Header'
 import Button from 'components/Button'
 
 import './Settings.module.css'
@@ -59,14 +60,11 @@ export function Settings ({
     updateSettings(settings)
   }
 
-  // Leaving error logging until error states designed and implemented on form
-  console.log('Login form errors (leave here until proper error handling is implemented):', errors)
+  console.log('Settings form errors (leave here until proper error handling is implemented):', errors)
 
-  return <div>
-    <div styleName='header'>
-      <span styleName='title'>HoloPort Settings</span>
-      <Button onClick={goToMenu} styleName='menu-button'>Menu</Button>
-    </div>
+  return <>
+    <Header title='HoloPort Settings' />
+
     <div>
       <label>Name</label>
       <p>{settings.deviceName}</p>
@@ -116,7 +114,7 @@ export function Settings ({
 
       <Button name='factory-reset' onClick={() => factoryReset()}>Factory Reset</Button>
     </div>
-  </div>
+  </>
 }
 
 export function SettingsFormInput ({
