@@ -9,7 +9,7 @@ import HolofuelCompleteTransactionsQuery from 'graphql/HolofuelCompleteTransacti
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 
-export default function HoloFuelTxOverview ({ history: { push } }) { 
+export default function HoloFuelTxOverview ({ history: { push } }) {
   const { data: { holofuelWaitingTransactions = [] } } = useQuery(HolofuelWaitingTransactionsQuery)
   const { data: { holofuelActionableTransactions = [] } } = useQuery(HolofuelActionableTransactionsQuery)
   const { data: { holofuelCompleteTransactions = [] } } = useQuery(HolofuelCompleteTransactionsQuery)
@@ -79,7 +79,7 @@ export default function HoloFuelTxOverview ({ history: { push } }) {
 }
 
 function separateDateTime (isoDate) {
-  const dateString = isoDate.toString().substring(0,10)
+  const dateString = isoDate.toString().substring(0, 10)
   const timeString = isoDate.toString().substring(11)
   return <div>
     {dateString}
@@ -96,7 +96,7 @@ function TransactionsTable ({ transaction }) {
     <td className='counterparty'>{counterparty}</td>
     <td className='status'>{status}</td>
     <td className='type'>{type}</td>
-    <td className='action'>{status === `pending` ? `Awaiting counterparty`: null}</td>
+    <td className='action'>{status === `pending` ? `Awaiting counterparty` : null}</td>
   </tr>
 }
 
