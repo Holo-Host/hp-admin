@@ -1,15 +1,25 @@
 import React from 'react'
-import { useQuery } from '@apollo/react-hooks'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
+import Button from 'components/Button'
 import './HoloFuelDashboard.module.css'
 import HolofuelLedgerState from 'graphql/HolofuelLedgerStateQuery.gql'
+import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
+import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 
 export default function HoloFuelDashboard ({ history: { push } }) {
   const { data: { holofuelLedgerState = [] } } = useQuery(HolofuelLedgerState)
+  const [holofuelRequestMutation] = useMutation(HolofuelRequestMutation)
+  const [holofuelOfferMutation] = useMutation(HolofuelOfferMutation)
+  const holofuelRequest = (counterparty, amount) => holofuelRequestMutation({ variables: { counterparty, amount } })
+  const holofuelOffer = (counterparty, amount, requestId) => holofuelOfferMutation({ variables: { counterparty, amount, requestId } })
+
+  const goToHfTxOverview = () => push('/holofuel')
 
   return <div styleName='container'>
     <div styleName='header'>
       <span styleName='title'>HoloFuel Dashboard</span>
+      <Button onClick={goToHfTxOverview} styleName='menu-button'>Transaction History</Button>
     </div>
     <main>
       <h3 styleName='holofuel-ledger'> HoloFuel Ledger</h3>
@@ -21,6 +31,11 @@ export default function HoloFuelDashboard ({ history: { push } }) {
         <h4 styleName='ledger-detail'>Fees: { holofuelLedgerState.fees }</h4>
       </section>
       }
+
+      <section className='make-holofuel-transaction'>
+        <Button styleName='small-btn' onClick={() => holofuelRequest('HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', 333.33)}>Request 333.33</Button>
+        <Button styleName='small-btn' onClick={() => holofuelOffer('HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', 777.77)}>Offer 777.77</Button>
+      </section>
     </main>
   </div>
 }

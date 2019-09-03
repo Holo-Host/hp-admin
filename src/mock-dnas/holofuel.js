@@ -1,3 +1,6 @@
+import bcrypt from 'bcryptjs'
+// import scrypt from 'scrypt'
+
 const transactionList = {
   ledger: {
     balance: '1000.00',
@@ -284,15 +287,36 @@ const pendingList = {
   ]
 }
 
+const SALT_ROUNDS = 10
+const genAddressHash = (input) => {
+  return bcrypt.genSalt(SALT_ROUNDS, (err, salt) => {
+    if (err) throw new Error('Error occured when creating salt for MOCK hash address. ERROR: ', err)
+    bcrypt.hash(input, salt, (err, hash) => {
+      if (err) throw new Error('Error occured when creating MOCK hash address for new MOCK chain entry. ERROR: ', err)
+      else {
+        console.log('bycrpt hash for new MOCK entry : ', hash)
+        return hash
+      }
+    })
+  })
+}
+
+// const genAddressHash = (input) => {
+//   const key = Buffer.from(input)
+//   scrypt.hash(key, { N: 16, r: 1, p: 1 }, 64, '').then(result => {
+//     console.log(result.toString('hex'))
+//   }, err => { throw new Error('Error occured when creating MOCK hash address for new MOCH chain entry. ERROR: ', err) })
+// }
+
 const holofuel = {
   transactions: {
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: () => pendingList,
-    request: ({ from, amount, deadline }) => 'Qm1MNMQcEsd3BkQpaFUyZrViQ26axooErWtc', // NOTE: import a encryption to hash these for deterministic testing
-    promise: ({ to, amount, request, deadline }) => 'Qm1DEiFZ1kThW4AVtDmL1w2oDyEKYKcqBcRB',
-    receive_payment: ({ origin }) => 'Qm1Aasdfas8HCijlkmxKUBN7tQHTu75FNp439joi',
-    reject: ({ origin }) > 'Qm1XTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6iu9u98ui'
+    request: ({ from, amount, deadline }) => genAddressHash(from + amount + deadline), // 'Qm1MNMQcEsd3BkQpaFUyZrViQ26axooErWtc', // NOTE: import a encryption to hash these for deterministic testing
+    promise: ({ to, amount, request, deadline }) => genAddressHash(to + amount + request + deadline), // 'Qm1DEiFZ1kThW4AVtDmL1w2oDyEKYKcqBcRB',
+    receive_payment: ({ origin }) => genAddressHash(origin), // 'Qm1Aasdfas8HCijlkmxKUBN7tQHTu75FNp439joi',
+    reject: ({ origin }) => genAddressHash(origin) // 'Qm1XTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6iu9u98ui'
   }
 }
 

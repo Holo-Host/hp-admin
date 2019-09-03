@@ -31,7 +31,7 @@ export default function HoloFuelTxOverview ({ history: { push } }) {
   const filterDuplicates = (array) => {
     const updatedArray = []
     return [...new Set(array)].filter((item) => {
-      for (let tx of array) {
+      for (const tx of array) {
         if (item.id === tx.id && !updatedArray.includes(tx.id)) {
           updatedArray.push(tx.id)
           return item
@@ -46,7 +46,7 @@ export default function HoloFuelTxOverview ({ history: { push } }) {
       <Button onClick={goToHfDash} styleName='menu-button'>HoloFuel Dashboard</Button>
     </div>
 
-    <Button styleName='refresh-btn' onClick={() => refetch()}>Refetch Actionable Tx</Button>
+    <Button styleName='small-btn' onClick={() => refetch()}>Refetch Actionable Tx</Button>
 
     <section className='actionable-transactions-table'>
       <h3 className='actionable-transactions'> Actionable Transactions</h3>

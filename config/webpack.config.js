@@ -26,6 +26,9 @@ const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin')
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter')
 
+// TODO: Discuss the use of nodeExternals module : https://www.npmjs.com/package/webpack-node-externals
+// const nodeExternals = require('webpack-node-externals')
+
 const postcssNormalize = require('postcss-normalize')
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
@@ -119,6 +122,8 @@ module.exports = function (webpackEnv) {
 
   return {
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
+    // target: 'node',
+    // externals: [nodeExternals()],
     // Stop compilation early in production
     bail: isEnvProduction,
     devtool: isEnvProduction
