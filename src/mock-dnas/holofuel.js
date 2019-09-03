@@ -313,10 +313,10 @@ const holofuel = {
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: () => pendingList,
-    request: ({ from, amount, deadline }) => genAddressHash(from + amount + deadline), // 'Qm1MNMQcEsd3BkQpaFUyZrViQ26axooErWtc', // NOTE: import a encryption to hash these for deterministic testing
-    promise: ({ to, amount, request, deadline }) => genAddressHash(to + amount + request + deadline), // 'Qm1DEiFZ1kThW4AVtDmL1w2oDyEKYKcqBcRB',
-    receive_payment: ({ origin }) => genAddressHash(origin), // 'Qm1Aasdfas8HCijlkmxKUBN7tQHTu75FNp439joi',
-    reject: ({ origin }) => genAddressHash(origin) // 'Qm1XTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6iu9u98ui'
+    request: async ({ from, amount, deadline }) => { const hash = await genAddressHash(from + amount + deadline); return hash }, // 'Qm1MNMQcEsd3BkQpaFUyZrViQ26axooErWtc', // NOTE: import a encryption to hash these for deterministic testing
+    promise: async ({ to, amount, request, deadline }) => { const hash = await genAddressHash(to + amount + request + deadline); return hash }, // 'Qm1DEiFZ1kThW4AVtDmL1w2oDyEKYKcqBcRB',
+    receive_payment: async ({ origin }) => { const hash = await genAddressHash(origin); return hash }, // 'Qm1Aasdfas8HCijlkmxKUBN7tQHTu75FNp439joi',
+    reject: async ({ origin }) => { const hash = genAddressHash(origin); return hash } // 'Qm1XTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6iu9u98ui'
   }
 }
 
