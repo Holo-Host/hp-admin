@@ -1,6 +1,5 @@
 import React from 'react'
 import { isEmpty } from 'lodash/fp'
-import { Link } from 'react-router-dom'
 import HappThumbnail from 'components/HappThumbnail'
 import HostButton from 'components/HostButton'
 import { useQuery, useMutation } from '@apollo/react-hooks'

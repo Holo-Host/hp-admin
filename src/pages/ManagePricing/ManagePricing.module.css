@@ -10,21 +10,35 @@
   text-align: center;
 }
 
-.units-dropdown {
-  margin-bottom: 10px;
-  display: inline-block;
-  border: 1px solid lightgray;
-}
-
-.price-input-wrapper {
-  margin-bottom: 10px;
-}
-
-.price-input-label {
-  font-size: 14px;
+.inputs {
+  display: flex;
+  margin-bottom: 50px;
 }
 
 .price-input {
-  margin-left: 5px;
+  margin-right: 5px;
   border: 1px solid lightgray;
+  text-align:right;
+  font-size: 16px;
+  max-width: 80px;
+}
+
+.connecting-label {
+  margin-right: 5px;
+  margin-top: 1px;
+}
+
+.units-dropdown {
+  border: 1px solid lightgray;
+  border-radius: 0;
+  background-color: white;
+  font-size: 16px;
+}
+
+.save-button-row {
+  display: flex;
+}
+
+.save-button {
+  margin-left: auto;
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
-import './Button.module.css'
+// not importing styles here breaks tests. This is a hack.
+import styles from './Button.module.css' // eslint-disable-line no-unused-vars
 
 function Button ({
   disabled = false,
@@ -17,7 +18,8 @@ function Button ({
     primary: (variant === 'primary'),
     secondary: (variant === 'secondary'),
     plain: (variant === 'plain'),
-    mini: (variant === 'mini')
+    mini: (variant === 'mini'),
+    disabled
   })
 
   return (

@@ -24,10 +24,10 @@ export default function ManagePricing () {
   }, [hostPricing])
 
   const dropdownOptions = [
-    { value: UNITS.cpu, label: `CPU = ${pricePerUnit} HF per second` },
-    { value: UNITS.bandwidth, label: `Bandwidth = ${pricePerUnit} HF per KB` },
-    { value: UNITS.storage, label: `Storage = ${pricePerUnit} HF per MB` },
-    { value: UNITS.ram, label: `RAM = ${pricePerUnit} HF per MB` }
+    { value: UNITS.cpu, label: `CPU (MS)` },
+    { value: UNITS.bandwidth, label: `Bandwidth (MB)` },
+    { value: UNITS.storage, label: `Storage (MB)` },
+    { value: UNITS.ram, label: `RAM (MB)` }
   ]
 
   const onFuelInputChange = ({ target: { value } }) => {
@@ -53,8 +53,11 @@ export default function ManagePricing () {
 
     <div styleName='subtitle'>Price Settings</div>
 
-    <div styleName='units-dropdown'>
-      <select value={units}
+    <div styleName='inputs'>
+      <input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' data-testid='price-input' />
+      <span styleName='connecting-label'>HoloFuel per</span>
+      <select styleName='units-dropdown'
+        value={units}
         onChange={onUnitsChange}
         data-testid='units-dropdown'>
         {dropdownOptions.map(({ value, label }) =>
@@ -64,15 +67,8 @@ export default function ManagePricing () {
       </select>
     </div>
 
-    <div styleName='price-input-wrapper'>
-      <label styleName='price-input-label'>
-        Holofuel per unit
-        <input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' />
-      </label>
-    </div>
-
-    <div>
-      <Button variant='primary' onClick={save} disabled={loading || saved || !changed}>
+    <div styleName='save-button-row'>
+      <Button styleName='save-button' variant='primary' onClick={save} disabled={loading || saved || !changed}>
         {loading ? 'Saving' : (saved ? 'Saved' : 'Save')}
       </Button>
     </div>
