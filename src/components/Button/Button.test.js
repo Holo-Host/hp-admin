@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 
 import Button from './Button'
 
-it('should rendered child text', () => {
+it('should render child text', () => {
   const childText = 'Child Text'
   const { getByText } = render(
     <Button>{childText}</Button>

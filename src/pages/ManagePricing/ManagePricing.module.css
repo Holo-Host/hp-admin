@@ -2,33 +2,15 @@
   width: 100%;
 }
 
-.header {
-  display: flex;
-  padding-bottom: 6px;
-  border-bottom: 1px solid lightgray;
-  margin-bottom: 10px;
-}
-
-.menu-button {
-  margin-left: auto;
-}
-
-.title {
-  font-style: normal;
-  font-weight: bold;
-  font-size: 24px;
-  line-height: 28px;
-  letter-spacing: 0.02em;
-  color: #484848;
-}
-
 .subtitle {
+  margin-top: 15px;
+  margin-bottom: 15px;  
   font-style: normal;
   font-weight: bold;
   font-size: 14px;
   line-height: 28px;
   letter-spacing: 0.02em;
-  color: #484848;
+  color: var(--color-tundora);
   text-align: center;
 }
 
@@ -50,5 +32,3 @@
   margin-left: 5px;
   border: 1px solid lightgray;
 }
-
-

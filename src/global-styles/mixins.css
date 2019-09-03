@@ -1,0 +1,7 @@
+/* circle mixin is an example. It's currently used in StyleDemo only.  */
+@mixin circle($dimension) {
+  position: absolute;
+  height: $dimension;  
+  width: $dimension;  
+  border-radius: 50%;
+}

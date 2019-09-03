@@ -1,0 +1,16 @@
+.host-button {
+  margin-left: auto;
+  color: white;
+  background-color: #484848;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 14px;
+  text-transform: uppercase;
+  min-width: 67px;
+  height: 26px;
+}
+
+.unhost {
+  color: #484848;
+  background-color: #CDCDCD;
+}

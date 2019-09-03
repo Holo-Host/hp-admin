@@ -20,7 +20,7 @@ export default function Dashboard ({ me, happStoreUser, registerUser }) {
     </p>
 
     <p>
-      <Btn onClick={() => registerUser('Test User', 'testuserface.png')}>Register a test user</Btn>
+      <Btn variant='primary' onClick={() => registerUser('Test User', 'testuserface.png')}>Register a test user</Btn>
     </p>
   </div>
 }

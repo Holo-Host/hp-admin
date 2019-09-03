@@ -29,16 +29,22 @@
     "graphql-iso-date": "^3.6.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "postcss-custom-properties": "^9.0.2",
+    "postcss-import": "^12.0.1",
+    "postcss-sassy-mixins": "^2.1.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
+    "react-hook-form": "^3.23.0",
     "react-identicon-variety-pack": "^0.2.1",
     "react-media-hook": "^0.4.4",
+    "react-modal": "^3.9.1",
     "react-test-renderer": "^16.9.0",
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",
     "rpc-websockets": "^4.5.1",
     "waait": "^1.0.5",
-    "ws": "^7.1.1"
+    "ws": "^7.1.1",
+    "yup": "^0.27.0"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",
@@ -145,7 +151,8 @@
       [
         "react-css-modules",
         {
-          "generateScopedName": "[name]__[local]___[hash:base64:5]"
+          "generateScopedName": "[name]__[local]___[hash:base64:5]",
+          "exclude": "node_modules"
         }
       ],
       [
