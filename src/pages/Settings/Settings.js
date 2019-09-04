@@ -42,7 +42,6 @@ export function Settings ({
   toggleSshAccess,
   history: { push }
 }) {
-  const goToMenu = () => push('/menu')
   const { register, handleSubmit, errors } = useForm({
     defaultValues: settings,
     validationSchema: SettingsValidationSchema
@@ -65,55 +64,60 @@ export function Settings ({
   return <>
     <Header title='HoloPort Settings' />
 
-    <div>
-      <label>Name</label>
-      <p>{settings.deviceName}</p>
+    <strong style={{marginTop: '20px'}}>Name</strong>
+    <p>
+      {settings.deviceName}
+    </p>
 
-      <label>URL</label>
-      <p>{settings.hostUrl}</p>
+    <strong>URL</strong>
+    <p>
+      {settings.hostUrl}
+    </p>
 
-      <label>URL</label>
-      <p>{settings.networkId}</p>
+    <strong>Network ID</strong>
+    <p>
+      {settings.networkId}
+    </p>
 
-      <h2>Access Port Numbers</h2>
+    <strong>Access Port Numbers</strong>
 
-      <form styleName='settings-form' onSubmit={handleSubmit(onSubmit)}>
-        <SettingsFormInput
-          label='Device Admin'
-          name='deviceAdminPort'
-          register={register} />
-
-        <SettingsFormInput
-          label='HC Admin'
-          name='hcAdminPort'
-          register={register} />
-
-        <SettingsFormInput
-          label='HC Network'
-          name='hcNetworkPort'
-          register={register} />
-
-        <SettingsFormInput
-          label='Hosting'
-          name='hostingPort'
-          register={register} />
-
-        <Button type='submit' name='update-settings' value='Submit'>Update</Button>
-      </form>
-
-      <hr />
-
-      <h2 >Support Access and Factory Reset</h2>
+    <form styleName='settings-form' onSubmit={handleSubmit(onSubmit)}>
+      <SettingsFormInput
+        label='Device Admin'
+        name='deviceAdminPort'
+        register={register} />
 
       <SettingsFormInput
-        label='Turn on access for HoloPort support (SSH)'
-        name='sshAccess'
-        type='checkbox'
-        checked={sshAccessVal}
-        onChange={handleToggleSshAccess} />
+        label='HC Admin'
+        name='hcAdminPort'
+        register={register} />
 
-      <Button name='factory-reset' onClick={() => factoryReset()}>Factory Reset</Button>
-    </div>
+      <SettingsFormInput
+        label='HC Network'
+        name='hcNetworkPort'
+        register={register} />
+
+      <SettingsFormInput
+        label='Hosting'
+        name='hostingPort'
+        register={register} />
+
+    </form>
+
+    <Button type='submit' styleName='saveChanges' wide primary name='update-settings' value='Submit'>Save Changes</Button>
+
+    <hr />
+
+    <h2 >Support Access and Factory Reset</h2>
+
+    <SettingsFormInput
+      label='Access for HoloPort support (SSH)'
+      name='sshAccess'
+      type='checkbox'
+      checked={sshAccessVal}
+      onChange={handleToggleSshAccess} />
+
+    <Button name='factory-reset' styleName='factoryReset' wide primary onClick={() => factoryReset()}>Factory Reset</Button>
   </>
 }
 
@@ -125,14 +129,15 @@ export function SettingsFormInput ({
   ...inputProps
 }) {
   return <React.Fragment>
-    {label && <label data-for={name}>{label}</label>}
-    <input name={name} id={name} type={type} ref={register} {...inputProps} />
+    {label && <label styleName='settingsLabel' data-for={name}>{label}</label>}
+    <input styleName='settingsInput' name={name} id={name} type={type} ref={register} {...inputProps} />
   </React.Fragment>
 }
 
 const mockedProps = {
   settings: {
     hostName: 'My Host',
+    hostUrl: 'https://288f092.holo.host',
     hostPubKey: 'hcsFAkeHashSTring2443223ee',
     registrationEmail: 'iamahost@hosting.com',
     deviceName: 'My Very First HoloPort',
