@@ -39,10 +39,8 @@ export function Settings ({
   settings,
   updateSettings,
   factoryReset,
-  toggleSshAccess,
-  history: { push }
+  toggleSshAccess
 }) {
-  const goToMenu = () => push('/menu')
   const { register, handleSubmit, errors } = useForm({
     defaultValues: settings,
     validationSchema: SettingsValidationSchema
