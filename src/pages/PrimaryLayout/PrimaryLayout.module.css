@@ -3,6 +3,7 @@
   flex-direction: column;
   word-break: break-word;
   height: 100%;
+  box-sizing: border-box;
 }
 
 .wide {
@@ -12,7 +13,7 @@
 }
 
 .narrow {
-  padding: 25px 20px;  
+  padding: 25px 20px;
 }
 
 .menu-link {
