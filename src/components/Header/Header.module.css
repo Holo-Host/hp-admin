@@ -52,7 +52,13 @@
   text-transform: uppercase;
 }
 
-.subHeader {
+.avatar-link {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+}
+
+.sub-header {
   margin: -20px -20px 0px -20px;
   background-color: rgb(140,140,140);
   /* background-image: linear-gradient(rgb(100,100,100), rgb(255,255,255)); */
@@ -62,7 +68,7 @@
   border: none;
 }
 
-.subTitle {
+.sub-title {
   font-size: 20px;
 }
 
