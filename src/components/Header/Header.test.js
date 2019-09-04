@@ -38,7 +38,6 @@ it('should render the title and a menu icon', () => {
   expect(props.history.push).toHaveBeenCalledWith('/dashboard')
 })
 
-
 // describe('with backTo defined', () => {
 //   it('should render the title and a back button', () => {
 //     const props = {
@@ -58,4 +57,3 @@ it('should render the title and a menu icon', () => {
 //     expect(props.history.push).toHaveBeenCalledWith(props.backTo)
 //   })
 // })
-
