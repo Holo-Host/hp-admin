@@ -8,7 +8,7 @@ import MenuIcon from 'components/icons/MenuIcon'
 
 export function Header ({ title, backTo, history: { push } }) {
   const goToMenu = () => push('/dashboard')
-  const goBack = () => push(backTo)
+  // const goBack = () => push(backTo)
 
   const leftNav = <Button onClick={goToMenu} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />

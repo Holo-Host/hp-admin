@@ -19,7 +19,7 @@ export default function BrowseHapps ({ history: { push } }) {
 
   const goToPricing = () => push('/pricing')
 
-  return <>
+  return <React.Fragment>
     <Header title='Hosting' />
 
     {!isEmpty(happs) && <div styleName='happ-list' role='list'>
@@ -32,7 +32,7 @@ export default function BrowseHapps ({ history: { push } }) {
     </div>}
 
     <Button variant='primary' wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
-  </>
+  </React.Fragment>
 }
 
 export function HappRow ({ happ, enableHapp, disableHapp }) {
