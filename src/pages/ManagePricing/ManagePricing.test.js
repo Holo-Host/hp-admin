@@ -60,27 +60,27 @@ describe('ManagePricing', () => {
       history: {}
     }
 
-    let getByLabelText, getByText
+    let getByText, getByTestId
     await act(async () => {
-      ({ getByLabelText, getByText } = render(<ApolloProvider client={apolloClient}>
+      ({ getByText, getByTestId } = render(<ApolloProvider client={apolloClient}>
         <ManagePricing {...props} />
       </ApolloProvider>))
       await wait(0)
     })
 
-    expect(getByText('Price Settings')).toBeInTheDocument()
-    expect(getByText('CPU = 5 HF per second')).toBeInTheDocument()
-    expect(getByLabelText('Holofuel per unit').value).toEqual(mockHha.provider.get_service_log_details.price_per_unit)
+    expect(getByText('HoloFuel per')).toBeInTheDocument()
+    expect(getByText('CPU (MS)')).toBeInTheDocument()
+    expect(getByTestId('price-input').value).toEqual(mockHha.provider.get_service_log_details.price_per_unit)
   })
 
   it('allows you to set and save units and pricePerUnit', async () => {
     const props = {
       history: {}
     }
-    let getByLabelText, getByText, getByTestId
+    let getByText, getByTestId
 
     await act(async () => {
-      ({ getByLabelText, getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
+      ({ getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
         <ManagePricing {...props} />
       </MockedProvider>))
       await wait(0)
@@ -88,7 +88,7 @@ describe('ManagePricing', () => {
 
     fireEvent.change(getByTestId('units-dropdown'), { target: { value: UNITS.storage } })
 
-    fireEvent.change(getByLabelText('HoloFuel per unit'), { target: { value: newPrice } })
+    fireEvent.change(getByTestId('price-input'), { target: { value: newPrice } })
 
     fireEvent.click(getByText('Save'))
 
@@ -100,9 +100,9 @@ describe('ManagePricing', () => {
       history: {}
     }
 
-    let getByText, getByLabelText
+    let getByText, getByTestId
     await act(async () => {
-      ({ getByText, getByLabelText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+      ({ getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
         <ManagePricing {...props} />
       </MockedProvider>))
       await wait(0)
@@ -110,7 +110,7 @@ describe('ManagePricing', () => {
 
     expect(getByText('Save')).toHaveAttribute('disabled')
 
-    fireEvent.change(getByLabelText('HoloFuel per unit'), { target: { value: newPrice } })
+    fireEvent.change(getByTestId('price-input'), { target: { value: newPrice } })
 
     expect(getByText('Save')).not.toHaveAttribute('disabled')
 
@@ -124,7 +124,7 @@ describe('ManagePricing', () => {
 
     expect(getByText('Saved')).toHaveAttribute('disabled')
 
-    fireEvent.change(getByLabelText('HoloFuel per unit'), { target: { value: '123' } })
+    fireEvent.change(getByTestId('price-input'), { target: { value: '123' } })
 
     expect(getByText('Save')).not.toHaveAttribute('disabled')
   })

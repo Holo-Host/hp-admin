@@ -10,6 +10,7 @@ import HappDetails from 'pages/HappDetails'
 import ManagePricing from 'pages/ManagePricing'
 import HostingEarnings from 'pages/HostingEarnings'
 import StyleDemo from 'pages/StyleDemo'
+import Login from 'pages/Login'
 import ScreenWidthContext from 'contexts/screenWidth'
 import './PrimaryLayout.module.css'
 
@@ -17,6 +18,7 @@ export function PrimaryLayout () {
   const isWide = useContext(ScreenWidthContext)
 
   return <div styleName={cx('primary-layout', { wide: isWide }, { narrow: !isWide })}>
+    <Route path='/login' component={Login} />
     <Route path='/(|dashboard)' exact component={Dashboard} />
     <Route path='/menu' component={MainMenu} />
     <Route path='/browse-happs' exact component={BrowseHapps} />
