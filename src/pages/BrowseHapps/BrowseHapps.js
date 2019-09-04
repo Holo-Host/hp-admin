@@ -1,6 +1,5 @@
 import React from 'react'
 import { isEmpty } from 'lodash/fp'
-import { Link } from 'react-router-dom'
 import HappThumbnail from 'components/HappThumbnail'
 import HostButton from 'components/HostButton'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -18,14 +17,13 @@ export default function BrowseHapps ({ history: { push } }) {
   const enableHapp = appId => enableHappMutation({ variables: { appId } })
   const disableHapp = appId => disableHappMutation({ variables: { appId } })
 
-  const sortedHapps = happs.sort((a, b) => a.isEnabled ? -1 : b.isEnabled ? 1 : 0)
   const goToPricing = () => push('/pricing')
 
-  return <div styleName='container'>
+  return <>
     <Header title='hApps' />
 
-    {!isEmpty(sortedHapps) && <div styleName='happ-list' role='list'>
-      {sortedHapps.map(happ =>
+    {!isEmpty(happs) && <div styleName='happ-list' role='list'>
+      {happs.map(happ =>
         <HappRow
           happ={happ}
           enableHapp={enableHapp}
@@ -34,13 +32,12 @@ export default function BrowseHapps ({ history: { push } }) {
     </div>}
 
     <Button variant='primary' wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
-
-  </div>
+  </>
 }
 
 export function HappRow ({ happ, enableHapp, disableHapp }) {
   const { id, title, description, thumbnailUrl, isEnabled } = happ
-  return <Link to={'/browse-happs/' + id} styleName='happ-row' role='listitem'>
+  return <div styleName='happ-row' role='listitem'>
     <HappThumbnail url={thumbnailUrl} title={title} />
     <div styleName='details'>
       <div styleName='title-row'>
@@ -52,5 +49,5 @@ export function HappRow ({ happ, enableHapp, disableHapp }) {
       </div>
       <div styleName='description'>{description}</div>
     </div>
-  </Link>
+  </div>
 }

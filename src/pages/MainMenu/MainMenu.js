@@ -2,9 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 export default function MainMenu () {
-  return <div>
+  return <>
     <Menu />
-  </div>
+  </>
 }
 
 export function Menu () {
