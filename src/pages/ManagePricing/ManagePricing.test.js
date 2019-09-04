@@ -68,7 +68,7 @@ describe('ManagePricing', () => {
       await wait(0)
     })
 
-    expect(getByText('Price Settings')).toBeInTheDocument()
+    expect(getByText('HoloFuel per')).toBeInTheDocument()
     expect(getByText('CPU (MS)')).toBeInTheDocument()
     expect(getByTestId('price-input').value).toEqual(mockHha.provider.get_service_log_details.price_per_unit)
   })
