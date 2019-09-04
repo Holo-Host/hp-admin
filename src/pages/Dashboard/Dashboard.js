@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom'
 import './Dashboard.module.css'
 
 export default function Dashboard ({ me, happStoreUser, registerUser }) {
-  return <>
-    <Header title='My HoloPort' />
+  return <React.Fragment>
+    <Header />
 
     <div styleName='linkBox'>
       <h2><Link to='/browse-happs'>Hosting</Link></h2>
@@ -34,5 +34,5 @@ export default function Dashboard ({ me, happStoreUser, registerUser }) {
         <strong>Happ Store User data:</strong> {happStoreUser && JSON.stringify(happStoreUser)}
       </p>
     </div>
-  </>
+  </React.Fragment>
 }

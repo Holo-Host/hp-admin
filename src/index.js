@@ -8,8 +8,9 @@ import ReactModal from 'react-modal'
 import PrimaryLayout from 'pages/PrimaryLayout'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
-import './index.css'
+import './global-styles/normalize.css'
 import './global-styles/colors.css'
+import './index.css'
 
 export function App () {
   const isWide = useMediaPredicate('(min-width: 550px)')

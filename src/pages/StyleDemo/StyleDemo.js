@@ -2,7 +2,7 @@ import React from 'react'
 import './StyleDemo.module.css'
 
 export default function StyleDemo () {
-  return <>
+  return <React.Fragment>
     <div styleName='colored-div'>
       This is colored using a global color.
     </div>
@@ -15,5 +15,5 @@ export default function StyleDemo () {
     <div styleName='circle-div'>
       This uses a mixin for shape.
     </div>
-  </>
+  </React.Fragment>
 }
