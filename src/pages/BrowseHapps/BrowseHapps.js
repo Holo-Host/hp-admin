@@ -20,7 +20,7 @@ export default function BrowseHapps ({ history: { push } }) {
   const goToPricing = () => push('/pricing')
 
   return <>
-    <Header title='hApps' />
+    <Header title='Hosting' />
 
     {!isEmpty(happs) && <div styleName='happ-list' role='list'>
       {happs.map(happ =>

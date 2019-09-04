@@ -51,8 +51,6 @@ export default function ManagePricing () {
   return <>
     <Header title='Manage Pricing' backTo='/browse-happs' />
 
-    <div styleName='subtitle'>Price Settings</div>
-
     <div styleName='inputs'>
       <input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' data-testid='price-input' />
       <span styleName='connecting-label'>HoloFuel per</span>
@@ -68,7 +66,7 @@ export default function ManagePricing () {
     </div>
 
     <div styleName='save-button-row'>
-      <Button styleName='save-button' variant='primary' onClick={save} disabled={loading || saved || !changed}>
+      <Button styleName='save-button' wide variant='primary' onClick={save} disabled={loading || saved || !changed}>
         {loading ? 'Saving' : (saved ? 'Saved' : 'Save')}
       </Button>
     </div>

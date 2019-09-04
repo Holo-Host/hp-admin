@@ -6,7 +6,7 @@ import './Dashboard.module.css'
 
 export default function Dashboard ({ me, happStoreUser, registerUser }) {
   return <>
-    <Header title='My HoloPort' />
+    <Header />
 
     <div styleName='linkBox'>
       <h2><Link to='/browse-happs'>Hosting</Link></h2>
