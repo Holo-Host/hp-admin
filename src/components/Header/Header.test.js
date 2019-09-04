@@ -58,4 +58,3 @@ it('should render the title and a menu icon', () => {
 //     expect(props.history.push).toHaveBeenCalledWith(props.backTo)
 //   })
 // })
-
