@@ -8,7 +8,7 @@ import MenuIcon from 'components/icons/MenuIcon'
 // import BackIcon from 'components/icons/BackIcon'
 // import { gray } from 'utils/colors'
 
-export function Header ({ title = 'Untitled', avatarUrl, email, backTo, history: { push } }) {
+export function Header ({ title, avatarUrl, email, backTo, history: { push } }) {
   const goToMenu = () => push('/dashboard')
   // const goBack = () => push(backTo)
 
@@ -16,12 +16,14 @@ export function Header ({ title = 'Untitled', avatarUrl, email, backTo, history:
     <MenuIcon styleName='menu-icon' color='#FFF' />
   </Button>
 
-  return <div styleName='header'>
-    <div styleName='left-nav'>{leftNav}</div>
-    <div styleName='title'>My HoloPort</div>
-    <Link to='/my-profile'>
-      <HashAvatar avatarUrl={avatarUrl} email={email} size={32} />
-    </Link>
+  return <div>
+    <div styleName='header'>
+      <div styleName='left-nav'>{leftNav}</div>
+      <div styleName='title'>My HoloPort</div>
+      <Link to='/my-profile'>
+        <HashAvatar avatarUrl={avatarUrl} email={email} size={32} />
+      </Link>
+    </div>
     {title && <div styleName='subHeader'>
       <div styleName='subTitle'>{title}</div>
     </div>}
