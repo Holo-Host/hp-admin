@@ -63,7 +63,7 @@ export function Settings ({
   return <React.Fragment>
     <Header title='HoloPort Settings' />
 
-    <strong style={{marginTop: '20px'}}>Name</strong>
+    <strong style={{ marginTop: '20px' }}>Name</strong>
     <p>
       {settings.deviceName}
     </p>

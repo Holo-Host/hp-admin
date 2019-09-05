@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { instanceCreateZomeCall } from '../holochainClient'
-import { makeIsoStringDateTime } from 'utils'
+
+export const currentDataTimeIso = () => new Date().toISOString()
 
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
@@ -148,7 +149,7 @@ const HoloFuelDnaInterface = {
         direction: 'incoming', // this indicates the hf recipient
         status: 'pending',
         type: 'request',
-        timestamp: makeIsoStringDateTime
+        timestamp: currentDataTimeIso
       }
     }
   },
@@ -162,7 +163,7 @@ const HoloFuelDnaInterface = {
         direction: 'outgoing', // this indicates the hf spender
         status: 'pending',
         type: 'offer',
-        timestamp: makeIsoStringDateTime
+        timestamp: currentDataTimeIso
       }
     },
 
@@ -176,7 +177,7 @@ const HoloFuelDnaInterface = {
         direction: 'incoming', // this indicates the hf recipient
         status: 'complete',
         type: 'offer',
-        timestamp: makeIsoStringDateTime
+        timestamp: currentDataTimeIso
       }
     },
     // NOTE: Below we reflect our current change to the receive_payment API; the only param should now be the transaction's origin id
@@ -189,7 +190,7 @@ const HoloFuelDnaInterface = {
         direction: 'incoming', // this indicates the hf recipient
         status: 'rejected',
         type: 'offer',
-        timestamp: makeIsoStringDateTime
+        timestamp: currentDataTimeIso
       }
     }
   }
