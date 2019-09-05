@@ -1,3 +1,5 @@
+// eslint-disable array-callback-return
+
 import React from 'react'
 import moment from 'moment'
 import _ from 'lodash'
