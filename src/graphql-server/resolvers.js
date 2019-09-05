@@ -65,19 +65,9 @@ export const resolvers = {
 
     updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit),
 
-    holofuelRequest: async (_, { counterparty, amount }) => {
-      const newRequest = await HoloFuelDnaInterface.requests.create(counterparty, amount)
-      // Logging this out for demo:
-      console.log('The new HF Request transaction body : ', newRequest)
-      return newRequest
-    },
+    holofuelRequest: async (_, { counterparty, amount }) => HoloFuelDnaInterface.requests.create(counterparty, amount),
 
-    holofuelOffer: async (_, { counterparty, amount, requestId }) => {
-      const newOffer = await HoloFuelDnaInterface.offers.create(counterparty, amount, requestId)
-      // Logging this out for demo:
-      console.log('The new HF Offer transaction body : ', newOffer)
-      return newOffer
-    },
+    holofuelOffer: async (_, { counterparty, amount, requestId }) => HoloFuelDnaInterface.offers.create(counterparty, amount, requestId),
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
