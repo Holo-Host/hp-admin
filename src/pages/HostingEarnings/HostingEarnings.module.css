@@ -1,22 +1,17 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: var(--second-color);
-}
-
 .day-buttons {
   display: flex;
-  margin-top: 50px;
+  margin: 10px 0 10px 0;
 }
 
 .day-button {
-  margin: 0px 5px;
+  margin: 0 2px 0 2px;
+  flex: 1;
+  padding: 8px;
+  color: var(--color-gray);
 }
 
 .one-button {
   composes: day-button;
-  margin-left: auto;
 }
 
 .seven-button {
@@ -25,11 +20,11 @@
 
 .thirty-button {
   composes: day-button;
-  margin-right: auto;
 }
 
 .selected {
   background-color: var(--color-gray);
+  color: white;
 }
 
 .transaction-list {
@@ -38,14 +33,24 @@
 }
 
 table {
-  border-bottom: 1px solid black;
+  /* border-bottom: 1px solid var(--color-gray); */
 }
+
 
 th, td {
-  border-top: 1px solid black;
-  border-left: 1px solid black;  
+  border-top: 1px solid var(--color-gray);
+  border-right: 1px solid var(--color-gray);
+  text-align: left;
+  padding: 5px;
+  color: #333;
 }
 
-th:last-child, td:last-child {
-  border-right: 1px solid black;
+th {
+  color: #555;
+  border-top: 0px solid var(--color-gray);
+}
+
+th:last-child,
+td:last-child {
+  border-right: 0px solid var(--color-gray);
 }

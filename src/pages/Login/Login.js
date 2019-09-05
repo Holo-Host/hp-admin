@@ -10,7 +10,7 @@ export default function Login ({ history: { push } }) {
 
   console.log('Login form errors (leave here until proper error handling is implemented):', errors)
 
-  return <div styleName='container'>
+  return <React.Fragment>
     <Header title='HoloPort' />
 
     <form styleName='login-form' onSubmit={handleSubmit(onSubmit)}>
@@ -30,5 +30,5 @@ export default function Login ({ history: { push } }) {
         ref={register} />
       <Button type='submit' variant='primary' wide styleName='login-button'>Login</Button>
     </form>
-  </div>
+  </React.Fragment>
 }

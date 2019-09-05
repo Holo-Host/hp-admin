@@ -42,7 +42,7 @@ export default function BrowseHapps ({
       }))
   }
 
-  return <article styleName='container'>
+  return <React.Fragment>
     {errorSummary && <div styleName='error'>
       {errorSummary}
       {errorDetails && <code>{errorDetails.message}</code>}
@@ -85,7 +85,7 @@ export default function BrowseHapps ({
         <Button wide>Hosting Overview</Button>
       </footer>
     </Modal>
-  </article>
+  </React.Fragment>
 }
 
 const HappSection = ({ title, className, children }) => (

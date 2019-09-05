@@ -1,6 +1,6 @@
 import { invert, isArray } from 'lodash/fp'
 
-// Data mapping, interface <> Hylo UI
+// Data mapping, interface <React.Fragment> Hylo UI
 export const interfaceDefaultAttribsMap = () => ({
 })
 

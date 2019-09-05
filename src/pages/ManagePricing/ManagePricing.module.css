@@ -1,34 +1,48 @@
-.container {
-  width: 100%;
-}
-
-.subtitle {
-  margin-top: 15px;
-  margin-bottom: 15px;  
-  font-style: normal;
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 28px;
-  letter-spacing: 0.02em;
-  color: var(--color-tundora);
-  text-align: center;
-}
-
-.units-dropdown {
-  margin-bottom: 10px;
-  display: inline-block;
-  border: 1px solid lightgray;
-}
-
-.price-input-wrapper {
-  margin-bottom: 10px;
-}
-
-.price-input-label {
-  font-size: 14px;
+.inputs {
+  display: flex;
+  margin-top: 20px;
+  margin-bottom: 50px;
+  justify-content: space-evenly;
+  align-items: center
 }
 
 .price-input {
-  margin-left: 5px;
   border: 1px solid lightgray;
+  text-align:right;
+  font-size: 18px;
+  text-align: center;
+  padding: 10px;
+  max-width: 30px;
+}
+
+.connecting-label {
+  margin-right: 5px;
+  margin-top: 1px;
+  font-size: 12px;
+}
+
+.units-dropdown {
+  border: 1px solid lightgray;
+  border-radius: 0;
+  padding: 10px;
+  background-color: white;
+  font-size: 18px;
+}
+
+.save-button-row {
+  display: flex;
+}
+
+.save-button {
+  /* this margin-bottom value is to stop the button being pushed off the screen. there's a better way to do this */
+  margin-bottom: 40px;
+  margin-top: auto;
+  padding: 15px;
+  width: 100%;
+  background-color: var(--color-tundora);
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+  color: #FFFFFF;
+
 }
