@@ -122,7 +122,6 @@ const HoloFuelDnaInterface = {
     allComplete: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      // const noDuplicateIds = [...new Set(listOfNonActionableTransactions)]
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'complete').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
@@ -135,7 +134,6 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       // NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.
-      // const noDuplicateIds = [...new Set(listOfNonActionableTransactions)]
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     }
