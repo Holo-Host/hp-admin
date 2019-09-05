@@ -1,9 +1,10 @@
 import React from 'react'
+import moment from 'moment'
+import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import Button from 'components/Button'
 import './HoloFuelTxOverview.module.css'
-import { formatDateTime } from 'utils'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelCompleteTransactionsQuery from 'graphql/HolofuelCompleteTransactionsQuery.gql'
@@ -28,17 +29,7 @@ export default function HoloFuelTxOverview ({ history: { push } }) {
   // NOTE: This array will update the displayed data before the next query refetch.  In testing enviornments, it also helps track/maintain the visual display of data updates .
   const updatedTx = []
   // Filtering by ID to prevent display of duplicate transactions - purely for mock data / testing scenarios.
-  const filterDuplicates = (array) => {
-    const updatedArray = []
-    return [...new Set(array)].filter((item) => {
-      for (const tx of array) {
-        if (item.id === tx.id && !updatedArray.includes(tx.id)) {
-          updatedArray.push(tx.id)
-          return item
-        }
-      }
-    })
-  }
+  const filterDuplicates = array => _.uniqBy(array, 'id')
 
   return <div styleName='container'>
     <div styleName='header'>
@@ -145,4 +136,15 @@ const TransactionTableHeader = ({ incomplete }) => {
       <th className='action'>{incomplete ? 'Action' : 'Role'}</th>
     </tr>
   </thead>
+}
+
+function formatDateTime (isoDate) {
+  return <React.Fragment>
+    { parseInt(moment(isoDate).startOf('day').fromNow().split(' ')[0]) > 1
+      ? <p>{ moment(isoDate).format('LLLL')}</p>
+      : parseInt(moment(isoDate).startOf('hour').fromNow().split(' ')[0]) > 1
+        ? <p>{moment(isoDate).calendar()}</p>
+        : <p>{moment(isoDate).startOf('minute').fromNow()}</p>
+    }
+  </React.Fragment>
 }

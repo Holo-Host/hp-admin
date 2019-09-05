@@ -28,7 +28,7 @@ export const resolvers = {
 
     holofuelCompleteTransactions: () => HoloFuelDnaInterface.transactions.allComplete(),
 
-    holofuelLedgerState: () => HoloFuelDnaInterface.ledger.all(),
+    holofuelLedger: () => HoloFuelDnaInterface.ledger.all(),
 
     happ: (_, { id }) => {
       const happ = HhaDnaInterface.happs.get(id)

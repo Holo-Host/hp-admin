@@ -286,16 +286,16 @@ export const pendingList = {
   ]
 }
 
-const NO_SALT_ROUNDS = 10
+const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: () => pendingList,
-    request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NO_SALT_ROUNDS), // 'Qm1MNMQcEsd3BkQpaFUyZrViQ26axooErWtc', // NOTE: import a encryption to hash these for deterministic testing
-    promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NO_SALT_ROUNDS), // 'Qm1DEiFZ1kThW4AVtDmL1w2oDyEKYKcqBcRB',
-    receive_payment: ({ origin }) => bcrypt.hashSync((origin), NO_SALT_ROUNDS), // 'Qm1Aasdfas8HCijlkmxKUBN7tQHTu75FNp439joi',
-    reject: ({ origin }) => bcrypt.hashSync((origin), NO_SALT_ROUNDS) // 'Qm1XTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6iu9u98ui'
+    request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
+    promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
+    receive_payment: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS),
+    reject: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS)
   }
 }
 
