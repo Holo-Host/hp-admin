@@ -13,6 +13,5 @@ export function Menu () {
     <li><Link to='/browse-happs'>Hosting</Link></li>
     <li><Link to='/earnings'>Earnings</Link></li>
     <li><Link to='settings'>Settings</Link></li>
-    <li><Link to='/my-profile'>Edit Profile</Link></li>
   </ul>
 }
