@@ -5,7 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
-import HoloFuelPrimaryLayout from 'pages/HoloFuelPrimaryLayout'
+import PrimaryLayout from 'pages/PrimaryLayout'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
 import './global-styles/normalize.css'
@@ -19,7 +19,7 @@ export function App () {
     <Router>
       <RegisterUser>
         <ScreenWidthContext.Provider value={isWide}>
-          <HoloFuelPrimaryLayout />
+          <PrimaryLayout />
         </ScreenWidthContext.Provider>
       </RegisterUser>
     </Router>
