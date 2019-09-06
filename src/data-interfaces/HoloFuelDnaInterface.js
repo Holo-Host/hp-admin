@@ -112,7 +112,7 @@ function presentTransaction (transaction) {
 
 const HoloFuelDnaInterface = {
   ledger: {
-    all: async () => {
+    get: async () => {
       const { balance, credit, payable, receivable, fees } = await createZomeCall('transactions/ledger_state')()
       return {
         balance,
