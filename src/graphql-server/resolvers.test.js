@@ -60,7 +60,7 @@ describe('resolvers', () => {
     })
 
     describe('.holofuelLedger', () => {
-      it('calls HoloFuelInterface.transactions.ledger.all', async () => {
+      it('calls HoloFuelInterface.transactions.ledger.get', async () => {
         resolvers.Query.holofuelLedger()
         await wait(0)
         expect(mockHoloFuelInterface.ledger.all).toHaveBeenCalled()
