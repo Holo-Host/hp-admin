@@ -60,10 +60,10 @@ export function Settings ({
 
   console.log('Settings form errors (leave here until proper error handling is implemented):', errors)
 
-  return <>
+  return <React.Fragment>
     <Header title='HoloPort Settings' />
 
-    <strong style={{marginTop: '20px'}}>Name</strong>
+    <strong style={{ marginTop: '20px' }}>Name</strong>
     <p>
       {settings.deviceName}
     </p>
@@ -117,7 +117,7 @@ export function Settings ({
       onChange={handleToggleSshAccess} />
 
     <Button name='factory-reset' styleName='factoryReset' wide primary onClick={() => factoryReset()}>Factory Reset</Button>
-  </>
+  </React.Fragment>
 }
 
 export function SettingsFormInput ({
