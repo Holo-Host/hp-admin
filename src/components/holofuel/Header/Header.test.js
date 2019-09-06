@@ -6,7 +6,6 @@ import { createMemoryHistory } from 'history'
 // testing the named export Header rather than the default export which is wrapped in withRouter
 import { Header } from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
-// import { title as backIconTitle } from 'components/icons/BackIcon'
 
 const renderHeader = (
   props,
@@ -37,23 +36,3 @@ it('should render the title and a menu icon', () => {
 
   expect(props.history.push).toHaveBeenCalledWith('/dashboard')
 })
-
-// describe('with backTo defined', () => {
-//   it('should render the title and a back button', () => {
-//     const props = {
-//       title: 'the title',
-//       backTo: '/previous-page',
-//       history: { push: jest.fn() }
-//     }
-//     const { getByText, getByTestId } = render(
-//       <Header {...props} />)
-
-//     expect(getByText(props.title)).toBeInTheDocument()
-//     expect(getByText(backIconTitle)).toBeInTheDocument()
-//     expect(getByText('Back')).toBeInTheDocument()
-
-//     fireEvent.click(getByTestId('back-button'))
-
-//     expect(props.history.push).toHaveBeenCalledWith(props.backTo)
-//   })
-// })
