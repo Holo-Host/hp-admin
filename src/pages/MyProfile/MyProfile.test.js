@@ -119,4 +119,50 @@ describe('Validation', () => {
     expect(error).toBeInTheDocument()
     expect(pushSpy).not.toHaveBeenCalled()
   })
+
+  it('should not show error for correct email', async () => {
+    const { getByLabelText, getByText, queryByText } = renderMyProfile()
+    const input = getByLabelText('Email')
+    fireEvent.change(input, { target: { value: 'alice@example.com' } })
+
+    await act(async () => {
+      fireEvent.click(getByText('Save Changes'))
+      await wait(0)
+    })
+
+    const error = queryByText('You need to provide a valid email address.')
+    expect(error).not.toBeInTheDocument()
+  })
+
+  it('should not show error for name when provided', async () => {
+    const { getByLabelText, getByText, queryByText } = renderMyProfile()
+    const input = getByLabelText('Name')
+    fireEvent.change(input, { target: { value: 'Alice' } })
+
+    await act(async () => {
+      fireEvent.click(getByText('Save Changes'))
+      await wait(0)
+    })
+
+    const error = queryByText('You need to set your name.')
+    expect(error).not.toBeInTheDocument()
+  })
+
+  it('should accept the form when all required fields pass validation', async () => {
+    const pushSpy = jest.fn()
+    const { getByLabelText, getByText } = renderMyProfile({
+      history: { push: pushSpy }
+    })
+    const nameImput = getByLabelText('Name')
+    fireEvent.change(nameImput, { target: { value: 'Alice' } })
+    const emailInput = getByLabelText('Email')
+    fireEvent.change(emailInput, { target: { value: 'alice@example.com' } })
+
+    await act(async () => {
+      fireEvent.click(getByText('Save Changes'))
+      await wait(0)
+    })
+
+    expect(pushSpy).toHaveBeenCalled()
+  })
 })
