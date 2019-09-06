@@ -1,0 +1,11 @@
+mutation HolofuelRequestMutation ($counterparty: String, $amount: Float) {
+  holofuelRequest(counterparty: $counterparty, amount: $amount) {
+    id
+    amount
+    counterparty
+    direction
+    status
+    type
+    timestamp
+  }
+}
