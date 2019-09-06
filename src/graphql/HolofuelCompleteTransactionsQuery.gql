@@ -7,5 +7,7 @@ query HolofuelCompleteTransactionsQuery {
     status
     type
     timestamp
+    fees
+    endingBalance
   }
 }
