@@ -1,4 +1,4 @@
-import { makeIsoStringDateTime } from 'utils'
+const currentDataTimeIso = () => new Date().toISOString()
 
 const successfulTransactionResponse = ({ transactionId, amount, counterparty, status, type }) => {
   return {
@@ -8,7 +8,7 @@ const successfulTransactionResponse = ({ transactionId, amount, counterparty, st
     direction: type === 'offer' ? 'outgoing' : 'incoming',
     status,
     type,
-    timestamp: makeIsoStringDateTime
+    timestamp: currentDataTimeIso
   }
 }
 
