@@ -32,6 +32,42 @@ type HostPricing {
   pricePerUnit: String
 }
 
+enum TransactionType {
+  offer
+  request
+}
+
+enum TransactionStatus {
+  pending
+  complete
+  rejected
+}
+
+enum TransactionDirection {
+  incoming # indicates the recipient of funds
+  outgoing # indicates the spender of funds
+}
+
+type Transaction {
+  id: ID # ID will be the originCommitHash
+  amount: Float
+  counterparty: String
+  direction: TransactionDirection
+  status: TransactionStatus
+  type: TransactionType
+  timestamp: String
+  fees: Float
+  endingBalance: Float
+}
+
+type Ledger {
+  balance: Float
+  credit: Float
+  payable: Float
+  receivable: Float
+  fees: Float
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser
@@ -39,6 +75,10 @@ type Query {
   happs: [Happ]
   happ(id: String!): Happ
   hostPricing: HostPricing
+  holofuelCompleteTransactions: [Transaction]
+  holofuelWaitingTransactions: [Transaction]
+  holofuelActionableTransactions: [Transaction]
+  holofuelLedger: Ledger
 }
 
 type Mutation {
@@ -47,4 +87,8 @@ type Mutation {
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
+  holofuelRequest(counterparty:String, amount:Float): Transaction
+  holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
+  holofuelAcceptOffer(transactionId: ID): Transaction # NOTE: holofuelAcceptOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
+  holofuelRejectOffer(transactionId: ID): Transaction # NOTE: holofuelRejectOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
 }
