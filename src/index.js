@@ -10,10 +10,8 @@ import HFPrimaryLayout from 'pages/holofuel/PrimaryLayout'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
 
-const HOLOFUEL_APP = true
-
 export function App () {
-  if (HOLOFUEL_APP) {
+  if (process.env.REACT_APP_HOLOFUEL_APP) {
     return <HoloFuelApp />
   } else {
     return <HPAdminApp />
