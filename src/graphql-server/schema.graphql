@@ -57,7 +57,8 @@ type Transaction {
   type: TransactionType
   timestamp: String
   fees: Float
-  endingBalance: Float
+  presentBalance: Float
+  notes: String
 }
 
 type Ledger {

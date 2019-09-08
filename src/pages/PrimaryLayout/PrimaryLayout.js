@@ -10,6 +10,7 @@ import HappDetails from 'pages/HappDetails'
 import ManagePricing from 'pages/ManagePricing'
 import HostingEarnings from 'pages/HostingEarnings'
 import MyProfile from 'pages/MyProfile'
+import HoloFuelTransactionsLedger from 'pages/HoloFuelTransactionsLedger'
 import StyleDemo from 'pages/StyleDemo'
 import Login from 'pages/Login'
 import ScreenWidthContext from 'contexts/screenWidth'
@@ -29,6 +30,8 @@ export function PrimaryLayout () {
     <Route path='/tos' exact component={Tos} />
     <Route path='/earnings' component={HostingEarnings} />
     <Route path='/my-profile' component={MyProfile} />
+
+    <Route path='/holofuel/ledger' component={HoloFuelTransactionsLedger} />
 
     <Route path='/style-demo' component={StyleDemo} />
 
