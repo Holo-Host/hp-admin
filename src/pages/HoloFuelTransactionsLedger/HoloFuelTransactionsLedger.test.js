@@ -6,8 +6,8 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
-import { transactionList } from 'mock-dnas/holofuel' // pendingList
-import HoloFuelTransactionsLedger, { LedgerTransactionsTable, makeDisplayName } from './HoloFuelTransactionsLedger' // formatDateTime
+import { transactionList } from 'mock-dnas/holofuel' // pendingList,
+import HoloFuelTransactionsLedger, { makeDisplayName } from './HoloFuelTransactionsLedger' // formatDateTime
 
 function renderWithRouter (
   ui,
@@ -40,14 +40,20 @@ describe('HoloFuel Ledger Transactions', () => {
 
       const listItems = getAllByRole('rowgroup')
       expect(listItems).toHaveLength(2)
-      const { getByText } = within(listItems[1])
-      // expect(getByText(formatDateTime(hfInterfaceCompleteTxList[0].timestamp))).toBeInTheDocument()
-      expect(getByText(makeDisplayName(hfInterfaceCompleteTxList[0].counterparty))).toBeInTheDocument()
-      expect(getByText(hfInterfaceCompleteTxList[0].notes)).toBeInTheDocument()
-      expect(getByText(hfInterfaceCompleteTxList[0].amount)).toBeInTheDocument()
-      expect(getByText(hfInterfaceCompleteTxList[0].direction)).toBeInTheDocument()
-      expect(getByText(hfInterfaceCompleteTxList[0].fees)).toBeInTheDocument()
-      expect(getByText(hfInterfaceCompleteTxList[0].presentBalance)).toBeInTheDocument()
+
+      listItems.forEach((item, index) => {
+        const { getByText } = within(item)
+        if (index === 0) return null
+        else {
+          // expect(getByText(formatDateTime(hfInterfaceCompleteTxList[0].timestamp))).toBeInTheDocument()
+          expect(getByText(makeDisplayName(hfInterfaceCompleteTxList[0].counterparty))).toBeInTheDocument()
+          expect(getByText(hfInterfaceCompleteTxList[0].notes)).toBeInTheDocument()
+          expect(getByText(hfInterfaceCompleteTxList[0].amount)).toBeInTheDocument()
+          expect(getByText(hfInterfaceCompleteTxList[0].direction)).toBeInTheDocument()
+          expect(getByText(hfInterfaceCompleteTxList[0].fees)).toBeInTheDocument()
+          expect(getByText(hfInterfaceCompleteTxList[0].presentBalance)).toBeInTheDocument()
+        }
+      })
     })
 
     it('should render the header and title', async () => {
@@ -63,20 +69,21 @@ describe('HoloFuel Ledger Transactions', () => {
       expect(getByText('Completed Transactions')).toBeInTheDocument()
     })
 
-    it('should render the account balance', async () => {
-      let getByText
-      await act(async () => {
-        ({ getByText } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <HoloFuelTransactionsLedger history={{}} />
-        </ApolloProvider>))
-        await wait(0)
-      })
+    // it('should render the account balance', async () => {
+    //   let getByText
+    //   await act(async () => {
+    //     ({ getByText } = renderWithRouter(<ApolloProvider client={apolloClient}>
+    //       <HoloFuelTransactionsLedger history={{}} />
+    //     </ApolloProvider>))
+    //     await wait(0)
+    //   })
 
-      expect(getByText(transactionList.ledger.balance)).toBeInTheDocument()
-    })
+    //   expect(getByText(transactionList.ledger.balance)).toBeInTheDocument()
+    // })
   })
 })
 
+// Discuss issues with extracting this function and consider less repeative solutions
 // const renderHFLedgerTx = async () => {
 //   const txLedger = await renderWithRouter(<ApolloProvider client={apolloClient}>
 //     <HoloFuelTransactionsLedger history={{}} />

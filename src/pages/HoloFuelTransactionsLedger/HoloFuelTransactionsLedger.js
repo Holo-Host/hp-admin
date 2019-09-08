@@ -11,9 +11,7 @@ import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 
 export default function HoloFuelTransactonsLedger ({ history: { push } }) {
   const { data: { holofuelCompleteTransactions = [] } } = useQuery(HolofuelCompleteTransactionsQuery)
-  const { data: { holofuelLedgerQuery = [] } } = useQuery(HolofuelLedgerQuery)
-
-  // console.log('holofuelLedgerQuery : ', holofuelLedgerQuery)
+  const { data: { holofuelLedger = [] } } = useQuery(HolofuelLedgerQuery)
 
   const headings = [
     'Date',
@@ -29,7 +27,7 @@ export default function HoloFuelTransactonsLedger ({ history: { push } }) {
 
     <section styleName='account-ledger-subheader'>
       <p id='account-number' styleName='subheader-title'>AC1903F8EAAC1903F8EA</p>
-      <p id='account-balance' styleName='subheader-title'>Balance <span styleName='account-balance'>{!isEmpty(holofuelLedgerQuery) && holofuelLedgerQuery.balance}</span></p>
+      <p styleName='subheader-title'>Balance <span id='account-balance' styleName='account-balance'>{!isEmpty(holofuelLedger) && holofuelLedger.balance}</span></p>
     </section>
 
     <section styleName='account-ledger-table'>
@@ -59,7 +57,7 @@ export default function HoloFuelTransactonsLedger ({ history: { push } }) {
   </React.Fragment>
 }
 
-function LedgerTransactionsTable ({ transaction }) {
+export function LedgerTransactionsTable ({ transaction }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
   return <tr key={id} styleName='table-content-row'>
     <td id='date-time' styleName='completed-tx-col table-content'>{timestamp && formatDateTime(timestamp)}</td>
