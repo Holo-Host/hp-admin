@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { instanceCreateZomeCall } from '../holochainClient'
+import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 
 export const currentDataTimeIso = () => new Date().toISOString()
 
@@ -14,8 +15,8 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     amount: amount || event.Promise.tx.amount,
     counterparty: counterparty || event.Promise.tx.to,
     direction: stateDirection,
-    status: 'pending',
-    type: 'offer',
+    status: STATUS.pending,
+    type: TYPE.offer,
     timestamp: eventTimestamp
   }
 }
@@ -26,21 +27,21 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     amount: amount || event.Request.amount,
     counterparty: counterparty || event.Request.from,
     direction: stateDirection,
-    status: 'pending',
-    type: 'request',
+    status: STATUS.pending,
+    type: TYPE.request,
     timestamp: eventTimestamp
   }
 }
 
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
-  const counterparty = stateDirection === 'incoming' ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
+  const counterparty = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
   return {
     id: origin,
     amount: event.Receipt.cheque.invoice.promise.tx.amount,
     counterparty,
     direction: stateDirection,
-    status: 'complete',
-    type: event.Receipt.cheque.invoice.promise.request ? 'request' : 'offer', // this inicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
+    status: STATUS.complete,
+    type: event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
     fees,
     presentBalance
@@ -49,14 +50,14 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
 
 // TODO: Review whether we should be showing this in addition to the receipt
 const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
-  const counterparty = stateDirection === 'incoming' ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
+  const counterparty = stateDirection === DIRECTION.incoming ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
   return {
     id: origin,
     amount: event.Cheque.invoice.promise.tx.amount,
     counterparty,
     direction: stateDirection,
-    status: 'complete',
-    type: event.Cheque.invoice.promise.request ? 'request' : 'offer', // this inicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
+    status: STATUS.complete,
+    type: event.Cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
     fees,
     presentBalance
@@ -66,7 +67,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 function presentPendingRequest (transaction) {
   const { event, provenance } = transaction
   const origin = event[0]
-  const stateDirection = 'incoming' // this indicates the recipient of funds
+  const stateDirection = DIRECTION.incoming // this indicates the recipient of funds
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
   const amount = event[2].Request.amount
@@ -76,7 +77,7 @@ function presentPendingRequest (transaction) {
 function presentPendingOffer (transaction) {
   const { event, provenance } = transaction
   const origin = event[2].Promise.request ? event[2].Promise.request : event[0]
-  const stateDirection = 'outgoing' // this indicates the spender of funds
+  const stateDirection = DIRECTION.outgoing // this indicates the spender of funds
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
   const amount = event[2].Promise.tx.amount
@@ -150,9 +151,9 @@ const HoloFuelDnaInterface = {
         id: origin,
         amount,
         counterparty,
-        direction: 'incoming', // this indicates the hf recipient
-        status: 'pending',
-        type: 'request',
+        direction: DIRECTION.incoming, // this indicates the hf recipient
+        status: STATUS.pending,
+        type: TYPE.request,
         timestamp: currentDataTimeIso
       }
     }
@@ -164,9 +165,9 @@ const HoloFuelDnaInterface = {
         id: requestId || origin, // NOTE: If reqeuestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
         amount,
         counterparty,
-        direction: 'outgoing', // this indicates the hf spender
-        status: 'pending',
-        type: 'offer',
+        direction: DIRECTION.outgoing, // this indicates the hf spender
+        status: STATUS.pending,
+        type: TYPE.offer,
         timestamp: currentDataTimeIso
       }
     },
@@ -178,9 +179,9 @@ const HoloFuelDnaInterface = {
         id: transactionId,
         amount: 0, // NOTE: This data needs to be pulled from the gql cache
         counterparty: 'Data not avail until next refetch, retrieve from gql cache...', // NOTE: This data needs to be pulled from the gql cache
-        direction: 'incoming', // this indicates the hf recipient
-        status: 'complete',
-        type: 'offer',
+        direction: DIRECTION.incoming, // this indicates the hf recipient
+        status: STATUS.complete,
+        type: TYPE.offer,
         timestamp: currentDataTimeIso
       }
     },
@@ -191,9 +192,9 @@ const HoloFuelDnaInterface = {
         id: transactionId,
         amount: 0, // NOTE: This data needs to be pulled from the gql cache
         counterparty: 'Data not avail until next refetch, retrieve from gql cache...', // NOTE: This data needs to be pulled from the gql cache
-        direction: 'incoming', // this indicates the hf recipient
-        status: 'rejected',
-        type: 'offer',
+        direction: DIRECTION.incoming, // this indicates the hf recipient
+        status: STATUS.rejected,
+        type: TYPE.offer,
         timestamp: currentDataTimeIso
       }
     }

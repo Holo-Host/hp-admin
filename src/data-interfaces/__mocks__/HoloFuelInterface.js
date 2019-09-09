@@ -1,3 +1,5 @@
+import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
+
 const currentDataTimeIso = () => new Date().toISOString()
 
 const successfulTransactionResponse = ({ transactionId, amount, counterparty, status, type }) => {
@@ -5,7 +7,7 @@ const successfulTransactionResponse = ({ transactionId, amount, counterparty, st
     id: transactionId,
     amount: amount || 0,
     counterparty: counterparty || 'Data not avail until next refetch, retrieve from gql cache...',
-    direction: type === 'offer' ? 'outgoing' : 'incoming',
+    direction: type === TYPE.offer ? DIRECTION.outgoing : DIRECTION.incoming,
     status,
     type,
     timestamp: currentDataTimeIso
@@ -19,12 +21,12 @@ const mockHoloFuelDnaInterface = {
     allWaiting: jest.fn(() => ['mockWaitingTransactionOne', 'mockWaitingTransactionTwo'])
   },
   requests: {
-    create: jest.fn((counterparty, amount) => successfulTransactionResponse({ transactionId: 'requestHashId', counterparty, amount, status: 'pending', type: 'request' }))
+    create: jest.fn((counterparty, amount) => successfulTransactionResponse({ transactionId: 'requestHashId', counterparty, amount, status: STATUS.pending, type: TYPE.request }))
   },
   offers: {
-    create: jest.fn((counterparty, amount, requestId) => successfulTransactionResponse({ transactionId: requestId, counterparty, amount, status: 'pending', type: 'offer' })),
-    accept: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: 'complete', type: 'offer' })),
-    reject: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: 'rejected', type: 'offer' }))
+    create: jest.fn((counterparty, amount, requestId) => successfulTransactionResponse({ transactionId: requestId, counterparty, amount, status: STATUS.pending, type: TYPE.offer })),
+    accept: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.complete, type: TYPE.offer })),
+    reject: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.rejected, type: TYPE.offer }))
   }
 }
 
