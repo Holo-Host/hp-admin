@@ -36,7 +36,7 @@ describe('HoloFuel Ledger Transactions', () => {
       })
 
       const hfInterfaceCompleteTxList = await HoloFuelDnaInterface.transactions.allComplete()
-      console.log('>>>>>>>>> HERE ARE THE COMPLETED TRANSACTIONS : ', hfInterfaceCompleteTxList)
+      console.log(' ***DEBUG*** COMPLETED TRANSACTIONS : ', hfInterfaceCompleteTxList)
 
       const listItems = getAllByRole('rowgroup')
       expect(listItems).toHaveLength(2)
