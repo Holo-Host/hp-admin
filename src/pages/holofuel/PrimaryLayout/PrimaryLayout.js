@@ -4,6 +4,8 @@ import cx from 'classnames'
 import Dashboard from 'pages/holofuel/Dashboard'
 import ScreenWidthContext from 'contexts/screenWidth'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
+import 'global-styles/holofuel/colors.css'
+import 'global-styles/holofuel/index.css'
 
 export function PrimaryLayout () {
   const isWide = useContext(ScreenWidthContext)
