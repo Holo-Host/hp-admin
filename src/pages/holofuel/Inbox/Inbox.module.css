@@ -1,7 +1,36 @@
 .transaction-list {
-  /* empty */
+  margin: 0px -20px;
 }
 
 .transaction-row {
+  display: flex;
+  height: 100px;
+  border-bottom: 1px solid black;
+}
+
+.description-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.counterparty {
+  font-weight: bold;
+}
+
+.notes {
   /* empty */
+}
+
+.amount {
+  margin-left: auto;
+}
+
+.debit {
+  color: red;
+}
+
+.actions {
+
+  display: flex;
+  flex-direction: column;
 }
