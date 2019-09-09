@@ -1,0 +1,70 @@
+.account-ledger-subheader {
+  display: inline-flex;
+  justify-content: space-between;
+}
+
+.subheader-title {
+  margin: 0 2px 0 2px;
+  padding: 8px;
+}
+
+.account-balance {
+  color: blue;
+}
+
+.account-ledger-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.completed-transactions-title {
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.completed-transactions-table {
+  border: 1px solid var(--color-gray);
+  height: auto
+}
+
+.completed-tx-col {
+  min-width: 50px;
+}
+
+.table-header-row {
+  background: #939393;
+}
+
+.table-headers {
+  text-align: center;
+  padding: 5px 20px;
+}
+
+.table-content-row:nth-of-type(odd) {
+  background: #d8d6d6;
+}
+
+.table-content {
+  text-align: center;
+  position: relative;
+}
+
+.resizeable-div {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  cursor: col-resize;
+  user-select: none;
+  height: 100%;
+  /* REMOVE once this adjustable style is debugged */
+  background: red;
+}
+
+.red-text {
+  color: red;
+}
+
+.green-text {
+  color: green;
+}

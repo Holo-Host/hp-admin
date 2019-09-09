@@ -31,7 +31,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentReceipt = ({ origin, event, stateDirection, eventTimestamp }) => {
+const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterparty = stateDirection === 'incoming' ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
   return {
     id: origin,
@@ -40,12 +40,15 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp }) => {
     direction: stateDirection,
     status: 'complete',
     type: event.Receipt.cheque.invoice.promise.request ? 'request' : 'offer', // this inicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
-    timestamp: eventTimestamp
+    timestamp: eventTimestamp,
+    fees,
+    presentBalance,
+    notes: event.Receipt.cheque.invoice.promise.tx.notes
   }
 }
 
 // TODO: Review whether we should be showing this in addition to the receipt
-const presentCheque = ({ origin, event, stateDirection, eventTimestamp }) => {
+const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterparty = stateDirection === 'incoming' ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
   return {
     id: origin,
@@ -54,7 +57,10 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp }) => {
     direction: stateDirection,
     status: 'complete',
     type: event.Cheque.invoice.promise.request ? 'request' : 'offer', // this inicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
-    timestamp: eventTimestamp
+    timestamp: eventTimestamp,
+    fees,
+    presentBalance,
+    notes: event.Cheque.invoice.promise.tx.notes
   }
 }
 
@@ -79,18 +85,27 @@ function presentPendingOffer (transaction) {
 }
 
 function presentTransaction (transaction) {
-  const { state, origin, event, timestamp } = transaction
+  const { state, origin, event, timestamp, adjustment } = transaction
   const stateStage = state.split('/')[1]
   const stateDirection = state.split('/')[0] // NOTE: This returns either 'incoming' or 'outgoing,' wherein, 'incoming' indicates the recipient of funds, 'outgoing' indicates the spender of funds.
+  // NOTE: *We need to ask Perry to provide a balance that represents the 'RESULTING ACCT BALANCE after this transaction adjustment', instead of the only the tx adjustment balance or real-time balance.*
+  const adjustmentValues = Object.values(adjustment).map(key => key.Ok)
+  const adjustmentKeys = Object.keys(adjustment)
+  const parsedAdjustment = adjustmentValues.reduce((result, field, index) => {
+    result[adjustmentKeys[index]] = field
+    return result
+  }, {})
+
   switch (stateStage) {
     case 'completed': {
-      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event })
-      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event })
+      // console.log('typeof parsedAdjustment : ', typeof parsedAdjustment, parsedAdjustment)
+      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.balance })
+      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.balance })
       throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     case 'rejected': {
-      // TODO
-      return console.log('Complete the rejected transaction state case...')
+      // We have decided not to return the reject case into the Ledger
+      break
     }
     // The below two cases are 'waitingTransaction' cases :
     case 'requested': {
@@ -107,7 +122,7 @@ function presentTransaction (transaction) {
 
 const HoloFuelDnaInterface = {
   ledger: {
-    all: async () => {
+    get: async () => {
       const { balance, credit, payable, receivable, fees } = await createZomeCall('transactions/ledger_state')()
       return {
         balance,

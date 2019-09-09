@@ -3,11 +3,10 @@
   color: white;
   background-color: #484848;
   font-weight: bold;
-  font-size: 12px;
-  line-height: 14px;
+  font-size: 14px;
   text-transform: uppercase;
   min-width: 67px;
-  height: 26px;
+  padding: 5px;
 }
 
 .unhost {

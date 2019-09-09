@@ -35,11 +35,35 @@ describe('resolvers', () => {
       })
     })
 
-    describe('.holofuel', () => {
+    describe('.holofuelCompleteTransactions', () => {
       it('calls HoloFuelInterface.transactions.allComplete', async () => {
         resolvers.Query.holofuelCompleteTransactions()
         await wait(0)
         expect(mockHoloFuelInterface.transactions.allComplete).toHaveBeenCalled()
+      })
+    })
+
+    describe('.holofuelWaitingTransactions', () => {
+      it('calls HoloFuelInterface.transactions.allWaiting', async () => {
+        resolvers.Query.holofuelWaitingTransactions()
+        await wait(0)
+        expect(mockHoloFuelInterface.transactions.allWaiting).toHaveBeenCalled()
+      })
+    })
+
+    describe('.holofuelActionableTransactions', () => {
+      it('calls HoloFuelInterface.transactions.allActionable', async () => {
+        resolvers.Query.holofuelActionableTransactions()
+        await wait(0)
+        expect(mockHoloFuelInterface.transactions.allActionable).toHaveBeenCalled()
+      })
+    })
+
+    describe('.holofuelLedger', () => {
+      it('calls HoloFuelInterface.transactions.ledger.get', async () => {
+        resolvers.Query.holofuelLedger()
+        await wait(0)
+        expect(mockHoloFuelInterface.ledger.get).toHaveBeenCalled()
       })
     })
   })
@@ -87,6 +111,45 @@ describe('resolvers', () => {
           appId,
           isEnabled: false
         })
+      })
+    })
+
+    describe('.holofuelRequest', () => {
+      it('calls create request and constructs the result transaction', async () => {
+        const counterparty = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
+        const amount = 200.01
+        resolvers.Mutation.holofuelRequest(null, { counterparty, amount })
+        await wait(0)
+        expect(mockHoloFuelInterface.requests.create).toHaveBeenCalledWith(counterparty, amount)
+      })
+    })
+
+    describe('.holofuelOffer', () => {
+      it('calls create offer and constructs the result transaction', async () => {
+        const counterparty = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
+        const amount = 200.01
+        const requestId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
+        resolvers.Mutation.holofuelOffer(null, { counterparty, amount, requestId })
+        await wait(0)
+        expect(mockHoloFuelInterface.offers.create).toHaveBeenCalledWith(counterparty, amount, requestId)
+      })
+    })
+
+    describe('.holofuelAcceptOffer', () => {
+      it('calls accept offer and constructs the result transaction', async () => {
+        const transactionId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
+        resolvers.Mutation.holofuelAcceptOffer(null, { transactionId })
+        await wait(0)
+        expect(mockHoloFuelInterface.offers.accept).toHaveBeenCalledWith(transactionId)
+      })
+    })
+
+    describe('.holofuelRejectOffer', () => {
+      it('calls reject offer and constructs the result transaction', async () => {
+        const transactionId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
+        resolvers.Mutation.holofuelRejectOffer(null, { transactionId })
+        await wait(0)
+        expect(mockHoloFuelInterface.offers.reject).toHaveBeenCalledWith(transactionId)
       })
     })
   })

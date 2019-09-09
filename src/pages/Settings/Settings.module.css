@@ -1,0 +1,52 @@
+/* Menu */
+
+.title {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #484848;
+}
+
+/* page */
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+/* form */
+
+
+.input-list {
+  padding-top: 20px;
+}
+
+
+/* icons */
+
+.side-icon {
+  display: inline-block;
+  padding-left: 5px;
+}
+
+.settingsLabel {
+  padding: 5px;
+}
+
+.settingsInput {
+  padding: 5px;
+  border: 1px solid rgb(200,200,200);
+}
+
+.saveChanges,
+.factoryReset {
+  padding: 10px;
+  font-size: 16px;
+  background-color: rgb(200,200,200);
+}
+

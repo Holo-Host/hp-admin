@@ -55,7 +55,10 @@ type Transaction {
   direction: TransactionDirection
   status: TransactionStatus
   type: TransactionType
-  timestamp: String # QUESTION: Can we use GraphQLDateTime here instead? This timestamp is actually received as an ISO8601...
+  timestamp: String
+  fees: Float
+  presentBalance: Float
+  notes: String
 }
 
 type Ledger {
