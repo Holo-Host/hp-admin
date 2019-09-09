@@ -1,0 +1,6 @@
+query HolofuelUser($id: ID!) {
+  holofuelUser(id: $id) {
+    id
+    nickname
+  }
+}

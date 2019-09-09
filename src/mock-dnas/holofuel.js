@@ -286,9 +286,15 @@ export const pendingList = {
   ]
 }
 
+const whoamiObj = {
+  nick: 'HoloFuel Magician',
+  pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+}
+
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
+    whoami: ({ agentId }) => whoamiObj,
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: () => pendingList,

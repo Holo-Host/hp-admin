@@ -66,6 +66,15 @@ describe('resolvers', () => {
         expect(mockHoloFuelInterface.ledger.get).toHaveBeenCalled()
       })
     })
+
+    describe('.holofuelUser', () => {
+      it('calls HoloFuelInterface.transactions.holofuelUser.get', async () => {
+        const agentId = 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+        resolvers.Query.holofuelUser({ agentId })
+        await wait(0)
+        expect(mockHoloFuelInterface.user.get).toHaveBeenCalled()
+      })
+    })
   })
 
   describe('Mutation', () => {

@@ -32,6 +32,11 @@ type HostPricing {
   pricePerUnit: String
 }
 
+type HoloFuelUser {
+  id: ID
+  nickname: String
+}
+
 enum TransactionType {
   offer
   request
@@ -57,7 +62,8 @@ type Transaction {
   type: TransactionType
   timestamp: String
   fees: Float
-  endingBalance: Float
+  presentBalance: Float
+  notes: String 
 }
 
 type Ledger {
@@ -79,6 +85,7 @@ type Query {
   holofuelWaitingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
+  holofuelUser(agentId: ID!): HolofuelUser
 }
 
 type Mutation {
