@@ -88,19 +88,30 @@ function presentTransaction (transaction) {
   const { state, origin, event, timestamp, adjustment } = transaction
   const stateStage = state.split('/')[1]
   const stateDirection = state.split('/')[0] // NOTE: This returns either 'incoming' or 'outgoing,' wherein, 'incoming' indicates the recipient of funds, 'outgoing' indicates the spender of funds.
+<<<<<<< HEAD
   // NOTE: *We need to ask Perry to provide a balance that represents the 'RESULTING ACCT BALANCE after this transaction adjustment', instead of the only the tx adjustment balance or real-time balance.*
+=======
+  // NOTE: *Holofuel does NOT yet provide a balance that represents the 'RESULTING ACCT BALANCE after this transaction adjustment', instead of the only the tx adjustment balance or real-time balance.*
+>>>>>>> 4705-holofuel-data-layer-updated
   const adjustmentValues = Object.values(adjustment).map(key => key.Ok)
   const adjustmentKeys = Object.keys(adjustment)
   const parsedAdjustment = adjustmentValues.reduce((result, field, index) => {
     result[adjustmentKeys[index]] = field
     return result
   }, {})
+<<<<<<< HEAD
 
   switch (stateStage) {
     case 'completed': {
       // console.log('typeof parsedAdjustment : ', typeof parsedAdjustment, parsedAdjustment)
       if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.balance })
       if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.balance })
+=======
+  switch (stateStage) {
+    case 'completed': {
+      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.resulting_balance })
+      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.resulting_balance })
+>>>>>>> 4705-holofuel-data-layer-updated
       throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     case 'rejected': {
@@ -121,6 +132,16 @@ function presentTransaction (transaction) {
 }
 
 const HoloFuelDnaInterface = {
+  user: {
+    get: async ({ agentId }) => {
+      const result = await createZomeCall('transactions/whoami')({ agentId })
+      if (result.error) throw new Error('There was an error locating the agent nickname. ERROR: ', result.error)
+      return {
+        id: result.pub_sign_key,
+        nickname: result.nick
+      }
+    }
+  },
   ledger: {
     get: async () => {
       const { balance, credit, payable, receivable, fees } = await createZomeCall('transactions/ledger_state')()
@@ -183,7 +204,7 @@ const HoloFuelDnaInterface = {
 
     // NOTE: Below we reflect our current change to the receive_payment API; the only param should now be the transaction's origin id
     accept: async (transactionId) => {
-      await createZomeCall('transactions/receive_payment')({ origin: transactionId })
+      await createZomeCall('transactions/receive_payments_pending')({ origin: transactionId })
       return {
         id: transactionId,
         amount: 0, // NOTE: This data needs to be pulled from the gql cache

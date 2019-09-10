@@ -1,6 +1,6 @@
 import { makeIsoStringDateTime } from 'utils'
 
-const successfulTransactionResponse = ({ transactionId, amount, counterparty, status, type }) => {
+const successfulTransactionResponse = ({ transactionId, amount, counterparty, status, type, fees, presentBalance, notes }) => {
   return {
     id: transactionId,
     amount: amount || 0,
@@ -8,7 +8,11 @@ const successfulTransactionResponse = ({ transactionId, amount, counterparty, st
     direction: type === 'offer' ? 'outgoing' : 'incoming',
     status,
     type,
-    timestamp: makeIsoStringDateTime
+    timestamp: makeIsoStringDateTime,
+    // NOTE: the following details are ONLY available in the 'completed transactions'...
+    fees: fees || 0,
+    presentBalance: presentBalance || 'no presentBalance provided',
+    notes: notes || 'none'
   }
 }
 
