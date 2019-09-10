@@ -178,7 +178,6 @@ const HoloFuelDnaInterface = {
       return {
         id: transactionId,
         amount: 0, // NOTE: This data needs to be pulled from the gql cache
-        counterparty: 'Data not avail until next refetch, retrieve from gql cache...', // NOTE: This data needs to be pulled from the gql cache
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.complete,
         type: TYPE.offer,
@@ -191,7 +190,6 @@ const HoloFuelDnaInterface = {
       return {
         id: transactionId,
         amount: 0, // NOTE: This data needs to be pulled from the gql cache
-        counterparty: 'Data not avail until next refetch, retrieve from gql cache...', // NOTE: This data needs to be pulled from the gql cache
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.rejected,
         type: TYPE.offer,

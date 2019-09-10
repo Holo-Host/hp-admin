@@ -1,7 +1,10 @@
 import React from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, get } from 'lodash/fp'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
+import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
+import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
+
 import { TYPE } from 'models/Transaction'
 import Header from 'components/holofuel/Header'
 import Button from 'components/holofuel/Button'
@@ -27,12 +30,16 @@ export default function Inbox () {
   </React.Fragment>
 }
 
-function TransactionRow ({ transaction }) {
+function TransactionRow ({ transaction }) {  
   const timestamp = '2 days ago'
-  const counterparty = transaction.counterparty.slice(-6)
-  const story = transaction.type === TYPE.offer ? ' is offering' : ' is requesting'
+  const counterparty = (get('counterparty', transaction) || '').slice(-6)
+  const isOffer = transaction.type === TYPE.offer
+  const isRequest = !isOffer
+
+  const story = isOffer ? ' is offering' : ' is requesting'
   const notes = 'For the pizza'
   const amount = transaction.amount
+  const { id } = transaction
 
   return <div styleName='transaction-row'>
     <div>{timestamp}</div>
@@ -40,19 +47,52 @@ function TransactionRow ({ transaction }) {
       <div><span styleName='counterparty'>{counterparty}</span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
-    <div styleName={cx('amount', { debit: transaction.type === TYPE.request })}>{amount} HF</div>
+    <div styleName={cx('amount', { debit: isRequest })}>{amount} HF</div>
     <div styleName='actions'>
-      {transaction.type === TYPE.offer && <AcceptButton />}
-      {transaction.type === TYPE.request && <PayButton />}
-      <Button>Reject</Button>
+      {isOffer && <AcceptButton transaction={transaction} />}
+      {isRequest && <PayButton transaction={transaction} />}
+      <RejectButton transaction={transaction} />
     </div>
   </div>
 }
 
-function AcceptButton () {
-  return <Button>Accept</Button>
+// these are pulled out into custom hooks ready for if we need to move them to their own file for re-use elsewhere
+function useAcceptOffer (id) {
+  const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)
+  return () => acceptOffer({
+    variables: { transactionId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
 }
 
-function PayButton () {
-  return <Button>Pay</Button>
+function AcceptButton ({ transaction: { id } }) {
+  const acceptOffer = useAcceptOffer(id)
+  return <Button
+    onClick={acceptOffer}>
+    Accept
+  </Button>
+}
+
+function useOffer (id, amount, counterparty) {
+  const [offer] = useMutation(HolofuelOfferMutation)
+  return () => offer({
+    variables: { amount, counterparty, requestId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
+}
+
+function PayButton ({ transaction: { id, amount, counterparty } }) {
+  const pay = useOffer(id, amount, counterparty)
+  return <Button
+    onClick={pay}>
+    Pay
+  </Button>
+}
+
+function RejectButton ({ transaction: { id } }) {
+  return <Button onClick={() => console.log('reject transaction', id)}>Reject</Button>
 }
