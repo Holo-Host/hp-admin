@@ -62,7 +62,8 @@ export const transactionList = {
           Ok: '0'
         },
         resulting_balance: {
-          Ok: 'This endpoint is a WIP'
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -116,7 +117,8 @@ export const transactionList = {
           Ok: '0'
         },
         resulting_balance: {
-          Ok: 'This endpoint is a WIP'
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -165,7 +167,8 @@ export const transactionList = {
           Ok: '0'
         },
         resulting_balance: {
-          Ok: 'This endpoint is a WIP'
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -205,7 +208,8 @@ export const transactionList = {
           Ok: '0'
         },
         resulting_balance: {
-          Ok: 'This endpoint is a WIP'
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -242,7 +246,8 @@ export const transactionList = {
           Ok: '0'
         },
         resulting_balance: {
-          Ok: 'This endpoint is a WIP'
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     }
