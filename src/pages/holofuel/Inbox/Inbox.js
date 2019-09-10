@@ -5,6 +5,7 @@ import moment from 'moment'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
+import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
 import Header from 'components/holofuel/Header'
 import Button from 'components/holofuel/Button'
@@ -14,16 +15,25 @@ import cx from 'classnames'
 
 const lastSix = counterparty => (counterparty || '').slice(-6)
 
+function useDecline () {
+  const [decline] = useMutation(HolofuelDeclineMutation)
+  return id => decline({
+    variables: { transactionId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
+}
+
 export default function Inbox () {
   const { data: { holofuelActionableTransactions: transactions = [] } } = useQuery(HolofuelActionableTransactionsQuery)
-
+  const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
   const isTransactionsEmpty = isEmpty(transactions)
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
 
   const showRejectionModal = transaction => setModalTransaction(transaction)
-  const rejectTransaction = transaction => console.log('rejecting transaction', transaction)
 
   return <React.Fragment>
     <Header title={pageTitle} />
@@ -38,12 +48,12 @@ export default function Inbox () {
     <ConfirmRejectionModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
-      rejectTransaction={rejectTransaction} />
+      declineTransaction={declineTransaction} />
 
   </React.Fragment>
 }
 
-const presentDate = dateTime => {
+function presentDate (dateTime) {
   const daysDifferent = moment().diff(dateTime, 'days')
   if (daysDifferent < 1) {
     return 'Today'
@@ -96,7 +106,10 @@ function TransactionRow ({ transaction, showRejectionModal }) {
 function useAcceptOffer (id) {
   const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)
   return () => acceptOffer({
-    variables: { transactionId: id }
+    variables: { transactionId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
   })
 }
 
@@ -136,12 +149,12 @@ function RejectButton ({ showRejectionModal, transaction }) {
   </Button>
 }
 
-function ConfirmRejectionModal ({ transaction, handleClose, rejectTransaction }) {
+function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }) {
   if (!transaction) return null
 
-  const { counterparty, amount, type } = transaction
+  const { id, counterparty, amount, type } = transaction
   const onYes = () => {
-    rejectTransaction(transaction)
+    declineTransaction(id)
     handleClose()
   }
 

@@ -295,7 +295,7 @@ const holofuel = {
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
     receive_payment: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS),
-    reject: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS)
+    decline: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS)
   }
 }
 

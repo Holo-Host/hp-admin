@@ -26,7 +26,7 @@ const mockHoloFuelDnaInterface = {
   offers: {
     create: jest.fn((counterparty, amount, requestId) => successfulTransactionResponse({ transactionId: requestId, counterparty, amount, status: STATUS.pending, type: TYPE.offer })),
     accept: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.complete, type: TYPE.offer })),
-    reject: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.rejected, type: TYPE.offer }))
+    decline: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.rejected, type: TYPE.offer }))
   }
 }
 

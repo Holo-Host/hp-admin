@@ -142,6 +142,14 @@ const HoloFuelDnaInterface = {
       // NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+    },
+    decline: async transactionId => {
+      await createZomeCall('transactions/decline')({ origin: transactionId })
+      return {
+        id: transactionId,
+        status: STATUS.rejected,
+        direction: DIRECTION.incoming
+      }
     }
   },
   requests: {
