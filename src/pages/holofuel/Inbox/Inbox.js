@@ -1,21 +1,29 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
+import moment from 'moment'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import { TYPE } from 'models/Transaction'
 import Header from 'components/holofuel/Header'
 import Button from 'components/holofuel/Button'
+import Modal from 'components/holofuel/Modal'
 import './Inbox.module.css'
 import cx from 'classnames'
+
+const lastSix = counterparty => (counterparty || '').slice(-6)
 
 export default function Inbox () {
   const { data: { holofuelActionableTransactions: transactions = [] } } = useQuery(HolofuelActionableTransactionsQuery)
 
+  const [modalTransaction, setModalTransaction] = useState()
   const isTransactionsEmpty = isEmpty(transactions)
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
+
+  const showRejectionModal = transaction => setModalTransaction(transaction)
+  const rejectTransaction = transaction => console.log('rejecting transaction', transaction)
 
   return <React.Fragment>
     <Header title={pageTitle} />
@@ -23,26 +31,54 @@ export default function Inbox () {
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
+        showRejectionModal={showRejectionModal}
         key={transaction.id} />)}
     </div>}
+
+    <ConfirmRejectionModal
+      handleClose={() => setModalTransaction(null)}
+      transaction={modalTransaction}
+      rejectTransaction={rejectTransaction} />
 
   </React.Fragment>
 }
 
-function TransactionRow ({ transaction }) {  
-  const { counterparty, amount, type } = transaction
+const presentDate = dateTime => {
+  const daysDifferent = moment().diff(dateTime, 'days')
+  if (daysDifferent < 1) {
+    return 'Today'
+  } else if (daysDifferent < 7) {
+    return dateTime.fromNow()
+  } else {
+    return dateTime.format('MMM D')
+  }
+}
+
+function TransactionRow ({ transaction, showRejectionModal }) {
+  const { counterparty, amount, type, timestamp } = transaction
 
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
-  const timestamp = '2 days ago'
-  const shortCounterparty = (counterparty || '').slice(-6)
+  const dateTime = moment(timestamp)
+
+  const date = presentDate(dateTime)
+  const time = dateTime.format('kk:mm')
+
+  const shortCounterparty = lastSix(counterparty)
 
   const story = isOffer ? ' is offering' : ' is requesting'
   const notes = 'For the pizza'
 
   return <div styleName='transaction-row'>
-    <div styleName='date'>{timestamp}</div>
+    <div styleName='date-time'>
+      <div styleName='date'>
+        {date}
+      </div>
+      <div styleName='time'>
+        {time}
+      </div>
+    </div>
     <div styleName='description-cell'>
       <div styleName='story'><span styleName='counterparty'>{shortCounterparty}</span>{story}</div>
       <div styleName='notes'>{notes}</div>
@@ -51,7 +87,7 @@ function TransactionRow ({ transaction }) {
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} />}
-      <RejectButton transaction={transaction} />
+      <RejectButton transaction={transaction} showRejectionModal={showRejectionModal} />
     </div>
   </div>
 }
@@ -92,10 +128,43 @@ function PayButton ({ transaction: { id, amount, counterparty } }) {
   </Button>
 }
 
-function RejectButton ({ transaction: { id } }) {
+function RejectButton ({ showRejectionModal, transaction }) {
   return <Button
-    onClick={() => console.log('reject transaction', id)}
+    onClick={() => showRejectionModal(transaction)}
     styleName='reject-button'>
     Reject
   </Button>
+}
+
+function ConfirmRejectionModal ({ transaction, handleClose, rejectTransaction }) {
+  if (!transaction) return null
+
+  const { counterparty, amount, type } = transaction
+  const onYes = () => {
+    rejectTransaction(transaction)
+    handleClose()
+  }
+
+  return <Modal
+    contentLabel={`Reject ${type}?`}
+    isOpen={!!transaction}
+    handleClose={handleClose}
+    styleName='modal'>
+    <div styleName='modal-title'>Are you sure?</div>
+    <div styleName='modal-text'>
+      Reject <span styleName='modal-counterparty'>{lastSix(counterparty)}</span>'s {type} of <span styleName='modal-amount'>{Number(amount).toLocaleString()} HF</span>?
+    </div>
+    <div styleName='modal-buttons'>
+      <Button
+        onClick={handleClose}
+        styleName='modal-button-no'>
+        No
+      </Button>
+      <Button
+        onClick={onYes}
+        styleName='modal-button-yes'>
+        Yes
+      </Button>
+    </div>
+  </Modal>
 }
