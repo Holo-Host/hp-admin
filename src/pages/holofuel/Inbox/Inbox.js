@@ -1,10 +1,9 @@
 import React from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, get } from 'lodash/fp'
+import { isEmpty } from 'lodash/fp'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
-
 import { TYPE } from 'models/Transaction'
 import Header from 'components/holofuel/Header'
 import Button from 'components/holofuel/Button'
@@ -31,23 +30,24 @@ export default function Inbox () {
 }
 
 function TransactionRow ({ transaction }) {  
-  const timestamp = '2 days ago'
-  const counterparty = (get('counterparty', transaction) || '').slice(-6)
-  const isOffer = transaction.type === TYPE.offer
+  const { counterparty, amount, type } = transaction
+
+  const isOffer = type === TYPE.offer
   const isRequest = !isOffer
+
+  const timestamp = '2 days ago'
+  const shortCounterparty = (counterparty || '').slice(-6)
 
   const story = isOffer ? ' is offering' : ' is requesting'
   const notes = 'For the pizza'
-  const amount = transaction.amount
-  const { id } = transaction
 
   return <div styleName='transaction-row'>
-    <div>{timestamp}</div>
+    <div styleName='date'>{timestamp}</div>
     <div styleName='description-cell'>
-      <div><span styleName='counterparty'>{counterparty}</span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'>{shortCounterparty}</span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
-    <div styleName={cx('amount', { debit: isRequest })}>{amount} HF</div>
+    <div styleName={cx('amount', { debit: isRequest })}>{Number(amount).toLocaleString()} HF</div>
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} />}
@@ -60,17 +60,15 @@ function TransactionRow ({ transaction }) {
 function useAcceptOffer (id) {
   const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)
   return () => acceptOffer({
-    variables: { transactionId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    }]
+    variables: { transactionId: id }
   })
 }
 
 function AcceptButton ({ transaction: { id } }) {
   const acceptOffer = useAcceptOffer(id)
   return <Button
-    onClick={acceptOffer}>
+    onClick={acceptOffer}
+    styleName='accept-button'>
     Accept
   </Button>
 }
@@ -88,11 +86,16 @@ function useOffer (id, amount, counterparty) {
 function PayButton ({ transaction: { id, amount, counterparty } }) {
   const pay = useOffer(id, amount, counterparty)
   return <Button
-    onClick={pay}>
+    onClick={pay}
+    styleName='pay-button'>
     Pay
   </Button>
 }
 
 function RejectButton ({ transaction: { id } }) {
-  return <Button onClick={() => console.log('reject transaction', id)}>Reject</Button>
+  return <Button
+    onClick={() => console.log('reject transaction', id)}
+    styleName='reject-button'>
+    Reject
+  </Button>
 }

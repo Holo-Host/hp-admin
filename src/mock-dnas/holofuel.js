@@ -244,7 +244,7 @@ export const pendingList = {
           Request: {
             from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
             to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-            amount: '200.00',
+            amount: '200000.00',
             fee: '2',
             deadline: '2020-12-02T00:00:00+00:00',
             notes: null,
