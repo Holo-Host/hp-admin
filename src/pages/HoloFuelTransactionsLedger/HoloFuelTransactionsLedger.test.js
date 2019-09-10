@@ -6,7 +6,7 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
-import { transactionList } from 'mock-dnas/holofuel' // pendingList,
+// import { transactionList } from 'mock-dnas/holofuel' // pendingList,
 import HoloFuelTransactionsLedger, { makeDisplayName } from './HoloFuelTransactionsLedger' // formatDateTime
 
 function renderWithRouter (
