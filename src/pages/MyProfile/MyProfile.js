@@ -77,8 +77,8 @@ const MyProfile = ({
       <Button
         variant='primary'
         wide
-
         styleName='save-button'
+        type='submit'
       >
         Save Changes
       </Button>

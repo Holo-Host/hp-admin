@@ -6,13 +6,31 @@ import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
 import PrimaryLayout from 'pages/PrimaryLayout'
+import HFPrimaryLayout from 'pages/holofuel/PrimaryLayout'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
-import './global-styles/normalize.css'
-import './global-styles/colors.css'
-import './index.css'
 
 export function App () {
+  if (process.env.REACT_APP_HOLOFUEL_APP) {
+    return <HoloFuelApp />
+  } else {
+    return <HPAdminApp />
+  }
+}
+
+export function HoloFuelApp () {
+  const isWide = useMediaPredicate('(min-width: 550px)')
+
+  return <ApolloProvider client={apolloClient}>
+    <Router>
+      <ScreenWidthContext.Provider value={isWide}>
+        <HFPrimaryLayout />
+      </ScreenWidthContext.Provider>
+    </Router>
+  </ApolloProvider>
+}
+
+export function HPAdminApp () {
   const isWide = useMediaPredicate('(min-width: 550px)')
 
   return <ApolloProvider client={apolloClient}>
