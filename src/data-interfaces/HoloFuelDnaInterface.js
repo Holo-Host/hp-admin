@@ -61,7 +61,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
     timestamp: eventTimestamp,
     fees,
     presentBalance,
-    notes: event.Receipt.cheque.invoice.promise.tx.notes
+    notes: event.Cheque.invoice.promise.tx.notes
   }
 }
 
@@ -98,8 +98,8 @@ function presentTransaction (transaction) {
   }, {})
   switch (stateStage) {
     case 'completed': {
-      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.balance })
-      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.balance })
+      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.resulting_balance })
+      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.resulting_balance })
       throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     case 'rejected': {
@@ -121,11 +121,12 @@ function presentTransaction (transaction) {
 
 const HoloFuelDnaInterface = {
   user: {
-    get: async (agentId) => {
-      const { nick, pub_sign_key: id } = await createZomeCall('transactions/whoami')({ agentId })
+    get: async ({ agentId }) => {
+      const result = await createZomeCall('transactions/whoami')({ agentId })
+      if (result.error) throw new Error('There was an error locating the agent nickname. ERROR: ', result.error)
       return {
-        id,
-        nickname: nick
+        id: result.pub_sign_key,
+        nickname: result.nick
       }
     }
   },

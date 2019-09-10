@@ -32,7 +32,7 @@ type HostPricing {
   pricePerUnit: String
 }
 
-type HoloFuelUser {
+type HolofuelUser {
   id: ID
   nickname: String
 }
@@ -85,7 +85,7 @@ type Query {
   holofuelWaitingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
-  holofuelUser(agentId: ID!): HolofuelUser
+  holofuelUser(agentId: String): HolofuelUser
 }
 
 type Mutation {
