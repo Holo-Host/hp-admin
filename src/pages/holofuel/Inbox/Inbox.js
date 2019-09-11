@@ -42,6 +42,7 @@ export default function Inbox () {
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
         showRejectionModal={showRejectionModal}
+        role='list'
         key={transaction.id} />)}
     </div>}
 
@@ -79,7 +80,7 @@ function TransactionRow ({ transaction, showRejectionModal }) {
 
   const story = isOffer ? ' is offering' : ' is requesting'
 
-  return <div styleName='transaction-row'>
+  return <div styleName='transaction-row' role='listitem'>
     <div styleName='date-time'>
       <div styleName='date'>
         {date}
