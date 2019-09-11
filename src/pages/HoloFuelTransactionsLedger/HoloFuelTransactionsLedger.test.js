@@ -6,7 +6,7 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
-// import { transactionList } from 'mock-dnas/holofuel' // pendingList,
+import { transactionList } from 'mock-dnas/holofuel' // pendingList,
 import HoloFuelTransactionsLedger, { makeDisplayName } from './HoloFuelTransactionsLedger' // formatDateTime
 
 function renderWithRouter (
@@ -49,10 +49,10 @@ describe('HoloFuel Ledger Transactions', () => {
       const listSections = getAllByRole('region')
       expect(listSections).toHaveLength(2)
 
-      // const { getByTestId } = within(listSections[0])
-      // const balanceElement = getByTestId('account-balance')
+      const { getByTestId } = within(listSections[0])
+      const balanceElement = getByTestId('account-balance')
 
-      // expect(within(balanceElement).getByText(transactionList.ledger.balance)).toBeVisible()
+      expect(within(balanceElement).getByText(transactionList.ledger.balance)).toBeVisible()
     })
 
     it('should render and populate completed transaction table', async () => {

@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 
 export const transactionList = {
   ledger: {
-    balance: '1000.00',
+    balance: '1000.01',
     credit: '0',
     payable: '242.0201',
     receivable: '0',
