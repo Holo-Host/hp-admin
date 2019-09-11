@@ -68,7 +68,7 @@ describe('TransactionRow', () => {
   }
 
   it('renders a request', () => {
-    const { getByText } = render(<TransactionRow transaction={request} />)    
+    const { getByText } = render(<TransactionRow transaction={request} />)
     expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
     expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
