@@ -65,7 +65,7 @@ function presentDate (dateTime) {
   }
 }
 
-function TransactionRow ({ transaction, showRejectionModal }) {
+export function TransactionRow ({ transaction, showRejectionModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
