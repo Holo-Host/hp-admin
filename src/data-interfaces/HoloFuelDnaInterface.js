@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { mapValues} from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 
 export const currentDataTimeIso = () => new Date().toISOString()
@@ -90,12 +91,8 @@ function presentTransaction (transaction) {
   const stateStage = state.split('/')[1]
   const stateDirection = state.split('/')[0] // NOTE: This returns either 'incoming' or 'outgoing,' wherein, 'incoming' indicates the recipient of funds, 'outgoing' indicates the spender of funds.
   // NOTE: *Holofuel does NOT yet provide a balance that represents the 'RESULTING ACCT BALANCE after this transaction adjustment', instead of the only the tx adjustment balance or real-time balance.*
-  const adjustmentValues = Object.values(adjustment).map(key => key.Ok)
-  const adjustmentKeys = Object.keys(adjustment)
-  const parsedAdjustment = adjustmentValues.reduce((result, field, index) => {
-    result[adjustmentKeys[index]] = field
-    return result
-  }, {})
+  const parsedAdjustment = mapValues('Ok', adjustment)
+
   switch (stateStage) {
     case 'completed': {
       if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.resulting_balance })
