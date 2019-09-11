@@ -3,6 +3,7 @@ import { render, fireEvent, act, within } from '@testing-library/react'
 import wait from 'waait'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
+import moment from 'moment'
 import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
@@ -57,7 +58,7 @@ describe('TransactionRow', () => {
     counterparty: 'only care about the last 6',
     amount: 100,
     type: TYPE.request,
-    timestamp: '2019-08-10T00:18:20+00:00',
+    timestamp: moment().subtract(14, 'days'),
     notes: 'Pay me'
   }
 
@@ -67,9 +68,9 @@ describe('TransactionRow', () => {
   }
 
   it('renders a request', () => {
-    const { getByText } = render(<TransactionRow transaction={request} />)
-    expect(getByText('Aug 9')).toBeInTheDocument()
-    expect(getByText('18:18')).toBeInTheDocument()
+    const { getByText } = render(<TransactionRow transaction={request} />)    
+    expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is requesting')).toBeInTheDocument()
     expect(getByText(request.notes)).toBeInTheDocument()
@@ -79,8 +80,8 @@ describe('TransactionRow', () => {
 
   it('renders an offer', () => {
     const { getByText } = render(<TransactionRow transaction={offer} />)
-    expect(getByText('Aug 9')).toBeInTheDocument()
-    expect(getByText('18:18')).toBeInTheDocument()
+    expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is offering')).toBeInTheDocument()
     expect(getByText(offer.notes)).toBeInTheDocument()
