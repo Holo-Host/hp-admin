@@ -19,10 +19,10 @@ const MyProfile = ({
   const avatarUrl = watch('avatar')
   const email = watch('email')
 
-  return [
-    <Header title='Edit Profile' key='header' avatarUrl={avatarUrl} email={email} />,
+  return <>
+    <Header title='Edit Profile' avatarUrl={avatarUrl} email={email} />
 
-    <form onSubmit={handleSubmit(onSubmit)} styleName='form' key='form'>
+    <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
       <HashAvatar avatarUrl={avatarUrl} email={email} styleName='avatar-image' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
@@ -83,7 +83,7 @@ const MyProfile = ({
         Save Changes
       </Button>
     </form>
-  ]
+  </>
 }
 
 export default MyProfile

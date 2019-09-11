@@ -48,7 +48,7 @@ export default function ManagePricing () {
     updateHostPricing({ variables: { units, pricePerUnit } })
   }
 
-  return <React.Fragment>
+  return <>
     <Header title='Manage Pricing' backTo='/browse-happs' />
 
     <div styleName='inputs'>
@@ -65,10 +65,8 @@ export default function ManagePricing () {
       </select>
     </div>
 
-    <div styleName='save-button-row'>
-      <Button styleName='save-button' wide variant='primary' onClick={save} disabled={loading || saved || !changed}>
-        {loading ? 'Saving' : (saved ? 'Saved' : 'Save')}
-      </Button>
-    </div>
-  </React.Fragment>
+    <Button styleName='save-button' wide variant='primary' onClick={save} disabled={loading || saved || !changed}>
+      {loading ? 'Saving' : (saved ? 'Saved' : 'Save')}
+    </Button>
+  </>
 }

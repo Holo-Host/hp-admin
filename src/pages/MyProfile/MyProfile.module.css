@@ -45,7 +45,5 @@
 }
 
 .save-button {
-  padding: .8em 1.5em;
   margin-top: auto;
-  align-self: flex-end;
 }

@@ -19,6 +19,7 @@ function Button ({
     secondary: (variant === 'secondary'),
     plain: (variant === 'plain'),
     mini: (variant === 'mini'),
+    danger: (variant === 'danger'),
     disabled
   })
 

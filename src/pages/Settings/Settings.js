@@ -60,7 +60,7 @@ export function Settings ({
 
   console.log('Settings form errors (leave here until proper error handling is implemented):', errors)
 
-  return <React.Fragment>
+  return <>
     <Header title='HoloPort Settings' />
 
     <strong style={{ marginTop: '20px' }}>Name</strong>
@@ -103,7 +103,7 @@ export function Settings ({
 
     </form>
 
-    <Button type='submit' styleName='saveChanges' wide primary name='update-settings' value='Submit'>Save Changes</Button>
+    <Button type='submit' variant='primary' wide name='update-settings' value='Submit'>Save Changes</Button>
 
     <hr />
 
@@ -116,8 +116,8 @@ export function Settings ({
       checked={sshAccessVal}
       onChange={handleToggleSshAccess} />
 
-    <Button name='factory-reset' styleName='factoryReset' wide primary onClick={() => factoryReset()}>Factory Reset</Button>
-  </React.Fragment>
+    <Button name='factory-reset' variant='danger' wide onClick={() => factoryReset()}>Factory Reset</Button>
+  </>
 }
 
 export function SettingsFormInput ({
@@ -127,10 +127,10 @@ export function SettingsFormInput ({
   register,
   ...inputProps
 }) {
-  return <React.Fragment>
+  return <>
     {label && <label styleName='settingsLabel' data-for={name}>{label}</label>}
     <input styleName='settingsInput' name={name} id={name} type={type} ref={register} {...inputProps} />
-  </React.Fragment>
+  </>
 }
 
 const mockedProps = {
