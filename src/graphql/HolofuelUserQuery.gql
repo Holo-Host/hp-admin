@@ -1,0 +1,6 @@
+query HolofuelUser($agentId: String) {
+  holofuelUser(agentId: $agentId) {
+    id
+    nickname
+  }
+}

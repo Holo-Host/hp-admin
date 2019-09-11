@@ -2,7 +2,7 @@ import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 
 const currentDataTimeIso = () => new Date().toISOString()
 
-const successfulTransactionResponse = ({ transactionId, amount, counterparty, status, type }) => {
+const successfulTransactionResponse = ({ transactionId, amount, counterparty, status, type, fees, presentBalance, notes }) => {
   return {
     id: transactionId,
     amount: amount || 0,
@@ -10,7 +10,11 @@ const successfulTransactionResponse = ({ transactionId, amount, counterparty, st
     direction: type === TYPE.offer ? DIRECTION.outgoing : DIRECTION.incoming,
     status,
     type,
-    timestamp: currentDataTimeIso
+    timestamp: currentDataTimeIso,
+    // NOTE: the following details are ONLY available in the 'completed transactions'...
+    fees: fees || 0,
+    presentBalance: presentBalance || 'no presentBalance provided',
+    notes: notes || 'none'
   }
 }
 
