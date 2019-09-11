@@ -27,7 +27,7 @@ export default function HoloFuelTransactonsLedger ({ history: { push } }) {
 
     <section styleName='account-ledger-subheader'>
       <p id='account-number' styleName='subheader-title'>AC1903F8EAAC1903F8EA</p>
-      <p styleName='subheader-title'>Balance <span id='account-balance' styleName='account-balance'>{!isEmpty(holofuelLedger) && holofuelLedger.balance}</span></p>
+      <p styleName='subheader-title'>Balance <span id='account-balance' styleName='account-balance' data-testid='account-balance'>{!isEmpty(holofuelLedger) && holofuelLedger.balance}</span></p>
     </section>
 
     <section styleName='account-ledger-table'>
@@ -59,13 +59,13 @@ export default function HoloFuelTransactonsLedger ({ history: { push } }) {
 
 export function LedgerTransactionsTable ({ transaction }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
-  return <tr key={id} styleName='table-content-row'>
-    <td id='date-time' styleName='completed-tx-col table-content'>{timestamp && formatDateTime(timestamp)}</td>
-    <td id='counterparty' styleName='completed-tx-col table-content'>{counterparty && makeDisplayName(counterparty)}</td>
-    <td id='notes' styleName='completed-tx-col table-content'>{notes || 'none'}</td>
-    <td id='amount' styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })}>{direction === 'incoming' ? '+' : '-'}{amount}</td>
-    <td id='fees' styleName='completed-tx-col table-content'>{fees}</td>
-    <td id='present-balance' styleName='completed-tx-col table-content'>{presentBalance}<h6>*Note: This is the adjustment balance, NOT the resulting account balance.*</h6></td>
+  return <tr key={id} styleName='table-content-row' data-testid='transactions-table-row'>
+    <td id='date-time' styleName='completed-tx-col table-content' data-testid='cell-date-time'>{timestamp && formatDateTime(timestamp)}</td>
+    <td id='counterparty' styleName='completed-tx-col table-content' data-testid='cell-counterparty'>{counterparty && makeDisplayName(counterparty)}</td>
+    <td id='notes' styleName='completed-tx-col table-content' data-testid='cell-notes'>{notes || 'none'}</td>
+    <td id='amount' styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} data-testid='cell-amount'>{direction === 'incoming' ? '+' : '-'}{amount}</td>
+    <td id='fees' styleName='completed-tx-col table-content' data-testid='cell-fees'>{fees}</td>
+    <td id='present-balance' styleName='completed-tx-col table-content' data-testid='cell-present-balance'>{presentBalance}<h6>*Note: This is the adjustment balance, NOT the resulting account balance.*</h6></td>
   </tr>
 }
 
