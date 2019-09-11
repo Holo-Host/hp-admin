@@ -1,17 +1,3 @@
-.account-ledger-subheader {
-  display: inline-flex;
-  justify-content: space-between;
-}
-
-.subheader-title {
-  margin: 0 2px 0 2px;
-  padding: 8px;
-}
-
-.account-balance {
-  color: blue;
-}
-
 .account-ledger-table {
   display: flex;
   flex-direction: column;
@@ -54,18 +40,6 @@ th, td {
 .table-content {
   text-align: center;
   position: relative;
-}
-
-.resizeable-div {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 5px;
-  cursor: col-resize;
-  user-select: none;
-  height: 100%;
-  /* REMOVE once this adjustable style is debugged */
-  background: red;
 }
 
 .red-text {

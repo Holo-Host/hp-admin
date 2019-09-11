@@ -12,18 +12,18 @@ export default function HoloFuelTransactionsHistory ({ history: { push } }) {
   const { data: { holofuelCompleteTransactions = [] } } = useQuery(HolofuelCompleteTransactionsQuery)
 
   const headings = [
-    '',
-    '',
+    null,
+    null,
     'Amount',
     'Fees',
-    ''
+    null
   ]
 
   return <React.Fragment>
     <Header title='HoloFuel' />
 
     <section styleName='account-ledger-table'>
-      <h3 styleName='completed-transactions-title'>History</h3>
+      <h2 styleName='completed-transactions-title'>History</h2>
       <table styleName='completed-transactions-table'>
         <thead>
           <tr key='heading'>
@@ -64,8 +64,8 @@ export function LedgerTransactionsTable ({ transaction }) {
 }
 
 const TransactionEntry = ({ content }) => {
-  return <th id={content.toLowerCase()} styleName='completed-tx-col table-headers'>
-    {content}
+  return <th id={content ? content.toLowerCase() : null} styleName='completed-tx-col table-headers'>
+    {content || null}
   </th>
 }
 
@@ -81,6 +81,6 @@ function formatDateTime (isoDate) {
 }
 
 export const makeDisplayName = (agentHash) => {
-  if (agentHash.length > 7) return '...' + agentHash.substring(agentHash.length - 7)
+  if (agentHash.length > 7) return agentHash.substring(agentHash.length - 7).toUpperCase()
   else return agentHash
 }
