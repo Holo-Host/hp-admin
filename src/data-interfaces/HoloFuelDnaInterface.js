@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { mapValues} from 'lodash/fp'
+import { mapValues } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 
 export const currentDataTimeIso = () => new Date().toISOString()
