@@ -60,6 +60,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -111,6 +115,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -157,6 +165,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -194,6 +206,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -227,6 +243,10 @@ export const transactionList = {
           Ok: '0'
         },
         fees: {
+          Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
           Ok: '0'
         }
       }
@@ -286,9 +306,23 @@ export const pendingList = {
   ]
 }
 
+const agents = [
+  {
+    nick: 'Perry',
+    pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+  },
+  {
+    nick: 'Sam',
+    pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+  }
+]
+
+const whoamiObj = (agentId) => agents.find(agent => agent.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
+
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
+    whoami: ({ agentId }) => agentId ? whoamiObj(agentId) : agents[0],
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: () => pendingList,
