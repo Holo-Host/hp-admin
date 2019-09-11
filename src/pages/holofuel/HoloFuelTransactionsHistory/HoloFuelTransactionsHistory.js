@@ -3,13 +3,13 @@ import moment from 'moment'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
-import './HoloFuelTransactionsLedger.module.css'
+import './HoloFuelTransactionsHistory.module.css'
 import Header from 'components/Header'
 
 import HolofuelCompleteTransactionsQuery from 'graphql/HolofuelCompleteTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 
-export default function HoloFuelTransactonsLedger ({ history: { push } }) {
+export default function HoloFuelTransactionsHistory ({ history: { push } }) {
   const { data: { holofuelCompleteTransactions = [] } } = useQuery(HolofuelCompleteTransactionsQuery)
   const { data: { holofuelLedger = [] } } = useQuery(HolofuelLedgerQuery)
 

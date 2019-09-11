@@ -7,7 +7,7 @@ import apolloClient from 'apolloClient'
 import wait from 'waait'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 import { transactionList } from 'mock-dnas/holofuel' // pendingList,
-import HoloFuelTransactionsLedger, { makeDisplayName } from './HoloFuelTransactionsLedger' // formatDateTime
+import HoloFuelTransactionsHistory, { makeDisplayName } from './HoloFuelTransactionsHistory' // formatDateTime
 
 function renderWithRouter (
   ui,
@@ -28,7 +28,7 @@ describe('HoloFuel Ledger Transactions', () => {
       let getByText
       await act(async () => {
         ({ getByText } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <HoloFuelTransactionsLedger history={{}} />
+          <HoloFuelTransactionsHistory history={{}} />
         </ApolloProvider>))
         await wait(0)
       })
@@ -41,7 +41,7 @@ describe('HoloFuel Ledger Transactions', () => {
       let getAllByRole
       await act(async () => {
         ({ getAllByRole } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <HoloFuelTransactionsLedger history={{}} />
+          <HoloFuelTransactionsHistory history={{}} />
         </ApolloProvider>))
         await wait(0)
       })
@@ -61,7 +61,7 @@ describe('HoloFuel Ledger Transactions', () => {
       let getAllByRole
       await act(async () => {
         ({ getAllByRole } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <HoloFuelTransactionsLedger history={{}} />
+          <HoloFuelTransactionsHistory history={{}} />
         </ApolloProvider>))
         await wait(0)
       })
