@@ -19,12 +19,19 @@
 
 .completed-transactions-title {
   text-align: center;
-  padding-bottom: 20px;
+  padding: 20px 0px;
 }
 
 .completed-transactions-table {
-  border: 1px solid var(--color-gray);
   height: auto
+}
+
+table {
+  border-spacing: 0px;
+}
+
+th, td {
+  border-right: none;
 }
 
 .completed-tx-col {

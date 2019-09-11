@@ -1,3 +1,3 @@
-import Component from './HoloFuelTransactionsLedger'
+import Component from './HoloFuelTransactionsHistory'
 
 export default Component

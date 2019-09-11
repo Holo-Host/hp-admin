@@ -38,7 +38,7 @@ export const transactionList = {
             amount: '40.01',
             fee: '0',
             deadline: '2020-01-22T00:00:00-02:00',
-            notes: null,
+            notes: 'lyft ride',
             synchronous: null
           },
           request: null
@@ -82,7 +82,7 @@ export const transactionList = {
                   amount: '10.01',
                   fee: '0',
                   deadline: '2020-02-02T00:00:00+00:00',
-                  notes: null,
+                  notes: 'Taco Tuesday!',
                   synchronous: null
                 },
                 request: 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
@@ -136,7 +136,7 @@ export const transactionList = {
                 amount: '10.01',
                 fee: '0',
                 deadline: '2020-02-02T00:00:00+00:00',
-                notes: null,
+                notes: 'Taco Tuesday!',
                 synchronous: null
               },
               request: 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
@@ -291,7 +291,7 @@ export const pendingList = {
               amount: '40.01',
               fee: '0',
               deadline: '2020-01-22T00:00:00-02:00',
-              notes: null,
+              notes: 'lyft ride',
               synchronous: null
             },
             request: null
