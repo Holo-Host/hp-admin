@@ -264,10 +264,10 @@ export const pendingList = {
           Request: {
             from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
             to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-            amount: '200000.00',
+            amount: '124500.00',
             fee: '2',
             deadline: '2020-12-02T00:00:00+00:00',
-            notes: null,
+            notes: 'I want my $2!',
             synchronous: null
           }
         }
@@ -288,10 +288,10 @@ export const pendingList = {
             tx: {
               from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
               to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-              amount: '40.01',
+              amount: '2000',
               fee: '0',
               deadline: '2020-01-22T00:00:00-02:00',
-              notes: null,
+              notes: 'For the pizza',
               synchronous: null
             },
             request: null

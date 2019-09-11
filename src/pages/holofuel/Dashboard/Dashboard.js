@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import Header from 'components/holofuel/Header'
 import './Dashboard.module.css'
 
@@ -9,5 +10,7 @@ export default function Dashboard () {
     <div>
       This is the HoloFuel Dashboard.
     </div>
+
+    <Link to='/inbox'>Inbox</Link>
   </React.Fragment>
 }

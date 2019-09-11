@@ -65,7 +65,7 @@ function presentDate (dateTime) {
 }
 
 function TransactionRow ({ transaction, showRejectionModal }) {
-  const { counterparty, amount, type, timestamp } = transaction
+  const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
@@ -78,7 +78,6 @@ function TransactionRow ({ transaction, showRejectionModal }) {
   const shortCounterparty = lastSix(counterparty)
 
   const story = isOffer ? ' is offering' : ' is requesting'
-  const notes = 'For the pizza'
 
   return <div styleName='transaction-row'>
     <div styleName='date-time'>

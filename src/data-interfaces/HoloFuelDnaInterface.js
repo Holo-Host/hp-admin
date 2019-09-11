@@ -10,7 +10,7 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -18,11 +18,12 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     direction: stateDirection,
     status: STATUS.pending,
     type: TYPE.offer,
-    timestamp: eventTimestamp
+    timestamp: eventTimestamp,
+    notes
   }
 }
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -30,7 +31,8 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     direction: stateDirection,
     status: STATUS.pending,
     type: TYPE.request,
-    timestamp: eventTimestamp
+    timestamp: eventTimestamp,
+    notes
   }
 }
 
@@ -73,8 +75,8 @@ function presentPendingRequest (transaction) {
   const stateDirection = DIRECTION.incoming // this indicates the recipient of funds
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
-  const amount = event[2].Request.amount
-  return presentRequest({ origin, stateDirection, eventTimestamp, counterparty, amount })
+  const { amount, notes } = event[2].Request
+  return presentRequest({ origin, stateDirection, eventTimestamp, counterparty, amount, notes })
 }
 
 function presentPendingOffer (transaction) {
@@ -83,8 +85,8 @@ function presentPendingOffer (transaction) {
   const stateDirection = DIRECTION.outgoing // this indicates the spender of funds
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
-  const amount = event[2].Promise.tx.amount
-  return presentOffer({ origin, stateDirection, eventTimestamp, counterparty, amount })
+  const { amount, notes } = event[2].Promise.tx
+  return presentOffer({ origin, stateDirection, eventTimestamp, counterparty, amount, notes })
 }
 
 function presentTransaction (transaction) {
