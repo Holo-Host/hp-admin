@@ -131,7 +131,7 @@ describe('HoloFuel Ledger Transactions', () => {
       // console.log('Date-time Check : ', genDateFormat(MOCK_TIMEDATE.semanticFullDate))
 
       const fullDateTime = formatDateTime(MOCK_TIMEDATE.semanticFullDate)
-      expect(fullDateTime).toBe('August 30, 2019 6:17 AM')
+      expect(fullDateTime).toBe('August 30, 2019 11:17 AM')
 
       const hourDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
       expect(hourDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameDay).startOf('hour').fromNow())
