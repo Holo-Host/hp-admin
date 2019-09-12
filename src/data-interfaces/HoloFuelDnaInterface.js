@@ -143,6 +143,15 @@ const HoloFuelDnaInterface = {
     }
   },
   transactions: {
+    getPending: async transactionId => {
+      const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
+      const transactionArray = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
+      if (transactionArray.length === 0) {
+        throw new Error(`no pending transaction with id ${transactionId} found.`)
+      } else {
+        return transactionArray[0]
+      }
+    },
     allComplete: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
@@ -162,8 +171,10 @@ const HoloFuelDnaInterface = {
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
     decline: async transactionId => {
+      const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/decline')({ origin: transactionId })
       return {
+        ...transaction,
         id: transactionId,
         status: STATUS.rejected,
         direction: DIRECTION.incoming
@@ -188,7 +199,7 @@ const HoloFuelDnaInterface = {
     create: async (counterparty, amount, requestId) => {
       const origin = await createZomeCall('transactions/promise')({ to: counterparty, amount, deadline: MOCK_DEADLINE, requestId })
       return {
-        id: requestId || origin, // NOTE: If reqeuestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
+        id: requestId || origin, // NOTE: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
         amount,
         counterparty,
         direction: DIRECTION.outgoing, // this indicates the hf spender
@@ -200,24 +211,13 @@ const HoloFuelDnaInterface = {
 
     // NOTE: Below we reflect our current change to the receive_payment API; the only param should now be the transaction's origin id
     accept: async (transactionId) => {
+      const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/receive_payments_pending')({ origin: transactionId })
       return {
+        ...transaction,
         id: transactionId,
-        amount: 0, // NOTE: This data needs to be pulled from the gql cache
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.complete,
-        type: TYPE.offer,
-        timestamp: currentDataTimeIso
-      }
-    },
-    // NOTE: Below we reflect our current change to the receive_payment API; the only param should now be the transaction's origin id
-    reject: async (transactionId) => {
-      await createZomeCall('transactions/reject')({ origin: transactionId })
-      return {
-        id: transactionId,
-        amount: 0, // NOTE: This data needs to be pulled from the gql cache
-        direction: DIRECTION.incoming, // this indicates the hf recipient
-        status: STATUS.rejected,
         type: TYPE.offer,
         timestamp: currentDataTimeIso
       }
