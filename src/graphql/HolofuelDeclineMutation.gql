@@ -1,0 +1,11 @@
+mutation HolofuelDeclineMutation ($transactionId: ID) {
+  holofuelDecline(transactionId: $transactionId) {
+    id
+    amount
+    counterparty
+    direction
+    status
+    type
+    timestamp
+  }
+}

@@ -10,7 +10,7 @@
   position: relative;
 }
 
- /* TODO: Handle focus properly */
+/* TODO: Handle focus properly */
 .container:focus {
   outline: none;
 }
@@ -39,4 +39,8 @@
   text-indent: 0;
   font-size: 18px;
   line-height: 1;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 0753-inbox

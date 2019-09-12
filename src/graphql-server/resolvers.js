@@ -73,7 +73,8 @@ export const resolvers = {
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
-    holofuelRejectOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.reject(transactionId)
+    holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId)
+
   }
 }
 
