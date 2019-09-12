@@ -72,14 +72,11 @@ const TransactionEntry = ({ content }) => {
 
 export function formatDateTime (isoDate) {
   const dateDifference = moment(isoDate).startOf('date').fromNow()
-  return <React.Fragment>
-    { dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1
-      ? <p>{ moment(isoDate).format('LLL')}</p>
-      : parseInt(moment(isoDate).startOf('hour').fromNow().split(' ')[0]) > 1
-        ? <p>{moment(isoDate).startOf('hour').fromNow()}</p>
-        : <p>{moment(isoDate).startOf('minute').fromNow()}</p>
-    }
-  </React.Fragment>
+  if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
+    return moment(isoDate).format('LLL')
+  } else if (parseInt(moment(isoDate).startOf('hour').fromNow().split(' ')[0]) > 1) {
+    return moment(isoDate).startOf('hour').fromNow()
+  } else return moment(isoDate).startOf('minute').fromNow()
 }
 
 export const makeDisplayName = (agentHash) => {

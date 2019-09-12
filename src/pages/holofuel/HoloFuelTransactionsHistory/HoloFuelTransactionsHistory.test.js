@@ -1,12 +1,12 @@
 import React from 'react'
-// import moment from 'moment'
+import moment from 'moment'
 import { render, within, act, cleanup } from '@testing-library/react' // fireEvent,
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
-import HoloFuelTransactionsHistory, { makeDisplayName } from './HoloFuelTransactionsHistory' // formatDateTime
+import HoloFuelTransactionsHistory, { makeDisplayName, formatDateTime } from './HoloFuelTransactionsHistory' // formatDateTime
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (
@@ -79,9 +79,9 @@ describe('HoloFuel Ledger Transactions', () => {
           rows.forEach((row, rowIndex) => {
             const { getByTestId } = within(row)
             const notesDisplay = hfInterfaceCompleteTxList[rowIndex].notes === null ? 'none' : hfInterfaceCompleteTxList[rowIndex].notes
-            // const datetimeDisplay = formatDateTime(hfInterfaceCompleteTxList[rowIndex].timestamp)
+            const datetimeDisplay = formatDateTime(hfInterfaceCompleteTxList[rowIndex].timestamp)
 
-            // expect(within(getByTestId('cell-date-time')).getByText(datetimeDisplay)).toBeInTheDocument()
+            expect(within(getByTestId('cell-date-time')).getByText(datetimeDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-counterparty')).getByText(makeDisplayName(hfInterfaceCompleteTxList[rowIndex].counterparty))).toBeInTheDocument()
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-amount')).getByText(hfInterfaceCompleteTxList[rowIndex].amount)).toBeInTheDocument()
@@ -104,36 +104,30 @@ describe('HoloFuel Ledger Transactions', () => {
     })
   })
 
-  // describe('HoloFuelTransactionsHistory helper functions (formatDateTime & makeDisplayName)', () => {
-  //   it('should format timedate', async () => {
-  //     const currentMinute = new Date().getMinutes()
-  //     // console.log('>>>>>> currentMinute <<<<<<', currentMinute)
-  //     const minAgo = new Date().setMinutes(currentMinute - 1)
-  //     const currentDate = new Date().getHours()
-  //     // console.log('>>>>>> currentDate <<<<<<', currentDate)
-  //     const hourAgo = new Date().setHours(currentDate - 1)
+  describe('HoloFuelTransactionsHistory helper functions (formatDateTime & makeDisplayName)', () => {
+    it('should format timedate', async () => {
+      const currentMinute = new Date().getMinutes()
+      const minAgo = new Date().setMinutes(currentMinute - 1)
+      const currentDate = new Date().getHours()
+      const hourAgo = new Date().setHours(currentDate - 1)
 
-  //     const previousMinuteDateTimeIso = new Date(minAgo).toISOString()
-  //     console.log('>>>>>> previousMinuteDateTimeIso <<<<<<', previousMinuteDateTimeIso)
-  //     const previousHourTimeIso = new Date(hourAgo).toISOString()
-  //     console.log('>>>>>> previousHourTimeIso <<<<<<', previousHourTimeIso)
+      const previousMinuteDateTimeIso = new Date(minAgo).toISOString()
+      const previousHourTimeIso = new Date(hourAgo).toISOString()
 
-  //     const MOCK_TIMEDATE = {
-  //       semanticSameHour: previousMinuteDateTimeIso,
-  //       semanticSameDay: previousHourTimeIso,
-  //       semanticFullDate: '2019-08-30T11:17:16+00:00'
-  //     }
+      const MOCK_TIMEDATE = {
+        semanticSameHour: previousMinuteDateTimeIso,
+        semanticSameDay: previousHourTimeIso,
+        semanticFullDate: '2019-08-30T11:17:16+00:00'
+      }
 
-  //     // const wrapText = (content) => <React.Fragment><p>{content}</p></React.Fragment>
+      const fullDateTime = formatDateTime(MOCK_TIMEDATE.semanticFullDate)
+      expect(fullDateTime).toBe('August 30, 2019 6:17 AM')
 
-  //     const fullDateTime = formatDateTime(MOCK_TIMEDATE.semanticFullDate)
-  //     expect(fullDateTime).toBe('August 30, 2019 6:17 AM')
+      const hourDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
+      expect(hourDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameDay).startOf('hour').fromNow())
 
-  //     const hourDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
-  //     expect(hourDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameHour).startOf('hour').fromNow())
-
-  //     const minuteDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
-  //     expect(minuteDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameHour).startOf('minute').fromNow())
-  //   })
-  // })
+      const minuteDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
+      expect(minuteDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameHour).startOf('minute').fromNow())
+    })
+  })
 })
