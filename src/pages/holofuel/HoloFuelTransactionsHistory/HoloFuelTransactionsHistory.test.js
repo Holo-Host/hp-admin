@@ -112,7 +112,10 @@ describe('HoloFuel Ledger Transactions', () => {
       const hourAgo = new Date().setHours(currentDate - 1)
 
       const previousMinuteDateTimeIso = new Date(minAgo).toISOString()
+      // console.log('previousMinuteDateTimeIso : ', previousMinuteDateTimeIso)
+
       const previousHourTimeIso = new Date(hourAgo).toISOString()
+      // console.log('previousHourTimeIso : ', previousHourTimeIso)
 
       const MOCK_TIMEDATE = {
         semanticSameHour: previousMinuteDateTimeIso,
@@ -120,8 +123,15 @@ describe('HoloFuel Ledger Transactions', () => {
         semanticFullDate: '2019-08-30T11:17:16+00:00'
       }
 
+      // const genDateFormat = isodate => {
+      //   const date = new Date(isodate)
+      //   const newDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + ' at ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+      //   return newDate
+      // }
+      // console.log('Date-time Check : ', genDateFormat(MOCK_TIMEDATE.semanticFullDate))
+
       const fullDateTime = formatDateTime(MOCK_TIMEDATE.semanticFullDate)
-      expect(fullDateTime).toBe('August 30, 2019 11:17 AM')
+      expect(fullDateTime).toBe('August 30, 2019 6:17 AM')
 
       const hourDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
       expect(hourDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameDay).startOf('hour').fromNow())
