@@ -3,6 +3,7 @@ import { useQuery, useMutation } from '@apollo/react-hooks'
 import './ManagePricing.module.css'
 import Header from 'components/Header'
 import Button from 'components/Button'
+import Input from 'components/Input'
 import { UNITS } from 'models/HostPricing'
 import HostPricingQuery from 'graphql/HostPricingQuery.gql'
 import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
@@ -52,7 +53,7 @@ export default function ManagePricing () {
     <Header title='Manage Pricing' backTo='/browse-happs' />
 
     <div styleName='inputs'>
-      <input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' data-testid='price-input' />
+      <Input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' data-testid='price-input' />
       <span styleName='connecting-label'>HoloFuel per</span>
       <select styleName='units-dropdown'
         value={units}

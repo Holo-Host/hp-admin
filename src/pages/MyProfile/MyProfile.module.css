@@ -20,19 +20,18 @@
 }
 
 .field-name {
-  margin-right: 3%;
+  box-sizing: border-box;
+  padding-right: 3%;
   font-size: 14px;
   font-weight: 600;
-  flex: 1 1 36%;
+  flex: 1 1 30%;
   text-align: right;
   height: 1.5em;
   align-self: center;
 }
 
 .field-input {
-  box-sizing: border-box;
-  flex: 1 1 60%;
-  padding: .4em .6em;
+  flex: 1 1 70%;
 }
 
 .field-error {

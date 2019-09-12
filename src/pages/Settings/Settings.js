@@ -3,6 +3,7 @@ import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import Header from 'components/Header'
 import Button from 'components/Button'
+import Input from 'components/Input'
 
 import './Settings.module.css'
 
@@ -129,7 +130,7 @@ export function SettingsFormInput ({
 }) {
   return <>
     {label && <label styleName='settingsLabel' data-for={name}>{label}</label>}
-    <input styleName='settingsInput' name={name} id={name} type={type} ref={register} {...inputProps} />
+    <Input name={name} id={name} type={type} ref={register} {...inputProps} />
   </>
 }
 

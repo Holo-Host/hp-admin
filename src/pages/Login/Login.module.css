@@ -5,10 +5,8 @@
   padding-top: 25px;
 }
 
-.form-input {
-  margin: 5px;
-  border: 1px solid var(--color-gray);
-  font-size: 24px;
+.login-label {
+  margin: 15px 0 6px;
 }
 
 .login-button {

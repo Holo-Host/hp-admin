@@ -3,6 +3,7 @@ import useForm from 'react-hook-form'
 
 import Header from 'components/Header'
 import Button from 'components/Button'
+import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
 import './MyProfile.module.css'
 
@@ -26,7 +27,7 @@ const MyProfile = ({
       <HashAvatar avatarUrl={avatarUrl} email={email} styleName='avatar-image' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
-        <input
+        <Input
           name='avatar'
           placeholder='eg. https://example.com/avatar.jpg'
           ref={register}
@@ -39,7 +40,7 @@ const MyProfile = ({
 
       <label styleName='field'>
         <span styleName='field-name'>Name</span>
-        <input
+        <Input
           name='name'
           placeholder='eg. Alice Cooper'
           ref={register({ required: true })}
@@ -52,7 +53,7 @@ const MyProfile = ({
 
       <label styleName='field'>
         <span styleName='field-name'>Email</span>
-        <input
+        <Input
           name='email'
           placeholder='eg. alice@example.com'
           ref={register({ required: true, pattern: EMAIL_REGEXP })}
@@ -65,7 +66,7 @@ const MyProfile = ({
 
       <label styleName='field'>
         <span styleName='field-name'>Password</span>
-        <input
+        <Input
           name='password'
           type='password'
           placeholder='type to reset password'
