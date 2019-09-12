@@ -6,9 +6,6 @@ import Button from 'components/Button'
 
 import './Settings.module.css'
 
-export const PORT_NUMBER_REGEX = /^\d{4,6}$/
-export const EMAIL_REGEX = /^\S+@\S+$/i
-
 const SettingsValidationSchema = yup.object().shape({
   hostName: yup.string().required(),
   hostPubKey: yup.string().required(),
