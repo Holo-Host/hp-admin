@@ -12,5 +12,6 @@ export default function Dashboard () {
     </div>
 
     <Link to='/inbox'>Inbox</Link>
+    <Link to='/offer'>Create Offer</Link>
   </React.Fragment>
 }
