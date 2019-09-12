@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import useForm from 'react-hook-form'
 
 import Header from 'components/Header'
 import Button from 'components/Button'
 import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
+import TosModal from 'components/TosModal'
 import './MyProfile.module.css'
 
 // eslint-disable-next-line no-useless-escape
@@ -13,12 +14,17 @@ const EMAIL_REGEXP = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+
 const MyProfile = ({
   history: { push }
 }) => {
+  const [isTosOpen, setTosOpen] = useState(false)
   const { register, handleSubmit, errors, watch } = useForm()
   const onSubmit = data => {
     push('/dashboard')
   }
   const avatarUrl = watch('avatar')
   const email = watch('email')
+  const showTos = e => {
+    e.preventDefault()
+    setTosOpen(true)
+  }
 
   return <>
     <Header title='Edit Profile' avatarUrl={avatarUrl} email={email} />
@@ -74,6 +80,12 @@ const MyProfile = ({
           styleName='field-input'
         />
       </label>
+
+      <Button variant='link' onClick={showTos}>
+        View Terms of Service
+      </Button>
+
+      <TosModal isOpen={isTosOpen} handleClose={() => setTosOpen(false)} />
 
       <Button
         variant='primary'

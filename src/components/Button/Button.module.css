@@ -30,6 +30,14 @@
   background-color: #aaa;
 }
 
+.link {
+  display: inline-block;
+  border: none;
+  background: none;
+  text-decoration: underline;
+  font-size: 1em;
+}
+
 .danger {
   color: #721c24;
   background-color: #f8d7da;
