@@ -15,15 +15,15 @@ export function Header ({ title, avatarUrl, email, backTo, history: { push } }) 
 
   return <div>
     <div styleName='header'>
-      <div styleName='left-nav'>{leftNav}</div>
-      <div styleName='title'>My HoloPort</div>
+      <div styleName='left-nav'>
+        {leftNav}
+        <span styleName='title header-font'>{title}</span>
+      </div>
+      <div styleName='right-nav account-number header-font'>AC1903F8EAAC1903F8EA</div>
       <Link to='/dashboard' styleName='avatar-link'>
         <HashAvatar avatarUrl={avatarUrl} email={email} size={32} />
       </Link>
     </div>
-    {title && <div styleName='sub-header'>
-      <div styleName='sub-title'>{title}</div>
-    </div>}
   </div>
 }
 

@@ -9,7 +9,9 @@
 }
 
 .completed-transactions-table {
-  height: auto
+  height: auto;
+  font-family: Roboto;
+  font-size: 13px;
 }
 
 table {

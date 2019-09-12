@@ -1,13 +1,13 @@
 import React from 'react'
+// import moment from 'moment'
 import { render, within, act, cleanup } from '@testing-library/react' // fireEvent,
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
+import HoloFuelTransactionsHistory, { makeDisplayName, formatDateTime } from './HoloFuelTransactionsHistory'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
-import { transactionList } from 'mock-dnas/holofuel' // pendingList,
-import HoloFuelTransactionsHistory, { makeDisplayName } from './HoloFuelTransactionsHistory' // formatDateTime
 
 function renderWithRouter (
   ui,
@@ -34,25 +34,7 @@ describe('HoloFuel Ledger Transactions', () => {
       })
 
       expect(getByText('HoloFuel')).toBeVisible()
-      expect(getByText('Completed Transactions')).toBeVisible()
-    })
-
-    it('should render the account balance', async () => {
-      let getAllByRole
-      await act(async () => {
-        ({ getAllByRole } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <HoloFuelTransactionsHistory history={{}} />
-        </ApolloProvider>))
-        await wait(0)
-      })
-
-      const listSections = getAllByRole('region')
-      expect(listSections).toHaveLength(2)
-
-      const { getByTestId } = within(listSections[0])
-      const balanceElement = getByTestId('account-balance')
-
-      expect(within(balanceElement).getByText(transactionList.ledger.balance)).toBeVisible()
+      expect(getByText('History')).toBeVisible()
     })
 
     it('should render and populate completed transaction table', async () => {
@@ -71,7 +53,7 @@ describe('HoloFuel Ledger Transactions', () => {
       const listTableGroups = getAllByRole('rowgroup')
       expect(listTableGroups).toHaveLength(2)
 
-      const NUM_TABLE_HEADERS = 6
+      const NUM_TABLE_HEADERS = 5
       const listTableHeaders = getAllByRole('columnheader')
       // number of cols check
       expect(listTableHeaders).toHaveLength(NUM_TABLE_HEADERS)
@@ -85,12 +67,8 @@ describe('HoloFuel Ledger Transactions', () => {
         if (index === 0) {
           // thead :
           // header label content check
-          expect(getByText('Date')).toBeVisible()
-          expect(getByText('From/To')).toBeVisible()
-          expect(getByText('Notes')).toBeVisible()
-          expect(getByText('Amount (+/-)')).toBeVisible()
+          expect(getByText('Amount')).toBeVisible()
           expect(getByText('Fees')).toBeVisible()
-          expect(getByText('Balance')).toBeVisible()
         } else if (index === 1) {
           // tbody :
           const rows = getAllByTestId('transactions-table-row')
@@ -117,4 +95,46 @@ describe('HoloFuel Ledger Transactions', () => {
       })
     })
   })
+
+  describe('helper function : makeDisplayName', () => {
+    it('should take in a full hashString and return only the last 7 chars', async () => {
+      const { id } = await HoloFuelDnaInterface.user.get({})
+      const displayName = makeDisplayName(id)
+      expect(displayName.length).toEqual(7)
+      expect(displayName.toLowerCase()).toBe(displayName.substring(displayName.length - 7).toLowerCase())
+    })
+  })
+
+  // describe('HoloFuelTransactionsHistory helper functions (formatDateTime & makeDisplayName)', () => {
+  //   it('should format timedate', async () => {
+  //     const currentMinute = new Date().getMinutes()
+  //     // console.log('>>>>>> currentMinute <<<<<<', currentMinute)
+  //     const minAgo = new Date().setMinutes(currentMinute - 1)
+  //     const currentDate = new Date().getHours()
+  //     // console.log('>>>>>> currentDate <<<<<<', currentDate)
+  //     const hourAgo = new Date().setHours(currentDate - 1)
+
+  //     const previousMinuteDateTimeIso = new Date(minAgo).toISOString()
+  //     console.log('>>>>>> previousMinuteDateTimeIso <<<<<<', previousMinuteDateTimeIso)
+  //     const previousHourTimeIso = new Date(hourAgo).toISOString()
+  //     console.log('>>>>>> previousHourTimeIso <<<<<<', previousHourTimeIso)
+
+  //     const MOCK_TIMEDATE = {
+  //       semanticSameHour: previousMinuteDateTimeIso,
+  //       semanticSameDay: previousHourTimeIso,
+  //       semanticFullDate: '2019-08-30T11:17:16+00:00'
+  //     }
+
+  //     // const wrapText = (content) => <React.Fragment><p>{content}</p></React.Fragment>
+
+  //     const fullDateTime = formatDateTime(MOCK_TIMEDATE.semanticFullDate)
+  //     expect(fullDateTime).toBe('August 30, 2019 6:17 AM')
+
+  //     const hourDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
+  //     expect(hourDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameHour).startOf('hour').fromNow())
+
+  //     const minuteDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
+  //     expect(minuteDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameHour).startOf('minute').fromNow())
+  //   })
+  // })
 })
