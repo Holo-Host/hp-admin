@@ -6,11 +6,12 @@
 .completed-transactions-title {
   text-align: center;
   padding: 20px 0px;
+  font-family: 'Roboto', sans-serif;
 }
 
 .completed-transactions-table {
   height: auto;
-  font-family: Roboto;
+  font-family: 'Roboto', sans-serif;
   font-size: 13px;
 }
 
@@ -50,4 +51,8 @@ th, td {
 
 .green-text {
   color: green;
+}
+
+.notes {
+  font-style: italic
 }

@@ -1,5 +1,6 @@
 .left-nav {
   flex: 1;
+  display: flex;
 }
 
 .right-nav {

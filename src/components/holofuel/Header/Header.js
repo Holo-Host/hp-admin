@@ -6,7 +6,7 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
-export function Header ({ title, avatarUrl, email, backTo, history: { push } }) {
+export function Header ({ title, accountNumber, avatarUrl, email, backTo, history: { push } }) {
   const goToMenu = () => push('/dashboard')
 
   const leftNav = <Button onClick={goToMenu} styleName='menu-button' dataTestId='menu-button'>
@@ -19,7 +19,7 @@ export function Header ({ title, avatarUrl, email, backTo, history: { push } }) 
         {leftNav}
         <span styleName='title header-font'>{title}</span>
       </div>
-      <div styleName='right-nav account-number header-font'>AC1903F8EAAC1903F8EA</div>
+      <div styleName='right-nav account-number header-font'>{accountNumber}</div>
       <Link to='/dashboard' styleName='avatar-link'>
         <HashAvatar avatarUrl={avatarUrl} email={email} size={32} />
       </Link>

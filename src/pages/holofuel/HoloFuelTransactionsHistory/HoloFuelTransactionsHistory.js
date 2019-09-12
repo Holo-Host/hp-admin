@@ -21,7 +21,7 @@ export default function HoloFuelTransactionsHistory ({ history: { push } }) {
   ]
 
   return <React.Fragment>
-    <Header title='HoloFuel' /> {/* NOTE: We will need to pass account number int header too. */}
+    <Header title='HoloFuel' accountNumber='AC1903F8EAAC1903F8EA' /> {/* NOTE: We will need to pass account number int header too. */}
 
     <section styleName='account-ledger-table'>
       <h2 styleName='completed-transactions-title'>History</h2>
@@ -54,13 +54,13 @@ export function LedgerTransactionsTable ({ transaction }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
   return <tr key={id} styleName='table-content-row' data-testid='transactions-table-row'>
     <td id='date-time' styleName='completed-tx-col table-content' data-testid='cell-date-time'>{timestamp && formatDateTime(timestamp)}</td>
-    <td id='counterparty' styleName='completed-tx-col table-content'>
-      <h4 data-testid='cell-counterparty'>{counterparty && makeDisplayName(counterparty)}</h4>
-      <p data-testid='cell-notes'>{notes || 'none'}</p>
+    <td styleName='completed-tx-col table-content'>
+      <h4 id='counterparty' data-testid='cell-counterparty'>{counterparty && makeDisplayName(counterparty)}</h4>
+      <p id='notes' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td id='fees' styleName='completed-tx-col table-content red-text' data-testid='cell-fees'>{fees}</td>
     <td id='amount' styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} data-testid='cell-amount'>{amount}</td>
-    <td id='present-balance' styleName='completed-tx-col table-content' data-testid='cell-present-balance'>{presentBalance}</td>
+    <td id='present-balance' styleName='completed-tx-col table-content notes' data-testid='cell-present-balance'>{presentBalance}</td>
   </tr>
 }
 

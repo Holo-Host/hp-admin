@@ -6,7 +6,7 @@ import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
-import HoloFuelTransactionsHistory, { makeDisplayName, formatDateTime } from './HoloFuelTransactionsHistory' // formatDateTime
+import HoloFuelTransactionsHistory, { makeDisplayName, formatDateTime } from './HoloFuelTransactionsHistory'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (
@@ -121,7 +121,7 @@ describe('HoloFuel Ledger Transactions', () => {
       }
 
       const fullDateTime = formatDateTime(MOCK_TIMEDATE.semanticFullDate)
-      expect(fullDateTime).toBe('August 30, 2019 6:17 AM')
+      expect(fullDateTime).toBe('August 30, 2019 11:17 AM')
 
       const hourDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
       expect(hourDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameDay).startOf('hour').fromNow())
