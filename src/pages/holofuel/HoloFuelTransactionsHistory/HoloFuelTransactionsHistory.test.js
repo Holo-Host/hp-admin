@@ -6,7 +6,7 @@ import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
-import HoloFuelTransactionsHistory, { makeDisplayName, formatDateTime } from './HoloFuelTransactionsHistory'
+import HoloFuelTransactionsHistory, { makeDisplayName } from './HoloFuelTransactionsHistory' // formatDateTime
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (
@@ -78,14 +78,13 @@ describe('HoloFuel Ledger Transactions', () => {
           // cell content check
           rows.forEach((row, rowIndex) => {
             const { getByTestId } = within(row)
-            const directionDisplay = hfInterfaceCompleteTxList[rowIndex].direction === 'incoming' ? '+' : '-'
             const notesDisplay = hfInterfaceCompleteTxList[rowIndex].notes === null ? 'none' : hfInterfaceCompleteTxList[rowIndex].notes
             // const datetimeDisplay = formatDateTime(hfInterfaceCompleteTxList[rowIndex].timestamp)
 
             // expect(within(getByTestId('cell-date-time')).getByText(datetimeDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-counterparty')).getByText(makeDisplayName(hfInterfaceCompleteTxList[rowIndex].counterparty))).toBeInTheDocument()
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-amount')).getByText(directionDisplay + (hfInterfaceCompleteTxList[rowIndex].amount))).toBeInTheDocument()
+            expect(within(getByTestId('cell-amount')).getByText(hfInterfaceCompleteTxList[rowIndex].amount)).toBeInTheDocument()
             expect(within(getByTestId('cell-fees')).getByText(hfInterfaceCompleteTxList[rowIndex].fees)).toBeInTheDocument()
             expect(within(getByTestId('cell-present-balance')).getByText(hfInterfaceCompleteTxList[rowIndex].presentBalance)).toBeInTheDocument()
           })
