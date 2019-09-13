@@ -1,145 +1,65 @@
 .help-text {
-  
-}
-
-.offer-form {
-  
-}
-
-.form-row {
-
-}
-
-.form-input {
-
-}
-
-/* Inbox styles. To be removed */
-
-.transaction-list {
-  margin: 0px -20px;
-}
-
-.transaction-row {
-  display: flex;
-  border-bottom: 1px solid black;
-  font-size: 14px;
-  padding: 10px 10px 15px 10px;
-}
-
-.date-time {
-  width: 50px;
-  margin-right: 10px;
-  font-size: 12px;
-}
-
-.date {
-  margin-bottom: 5px;
-}
-
-.time {
-  
-}
-
-.description-cell {
-  display: flex;
-  flex-direction: column;
-}
-
-.story {
-  margin-bottom: 3px;
-}
-
-.counterparty {
-  font-weight: bold;
-}
-
-.notes {
-  font-style: italic;
+  margin-top: 20px;
+  font-size: 13px;
   color: var(--color-gray);
 }
 
-.amount {
-  margin-left: auto;
-  margin-right: 10px;
-}
-
-.debit {
-  color: red;
-}
-
-.actions {
+.offer-form {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  margin-top: 20px;
+  flex-grow: 1;
 }
 
-.button {
-  font-weight: normal;
-  border: 1px solid black;
-  padding: 5px;
-  width: 75px;
-  margin-bottom: 10px;
+.form-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  margin-bottom: 20px;
+  height: 32px;
 }
 
-.accept-button {
-  composes: button;
-  background-color: lightgreen;
+.form-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-tundora);
+  width: 60px;
+  text-align: right;
 }
 
-.pay-button {
-  composes: button;
-  color: white;
-  background-color: lightcoral;
+.form-input {
+  border: 1px solid var(--color-gray);
+  height: 25px;
+  margin: 0px 10px;
+  padding: 0px 5px;
+  font-size: 16px;
+  color: var(--color-dove-gray);
 }
 
-.reject-button {
+.number-input {
+  composes: form-input;
+  text-align: right;
+}
+
+.fee-input {
+  composes: number-input;
   border: none;
-  text-decoration: underline;
-  color: #0000EE;
-  background-color: var(--color-alabaster);
-  font-weight: normal;
+  background-color: var(--color-alto);
 }
 
-.modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.hash-icon-wrapper {
+  width: 60px;
+  margin-top: 4px;
 }
 
-.modal-title {
-  margin-bottom: 10px;
+.hf {
+  composes: form-label;
+  text-align: left;
 }
 
-.modal-text {
-  font-size: 14px;
-  margin-bottom: 30px;
-}
-
-.modal-counterparty {
-  font-weight: bold;
-}
-
-.modal-amount {
-  font-weight: bold;
-}
-
-.modal-buttons {
+.send-button {
   margin-top: auto;
-  margin-left: auto;
-}
-
-.modal-button {
-  border: none;
-  text-decoration: underline;
-  color: #0000EE;
-  font-weight: normal;
-}
-
-.modal-button-no {
-  composes: modal-button;
-}
-
-.modal-button-yes {
-  composes: modal-button;
-  font-weight: bold;
+  height: 54px;
+  font-size: 24px;
 }
