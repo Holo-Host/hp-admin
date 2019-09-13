@@ -6,7 +6,7 @@ import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
-import HoloFuelTransactionsHistory, { makeDisplayName, formatDateTime } from './HoloFuelTransactionsHistory'
+import HoloFuelTransactionsHistory, { makeDisplayName, formatDateTime } from './TransactionHistory'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (

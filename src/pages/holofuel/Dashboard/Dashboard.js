@@ -12,5 +12,7 @@ export default function Dashboard () {
     </div>
 
     <Link to='/inbox'>Inbox</Link>
+    <Link to='/history'>History</Link>
+
   </React.Fragment>
 }

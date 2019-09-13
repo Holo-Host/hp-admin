@@ -161,12 +161,44 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
+    // decline pending proposed transaction (NB: proposed by another agent).
     decline: async transactionId => {
+      const result = await createZomeCall('transactions/list_pending')({ origin: transactionId })
+      let data
+      if (result.requests) { data = presentPendingRequest(result.requests); return data }
+      if (result.promises) { data = presentPendingOffer(result.promises); return data }
+      const { counterparty, amount, direction, type } = data
+      console.log('DECLINE >>>> counterparty, amount, direction, type :', counterparty, amount, direction, type)
+
       await createZomeCall('transactions/decline')({ origin: transactionId })
       return {
         id: transactionId,
+        amount,
+        counterparty,
         status: STATUS.rejected,
-        direction: DIRECTION.incoming
+        direction, // NOTE: incoming indicates the hf recipient, outgoing indicates the hf spender
+        type: type,
+        timestamp: currentDataTimeIso
+      }
+    },
+    // cancel pending authored transaction.
+    cancel: async transactionId => {
+      const result = await createZomeCall('transactions/list_pending')({ origin: transactionId })
+      let data
+      if (result.requests) { data = presentPendingRequest(result.requests); return data }
+      if (result.promises) { data = presentPendingOffer(result.promises); return data }
+      const { counterparty, amount, direction, type } = data
+      console.log('CANCEL >>>> counterparty, amount, direction, type :', counterparty, amount, direction, type)
+
+      await createZomeCall('transactions/cancel')({ origin: transactionId })
+      return {
+        id: transactionId,
+        amount,
+        counterparty,
+        status: STATUS.cancelled,
+        direction, // NOTE: incoming indicates the hf recipient, outgoing indicates the hf spender
+        type: type,
+        timestamp: currentDataTimeIso
       }
     }
   },
@@ -198,7 +230,6 @@ const HoloFuelDnaInterface = {
       }
     },
 
-    // NOTE: Below we reflect our current change to the receive_payment API; the only param should now be the transaction's origin id
     accept: async (transactionId) => {
       await createZomeCall('transactions/receive_payments_pending')({ origin: transactionId })
       return {
@@ -209,19 +240,19 @@ const HoloFuelDnaInterface = {
         type: TYPE.offer,
         timestamp: currentDataTimeIso
       }
-    },
-    // NOTE: Below we reflect our current change to the receive_payment API; the only param should now be the transaction's origin id
-    reject: async (transactionId) => {
-      await createZomeCall('transactions/reject')({ origin: transactionId })
-      return {
-        id: transactionId,
-        amount: 0, // NOTE: This data needs to be pulled from the gql cache
-        direction: DIRECTION.incoming, // this indicates the hf recipient
-        status: STATUS.rejected,
-        type: TYPE.offer,
-        timestamp: currentDataTimeIso
-      }
-    }
+    } // ,
+    // NOTE: Below will SOON BE DEPRECATED ...
+    // reject: async (transactionId) => {
+    //   await createZomeCall('transactions/reject')({ origin: transactionId })
+    //   return {
+    //     id: transactionId,
+    //     amount: 0, // NOTE: This data needs to be pulled from the gql cache
+    //     direction: DIRECTION.incoming, // this indicates the hf recipient
+    //     status: STATUS.rejected,
+    //     type: TYPE.offer,
+    //     timestamp: currentDataTimeIso
+    //   }
+    // }
   }
 }
 

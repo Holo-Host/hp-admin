@@ -1,0 +1,126 @@
+/* Headers/Title */
+.account-ledger-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.completed-transactions-title {
+  text-align: center;
+  padding: 20px 0px;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Table */
+.completed-transactions-table {
+  height: auto;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+}
+
+table {
+  border-spacing: 0px;
+}
+
+th, td {
+  border-right: none;
+}
+
+.completed-tx-col {
+  min-width: 50px;
+}
+
+.table-header-row {
+  background: #939393;
+}
+
+.table-headers {
+  text-align: center;
+  padding: 5px 20px;
+}
+
+.table-content-row:nth-of-type(odd) {
+  background: #d8d6d6;
+}
+
+.table-content {
+  text-align: center;
+  position: relative;
+}
+
+.red-text {
+  color: red;
+}
+
+.green-text {
+  color: green;
+}
+
+.italic {
+  font-style: italic
+}
+
+/* Button */
+.button {
+  font-weight: normal;
+  border: 1px solid black;
+  padding: 5px;
+  width: 75px;
+  margin-bottom: 10px;
+}
+
+.cancel-button {
+  border: none;
+  text-decoration: underline;
+  color: #0000EE;
+  background-color: var(--color-alabaster);
+  font-weight: normal;
+}
+
+/* Modal */
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-title {
+  margin-bottom: 10px;
+}
+
+.modal-text {
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.modal-counterparty {
+  font-weight: bold;
+}
+
+.modal-amount {
+  font-weight: bold;
+}
+
+.modal-buttons {
+  margin-top: auto;
+  margin-left: auto;
+}
+
+.modal-button, .modal-button-no, .modal-button-yes {
+  border: none;
+  text-decoration: underline;
+  color: #0000EE;
+  font-weight: normal;
+}
+
+.modal-button-yes {
+  font-weight: bold;
+}
+
+/* .modal-button-no {
+  composes: modal-button;
+}
+
+.modal-button-yes {
+  composes: modal-button;
+  font-weight: bold;
+} */

@@ -167,5 +167,14 @@ describe('resolvers', () => {
         expect(mockHoloFuelInterface.transactions.decline).toHaveBeenCalledWith(transactionId)
       })
     })
+
+    describe('.holofuelCancel', () => {
+      it('calls cancel request and constructs the result transaction', async () => {
+        const transactionId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
+        resolvers.Mutation.holofuelCancel(null, { transactionId })
+        await wait(0)
+        expect(mockHoloFuelInterface.transactions.cancel).toHaveBeenCalledWith(transactionId)
+      })
+    })
   })
 })

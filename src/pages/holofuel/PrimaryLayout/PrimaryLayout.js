@@ -3,7 +3,7 @@ import { Route } from 'react-router-dom'
 import cx from 'classnames'
 import Dashboard from 'pages/holofuel/Dashboard'
 import MainMenu from 'pages/holofuel/MainMenu'
-import TransactionHistory from 'pages/holofuel/HoloFuelTransactionsHistory'
+import TransactionHistory from 'pages/holofuel/TransactionHistory'
 import Inbox from 'pages/holofuel/Inbox'
 import ScreenWidthContext from 'contexts/screenWidth'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars

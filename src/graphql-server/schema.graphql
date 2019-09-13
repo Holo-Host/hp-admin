@@ -97,6 +97,6 @@ type Mutation {
   holofuelRequest(counterparty:String, amount:Float): Transaction
   holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction # NOTE: holofuelAcceptOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
-  holofuelRejectOffer(transactionId: ID): Transaction # NOTE: holofuelRejectOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
-  holofuelDecline(transactionId: ID): Transaction
+  holofuelDecline(transactionId: ID): Transaction # ""
+  holofuelCancel(transactionId: ID): Transaction # ""
 }
