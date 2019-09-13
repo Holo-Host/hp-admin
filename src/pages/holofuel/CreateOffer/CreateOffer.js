@@ -10,8 +10,8 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
 import Header from 'components/holofuel/Header'
+import HashIcon from 'components/holofuel/HashIcon'
 import Button from 'components/holofuel/Button'
-import Modal from 'components/holofuel/Modal'
 import './CreateOffer.module.css'
 import cx from 'classnames'
 
@@ -41,22 +41,24 @@ const FormValidationSchema = yup.object().shape({
   //   .required()
 })
 
-function useOffer (amount, counterparty) {
+function useOfferMutation () {
   const [offer] = useMutation(HolofuelOfferMutation)
-  return () => offer({
+  return (amount, counterparty) => offer({
     variables: { amount, counterparty }
   })
 }
 
 export default function CreateOffer ({ history: { push } }) {
-  const [amount, setAmount] = useState()
-  const [counterparty, setcounterparty] = useState()
-  const offer = useOffer(amount, counterparty)
+  const [counterparty, setCounterparty] = useState('')
+  const createOffer = useOfferMutation()
 
-  const { register, handleSubmit, errors } = useForm()
-  const onSubmit = () => push('/')
+  const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
+  const onSubmit = ({ amount, counterparty }) => {
+    createOffer(amount, counterparty)
+    push('/')
+  }
 
-  console.log('CreateOffer form errors (leave here until proper error handling is implemented):', errors)
+  !isEmpty(errors) && console.log('Offer form errors (leave here until proper error handling is implemented):', errors)
 
   return <>
     <Header title='Offer' />
@@ -70,8 +72,12 @@ export default function CreateOffer ({ history: { push } }) {
           name='counterparty'
           placeholder='To'
           styleName='form-input'
-          ref={register} />
+          value={counterparty}
+          ref={register}
+          onChange={({ target: { value } }) => setCounterparty(value)} />
+        <HashIcon hash={counterparty} />
       </div>
+      <Button type='submit' wide variant='secondary'>Send</Button>
     </form>
   </>
 }
@@ -79,7 +85,7 @@ export default function CreateOffer ({ history: { push } }) {
 //
 //
 //
-
+/*
 const lastSix = counterparty => (counterparty || '').slice(-6)
 
 function useDecline () {
@@ -238,3 +244,4 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
     </div>
   </Modal>
 }
+*/
