@@ -66,6 +66,7 @@ describe('CreateOffer', () => {
     })
 
     expect(offerMock.newData).toHaveBeenCalled()
+    expect(push).toHaveBeenCalledWith('/')
   })
 
   it.skip('responds appropriately to bad input', () => {
