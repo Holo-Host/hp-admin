@@ -60,6 +60,7 @@ export default function CreateOffer ({ history: { push } }) {
         <label htmlFor='counterparty' styleName='form-label'>To</label>
         <input
           name='counterparty'
+          id='counterparty'
           styleName='form-input'
           ref={register}
           onChange={({ target: { value } }) => setCounterparty(value)} />
@@ -71,6 +72,7 @@ export default function CreateOffer ({ history: { push } }) {
         <label htmlFor='amount' styleName='form-label'>Amount</label>
         <input
           name='amount'
+          id='amount'
           type='number'
           styleName='number-input'
           ref={register}
@@ -81,6 +83,7 @@ export default function CreateOffer ({ history: { push } }) {
         <label htmlFor='fee' styleName='form-label'>Fee</label>
         <input
           name='fee'
+          id='fee'
           value={fee}
           readOnly
           styleName='fee-input' />

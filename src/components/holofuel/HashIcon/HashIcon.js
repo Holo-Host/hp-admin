@@ -16,7 +16,7 @@ export default function HashIcon ({
     setCopied(true)
   }
 
-  return <div data-tip={hash} onClick={copyHash}>
+  return <div data-tip={hash} onClick={copyHash} data-testid='hash-icon'>
     <Identicon
       seed={hash}
       size={size}
