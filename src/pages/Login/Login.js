@@ -9,8 +9,6 @@ export default function Login ({ history: { push } }) {
   const { register, handleSubmit, errors } = useForm()
   const onSubmit = () => push('/')
 
-  console.log('Login form errors (leave here until proper error handling is implemented):', errors)
-
   return <>
     <Header title='HoloPort' />
 
@@ -21,14 +19,23 @@ export default function Login ({ history: { push } }) {
         type='email'
         name='email'
         placeholder='Email address'
-        ref={register} />
+        ref={register({ required: true })} />
+      {errors.email && <small styleName='field-error'>
+        You need to provide a valid email address.
+      </small>}
+
       <label styleName='login-label' htmlFor='email'>Password</label>
       <Input
         variant='big'
         type='password'
         name='password'
         placeholder='Password'
-        ref={register} />
+        ref={register({ required: true, minLength: 6 })} />
+      {errors.password && <small styleName='field-error'>
+        {errors.password.type === 'required' && 'Type in your password, please.'}
+        {errors.password.type === 'minLength' && 'Password need to be at least 6 characters long.'}
+      </small>}
+
       <Button type='submit' variant='primary' wide styleName='login-button'>Login</Button>
     </form>
   </>

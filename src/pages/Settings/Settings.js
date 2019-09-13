@@ -10,6 +10,11 @@ import './Settings.module.css'
 export const PORT_NUMBER_REGEX = /^\d{4,6}$/
 export const EMAIL_REGEX = /^\S+@\S+$/i
 
+const portValidationRules = yup.number()
+  .typeError('Port must be specified.') // TypeError because empty value gets cast into NaN
+  .min(1000, 'Ports must be between 1000 and 65000.')
+  .max(65000, 'Ports must be between 1000 and 65000.')
+  .required()
 const SettingsValidationSchema = yup.object().shape({
   hostName: yup.string().required(),
   hostPubKey: yup.string().required(),
@@ -18,22 +23,10 @@ const SettingsValidationSchema = yup.object().shape({
     .required(),
   deviceName: yup.string().required(),
   networkId: yup.string().required(),
-  deviceAdminPort: yup.number()
-    .min(1000)
-    .max(65000)
-    .required(),
-  hcAdminPort: yup.number()
-    .min(1000)
-    .max(65000)
-    .required(),
-  hcNetworkPort: yup.number()
-    .min(1000)
-    .max(65000)
-    .required(),
-  hostingPort: yup.number()
-    .min(1000)
-    .max(65000)
-    .required()
+  deviceAdminPort: portValidationRules,
+  hcAdminPort: portValidationRules,
+  hcNetworkPort: portValidationRules,
+  hostingPort: portValidationRules
 })
 
 export function Settings ({
@@ -48,7 +41,6 @@ export function Settings ({
   })
 
   const [sshAccessVal, setSshAccess] = useState(false)
-
   const handleToggleSshAccess = (e) => {
     e.preventDefault()
     setSshAccess(e.target.checked)
@@ -58,8 +50,6 @@ export function Settings ({
   const onSubmit = settings => {
     updateSettings(settings)
   }
-
-  console.log('Settings form errors (leave here until proper error handling is implemented):', errors)
 
   return <>
     <Header title='HoloPort Settings' />
@@ -85,26 +75,29 @@ export function Settings ({
       <SettingsFormInput
         label='Device Admin'
         name='deviceAdminPort'
-        register={register} />
+        register={register}
+        errors={errors} />
 
       <SettingsFormInput
         label='HC Admin'
         name='hcAdminPort'
-        register={register} />
+        register={register}
+        errors={errors} />
 
       <SettingsFormInput
         label='HC Network'
         name='hcNetworkPort'
-        register={register} />
+        register={register}
+        errors={errors} />
 
       <SettingsFormInput
         label='Hosting'
         name='hostingPort'
-        register={register} />
+        register={register}
+        errors={errors} />
 
+      <Button variant='primary' wide name='update-settings' value='Submit'>Save Changes</Button>
     </form>
-
-    <Button type='submit' variant='primary' wide name='update-settings' value='Submit'>Save Changes</Button>
 
     <hr />
 
@@ -124,13 +117,15 @@ export function Settings ({
 export function SettingsFormInput ({
   name,
   label,
-  type = 'text',
+  type = 'number',
   register,
+  errors = {},
   ...inputProps
 }) {
   return <>
-    {label && <label styleName='settingsLabel' data-for={name}>{label}</label>}
+    {label && <label styleName='settingsLabel' htmlFor={name}>{label}</label>}
     <Input name={name} id={name} type={type} ref={register} {...inputProps} />
+    {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
   </>
 }
 
