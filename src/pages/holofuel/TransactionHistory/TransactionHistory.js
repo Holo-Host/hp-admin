@@ -128,19 +128,17 @@ export function formatDateTime (isoDate) {
   console.log('daysDifferent : ', daysDifferent)
   if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7) {
     return moment(isoDate).format('LLL')
-  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
-    return isoDate.fromNow()
   } else if (dateDifference.split(' ')[1] === 'hours' && parseInt(moment(isoDate).startOf('hour').fromNow().split(' ')[0]) > 1) {
     return moment(isoDate).startOf('hour').fromNow()
   } else return moment(isoDate).startOf('minute').fromNow()
 }
 
 function CancelButton ({ showCancellationModal, transaction }) {
-  return <link
+  return <Button
     onClick={() => showCancellationModal(transaction)}
     styleName='cancel-button'>
     Cancel
-  </link>
+  </Button>
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
