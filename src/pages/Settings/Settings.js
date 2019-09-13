@@ -124,7 +124,7 @@ export function SettingsFormInput ({
 }) {
   return <>
     {label && <label styleName='settingsLabel' htmlFor={name}>{label}</label>}
-    <Input name={name} id={name} type={type} ref={register} {...inputProps} />
+    <Input name={name} id={name} type={type} placeholder={label} ref={register} {...inputProps} />
     {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
   </>
 }
