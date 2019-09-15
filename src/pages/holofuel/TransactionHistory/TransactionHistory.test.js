@@ -6,7 +6,7 @@ import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
-import HoloFuelTransactionsHistory, { makeDisplayName, formatDateTime } from './TransactionHistory'
+import TransactionsHistory, { makeDisplayName, formatDateTime } from './TransactionHistory'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (
@@ -28,7 +28,7 @@ describe('HoloFuel Ledger Transactions', () => {
       let getByText
       await act(async () => {
         ({ getByText } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <HoloFuelTransactionsHistory history={{}} />
+          <TransactionsHistory history={{}} />
         </ApolloProvider>))
         await wait(0)
       })
@@ -43,7 +43,7 @@ describe('HoloFuel Ledger Transactions', () => {
       let getAllByRole
       await act(async () => {
         ({ getAllByRole } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <HoloFuelTransactionsHistory history={{}} />
+          <TransactionsHistory history={{}} />
         </ApolloProvider>))
         await wait(0)
       })
