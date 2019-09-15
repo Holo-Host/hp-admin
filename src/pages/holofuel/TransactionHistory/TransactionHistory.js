@@ -17,7 +17,6 @@ function useCancel () {
   const [cancel] = useMutation(HolofuelCancelMutation)
   return id => cancel({
     variables: { transactionId: id },
-    // (NOTE: Verify that the format below is correct (for refetching two quries upon an actionHandler....)
     refetchQueries: [{
       query: HolofuelCompletedTransactionsQuery
     }, {
@@ -28,7 +27,7 @@ function useCancel () {
 
 export default function TransactionsHistory ({ history: { push } }) {
   const { data: { holofuelUser: whoami = [] } } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelCompletedTransactions: completeTransactions = [] } } = useQuery(HolofuelCompletedTransactionsQuery)
+  const { data: { holofuelCompletedTransactions: completedTransactions = [] } } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelActionableTransactions: pendingTransactions = [] } } = useQuery(HolofuelActionableTransactionsQuery)
 
   console.log(' >>>> HOLOFUEL whoami ? <<<<<<< ', whoami)
@@ -74,7 +73,7 @@ export default function TransactionsHistory ({ history: { push } }) {
               pending />
           })}
 
-          {!isEmpty(completeTransactions) && completeTransactions.map(completeTx => {
+          {!isEmpty(completedTransactions) && completedTransactions.map(completeTx => {
             return <LedgerTransactionsTable
               transaction={completeTx}
               key={completeTx.id}
