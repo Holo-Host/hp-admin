@@ -9,7 +9,7 @@ import Button from 'components/holofuel/Button'
 import Modal from 'components/holofuel/Modal'
 
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
-import HolofuelCompleteTransactionsQuery from 'graphql/HolofuelCompleteTransactionsQuery.gql'
+import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 
@@ -19,7 +19,7 @@ function useCancel () {
     variables: { transactionId: id },
     // (NOTE: Verify that the format below is correct (for refetching two quries upon an actionHandler....)
     refetchQueries: [{
-      query: HolofuelCompleteTransactionsQuery
+      query: HolofuelCompletedTransactionsQuery
     }, {
       query: HolofuelActionableTransactionsQuery
     }]
@@ -28,7 +28,7 @@ function useCancel () {
 
 export default function TransactionsHistory ({ history: { push } }) {
   const { data: { holofuelUser: whoami = [] } } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelCompleteTransactions: completeTransactions = [] } } = useQuery(HolofuelCompleteTransactionsQuery)
+  const { data: { holofuelCompletedTransactions: completeTransactions = [] } } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelActionableTransactions: pendingTransactions = [] } } = useQuery(HolofuelActionableTransactionsQuery)
 
   console.log(' >>>> HOLOFUEL whoami ? <<<<<<< ', whoami)

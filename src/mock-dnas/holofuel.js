@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import { isString } from 'lodash/fp'
 
 export const transactionList = {
   ledger: {
@@ -319,18 +320,31 @@ const agents = [
 
 const whoamiObj = (agentId) => agents.find(agent => agent.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
 
+function listPending ({ origins }) {
+  if (!origins) return pendingList
+  if (isString(origins)) {
+    const filter = entry => entry.event[0] === origins
+    return {
+      requests: pendingList.requests.filter(filter),
+      promises: pendingList.promises.filter(filter)
+    }
+  }
+  throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
+}
+
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
     whoami: ({ agentId }) => agentId ? whoamiObj(agentId) : agents[0],
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
-    list_pending: () => pendingList,
+    list_pending: listPending,
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
-    receive_payment: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS),
-    decline: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS),
-    cancel: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS)
+    receive_payment: ({ promise, promise_sig: sig, promise_commit: commit }) => bcrypt.hashSync((promise + sig + commit + 'accepted'), NUM_SALT_ROUNDS),
+    receive_payments_pending: ({ promises }) => bcrypt.hashSync((promises + 'accepted'), NUM_SALT_ROUNDS),
+    decline: ({ origin }) => bcrypt.hashSync((origin + 'declined'), NUM_SALT_ROUNDS),
+    cancel: ({ origin }) => bcrypt.hashSync((origin + 'cancelled'), NUM_SALT_ROUNDS)
   }
 }
 

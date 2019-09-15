@@ -10,19 +10,6 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
-  return {
-    id: origin,
-    amount: amount || event.Promise.tx.amount,
-    counterparty: counterparty || event.Promise.tx.to,
-    direction: stateDirection,
-    status: STATUS.pending,
-    type: TYPE.offer,
-    timestamp: eventTimestamp,
-    notes
-  }
-}
-
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
   return {
     id: origin,
@@ -36,6 +23,19 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
+  return {
+    id: origin,
+    amount: amount || event.Promise.tx.amount,
+    counterparty: counterparty || event.Promise.tx.to,
+    direction: stateDirection,
+    status: STATUS.pending,
+    type: TYPE.offer,
+    timestamp: eventTimestamp,
+    notes
+  }
+}
+
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterparty = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
   return {
@@ -43,7 +43,7 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     amount: event.Receipt.cheque.invoice.promise.tx.amount,
     counterparty,
     direction: stateDirection,
-    status: STATUS.complete,
+    status: STATUS.completed,
     type: event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
     fees,
@@ -60,7 +60,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
     amount: event.Cheque.invoice.promise.tx.amount,
     counterparty,
     direction: stateDirection,
-    status: STATUS.complete,
+    status: STATUS.completed,
     type: event.Cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
     fees,
@@ -143,11 +143,11 @@ const HoloFuelDnaInterface = {
     }
   },
   transactions: {
-    allComplete: async () => {
+    allCompleted: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
-      return noDuplicateIds.filter(tx => tx.status === 'complete').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+      return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')()
@@ -161,44 +161,33 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
+    getSinglePending: async transactionId => {
+      const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
+      const transactionArray = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
+      if (transactionArray.length === 0) {
+        throw new Error(`no pending transaction with id ${transactionId} found.`)
+      } else {
+        return transactionArray[0]
+      }
+    },
     // decline pending proposed transaction (NB: proposed by another agent).
     decline: async transactionId => {
-      const result = await createZomeCall('transactions/list_pending')({ origins: transactionId })
-      let data
-      if (result.requests) { data = presentPendingRequest(result.requests); return data }
-      if (result.promises) { data = presentPendingOffer(result.promises); return data }
-      const { counterparty, amount, direction, type } = data
-      console.log('DECLINE >>>> counterparty, amount, direction, type :', counterparty, amount, direction, type)
-
+      const transaction = await HoloFuelDnaInterface.transactions.getSinglePending(transactionId)
       await createZomeCall('transactions/decline')({ origin: transactionId })
       return {
+        ...transaction,
         id: transactionId,
-        amount,
-        counterparty,
-        status: STATUS.rejected,
-        direction, // NOTE: incoming indicates the hf recipient, outgoing indicates the hf spender
-        type: type,
-        timestamp: currentDataTimeIso
+        status: STATUS.rejected
       }
     },
     // cancel pending authored transaction.
     cancel: async transactionId => {
-      const result = await createZomeCall('transactions/list_pending')({ origins: transactionId })
-      let data
-      if (result.requests) { data = presentPendingRequest(result.requests); return data }
-      if (result.promises) { data = presentPendingOffer(result.promises); return data }
-      const { counterparty, amount, direction, type } = data
-      console.log('CANCEL >>>> counterparty, amount, direction, type :', counterparty, amount, direction, type)
-
+      const transaction = await HoloFuelDnaInterface.transactions.getSinglePending(transactionId)
       await createZomeCall('transactions/cancel')({ origin: transactionId })
       return {
+        ...transaction,
         id: transactionId,
-        amount,
-        counterparty,
-        status: STATUS.cancelled,
-        direction, // NOTE: incoming indicates the hf recipient, outgoing indicates the hf spender
-        type: type,
-        timestamp: currentDataTimeIso
+        status: STATUS.cancelled
       }
     }
   },
@@ -220,7 +209,7 @@ const HoloFuelDnaInterface = {
     create: async (counterparty, amount, requestId) => {
       const origin = await createZomeCall('transactions/promise')({ to: counterparty, amount, deadline: MOCK_DEADLINE, requestId })
       return {
-        id: requestId || origin, // NOTE: If reqeuestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
+        id: requestId || origin, // NOTE: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
         amount,
         counterparty,
         direction: DIRECTION.outgoing, // this indicates the hf spender
@@ -231,14 +220,15 @@ const HoloFuelDnaInterface = {
     },
 
     accept: async (transactionId) => {
+      const transaction = await HoloFuelDnaInterface.transactions.getSinglePending(transactionId)
       await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
+      console.log('ACCEPT PAYMENT TRANSACTION OBJECT : ', transaction)
       return {
+        ...transaction,
         id: transactionId,
-        amount: 0, // NOTE: This data needs to be pulled from the gql cache
-        direction: DIRECTION.incoming, // this indicates the hf recipient
-        status: STATUS.complete,
-        type: TYPE.offer,
-        timestamp: currentDataTimeIso
+        // direction: DIRECTION.incoming, // this indicates the hf recipient
+        status: STATUS.completed // ,
+        // type: TYPE.offer
       }
     }
   }
