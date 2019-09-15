@@ -163,7 +163,7 @@ const HoloFuelDnaInterface = {
     },
     // decline pending proposed transaction (NB: proposed by another agent).
     decline: async transactionId => {
-      const result = await createZomeCall('transactions/list_pending')({ origin: transactionId })
+      const result = await createZomeCall('transactions/list_pending')({ origins: transactionId })
       let data
       if (result.requests) { data = presentPendingRequest(result.requests); return data }
       if (result.promises) { data = presentPendingOffer(result.promises); return data }
@@ -183,7 +183,7 @@ const HoloFuelDnaInterface = {
     },
     // cancel pending authored transaction.
     cancel: async transactionId => {
-      const result = await createZomeCall('transactions/list_pending')({ origin: transactionId })
+      const result = await createZomeCall('transactions/list_pending')({ origins: transactionId })
       let data
       if (result.requests) { data = presentPendingRequest(result.requests); return data }
       if (result.promises) { data = presentPendingOffer(result.promises); return data }
@@ -231,7 +231,7 @@ const HoloFuelDnaInterface = {
     },
 
     accept: async (transactionId) => {
-      await createZomeCall('transactions/receive_payments_pending')({ origin: transactionId })
+      await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
       return {
         id: transactionId,
         amount: 0, // NOTE: This data needs to be pulled from the gql cache
@@ -240,19 +240,7 @@ const HoloFuelDnaInterface = {
         type: TYPE.offer,
         timestamp: currentDataTimeIso
       }
-    } // ,
-    // NOTE: Below will SOON BE DEPRECATED ...
-    // reject: async (transactionId) => {
-    //   await createZomeCall('transactions/reject')({ origin: transactionId })
-    //   return {
-    //     id: transactionId,
-    //     amount: 0, // NOTE: This data needs to be pulled from the gql cache
-    //     direction: DIRECTION.incoming, // this indicates the hf recipient
-    //     status: STATUS.rejected,
-    //     type: TYPE.offer,
-    //     timestamp: currentDataTimeIso
-    //   }
-    // }
+    }
   }
 }
 
