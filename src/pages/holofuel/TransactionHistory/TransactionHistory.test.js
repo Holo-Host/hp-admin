@@ -1,13 +1,17 @@
 import React from 'react'
-// import moment from 'moment'
-import { render, within, act, cleanup } from '@testing-library/react' // fireEvent,
+import moment from 'moment'
+import { render, within, act, fireEvent, cleanup } from '@testing-library/react' // fireEvent,
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
+import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
+import { TYPE } from 'models/Transaction'
+import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
+import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import TransactionsHistory, { makeDisplayName, formatDateTime, MOCK_ACCT_NUM } from './TransactionHistory'
-import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
+import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (
   ui,
@@ -90,12 +94,101 @@ describe('HoloFuel Ledger Transactions', () => {
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-amount')).getByText(fullRowContent[rowIndex].amount)).toBeInTheDocument()
             expect(within(getByTestId('cell-fees')).getByText(fullRowContent[rowIndex].fees)).toBeInTheDocument()
-            // expect(within(getByTestId('cell-present-balance')).getByText(fullRowContent[rowIndex].presentBalance)).toBeInTheDocument()
+            // if (fullRowContent[rowIndex].presentBalance) expect(within(getByTestId('cell-present-balance')).getByText(fullRowContent[rowIndex].presentBalance)).toBeInTheDocument()
           })
         } else {
           throw new Error('There was an unknown table-group found : group label, index in tableGroup Array', tableGroup, index)
         }
       })
+    })
+  })
+  describe('Cancel buttons', () => {
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    const pendingRequest = {
+      id: 'QmMockEntryAddress123',
+      counterparty: 'AGENT_2_MOCK_HASH',
+      amount: 8000.88,
+      type: TYPE.request,
+      timestamp: currentDataTimeIso(),
+      notes: 'Pay up.'
+    }
+
+    const pendingOffer = {
+      ...pendingRequest,
+      amount: 2000.02,
+      type: TYPE.offer,
+      notes: 'A little help.'
+    }
+
+    const mockTransaction = {
+      ...pendingRequest,
+      direction: '',
+      status: ''
+    }
+
+    const cancelPendingRequestMock = {
+      request: {
+        query: HolofuelCancelMutation,
+        variables: { transactionId: pendingRequest.id }
+      },
+      result: {
+        data: { holofuelOffer: mockTransaction }
+      },
+      newData: jest.fn()
+    }
+
+    const cancelPendingOfferMock = {
+      request: {
+        query: HolofuelCancelMutation,
+        variables: { transactionId: pendingOffer.id }
+      },
+      result: {
+        data: { holofuelOffer: mockTransaction }
+      },
+      newData: jest.fn()
+    }
+
+    const mocks = [
+      cancelPendingRequestMock,
+      cancelPendingOfferMock,
+      {
+        request: {
+          query: HolofuelWaitingTransactionsQuery
+        },
+        result: {
+          data: {
+            holofuelWaitingTransactions: []
+          }
+        }
+      }
+    ]
+
+    it('should respond properly', async () => {
+      const props = {
+        transaction: pendingRequest,
+        showRejectionModal: jest.fn()
+      }
+      let getByText
+      await act(async () => {
+        ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+          <TransactionsHistory {...props} />
+        </MockedProvider>))
+        await wait(0)
+      })
+
+      await act(async () => {
+        fireEvent.click(getByText('Pay'))
+        await wait(0)
+      })
+
+      expect(pendingOffer.newData).toHaveBeenCalled()
+
+      fireEvent.click(getByText('Reject'))
+
+      expect(props.showRejectionModal).toHaveBeenCalledWith(pendingRequest)
     })
   })
 
@@ -110,41 +203,34 @@ describe('HoloFuel Ledger Transactions', () => {
 
   describe('HoloFuelTransactionsHistory helper functions (formatDateTime & makeDisplayName)', () => {
     describe('Semantic timedate formatting with momentjs', () => {
+      const currentYear = new Date().getFullYear()
+      const currentMonth = new Date().getMonth()
+      const currentHour = new Date().getHours()
       const currentMinute = new Date().getMinutes()
+
+      const tenYearsAgo = new Date().setFullYear(currentYear - 10)
+      const monthAgo = new Date().setMonth(currentMonth - 1)
+      const hourAgo = new Date().setHours(currentHour - 1)
       const minAgo = new Date().setMinutes(currentMinute - 1)
-      const currentDate = new Date().getHours()
-      const hourAgo = new Date().setHours(currentDate - 1)
-
-      const previousMinuteDateTimeIso = new Date(minAgo).toISOString()
-      // console.log('previousMinuteDateTimeIso : ', previousMinuteDateTimeIso)
-
-      const previousHourTimeIso = new Date(hourAgo).toISOString()
-      // console.log('previousHourTimeIso : ', previousHourTimeIso)
 
       const MOCK_TIMEDATE = {
-        semanticSameHour: previousMinuteDateTimeIso,
-        semanticSameDay: previousHourTimeIso,
-        semanticSameYear: '2019-08-30T11:17:16+00:00',
-        semanticOverAYear: '2000-08-30T11:17:16+00:00'
+        semanticSameMinute: new Date().toISOString(),
+        semanticSameHour: new Date(minAgo).toISOString(),
+        semanticSameDay: new Date(hourAgo).toISOString(),
+        semanticSameYear: new Date(monthAgo).toISOString(),
+        semanticOverAYear: new Date(tenYearsAgo).toISOString()
       }
 
-      // const genDateFormat = isodate => {
-      //   const date = new Date(isodate)
-      //   const newDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + ' at ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
-      //   return newDate
-      // }
-      // console.log('Date-time Check : ', genDateFormat(MOCK_TIMEDATE.semanticSameYear))
-
-      it('should format timedate within past year', () => {
+      it('should format timedate older than a year ago', () => {
         const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticOverAYear)
-        expect(date).toBe('August 30 2000')
-        expect(time).toBe('6:17')
+        expect(date).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('MMMM D YYYY'))
+        expect(time).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('h:mm'))
       })
 
       it('should format timedate within past year', () => {
         const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameYear)
-        expect(date).toBe('August 30')
-        expect(time).toBe('6:17')
+        expect(date).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('MMMM D'))
+        expect(time).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('h:mm'))
       })
 
       it('should format timedate within same day', () => {
@@ -157,6 +243,12 @@ describe('HoloFuel Ledger Transactions', () => {
         const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
         expect(date).toBe('Today')
         expect(time).toBe('a minute ago')
+      })
+
+      it('should format timedate within same minute', () => {
+        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameMinute)
+        expect(date).toBe('Today')
+        expect(time).toBe('a few seconds ago')
       })
     })
   })

@@ -174,13 +174,15 @@ export const makeDisplayName = agentHash => agentHash.substring(agentHash.length
 export function formatDateTime (isoDate) {
   const dateDifference = moment(isoDate).fromNow()
   // If over a year ago, include the year in date
-  if (dateDifference.split(' ')[1] === 'years') {
+  if (dateDifference.split(' ')[1] === 'years' || dateDifference.split(' ')[1] === 'year') {
     return {
       date: moment(isoDate).format('MMMM D YYYY'),
       time: moment(isoDate).format('h:mm')
     }
   // If over a week ago, include the month and day in date
-  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7) {
+  } else if (
+    dateDifference.split(' ')[1] === 'months' || dateDifference.split(' ')[1] === 'month' ||
+    (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7)) {
     return {
       date: moment(isoDate).format('MMMM D'),
       time: moment(isoDate).format('h:mm')
@@ -191,8 +193,11 @@ export function formatDateTime (isoDate) {
       date: dateDifference,
       time: moment(isoDate).format('h:mm')
     }
-  // If less than a day ago, state hours or minutes lapsed in time
-  } else if (dateDifference.split(' ')[1] === 'hours' || dateDifference.split(' ')[1] === 'hour' || dateDifference.split(' ')[1] === 'minutes' || dateDifference.split(' ')[1] === 'minute') {
+  // If less than a day ago, state hours, minutes, or seconds lapsed in time
+  } else if (
+    dateDifference.split(' ')[1] === 'hours' || dateDifference.split(' ')[1] === 'hour' ||
+    dateDifference.split(' ')[1] === 'minutes' || dateDifference.split(' ')[1] === 'minute' ||
+    dateDifference.split(' ')[2] === 'seconds' || dateDifference.split(' ')[1] === 'second') {
     return {
       date: 'Today',
       time: moment(isoDate).fromNow()
