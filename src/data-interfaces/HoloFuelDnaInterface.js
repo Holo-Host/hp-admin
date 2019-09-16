@@ -176,8 +176,7 @@ const HoloFuelDnaInterface = {
       return {
         ...transaction,
         id: transactionId,
-        status: STATUS.rejected,
-        direction: DIRECTION.incoming
+        status: STATUS.rejected
       }
     }
   },
@@ -218,8 +217,7 @@ const HoloFuelDnaInterface = {
         id: transactionId,
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.complete,
-        type: TYPE.offer,
-        timestamp: currentDataTimeIso
+        type: TYPE.offer
       }
     }
   }
