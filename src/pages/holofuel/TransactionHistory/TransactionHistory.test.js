@@ -1,12 +1,12 @@
 import React from 'react'
-import moment from 'moment'
+// import moment from 'moment'
 import { render, within, act, cleanup } from '@testing-library/react' // fireEvent,
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
-import TransactionsHistory, { makeDisplayName, formatDateTime } from './TransactionHistory'
+import TransactionsHistory, { makeDisplayName, formatDateTime, MOCK_ACCT_NUM } from './TransactionHistory'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (
@@ -33,6 +33,7 @@ describe('HoloFuel Ledger Transactions', () => {
         await wait(0)
       })
 
+      expect(getByText(MOCK_ACCT_NUM)).toBeVisible()
       expect(getByText('HoloFuel')).toBeVisible()
       expect(getByText('History')).toBeVisible()
     })
@@ -48,7 +49,8 @@ describe('HoloFuel Ledger Transactions', () => {
         await wait(0)
       })
 
-      const hfInterfaceCompleteTxList = await HoloFuelDnaInterface.transactions.allComplete()
+      const hfInterfaceCompletedTxList = await HoloFuelDnaInterface.transactions.allCompleted()
+      const hfInterfaceWaitingTxList = await HoloFuelDnaInterface.transactions.allWaiting()
 
       const listTableGroups = getAllByRole('rowgroup')
       expect(listTableGroups).toHaveLength(2)
@@ -60,7 +62,7 @@ describe('HoloFuel Ledger Transactions', () => {
 
       const listTableCells = getAllByRole('cell')
       // number of cells check
-      expect(listTableCells).toHaveLength(hfInterfaceCompleteTxList.length * NUM_TABLE_HEADERS)
+      expect(listTableCells).toHaveLength((hfInterfaceCompletedTxList.length + hfInterfaceWaitingTxList.length) * NUM_TABLE_HEADERS)
 
       listTableGroups.forEach((tableGroup, index) => {
         const { getByText, getAllByTestId } = within(tableGroup)
@@ -73,20 +75,22 @@ describe('HoloFuel Ledger Transactions', () => {
           // tbody :
           const rows = getAllByTestId('transactions-table-row')
           // number of rows check => tbody should have the same number of rows as the # of completed transactions
-          expect(rows).toHaveLength(hfInterfaceCompleteTxList.length)
-
+          expect(rows).toHaveLength(hfInterfaceCompletedTxList.length + hfInterfaceWaitingTxList.length)
+          const fullRowContent = hfInterfaceWaitingTxList.concat(hfInterfaceCompletedTxList)
           // cell content check
           rows.forEach((row, rowIndex) => {
             const { getByTestId } = within(row)
-            const notesDisplay = hfInterfaceCompleteTxList[rowIndex].notes === null ? 'none' : hfInterfaceCompleteTxList[rowIndex].notes
-            const datetimeDisplay = formatDateTime(hfInterfaceCompleteTxList[rowIndex].timestamp)
+            const notesDisplay = fullRowContent[rowIndex].notes === null ? 'none' : fullRowContent[rowIndex].notes
+            const dateDisplay = formatDateTime(fullRowContent[rowIndex].timestamp).date
+            const timeDisplay = formatDateTime(fullRowContent[rowIndex].timestamp).time
 
-            expect(within(getByTestId('cell-date-time')).getByText(datetimeDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-counterparty')).getByText(makeDisplayName(hfInterfaceCompleteTxList[rowIndex].counterparty))).toBeInTheDocument()
+            expect(within(getByTestId('cell-date')).getByText(dateDisplay)).toBeInTheDocument()
+            expect(within(getByTestId('cell-time')).getByText(timeDisplay)).toBeInTheDocument()
+            expect(within(getByTestId('cell-counterparty')).getByText(makeDisplayName(fullRowContent[rowIndex].counterparty.toUpperCase()))).toBeInTheDocument()
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-amount')).getByText(hfInterfaceCompleteTxList[rowIndex].amount)).toBeInTheDocument()
-            expect(within(getByTestId('cell-fees')).getByText(hfInterfaceCompleteTxList[rowIndex].fees)).toBeInTheDocument()
-            expect(within(getByTestId('cell-present-balance')).getByText(hfInterfaceCompleteTxList[rowIndex].presentBalance)).toBeInTheDocument()
+            expect(within(getByTestId('cell-amount')).getByText(fullRowContent[rowIndex].amount)).toBeInTheDocument()
+            expect(within(getByTestId('cell-fees')).getByText(fullRowContent[rowIndex].fees)).toBeInTheDocument()
+            // expect(within(getByTestId('cell-present-balance')).getByText(fullRowContent[rowIndex].presentBalance)).toBeInTheDocument()
           })
         } else {
           throw new Error('There was an unknown table-group found : group label, index in tableGroup Array', tableGroup, index)
@@ -100,12 +104,12 @@ describe('HoloFuel Ledger Transactions', () => {
       const { id } = await HoloFuelDnaInterface.user.get({})
       const displayName = makeDisplayName(id)
       expect(displayName.length).toEqual(7)
-      expect(displayName.toLowerCase()).toBe(displayName.substring(displayName.length - 7).toLowerCase())
+      expect(displayName).toBe(displayName.substring(displayName.length - 7))
     })
   })
 
   describe('HoloFuelTransactionsHistory helper functions (formatDateTime & makeDisplayName)', () => {
-    it('should format timedate', async () => {
+    describe('Semantic timedate formatting with momentjs', () => {
       const currentMinute = new Date().getMinutes()
       const minAgo = new Date().setMinutes(currentMinute - 1)
       const currentDate = new Date().getHours()
@@ -120,7 +124,8 @@ describe('HoloFuel Ledger Transactions', () => {
       const MOCK_TIMEDATE = {
         semanticSameHour: previousMinuteDateTimeIso,
         semanticSameDay: previousHourTimeIso,
-        semanticFullDate: '2019-08-30T11:17:16+00:00'
+        semanticSameYear: '2019-08-30T11:17:16+00:00',
+        semanticOverAYear: '2000-08-30T11:17:16+00:00'
       }
 
       // const genDateFormat = isodate => {
@@ -128,16 +133,31 @@ describe('HoloFuel Ledger Transactions', () => {
       //   const newDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + ' at ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
       //   return newDate
       // }
-      // console.log('Date-time Check : ', genDateFormat(MOCK_TIMEDATE.semanticFullDate))
+      // console.log('Date-time Check : ', genDateFormat(MOCK_TIMEDATE.semanticSameYear))
 
-      const fullDateTime = formatDateTime(MOCK_TIMEDATE.semanticFullDate)
-      expect(fullDateTime).toBe('August 30, 2019 11:17 AM')
+      it('should format timedate within past year', () => {
+        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticOverAYear)
+        expect(date).toBe('August 30 2000')
+        expect(time).toBe('6:17')
+      })
 
-      const hourDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
-      expect(hourDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameDay).startOf('hour').fromNow())
+      it('should format timedate within past year', () => {
+        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameYear)
+        expect(date).toBe('August 30')
+        expect(time).toBe('6:17')
+      })
 
-      const minuteDiffDateTime = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
-      expect(minuteDiffDateTime).toBe(moment(MOCK_TIMEDATE.semanticSameHour).startOf('minute').fromNow())
+      it('should format timedate within same day', () => {
+        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
+        expect(date).toBe('Today')
+        expect(time).toBe('an hour ago')
+      })
+
+      it('should format timedate within same hour', () => {
+        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
+        expect(date).toBe('Today')
+        expect(time).toBe('a minute ago')
+      })
     })
   })
 })

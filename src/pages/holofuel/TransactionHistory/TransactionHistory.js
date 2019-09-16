@@ -8,49 +8,14 @@ import Header from 'components/holofuel/Header'
 import Button from 'components/holofuel/Button'
 import Modal from 'components/holofuel/Modal'
 
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+// import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 
-const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
-export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7) || ''
+export const MOCK_ACCT_NUM = 'AC1903F8EAAC1903F8EA'
 
-export function formatDateTime (isoDate) {
-  const dateDifference = moment(isoDate).fromNow()
-  // If over a year ago, include the year in date
-  if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) > 365) {
-    return {
-      date: moment(isoDate).format('MMMM D YYYY'),
-      time: moment(isoDate).format('h:mm')
-    }
-  // If over a week ago, include the month and day in date
-  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7) {
-    return {
-      date: moment(isoDate).format('MMMM D'),
-      time: moment(isoDate).format('h:mm')
-    }
-  // If within a week ago, state days lapsed in date
-  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
-    return {
-      date: dateDifference,
-      time: moment(isoDate).format('h:mm')
-    }
-  // If less than a day ago, state hours lapsed in time
-  } else if (dateDifference.split(' ')[1] === 'hours' && parseInt(moment(isoDate).startOf('hour').fromNow().split(' ')[0]) > 1) {
-    return {
-      date: 'Today',
-      time: moment(isoDate).fromNow() // .startOf('hour')
-    }
-  } else {
-  // If less than an hour ago, state minutes lapsed in time
-    return {
-      date: 'Today',
-      time: moment(isoDate).fromNow() // .startOf('minute')
-    }
-  }
-}
-
+// Data - Mutation hook with refetch:
 function useCancel () {
   const [cancel] = useMutation(HolofuelCancelMutation)
   return (id) => cancel({
@@ -63,12 +28,13 @@ function useCancel () {
   })
 }
 
+// Display - Functional Components with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
-  const { data: { holofuelUser: whoami = {} } } = useQuery(HolofuelUserQuery)
+  // const { data: { holofuelUser: whoami = {} } } = useQuery(HolofuelUserQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } } = useQuery(HolofuelWaitingTransactionsQuery)
 
-  console.log('current Agent : ', whoami)
+  // console.log('current Agent : ', whoami)
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -85,7 +51,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   ]
 
   return <React.Fragment>
-    <Header title='HoloFuel' accountNumber='AC1903F8EAAC1903F8EA' />
+    <Header title='HoloFuel' accountNumber={MOCK_ACCT_NUM} />
 
     <section styleName='account-ledger-table'>
       <h2 styleName='completed-transactions-title'>History</h2>
@@ -126,7 +92,6 @@ export default function TransactionsHistory ({ history: { push } }) {
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       cancelTransaction={cancelTransaction} />
-
   </React.Fragment>
 }
 
@@ -138,9 +103,11 @@ const TransactionTableHeading = ({ content }) => {
 
 export function LedgerTransactionsTable ({ transaction, showCancellationModal, completed }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
-  // console.log('transaction object : ', transaction)
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
-    <td styleName='completed-tx-col table-content' data-testid='cell-date-time'>{formatDateTime(timestamp).date}<br />{formatDateTime(timestamp).time}</td>
+    <td styleName='completed-tx-col table-content'>
+      <p data-testid='cell-date'>{formatDateTime(timestamp).date}</p>
+      <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
+    </td>
     <td styleName='completed-tx-col table-content align-left'>
       <h4 data-testid='cell-counterparty'>{makeDisplayName(counterparty).toUpperCase()}</h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
@@ -198,4 +165,38 @@ function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction
       </Button>
     </div>
   </Modal>
+}
+
+// Utils - Helper Functions:
+const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
+export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7) || ''
+
+export function formatDateTime (isoDate) {
+  const dateDifference = moment(isoDate).fromNow()
+  // If over a year ago, include the year in date
+  if (dateDifference.split(' ')[1] === 'years') {
+    return {
+      date: moment(isoDate).format('MMMM D YYYY'),
+      time: moment(isoDate).format('h:mm')
+    }
+  // If over a week ago, include the month and day in date
+  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7) {
+    return {
+      date: moment(isoDate).format('MMMM D'),
+      time: moment(isoDate).format('h:mm')
+    }
+  // If within a week ago, state days lapsed in date
+  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
+    return {
+      date: dateDifference,
+      time: moment(isoDate).format('h:mm')
+    }
+  // If less than a day ago, state hours or minutes lapsed in time
+  } else if (dateDifference.split(' ')[1] === 'hours' || dateDifference.split(' ')[1] === 'hour' || dateDifference.split(' ')[1] === 'minutes' || dateDifference.split(' ')[1] === 'minute') {
+    return {
+      date: 'Today',
+      time: moment(isoDate).fromNow()
+    }
+    // Throw Error, iso-timedate cannot be parsed into valid format
+  } else throw new Error('Iso timedate is unable to be parsed.', isoDate)
 }
