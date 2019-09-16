@@ -1,6 +1,0 @@
-query HostingUser {
-  hostingUser {
-    id
-    isRegistered
-  }
-}

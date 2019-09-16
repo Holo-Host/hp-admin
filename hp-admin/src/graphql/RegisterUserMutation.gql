@@ -1,7 +1,0 @@
-mutation RegisterUser ($name: String, $avatarUrl: String) {
-  registerUser(name: $name, avatarUrl: $avatarUrl) {
-    id
-    name
-    avatarUrl
-  }
-}

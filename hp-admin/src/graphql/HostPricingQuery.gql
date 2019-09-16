@@ -1,6 +1,0 @@
-query HostPricing {
-  hostPricing {
-    units
-    pricePerUnit
-  }
-}

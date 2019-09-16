@@ -13,6 +13,7 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 
+const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7) || ''
 
 export function formatDateTime (isoDate) {
@@ -182,7 +183,7 @@ function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text'>
-      Cancel {type} {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty'>{makeDisplayName(counterparty)}</span> for <span styleName='modal-amount'>{Number(amount).toLocaleString()} HF</span>?
+      Cancel your {capitalizeFirstLetter(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount'>{Number(amount).toLocaleString()} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty'>{makeDisplayName(counterparty)}</span>?
     </div>
     <div styleName='modal-buttons'>
       <Button

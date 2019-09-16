@@ -1,9 +1,0 @@
-query HolofuelLedger {
-  holofuelLedger {
-    balance
-    credit
-    payable
-    receivable
-    fees
-  }
-}

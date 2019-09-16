@@ -1,1 +1,0 @@
-{"ast":null,"code":"/**\n * Returns the first argument it receives.\n */\nexport default function identityFunc(x) {\n  return x;\n}","map":null,"metadata":{},"sourceType":"module"}

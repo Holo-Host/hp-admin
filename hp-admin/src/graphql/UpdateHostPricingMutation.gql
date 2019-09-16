@@ -1,6 +1,0 @@
-mutation UpdateHostPricing ($units: String, $pricePerUnit: String) {
-  updateHostPricing(units: $units, pricePerUnit: $pricePerUnit) {
-    units
-    pricePerUnit
-  }
-}

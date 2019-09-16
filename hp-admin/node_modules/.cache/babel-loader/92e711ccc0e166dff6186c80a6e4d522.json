@@ -1,1 +1,0 @@
-{"ast":null,"code":"/* eslint-disable no-redeclare */\n// $FlowFixMe workaround for: https://github.com/facebook/flow/issues/5838\nvar objectEntries = Object.entries || function (obj) {\n  return Object.keys(obj).map(function (key) {\n    return [key, obj[key]];\n  });\n};\n\nexport default objectEntries;","map":null,"metadata":{},"sourceType":"module"}

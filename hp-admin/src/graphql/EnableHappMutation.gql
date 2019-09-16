@@ -1,8 +1,0 @@
-mutation EnableHapp ($appId: String) {
-  enableHapp(appId: $appId) {
-    id
-    title
-    happStoreId
-    isEnabled
-  }
-}
