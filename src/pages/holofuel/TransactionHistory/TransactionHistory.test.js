@@ -10,7 +10,7 @@ import wait from 'waait'
 import { TYPE } from 'models/Transaction'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import TransactionsHistory, { makeDisplayName, formatDateTime, MOCK_ACCT_NUM } from './TransactionHistory'
+import TransactionsHistory, { LedgerTransactionsTable, ConfirmCancellationModal, capitalizeFirstLetter, makeDisplayName, formatDateTime, MOCK_ACCT_NUM } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (
@@ -27,7 +27,7 @@ function renderWithRouter (
 }
 
 describe('HoloFuel Ledger Transactions', () => {
-  describe('rendering', () => {
+  describe('Page Rendering', () => {
     it('should render the header and title', async () => {
       let getByText
       await act(async () => {
@@ -102,25 +102,29 @@ describe('HoloFuel Ledger Transactions', () => {
       })
     })
   })
-  describe('Cancel buttons', () => {
+
+  //* ******************************* *//
+  // Cancellation Funcationality Tests :
+
+  describe('Cancel Transaction Modal and Mutation Button', () => {
     afterEach(() => {
       jest.clearAllMocks()
     })
 
     const pendingRequest = {
       id: 'QmMockEntryAddress123',
-      counterparty: 'AGENT_2_MOCK_HASH',
+      counterparty: 'AgentMockHash2',
       amount: 8000.88,
       type: TYPE.request,
       timestamp: currentDataTimeIso(),
-      notes: 'Pay up.'
+      direction: 'incoming'
     }
 
     const pendingOffer = {
       ...pendingRequest,
       amount: 2000.02,
       type: TYPE.offer,
-      notes: 'A little help.'
+      direction: 'outgoing'
     }
 
     const mockTransaction = {
@@ -129,71 +133,158 @@ describe('HoloFuel Ledger Transactions', () => {
       status: ''
     }
 
-    const cancelPendingRequestMock = {
-      request: {
-        query: HolofuelCancelMutation,
-        variables: { transactionId: pendingRequest.id }
-      },
-      result: {
-        data: { holofuelOffer: mockTransaction }
-      },
-      newData: jest.fn()
-    }
+    it('should display correct text for CancellationModal for a Pending Request', async () => {
+      const { getByRole } = render(<ConfirmCancellationModal transaction={pendingRequest} />)
+      const capitalizedType = capitalizeFirstLetter(pendingRequest.type)
 
-    const cancelPendingOfferMock = {
-      request: {
-        query: HolofuelCancelMutation,
-        variables: { transactionId: pendingOffer.id }
-      },
-      result: {
-        data: { holofuelOffer: mockTransaction }
-      },
-      newData: jest.fn()
-    }
+      const heading = getByRole('heading')
+      const { getByText } = within(heading) // , getByTestId
+      expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
+      expect(getByText('for', { exact: false })).toBeInTheDocument()
+      expect(getByText('from', { exact: false })).toBeInTheDocument()
 
-    const mocks = [
-      cancelPendingRequestMock,
-      cancelPendingOfferMock,
-      {
+      // nested in a span :
+      // expect(within(getByTestId('modal-amount')).getByText(pendingRequest.amount)).toBeInTheDocument()
+      // expect(within(getByTestId('modal-counterparty')).getByText(makeDisplayName(pendingRequest.counterparty))).toBeInTheDocument()
+    })
+
+    it('should display correct text for CancellationModal for a Pending Offer', async () => {
+      const { getByRole } = render(<ConfirmCancellationModal transaction={pendingOffer} />)
+      const capitalizedType = capitalizeFirstLetter(pendingOffer.type)
+
+      const heading = getByRole('heading')
+      const { getByText } = within(heading) // , getByTestId
+      expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
+      expect(getByText('of', { exact: false })).toBeInTheDocument()
+      expect(getByText('to', { exact: false })).toBeInTheDocument()
+
+      // nested in a span :
+      // expect(within(getByTestId('modal-amount')).getByText(pendingOffer.amount)).toBeInTheDocument()
+      // expect(within(getByTestId('modal-counterparty')).getByText(makeDisplayName(pendingOffer.counterparty))).toBeInTheDocument()
+    })
+
+    it('should open CancellationModal and trigger HolofuelCancelMutation for Pending Request', async () => {
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
+      const cancelPendingRequestMock = {
         request: {
-          query: HolofuelWaitingTransactionsQuery
+          query: HolofuelCancelMutation,
+          variables: { transactionId: pendingRequest.id }
         },
         result: {
-          data: {
-            holofuelWaitingTransactions: []
+          data: { holofuelCancel: mockTransaction }
+        },
+        newData: jest.fn()
+      }
+
+      const mocks = [
+        cancelPendingRequestMock,
+        {
+          request: {
+            query: HolofuelWaitingTransactionsQuery
+          },
+          result: {
+            data: {
+              holofuelWaitingTransactions: []
+            }
           }
         }
-      }
-    ]
+      ]
 
-    it('should respond properly', async () => {
       const props = {
         transaction: pendingRequest,
-        showRejectionModal: jest.fn()
+        key: pendingRequest.id,
+        showCancellationModal: jest.fn()
       }
       let getByText
       await act(async () => {
         ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <TransactionsHistory {...props} />
+          <LedgerTransactionsTable {...props} />
         </MockedProvider>))
         await wait(0)
       })
+      fireEvent.click(getByText('Cancel'))
+      expect(props.showCancellationModal).toHaveBeenCalledWith(pendingRequest)
 
       await act(async () => {
-        fireEvent.click(getByText('Pay'))
+        ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+          <ConfirmCancellationModal
+            transaction={pendingRequest}
+            cancelTransaction={cancelPendingRequestMock.newData}
+            handleClose={jest.fn()} />
+        </MockedProvider>))
         await wait(0)
       })
+      fireEvent.click(getByText('Yes'))
+      expect(cancelPendingRequestMock.newData).toHaveBeenCalled()
+    })
 
-      expect(pendingOffer.newData).toHaveBeenCalled()
+    it('should open CancellationModal and trigger HolofuelCancelMutation for Pending Offer', async () => {
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
 
-      fireEvent.click(getByText('Reject'))
+      const cancelPendingOfferMock = {
+        request: {
+          query: HolofuelCancelMutation,
+          variables: { transactionId: pendingOffer.id }
+        },
+        result: {
+          data: { holofuelCancel: mockTransaction }
+        },
+        newData: jest.fn()
+      }
 
-      expect(props.showRejectionModal).toHaveBeenCalledWith(pendingRequest)
+      const mocks = [
+        cancelPendingOfferMock,
+        {
+          request: {
+            query: HolofuelWaitingTransactionsQuery
+          },
+          result: {
+            data: {
+              holofuelWaitingTransactions: []
+            }
+          }
+        }
+      ]
+
+      const props = {
+        transaction: pendingOffer,
+        key: pendingRequest.id,
+        showCancellationModal: jest.fn()
+      }
+      let getByText
+      await act(async () => {
+        ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+          <LedgerTransactionsTable {...props} />
+        </MockedProvider>))
+        await wait(0)
+      })
+      fireEvent.click(getByText('Cancel'))
+      expect(props.showCancellationModal).toHaveBeenCalledWith(pendingOffer)
+
+      await act(async () => {
+        ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+          <ConfirmCancellationModal
+            transaction={pendingRequest}
+            cancelTransaction={cancelPendingOfferMock.newData}
+            handleClose={jest.fn()} />
+        </MockedProvider>))
+        await wait(0)
+      })
+      fireEvent.click(getByText('Yes'))
+      expect(cancelPendingOfferMock.newData).toHaveBeenCalled()
     })
   })
 
-  describe('helper function : makeDisplayName', () => {
-    it('should take in a full hashString and return only the last 7 chars', async () => {
+  //* ******************************* *//
+  // Helper Functions Tests :
+
+  describe('Helper function : makeDisplayName() - PubKey Truncation and Formatting', () => {
+    it('should accept a full hashString and return the last 7 chars', async () => {
       const { id } = await HoloFuelDnaInterface.user.get({})
       const displayName = makeDisplayName(id)
       expect(displayName.length).toEqual(7)
@@ -201,55 +292,53 @@ describe('HoloFuel Ledger Transactions', () => {
     })
   })
 
-  describe('HoloFuelTransactionsHistory helper functions (formatDateTime & makeDisplayName)', () => {
-    describe('Semantic timedate formatting with momentjs', () => {
-      const currentYear = new Date().getFullYear()
-      const currentMonth = new Date().getMonth()
-      const currentHour = new Date().getHours()
-      const currentMinute = new Date().getMinutes()
+  describe('Helper function : formatDateTime() - Semantic timedate formatting.', () => {
+    const currentYear = new Date().getFullYear()
+    const currentMonth = new Date().getMonth()
+    const currentHour = new Date().getHours()
+    const currentMinute = new Date().getMinutes()
 
-      const tenYearsAgo = new Date().setFullYear(currentYear - 10)
-      const monthAgo = new Date().setMonth(currentMonth - 1)
-      const hourAgo = new Date().setHours(currentHour - 1)
-      const minAgo = new Date().setMinutes(currentMinute - 1)
+    const tenYearsAgo = new Date().setFullYear(currentYear - 10)
+    const monthAgo = new Date().setMonth(currentMonth - 1)
+    const hourAgo = new Date().setHours(currentHour - 1)
+    const minAgo = new Date().setMinutes(currentMinute - 1)
 
-      const MOCK_TIMEDATE = {
-        semanticSameMinute: new Date().toISOString(),
-        semanticSameHour: new Date(minAgo).toISOString(),
-        semanticSameDay: new Date(hourAgo).toISOString(),
-        semanticSameYear: new Date(monthAgo).toISOString(),
-        semanticOverAYear: new Date(tenYearsAgo).toISOString()
-      }
+    const MOCK_TIMEDATE = {
+      semanticSameMinute: new Date().toISOString(),
+      semanticSameHour: new Date(minAgo).toISOString(),
+      semanticSameDay: new Date(hourAgo).toISOString(),
+      semanticSameYear: new Date(monthAgo).toISOString(),
+      semanticOverAYear: new Date(tenYearsAgo).toISOString()
+    }
 
-      it('should format timedate older than a year ago', () => {
-        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticOverAYear)
-        expect(date).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('MMMM D YYYY'))
-        expect(time).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('h:mm'))
-      })
+    it('should format timedate older than a year ago', () => {
+      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticOverAYear)
+      expect(date).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('MMMM D YYYY'))
+      expect(time).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('h:mm'))
+    })
 
-      it('should format timedate within past year', () => {
-        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameYear)
-        expect(date).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('MMMM D'))
-        expect(time).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('h:mm'))
-      })
+    it('should format timedate within past year', () => {
+      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameYear)
+      expect(date).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('MMMM D'))
+      expect(time).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('h:mm'))
+    })
 
-      it('should format timedate within same day', () => {
-        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
-        expect(date).toBe('Today')
-        expect(time).toBe('an hour ago')
-      })
+    it('should format timedate within same day', () => {
+      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
+      expect(date).toBe('Today')
+      expect(time).toBe('an hour ago')
+    })
 
-      it('should format timedate within same hour', () => {
-        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
-        expect(date).toBe('Today')
-        expect(time).toBe('a minute ago')
-      })
+    it('should format timedate within same hour', () => {
+      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
+      expect(date).toBe('Today')
+      expect(time).toBe('a minute ago')
+    })
 
-      it('should format timedate within same minute', () => {
-        const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameMinute)
-        expect(date).toBe('Today')
-        expect(time).toBe('a few seconds ago')
-      })
+    it('should format timedate within same minute', () => {
+      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameMinute)
+      expect(date).toBe('Today')
+      expect(time).toBe('a few seconds ago')
     })
   })
 })

@@ -134,7 +134,7 @@ function CancelButton ({ showCancellationModal, transaction }) {
 
 //
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
-function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
   if (!transaction) return null
 
   const { id, counterparty, amount, type, direction } = transaction
@@ -142,15 +142,19 @@ function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction
     cancelTransaction(id)
     handleClose()
   }
-
   return <Modal
     contentLabel={`Cancel ${type}?`}
     isOpen={!!transaction}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
-    <div styleName='modal-text'>
-      Cancel your {capitalizeFirstLetter(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount'>{Number(amount).toLocaleString()} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty'>{makeDisplayName(counterparty)}</span>?
+    <div styleName='modal-text' role='heading'>
+      Cancel your {capitalizeFirstLetter(type)}
+      {direction === 'incoming' ? 'for' : 'of'}
+      <span styleName='modal-amount' data-testid='modal-amount'>{Number(amount).toLocaleString()} HF</span>
+      {direction === 'incoming' ? 'from' : 'to'}
+      <span styleName='modal-counterparty' data-testid='modal-counterparty'>{makeDisplayName(counterparty)}</span>
+      ?
     </div>
     <div styleName='modal-buttons'>
       <Button
@@ -168,7 +172,7 @@ function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction
 }
 
 // Utils - Helper Functions:
-const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
+export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7) || ''
 
 export function formatDateTime (isoDate) {
