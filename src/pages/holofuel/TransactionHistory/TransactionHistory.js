@@ -16,7 +16,6 @@ import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7) || ''
 
 export function formatDateTime (isoDate) {
-  console.log('isoDate : ', isoDate)
   const dateDifference = moment(isoDate).fromNow()
   // If over a year ago, include the year in date
   if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) > 365) {
@@ -53,7 +52,7 @@ export function formatDateTime (isoDate) {
 
 function useCancel () {
   const [cancel] = useMutation(HolofuelCancelMutation)
-  return id => cancel({
+  return (id) => cancel({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelCompletedTransactionsQuery
@@ -64,11 +63,11 @@ function useCancel () {
 }
 
 export default function TransactionsHistory ({ history: { push } }) {
-  const { data: { holofuelUser: whoami = [] } } = useQuery(HolofuelUserQuery)
+  const { data: { holofuelUser: whoami = {} } } = useQuery(HolofuelUserQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } } = useQuery(HolofuelWaitingTransactionsQuery)
 
-  console.log('pending TX : ', pendingTransactions)
+  console.log('current Agent : ', whoami)
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -103,7 +102,7 @@ export default function TransactionsHistory ({ history: { push } }) {
           </tr>
         </thead>
         <tbody>
-          {!isEmpty(pendingTransactions) && pendingTransactions.filter(t => t.counterparty === whoami.id).map(pendingTx => {
+          {!isEmpty(pendingTransactions) && pendingTransactions.map(pendingTx => {
             return <LedgerTransactionsTable
               transaction={pendingTx}
               key={pendingTx.id}
