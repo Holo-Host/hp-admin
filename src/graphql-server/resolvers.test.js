@@ -72,7 +72,7 @@ describe('resolvers', () => {
         const agentId = 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
         resolvers.Query.holofuelUser(null, { agentId })
         await wait(0)
-        expect(mockHoloFuelInterface.user.get).toHaveBeenCalled()
+        expect(mockHoloFuelInterface.user.get).toHaveBeenCalledWith(agentId)
       })
 
       it('calls HoloFuelInterface.transactions.holofuelUser.get *without* agentId', async () => {

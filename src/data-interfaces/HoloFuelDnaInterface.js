@@ -163,7 +163,7 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
-    getSinglePending: async transactionId => {
+    getPending: async transactionId => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
       const transactionArray = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
       if (transactionArray.length === 0) {
@@ -174,7 +174,7 @@ const HoloFuelDnaInterface = {
     },
     // decline pending proposed transaction (NB: proposed by another agent).
     decline: async transactionId => {
-      const transaction = await HoloFuelDnaInterface.transactions.getSinglePending(transactionId)
+      const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/decline')({ origin: transactionId })
       return {
         ...transaction,
@@ -184,7 +184,7 @@ const HoloFuelDnaInterface = {
     },
     // cancel pending authored transaction.
     cancel: async transactionId => {
-      const transaction = await HoloFuelDnaInterface.transactions.getSinglePending(transactionId)
+      const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/cancel')({ origin: transactionId })
       return {
         ...transaction,
@@ -222,15 +222,15 @@ const HoloFuelDnaInterface = {
     },
 
     accept: async (transactionId) => {
-      const transaction = await HoloFuelDnaInterface.transactions.getSinglePending(transactionId)
+      const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
       console.log('ACCEPT PAYMENT TRANSACTION OBJECT : ', transaction)
       return {
         ...transaction,
         id: transactionId,
-        // direction: DIRECTION.incoming, // this indicates the hf recipient
-        status: STATUS.completed // ,
-        // type: TYPE.offer
+        direction: DIRECTION.incoming, // this indicates the hf recipient
+        status: STATUS.completed,
+        type: TYPE.offer
       }
     }
   }
