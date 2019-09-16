@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import useForm from 'react-hook-form'
 
+import PrimaryLayout from 'components/layout/PrimaryLayout'
+
 import Header from 'components/Header'
 import Button from 'components/Button'
 import Input from 'components/Input'
@@ -26,7 +28,18 @@ const MyProfile = ({
     setTosOpen(true)
   }
 
-  return <>
+  return <PrimaryLayout
+    footer={() => (
+      <Button
+        variant='primary'
+        wide
+        styleName='save-button'
+        type='submit'
+      >
+        Save Changes
+      </Button>
+    )}
+  >
     <Header title='Edit Profile' avatarUrl={avatarUrl} email={email} />
 
     <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
@@ -86,17 +99,8 @@ const MyProfile = ({
       </Button>
 
       <TosModal isOpen={isTosOpen} handleClose={() => setTosOpen(false)} />
-
-      <Button
-        variant='primary'
-        wide
-        styleName='save-button'
-        type='submit'
-      >
-        Save Changes
-      </Button>
     </form>
-  </>
+  </PrimaryLayout>
 }
 
 export default MyProfile
