@@ -10,7 +10,7 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes, fees }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -19,11 +19,12 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     status: STATUS.pending,
     type: TYPE.request,
     timestamp: eventTimestamp,
-    notes
+    notes: notes || event.Request.notes,
+    fees
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes, fees }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -32,7 +33,8 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     status: STATUS.pending,
     type: TYPE.offer,
     timestamp: eventTimestamp,
-    notes
+    notes: notes || event.Promise.tx.notes,
+    fees
   }
 }
 
@@ -75,8 +77,8 @@ function presentPendingRequest (transaction) {
   const stateDirection = DIRECTION.incoming // this indicates the recipient of funds
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
-  const { amount, notes } = event[2].Request
-  return presentRequest({ origin, stateDirection, eventTimestamp, counterparty, amount, notes })
+  const { amount, notes, fee } = event[2].Request
+  return presentRequest({ origin, stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
 }
 
 function presentPendingOffer (transaction) {
@@ -85,8 +87,8 @@ function presentPendingOffer (transaction) {
   const stateDirection = DIRECTION.outgoing // this indicates the spender of funds
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
-  const { amount, notes } = event[2].Promise.tx
-  return presentOffer({ origin, stateDirection, eventTimestamp, counterparty, amount, notes })
+  const { amount, notes, fee } = event[2].Promise.tx
+  return presentOffer({ origin, stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
 }
 
 function presentTransaction (transaction) {
@@ -108,11 +110,11 @@ function presentTransaction (transaction) {
     }
     // The below two cases are 'waitingTransaction' cases :
     case 'requested': {
-      return presentRequest({ origin, event, stateDirection, timestamp: timestamp.event })
+      return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
     // NOTE: 'approved' only indicates that a payment was offered (could be in response to a request or an isolate payment)
     case 'approved': {
-      return presentOffer({ origin, event, stateDirection, timestamp: timestamp.event })
+      return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
     default:
       throw new Error('Error: No transaction stateState was matched. Current transaction stateStage : ', stateStage)

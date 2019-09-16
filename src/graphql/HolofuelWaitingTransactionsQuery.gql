@@ -7,5 +7,7 @@ query HolofuelWaitingTransactionsQuery {
     status
     type
     timestamp
+    notes
+    fees
   }
 }

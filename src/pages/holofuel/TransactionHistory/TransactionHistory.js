@@ -10,8 +10,46 @@ import Modal from 'components/holofuel/Modal'
 
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
+import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
+
+export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7) || ''
+
+export function formatDateTime (isoDate) {
+  console.log('isoDate : ', isoDate)
+  const dateDifference = moment(isoDate).fromNow()
+  // If over a year ago, include the year in date
+  if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) > 365) {
+    return {
+      date: moment(isoDate).format('MMMM D YYYY'),
+      time: moment(isoDate).format('h:mm')
+    }
+  // If over a week ago, include the month and day in date
+  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7) {
+    return {
+      date: moment(isoDate).format('MMMM D'),
+      time: moment(isoDate).format('h:mm')
+    }
+  // If within a week ago, state days lapsed in date
+  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
+    return {
+      date: dateDifference,
+      time: moment(isoDate).format('h:mm')
+    }
+  // If less than a day ago, state hours lapsed in time
+  } else if (dateDifference.split(' ')[1] === 'hours' && parseInt(moment(isoDate).startOf('hour').fromNow().split(' ')[0]) > 1) {
+    return {
+      date: 'Today',
+      time: moment(isoDate).fromNow() // .startOf('hour')
+    }
+  } else {
+  // If less than an hour ago, state minutes lapsed in time
+    return {
+      date: 'Today',
+      time: moment(isoDate).fromNow() // .startOf('minute')
+    }
+  }
+}
 
 function useCancel () {
   const [cancel] = useMutation(HolofuelCancelMutation)
@@ -20,7 +58,7 @@ function useCancel () {
     refetchQueries: [{
       query: HolofuelCompletedTransactionsQuery
     }, {
-      query: HolofuelActionableTransactionsQuery
+      query: HolofuelWaitingTransactionsQuery
     }]
   })
 }
@@ -28,9 +66,9 @@ function useCancel () {
 export default function TransactionsHistory ({ history: { push } }) {
   const { data: { holofuelUser: whoami = [] } } = useQuery(HolofuelUserQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } } = useQuery(HolofuelCompletedTransactionsQuery)
-  const { data: { holofuelActionableTransactions: pendingTransactions = [] } } = useQuery(HolofuelActionableTransactionsQuery)
+  const { data: { holofuelWaitingTransactions: pendingTransactions = [] } } = useQuery(HolofuelWaitingTransactionsQuery)
 
-  console.log(' >>>> HOLOFUEL whoami ? <<<<<<< ', whoami)
+  console.log('pending TX : ', pendingTransactions)
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -56,7 +94,7 @@ export default function TransactionsHistory ({ history: { push } }) {
           <tr key='heading'>
             {headings && headings.map((header, contentIndex) => {
               return (
-                <TransactionEntry
+                <TransactionTableHeading
                   key={`heading-${contentIndex}`}
                   content={header}
                 />
@@ -70,7 +108,7 @@ export default function TransactionsHistory ({ history: { push } }) {
               transaction={pendingTx}
               key={pendingTx.id}
               showCancellationModal={showCancellationModal}
-              pending />
+            />
           })}
 
           {!isEmpty(completedTransactions) && completedTransactions.map(completeTx => {
@@ -78,7 +116,7 @@ export default function TransactionsHistory ({ history: { push } }) {
               transaction={completeTx}
               key={completeTx.id}
               showCancellationModal={showCancellationModal}
-              complete />
+              completed />
           })}
         </tbody>
       </table>
@@ -92,44 +130,31 @@ export default function TransactionsHistory ({ history: { push } }) {
   </React.Fragment>
 }
 
-export function LedgerTransactionsTable ({ transaction, showCancellationModal, complete }) {
-  const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
-  return <tr key={id} styleName='table-content-row' data-testid='transactions-table-row'>
-    <td id='date-time' styleName='completed-tx-col table-content' data-testid='cell-date-time'>{timestamp && formatDateTime(timestamp)}</td>
-    <td styleName='completed-tx-col table-content'>
-      <h4 id='counterparty' data-testid='cell-counterparty'>{counterparty && makeDisplayName(counterparty)}</h4>
-      <p id='notes' styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
-    </td>
-    <td id='fees' styleName='completed-tx-col table-content red-text' data-testid='cell-fees'>{fees}</td>
-    <td id='amount' styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} data-testid='cell-amount'>{amount}</td>
-    { complete && !isEmpty(presentBalance)
-      ? <td id='present-balance' styleName='completed-tx-col table-content' data-testid='cell-present-balance'>{presentBalance}</td>
-      : <td id='pending-item' styleName='completed-tx-col table-content' data-testid='cell-pending-item'>
-        <p styleName='italic'>Pending</p>
-        <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />
-      </td>
-    }
-  </tr>
-}
-
-const TransactionEntry = ({ content }) => {
+const TransactionTableHeading = ({ content }) => {
   return <th id={content ? content.toLowerCase() : null} styleName='completed-tx-col table-headers'>
     {content || null}
   </th>
 }
 
-export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7).toUpperCase() || ''
-
-export function formatDateTime (isoDate) {
-  const dateDifference = moment(isoDate).startOf('date').fromNow()
-  const daysDifferent = moment().diff(isoDate, 'days')
-  console.log('dateDifference : ', dateDifference)
-  console.log('daysDifferent : ', daysDifferent)
-  if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7) {
-    return moment(isoDate).format('LLL')
-  } else if (dateDifference.split(' ')[1] === 'hours' && parseInt(moment(isoDate).startOf('hour').fromNow().split(' ')[0]) > 1) {
-    return moment(isoDate).startOf('hour').fromNow()
-  } else return moment(isoDate).startOf('minute').fromNow()
+export function LedgerTransactionsTable ({ transaction, showCancellationModal, completed }) {
+  const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
+  // console.log('transaction object : ', transaction)
+  return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
+    <td styleName='completed-tx-col table-content' data-testid='cell-date-time'>{formatDateTime(timestamp).date}<br />{formatDateTime(timestamp).time}</td>
+    <td styleName='completed-tx-col table-content align-left'>
+      <h4 data-testid='cell-counterparty'>{makeDisplayName(counterparty).toUpperCase()}</h4>
+      <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
+    </td>
+    <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
+    <td styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} data-testid='cell-amount'>{amount}</td>
+    { completed
+      ? <td styleName='completed-tx-col table-content' data-testid='cell-present-balance'><p>*Awaiting DNA update*</p>{presentBalance}</td>
+      : <td styleName='completed-tx-col table-content' data-testid='cell-pending-item'>
+        <p styleName='italic'>Pending</p>
+        <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />
+      </td>
+    }
+  </tr>
 }
 
 function CancelButton ({ showCancellationModal, transaction }) {
@@ -140,6 +165,7 @@ function CancelButton ({ showCancellationModal, transaction }) {
   </Button>
 }
 
+//
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
 function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
   if (!transaction) return null

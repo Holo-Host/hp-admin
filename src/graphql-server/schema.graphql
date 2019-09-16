@@ -44,8 +44,10 @@ enum TransactionType {
 
 enum TransactionStatus {
   pending
-  complete
+  completed
   rejected
+  declined
+  cancelled
 }
 
 enum TransactionDirection {
