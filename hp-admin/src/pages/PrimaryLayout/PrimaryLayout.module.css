@@ -1,0 +1,26 @@
+.primary-layout {
+  display: flex;
+  flex-direction: column;
+  word-break: break-word;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.wide {
+  padding: 50px;
+
+  /* empty */
+}
+
+.narrow {
+  padding: 25px 20px;
+}
+
+.menu-link {
+  padding-bottom: 20px;
+  cursor: pointer;
+}
+
+.side-menu {
+  padding-right: 10px;
+}

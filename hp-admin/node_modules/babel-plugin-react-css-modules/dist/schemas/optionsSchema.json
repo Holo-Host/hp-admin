@@ -1,0 +1,81 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "context": {
+      "type": "string"
+    },
+    "exclude": {
+      "type": "string"
+    },
+    "filetypes": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "\\..*": {
+          "additionalProperties": false,
+          "properties": {
+            "plugins": {
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "syntax": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "generateScopedName": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "typeof": "function"
+        }
+      ]
+    },
+    "removeImport": {
+      "type": "boolean"
+    },
+    "webpackHotModuleReloading": {
+      "type": "boolean"
+    },
+    "handleMissingStyleName": {
+      "enum": ["throw", "warn", "ignore"]
+    },
+    "attributeNames": {
+      "additionalProperties": false,
+      "patternProperties": {
+        ".*": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "skip": {
+      "type": "boolean"
+    },
+    "autoResolveMultipleImports": {
+      "type": "boolean"
+    }
+  },
+  "type": "object"
+}

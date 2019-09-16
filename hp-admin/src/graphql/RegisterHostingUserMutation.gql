@@ -1,0 +1,6 @@
+mutation RegisterHostingUser {
+  registerHostingUser {
+    id
+    isRegistered
+  }
+}

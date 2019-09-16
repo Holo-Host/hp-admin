@@ -1,0 +1,7 @@
+.image {
+  display: block;
+  flex: 0 0 90px;
+  height: 90px;
+  box-shadow: 2px 2px 5px rgba(66, 66, 66, 0.5);
+  border-radius: 10px;
+}

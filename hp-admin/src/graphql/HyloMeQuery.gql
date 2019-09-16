@@ -1,0 +1,8 @@
+query HyloMe {
+  me {
+    id
+    name
+    avatarUrl
+    isRegistered
+  }
+}

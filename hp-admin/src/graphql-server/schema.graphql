@@ -1,0 +1,104 @@
+type Me {
+  id: ID
+  name: String
+  avatarUrl: String
+  isRegistered: Boolean
+}
+
+type HappStoreUser {
+  hash: String
+  name: String
+}
+
+type HhaUser {
+  id: ID
+  isRegistered: Boolean
+}
+
+type Happ {
+  id: ID
+  title: String
+  description: String
+  thumbnailUrl: String
+  homepageUrl: String
+  dnaHash: String
+  ui: String
+  happStoreId: String
+  isEnabled: Boolean
+}
+
+type HostPricing {
+  units: String
+  pricePerUnit: String
+}
+
+type HolofuelUser {
+  id: ID
+  nickname: String
+}
+
+enum TransactionType {
+  offer
+  request
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  rejected
+  declined
+  cancelled
+}
+
+enum TransactionDirection {
+  incoming # indicates the recipient of funds
+  outgoing # indicates the spender of funds
+}
+
+type Transaction {
+  id: ID # ID will be the originCommitHash
+  amount: Float
+  counterparty: String
+  direction: TransactionDirection
+  status: TransactionStatus
+  type: TransactionType
+  timestamp: String
+  fees: Float
+  presentBalance: Float
+  notes: String 
+}
+
+type Ledger {
+  balance: Float
+  credit: Float
+  payable: Float
+  receivable: Float
+  fees: Float
+}
+
+type Query {
+  me: Me
+  happStoreUser: HappStoreUser
+  hostingUser: HhaUser
+  happs: [Happ]
+  happ(id: String!): Happ
+  hostPricing: HostPricing
+  holofuelCompletedTransactions: [Transaction]
+  holofuelWaitingTransactions: [Transaction]
+  holofuelActionableTransactions: [Transaction]
+  holofuelLedger: Ledger
+  holofuelUser(agentId: String): HolofuelUser
+}
+
+type Mutation {
+  registerUser(name: String, avatarUrl: String): Me
+  registerHostingUser: HhaUser
+  enableHapp(appId: String): Happ
+  disableHapp(appId: String): Happ
+  updateHostPricing(units: String, pricePerUnit: String): HostPricing
+  holofuelRequest(counterparty:String, amount:Float): Transaction
+  holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
+  holofuelAcceptOffer(transactionId: ID): Transaction # NOTE: holofuelAcceptOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
+  holofuelDecline(transactionId: ID): Transaction # ""
+  holofuelCancel(transactionId: ID): Transaction # ""
+}

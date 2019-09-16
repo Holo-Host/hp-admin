@@ -1,0 +1,13 @@
+query HolofuelWaitingTransactionsQuery {
+  holofuelWaitingTransactions {
+    id
+    amount
+    counterparty
+    direction
+    status
+    type
+    timestamp
+    notes
+    fees
+  }
+}

@@ -1,0 +1,1 @@
+{"ast":null,"code":"/* eslint-disable no-redeclare */\n// $FlowFixMe workaround for: https://github.com/facebook/flow/issues/4441\nvar isFinitePolyfill = Number.isFinite || function (value) {\n  return typeof value === 'number' && isFinite(value);\n};\n\nexport default isFinitePolyfill;","map":null,"metadata":{},"sourceType":"module"}

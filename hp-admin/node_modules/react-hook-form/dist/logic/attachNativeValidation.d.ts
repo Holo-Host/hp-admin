@@ -1,0 +1,2 @@
+import { FieldValues, Ref } from '../types';
+export default function attachNativeValidation(ref: Ref, rules: FieldValues): void;

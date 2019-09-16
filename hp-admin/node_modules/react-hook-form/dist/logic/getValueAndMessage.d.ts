@@ -1,0 +1,9 @@
+import { ValidationTypes } from '../types';
+declare const _default: (validationData?: string | number | RegExp | {
+    value: ValidationTypes;
+    message: string;
+} | undefined) => {
+    value: ValidationTypes;
+    message: string;
+};
+export default _default;

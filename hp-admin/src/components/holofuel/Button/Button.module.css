@@ -1,0 +1,35 @@
+.button {
+  font-size: 14px;
+  background: white;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.wide {
+  display: block;
+  width: 100%;
+}
+
+.plain {
+  background-color: white;
+  color: black;  
+}
+
+.primary {
+  background-color: #222;
+  color: #fff;
+}
+
+.secondary {
+  background-color: #aaa;
+}
+
+.disabled {
+  opacity: 0.7
+}
+
+.mini {
+  padding: 0;
+}

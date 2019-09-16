@@ -1,0 +1,3 @@
+import { FieldValues } from '../types';
+export declare function isKey(value: [] | string): boolean;
+export default function set(object: FieldValues, path: string, value: string): Record<string, any>;

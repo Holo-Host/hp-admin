@@ -1,0 +1,13 @@
+query HappsQuery {
+  happs {
+    id
+    title
+    description
+    thumbnailUrl
+    homepageUrl
+    dnaHash
+    ui
+    happStoreId
+    isEnabled
+  }
+}

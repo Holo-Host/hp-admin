@@ -1,0 +1,6 @@
+declare const _default: (mode?: string | undefined) => {
+    isOnSubmit: boolean;
+    isOnBlur: boolean;
+    isOnChange: boolean;
+};
+export default _default;

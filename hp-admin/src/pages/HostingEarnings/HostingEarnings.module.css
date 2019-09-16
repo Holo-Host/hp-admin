@@ -1,0 +1,56 @@
+.day-buttons {
+  display: flex;
+  margin: 10px 0 10px 0;
+}
+
+.day-button {
+  margin: 0 2px 0 2px;
+  flex: 1;
+  padding: 8px;
+  color: var(--color-gray);
+}
+
+.one-button {
+  composes: day-button;
+}
+
+.seven-button {
+  composes: day-button;
+}
+
+.thirty-button {
+  composes: day-button;
+}
+
+.selected {
+  background-color: var(--color-gray);
+  color: white;
+}
+
+.transaction-list {
+  padding-top: 20px;
+  font-size: 12px;
+}
+
+table {
+  /* border-bottom: 1px solid var(--color-gray); */
+}
+
+
+th, td {
+  border-top: 1px solid var(--color-gray);
+  border-right: 1px solid var(--color-gray);
+  text-align: left;
+  padding: 5px;
+  color: #333;
+}
+
+th {
+  color: #555;
+  border-top: 0px solid var(--color-gray);
+}
+
+th:last-child,
+td:last-child {
+  border-right: 0px solid var(--color-gray);
+}

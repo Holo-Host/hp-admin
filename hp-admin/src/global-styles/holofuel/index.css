@@ -1,0 +1,16 @@
+@font-face {
+  font-family: 'Roboto';
+  src: local('Roboto'), url(../../assets/fonts/Roboto-Regular.ttf) format('truetype');
+}
+
+body {
+  margin: 0;
+  font-family: "Roboto";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-alabaster);
+}
+
+html, body, #root {
+  height: 100%;
+}

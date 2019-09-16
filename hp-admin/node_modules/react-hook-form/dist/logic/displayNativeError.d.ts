@@ -1,0 +1,2 @@
+declare const _default: (nativeValidation: boolean, ref: any, message: string) => void;
+export default _default;

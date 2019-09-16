@@ -1,0 +1,13 @@
+query HolofuelActionableTransactionsQuery {
+  holofuelActionableTransactions {
+    id
+    amount
+    counterparty
+    direction
+    status
+    type
+    timestamp
+    notes
+    fees
+  }
+}
