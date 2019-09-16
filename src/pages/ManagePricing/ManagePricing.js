@@ -8,7 +8,7 @@ import HostPricingQuery from 'graphql/HostPricingQuery.gql'
 import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 
 export default function ManagePricing () {
-  const { data: { hostPricing } } = useQuery(HostPricingQuery)
+  const { data: { hostPricing } = {} } = useQuery(HostPricingQuery)
   const [updateHostPricing, { loading }] = useMutation(UpdateHostPricingMutation)
 
   const [units, setUnits] = useState('')
