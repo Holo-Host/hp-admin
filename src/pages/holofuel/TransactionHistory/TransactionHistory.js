@@ -31,8 +31,8 @@ function useCancel () {
 // Display - Functional Components with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
   // const { data: { holofuelUser: whoami = {} } } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelCompletedTransactions: completedTransactions = [] } } = useQuery(HolofuelCompletedTransactionsQuery)
-  const { data: { holofuelWaitingTransactions: pendingTransactions = [] } } = useQuery(HolofuelWaitingTransactionsQuery)
+  const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
   // console.log('current Agent : ', whoami)
 
