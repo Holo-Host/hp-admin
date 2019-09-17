@@ -2,7 +2,12 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-export const MOCK_DNA_CONNECTION = true || process.env.NODE_ENV === 'test'
+export const MOCK_DNA_CONNECTION = false || process.env.NODE_ENV === 'test'
+export const MOCK_INDIVIDUAL_DNAS = {
+  hylo: true,
+  'happ-store': true,
+  hha: true
+}
 export const MOCK_ENVOY_CONNECTION = true || process.env.NODE_ENV === 'test'
 export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
 
@@ -10,6 +15,7 @@ export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
 
 async function initAndGetHolochainClient () {
+  console.log('process.env.REACT_APP_DNA_INTERFACE_URL', process.env.REACT_APP_DNA_INTERFACE_URL)
   if (holochainClient) return holochainClient
   try {
     holochainClient = await hcWebClientConnect({
@@ -20,7 +26,7 @@ async function initAndGetHolochainClient () {
       console.log('🎉 Successfully connected to Holochain!')
     }
   } catch (error) {
-    if (this.params.logging) {
+    if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
     throw (error)
@@ -41,7 +47,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
       let zomeCall
 
-      if (MOCK_DNA_CONNECTION) {
+      if (MOCK_DNA_CONNECTION || MOCK_INDIVIDUAL_DNAS[instanceId]) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()
