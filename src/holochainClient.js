@@ -15,7 +15,6 @@ export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
 
 async function initAndGetHolochainClient () {
-  console.log('process.env.REACT_APP_DNA_INTERFACE_URL', process.env.REACT_APP_DNA_INTERFACE_URL)
   if (holochainClient) return holochainClient
   try {
     holochainClient = await hcWebClientConnect({

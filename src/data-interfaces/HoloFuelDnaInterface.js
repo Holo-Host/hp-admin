@@ -78,7 +78,7 @@ function presentPendingRequest (transaction) {
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
   const { amount, notes, fee } = event[2].Request
-  return presentRequest({ origin, stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
+  return presentRequest({ origin, event: event[2], stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
 }
 
 function presentPendingOffer (transaction) {
@@ -88,7 +88,7 @@ function presentPendingOffer (transaction) {
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
-  return presentOffer({ origin, stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
+  return presentOffer({ origin, event: event[2], stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
 }
 
 function presentTransaction (transaction) {
@@ -195,7 +195,7 @@ const HoloFuelDnaInterface = {
   },
   requests: {
     create: async (counterparty, amount) => {
-      const origin = await createZomeCall('transactions/request')({ from: counterparty, amount, deadline: MOCK_DEADLINE })
+      const origin = await createZomeCall('transactions/request')({ from: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE })
       return {
         id: origin,
         amount,
@@ -209,7 +209,7 @@ const HoloFuelDnaInterface = {
   },
   offers: {
     create: async (counterparty, amount, requestId) => {
-      const origin = await createZomeCall('transactions/promise')({ to: counterparty, amount, deadline: MOCK_DEADLINE, requestId })
+      const origin = await createZomeCall('transactions/promise')({ to: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE, requestId })
       return {
         id: requestId || origin, // NOTE: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
         amount,
