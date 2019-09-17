@@ -5,7 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
-import HFPrimaryLayout from 'pages/holofuel/PrimaryLayout'
+import HFRouter from './router-holofuel'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
 import HPAdminRouter from './router'
@@ -24,7 +24,7 @@ export function HoloFuelApp () {
   return <ApolloProvider client={apolloClient}>
     <Router>
       <ScreenWidthContext.Provider value={isWide}>
-        <HFPrimaryLayout />
+        <HFRouter />
       </ScreenWidthContext.Provider>
     </Router>
   </ApolloProvider>

@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import Header from 'components/holofuel/Header'
+import PrimaryLayout from 'components/holofuel/layout/PrimaryLayout'
 import HashIcon from 'components/holofuel/HashIcon'
 import Button from 'components/holofuel/Button'
 import './CreateRequest.module.css'
@@ -42,8 +42,7 @@ export default function CreateRequest ({ history: { push } }) {
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)
 
-  return <>
-    <Header title='Request' />
+  return <PrimaryLayout headerProps={{ title: 'Request' }}>
     <div styleName='help-text'>
       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     </div>
@@ -72,5 +71,5 @@ export default function CreateRequest ({ history: { push } }) {
       </div>
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
     </form>
-  </>
+  </PrimaryLayout>
 }

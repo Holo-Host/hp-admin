@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
-import Header from 'components/holofuel/Header'
+import PrimaryLayout from 'components/holofuel/layout/PrimaryLayout'
 import HashIcon from 'components/holofuel/HashIcon'
 import Button from 'components/holofuel/Button'
 import './CreateOffer.module.css'
@@ -49,8 +49,7 @@ export default function CreateOffer ({ history: { push } }) {
 
   !isEmpty(errors) && console.log('Offer form errors (leave here until proper error handling is implemented):', errors)
 
-  return <>
-    <Header title='Offer' />
+  return <PrimaryLayout headerProps={{ title: 'Offer' }}>
     <div styleName='help-text'>
       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     </div>
@@ -90,5 +89,5 @@ export default function CreateOffer ({ history: { push } }) {
       </div>
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
     </form>
-  </>
+  </PrimaryLayout>
 }

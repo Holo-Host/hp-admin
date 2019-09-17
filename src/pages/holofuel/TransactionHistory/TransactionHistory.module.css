@@ -2,13 +2,7 @@
 .account-ledger-table {
   display: flex;
   flex-direction: column;
-}
-
-.completed-transactions-title {
-  text-align: center;
-  padding: 20px 0px;
-  margin-top: -15px;
-  font-family: 'Roboto', sans-serif;
+  margin-top: 20px;
 }
 
 /* Table */
