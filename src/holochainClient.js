@@ -2,9 +2,9 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-export const MOCK_DNA_CONNECTION = true || process.env.NODE_ENV === 'test'
-export const MOCK_ENVOY_CONNECTION = true || process.env.NODE_ENV === 'test'
-export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
+export const MOCK_DNA_CONNECTION = false || process.env.NODE_ENV === 'test'
+export const MOCK_ENVOY_CONNECTION = false || process.env.NODE_ENV === 'test'
+export const MOCK_HP_CONNECTION = false || process.env.NODE_ENV === 'test'
 
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient

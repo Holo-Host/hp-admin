@@ -1,10 +1,12 @@
+####
+# NOTE: This File is for exclusively running the holofuel DNA with two agents.
 ##
 # * Copy this file to conductor-config.toml and generate a unique agent key for each of the `agents` fields below:
 #
 # * Steps for creating an agent:
 #    1. Run `hc keygen -n --path keystores/myagent.keystore`
 #    2. Copy the public address hash and paste it as the value for the agent's `public_address`
-##
+####
 
 # -- All Agents
 [[agents]]
@@ -21,65 +23,11 @@ keystore_file = "keystores/myagent.keystore"
 
 # -- All DNAs
 [[dnas]]
-id = "happ_store_dna"
-file = "/PATH/TO/happ-store.dna.json"
-hash = "currently unused"
-
-[[dnas]]
-id = "hylo_dna"
-file = "/PATH/TO/hylo.dna.json"
-hash = "currently unused"
-
-[[dnas]]
-id = "hha_dna"
-file = "/PATH/TO/HHA/dna-src.dna.json"
-hash = "currently unused"
-
-[[dnas]]
 id = "holofuel_dna"
 file = "/PATH/TO/holofuel.dna.json"
 hash = "currently unused"
 
 # -- Agent Instances for each DNA
-[[instances]]
-id = "happ-store"
-dna = "happ_store_dna"
-agent = "hp_admin_agent_1"
-
-  [instances.logger]
-  type = "simple"
-  file = "app_spec.log"
-
-  [instances.storage]
-  type = "file"
-  path = "tmp/tmp-storage-agent1-1"
-
-[[instances]]
-id = "hylo"
-dna = "hylo_dna"
-agent = "hp_admin_agent_1"
-
-  [instances.logger]
-  type = "simple"
-  file = "app_spec.log"
-
-  [instances.storage]
-  type = "file"
-  path = "tmp/tmp-storage-agent1-2"
-
-[[instances]]
-id = "hha"
-dna = "hha_dna"
-agent = "hp_admin_agent_1"
-
-  [instances.logger]
-  type = "simple"
-  file = "app_spec.log"
-
-  [instances.storage]
-  type = "file"
-  path = "tmp/tmp-storage-agent1-3"
-
 [[instances]]
 id = "holofuel"
 dna = "holofuel_dna"
@@ -91,7 +39,7 @@ agent = "hp_admin_agent_1"
 
   [instances.storage]
   type = "file"
-  path = "tmp/tmp-storage-agent1-4"
+  path = "tmp/tmp-storage-agent1-1"
 
 [[instances]]
 id = "holofuel2"
@@ -115,15 +63,6 @@ id = "websocket-interface"
     port = 3400
 
     [[interfaces.instances]]
-    id = "hylo"
-
-    [[interfaces.instances]]
-    id = "happ-store"
-
-    [[interfaces.instances]]
-    id = "hha"
-
-    [[interfaces.instances]]
     id = "holofuel"
 
     [[interfaces.instances]]
@@ -137,15 +76,6 @@ admin = true
     [interfaces.driver]
     type = "websocket"
     port = 3300
-
-    [[interfaces.instances]]
-    id = "hylo"
-
-    [[interfaces.instances]]
-    id = "happ-store"
-
-    [[interfaces.instances]]
-    id = "hha"
 
     [[interfaces.instances]]
     id = "holofuel"
