@@ -153,12 +153,12 @@ describe('resolvers', () => {
       })
     })
 
-    describe('.holofuelRejectOffer', () => {
+    describe('.holofuelDecline', () => {
       it('calls reject offer and constructs the result transaction', async () => {
         const transactionId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
-        resolvers.Mutation.holofuelRejectOffer(null, { transactionId })
+        resolvers.Mutation.holofuelDecline(null, { transactionId })
         await wait(0)
-        expect(mockHoloFuelInterface.offers.reject).toHaveBeenCalledWith(transactionId)
+        expect(mockHoloFuelInterface.transactions.decline).toHaveBeenCalledWith(transactionId)
       })
     })
   })
