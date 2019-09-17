@@ -95,7 +95,8 @@ describe('HoloFuel Ledger Transactions', () => {
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-amount')).getByText(fullRowContent[rowIndex].amount)).toBeInTheDocument()
             expect(within(getByTestId('cell-fees')).getByText(fullRowContent[rowIndex].fees)).toBeInTheDocument()
-            // if (fullRowContent[rowIndex].presentBalance) expect(within(getByTestId('cell-present-balance')).getByText(fullRowContent[rowIndex].presentBalance)).toBeInTheDocument()
+            if (fullRowContent[rowIndex].presentBalance) expect(within(getByTestId('cell-present-balance')).getByText(fullRowContent[rowIndex].presentBalance)).toBeInTheDocument()
+            else expect(within(getByTestId('cell-pending-item')).getByRole('button')).toBeInTheDocument()
           })
         } else {
           throw new Error('There was an unknown table-group found : group label, index in tableGroup Array', tableGroup, index)
@@ -143,10 +144,6 @@ describe('HoloFuel Ledger Transactions', () => {
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('for', { exact: false })).toBeInTheDocument()
       expect(getByText('from', { exact: false })).toBeInTheDocument()
-
-      // nested in a span :
-      // expect(within(getByTestId('modal-amount')).getByText(pendingRequest.amount)).toBeInTheDocument()
-      // expect(within(getByTestId('modal-counterparty')).getByText(makeDisplayName(pendingRequest.counterparty))).toBeInTheDocument()
     })
 
     it('should display correct text for CancellationModal for a Pending Offer', async () => {
@@ -158,10 +155,6 @@ describe('HoloFuel Ledger Transactions', () => {
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('of', { exact: false })).toBeInTheDocument()
       expect(getByText('to', { exact: false })).toBeInTheDocument()
-
-      // nested in a span :
-      // expect(within(getByTestId('modal-amount')).getByText(pendingOffer.amount)).toBeInTheDocument()
-      // expect(within(getByTestId('modal-counterparty')).getByText(makeDisplayName(pendingOffer.counterparty))).toBeInTheDocument()
     })
 
     it('should open CancellationModal and trigger HolofuelCancelMutation for Pending Request', async () => {
