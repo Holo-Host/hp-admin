@@ -16,18 +16,18 @@ export function Header ({ title, avatarUrl, email, backTo, history: { push } }) 
     <MenuIcon styleName='menu-icon' color='#FFF' />
   </Button>
 
-  return <div>
-    <div styleName='header'>
+  return <header>
+    <section styleName='header'>
       <div styleName='left-nav'>{leftNav}</div>
       <div styleName='title'>My HoloPort</div>
       <Link to='/my-profile' styleName='avatar-link'>
         <HashAvatar avatarUrl={avatarUrl} email={email} size={32} />
       </Link>
-    </div>
-    {title && <div styleName='sub-header'>
+    </section>
+    {title && <section styleName='sub-header'>
       <div styleName='sub-title'>{title}</div>
-    </div>}
-  </div>
+    </section>}
+  </header>
 }
 
 export default withRouter(Header)

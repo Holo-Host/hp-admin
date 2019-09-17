@@ -3,7 +3,6 @@ import useForm from 'react-hook-form'
 
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 
-import Header from 'components/Header'
 import Button from 'components/Button'
 import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
@@ -29,19 +28,12 @@ const MyProfile = ({
   }
 
   return <PrimaryLayout
-    footer={() => (
-      <Button
-        variant='primary'
-        wide
-        styleName='save-button'
-        type='submit'
-      >
-        Save Changes
-      </Button>
-    )}
+    header={{
+      title: 'Edit Profile',
+      avatarUrl,
+      email
+    }}
   >
-    <Header title='Edit Profile' avatarUrl={avatarUrl} email={email} />
-
     <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
       <HashAvatar avatarUrl={avatarUrl} email={email} styleName='avatar-image' />
       <label styleName='field'>
@@ -99,6 +91,15 @@ const MyProfile = ({
       </Button>
 
       <TosModal isOpen={isTosOpen} handleClose={() => setTosOpen(false)} />
+
+      <Button
+        variant='primary'
+        wide
+        styleName='save-button'
+        type='submit'
+      >
+        Save Changes
+      </Button>
     </form>
   </PrimaryLayout>
 }

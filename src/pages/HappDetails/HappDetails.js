@@ -3,6 +3,7 @@ import HappThumbnail from 'components/HappThumbnail'
 import HostButton from 'components/HostButton'
 import Button from 'components/Button'
 import Modal from 'components/Modal'
+import PrimaryLayout from 'components/layout/PrimaryLayout'
 import './HappDetails.module.css'
 
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -42,7 +43,7 @@ export default function HappDetails ({
       }))
   }
 
-  return <>
+  return <PrimaryLayout header={{ title: 'Hosting' }}>
     {errorSummary && <div styleName='error'>
       {errorSummary}
       {errorDetails && <code>{errorDetails.message}</code>}
@@ -85,7 +86,7 @@ export default function HappDetails ({
         <Button wide>Hosting Overview</Button>
       </footer>
     </Modal>
-  </>
+  </PrimaryLayout>
 }
 
 const HappSection = ({ title, className, children }) => (

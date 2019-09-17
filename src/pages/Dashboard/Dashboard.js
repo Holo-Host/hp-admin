@@ -1,13 +1,11 @@
 import React from 'react'
 import Btn from 'components/Button'
-import Header from 'components/Header'
+import PrimaryLayout from 'components/layout/PrimaryLayout'
 import { Link } from 'react-router-dom'
 import './Dashboard.module.css'
 
 export default function Dashboard ({ me, happStoreUser, registerUser }) {
-  return <>
-    <Header />
-
+  return <PrimaryLayout>
     <div styleName='linkBox'>
       <h2><Link to='/browse-happs'>Hosting</Link></h2>
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
@@ -34,5 +32,5 @@ export default function Dashboard ({ me, happStoreUser, registerUser }) {
         <strong>Happ Store User data:</strong> {happStoreUser && JSON.stringify(happStoreUser)}
       </p>
     </div>
-  </>
+  </PrimaryLayout>
 }

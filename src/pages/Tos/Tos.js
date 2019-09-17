@@ -1,4 +1,5 @@
 import React from 'react'
+import PrimaryLayout from 'components/layout/PrimaryLayout'
 import TosModal from 'components/TosModal'
 
 export default function Tos ({
@@ -6,5 +7,7 @@ export default function Tos ({
 }) {
   const returnToSettings = () => push('/settings')
 
-  return <TosModal handleClose={returnToSettings} isOpen />
+  return <PrimaryLayout>
+    <TosModal handleClose={returnToSettings} isOpen />
+  </PrimaryLayout>
 }
