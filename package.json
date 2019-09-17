@@ -8,6 +8,7 @@
     "build": "node scripts/build.js",
     "hc:start": "mkdir -p tmp && holochain -c ./conductor-config.toml",
     "provider-flow": "node scripts/HHAProviderFlow/index.js",
+    "holofuel-load": "node scripts/HoloFuelDataEntry/index.js",
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js",

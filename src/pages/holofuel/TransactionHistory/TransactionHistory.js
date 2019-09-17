@@ -177,7 +177,7 @@ export function formatDateTime (isoDate) {
   if (dateDifference.split(' ')[1] === 'years' || dateDifference.split(' ')[1] === 'year') {
     return {
       date: moment(isoDate).format('MMMM D YYYY'),
-      time: moment(isoDate).format('h:mm')
+      time: moment(isoDate).format('kk:mm')
     }
   // If over a week ago, include the month and day in date
   } else if (
@@ -185,13 +185,13 @@ export function formatDateTime (isoDate) {
     (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7)) {
     return {
       date: moment(isoDate).format('MMMM D'),
-      time: moment(isoDate).format('h:mm')
+      time: moment(isoDate).format('kk:mm')
     }
   // If within a week ago, state days lapsed in date
   } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
     return {
       date: dateDifference,
-      time: moment(isoDate).format('h:mm')
+      time: moment(isoDate).format('kk:mm')
     }
   // If less than a day ago, state hours, minutes, or seconds lapsed in time
   } else if (
