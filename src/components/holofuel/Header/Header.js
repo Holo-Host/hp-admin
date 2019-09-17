@@ -21,7 +21,7 @@ export function Header ({ title, accountNumber, avatarUrl, email, backTo, histor
       </div>
       <div styleName='right-nav account-number header-font'>{accountNumber}</div>
       <Link to='/dashboard' styleName='avatar-link'>
-        <HashAvatar avatarUrl={avatarUrl} email={email} size={32} />
+        <HashAvatar avatarUrl={avatarUrl} seed={accountNumber} size={32} />
       </Link>
     </div>
   </div>

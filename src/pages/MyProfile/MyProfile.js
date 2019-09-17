@@ -35,7 +35,7 @@ const MyProfile = ({
     }}
   >
     <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
-      <HashAvatar avatarUrl={avatarUrl} email={email} styleName='avatar-image' />
+      <HashAvatar avatarUrl={avatarUrl} seed={email} styleName='avatar-image' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
         <Input
