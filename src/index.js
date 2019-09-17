@@ -5,10 +5,10 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
-import HFRouter from './router-holofuel'
+import HFRouter from './HFRouter'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
-import HPAdminRouter from './router'
+import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
   if (process.env.REACT_APP_HOLOFUEL_APP) {
