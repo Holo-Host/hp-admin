@@ -10,20 +10,7 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
-  return {
-    id: origin,
-    amount: amount || event.Promise.tx.amount,
-    counterparty: counterparty || event.Promise.tx.to,
-    direction: stateDirection,
-    status: STATUS.pending,
-    type: TYPE.offer,
-    timestamp: eventTimestamp,
-    notes
-  }
-}
-
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes, fees }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -32,7 +19,22 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     status: STATUS.pending,
     type: TYPE.request,
     timestamp: eventTimestamp,
-    notes
+    notes: notes || event.Request.notes,
+    fees
+  }
+}
+
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes, fees }) => {
+  return {
+    id: origin,
+    amount: amount || event.Promise.tx.amount,
+    counterparty: counterparty || event.Promise.tx.to,
+    direction: stateDirection,
+    status: STATUS.pending,
+    type: TYPE.offer,
+    timestamp: eventTimestamp,
+    notes: notes || event.Promise.tx.notes,
+    fees
   }
 }
 
@@ -43,7 +45,7 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     amount: event.Receipt.cheque.invoice.promise.tx.amount,
     counterparty,
     direction: stateDirection,
-    status: STATUS.complete,
+    status: STATUS.completed,
     type: event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
     fees,
@@ -60,7 +62,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
     amount: event.Cheque.invoice.promise.tx.amount,
     counterparty,
     direction: stateDirection,
-    status: STATUS.complete,
+    status: STATUS.completed,
     type: event.Cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
     fees,
@@ -75,8 +77,8 @@ function presentPendingRequest (transaction) {
   const stateDirection = DIRECTION.incoming // this indicates the recipient of funds
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
-  const { amount, notes } = event[2].Request
-  return presentRequest({ origin, stateDirection, eventTimestamp, counterparty, amount, notes })
+  const { amount, notes, fee } = event[2].Request
+  return presentRequest({ origin, stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
 }
 
 function presentPendingOffer (transaction) {
@@ -85,8 +87,8 @@ function presentPendingOffer (transaction) {
   const stateDirection = DIRECTION.outgoing // this indicates the spender of funds
   const eventTimestamp = event[1]
   const counterparty = provenance[0]
-  const { amount, notes } = event[2].Promise.tx
-  return presentOffer({ origin, stateDirection, eventTimestamp, counterparty, amount, notes })
+  const { amount, notes, fee } = event[2].Promise.tx
+  return presentOffer({ origin, stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
 }
 
 function presentTransaction (transaction) {
@@ -108,11 +110,11 @@ function presentTransaction (transaction) {
     }
     // The below two cases are 'waitingTransaction' cases :
     case 'requested': {
-      return presentRequest({ origin, event, stateDirection, timestamp: timestamp.event })
+      return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
     // NOTE: 'approved' only indicates that a payment was offered (could be in response to a request or an isolate payment)
     case 'approved': {
-      return presentOffer({ origin, event, stateDirection, timestamp: timestamp.event })
+      return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
     default:
       throw new Error('Error: No transaction stateState was matched. Current transaction stateStage : ', stateStage)
@@ -143,20 +145,11 @@ const HoloFuelDnaInterface = {
     }
   },
   transactions: {
-    getPending: async transactionId => {
-      const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
-      const transactionArray = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
-      if (transactionArray.length === 0) {
-        throw new Error(`no pending transaction with id ${transactionId} found.`)
-      } else {
-        return transactionArray[0]
-      }
-    },
-    allComplete: async () => {
+    allCompleted: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
-      return noDuplicateIds.filter(tx => tx.status === 'complete').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+      return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')()
@@ -170,6 +163,16 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
+    getPending: async transactionId => {
+      const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
+      const transactionArray = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
+      if (transactionArray.length === 0) {
+        throw new Error(`no pending transaction with id ${transactionId} found.`)
+      } else {
+        return transactionArray[0]
+      }
+    },
+    // decline pending proposed transaction (NB: proposed by another agent).
     decline: async transactionId => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/decline')({ origin: transactionId })
@@ -177,6 +180,16 @@ const HoloFuelDnaInterface = {
         ...transaction,
         id: transactionId,
         status: STATUS.rejected
+      }
+    },
+    // cancel pending authored transaction.
+    cancel: async transactionId => {
+      const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
+      await createZomeCall('transactions/cancel')({ origin: transactionId })
+      return {
+        ...transaction,
+        id: transactionId,
+        status: STATUS.cancelled
       }
     }
   },
@@ -208,15 +221,14 @@ const HoloFuelDnaInterface = {
       }
     },
 
-    // NOTE: Below we reflect our current change to the receive_payment API; the only param should now be the transaction's origin id
     accept: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      await createZomeCall('transactions/receive_payments_pending')({ origin: transactionId })
+      await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
       return {
         ...transaction,
         id: transactionId,
         direction: DIRECTION.incoming, // this indicates the hf recipient
-        status: STATUS.complete,
+        status: STATUS.completed,
         type: TYPE.offer
       }
     }

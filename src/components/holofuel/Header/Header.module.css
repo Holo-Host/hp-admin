@@ -1,5 +1,10 @@
 .left-nav {
   flex: 1;
+  display: flex;
+}
+
+.right-nav {
+  flex: 1;
 }
 
 .back-button {
@@ -42,7 +47,7 @@
   align-items: center;
 }
 
-.title {
+.header-font {
   font-style: normal;
   font-weight: bold;
   flex-grow: 1;
@@ -50,6 +55,16 @@
   font-size: 16px;
   color: rgb(200,200,200);
   text-transform: uppercase;
+}
+
+.title {
+  text-align: left;
+  margin: 10px;
+}
+
+.account-number {
+  text-align: right;
+  margin: 10px;
 }
 
 .avatar-link {

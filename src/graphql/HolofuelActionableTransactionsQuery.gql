@@ -8,5 +8,6 @@ query HolofuelActionableTransactionsQuery {
     type
     timestamp
     notes
+    fees
   }
 }

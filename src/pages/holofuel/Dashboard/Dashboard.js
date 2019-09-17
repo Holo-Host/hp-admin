@@ -14,5 +14,6 @@ export default function Dashboard () {
     <Link to='/inbox'>Inbox</Link>
     <Link to='/offer'>Create Offer</Link>
     <Link to='/request'>Create Request</Link>
+    <Link to='/history'>History</Link>
   </>
 }

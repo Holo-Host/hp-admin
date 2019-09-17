@@ -28,7 +28,7 @@ export const resolvers = {
 
     holofuelActionableTransactions: () => HoloFuelDnaInterface.transactions.allActionable(),
 
-    holofuelCompleteTransactions: () => HoloFuelDnaInterface.transactions.allComplete(),
+    holofuelCompletedTransactions: () => HoloFuelDnaInterface.transactions.allCompleted(),
 
     holofuelLedger: () => HoloFuelDnaInterface.ledger.get(),
 
@@ -73,8 +73,9 @@ export const resolvers = {
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
-    holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId)
+    holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId),
 
+    holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId)
   }
 }
 

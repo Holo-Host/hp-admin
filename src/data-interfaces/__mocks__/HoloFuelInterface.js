@@ -20,17 +20,18 @@ const successfulTransactionResponse = ({ transactionId, amount, counterparty, st
 
 const mockHoloFuelDnaInterface = {
   transactions: {
-    allComplete: jest.fn(() => ['mockCompleteTransactionOne', 'mockCompleteTransactionTwo']),
+    allCompleted: jest.fn(() => ['mockCompleteTransactionOne', 'mockCompleteTransactionTwo']),
     allActionable: jest.fn(() => ['mockActionableTransactionOne', 'mockActionableTransactionTwo']),
-    allWaiting: jest.fn(() => ['mockWaitingTransactionOne', 'mockWaitingTransactionTwo'])
+    allWaiting: jest.fn(() => ['mockWaitingTransactionOne', 'mockWaitingTransactionTwo']),
+    decline: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.declined, type: TYPE.offer })), // type is hard-coded, but could be either
+    cancel: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.cancelled, type: TYPE.outgoing })) // type is hard-coded, but could be either
   },
   requests: {
     create: jest.fn((counterparty, amount) => successfulTransactionResponse({ transactionId: 'requestHashId', counterparty, amount, status: STATUS.pending, type: TYPE.request }))
   },
   offers: {
     create: jest.fn((counterparty, amount, requestId) => successfulTransactionResponse({ transactionId: requestId, counterparty, amount, status: STATUS.pending, type: TYPE.offer })),
-    accept: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.complete, type: TYPE.offer })),
-    decline: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.rejected, type: TYPE.offer }))
+    accept: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.completed, type: TYPE.offer })) // ,
   }
 }
 

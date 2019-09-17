@@ -10,7 +10,7 @@ import HappQuery from 'graphql/HappQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 
-export default function BrowseHapps ({
+export default function HappDetails ({
   history: { push },
   match: { params }
 } = {}) {

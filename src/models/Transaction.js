@@ -5,8 +5,9 @@ export const TYPE = {
 
 export const STATUS = {
   pending: 'pending',
-  complete: 'complete',
-  rejected: 'rejected'
+  completed: 'completed',
+  rejected: 'rejected',
+  cancelled: 'cancelled'
 }
 
 export const DIRECTION = {

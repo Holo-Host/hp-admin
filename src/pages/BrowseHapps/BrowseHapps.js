@@ -11,7 +11,7 @@ import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
 
 export default function BrowseHapps ({ history: { push } }) {
-  const { data: { happs = [] } } = useQuery(HappsQuery)
+  const { data: { happs = [] } = {} } = useQuery(HappsQuery)
   const [enableHappMutation] = useMutation(EnableHappMutation)
   const [disableHappMutation] = useMutation(DisableHappMutation)
   const enableHapp = appId => enableHappMutation({ variables: { appId } })

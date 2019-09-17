@@ -44,8 +44,9 @@ enum TransactionType {
 
 enum TransactionStatus {
   pending
-  complete
+  completed
   rejected
+  cancelled
 }
 
 enum TransactionDirection {
@@ -81,7 +82,7 @@ type Query {
   happs: [Happ]
   happ(id: String!): Happ
   hostPricing: HostPricing
-  holofuelCompleteTransactions: [Transaction]
+  holofuelCompletedTransactions: [Transaction]
   holofuelWaitingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
@@ -97,6 +98,6 @@ type Mutation {
   holofuelRequest(counterparty:String, amount:Float): Transaction
   holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction # NOTE: holofuelAcceptOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
-  holofuelRejectOffer(transactionId: ID): Transaction # NOTE: holofuelRejectOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
-  holofuelDecline(transactionId: ID): Transaction
+  holofuelDecline(transactionId: ID): Transaction # ""
+  holofuelCancel(transactionId: ID): Transaction # ""
 }

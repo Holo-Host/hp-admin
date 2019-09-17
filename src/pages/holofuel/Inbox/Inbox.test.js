@@ -67,8 +67,15 @@ describe('TransactionRow', () => {
     type: TYPE.offer
   }
 
-  it('renders a request', () => {
-    const { getByText } = render(<TransactionRow transaction={request} />)
+  it('renders a request', async () => {
+    let getByText
+    await act(async () => {
+      ({ getByText } = render(<MockedProvider addTypename={false}>
+        <TransactionRow transaction={request} />
+      </MockedProvider>))
+      await wait(0)
+    })
+
     expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
     expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
@@ -78,8 +85,15 @@ describe('TransactionRow', () => {
     expect(getByText('Reject')).toBeInTheDocument()
   })
 
-  it('renders an offer', () => {
-    const { getByText } = render(<TransactionRow transaction={offer} />)
+  it('renders an offer', async () => {
+    let getByText
+    await act(async () => {
+      ({ getByText } = render(<MockedProvider addTypename={false}>
+        <TransactionRow transaction={offer} />
+      </MockedProvider>))
+      await wait(0)
+    })
+
     expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
     expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()

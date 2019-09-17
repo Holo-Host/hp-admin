@@ -3,7 +3,7 @@ import { isString } from 'lodash/fp'
 
 export const transactionList = {
   ledger: {
-    balance: '1000.00',
+    balance: '1000.01',
     credit: '0',
     payable: '242.0201',
     receivable: '0',
@@ -39,7 +39,7 @@ export const transactionList = {
             amount: '40.01',
             fee: '0',
             deadline: '2020-01-22T00:00:00-02:00',
-            notes: null,
+            notes: 'lyft ride',
             synchronous: null
           },
           request: null
@@ -83,7 +83,7 @@ export const transactionList = {
                   amount: '10.01',
                   fee: '0',
                   deadline: '2020-02-02T00:00:00+00:00',
-                  notes: null,
+                  notes: 'Taco Tuesday!',
                   synchronous: null
                 },
                 request: 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
@@ -137,7 +137,7 @@ export const transactionList = {
                 amount: '10.01',
                 fee: '0',
                 deadline: '2020-02-02T00:00:00+00:00',
-                notes: null,
+                notes: 'Taco Tuesday!',
                 synchronous: null
               },
               request: 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
@@ -222,7 +222,7 @@ export const transactionList = {
         Request: {
           from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
           to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-          amount: '200.00',
+          amount: '200.01',
           fee: '2',
           deadline: '2020-12-02T00:00:00+00:00',
           notes: null,
@@ -292,7 +292,7 @@ export const pendingList = {
               amount: '2000',
               fee: '0',
               deadline: '2020-01-22T00:00:00-02:00',
-              notes: 'For the pizza',
+              notes: 'lyft ride',
               synchronous: null
             },
             request: null
@@ -329,7 +329,7 @@ function listPending ({ origins }) {
       promises: pendingList.promises.filter(filter)
     }
   }
-  throw new Error('array value for origins param of list_pending is not supported in the mock dna')
+  throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
 }
 
 const NUM_SALT_ROUNDS = 10
@@ -341,8 +341,10 @@ const holofuel = {
     list_pending: listPending,
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
-    receive_payment: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS),
-    decline: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS)
+    receive_payment: ({ promise, promise_sig: sig, promise_commit: commit }) => bcrypt.hashSync((promise + sig + commit + 'accepted'), NUM_SALT_ROUNDS),
+    receive_payments_pending: ({ promises }) => bcrypt.hashSync((promises + 'accepted'), NUM_SALT_ROUNDS),
+    decline: ({ origin }) => bcrypt.hashSync((origin + 'declined'), NUM_SALT_ROUNDS),
+    cancel: ({ origin }) => bcrypt.hashSync((origin + 'cancelled'), NUM_SALT_ROUNDS)
   }
 }
 

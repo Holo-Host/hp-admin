@@ -35,11 +35,11 @@ describe('resolvers', () => {
       })
     })
 
-    describe('.holofuelCompleteTransactions', () => {
-      it('calls HoloFuelInterface.transactions.allComplete', async () => {
-        resolvers.Query.holofuelCompleteTransactions()
+    describe('.holofuelCompletedTransactions', () => {
+      it('calls HoloFuelInterface.transactions.allCompleted', async () => {
+        resolvers.Query.holofuelCompletedTransactions()
         await wait(0)
-        expect(mockHoloFuelInterface.transactions.allComplete).toHaveBeenCalled()
+        expect(mockHoloFuelInterface.transactions.allCompleted).toHaveBeenCalled()
       })
     })
 
@@ -68,9 +68,15 @@ describe('resolvers', () => {
     })
 
     describe('.holofuelUser', () => {
-      it('calls HoloFuelInterface.transactions.holofuelUser.get', async () => {
+      it('calls HoloFuelInterface.transactions.holofuelUser.get *with* agentId', async () => {
         const agentId = 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
         resolvers.Query.holofuelUser(null, { agentId })
+        await wait(0)
+        expect(mockHoloFuelInterface.user.get).toHaveBeenCalledWith({ agentId })
+      })
+
+      it('calls HoloFuelInterface.transactions.holofuelUser.get *without* agentId', async () => {
+        resolvers.Query.holofuelUser(null, {})
         await wait(0)
         expect(mockHoloFuelInterface.user.get).toHaveBeenCalled()
       })
@@ -159,6 +165,15 @@ describe('resolvers', () => {
         resolvers.Mutation.holofuelDecline(null, { transactionId })
         await wait(0)
         expect(mockHoloFuelInterface.transactions.decline).toHaveBeenCalledWith(transactionId)
+      })
+    })
+
+    describe('.holofuelCancel', () => {
+      it('calls cancel request and constructs the result transaction', async () => {
+        const transactionId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
+        resolvers.Mutation.holofuelCancel(null, { transactionId })
+        await wait(0)
+        expect(mockHoloFuelInterface.transactions.cancel).toHaveBeenCalledWith(transactionId)
       })
     })
   })
