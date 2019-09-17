@@ -64,7 +64,7 @@ describe('CreateRequest', () => {
     })
 
     expect(requestMock.newData).toHaveBeenCalled()
-    expect(push).toHaveBeenCalledWith('/')
+    expect(push).toHaveBeenCalledWith('/history')
   })
 
   it.skip('responds appropriately to bad input', () => {

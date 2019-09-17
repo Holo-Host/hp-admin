@@ -147,9 +147,9 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
       Cancel your {_.capitalize(type)}
-      {direction === 'incoming' ? 'for' : 'of'}
+      {direction === 'incoming' ? ' for ' : ' of '}
       <span styleName='modal-amount' data-testid='modal-amount'>{Number(amount).toLocaleString()} HF</span>
-      {direction === 'incoming' ? 'from' : 'to'}
+      {direction === 'incoming' ? ' from ' : ' to '}
       <span styleName='modal-counterparty' data-testid='modal-counterparty'>{makeDisplayName(counterparty)}</span>
       ?
     </div>

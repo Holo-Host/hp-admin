@@ -44,8 +44,7 @@ export default function CreateOffer ({ history: { push } }) {
 
   const onSubmit = ({ amount, counterparty }) => {
     createOffer(amount, counterparty)
-    // TODO: this should redirect to the transaction list once that page is merged
-    push('/')
+    push('/history')
   }
 
   !isEmpty(errors) && console.log('Offer form errors (leave here until proper error handling is implemented):', errors)

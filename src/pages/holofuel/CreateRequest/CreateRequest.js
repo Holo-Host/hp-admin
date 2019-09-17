@@ -37,8 +37,7 @@ export default function CreateRequest ({ history: { push } }) {
 
   const onSubmit = ({ amount, counterparty }) => {
     createRequest(amount, counterparty)
-    // TODO: this should redirect to the transaction list once that page is merged
-    push('/')
+    push('/history')
   }
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)
