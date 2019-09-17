@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import _ from 'lodash'
 import { render, within, act, fireEvent, cleanup } from '@testing-library/react' // fireEvent,
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
@@ -10,7 +11,7 @@ import wait from 'waait'
 import { TYPE } from 'models/Transaction'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import TransactionsHistory, { LedgerTransactionsTable, ConfirmCancellationModal, capitalizeFirstLetter, makeDisplayName, formatDateTime, MOCK_ACCT_NUM } from './TransactionHistory'
+import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, makeDisplayName, formatDateTime, MOCK_ACCT_NUM } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 
 function renderWithRouter (
@@ -104,7 +105,7 @@ describe('HoloFuel Ledger Transactions', () => {
   })
 
   //* ******************************* *//
-  // Cancellation Funcationality Tests :
+  // Cancellation Functionality Tests :
 
   describe('Cancel Transaction Modal and Mutation Button', () => {
     afterEach(() => {
@@ -135,7 +136,7 @@ describe('HoloFuel Ledger Transactions', () => {
 
     it('should display correct text for CancellationModal for a Pending Request', async () => {
       const { getByRole } = render(<ConfirmCancellationModal transaction={pendingRequest} />)
-      const capitalizedType = capitalizeFirstLetter(pendingRequest.type)
+      const capitalizedType = _.capitalize(pendingRequest.type)
 
       const heading = getByRole('heading')
       const { getByText } = within(heading) // , getByTestId
@@ -150,7 +151,7 @@ describe('HoloFuel Ledger Transactions', () => {
 
     it('should display correct text for CancellationModal for a Pending Offer', async () => {
       const { getByRole } = render(<ConfirmCancellationModal transaction={pendingOffer} />)
-      const capitalizedType = capitalizeFirstLetter(pendingOffer.type)
+      const capitalizedType = _.capitalize(pendingOffer.type)
 
       const heading = getByRole('heading')
       const { getByText } = within(heading) // , getByTestId
@@ -201,7 +202,7 @@ describe('HoloFuel Ledger Transactions', () => {
       let getByText
       await act(async () => {
         ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <LedgerTransactionsTable {...props} />
+          <TransactionRow {...props} />
         </MockedProvider>))
         await wait(0)
       })
@@ -259,7 +260,7 @@ describe('HoloFuel Ledger Transactions', () => {
       let getByText
       await act(async () => {
         ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <LedgerTransactionsTable {...props} />
+          <TransactionRow {...props} />
         </MockedProvider>))
         await wait(0)
       })

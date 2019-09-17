@@ -224,7 +224,6 @@ const HoloFuelDnaInterface = {
     accept: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
-      console.log('ACCEPT PAYMENT TRANSACTION OBJECT : ', transaction)
       return {
         ...transaction,
         id: transactionId,

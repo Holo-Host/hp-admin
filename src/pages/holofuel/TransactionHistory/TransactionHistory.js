@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import moment from 'moment'
 import cx from 'classnames'
+import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import './TransactionHistory.module.css'
@@ -8,7 +9,6 @@ import Header from 'components/holofuel/Header'
 import Button from 'components/holofuel/Button'
 import Modal from 'components/holofuel/Modal'
 
-// import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
@@ -30,11 +30,8 @@ function useCancel () {
 
 // Display - Functional Components with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
-  // const { data: { holofuelUser: whoami = {} } } = useQuery(HolofuelUserQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-
-  // console.log('current Agent : ', whoami)
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -70,7 +67,7 @@ export default function TransactionsHistory ({ history: { push } }) {
         </thead>
         <tbody>
           {!isEmpty(pendingTransactions) && pendingTransactions.map(pendingTx => {
-            return <LedgerTransactionsTable
+            return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
               showCancellationModal={showCancellationModal}
@@ -78,7 +75,7 @@ export default function TransactionsHistory ({ history: { push } }) {
           })}
 
           {!isEmpty(completedTransactions) && completedTransactions.map(completeTx => {
-            return <LedgerTransactionsTable
+            return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
               showCancellationModal={showCancellationModal}
@@ -97,11 +94,11 @@ export default function TransactionsHistory ({ history: { push } }) {
 
 const TransactionTableHeading = ({ content }) => {
   return <th id={content ? content.toLowerCase() : null} styleName='completed-tx-col table-headers'>
-    {content || null}
+    {content}
   </th>
 }
 
-export function LedgerTransactionsTable ({ transaction, showCancellationModal, completed }) {
+export function TransactionRow ({ transaction, showCancellationModal, completed }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
@@ -149,7 +146,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {capitalizeFirstLetter(type)}
+      Cancel your {_.capitalize(type)}
       {direction === 'incoming' ? 'for' : 'of'}
       <span styleName='modal-amount' data-testid='modal-amount'>{Number(amount).toLocaleString()} HF</span>
       {direction === 'incoming' ? 'from' : 'to'}
@@ -172,7 +169,6 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
 }
 
 // Utils - Helper Functions:
-export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7) || ''
 
 export function formatDateTime (isoDate) {

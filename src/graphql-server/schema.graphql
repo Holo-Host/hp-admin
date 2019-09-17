@@ -46,7 +46,6 @@ enum TransactionStatus {
   pending
   completed
   rejected
-  declined
   cancelled
 }
 
