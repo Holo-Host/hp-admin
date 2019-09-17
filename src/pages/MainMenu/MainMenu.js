@@ -2,9 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 export default function MainMenu () {
-  return <React.Fragment>
+  return <>
     <Menu />
-  </React.Fragment>
+  </>
 }
 
 export function Menu () {

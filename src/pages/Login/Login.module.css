@@ -5,21 +5,17 @@
   padding-top: 25px;
 }
 
-.form-input {
-  margin: 5px;  
-  border: 1px solid var(--color-gray);
-  font-size: 24px;
+.login-label {
+  margin: 15px 0 6px;
 }
 
 .login-button {
-  /* this margin-bottom value is to stop the button being pushed off the screen. there's a better way to do this */
-  margin-bottom: 40px;
   margin-top: auto;
-  padding: 15px;
-  width: 100%;
-  background-color: var(--color-tundora);
-  font-size: 16px;
-  line-height: 19px;
-  text-align: center;
-  color: #FFFFFF;
+}
+
+.field-error {
+  font-size: .9em;
+  font-weight: 500;
+  color: #a00;
+  margin: .3em 0 .0;
 }

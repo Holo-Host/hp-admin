@@ -4,15 +4,7 @@
 
 .pricing-button {
   /* this margin-bottom value is to stop the button being pushed off the screen. there's a better way to do this */
-  margin-bottom: 40px;
   margin-top: auto;
-  padding: 15px;
-  width: 100%;
-  background-color: var(--color-tundora);
-  font-size: 16px;
-  line-height: 19px;
-  text-align: center;
-  color: #FFFFFF;
 }
 
 .happ-row {
@@ -35,7 +27,7 @@
 
 .title {
   font-size: 20px;
-  color: var(--color-tundora);  
+  color: var(--color-tundora);
 }
 
 .description {

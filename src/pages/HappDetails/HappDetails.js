@@ -42,7 +42,7 @@ export default function HappDetails ({
       }))
   }
 
-  return <React.Fragment>
+  return <>
     {errorSummary && <div styleName='error'>
       {errorSummary}
       {errorDetails && <code>{errorDetails.message}</code>}
@@ -85,7 +85,7 @@ export default function HappDetails ({
         <Button wide>Hosting Overview</Button>
       </footer>
     </Modal>
-  </React.Fragment>
+  </>
 }
 
 const HappSection = ({ title, className, children }) => (
