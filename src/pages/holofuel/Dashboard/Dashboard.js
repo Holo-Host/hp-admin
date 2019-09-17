@@ -4,7 +4,7 @@ import Header from 'components/holofuel/Header'
 import './Dashboard.module.css'
 
 export default function Dashboard () {
-  return <React.Fragment>
+  return <>
     <Header />
 
     <div>
@@ -14,5 +14,5 @@ export default function Dashboard () {
     <Link to='/inbox'>Inbox</Link>
     <Link to='/offer'>Create Offer</Link>
     <Link to='/request'>Create Request</Link>
-  </React.Fragment>
+  </>
 }

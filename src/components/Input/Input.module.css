@@ -1,0 +1,18 @@
+.input {
+  box-sizing: border-box;
+}
+
+/* Text & numeric input boxes (no checkboxes etc.) */
+.input-box {
+  font-size: 16px;
+  border: 1px solid lightgray;
+  padding: .5em .8em;
+}
+
+.input-number {
+  text-align: right;
+}
+
+.input-big {
+  font-size: 22px;
+}

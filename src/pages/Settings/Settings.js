@@ -3,9 +3,15 @@ import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import Header from 'components/Header'
 import Button from 'components/Button'
+import Input from 'components/Input'
 
 import './Settings.module.css'
 
+const portValidationRules = yup.number()
+  .typeError('Port must be specified.') // TypeError because empty value gets cast into NaN
+  .min(1000, 'Ports must be between 1000 and 65000.')
+  .max(65000, 'Ports must be between 1000 and 65000.')
+  .required()
 const SettingsValidationSchema = yup.object().shape({
   hostName: yup.string().required(),
   hostPubKey: yup.string().required(),
@@ -14,22 +20,10 @@ const SettingsValidationSchema = yup.object().shape({
     .required(),
   deviceName: yup.string().required(),
   networkId: yup.string().required(),
-  deviceAdminPort: yup.number()
-    .min(1000)
-    .max(65000)
-    .required(),
-  hcAdminPort: yup.number()
-    .min(1000)
-    .max(65000)
-    .required(),
-  hcNetworkPort: yup.number()
-    .min(1000)
-    .max(65000)
-    .required(),
-  hostingPort: yup.number()
-    .min(1000)
-    .max(65000)
-    .required()
+  deviceAdminPort: portValidationRules,
+  hcAdminPort: portValidationRules,
+  hcNetworkPort: portValidationRules,
+  hostingPort: portValidationRules
 })
 
 export function Settings ({
@@ -44,7 +38,6 @@ export function Settings ({
   })
 
   const [sshAccessVal, setSshAccess] = useState(false)
-
   const handleToggleSshAccess = (e) => {
     e.preventDefault()
     setSshAccess(e.target.checked)
@@ -55,9 +48,7 @@ export function Settings ({
     updateSettings(settings)
   }
 
-  console.log('Settings form errors (leave here until proper error handling is implemented):', errors)
-
-  return <React.Fragment>
+  return <>
     <Header title='HoloPort Settings' />
 
     <strong style={{ marginTop: '20px' }}>Name</strong>
@@ -81,26 +72,29 @@ export function Settings ({
       <SettingsFormInput
         label='Device Admin'
         name='deviceAdminPort'
-        register={register} />
+        register={register}
+        errors={errors} />
 
       <SettingsFormInput
         label='HC Admin'
         name='hcAdminPort'
-        register={register} />
+        register={register}
+        errors={errors} />
 
       <SettingsFormInput
         label='HC Network'
         name='hcNetworkPort'
-        register={register} />
+        register={register}
+        errors={errors} />
 
       <SettingsFormInput
         label='Hosting'
         name='hostingPort'
-        register={register} />
+        register={register}
+        errors={errors} />
 
+      <Button variant='primary' wide name='update-settings' value='Submit'>Save Changes</Button>
     </form>
-
-    <Button type='submit' styleName='saveChanges' wide primary name='update-settings' value='Submit'>Save Changes</Button>
 
     <hr />
 
@@ -113,21 +107,23 @@ export function Settings ({
       checked={sshAccessVal}
       onChange={handleToggleSshAccess} />
 
-    <Button name='factory-reset' styleName='factoryReset' wide primary onClick={() => factoryReset()}>Factory Reset</Button>
-  </React.Fragment>
+    <Button name='factory-reset' variant='danger' wide onClick={() => factoryReset()}>Factory Reset</Button>
+  </>
 }
 
 export function SettingsFormInput ({
   name,
   label,
-  type = 'text',
+  type = 'number',
   register,
+  errors = {},
   ...inputProps
 }) {
-  return <React.Fragment>
-    {label && <label styleName='settingsLabel' data-for={name}>{label}</label>}
-    <input styleName='settingsInput' name={name} id={name} type={type} ref={register} {...inputProps} />
-  </React.Fragment>
+  return <>
+    {label && <label styleName='settingsLabel' htmlFor={name}>{label}</label>}
+    <Input name={name} id={name} type={type} placeholder={label} ref={register} {...inputProps} />
+    {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
+  </>
 }
 
 const mockedProps = {

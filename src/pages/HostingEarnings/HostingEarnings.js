@@ -178,7 +178,7 @@ export default function HostingEarnings () {
 
   const buttons = [{ days: 'one', label: '1 Day' }, { days: 'seven', label: '7 Days' }, { days: 'thirty', label: '30 Days' }]
 
-  return <React.Fragment>
+  return <>
     <Header title='Earnings' />
 
     <div styleName='day-buttons'>
@@ -208,7 +208,7 @@ export default function HostingEarnings () {
       </tbody>
     </table>}
 
-  </React.Fragment>
+  </>
 }
 
 export function TransactionRow ({ transaction }) {

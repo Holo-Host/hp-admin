@@ -2,23 +2,17 @@
   display: flex;
   margin-top: 20px;
   margin-bottom: 50px;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center
 }
 
 .price-input {
-  border: 1px solid lightgray;
-  text-align:right;
-  font-size: 18px;
-  text-align: center;
-  padding: 10px;
-  max-width: 30px;
+  max-width: 5.5em; /* Up to 5 digits */
 }
 
 .connecting-label {
-  margin-right: 5px;
-  margin-top: 1px;
-  font-size: 12px;
+  margin: 3px 14px 5px;
+  font-size: 14px;
 }
 
 .units-dropdown {
@@ -29,19 +23,6 @@
   font-size: 18px;
 }
 
-.save-button-row {
-  display: flex;
-}
-
 .save-button {
-  /* this margin-bottom value is to stop the button being pushed off the screen. there's a better way to do this */
-  margin-bottom: 40px;
   margin-top: auto;
-  padding: 15px;
-  width: 100%;
-  background-color: var(--color-tundora);
-  font-size: 16px;
-  line-height: 19px;
-  text-align: center;
-  color: #FFFFFF;
 }

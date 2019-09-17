@@ -1,13 +1,16 @@
 .container {
-  max-width: 250px;
+  max-width: 80%;
+  max-height: 90%;
   margin: 0 auto;
-  top: 30%;
+  top: 50%;
+  transform: translateY(-50%);
   background-color: #fff;
   border: 1px solid #000;
   border-radius: 8px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, .5);
   padding: 32px;
   position: relative;
+  overflow: auto;
 }
 
 /* TODO: Handle focus properly */
