@@ -5,10 +5,12 @@ const Agent2TransactionLedger = require('./Agent2HFLedger.js')
 
 // HoloFuel Users :
 const Agent1 = {
+  // agentId: <CONDUCTOR_AGENT_1>,
   agentId: 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a',
   nick: 'Perry'
 }
 const Agent2 = {
+  // agentId: <CONDUCTOR_AGENT_2>,
   agentId: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
   nick: 'Sam'
 }
