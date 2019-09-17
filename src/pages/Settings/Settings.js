@@ -7,9 +7,6 @@ import Input from 'components/Input'
 
 import './Settings.module.css'
 
-export const PORT_NUMBER_REGEX = /^\d{4,6}$/
-export const EMAIL_REGEX = /^\S+@\S+$/i
-
 const portValidationRules = yup.number()
   .typeError('Port must be specified.') // TypeError because empty value gets cast into NaN
   .min(1000, 'Ports must be between 1000 and 65000.')

@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import { isString } from 'lodash/fp'
 
 export const transactionList = {
   ledger: {
@@ -60,6 +61,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -111,6 +116,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -157,6 +166,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -194,6 +207,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     },
@@ -228,6 +245,10 @@ export const transactionList = {
         },
         fees: {
           Ok: '0'
+        },
+        resulting_balance: {
+          // 'This endpoint is a WIP'
+          Ok: '0'
         }
       }
     }
@@ -239,15 +260,15 @@ export const pendingList = {
     {
       event: [
         'QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz',
-        '2019-08-30T00:18:00+00:00',
+        '2019-09-10T00:18:20+00:00',
         {
           Request: {
             from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
             to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-            amount: '200.00',
+            amount: '124500.00',
             fee: '2',
             deadline: '2020-12-02T00:00:00+00:00',
-            notes: null,
+            notes: 'I want my $2!',
             synchronous: null
           }
         }
@@ -262,16 +283,16 @@ export const pendingList = {
     {
       event: [
         'QmYNt6DYMiymJtf8oeZ4qn86yWANurFEuAzKuzMQGhsnDd',
-        '2019-08-30T11:45:10+00:00',
+        '2019-09-01T11:45:10+00:00',
         {
           Promise: {
             tx: {
               from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
               to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-              amount: '40.01',
+              amount: '2000',
               fee: '0',
               deadline: '2020-01-22T00:00:00-02:00',
-              notes: null,
+              notes: 'For the pizza',
               synchronous: null
             },
             request: null
@@ -286,16 +307,42 @@ export const pendingList = {
   ]
 }
 
+const agents = [
+  {
+    nick: 'Perry',
+    pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+  },
+  {
+    nick: 'Sam',
+    pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+  }
+]
+
+const whoamiObj = (agentId) => agents.find(agent => agent.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
+
+function listPending ({ origins }) {
+  if (!origins) return pendingList
+  if (isString(origins)) {
+    const filter = entry => entry.event[0] === origins
+    return {
+      requests: pendingList.requests.filter(filter),
+      promises: pendingList.promises.filter(filter)
+    }
+  }
+  throw new Error('array value for origins param of list_pending is not supported in the mock dna')
+}
+
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
+    whoami: ({ agentId }) => agentId ? whoamiObj(agentId) : agents[0],
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
-    list_pending: () => pendingList,
+    list_pending: listPending,
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
     receive_payment: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS),
-    reject: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS)
+    decline: ({ origin }) => bcrypt.hashSync((origin), NUM_SALT_ROUNDS)
   }
 }
 

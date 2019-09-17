@@ -32,6 +32,11 @@ type HostPricing {
   pricePerUnit: String
 }
 
+type HolofuelUser {
+  id: ID
+  nickname: String
+}
+
 enum TransactionType {
   offer
   request
@@ -57,7 +62,8 @@ type Transaction {
   type: TransactionType
   timestamp: String
   fees: Float
-  endingBalance: Float
+  presentBalance: Float
+  notes: String 
 }
 
 type Ledger {
@@ -79,6 +85,7 @@ type Query {
   holofuelWaitingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
+  holofuelUser(agentId: String): HolofuelUser
 }
 
 type Mutation {
@@ -91,4 +98,5 @@ type Mutation {
   holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction # NOTE: holofuelAcceptOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
   holofuelRejectOffer(transactionId: ID): Transaction # NOTE: holofuelRejectOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
+  holofuelDecline(transactionId: ID): Transaction
 }

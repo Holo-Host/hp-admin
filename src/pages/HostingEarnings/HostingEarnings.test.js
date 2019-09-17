@@ -2,7 +2,6 @@ import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import HostingEarnings from './HostingEarnings'
 
-jest.mock('data-interfaces/EnvoyInterface')
 // mocking Header because it depends on Router
 jest.mock('components/Header')
 

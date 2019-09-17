@@ -22,6 +22,8 @@ export const resolvers = {
 
     hostPricing: () => HhaDnaInterface.hostPricing.get(),
 
+    holofuelUser: (_, { agentId }) => HoloFuelDnaInterface.user.get({ agentId }),
+
     holofuelWaitingTransactions: () => HoloFuelDnaInterface.transactions.allWaiting(),
 
     holofuelActionableTransactions: () => HoloFuelDnaInterface.transactions.allActionable(),
@@ -71,7 +73,8 @@ export const resolvers = {
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
-    holofuelRejectOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.reject(transactionId)
+    holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId)
+
   }
 }
 
