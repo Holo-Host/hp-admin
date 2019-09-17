@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import './Dashboard.module.css'
 
 export default function Dashboard ({ me, happStoreUser, registerUser }) {
-  return <React.Fragment>
+  return <>
     <Header />
 
     <div styleName='linkBox'>
@@ -34,5 +34,5 @@ export default function Dashboard ({ me, happStoreUser, registerUser }) {
         <strong>Happ Store User data:</strong> {happStoreUser && JSON.stringify(happStoreUser)}
       </p>
     </div>
-  </React.Fragment>
+  </>
 }

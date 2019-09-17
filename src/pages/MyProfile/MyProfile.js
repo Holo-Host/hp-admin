@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import useForm from 'react-hook-form'
 
 import Header from 'components/Header'
 import Button from 'components/Button'
+import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
+import TosModal from 'components/TosModal'
 import './MyProfile.module.css'
 
 // eslint-disable-next-line no-useless-escape
@@ -12,21 +14,26 @@ const EMAIL_REGEXP = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+
 const MyProfile = ({
   history: { push }
 }) => {
+  const [isTosOpen, setTosOpen] = useState(false)
   const { register, handleSubmit, errors, watch } = useForm()
   const onSubmit = data => {
     push('/dashboard')
   }
   const avatarUrl = watch('avatar')
   const email = watch('email')
+  const showTos = e => {
+    e.preventDefault()
+    setTosOpen(true)
+  }
 
-  return [
-    <Header title='Edit Profile' key='header' avatarUrl={avatarUrl} email={email} />,
+  return <>
+    <Header title='Edit Profile' avatarUrl={avatarUrl} email={email} />
 
-    <form onSubmit={handleSubmit(onSubmit)} styleName='form' key='form'>
+    <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
       <HashAvatar avatarUrl={avatarUrl} email={email} styleName='avatar-image' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
-        <input
+        <Input
           name='avatar'
           placeholder='eg. https://example.com/avatar.jpg'
           ref={register}
@@ -39,7 +46,7 @@ const MyProfile = ({
 
       <label styleName='field'>
         <span styleName='field-name'>Name</span>
-        <input
+        <Input
           name='name'
           placeholder='eg. Alice Cooper'
           ref={register({ required: true })}
@@ -52,7 +59,7 @@ const MyProfile = ({
 
       <label styleName='field'>
         <span styleName='field-name'>Email</span>
-        <input
+        <Input
           name='email'
           placeholder='eg. alice@example.com'
           ref={register({ required: true, pattern: EMAIL_REGEXP })}
@@ -65,7 +72,7 @@ const MyProfile = ({
 
       <label styleName='field'>
         <span styleName='field-name'>Password</span>
-        <input
+        <Input
           name='password'
           type='password'
           placeholder='type to reset password'
@@ -73,6 +80,12 @@ const MyProfile = ({
           styleName='field-input'
         />
       </label>
+
+      <Button variant='link' onClick={showTos}>
+        View Terms of Service
+      </Button>
+
+      <TosModal isOpen={isTosOpen} handleClose={() => setTosOpen(false)} />
 
       <Button
         variant='primary'
@@ -83,7 +96,7 @@ const MyProfile = ({
         Save Changes
       </Button>
     </form>
-  ]
+  </>
 }
 
 export default MyProfile

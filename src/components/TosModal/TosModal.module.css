@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  padding-bottom: 6px;
+  border-bottom: 1px solid lightgray;
+  margin-top: -8px;
+}
+
+.menu-button {
+  margin-left: auto;
+}
+
+.title {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #484848;
+}
+
+.content {
+  padding: 20px 12px 20px 0;
+  flex-shrink: 1;
+  overflow: auto;
+  line-height: 1.5;
+  color: #444;
+}
