@@ -179,7 +179,7 @@ export default function HostingEarnings () {
 
   const buttons = [{ days: 'one', label: '1 Day' }, { days: 'seven', label: '7 Days' }, { days: 'thirty', label: '30 Days' }]
 
-  return <PrimaryLayout header={{ title: 'Earnings' }}>
+  return <PrimaryLayout headerProps={{ title: 'Earnings' }}>
 
     <div styleName='day-buttons'>
       {buttons.map(button =>

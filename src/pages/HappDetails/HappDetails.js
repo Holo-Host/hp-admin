@@ -43,7 +43,7 @@ export default function HappDetails ({
       }))
   }
 
-  return <PrimaryLayout header={{ title: 'Hosting' }}>
+  return <PrimaryLayout headerProps={{ title: 'Hosting' }}>
     {errorSummary && <div styleName='error'>
       {errorSummary}
       {errorDetails && <code>{errorDetails.message}</code>}

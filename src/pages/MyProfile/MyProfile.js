@@ -28,7 +28,7 @@ const MyProfile = ({
   }
 
   return <PrimaryLayout
-    header={{
+    headerProps={{
       title: 'Edit Profile',
       avatarUrl,
       email

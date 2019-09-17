@@ -19,7 +19,7 @@ export default function BrowseHapps ({ history: { push } }) {
 
   const goToPricing = () => push('/pricing')
 
-  return <PrimaryLayout header={{ title: 'Hosting' }}>
+  return <PrimaryLayout headerProps={{ title: 'Hosting' }}>
     {!isEmpty(happs) && <div styleName='happ-list' role='list'>
       {happs.map(happ =>
         <HappRow

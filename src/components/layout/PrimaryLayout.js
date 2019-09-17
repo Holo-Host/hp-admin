@@ -10,19 +10,18 @@ import Header from 'components/Header'
 
 export function PrimaryLayout ({
   children,
-  footer,
-  header = {}
+  headerProps = {}
 }) {
   const isWide = useContext(ScreenWidthContext)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...header} />
+    <Header {...headerProps} />
     {children}
   </div>
 }
 
 PrimaryLayout.propTypes = {
-  header: object
+  headerProps: object
 }
 
 export default PrimaryLayout

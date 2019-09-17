@@ -48,7 +48,7 @@ export function Settings ({
     updateSettings(settings)
   }
 
-  return <PrimaryLayout header={{ title: 'HoloPort Settings' }}>
+  return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
     <strong style={{ marginTop: '20px' }}>Name</strong>
     <p>
       {settings.deviceName}

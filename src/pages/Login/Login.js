@@ -10,7 +10,7 @@ export default function Login ({ history: { push } }) {
   const onSubmit = () => push('/')
 
   return <PrimaryLayout
-    header={{
+    headerProps={{
       title: 'HoloPort'
     }}
   >

@@ -50,7 +50,7 @@ export default function ManagePricing () {
   }
 
   return <PrimaryLayout
-    header={{
+    headerProps={{
       title: 'Manage Pricing',
       backTo: '/browse-happs'
     }}
