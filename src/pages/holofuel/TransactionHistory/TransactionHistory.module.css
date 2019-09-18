@@ -12,11 +12,12 @@
   font-size: 13px;
 }
 
-table {
+.completed-transactions-table table {
   border-spacing: 0px;
 }
 
-th, td {
+.completed-transactions-table th,
+.completed-transactions-table td {
   border-right: none;
 }
 
