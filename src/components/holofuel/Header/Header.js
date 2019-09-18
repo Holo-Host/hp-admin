@@ -18,7 +18,7 @@ export function Header ({ title, accountNumber, avatarUrl, email, backTo, histor
         <span styleName='title header-font'>HoloFuel</span>
       </div>
       <div styleName='right-nav account-number header-font'>{accountNumber}</div>
-      <Link to='/dashboard' styleName='avatar-link'>
+      <Link to='/history' styleName='avatar-link'>
         <HashAvatar avatarUrl={avatarUrl} seed={accountNumber} size={32} />
       </Link>
     </section>
