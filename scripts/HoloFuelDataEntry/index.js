@@ -145,27 +145,27 @@ startTestConductor()
         const halfInitiatingOffersLength = halfArrayLength(AGENT.offers.initated)
 
         // CASE 1 : Current Agent makes 10 full cycle REQUESTS
-        arrayFirstHalf(AGENT.requests).forEach((tx, index) => {
-          console.log('REQUEST index # : ', index)
+        // arrayFirstHalf(AGENT.requests).forEach((tx, index) => {
+        //   console.log('REQUEST index # : ', index)
 
-          let txOriginId
-          // Current Agent Requests HF
-          transactHoloFuel(currentAgentID, REQUEST, holochainZomeCall, { index })
-            // Transactee Agent Offers HF in response to Current Agent's request
-            .then(r => {
-              const { Ok: originId } = JSON.parse(r)
-              txOriginId = originId
-              transactHoloFuel(transacteeID, PAY, holochainZomeCall, { transactionTrace: index, originId })
-            })
-            // Current Agent Accepts HF offered by Transactee Agent and completes originating Request
-            .then(res => {
-              const { Ok: resultingHash } = JSON.parse(res)
-              console.log('Resulting Hash from Offer in response to last Request : ', resultingHash)
-              console.log('tx originId for ACCEPT payment Zome Call - REQUESTS: ', txOriginId)
-              transactHoloFuel(currentAgentID, ACCEPT, holochainZomeCall, { transactionTrace: index, originId: txOriginId })
-            })
-            .catch(error => { return error })
-        })
+        //   let txOriginId
+        //   // Current Agent Requests HF
+        //   transactHoloFuel(currentAgentID, REQUEST, holochainZomeCall, { index })
+        //     // Transactee Agent Offers HF in response to Current Agent's request
+        //     .then(r => {
+        //       const { Ok: originId } = JSON.parse(r)
+        //       txOriginId = originId
+        //       transactHoloFuel(transacteeID, PAY, holochainZomeCall, { transactionTrace: index, originId })
+        //     })
+        //     // Current Agent Accepts HF offered by Transactee Agent and completes originating Request
+        //     .then(res => {
+        //       const { Ok: resultingHash } = JSON.parse(res)
+        //       console.log('Resulting Hash from Offer in response to last Request : ', resultingHash)
+        //       console.log('tx originId for ACCEPT payment Zome Call - REQUESTS: ', txOriginId)
+        //       transactHoloFuel(currentAgentID, ACCEPT, holochainZomeCall, { transactionTrace: index, originId: txOriginId })
+        //     })
+        //     .catch(error => { return error })
+        // })
 
         // CASE 2 : Current Agent makes 5 REQUESTS & counterparty offers to pay (5 * 2/3 tx-cycle requests)
         arrayFirstHalf(arraySecondHalf(AGENT.requests)).forEach((tx, index) => {
@@ -182,40 +182,40 @@ startTestConductor()
             .catch(error => { return error })
         })
 
-        // CASE 3 : Current Agent makes 5 REQUESTS & requests remain pending (5 * 1/3 tx-cycle requests)
-        arraySecondHalf(arraySecondHalf(AGENT.requests)).forEach((tx, index) => {
-          index = index + halfRequestsLength + forthRequestsLength
-          console.log('REQUEST index # : ', index)
+        // // CASE 3 : Current Agent makes 5 REQUESTS & requests remain pending (5 * 1/3 tx-cycle requests)
+        // arraySecondHalf(arraySecondHalf(AGENT.requests)).forEach((tx, index) => {
+        //   index = index + (halfRequestsLength + forthRequestsLength)
+        //   console.log('REQUEST index # : ', index)
 
-          // Current Agent Requests HF
-          transactHoloFuel(currentAgentID, REQUEST, holochainZomeCall, { index })
-            .catch(error => { return error })
-        })
+        //   // Current Agent Requests HF
+        //   transactHoloFuel(currentAgentID, REQUEST, holochainZomeCall, { index })
+        //     .catch(error => { return error })
+        // })
 
-        // CASE 4 : Current Agent makes 5 PROMISES & counterparty Accepts them (5 * full-tx-cycle offers)
-        arrayFirstHalf(AGENT.offers.initated).forEach((tx, index) => {
-          console.log('PROMISE / OFFER index # : ', index)
+        // // CASE 4 : Current Agent makes 5 PROMISES & counterparty Accepts them (5 * full-tx-cycle offers)
+        // arrayFirstHalf(AGENT.offers.initated).forEach((tx, index) => {
+        //   console.log('PROMISE / OFFER index # : ', index)
 
-          // Current Agent Offers HF
-          transactHoloFuel(currentAgentID, OFFER, holochainZomeCall, { index })
-            // Transactee Accepts HF offered by Current Agent and completes originating Promise/Offer
-            .then(r => {
-              const { Ok: originId } = JSON.parse(r)
-              console.log('tx originId for ACCEPT payment Zome Call - PROMISE : ', originId)
-              transactHoloFuel(currentAgentID, ACCEPT, holochainZomeCall, { transactionTrace: index, originId })
-            })
-            .catch(error => { return error })
-        })
+        //   // Current Agent Offers HF
+        //   transactHoloFuel(currentAgentID, OFFER, holochainZomeCall, { index })
+        //     // Transactee Accepts HF offered by Current Agent and completes originating Promise/Offer
+        //     .then(r => {
+        //       const { Ok: originId } = JSON.parse(r)
+        //       console.log('tx originId for ACCEPT payment Zome Call - PROMISE : ', originId)
+        //       transactHoloFuel(currentAgentID, ACCEPT, holochainZomeCall, { transactionTrace: index, originId })
+        //     })
+        //     .catch(error => { return error })
+        // })
 
-        // CASE 5 : Current Agent makes 5 PROMISES & promises remain pending (5 * 1/2 tx-cycle offers)
-        arraySecondHalf(AGENT.offers.initated).forEach((tx, index) => {
-          index = index + halfInitiatingOffersLength
-          console.log('PROMISE / OFFER index # : ', index)
+        // // CASE 5 : Current Agent makes 5 PROMISES & promises remain pending (5 * 1/2 tx-cycle offers)
+        // arraySecondHalf(AGENT.offers.initated).forEach((tx, index) => {
+        //   index = index + halfInitiatingOffersLength
+        //   console.log('PROMISE / OFFER index # : ', index)
 
-          // Current Agent Offers HF
-          transactHoloFuel(currentAgentID, OFFER, holochainZomeCall, { index })
-            .catch(error => { return error })
-        })
+        //   // Current Agent Offers HF
+        //   transactHoloFuel(currentAgentID, OFFER, holochainZomeCall, { index })
+        //     .catch(error => { return error })
+        // })
       }
 
       agentScenarioFlow(1)
