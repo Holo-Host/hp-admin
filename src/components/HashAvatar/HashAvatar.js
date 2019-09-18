@@ -3,7 +3,7 @@ import { Network as Identicon } from 'react-identicon-variety-pack'
 
 import './HashAvatar.module.css'
 
-const HashAvatar = ({ avatarUrl, email, size = 96, className }) => avatarUrl
+const HashAvatar = ({ avatarUrl, seed, size = 96, className }) => avatarUrl
   ? <img
     src={avatarUrl}
     alt='Avatar'
@@ -11,6 +11,6 @@ const HashAvatar = ({ avatarUrl, email, size = 96, className }) => avatarUrl
     className={className}
     style={{ width: size, height: size }}
   />
-  : <Identicon seed={email || 'default-seed'} className={className} size={size} circle />
+  : <Identicon seed={seed || 'default-seed'} className={className} size={size} circle />
 
 export default HashAvatar

@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import useForm from 'react-hook-form'
 
-import Header from 'components/Header'
+import PrimaryLayout from 'components/layout/PrimaryLayout'
+
 import Button from 'components/Button'
 import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
@@ -26,11 +27,15 @@ const MyProfile = ({
     setTosOpen(true)
   }
 
-  return <>
-    <Header title='Edit Profile' avatarUrl={avatarUrl} email={email} />
-
+  return <PrimaryLayout
+    headerProps={{
+      title: 'Edit Profile',
+      avatarUrl,
+      email
+    }}
+  >
     <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
-      <HashAvatar avatarUrl={avatarUrl} email={email} styleName='avatar-image' />
+      <HashAvatar avatarUrl={avatarUrl} seed={email} styleName='avatar-image' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
         <Input
@@ -96,7 +101,7 @@ const MyProfile = ({
         Save Changes
       </Button>
     </form>
-  </>
+  </PrimaryLayout>
 }
 
 export default MyProfile

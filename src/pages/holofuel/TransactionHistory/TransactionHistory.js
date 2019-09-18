@@ -5,7 +5,7 @@ import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import './TransactionHistory.module.css'
-import Header from 'components/holofuel/Header'
+import PrimaryLayout from 'components/holofuel/layout/PrimaryLayout'
 import Button from 'components/holofuel/Button'
 import Modal from 'components/holofuel/Modal'
 
@@ -47,11 +47,8 @@ export default function TransactionsHistory ({ history: { push } }) {
     null
   ]
 
-  return <React.Fragment>
-    <Header title='HoloFuel' accountNumber={MOCK_ACCT_NUM} />
-
+  return <PrimaryLayout headerProps={{ title: 'History', accountNumber: MOCK_ACCT_NUM }}>
     <section styleName='account-ledger-table'>
-      <h2 styleName='completed-transactions-title'>History</h2>
       <table styleName='completed-transactions-table'>
         <thead>
           <tr key='heading'>
@@ -89,7 +86,7 @@ export default function TransactionsHistory ({ history: { push } }) {
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       cancelTransaction={cancelTransaction} />
-  </React.Fragment>
+  </PrimaryLayout>
 }
 
 const TransactionTableHeading = ({ content }) => {

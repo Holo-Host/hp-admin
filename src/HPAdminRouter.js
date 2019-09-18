@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Route } from 'react-router-dom'
-import cx from 'classnames'
+
 import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
 import Settings from 'pages/Settings'
@@ -12,15 +12,9 @@ import HostingEarnings from 'pages/HostingEarnings'
 import MyProfile from 'pages/MyProfile'
 import StyleDemo from 'pages/StyleDemo'
 import Login from 'pages/Login'
-import ScreenWidthContext from 'contexts/screenWidth'
-import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
-import 'global-styles/colors.css'
-import 'global-styles/index.css'
 
-export function PrimaryLayout () {
-  const isWide = useContext(ScreenWidthContext)
-
-  return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
+export default function HPAdminRouter () {
+  return <>
     <Route path='/login' component={Login} />
     <Route path='/(|dashboard)' exact component={Dashboard} />
     <Route path='/menu' component={MainMenu} />
@@ -34,7 +28,5 @@ export function PrimaryLayout () {
 
     <Route path='/style-demo' component={StyleDemo} />
 
-  </div>
+  </>
 }
-
-export default PrimaryLayout

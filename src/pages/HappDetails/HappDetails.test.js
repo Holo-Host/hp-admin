@@ -2,6 +2,8 @@ import React from 'react'
 import { render, fireEvent, act, cleanup } from '@testing-library/react'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
+import { Router } from 'react-router-dom'
+import { createMemoryHistory } from 'history'
 import wait from 'waait'
 import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 import hhaInterface from 'data-interfaces/HhaDnaInterface'
@@ -15,8 +17,11 @@ afterEach(() => {
 })
 
 async function renderHappDetails (appId = 'QmHHAHappEntryAddressHash1') {
+  const history = createMemoryHistory({ initialEntries: ['/'] })
   const app = await render(<ApolloProvider client={apolloClient}>
-    <HappDetails history={{}} match={{ params: { appId } }} />
+    <Router history={history}>
+      <HappDetails history={{}} match={{ params: { appId } }} />
+    </Router>
   </ApolloProvider>)
 
   await wait(0)
@@ -88,13 +93,16 @@ describe('HappDetails', () => {
     })
 
     it('"Back to hApps" in modal navigates to /browse-apps', async () => {
+      const memoryHistory = createMemoryHistory({ initialEntries: ['/'] })
       const mockHistory = { push: jest.fn() }
       let getByText
       await act(async () => {
         ({ getByText } = render(
-          <ApolloProvider client={apolloClient}>
-            <HappDetails history={mockHistory} match={{ params: { appId: 'QmHHAHappEntryAddressHash2' } }} />
-          </ApolloProvider>
+          <Router history={memoryHistory}>
+            <ApolloProvider client={apolloClient}>
+              <HappDetails history={mockHistory} match={{ params: { appId: 'QmHHAHappEntryAddressHash2' } }} />
+            </ApolloProvider>
+          </Router>
         ))
       })
       await wait(0)
