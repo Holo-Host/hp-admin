@@ -5,6 +5,8 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import moment from 'moment'
 import apolloClient from 'apolloClient'
+import { Router } from 'react-router-dom'
+import { createMemoryHistory } from 'history'
 import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
@@ -26,12 +28,27 @@ jest.mock('data-interfaces/EnvoyInterface')
 // mocking Header because it depends on Router
 jest.mock('components/holofuel/Header')
 
+const renderWithRouter = (
+  ui,
+  {
+    route = '/',
+    history = createMemoryHistory({ initialEntries: [route] })
+  } = {}
+) => ({
+  ...render(
+    <Router history={history}>
+      {ui}
+    </Router>
+  ),
+  history
+})
+
 describe('Inbox Connected', () => {
   it('renders', async () => {
     let getAllByRole
 
     await act(async () => {
-      ({ getAllByRole } = render(<ApolloProvider client={apolloClient}>
+      ({ getAllByRole } = renderWithRouter(<ApolloProvider client={apolloClient}>
         <Inbox />
       </ApolloProvider>))
       await wait(15)
