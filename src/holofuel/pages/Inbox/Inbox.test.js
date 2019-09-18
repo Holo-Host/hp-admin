@@ -24,7 +24,7 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
 
 jest.mock('data-interfaces/EnvoyInterface')
 // mocking Header because it depends on Router
-jest.mock('components/holofuel/Header')
+jest.mock('holofuel/components/Header')
 
 describe('Inbox Connected', () => {
   it('renders', async () => {

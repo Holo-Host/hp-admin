@@ -6,7 +6,7 @@ import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
 
-import Header from 'components/holofuel/Header'
+import Header from 'holofuel/components/Header'
 
 export function PrimaryLayout ({
   children,
