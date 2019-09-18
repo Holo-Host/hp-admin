@@ -14,9 +14,9 @@ function deadline () {
   return moment().subtract(randomNumber, 'days').toISOString()
 }
 
-const txProfliferator = () => {
+const txProfliferator = (iterNum) => {
   const transactionList = []
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < iterNum; i++) {
     const transaction = {
       counterparty: 'SHOULD BE AGENT 1',
       amount: amount(),
@@ -29,9 +29,9 @@ const txProfliferator = () => {
 }
 
 const Agent2TransactionLedger = {
-  requests: txProfliferator(),
+  requests: txProfliferator(20),
   offers: {
-    initated: txProfliferator(),
+    initated: txProfliferator(10),
     reponding: [{}]
   },
   acceptedTransactions: {
