@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { mapValues } from 'lodash/fp'
+import { mapValues, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 
@@ -209,7 +209,7 @@ const HoloFuelDnaInterface = {
   },
   offers: {
     create: async (counterparty, amount, requestId) => {
-      const origin = await createZomeCall('transactions/promise')({ to: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE, requestId })
+      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE, requestId }))
       return {
         id: requestId || origin, // NOTE: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
         amount,
