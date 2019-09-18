@@ -47,6 +47,7 @@
 
 .drawer--open .drawer-overlay {
   opacity: .5;
+  pointer-events: initial;
 }
 
 .header {
