@@ -9,9 +9,11 @@ export default function Dashboard () {
       This is the HoloFuel Dashboard.
     </div>
 
-    <Link to='/inbox'>Inbox</Link>
-    <Link to='/offer'>Create Offer</Link>
-    <Link to='/request'>Create Request</Link>
-    <Link to='/history'>History</Link>
+    <ul>
+      <li><Link to='/inbox'>Inbox</Link></li>
+      <li><Link to='/offer'>Create Offer</Link></li>
+      <li><Link to='/request'>Create Request</Link></li>
+      <li><Link to='/history'>History</Link></li>
+    </ul>
   </PrimaryLayout>
 }

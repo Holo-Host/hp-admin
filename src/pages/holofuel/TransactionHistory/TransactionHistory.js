@@ -47,7 +47,7 @@ export default function TransactionsHistory ({ history: { push } }) {
     null
   ]
 
-  return <PrimaryLayout headerProps={{ title: 'History', accountNumber: MOCK_ACCT_NUM }}>
+  return <PrimaryLayout headerProps={{ title: 'History' }} accountNumber={MOCK_ACCT_NUM}>
     <section styleName='account-ledger-table'>
       <table styleName='completed-transactions-table'>
         <thead>

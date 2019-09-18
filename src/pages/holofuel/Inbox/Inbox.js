@@ -35,7 +35,7 @@ export default function Inbox () {
 
   const showRejectionModal = transaction => setModalTransaction(transaction)
 
-  return <PrimaryLayout headerProps={{ title: pageTitle }}>
+  return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}

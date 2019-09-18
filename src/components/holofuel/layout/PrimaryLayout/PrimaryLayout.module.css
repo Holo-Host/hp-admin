@@ -7,11 +7,15 @@
 }
 
 .wide {
-  padding: 50px;
+  padding: 0;
 }
 
 .narrow {
-  padding: 25px 20px;
+  padding: 0;
+}
+
+.content {
+  padding: 20px;
 }
 
 .menu-link {
