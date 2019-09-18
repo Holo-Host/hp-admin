@@ -90,7 +90,7 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
       <div styleName='story'><span styleName='counterparty'>{shortCounterparty}</span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
-    <div styleName={cx('amount', { debit: isRequest })}>{Number(amount).toLocaleString()} HF</div>
+    <div styleName={cx('amount', { debit: isRequest })}>{Number.parseFloat(amount).toFixed(2).toLocaleString()}</div>
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} />}

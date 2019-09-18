@@ -48,7 +48,7 @@ export default function CreateRequest ({ history: { push } }) {
     </div>
     <form styleName='request-form' onSubmit={handleSubmit(onSubmit)}>
       <div styleName='form-row'>
-        <label htmlFor='counterparty' styleName='form-label'>To</label>
+        <label htmlFor='counterparty' styleName='form-label'>From</label>
         <input
           name='counterparty'
           id='counterparty'
