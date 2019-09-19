@@ -3,7 +3,7 @@ import { isString } from 'lodash/fp'
 
 export const transactionList = {
   ledger: {
-    balance: '1000.01',
+    balance: '1038900.01',
     credit: '0',
     payable: '242.0201',
     receivable: '0',

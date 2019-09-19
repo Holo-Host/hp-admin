@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
+import { presentHolofuelAmount } from 'utils'
 
 import './SideMenu.module.css'
 
@@ -9,19 +10,19 @@ export function SideMenu ({
   isOpen,
   handleClose,
   avatarUrl = '',
-  accountNumber = 'AC1903F9EACC1903F8EA',
-  inboxCount = 3,
-  holofuelBalance = '120,200 HF'
+  agentId,
+  inboxCount,
+  holofuelBalance
 }) {
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
         <h1 styleName='appName'>HoloFuel</h1>
 
-        <HashAvatar avatarUrl={avatarUrl} seed={accountNumber} size={100} styleName='avatar' />
+        <HashAvatar avatarUrl={avatarUrl} seed={agentId} size={100} styleName='avatar' />
 
-        <span styleName='header-account'>{accountNumber}</span>
-        <strong styleName='header-balance'>{holofuelBalance}</strong>
+        <span styleName='header-account'>{agentId}</span>
+        <strong styleName='header-balance'>{presentHolofuelAmount(holofuelBalance)}</strong>
       </header>
 
       <nav styleName='nav'>

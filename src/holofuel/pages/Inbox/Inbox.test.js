@@ -42,7 +42,7 @@ describe('Inbox Connected', () => {
     listItems.forEach((item, index) => {
       const { getByText } = within(item)
       expect(getByText(actionableTransactions[index].notes)).toBeInTheDocument()
-      expect(getByText(`${Number(actionableTransactions[index].amount).toFixed(2).toLocaleString()}`)).toBeInTheDocument()
+      expect(getByText(`${Number(actionableTransactions[index].amount).toLocaleString()}`)).toBeInTheDocument()
     })
   })
 })
