@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import PrimaryLayout from 'components/holofuel/layout/PrimaryLayout'
+import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import './Dashboard.module.css'
 
 export default function Dashboard () {

@@ -7,7 +7,7 @@ import CreateRequest from './CreateRequest'
 import { TYPE } from 'models/Transaction'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 
-jest.mock('components/holofuel/Header')
+jest.mock('holofuel/components/Header')
 
 const counterparty = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
 const amount = 35674
