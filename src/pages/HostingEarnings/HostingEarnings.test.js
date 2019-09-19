@@ -2,8 +2,7 @@ import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import HostingEarnings from './HostingEarnings'
 
-// mocking Header because it depends on Router
-jest.mock('components/Header')
+jest.mock('components/layout/PrimaryLayout')
 
 describe('HostingEarnings', () => {
   it('renders', () => {
