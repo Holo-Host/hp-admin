@@ -7,9 +7,9 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
-import PrimaryLayout from 'components/holofuel/layout/PrimaryLayout'
-import Button from 'components/holofuel/Button'
-import Modal from 'components/holofuel/Modal'
+import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import Button from 'holofuel/components/Button'
+import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
 import cx from 'classnames'
 

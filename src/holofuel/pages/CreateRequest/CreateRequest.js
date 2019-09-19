@@ -4,9 +4,9 @@ import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import PrimaryLayout from 'components/holofuel/layout/PrimaryLayout'
-import HashIcon from 'components/holofuel/HashIcon'
-import Button from 'components/holofuel/Button'
+import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import HashIcon from 'holofuel/components/HashIcon'
+import Button from 'holofuel/components/Button'
 import './CreateRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific

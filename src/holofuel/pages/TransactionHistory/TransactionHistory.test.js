@@ -14,7 +14,7 @@ import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, makeDisplayName, formatDateTime } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 
-jest.mock('components/holofuel/layout/PrimaryLayout')
+jest.mock('holofuel/components/layout/PrimaryLayout')
 
 function renderWithRouter (
   ui,
