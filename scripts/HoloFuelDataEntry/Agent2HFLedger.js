@@ -18,7 +18,7 @@ const txProfliferator = (iterNum) => {
   const transactionList = []
   for (let i = 0; i < iterNum; i++) {
     const transaction = {
-      counterparty: 'SHOULD BE AGENT 1',
+      counterparty: 'SHOULD BECOME AGENT 1',
       amount: amount(),
       notes: notes(),
       deadline: deadline()

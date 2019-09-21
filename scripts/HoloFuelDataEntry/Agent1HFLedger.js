@@ -18,7 +18,7 @@ const txProfliferator = (iterNum) => {
   const transactionList = []
   for (let i = 0; i < iterNum; i++) {
     const transaction = {
-      counterparty: 'SHOULD BE AGENT 2',
+      counterparty: 'SHOULD BECOME AGENT 2',
       amount: amount(),
       notes: notes(),
       deadline: deadline()
@@ -29,9 +29,9 @@ const txProfliferator = (iterNum) => {
 }
 
 const Agent1TransactionLedger = {
-  requests: txProfliferator(1),
+  requests: txProfliferator(4),
   offers: {
-    initated: txProfliferator(1),
+    initated: txProfliferator(4),
     reponding: [{}]
   },
   acceptedTransactions: {
