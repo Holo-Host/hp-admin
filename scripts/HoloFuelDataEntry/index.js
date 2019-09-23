@@ -1,3 +1,29 @@
+// //////////////////////////////////////////////////////////////////////////////////// //
+
+// HF ACTION FLOWS (for all successful cases):
+// ===========================================
+// AGENT 1 FLOW:
+// >> Full Request Case
+// >>>> Agent 1 Requests HF
+// >>>> Agent 2 Offers HF (response to requested)
+// >>>> Agent 1 Accepts Offered HF
+
+// >> Full Promise Case
+// >>>> Agent 1 Offers HF (initiated)
+// >>>> Agent 2 Accepts Offered HF
+
+// AGENT 2 FLOW:
+// >> Full Request Case
+// >>>> Agent 2 Requests HF
+// >>>> Agent 1 Offers HF (response to requested)
+// >>>> Agent 2 Accepts HF
+
+// >> Full Promise Case
+// >>>> Agent 2 Offers HF (initiated)
+// >>>> Agent 1 Accepts Offered HF
+
+// //////////////////////////////////////////////////////////////////////////////////// //
+
 const { connect } = require('@holochain/hc-web-client')
 const axios = require('axios')
 // const wait = require('waait')
@@ -35,14 +61,12 @@ const startTestConductor = async () => {
 const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, originId }) => {
   const txType = type === OFFER ? agentId[`offers`][`initated`] : agentId[type]
   const counterparty = agentId === AGENT_1 ? Agent2.agentId : Agent1.agentId
-
   let origininatingTx = null
   if (transactionTrace || transactionTrace === 0) {
     // For payment of a request :
     const otherAgent = agentId === AGENT_1 ? AGENT_2 : AGENT_1
     origininatingTx = otherAgent[REQUEST][transactionTrace]
   }
-
   switch (type) {
     case REQUEST: {
       console.log('\n INVOKING REQUEST CALL ****************************')
@@ -280,31 +304,5 @@ startTestConductor()
 
       agentScenarioFlow(AGENT_1)
       // agentScenarioFlow(AGENT_2)
-    }) // end of script
+    })
   })
-
-// //////////////////////////////////////////////////////////////////////////////////// //
-
-// HF ACTION FLOWS (for all successful cases):
-// ===========================================
-// AGENT 1 FLOW:
-// >> Full Request Case
-// >>>> Agent 1 Requests HF
-// >>>> Agent 2 Offers HF (response to requested)
-// >>>> Agent 1 Accepts Offered HF
-
-// >> Full Promise Case
-// >>>> Agent 1 Offers HF (initiated)
-// >>>> Agent 2 Accepts Offered HF
-
-// AGENT 2 FLOW:
-// >> Full Request Case
-// >>>> Agent 2 Requests HF
-// >>>> Agent 1 Offers HF (response to requested)
-// >>>> Agent 2 Accepts HF
-
-// >> Full Promise Case
-// >>>> Agent 2 Offers HF (initiated)
-// >>>> Agent 1 Accepts Offered HF
-
-// //////////////////////////////////////////////////////////////////////////////////// //
