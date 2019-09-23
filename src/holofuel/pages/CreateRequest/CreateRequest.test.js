@@ -2,12 +2,14 @@ import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import { MockedProvider } from '@apollo/react-testing'
+import { Router } from 'react-router-dom'
+import { createMemoryHistory } from 'history'
 import moment from 'moment'
 import CreateRequest from './CreateRequest'
 import { TYPE } from 'models/Transaction'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 
-jest.mock('holofuel/components/Header')
+jest.mock('holofuel/components/layout/PrimaryLayout')
 
 const counterparty = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
 const amount = 35674
@@ -38,21 +40,38 @@ const mocks = [
   requestMock
 ]
 
+const renderWithRouter = (
+  ui,
+  {
+    route = '/',
+    history = createMemoryHistory({ initialEntries: [route] })
+  } = {}
+) => ({
+  ...render(
+    <Router history={history}>
+      <MockedProvider mocks={mocks} addTypename={false}>
+        {ui}
+      </MockedProvider>
+    </Router>
+  ),
+  history
+})
+
 describe('CreateRequest', () => {
   it('renders a form that can be filled out and submitted', async () => {
     const push = jest.fn()
 
     let getByLabelText, getByText, queryByTestId, getByTestId
     await act(async () => {
-      ({ getByLabelText, getByText, queryByTestId, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
+      ({ getByLabelText, getByText, queryByTestId, getByTestId } = renderWithRouter(
         <CreateRequest history={{ push }} />
-      </MockedProvider>))
+      ))
       await wait(0)
     })
 
     expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
-    fireEvent.change(getByLabelText('To'), { target: { value: counterparty } })
+    fireEvent.change(getByLabelText('From'), { target: { value: counterparty } })
 
     expect(getByTestId('hash-icon')).toBeInTheDocument()
 

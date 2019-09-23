@@ -7,7 +7,7 @@ export const MOCK_INDIVIDUAL_DNAS = {
   hylo: true,
   'happ-store': true,
   hha: true,
-  holofuel: true
+  holofuel: false
 }
 export const MOCK_ENVOY_CONNECTION = true || process.env.NODE_ENV === 'test'
 export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'

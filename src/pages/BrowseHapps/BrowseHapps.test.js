@@ -14,8 +14,7 @@ import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
 import BrowseHapps from './BrowseHapps'
 
 jest.mock('data-interfaces/EnvoyInterface')
-// mocking Header because it depends on Router
-jest.mock('components/Header')
+jest.mock('components/layout/PrimaryLayout')
 
 function renderWithRouter (
   ui,

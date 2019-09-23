@@ -10,3 +10,11 @@ export async function promiseMap (array, fn) {
   const resolved = await Promise.all(promiseArray)
   return resolved
 }
+
+export function presentAgentId (agentId) {
+  return (agentId || '').slice(-6)
+}
+
+export function presentHolofuelAmount (amount) {
+  return Number.parseFloat(amount).toLocaleString()
+}

@@ -2,7 +2,7 @@ const { connect } = require('@holochain/hc-web-client')
 const axios = require('axios')
 const HAPP_CONFIG = require('./HappConfig.js')
 
-function testConductor () {
+function startTestConductor () {
   return new Promise((resolve, reject) => {
     const callToHC = axios.post('http://localhost:3300/admin/agent/list', {})
     resolve(callToHC)
@@ -10,7 +10,7 @@ function testConductor () {
     .catch(e => console.log(' >>>>>>>>> Make sure your HC conductor is running! <<<<<<<<<  '))
 }
 
-testConductor()
+startTestConductor()
   .then(() => {
     connect({ url: 'ws://localhost:3400' }).then(({ callZome }) => {
       const holochainZomeCall = (instance, zomeName, zomeFuncName, args) => {

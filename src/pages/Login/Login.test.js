@@ -3,8 +3,7 @@ import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import Login from './Login'
 
-// mocking Header because it depends on Router
-jest.mock('components/Header')
+jest.mock('components/layout/PrimaryLayout')
 
 describe('Login', () => {
   it('renders', async () => {

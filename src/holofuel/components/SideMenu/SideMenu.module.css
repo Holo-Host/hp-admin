@@ -1,0 +1,147 @@
+.drawer {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  bottom: 0;
+  z-index: 98;
+}
+
+.drawer--open {
+
+}
+
+.container {
+  box-sizing: border-box;
+  width: 280px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 60px 20px 20px;
+  background-color: #444;
+  color: #ccc;
+  transform: translateX(-10%);
+  transition: transform .3s ease;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, .6);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.drawer--open .container {
+  transform: translateX(100%);
+  pointer-events: initial;
+}
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000;
+  opacity: 0;
+  z-index: -1;
+  will-change: opacity;
+  transition: opacity .3s ease;
+  pointer-events: none;
+}
+
+.drawer--open .drawer-overlay {
+  opacity: .5;
+  pointer-events: initial;
+}
+
+.header {
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.nav {
+  color: #fff;
+}
+
+.footer {
+  justify-self: flex-end;
+  margin-top: auto;
+}
+
+/* Header */
+
+.appName {
+  font-weight: 700;
+  font-size: 32px;
+}
+
+.avatar {
+  margin: 12px 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .2);
+}
+
+.header-account {
+  display: block;
+  margin: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.header-balance {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Nav */
+
+.nav-list {
+  padding: 0;
+  list-style-type: none;
+}
+
+.nav-link {
+  display: block;
+  padding: 16px 0;
+  color: #fff;
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+
+.nav-icon {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background-color: #aaa;
+  vertical-align: middle;
+  margin-right: 10px;
+  margin-top: -3px;
+}
+
+/* We should turn this into a design-system component */
+.nav-badge {
+  box-sizing: border-box;
+  float: right;
+  background-color: #36f;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .2) inset,
+    0 0 0 1px rgba(0, 0, 0, .25);
+  font-size: .7em;
+  min-width: 30px;
+  line-height: 14px;
+  text-align: center;
+  border-radius: 9999px;
+  font-weight: 700;
+  padding: 8px;
+}
+
+/* Footer */
+
+.footer-list {
+  padding: 0;
+  list-style-type: none;
+}
+
+.footer-link {
+  color: #888;
+  display: block;
+  padding: 6px 0;
+  text-decoration: none;
+}

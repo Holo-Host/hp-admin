@@ -11,8 +11,10 @@ import wait from 'waait'
 import { TYPE } from 'models/Transaction'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, makeDisplayName, formatDateTime, MOCK_ACCT_NUM } from './TransactionHistory'
+import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, makeDisplayName, formatDateTime } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
+
+jest.mock('holofuel/components/layout/PrimaryLayout')
 
 function renderWithRouter (
   ui,
@@ -27,22 +29,8 @@ function renderWithRouter (
   }
 }
 
-describe('HoloFuel Ledger Transactions', () => {
+describe('TransactionsHistory', () => {
   describe('Page Rendering', () => {
-    it('should render the header and title', async () => {
-      let getByText
-      await act(async () => {
-        ({ getByText } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <TransactionsHistory history={{}} />
-        </ApolloProvider>))
-        await wait(0)
-      })
-
-      expect(getByText(MOCK_ACCT_NUM)).toBeVisible()
-      expect(getByText('HoloFuel')).toBeVisible()
-      expect(getByText('History')).toBeVisible()
-    })
-
     it('should render and populate completed transaction table', async () => {
       beforeEach(cleanup)
 
@@ -195,7 +183,11 @@ describe('HoloFuel Ledger Transactions', () => {
       let getByText
       await act(async () => {
         ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <TransactionRow {...props} />
+          <table>
+            <tbody>
+              <TransactionRow {...props} />
+            </tbody>
+          </table>
         </MockedProvider>))
         await wait(0)
       })
@@ -253,7 +245,11 @@ describe('HoloFuel Ledger Transactions', () => {
       let getByText
       await act(async () => {
         ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <TransactionRow {...props} />
+          <table>
+            <tbody>
+              <TransactionRow {...props} />
+            </tbody>
+          </table>
         </MockedProvider>))
         await wait(0)
       })
@@ -308,13 +304,13 @@ describe('HoloFuel Ledger Transactions', () => {
     it('should format timedate older than a year ago', () => {
       const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticOverAYear)
       expect(date).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('MMMM D YYYY'))
-      expect(time).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('h:mm'))
+      expect(time).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('kk:mm'))
     })
 
     it('should format timedate within past year', () => {
       const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameYear)
       expect(date).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('MMMM D'))
-      expect(time).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('h:mm'))
+      expect(time).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('kk:mm'))
     })
 
     it('should format timedate within same day', () => {
