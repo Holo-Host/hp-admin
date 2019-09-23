@@ -21,7 +21,7 @@ const AGENT_2 = Agent2TransactionLedger
 const REQUEST = 'requests'
 const OFFER = 'offers.initated'
 const PAY = 'offers.responding'
-const ACCEPT = 'acceptedTransactions.offers'
+const ACCEPT = 'offers.accepted'
 
 const startTestConductor = async () => {
   return new Promise((resolve, reject) => {
@@ -121,8 +121,8 @@ startTestConductor()
           })
             .catch(e => {
               console.log('****************************************************************** \n')
-              console.log('****************************************************************** \n')
-              console.log('HC ZomeCall error occured. ERROR :  ', e)
+              console.log('*************************** !!!!!! ZOME_CALL ERROR OCCURED !!!!!! ************************ \n')
+              console.log('ERROR :  ', e)
               console.log('****************************************************************** \n')
               console.log('****************************************************************** \n')
             })
@@ -162,7 +162,7 @@ startTestConductor()
           console.log(' Length of this cycle: ', arrayFirstHalf(CURRENT_AGENT.requests).length)
           for (let i = 0; i < arrayFirstHalf(CURRENT_AGENT.requests).length; i++) {
             await new Promise(resolve => {
-              console.log('\n Iteration Number (index) : ', i)
+              console.log('\n Full Request Array Iteration Number (index) : ', i)
               let txOriginId
               // Agent 1 Requests HF
               transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index: i })
@@ -189,7 +189,7 @@ startTestConductor()
           for (let i = 0; i < arrayFirstHalf(arraySecondHalf(CURRENT_AGENT.requests)).length; i++) {
             await new Promise(resolve => {
               i = i + halfRequestsLength
-              console.log('\n Iteration Number (index) : ', i)
+              console.log('\n Full Request Array Iteration Number (index) : ', i)
               console.log('\n MAKING CALL TO REQUEST')
               // Current Agent Requests HF
               transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index: i })
@@ -211,7 +211,7 @@ startTestConductor()
           for (let i = 0; i < arraySecondHalf(arraySecondHalf(CURRENT_AGENT.requests)).length; i++) {
             await new Promise(resolve => {
               i = i + halfRequestsLength + forthRequestsLength
-              console.log('\n Iteration Number (index) : ', i)
+              console.log('\n Full Request Array Iteration Number (index) : ', i)
               // Current Agent Requests HF
               resolve(transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index: i }))
             })
@@ -226,8 +226,7 @@ startTestConductor()
           console.log(' Length of this cycle: ', arrayFirstHalf(CURRENT_AGENT.offers.initated).length)
           for (let i = 0; i < arrayFirstHalf(CURRENT_AGENT.offers.initated).length; i++) {
             await new Promise(resolve => {
-              console.log('\n Iteration Number (index) : ', i)
-              console.log('\n MAKING CALL TO PROMISE / OFFER')
+              console.log('\n Full Offer Array Iteration Number (index) : ', i)
               // Current Agent Offers HF
               transactHoloFuel(CURRENT_AGENT, OFFER, holochainZomeCall, { index: i })
                 // Transactee Accepts HF offered by Current Agent and completes originating Promise/Offer
@@ -248,7 +247,7 @@ startTestConductor()
           for (let i = 0; i < arraySecondHalf(CURRENT_AGENT.offers.initated).length; i++) {
             await new Promise(resolve => {
               i = i + halfInitiatingOffersLength
-              console.log('\n Iteration Number (index) : ', i)
+              console.log('\n Full Offer Array Iteration Number (index) : ', i)
 
               console.log('\n arraySecondHalf(CURRENT_AGENT.offers.initated) : ', arraySecondHalf(CURRENT_AGENT.offers.initated))
               console.log('CURRENT_AGENT.offers.initated[INDEX] : ', CURRENT_AGENT.offers.initated[i])

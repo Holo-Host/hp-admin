@@ -32,10 +32,8 @@ const Agent2TransactionLedger = {
   requests: txProfliferator(4),
   offers: {
     initated: txProfliferator(2),
-    reponding: [{}]
-  },
-  acceptedTransactions: {
-    offers: [{}]
+    reponding: [{}],
+    accepted: [{}]
   }
 }
 
