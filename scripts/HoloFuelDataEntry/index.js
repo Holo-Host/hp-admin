@@ -282,15 +282,11 @@ startTestConductor()
               const index = i + halfInitiatingOffersLength
               console.log('\n Full Offer Array Iteration Number (index) : ', index)
 
-              // console.log('\n arraySecondHalf(CURRENT_AGENT.offers.initated) : ', arraySecondHalf(CURRENT_AGENT.offers.initated))
-              // console.log('CURRENT_AGENT.offers.initated[INDEX] : ', CURRENT_AGENT.offers.initated[i])
-
               // Current Agent Offers HF
               resolve(transactHoloFuel(CURRENT_AGENT, OFFER, holochainZomeCall, { index }))
             })
               .catch(error => { return error })
           }
-          process.exit()
         }
 
         // Invoke Individual Transaction Cases for Agents
