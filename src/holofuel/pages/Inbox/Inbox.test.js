@@ -23,8 +23,7 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
 })
 
 jest.mock('data-interfaces/EnvoyInterface')
-// mocking Header because it depends on Router
-jest.mock('holofuel/components/Header')
+jest.mock('holofuel/components/layout/PrimaryLayout')
 
 describe('Inbox Connected', () => {
   it('renders', async () => {
@@ -43,7 +42,7 @@ describe('Inbox Connected', () => {
     listItems.forEach((item, index) => {
       const { getByText } = within(item)
       expect(getByText(actionableTransactions[index].notes)).toBeInTheDocument()
-      expect(getByText(`${Number(actionableTransactions[index].amount).toLocaleString()} HF`)).toBeInTheDocument()
+      expect(getByText(`${Number(actionableTransactions[index].amount).toLocaleString()}`)).toBeInTheDocument()
     })
   })
 })

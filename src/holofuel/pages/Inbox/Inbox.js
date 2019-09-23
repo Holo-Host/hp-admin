@@ -12,8 +12,7 @@ import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
 import cx from 'classnames'
-
-const lastSix = counterparty => (counterparty || '').slice(-6)
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
@@ -35,7 +34,7 @@ export default function Inbox () {
 
   const showRejectionModal = transaction => setModalTransaction(transaction)
 
-  return <PrimaryLayout headerProps={{ title: pageTitle }}>
+  return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
@@ -73,7 +72,7 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
   const date = presentDate(dateTime)
   const time = dateTime.format('kk:mm')
 
-  const shortCounterparty = lastSix(counterparty)
+  const shortCounterparty = presentAgentId(counterparty)
 
   const story = isOffer ? ' is offering' : ' is requesting'
 
@@ -90,7 +89,7 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
       <div styleName='story'><span styleName='counterparty'>{shortCounterparty}</span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
-    <div styleName={cx('amount', { debit: isRequest })}>{Number(amount).toLocaleString()} HF</div>
+    <div styleName={cx('amount', { debit: isRequest })}>{presentHolofuelAmount(amount)}</div>
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} />}
@@ -162,7 +161,7 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text'>
-      Reject <span styleName='modal-counterparty'>{lastSix(counterparty)}</span>'s {type} of <span styleName='modal-amount'>{Number(amount).toLocaleString()} HF</span>?
+      Reject <span styleName='modal-counterparty'>{presentAgentId(counterparty)}</span>'s {type} of <span styleName='modal-amount'>{Number(amount).toLocaleString()} HF</span>?
     </div>
     <div styleName='modal-buttons'>
       <Button
