@@ -218,15 +218,15 @@ startTestConductor()
           console.log(' Length of this cycle: ', array.length)
           for (let i = 0; i < array.length; i++) {
             await new Promise(resolve => {
-              i = i + halfRequestsLength
-              console.log('\n Full Request Array Iteration Number (index) : ', i)
+              const index = i + halfRequestsLength
+              console.log('\n Full Request Array Iteration Number (index) : ', index)
               console.log('\n MAKING CALL TO REQUEST')
               // Current Agent Requests HF
-              transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index: i })
+              transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index })
                 // Transactee Agent Offers HF in response to Current Agent's request
                 .then(r => {
                   const { Ok: originId } = JSON.parse(r)
-                  resolve(transactHoloFuel(COUNTERPARTY_AGENT, PAY, holochainZomeCall, { transactionTrace: i, originId }))
+                  resolve(transactHoloFuel(COUNTERPARTY_AGENT, PAY, holochainZomeCall, { transactionTrace: index, originId }))
                 })
                 .catch(error => { return error })
             })
@@ -242,10 +242,10 @@ startTestConductor()
           console.log(' Length of this cycle: ', arraySecondHalf(arraySecondHalf(CURRENT_AGENT.requests)).length)
           for (let i = 0; i < arraySecondHalf(arraySecondHalf(CURRENT_AGENT.requests)).length; i++) {
             await new Promise(resolve => {
-              i = i + halfRequestsLength + forthRequestsLength
-              console.log('\n Full Request Array Iteration Number (index) : ', i)
+              const index = i + halfRequestsLength + forthRequestsLength
+              console.log('\n Full Request Array Iteration Number (index) : ', index)
               // Current Agent Requests HF
-              resolve(transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index: i }))
+              resolve(transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index }))
             })
               .catch(error => { return error })
           }
@@ -281,18 +281,18 @@ startTestConductor()
           console.log(' Length of this cycle: ', arraySecondHalf(CURRENT_AGENT.offers.initated).length)
           for (let i = 0; i < arraySecondHalf(CURRENT_AGENT.offers.initated).length; i++) {
             await new Promise(resolve => {
-              i = i + halfInitiatingOffersLength
-              console.log('\n Full Offer Array Iteration Number (index) : ', i)
+              const index = i + halfInitiatingOffersLength
+              console.log('\n Full Offer Array Iteration Number (index) : ', index)
 
               // console.log('\n arraySecondHalf(CURRENT_AGENT.offers.initated) : ', arraySecondHalf(CURRENT_AGENT.offers.initated))
               // console.log('CURRENT_AGENT.offers.initated[INDEX] : ', CURRENT_AGENT.offers.initated[i])
 
               // Current Agent Offers HF
-              resolve(transactHoloFuel(CURRENT_AGENT, OFFER, holochainZomeCall, { index: i }))
+              resolve(transactHoloFuel(CURRENT_AGENT, OFFER, holochainZomeCall, { index }))
             })
               .catch(error => { return error })
           }
-          // process.exit()
+          process.exit()
         }
 
         // Invoke Individual Transaction Cases for Agents
