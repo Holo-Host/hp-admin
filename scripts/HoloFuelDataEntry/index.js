@@ -26,7 +26,6 @@
 
 const { connect } = require('@holochain/hc-web-client')
 const axios = require('axios')
-// const wait = require('waait')
 const Agent1TransactionLedger = require('./Agent1HFLedger.js')
 const Agent2TransactionLedger = require('./Agent2HFLedger.js')
 
@@ -200,7 +199,6 @@ startTestConductor()
                 })
                 // Agent 1 Accepts HF offered by Agent 2 and completes originating Request
                 .then(res => {
-                  // await wait(5)
                   setTimeout(() => resolve(transactHoloFuel(CURRENT_AGENT, ACCEPT, holochainZomeCall, { originId: txOriginId })), 5000)
                 })
                 .catch(error => { return error })
