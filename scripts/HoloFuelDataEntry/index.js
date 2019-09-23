@@ -44,7 +44,7 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
 
   switch (type) {
     case REQUEST: {
-      console.log(' INVOKING REQUEST CALL ****************************')
+      console.log('\n INVOKING REQUEST CALL ****************************')
       // initate request
       return ZomeCall(
         'holofuel',
@@ -58,7 +58,7 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
       )
     }
     case OFFER: {
-      console.log(' INVOKING OFFER CALL ****************************')
+      console.log('\n INVOKING OFFER CALL ****************************')
       // initiate offer
       return ZomeCall(
         'holofuel',
@@ -72,7 +72,7 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
       )
     }
     case PAY: {
-      console.log(' INVOKING PAY CALL ****************************')
+      console.log('\n INVOKING PAY CALL ****************************')
       // offer in response to request
       return ZomeCall(
         'holofuel',
@@ -88,7 +88,7 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
       )
     }
     case ACCEPT: {
-      console.log(' INVOKING ACCEPT CALL ****************************')
+      console.log('\n INVOKING ACCEPT CALL ****************************')
       // accept offer
       return ZomeCall(
         'holofuel',
@@ -119,9 +119,15 @@ startTestConductor()
             console.log('------------------------------------------------------------------- \n')
             return r
           })
-            .catch(e => console.log('HC ZomeCall error occured. >> ERROR :  ', e))
+            .catch(e => {
+              console.log('****************************************************************** \n')
+              console.log('****************************************************************** \n')
+              console.log('HC ZomeCall error occured. ERROR :  ', e)
+              console.log('****************************************************************** \n')
+              console.log('****************************************************************** \n')
+            })
         } catch (e) {
-          console.log(`Error occured when connecting to HC conductor. >> ERROR: (${e})`)
+          console.log(`Error occured when connecting to HC CONDUCTOR. >>>>>>>>>>>> ERROR: (${e}) <<<<<<<<<<<<<<<<< `)
         }
       }
 
@@ -159,13 +165,11 @@ startTestConductor()
               console.log('\n Iteration Number (index) : ', i)
               let txOriginId
               // Agent 1 Requests HF
-              console.log('\n MAKING CALL TO REQUEST')
               transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index: i })
               // Agent 2 Offers HF in response to Agent 1's request
                 .then(r => {
                   const { Ok: originId } = JSON.parse(r)
                   txOriginId = originId
-                  console.log('MAKING CALL TO PAY')
                   return transactHoloFuel(COUNTERPARTY_AGENT, PAY, holochainZomeCall, { transactionTrace: i, originId })
                 })
                 // Agent 1 Accepts HF offered by Agent 2 and completes originating Request
@@ -229,7 +233,6 @@ startTestConductor()
                 // Transactee Accepts HF offered by Current Agent and completes originating Promise/Offer
                 .then(r => {
                   const { Ok: originId } = JSON.parse(r)
-                  console.log('ABOUT TO ACCEPT')
                   resolve(transactHoloFuel(COUNTERPARTY_AGENT, ACCEPT, holochainZomeCall, { transactionTrace: i, originId }))
                 })
                 .catch(error => { return error })
@@ -249,8 +252,6 @@ startTestConductor()
 
               console.log('\n arraySecondHalf(CURRENT_AGENT.offers.initated) : ', arraySecondHalf(CURRENT_AGENT.offers.initated))
               console.log('CURRENT_AGENT.offers.initated[INDEX] : ', CURRENT_AGENT.offers.initated[i])
-
-              console.log('\n ABOUT TO PROMISE / OFFER')
               // Current Agent Offers HF
               resolve(transactHoloFuel(CURRENT_AGENT, OFFER, holochainZomeCall, { index: i }))
             })
