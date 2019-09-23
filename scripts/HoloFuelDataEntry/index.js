@@ -1,5 +1,6 @@
 const { connect } = require('@holochain/hc-web-client')
 const axios = require('axios')
+// const wait = require('waait')
 const Agent1TransactionLedger = require('./Agent1HFLedger.js')
 const Agent2TransactionLedger = require('./Agent2HFLedger.js')
 
@@ -37,7 +38,7 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
 
   let origininatingTx = null
   if (transactionTrace || transactionTrace === 0) {
-    // For payment of a request or acceptance of a payment:
+    // For payment of a request :
     const otherAgent = agentId === AGENT_1 ? AGENT_2 : AGENT_1
     origininatingTx = otherAgent[REQUEST][transactionTrace]
   }
@@ -159,8 +160,9 @@ startTestConductor()
         const fullRequestCycle = async () => {
           console.log(' \n\n ================================ CASE 1 : Full Request Cycle =========================================== ')
           console.log(' Length of all Initiated Requests: ', CURRENT_AGENT.requests.length)
-          console.log(' Length of this cycle: ', arrayFirstHalf(CURRENT_AGENT.requests).length)
-          for (let i = 0; i < arrayFirstHalf(CURRENT_AGENT.requests).length; i++) {
+          const array = CURRENT_AGENT.requests.length <= 1 ? CURRENT_AGENT.requests : arrayFirstHalf(CURRENT_AGENT.requests)
+          console.log(' Length of this cycle: ', array.length)
+          for (let i = 0; i < array.length; i++) {
             await new Promise(resolve => {
               console.log('\n Full Request Array Iteration Number (index) : ', i)
               let txOriginId
@@ -174,7 +176,8 @@ startTestConductor()
                 })
                 // Agent 1 Accepts HF offered by Agent 2 and completes originating Request
                 .then(res => {
-                  resolve(transactHoloFuel(CURRENT_AGENT, ACCEPT, holochainZomeCall, { originId: txOriginId }))
+                  // await wait(5)
+                  setTimeout(() => resolve(transactHoloFuel(CURRENT_AGENT, ACCEPT, holochainZomeCall, { originId: txOriginId })), 5000)
                 })
                 .catch(error => { return error })
             })
@@ -185,8 +188,11 @@ startTestConductor()
         const twoPartsRequestCycle = async () => {
           console.log('  \n\n ================================ CASE 2 : Two Parts Request Cycle =========================================== ')
           console.log(' Length of all Initiated Requests: ', CURRENT_AGENT.requests.length)
-          console.log(' Length of this cycle: ', arrayFirstHalf(arraySecondHalf(CURRENT_AGENT.requests)).length)
-          for (let i = 0; i < arrayFirstHalf(arraySecondHalf(CURRENT_AGENT.requests)).length; i++) {
+          if (CURRENT_AGENT.requests.length <= 1) { return console.log('The REQUEST array has less than 2 entries, this case is being skipped...') }
+
+          const array = arraySecondHalf(CURRENT_AGENT.requests).length <= 1 ? arraySecondHalf(CURRENT_AGENT.requests) : arrayFirstHalf(arraySecondHalf(CURRENT_AGENT.requests))
+          console.log(' Length of this cycle: ', array.length)
+          for (let i = 0; i < array.length; i++) {
             await new Promise(resolve => {
               i = i + halfRequestsLength
               console.log('\n Full Request Array Iteration Number (index) : ', i)
@@ -207,6 +213,8 @@ startTestConductor()
         const onePartRequestCycle = async () => {
           console.log(' \n\n ================================== CASE 3 : One Part Request Cycle =========================================== ')
           console.log(' Length of all Initiated Requests: ', CURRENT_AGENT.requests.length)
+          if (arraySecondHalf(CURRENT_AGENT.requests).length <= 1) { return console.log('The REQUEST array has less than 4 entries, this case is being skipped...') }
+
           console.log(' Length of this cycle: ', arraySecondHalf(arraySecondHalf(CURRENT_AGENT.requests)).length)
           for (let i = 0; i < arraySecondHalf(arraySecondHalf(CURRENT_AGENT.requests)).length; i++) {
             await new Promise(resolve => {
@@ -223,8 +231,9 @@ startTestConductor()
         const fullOfferCycle = async () => {
           console.log(' \n\n ================================== CASE 4 : Full Offer Cycle =========================================== ')
           console.log(' Length of all Initiated Promises: ', CURRENT_AGENT.offers.initated.length)
-          console.log(' Length of this cycle: ', arrayFirstHalf(CURRENT_AGENT.offers.initated).length)
-          for (let i = 0; i < arrayFirstHalf(CURRENT_AGENT.offers.initated).length; i++) {
+          const array = CURRENT_AGENT.offers.initated.length <= 1 ? CURRENT_AGENT.offers.initated : arrayFirstHalf(CURRENT_AGENT.offers.initated)
+          console.log(' Length of this cycle: ', array.length)
+          for (let i = 0; i < array.length; i++) {
             await new Promise(resolve => {
               console.log('\n Full Offer Array Iteration Number (index) : ', i)
               // Current Agent Offers HF
@@ -232,7 +241,7 @@ startTestConductor()
                 // Transactee Accepts HF offered by Current Agent and completes originating Promise/Offer
                 .then(r => {
                   const { Ok: originId } = JSON.parse(r)
-                  resolve(transactHoloFuel(COUNTERPARTY_AGENT, ACCEPT, holochainZomeCall, { transactionTrace: i, originId }))
+                  setTimeout(() => resolve(transactHoloFuel(COUNTERPARTY_AGENT, ACCEPT, holochainZomeCall, { transactionTrace: i, originId })), 5000)
                 })
                 .catch(error => { return error })
             })
@@ -243,14 +252,17 @@ startTestConductor()
         const halfOfferCycle = async () => {
           console.log(' \n\n ================================== CASE 5 : Half Offer Cycle =========================================== ')
           console.log(' Length of all Initiated Promises: ', CURRENT_AGENT.offers.initated.length)
+          if (CURRENT_AGENT.offers.initated.length <= 1) { console.log('The OFFER / PROMISE array has less than 2 entries, this case is being skipped...'); process.exit() }
+
           console.log(' Length of this cycle: ', arraySecondHalf(CURRENT_AGENT.offers.initated).length)
           for (let i = 0; i < arraySecondHalf(CURRENT_AGENT.offers.initated).length; i++) {
             await new Promise(resolve => {
               i = i + halfInitiatingOffersLength
               console.log('\n Full Offer Array Iteration Number (index) : ', i)
 
-              console.log('\n arraySecondHalf(CURRENT_AGENT.offers.initated) : ', arraySecondHalf(CURRENT_AGENT.offers.initated))
-              console.log('CURRENT_AGENT.offers.initated[INDEX] : ', CURRENT_AGENT.offers.initated[i])
+              // console.log('\n arraySecondHalf(CURRENT_AGENT.offers.initated) : ', arraySecondHalf(CURRENT_AGENT.offers.initated))
+              // console.log('CURRENT_AGENT.offers.initated[INDEX] : ', CURRENT_AGENT.offers.initated[i])
+
               // Current Agent Offers HF
               resolve(transactHoloFuel(CURRENT_AGENT, OFFER, holochainZomeCall, { index: i }))
             })
@@ -266,8 +278,8 @@ startTestConductor()
         await halfOfferCycle()
       }
 
-      // agentScenarioFlow(AGENT_1)
-      agentScenarioFlow(AGENT_2)
+      agentScenarioFlow(AGENT_1)
+      // agentScenarioFlow(AGENT_2)
     }) // end of script
   })
 
