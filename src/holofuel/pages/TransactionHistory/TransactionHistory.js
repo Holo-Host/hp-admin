@@ -2,15 +2,16 @@ import React, { useState } from 'react'
 import moment from 'moment'
 import cx from 'classnames'
 import _ from 'lodash'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 
-import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
+import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 
 export const MOCK_ACCT_NUM = 'AC1903F8EAAC1903F8EA'
@@ -28,15 +29,31 @@ function useCancel () {
   })
 }
 
+function useWhoIs (id) {
+  const { data: { holofuelUser: whoisthis = {} } = {} } = useLazyQuery(HolofuelUserQuery, {
+    variables: {
+      agentId: id || ''
+    }
+  })
+  return whoisthis
+}
+
 // Display - Functional Components with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
+  const findWhoIs = useWhoIs()
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
 
   const showCancellationModal = transaction => setModalTransaction(transaction)
+
+  // TESTING OUT THE NICKNAMES BY AGENT_ID
+  console.log('WHOAMI ? : ', whoami)
+  // const agentId = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+  // console.log('WHOIS ? :', useWhoIs(agentId))
 
   // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.
   const headings = [
@@ -67,6 +84,7 @@ export default function TransactionsHistory ({ history: { push } }) {
             return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
+              // findWhoIs={findWhoIs}
               showCancellationModal={showCancellationModal}
             />
           })}
@@ -75,6 +93,7 @@ export default function TransactionsHistory ({ history: { push } }) {
             return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
+              // findWhoIs={findWhoIs}
               showCancellationModal={showCancellationModal}
               completed />
           })}
@@ -85,6 +104,7 @@ export default function TransactionsHistory ({ history: { push } }) {
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
+      findWhoIs={findWhoIs}
       cancelTransaction={cancelTransaction} />
   </PrimaryLayout>
 }
@@ -95,7 +115,7 @@ const TransactionTableHeading = ({ content }) => {
   </th>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed }) {
+export function TransactionRow ({ transaction, showCancellationModal, completed, findWhoIs }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
@@ -103,7 +123,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'>{makeDisplayName(counterparty).toUpperCase()}</h4>
+      <h4 data-testid='cell-counterparty'>{findWhoIs(counterparty || '') || ''}</h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -128,11 +148,15 @@ function CancelButton ({ showCancellationModal, transaction }) {
 
 //
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
-export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, findWhoIs }) { // findWhoIs
   if (!transaction) return null
 
   const { id, counterparty, amount, type, direction } = transaction
   const onYes = () => {
+    // TESTING :
+    const agentId = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+    findWhoIs(agentId)
+
     cancelTransaction(id)
     handleClose()
   }
