@@ -67,16 +67,18 @@ describe('resolvers', () => {
       })
     })
 
-    describe('.holofuelUser', () => {
-      it('calls HoloFuelInterface.transactions.holofuelUser.get *with* agentId', async () => {
+    describe('.holofuelCounterparty', () => {
+      it('calls HoloFuelDnaInterface.user.getCounterparty with agentId', async () => {
         const agentId = 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
-        resolvers.Query.holofuelUser(null, { agentId })
+        resolvers.Query.holofuelCounterparty(null, { agentId })
         await wait(0)
-        expect(mockHoloFuelInterface.user.get).toHaveBeenCalledWith({ agentId })
+        expect(mockHoloFuelInterface.user.getCounterparty).toHaveBeenCalledWith({ agentId })
       })
+    })
 
-      it('calls HoloFuelInterface.transactions.holofuelUser.get *without* agentId', async () => {
-        resolvers.Query.holofuelUser(null, {})
+    describe('.holofuelUser', () => {
+      it('calls HoloFuelDnaInterface.user.get', async () => {
+        resolvers.Query.holofuelUser()
         await wait(0)
         expect(mockHoloFuelInterface.user.get).toHaveBeenCalled()
       })

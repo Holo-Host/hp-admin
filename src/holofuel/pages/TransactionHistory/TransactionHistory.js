@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import moment from 'moment'
 import cx from 'classnames'
 import _ from 'lodash'
-import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -12,6 +12,7 @@ import Modal from 'holofuel/components/Modal'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 
 export const MOCK_ACCT_NUM = 'AC1903F8EAAC1903F8EA'
@@ -29,14 +30,34 @@ function useCancel () {
   })
 }
 
-function useWhoIs (id) {
-  const { data: { holofuelUser: whoisthis = {} } = {} } = useLazyQuery(HolofuelUserQuery, {
-    variables: {
-      agentId: id || ''
-    }
-  })
-  return whoisthis
+function useWhoIs () {
+  const whois = useQuery(HolofuelCounterpartyQuery)
+  return (id) => {
+    console.log('--------------->', id)
+    const { loading, error, data: { holofuelCounterparty: whoisthis = {} } = {} } = (whois, {
+      variables: {
+        agentId: id
+      }
+    })
+    console.log('WHOIS : ', whois)
+
+    let message
+    if (loading) message = 'Loading'
+    if (error) message = `Error! ${error}`
+    else message = whoisthis.nickname
+
+    return message
+  }
 }
+
+// function useWhoIs (id) {
+//   const { data: { holofuelCounterparty: whoisthis = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
+//     variables: {
+//       agentId: id
+//     }
+//   })
+//   return whoisthis
+// }
 
 // Display - Functional Components with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
@@ -52,8 +73,7 @@ export default function TransactionsHistory ({ history: { push } }) {
 
   // TESTING OUT THE NICKNAMES BY AGENT_ID
   console.log('WHOAMI ? : ', whoami)
-  // const agentId = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
-  // console.log('WHOIS ? :', useWhoIs(agentId))
+  // console.log('TEST WHOIS ? :', findWhoIs('HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'))
 
   // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.
   const headings = [
@@ -115,7 +135,7 @@ const TransactionTableHeading = ({ content }) => {
   </th>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed, findWhoIs }) {
+export function TransactionRow ({ transaction, showCancellationModal, completed }) { // findWhoIs
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
@@ -123,7 +143,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
       <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'>{findWhoIs(counterparty || '') || ''}</h4>
+      <h4 data-testid='cell-counterparty'>{counterparty}</h4> {/*  && findWhoIs(counterparty) */}
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>

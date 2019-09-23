@@ -35,6 +35,7 @@ type HostPricing {
 type HolofuelUser {
   id: ID
   nickname: String
+  pubkey: String
 }
 
 enum TransactionType {
@@ -87,6 +88,7 @@ type Query {
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
   holofuelUser(agentId: String): HolofuelUser
+  holofuelCounterparty(agentId: String): HolofuelUser
 }
 
 type Mutation {
@@ -97,7 +99,7 @@ type Mutation {
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
   holofuelRequest(counterparty:String, amount:Float): Transaction
   holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
-  holofuelAcceptOffer(transactionId: ID): Transaction # NOTE: holofuelAcceptOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
-  holofuelDecline(transactionId: ID): Transaction # ""
-  holofuelCancel(transactionId: ID): Transaction # ""
+  holofuelAcceptOffer(transactionId: ID): Transaction 
+  holofuelDecline(transactionId: ID): Transaction
+  holofuelCancel(transactionId: ID): Transaction
 }
