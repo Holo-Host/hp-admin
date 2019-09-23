@@ -135,7 +135,7 @@ id = 'http-admin-interface'
 admin = true
 
     [interfaces.driver]
-    type = "websocket"
+    type = "http"
     port = 3300
 
     [[interfaces.instances]]

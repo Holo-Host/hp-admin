@@ -34,11 +34,11 @@ const Agent2TransactionLedger = require('./Agent2HFLedger.js')
 // HoloFuel Users :
 const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
 const Agent1 = {
-  agentId: config.agents[0].public_address || 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a',
+  agentId: config.agents[0].public_address || 'ERROR: No Agent Pub Key Found',
   nick: config.agents[0].i || 'Perry'
 }
 const Agent2 = {
-  agentId: config.agents[1].public_address || 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+  agentId: config.agents[1].public_address || 'ERROR: No Agent Pub Key Found',
   nick: config.agents[1].id || 'Sam'
 }
 // HoloFuel User Transactions Log :
