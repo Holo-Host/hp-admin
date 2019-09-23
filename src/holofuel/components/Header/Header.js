@@ -13,18 +13,21 @@ export function Header ({ title, accountNumber, avatarUrl, email, backTo, histor
     <MenuIcon styleName='menu-icon' color='#FFF' />
   </Button>
 
-  return <div>
-    <div styleName='header'>
+  return <header>
+    <section styleName='header'>
       <div styleName='left-nav'>
         {leftNav}
-        <span styleName='title header-font'>{title}</span>
+        <span styleName='title header-font'>HoloFuel</span>
       </div>
       <div styleName='right-nav account-number header-font'>{accountNumber}</div>
       <Link to='/dashboard' styleName='avatar-link'>
-        <HashAvatar avatarUrl={avatarUrl} email={email} size={32} />
+        <HashAvatar avatarUrl={avatarUrl} seed={accountNumber} size={32} />
       </Link>
-    </div>
-  </div>
+    </section>
+    {title && <section styleName='sub-header'>
+      <div styleName='sub-title'>{title}</div>
+    </section>}
+  </header>
 }
 
 export default withRouter(Header)

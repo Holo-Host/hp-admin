@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
-import Header from 'components/Header'
+import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
 import Input from 'components/Input'
 
@@ -48,9 +48,7 @@ export function Settings ({
     updateSettings(settings)
   }
 
-  return <>
-    <Header title='HoloPort Settings' />
-
+  return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
     <strong style={{ marginTop: '20px' }}>Name</strong>
     <p>
       {settings.deviceName}
@@ -108,7 +106,7 @@ export function Settings ({
       onChange={handleToggleSshAccess} />
 
     <Button name='factory-reset' variant='danger' wide onClick={() => factoryReset()}>Factory Reset</Button>
-  </>
+  </PrimaryLayout>
 }
 
 export function SettingsFormInput ({

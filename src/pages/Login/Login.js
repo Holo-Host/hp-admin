@@ -1,7 +1,7 @@
 import React from 'react'
 import useForm from 'react-hook-form'
 import './Login.module.css'
-import Header from 'components/Header'
+import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
 import Input from 'components/Input'
 
@@ -9,9 +9,11 @@ export default function Login ({ history: { push } }) {
   const { register, handleSubmit, errors } = useForm()
   const onSubmit = () => push('/')
 
-  return <>
-    <Header title='HoloPort' />
-
+  return <PrimaryLayout
+    headerProps={{
+      title: 'HoloPort'
+    }}
+  >
     <form styleName='login-form' onSubmit={handleSubmit(onSubmit)}>
       <label styleName='login-label' htmlFor='email'>Email</label>
       <Input
@@ -38,5 +40,5 @@ export default function Login ({ history: { push } }) {
 
       <Button type='submit' variant='primary' wide styleName='login-button'>Login</Button>
     </form>
-  </>
+  </PrimaryLayout>
 }

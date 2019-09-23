@@ -7,9 +7,9 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
-import Header from 'components/holofuel/Header'
-import Button from 'components/holofuel/Button'
-import Modal from 'components/holofuel/Modal'
+import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import Button from 'holofuel/components/Button'
+import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
 import cx from 'classnames'
 
@@ -35,9 +35,7 @@ export default function Inbox () {
 
   const showRejectionModal = transaction => setModalTransaction(transaction)
 
-  return <React.Fragment>
-    <Header title={pageTitle} />
-
+  return <PrimaryLayout headerProps={{ title: pageTitle }}>
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
@@ -50,8 +48,7 @@ export default function Inbox () {
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       declineTransaction={declineTransaction} />
-
-  </React.Fragment>
+  </PrimaryLayout>
 }
 
 function presentDate (dateTime) {

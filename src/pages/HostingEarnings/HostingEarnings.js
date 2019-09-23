@@ -2,10 +2,11 @@ import React, { useState } from 'react'
 import { isEmpty } from 'lodash/fp'
 import cx from 'classnames'
 import moment from 'moment'
-import './HostingEarnings.module.css'
-import Header from 'components/Header'
+
+import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
 import { UNITS } from 'models/HostPricing'
+import './HostingEarnings.module.css'
 
 // these transactions are mock data and will come from useQuery calls
 
@@ -178,8 +179,7 @@ export default function HostingEarnings () {
 
   const buttons = [{ days: 'one', label: '1 Day' }, { days: 'seven', label: '7 Days' }, { days: 'thirty', label: '30 Days' }]
 
-  return <>
-    <Header title='Earnings' />
+  return <PrimaryLayout headerProps={{ title: 'Earnings' }}>
 
     <div styleName='day-buttons'>
       {buttons.map(button =>
@@ -208,7 +208,7 @@ export default function HostingEarnings () {
       </tbody>
     </table>}
 
-  </>
+  </PrimaryLayout>
 }
 
 export function TransactionRow ({ transaction }) {

@@ -1,5 +1,5 @@
 .transaction-list {
-  margin: 0px -20px;
+  margin: 20px -20px 0;
 }
 
 .transaction-row {
@@ -20,7 +20,7 @@
 }
 
 .time {
-  
+
 }
 
 .description-cell {

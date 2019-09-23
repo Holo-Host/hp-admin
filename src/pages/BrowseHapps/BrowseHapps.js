@@ -4,7 +4,7 @@ import HappThumbnail from 'components/HappThumbnail'
 import HostButton from 'components/HostButton'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import './BrowseHapps.module.css'
-import Header from 'components/Header'
+import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
@@ -19,9 +19,7 @@ export default function BrowseHapps ({ history: { push } }) {
 
   const goToPricing = () => push('/pricing')
 
-  return <>
-    <Header title='Hosting' />
-
+  return <PrimaryLayout headerProps={{ title: 'Hosting' }}>
     {!isEmpty(happs) && <div styleName='happ-list' role='list'>
       {happs.map(happ =>
         <HappRow
@@ -32,7 +30,7 @@ export default function BrowseHapps ({ history: { push } }) {
     </div>}
 
     <Button variant='primary' wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
-  </>
+  </PrimaryLayout>
 }
 
 export function HappRow ({ happ, enableHapp, disableHapp }) {
