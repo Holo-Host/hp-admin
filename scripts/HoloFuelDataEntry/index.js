@@ -131,7 +131,7 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
 
 startTestConductor()
   .then(() => {
-    connect({ url: 'ws://localhost:3400' }).then(({ callZome }) => {
+    connect({ url: 'ws://localhost:3400' }).then(async ({ callZome }) => {
       // //////////////////////////////////////////////////////////////////////////////////// //
       // Zome Call :
       const holochainZomeCall = (instance, zomeName, zomeFuncName, args) => {
@@ -292,9 +292,10 @@ startTestConductor()
             })
               .catch(error => { return error })
           }
-          process.exit()
+          // process.exit()
         }
 
+        // Invoke Individual Transaction Cases for Agents
         await fullRequestCycle()
         await twoPartsRequestCycle()
         await onePartRequestCycle()
@@ -302,7 +303,8 @@ startTestConductor()
         await halfOfferCycle()
       }
 
-      agentScenarioFlow(AGENT_1)
-      // agentScenarioFlow(AGENT_2)
+      // Invoke Scenario Flow for Agents 1 & 2
+      await agentScenarioFlow(AGENT_1)
+      await agentScenarioFlow(AGENT_2).then(r => process.exit())
     })
   })
