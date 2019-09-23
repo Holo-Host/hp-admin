@@ -44,6 +44,7 @@
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",
     "rpc-websockets": "^4.5.1",
+    "toml": "^3.0.0",
     "waait": "^1.0.5",
     "ws": "^7.1.1",
     "yup": "^0.27.0"

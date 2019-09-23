@@ -24,21 +24,22 @@
 
 // //////////////////////////////////////////////////////////////////////////////////// //
 
+const fs = require('fs')
+const toml = require('toml')
 const { connect } = require('@holochain/hc-web-client')
 const axios = require('axios')
 const Agent1TransactionLedger = require('./Agent1HFLedger.js')
 const Agent2TransactionLedger = require('./Agent2HFLedger.js')
 
 // HoloFuel Users :
+const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
 const Agent1 = {
-  // agentId: <CONDUCTOR_AGENT_1>,
-  agentId: 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a',
-  nick: 'Perry'
+  agentId: config.agents[0].public_address || 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a',
+  nick: config.agents[0].i || 'Perry'
 }
 const Agent2 = {
-  // agentId: <CONDUCTOR_AGENT_2>,
-  agentId: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-  nick: 'Sam'
+  agentId: config.agents[1].public_address || 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+  nick: config.agents[1].id || 'Sam'
 }
 // HoloFuel User Transactions Log :
 const AGENT_1 = Agent1TransactionLedger
@@ -131,7 +132,7 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
 startTestConductor()
   .then(() => {
     connect({ url: 'ws://localhost:3400' }).then(async ({ callZome }) => {
-      // //////////////////////////////////////////////////////////////////////////////////// //
+      // *************************************************************************************************** //
       // Zome Call :
       const holochainZomeCall = (instance, zomeName, zomeFuncName, args) => {
         console.log('------------------------------------------------------------------')
@@ -155,7 +156,7 @@ startTestConductor()
         }
       }
 
-      // //////////////////////////////////////////////////////////////////////////////////// //
+      // *************************************************************************************************** //
       // INPUT DATA:
       const agentScenarioFlow = async (agentNum) => {
         console.log(' \n\n\n\n *********************************************************************************************************** ')
