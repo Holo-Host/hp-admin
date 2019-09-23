@@ -131,7 +131,7 @@ id = "websocket-interface"
 
 # -- HTTP admin interface (currently only used for testing the conductor is running in setup script)
 [[interfaces]]
-id = 'http-admin-interface'
+id = 'http-interface'
 admin = true
 
     [interfaces.driver]
