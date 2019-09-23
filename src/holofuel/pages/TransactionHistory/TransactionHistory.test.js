@@ -304,13 +304,13 @@ describe('TransactionsHistory', () => {
     it('should format timedate older than a year ago', () => {
       const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticOverAYear)
       expect(date).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('MMMM D YYYY'))
-      expect(time).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('h:mm'))
+      expect(time).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('kk:mm'))
     })
 
     it('should format timedate within past year', () => {
       const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameYear)
       expect(date).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('MMMM D'))
-      expect(time).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('h:mm'))
+      expect(time).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('kk:mm'))
     })
 
     it('should format timedate within same day', () => {
