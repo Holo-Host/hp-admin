@@ -71,7 +71,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
   // TESTING OUT THE NICKNAMES BY AGENT_ID
-  // console.log('WHOAMI ? : ', whoami)
+  console.log('WHOAMI ? : ', whoami)
 
   // const setAgent = async (agentId) => {
   //   console.log('finding WHOIS --------------->', agentId)

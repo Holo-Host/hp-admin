@@ -1,6 +1,0 @@
-query HoloFuelInboxCounterparties {
-  holoFuelInboxCounterparties {
-    pubkey
-    nickname
-  }
-}

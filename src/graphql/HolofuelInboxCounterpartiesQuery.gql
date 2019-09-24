@@ -1,0 +1,6 @@
+query HolofuelInboxCounterparties {
+  holofuelInboxCounterparties {
+    pubkey
+    nickname
+  }
+}
