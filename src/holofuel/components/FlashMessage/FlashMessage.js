@@ -1,11 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { isEmpty } from 'lodash/fp'
-import FlashMessageContext from 'holofuel/contexts/flashMessage'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import './FlashMessage.module.css'
 
 export default function FlashMessage () {
   const [isDisplayed, setIsDisplayed] = useState(false)
-  const { message, time, newMessage } = useContext(FlashMessageContext)
+  const { message, time, newMessage } = useFlashMessageContext()
 
   useEffect(() => {
     setIsDisplayed(true)

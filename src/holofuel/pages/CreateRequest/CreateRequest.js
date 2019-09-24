@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
@@ -7,7 +7,8 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
-import FlashMessageContext from 'holofuel/contexts/flashMessage'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import './CreateRequest.module.css'
 
 // TODO: this constants should come from somewhere more scientific
@@ -36,12 +37,12 @@ export default function CreateRequest ({ history: { push } }) {
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
-  const { newMessage } = useContext(FlashMessageContext)
+  const { newMessage } = useFlashMessageContext()
 
   const onSubmit = ({ amount, counterparty }) => {
     createRequest(amount, counterparty)
     push('/history')
-    newMessage(`Request for ${amount} HF sent to ${counterparty}.`, 5000)
+    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
   }
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)

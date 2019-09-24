@@ -7,9 +7,12 @@ import { createMemoryHistory } from 'history'
 import moment from 'moment'
 import CreateRequest from './CreateRequest'
 import { TYPE } from 'models/Transaction'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
+import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
+jest.mock('holofuel/contexts/useFlashMessageContext')
 
 const counterparty = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
 const amount = 35674
@@ -84,6 +87,7 @@ describe('CreateRequest', () => {
 
     expect(requestMock.newData).toHaveBeenCalled()
     expect(push).toHaveBeenCalledWith('/history')
+    expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
   })
 
   it.skip('responds appropriately to bad input', () => {

@@ -1,14 +1,13 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import FlashMessage from './FlashMessage.js'
-import FlashMessageProvider from 'holofuel/contexts/FlashMessageProvider'
-import FlashMessageContext from 'holofuel/contexts/flashMessage'
+import useFlashMessageContext, { FlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 
 // Think about ways to refactor this to test fewer implementation details.
 
 function MockFlashMessageConsumer ({ message, time }) {
-  const { newMessage } = useContext(FlashMessageContext)
+  const { newMessage } = useFlashMessageContext()
   return <button onClick={() => newMessage(message, time)}>
     New Message
   </button>

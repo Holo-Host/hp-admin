@@ -9,7 +9,7 @@ import HFRouter from './holofuel/HFRouter'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
-import FlashMessageProvider from 'holofuel/contexts/FlashMessageProvider'
+import { FlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
