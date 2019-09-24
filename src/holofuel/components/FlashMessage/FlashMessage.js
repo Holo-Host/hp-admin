@@ -18,7 +18,8 @@ export function FlashMessage () {
 
   if (!isDisplayed || isEmpty(message)) return null
 
-  return <div>
-    {message} <button onClick={() => setIsDisplayed(false)}>Close</button>
+  return <div styleName='flash-message'>
+    <div styleName='message'>{message}</div>
+    <button styleName='close-button' onClick={() => setIsDisplayed(false)}>x</button>
   </div>
 }
