@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
@@ -7,9 +7,10 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
+import FlashMessageContext from 'holofuel/contexts/flashMessage'
 import './CreateRequest.module.css'
 
-// TODO: these constants should come from somewhere more scientific
+// TODO: this constants should come from somewhere more scientific
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
@@ -35,9 +36,12 @@ export default function CreateRequest ({ history: { push } }) {
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
+  const { newMessage } = useContext(FlashMessageContext)
+
   const onSubmit = ({ amount, counterparty }) => {
     createRequest(amount, counterparty)
     push('/history')
+    newMessage(`Request for ${amount} HF sent to ${counterparty}.`, 5000)
   }
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)

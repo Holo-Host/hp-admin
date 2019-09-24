@@ -8,6 +8,8 @@ import ReactModal from 'react-modal'
 import HFRouter from './holofuel/HFRouter'
 import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
+import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
+import FlashMessageProvider from 'holofuel/contexts/FlashMessageProvider'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
@@ -23,9 +25,11 @@ export function HoloFuelApp () {
 
   return <ApolloProvider client={apolloClient}>
     <Router>
-      <ScreenWidthContext.Provider value={isWide}>
-        <HFRouter />
-      </ScreenWidthContext.Provider>
+      <HFScreenWidthContext.Provider value={isWide}>
+        <FlashMessageProvider>
+          <HFRouter />
+        </FlashMessageProvider>
+      </HFScreenWidthContext.Provider>
     </Router>
   </ApolloProvider>
 }
