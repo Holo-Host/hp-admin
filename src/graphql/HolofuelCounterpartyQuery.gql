@@ -1,6 +1,6 @@
-query HolofuelCounterparty($agentId: String) {
+query HolofuelCounterparty($agentId: String!) {
   holofuelCounterparty(agentId: $agentId) {
-    pubKey
+    pubkey
     nickname
   }
 }

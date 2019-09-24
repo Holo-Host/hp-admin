@@ -1,0 +1,6 @@
+query HoloFuelHistoryCounterparties {
+  holoFuelHistoryCounterparties {
+    pubkey
+    nickname
+  }
+}

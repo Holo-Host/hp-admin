@@ -12,7 +12,8 @@ import Modal from 'holofuel/components/Modal'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+// import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 
 export const MOCK_ACCT_NUM = 'AC1903F8EAAC1903F8EA'
@@ -30,48 +31,58 @@ function useCancel () {
   })
 }
 
-function useWhoIs () {
-  const whois = useQuery(HolofuelCounterpartyQuery)
-  return (id) => {
-    console.log('WHOIS pubkey/Agent Id --------------->', id)
-    const { loading, error, data: { holofuelCounterparty: whoisthis = {} } = {} } = (whois, {
-      variables: {
-        agentId: id
-      }
-    })
-    console.log('WHOIS : ', whoisthis)
-    let message
-    if (loading) message = 'Loading'
-    if (error) message = `Error! ${error}`
-    else message = whoisthis.nickname
-    return message
-  }
-}
-
-// function useWhoIs (id) {
-//   const { data: { holofuelCounterparty: whoisthis = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
+// let useWhoIs = (agentId) => {
+//   console.log('WHOIS pubkey/Agent Id --------------->', agentId)
+//   const { loading, error, data: { holofuelCounterparty: whoisthis = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
 //     variables: {
-//       agentId: id
+//       agentId: agentId
 //     }
 //   })
-//   return whoisthis
+//   console.log('WHOIS : ', whoisthis)
+//   let message
+//   if (loading) message = 'Loading'
+//   if (error) message = `Error! ${error}`
+//   else message = whoisthis.nickname
+//   return message
 // }
+
+const useFetchCounterparties = () => {
+  const { loading, error, data: { holofuelHistoryCounterparties: counterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  console.log('Array of counterpart Agents : ', counterparties)
+  let response
+  if (loading) response = { loading: true }
+  if (error) response = { error: `Error: ${error}` }
+  else response = counterparties
+  return response
+}
 
 // Display - Functional Components with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
+  // const { data: { holofuelHistoryCounterparties: counterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
 
-  const findWhoIs = useWhoIs()
+  // const callWhoIs = useWhoIs()
+  const callCounterpartyList = useFetchCounterparties()
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
 
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
   // TESTING OUT THE NICKNAMES BY AGENT_ID
-  console.log('WHOAMI ? : ', whoami)
-  console.log('TEST WHOIS ? :', findWhoIs('HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'))
+  // console.log('WHOAMI ? : ', whoami)
+
+  // const setAgent = async (agentId) => {
+  //   console.log('finding WHOIS --------------->', agentId)
+  //   useWhoIs = await useWhoIs.bind(null, agentId)
+  //   return agentId
+  // }
+  // const findNickname = async () => {
+  //   const nickname = await callWhoIs
+  //   console.log('nickname : ', nickname)
+  //   return nickname
+  // }
 
   // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.
   const headings = [
@@ -102,7 +113,7 @@ export default function TransactionsHistory ({ history: { push } }) {
             return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
-              // findWhoIs={findWhoIs}
+              counterparties={callCounterpartyList}
               showCancellationModal={showCancellationModal}
             />
           })}
@@ -111,7 +122,7 @@ export default function TransactionsHistory ({ history: { push } }) {
             return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
-              // findWhoIs={findWhoIs}
+              counterparties={callCounterpartyList}
               showCancellationModal={showCancellationModal}
               completed />
           })}
@@ -122,7 +133,7 @@ export default function TransactionsHistory ({ history: { push } }) {
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
-      findWhoIs={findWhoIs}
+      counterparties={callCounterpartyList}
       cancelTransaction={cancelTransaction} />
   </PrimaryLayout>
 }
@@ -133,15 +144,28 @@ const TransactionTableHeading = ({ content }) => {
   </th>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed }) { // findWhoIs
+export function TransactionRow ({ transaction, showCancellationModal, completed, callWhoIs, counterparties }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
+
+  let agent
+  const agentList = counterparties()
+  if (agentList.error) return console.error(agentList.error)
+  else if (agentList.loading) {
+    agent = 'Loading...'
+    console.log('agent inside of row : ', agent)
+    counterparties()
+  } else {
+    agent = agentList.find(person => person.pubkey === counterparty)
+    console.log('agent inside of row : ', agent)
+  }
+
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
       <p data-testid='cell-date'>{formatDateTime(timestamp).date}</p>
       <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'>{counterparty}</h4> {/*  && findWhoIs(counterparty) */}
+      <h4 data-testid='cell-counterparty'>{agent}</h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -166,13 +190,8 @@ function CancelButton ({ showCancellationModal, transaction }) {
 
 //
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
-export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, findWhoIs }) { // findWhoIs
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
   if (!transaction) return null
-
-  // TESTING :
-  const agentId = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
-  console.log('Call WHOIS with AGENT ID for SAM : ', findWhoIs(agentId))
-
   const { id, counterparty, amount, type, direction } = transaction
   const onYes = () => {
     cancelTransaction(id)
