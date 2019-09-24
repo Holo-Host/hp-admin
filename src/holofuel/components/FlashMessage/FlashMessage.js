@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash/fp'
 import FlashMessageContext from 'holofuel/contexts/flashMessage'
 import './FlashMessage.module.css'
 
-export function FlashMessage () {
+export default function FlashMessage () {
   const [isDisplayed, setIsDisplayed] = useState(false)
   const { message, time, newMessage } = useContext(FlashMessageContext)
 

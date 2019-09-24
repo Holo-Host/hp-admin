@@ -7,13 +7,12 @@ import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import SideMenu from 'holofuel/components/SideMenu'
+import Header from 'holofuel/components/Header'
+import FlashMessage from 'holofuel/components/FlashMessage'
 import { presentAgentId } from 'utils'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
-
-import Header from 'holofuel/components/Header'
-import { FlashMessage } from '../../FlashMessage/FlashMessage'
 
 export function PrimaryLayout ({
   children,

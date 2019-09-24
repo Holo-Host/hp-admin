@@ -1,22 +1,56 @@
-import React from 'react'
-import { render } from '@testing-library/react'
+import React, { useContext } from 'react'
+import { render, fireEvent, act } from '@testing-library/react'
+import wait from 'waait'
+import FlashMessage from './FlashMessage.js'
+import FlashMessageProvider from 'holofuel/contexts/FlashMessageProvider'
+import FlashMessageContext from 'holofuel/contexts/flashMessage'
 
-import Button from './Button'
+// Think about ways to refactor this to test fewer implementation details.
 
-it('should render child text', () => {
-  const childText = 'Child Text'
-  const { getByText } = render(
-    <Button>{childText}</Button>
+function MockFlashMessageConsumer ({ message, time }) {
+  const { newMessage } = useContext(FlashMessageContext)
+  return <button onClick={() => newMessage(message, time)}>
+    New Message
+  </button>
+}
+
+it('should render a closable message', () => {
+  const message = 'this is the message'
+  const { queryByText, getByText } = render(
+    <FlashMessageProvider>
+      <FlashMessage />
+      <MockFlashMessageConsumer message={message} />
+    </FlashMessageProvider>
   )
 
-  expect(getByText(childText)).toBeInTheDocument()
+  expect(queryByText(message)).not.toBeInTheDocument()
+
+  fireEvent.click(getByText('New Message'))
+
+  expect(queryByText(message)).toBeInTheDocument()
+
+  fireEvent.click(getByText('x'))
+
+  expect(queryByText(message)).not.toBeInTheDocument()
 })
 
-it('should pass disabled attribute to underlying button element', () => {
-  const childText = 'Child Text'
-  const { getByText } = render(
-    <Button disabled>{childText}</Button>
+it('should render a message which closes itself after the given time', async () => {
+  const message = 'this is the message'
+  const time = 10
+  const { queryByText, getByText } = render(
+    <FlashMessageProvider>
+      <FlashMessage />
+      <MockFlashMessageConsumer message={message} time={time} />
+    </FlashMessageProvider>
   )
 
-  expect(getByText(childText)).toHaveAttribute('disabled')
+  expect(queryByText(message)).not.toBeInTheDocument()
+
+  fireEvent.click(getByText('New Message'))
+
+  expect(queryByText(message)).toBeInTheDocument()
+
+  await act(async => wait(time * 2))
+
+  expect(queryByText(message)).not.toBeInTheDocument()
 })
