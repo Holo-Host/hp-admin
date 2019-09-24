@@ -28,6 +28,8 @@
 }
 
 .menu-button {
+  position: relative;
+  z-index: 99;
   border: none;
   padding: 5px;
   background-color: var(--color-tundora);
@@ -42,8 +44,7 @@
 .header {
   display: flex;
   background-color: var(--color-tundora);
-  margin: -25px -20px 20px -20px;
-  padding: 10px 10px 5px 10px;
+  padding: 5px 10px;
   align-items: center;
 }
 
@@ -74,7 +75,6 @@
 }
 
 .sub-header {
-  margin: -20px -20px 0px -20px;
   background-color: rgb(140,140,140);
   /* background-image: linear-gradient(rgb(100,100,100), rgb(255,255,255)); */
   text-align: center;
