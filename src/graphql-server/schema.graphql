@@ -33,13 +33,8 @@ type HostPricing {
 }
 
 type HolofuelUser {
-  id: ID
-  nickname: String
-}
-
-type HolofuelCounterparty {
-  nickname: String
   pubkey: String
+  nickname: String
 }
 
 enum TransactionType {
@@ -92,7 +87,7 @@ type Query {
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
   holofuelUser(agentId: String): HolofuelUser
-  holofuelCounterparty(agentId: String): HolofuelCounterparty
+  holofuelCounterparty(agentId: String): HolofuelUser
 }
 
 type Mutation {

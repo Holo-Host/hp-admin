@@ -33,19 +33,17 @@ function useCancel () {
 function useWhoIs () {
   const whois = useQuery(HolofuelCounterpartyQuery)
   return (id) => {
-    console.log('--------------->', id)
+    console.log('WHOIS pubkey/Agent Id --------------->', id)
     const { loading, error, data: { holofuelCounterparty: whoisthis = {} } = {} } = (whois, {
       variables: {
         agentId: id
       }
     })
-    console.log('WHOIS : ', whois)
-
+    console.log('WHOIS : ', whoisthis)
     let message
     if (loading) message = 'Loading'
     if (error) message = `Error! ${error}`
     else message = whoisthis.nickname
-
     return message
   }
 }
@@ -73,7 +71,7 @@ export default function TransactionsHistory ({ history: { push } }) {
 
   // TESTING OUT THE NICKNAMES BY AGENT_ID
   console.log('WHOAMI ? : ', whoami)
-  // console.log('TEST WHOIS ? :', findWhoIs('HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'))
+  console.log('TEST WHOIS ? :', findWhoIs('HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'))
 
   // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.
   const headings = [
@@ -171,12 +169,12 @@ function CancelButton ({ showCancellationModal, transaction }) {
 export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, findWhoIs }) { // findWhoIs
   if (!transaction) return null
 
+  // TESTING :
+  const agentId = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+  console.log('Call WHOIS with AGENT ID for SAM : ', findWhoIs(agentId))
+
   const { id, counterparty, amount, type, direction } = transaction
   const onYes = () => {
-    // TESTING :
-    const agentId = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
-    findWhoIs(agentId)
-
     cancelTransaction(id)
     handleClose()
   }

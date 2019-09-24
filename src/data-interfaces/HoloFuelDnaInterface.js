@@ -127,7 +127,7 @@ const HoloFuelDnaInterface = {
       const result = await createZomeCall('transactions/whoami')()
       if (result.error) throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.error)
       return {
-        id: result.pub_sign_key,
+        pubKey: result.pub_sign_key,
         nickname: result.nick
       }
     },
