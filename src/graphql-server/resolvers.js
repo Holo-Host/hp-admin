@@ -26,15 +26,17 @@ export const resolvers = {
 
     holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
 
-    holofuelHistoryCounterparties: () => {
-      const historyTransactions = HoloFuelDnaInterface.transactions.allCompleted().concat(HoloFuelDnaInterface.transactions.allWaiting())
-      const transactionCounterparties = historyTransactions.then(getTxCounterparties)
-      return transactionCounterparties
+    holofuelHistoryCounterparties: async () => {
+      const completed = await HoloFuelDnaInterface.transactions.allCompleted()
+      const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
+      const historyTransactions = completed.concat(waiting)
+      return getTxCounterparties(historyTransactions)
     },
 
     holofuelInboxCounterparties: () => {
       const historyTransactions = HoloFuelDnaInterface.transactions.allActionable()
       const transactionCounterparties = historyTransactions.then(getTxCounterparties)
+      console.log('+++++++++++++++ IN INBOX (ALLACTIONABLE) RESOLVER transactionCounterparties : ', transactionCounterparties)
       return transactionCounterparties
     },
 

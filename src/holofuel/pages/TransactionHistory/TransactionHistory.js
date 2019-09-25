@@ -12,7 +12,7 @@ import Modal from 'holofuel/components/Modal'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
-// import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 
@@ -46,17 +46,21 @@ function useCancel () {
 //   return message
 // }
 
-const useFetchCounterparties = () => {
-  const { loading, error, data: { holofuelHistoryCounterparties: counterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-  console.log('Array of counterpart Agents : ', counterparties)
+function useFetchCounterparties () {
+  const { loading, error, data: { holofuelHistoryCounterparties } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+
+  console.log('=======================> INSIDE Component Hook, holofuelHistoryCounterparties : ', holofuelHistoryCounterparties)
+
   let response
   if (loading) response = { loading: true }
   if (error) response = { error: `Error: ${error}` }
-  else response = counterparties
-  return response
+  else response = holofuelHistoryCounterparties
+
+  console.log('<><><<><><><><><<><><> RESPONSE : <><><<><><><><><<><><>', response)
+  // return response
 }
 
-// Display - Functional Components with Hooks :
+// Display - Functional Components   with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
@@ -71,7 +75,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
   // TESTING OUT THE NICKNAMES BY AGENT_ID
-  console.log('WHOAMI ? : ', whoami)
+  // console.log('WHOAMI ? : ', whoami)
 
   // const setAgent = async (agentId) => {
   //   console.log('finding WHOIS --------------->', agentId)
@@ -113,7 +117,7 @@ export default function TransactionsHistory ({ history: { push } }) {
             return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
-              counterparties={callCounterpartyList}
+              callCounterpartyList={callCounterpartyList}
               showCancellationModal={showCancellationModal}
             />
           })}
@@ -122,7 +126,7 @@ export default function TransactionsHistory ({ history: { push } }) {
             return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
-              counterparties={callCounterpartyList}
+              callCounterpartyList={callCounterpartyList}
               showCancellationModal={showCancellationModal}
               completed />
           })}
@@ -133,7 +137,7 @@ export default function TransactionsHistory ({ history: { push } }) {
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
-      counterparties={callCounterpartyList}
+      callCounterpartyList={callCounterpartyList}
       cancelTransaction={cancelTransaction} />
   </PrimaryLayout>
 }
@@ -144,20 +148,20 @@ const TransactionTableHeading = ({ content }) => {
   </th>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed, callWhoIs, counterparties }) {
+export function TransactionRow ({ transaction, showCancellationModal, completed, callCounterpartyList }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
 
-  let agent
-  const agentList = counterparties()
-  if (agentList.error) return console.error(agentList.error)
-  else if (agentList.loading) {
-    agent = 'Loading...'
-    console.log('agent inside of row : ', agent)
-    counterparties()
-  } else {
-    agent = agentList.find(person => person.pubkey === counterparty)
-    console.log('agent inside of row : ', agent)
-  }
+  // let agent
+  // const agentList = callCounterpartyList()
+  // if (agentList.error) return console.error(agentList.error)
+  // else if (agentList.loading) {
+  //   agent = 'Loading...'
+  //   console.log('agent inside of row : ', agent)
+  //   callCounterpartyList()
+  // } else {
+  //   agent = agentList.find(person => person.pubkey === counterparty)
+  //   console.log('agent inside of row : ', agent)
+  // }
 
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
@@ -165,7 +169,8 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
       <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'>{agent}</h4>
+      {/* <h4 data-testid='cell-counterparty'>{agent}</h4> */}
+      <RenderNickname agentId={counterparty}/>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -178,6 +183,20 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
       </td>
     }
   </tr>
+}
+
+function RenderNickname ({ agentId }) {
+  console.log(' --------------->RenderNickname : WHOIS pubkey/Agent Id --------------->', agentId)
+  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+    variables: { agentId }
+  })
+
+  if (loading) return 'Loading...'
+  if (error) return `ERROR! : ${error}`
+
+  return (
+    <h4 data-testid='cell-counterparty'>{data.holofuelCounterparty.nickname}</h4>
+  )
 }
 
 function CancelButton ({ showCancellationModal, transaction }) {

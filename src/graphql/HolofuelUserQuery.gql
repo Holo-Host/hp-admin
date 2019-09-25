@@ -1,6 +1,6 @@
 query HolofuelUser {
   holofuelUser {
-    pubkey
+    id
     nickname
   }
 }
