@@ -31,20 +31,6 @@ function useCancel () {
   })
 }
 
-// function useFetchCounterparties () {
-//   const { loading, error, data: { holofuelHistoryCounterparties } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-
-//   console.log('=======================> INSIDE Component Hook, holofuelHistoryCounterparties : ', holofuelHistoryCounterparties)
-
-//   let response
-//   if (loading) response = { loading: true }
-//   if (error) response = { error: `Error: ${error}` }
-//   else response = holofuelHistoryCounterparties
-
-//   console.log('<><><<><><><><><<><><> RESPONSE : <><><<><><><><><<><><>', response)
-//   // return response
-// }
-
 // Display - Functional Components   with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
@@ -52,10 +38,6 @@ export default function TransactionsHistory ({ history: { push } }) {
 
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   // console.log('WHOAMI ? : ', whoami)
-
-  // const { data: { holofuelHistoryCounterparties: counterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-  // const callCounterpartyList = useFetchCounterparties()
-  // console.log('callCounterpartyList ? : ', callCounterpartyList())
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
