@@ -10,7 +10,7 @@ import Button from 'holofuel/components/Button'
 import './CreateOffer.module.css'
 
 // TODO: these constants should come from somewhere more scientific
-export const FEE_PERCENTAGE = 0.005
+export const FEE_PERCENTAGE = 0.01
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
@@ -33,13 +33,16 @@ export default function CreateOffer ({ history: { push } }) {
   const createOffer = useOfferMutation()
 
   const [counterparty, setCounterparty] = useState('')
-  const [fee, setFee] = useState('0')
+  const [fee, setFee] = useState(0)
+  const [total, setTotal] = useState(0)
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
   const onAmountChange = amount => {
     if (isNaN(amount)) return
-    setFee((amount * FEE_PERCENTAGE).toFixed(2))
+    const newFee = Number(amount) * FEE_PERCENTAGE
+    setFee(newFee)
+    setTotal(Number(amount) + newFee)
   }
 
   const onSubmit = ({ amount, counterparty }) => {
@@ -78,13 +81,23 @@ export default function CreateOffer ({ history: { push } }) {
         <span styleName='hf'>HF</span>
       </div>
       <div styleName='form-row'>
-        <label htmlFor='fee' styleName='form-label'>Fee</label>
+        <label htmlFor='fee' styleName='form-label'>Fee (1%)</label>
         <input
           name='fee'
           id='fee'
-          value={fee}
+          value={fee.toFixed(2)}
           readOnly
-          styleName='fee-input' />
+          styleName='readonly-input' />
+        <span styleName='hf'>HF</span>
+      </div>
+      <div styleName='form-row'>
+        <label htmlFor='total' styleName='form-label'>Total</label>
+        <input
+          name='total'
+          id='total'
+          value={total.toFixed(2)}
+          readOnly
+          styleName='readonly-input' />
         <span styleName='hf'>HF</span>
       </div>
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>

@@ -135,7 +135,6 @@ function CancelButton ({ showCancellationModal, transaction }) {
   </Button>
 }
 
-//
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
 export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
   if (!transaction) return null

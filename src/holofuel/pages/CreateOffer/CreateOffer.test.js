@@ -75,7 +75,9 @@ describe('CreateOffer', () => {
 
     fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
 
-    expect(getByLabelText('Fee').value).toEqual((amount * FEE_PERCENTAGE).toFixed(2))
+    expect(getByLabelText('Fee (1%)').value).toEqual((amount * FEE_PERCENTAGE).toFixed(2))
+
+    expect(getByLabelText('Total').value).toEqual((amount + (amount * FEE_PERCENTAGE)).toFixed(2))
 
     await act(async () => {
       fireEvent.click(getByText('Send'))
