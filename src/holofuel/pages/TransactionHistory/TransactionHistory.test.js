@@ -11,8 +11,9 @@ import wait from 'waait'
 import { TYPE } from 'models/Transaction'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, makeDisplayName, formatDateTime } from './TransactionHistory'
+import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, formatDateTime } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 
@@ -72,18 +73,20 @@ describe('TransactionsHistory', () => {
           const fullRowContent = hfInterfaceWaitingTxList.concat(hfInterfaceCompletedTxList)
           // cell content check
           rows.forEach((row, rowIndex) => {
+            const transaction = fullRowContent[rowIndex]
             const { getByTestId } = within(row)
-            const notesDisplay = fullRowContent[rowIndex].notes === null ? 'none' : fullRowContent[rowIndex].notes
-            const dateDisplay = formatDateTime(fullRowContent[rowIndex].timestamp).date
-            const timeDisplay = formatDateTime(fullRowContent[rowIndex].timestamp).time
+            const notesDisplay = transaction.notes === null ? 'none' : transaction.notes
+            const dateDisplay = formatDateTime(transaction.timestamp).date
+            const timeDisplay = formatDateTime(transaction.timestamp).time
+            const amountToMatch = transaction.direction === 'outgoing' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
 
             expect(within(getByTestId('cell-date')).getByText(dateDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-time')).getByText(timeDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-counterparty')).getByText(makeDisplayName(fullRowContent[rowIndex].counterparty.toUpperCase()))).toBeInTheDocument()
+            expect(within(getByTestId('cell-counterparty')).getByText(presentAgentId(transaction.counterparty))).toBeInTheDocument()
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-amount')).getByText(fullRowContent[rowIndex].amount)).toBeInTheDocument()
-            expect(within(getByTestId('cell-fees')).getByText(fullRowContent[rowIndex].fees)).toBeInTheDocument()
-            if (fullRowContent[rowIndex].presentBalance) expect(within(getByTestId('cell-present-balance')).getByText(fullRowContent[rowIndex].presentBalance)).toBeInTheDocument()
+            expect(within(getByTestId('cell-amount')).getByText(amountToMatch)).toBeInTheDocument()
+            expect(within(getByTestId('cell-fees')).getByText(transaction.fees)).toBeInTheDocument()
+            if (transaction.presentBalance) expect(within(getByTestId('cell-present-balance')).getByText(transaction.presentBalance)).toBeInTheDocument()
             else expect(within(getByTestId('cell-pending-item')).getByRole('button')).toBeInTheDocument()
           })
         } else {
@@ -272,15 +275,6 @@ describe('TransactionsHistory', () => {
 
   //* ******************************* *//
   // Helper Functions Tests :
-
-  describe('Helper function : makeDisplayName() - PubKey Truncation and Formatting', () => {
-    it('should accept a full hashString and return the last 7 chars', async () => {
-      const { id } = await HoloFuelDnaInterface.user.get({})
-      const displayName = makeDisplayName(id)
-      expect(displayName.length).toEqual(7)
-      expect(displayName).toBe(displayName.substring(displayName.length - 7))
-    })
-  })
 
   describe('Helper function : formatDateTime() - Semantic timedate formatting.', () => {
     const currentYear = new Date().getFullYear()

@@ -8,15 +8,22 @@ import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
+import { presentHolofuelAmount } from 'utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).reverse().map(item => {
   if (item.event[2].Request) {
-    return item.event[2].Request
+    return {
+      type: 'request',
+      ...item.event[2].Request
+    }
   } else if (item.event[2].Promise) {
-    return item.event[2].Promise.tx
+    return {
+      type: 'offer',
+      ...item.event[2].Promise.tx
+    }
   } else {
     throw new Error('unrecognized transaction type', item.toString())
   }
@@ -41,8 +48,10 @@ describe('Inbox Connected', () => {
 
     listItems.forEach((item, index) => {
       const { getByText } = within(item)
-      expect(getByText(actionableTransactions[index].notes)).toBeInTheDocument()
-      expect(getByText(`${Number(actionableTransactions[index].amount).toLocaleString()}`)).toBeInTheDocument()
+      const transaction = actionableTransactions[index]
+      expect(getByText(transaction.notes)).toBeInTheDocument()
+      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
+      expect(getByText(amountToMatch)).toBeInTheDocument()
     })
   })
 })

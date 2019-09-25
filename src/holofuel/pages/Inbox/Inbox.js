@@ -89,13 +89,19 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
       <div styleName='story'><span styleName='counterparty'>{shortCounterparty}</span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
-    <div styleName={cx('amount', { debit: isRequest })}>{presentHolofuelAmount(amount)}</div>
+    <AmountCell amount={amount} isRequest={isRequest} />
+
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} />}
       <RejectButton transaction={transaction} showRejectionModal={showRejectionModal} />
     </div>
   </div>
+}
+
+function AmountCell ({ amount, isRequest }) {
+  const amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
+  return <div styleName={cx('amount', { debit: isRequest })}>{amountDisplay}</div>
 }
 
 // these are pulled out into custom hooks ready for if we need to move them to their own file for re-use elsewhere

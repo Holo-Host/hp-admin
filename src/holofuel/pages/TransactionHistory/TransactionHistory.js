@@ -8,7 +8,7 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
-import { presentAgentId } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
@@ -28,7 +28,7 @@ function useCancel () {
 }
 
 // Display - Functional Components with Hooks :
-export default function TransactionsHistory ({ history: { push } }) {
+export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
@@ -106,7 +106,8 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
-    <td styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} data-testid='cell-amount'>{amount}</td>
+    <AmountCell amount={amount} direction={direction} />
+
     { completed
       ? <td styleName='completed-tx-col table-content' data-testid='cell-present-balance'><p>*Awaiting DNA update*</p>{presentBalance}</td>
       : <td styleName='completed-tx-col table-content' data-testid='cell-pending-item'>
@@ -115,6 +116,15 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       </td>
     }
   </tr>
+}
+
+function AmountCell ({ amount, direction }) {
+  const amountDisplay = direction === 'outgoing' ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
+  return <td
+    styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} 
+    data-testid='cell-amount'>
+    {amountDisplay}
+  </td>
 }
 
 function CancelButton ({ showCancellationModal, transaction }) {
