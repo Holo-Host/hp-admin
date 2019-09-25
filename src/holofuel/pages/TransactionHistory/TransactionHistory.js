@@ -47,10 +47,10 @@ function useCancel () {
 
 // Display - Functional Components   with Hooks :
 export default function TransactionsHistory ({ history: { push } }) {
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   // console.log('WHOAMI ? : ', whoami)
 
   // const { data: { holofuelHistoryCounterparties: counterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
@@ -61,17 +61,6 @@ export default function TransactionsHistory ({ history: { push } }) {
   const [modalTransaction, setModalTransaction] = useState()
 
   const showCancellationModal = transaction => setModalTransaction(transaction)
-
-  // const setAgent = async (agentId) => {
-  //   console.log('finding WHOIS --------------->', agentId)
-  //   useWhoIs = await useWhoIs.bind(null, agentId)
-  //   return agentId
-  // }
-  // const findNickname = async () => {
-  //   const nickname = await callWhoIs
-  //   console.log('nickname : ', nickname)
-  //   return nickname
-  // }
 
   // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.
   const headings = [
@@ -102,7 +91,6 @@ export default function TransactionsHistory ({ history: { push } }) {
             return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
-              // callCounterpartyList={callCounterpartyList}
               showCancellationModal={showCancellationModal}
             />
           })}
@@ -111,7 +99,6 @@ export default function TransactionsHistory ({ history: { push } }) {
             return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
-              // callCounterpartyList={callCounterpartyList}
               showCancellationModal={showCancellationModal}
               completed />
           })}
@@ -122,7 +109,6 @@ export default function TransactionsHistory ({ history: { push } }) {
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
-      // callCounterpartyList={callCounterpartyList}
       cancelTransaction={cancelTransaction} />
   </PrimaryLayout>
 }
@@ -135,26 +121,12 @@ const TransactionTableHeading = ({ content }) => {
 
 export function TransactionRow ({ transaction, showCancellationModal, completed, callCounterpartyList }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
-
-  // let agent
-  // const agentList = callCounterpartyList()
-  // if (agentList.error) return console.error(agentList.error)
-  // else if (agentList.loading) {
-  //   agent = 'Loading...'
-  //   console.log('agent inside of row : ', agent)
-  //   callCounterpartyList()
-  // } else {
-  //   agent = agentList.find(person => person.pubkey === counterparty)
-  //   console.log('agent inside of row : ', agent)
-  // }
-
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
       <p data-testid='cell-date'>{formatDateTime(timestamp).date}</p>
       <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      {/* <h4 data-testid='cell-counterparty'>{agent}</h4> */}
       <RenderNickname agentId={counterparty}/>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
@@ -175,13 +147,9 @@ function RenderNickname ({ agentId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-
-  if (loading) return 'Loading...'
+  if (loading) return <h4 data-testid='cell-counterparty'>Loading...</h4>
   if (error) return `ERROR! : ${error}`
-
-  return (
-    <h4 data-testid='cell-counterparty'>{data.holofuelCounterparty.nickname}</h4>
-  )
+  return <h4 data-testid='cell-counterparty'>{data.holofuelCounterparty.nickname}</h4>
 }
 
 function CancelButton ({ showCancellationModal, transaction }) {
