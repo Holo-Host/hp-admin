@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
-import moment from 'moment'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
@@ -12,7 +11,7 @@ import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
 import cx from 'classnames'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
@@ -50,27 +49,13 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-function presentDate (dateTime) {
-  const daysDifferent = moment().diff(dateTime, 'days')
-  if (daysDifferent < 1) {
-    return 'Today'
-  } else if (daysDifferent < 7) {
-    return dateTime.fromNow()
-  } else {
-    return dateTime.format('MMM D')
-  }
-}
-
 export function TransactionRow ({ transaction, showRejectionModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
-  const dateTime = moment(timestamp)
-
-  const date = presentDate(dateTime)
-  const time = dateTime.format('kk:mm')
+  const { date, time } = presentDateAndTime(timestamp)
 
   const shortCounterparty = presentAgentId(counterparty)
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import moment from 'moment'
 import cx from 'classnames'
 import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -8,7 +7,7 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
@@ -96,10 +95,11 @@ const TransactionTableHeading = ({ content }) => {
 
 export function TransactionRow ({ transaction, showCancellationModal, completed }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
+  const { date, time } = presentDateAndTime(timestamp)
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
-      <p data-testid='cell-date'>{formatDateTime(timestamp).date}</p>
-      <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
+      <p data-testid='cell-date'>{date}</p>
+      <p data-testid='cell-time'>{time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
       <h4 data-testid='cell-counterparty'>{presentAgentId(counterparty)}</h4>
@@ -166,39 +166,4 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
       </Button>
     </div>
   </Modal>
-}
-
-export function formatDateTime (isoDate) {
-  const dateDifference = moment(isoDate).fromNow()
-  // If over a year ago, include the year in date
-  if (dateDifference.split(' ')[1] === 'years' || dateDifference.split(' ')[1] === 'year') {
-    return {
-      date: moment(isoDate).format('MMMM D YYYY'),
-      time: moment(isoDate).format('kk:mm')
-    }
-  // If over a week ago, include the month and day in date
-  } else if (
-    dateDifference.split(' ')[1] === 'months' || dateDifference.split(' ')[1] === 'month' ||
-    (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7)) {
-    return {
-      date: moment(isoDate).format('MMMM D'),
-      time: moment(isoDate).format('kk:mm')
-    }
-  // If within a week ago, state days lapsed in date
-  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
-    return {
-      date: dateDifference,
-      time: moment(isoDate).format('kk:mm')
-    }
-  // If less than a day ago, state hours, minutes, or seconds lapsed in time
-  } else if (
-    dateDifference.split(' ')[1] === 'hours' || dateDifference.split(' ')[1] === 'hour' ||
-    dateDifference.split(' ')[1] === 'minutes' || dateDifference.split(' ')[1] === 'minute' ||
-    dateDifference.split(' ')[2] === 'seconds' || dateDifference.split(' ')[1] === 'second') {
-    return {
-      date: 'Today',
-      time: moment(isoDate).fromNow()
-    }
-    // Throw Error, iso-timedate cannot be parsed into valid format
-  } else throw new Error('Iso timedate is unable to be parsed.', isoDate)
 }

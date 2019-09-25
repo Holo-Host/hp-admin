@@ -144,7 +144,7 @@ describe('resolvers', () => {
       it('calls create offer and constructs the result transaction', async () => {
         const counterparty = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
         const amount = 200.01
-        const notes = 'Hi there'        
+        const notes = 'Hi there'
         const requestId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
         resolvers.Mutation.holofuelOffer(null, { counterparty, amount, notes, requestId })
         await wait(0)

@@ -84,8 +84,8 @@ describe('TransactionRow', () => {
       await wait(0)
     })
 
-    expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is requesting')).toBeInTheDocument()
     expect(getByText(request.notes)).toBeInTheDocument()
@@ -102,8 +102,8 @@ describe('TransactionRow', () => {
       await wait(0)
     })
 
-    expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is offering')).toBeInTheDocument()
     expect(getByText(offer.notes)).toBeInTheDocument()
