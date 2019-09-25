@@ -24,8 +24,8 @@ const FormValidationSchema = yup.object().shape({
 
 function useOfferMutation () {
   const [offer] = useMutation(HolofuelOfferMutation)
-  return (amount, counterparty) => offer({
-    variables: { amount, counterparty }
+  return (amount, counterparty, notes) => offer({
+    variables: { amount, counterparty, notes }
   })
 }
 
@@ -45,8 +45,8 @@ export default function CreateOffer ({ history: { push } }) {
     setTotal(Number(amount) + newFee)
   }
 
-  const onSubmit = ({ amount, counterparty }) => {
-    createOffer(amount, counterparty)
+  const onSubmit = ({ amount, counterparty, notes }) => {
+    createOffer(amount, counterparty, notes)
     push('/history')
   }
 
@@ -100,6 +100,11 @@ export default function CreateOffer ({ history: { push } }) {
           styleName='readonly-input' />
         <span styleName='hf'>HF</span>
       </div>
+      <textarea
+        styleName='notes-input'
+        name='notes'
+        placeholder='Notes'
+        ref={register} />
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
     </form>
   </PrimaryLayout>

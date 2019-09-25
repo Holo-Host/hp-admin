@@ -121,7 +121,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
 function AmountCell ({ amount, direction }) {
   const amountDisplay = direction === 'outgoing' ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
   return <td
-    styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} 
+    styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })}
     data-testid='cell-amount'>
     {amountDisplay}
   </td>
