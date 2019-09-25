@@ -1,25 +1,26 @@
-import React, { useState, useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { isEmpty } from 'lodash/fp'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import './FlashMessage.module.css'
 
 export default function FlashMessage () {
-  const [isDisplayed, setIsDisplayed] = useState(false)
   const { message, time, newMessage } = useFlashMessageContext()
+  const clearMessage = useCallback(
+    () => newMessage('', 0),
+    [newMessage])
 
   useEffect(() => {
-    setIsDisplayed(true)
     if (time) {
       setTimeout(() => {
-        newMessage('', 0)
+        clearMessage()
       }, time)
     }
-  }, [message, time, newMessage])
+  }, [message, time, clearMessage])
 
-  if (!isDisplayed || isEmpty(message)) return null
+  if (isEmpty(message)) return null
 
   return <div styleName='flash-message'>
     <div styleName='message'>{message}</div>
-    <button styleName='close-button' onClick={() => setIsDisplayed(false)}>x</button>
+    <button styleName='close-button' onClick={clearMessage}>x</button>
   </div>
 }
