@@ -8,15 +8,51 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
-
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-// import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 
 export const MOCK_ACCT_NUM = 'AC1903F8EAAC1903F8EA'
+
+// ********************************************************************************************************
+// Utils - Helper Functions:
+export function formatDateTime (isoDate) {
+  const dateDifference = moment(isoDate).fromNow()
+  // If over a year ago, include the year in date
+  if (dateDifference.split(' ')[1] === 'years' || dateDifference.split(' ')[1] === 'year') {
+    return {
+      date: moment(isoDate).format('MMMM D YYYY'),
+      time: moment(isoDate).format('kk:mm')
+    }
+  // If over a week ago, include the month and day in date
+  } else if (
+    dateDifference.split(' ')[1] === 'months' || dateDifference.split(' ')[1] === 'month' ||
+    (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7)) {
+    return {
+      date: moment(isoDate).format('MMMM D'),
+      time: moment(isoDate).format('kk:mm')
+    }
+  // If within a week ago, state days lapsed in date
+  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
+    return {
+      date: dateDifference,
+      time: moment(isoDate).format('kk:mm')
+    }
+  // If less than a day ago, state hours, minutes, or seconds lapsed in time
+  } else if (
+    dateDifference.split(' ')[1] === 'hours' || dateDifference.split(' ')[1] === 'hour' ||
+    dateDifference.split(' ')[1] === 'minutes' || dateDifference.split(' ')[1] === 'minute' ||
+    dateDifference.split(' ')[2] === 'seconds' || dateDifference.split(' ')[1] === 'second') {
+    return {
+      date: 'Today',
+      time: moment(isoDate).fromNow()
+    }
+    // Throw Error, iso-timedate cannot be parsed into valid format
+  } else throw new Error('Iso timedate is unable to be parsed.', isoDate)
+}
+// ********************************************************************************************************
 
 // Data - Mutation hook with refetch:
 function useCancel () {
@@ -35,9 +71,6 @@ function useCancel () {
 export default function TransactionsHistory ({ history: { push } }) {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  // console.log('WHOAMI ? : ', whoami)
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -101,7 +134,7 @@ const TransactionTableHeading = ({ content }) => {
   </th>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed, callCounterpartyList }) {
+export function TransactionRow ({ transaction, showCancellationModal, completed }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
@@ -109,11 +142,11 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
       <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <RenderNickname agentId={counterparty}/>
+      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} /></h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
-    <td styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} data-testid='cell-amount'>{amount}</td>
+    <td styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })} data-testid='cell-amount'>{presentHolofuelAmount(amount)}</td>
     { completed
       ? <td styleName='completed-tx-col table-content' data-testid='cell-present-balance'><p>*Awaiting DNA update*</p>{presentBalance}</td>
       : <td styleName='completed-tx-col table-content' data-testid='cell-pending-item'>
@@ -124,16 +157,6 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
   </tr>
 }
 
-function RenderNickname ({ agentId }) {
-  console.log(' --------------->RenderNickname : WHOIS pubkey/Agent Id --------------->', agentId)
-  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
-    variables: { agentId }
-  })
-  if (loading) return <h4 data-testid='cell-counterparty'>Loading...</h4>
-  if (error) return `ERROR! : ${error}`
-  return <h4 data-testid='cell-counterparty'>{data.holofuelCounterparty.nickname}</h4>
-}
-
 function CancelButton ({ showCancellationModal, transaction }) {
   return <Button
     onClick={() => showCancellationModal(transaction)}
@@ -142,7 +165,6 @@ function CancelButton ({ showCancellationModal, transaction }) {
   </Button>
 }
 
-//
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
 export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
   if (!transaction) return null
@@ -158,7 +180,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{Number(amount).toLocaleString()} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' data-testid='modal-counterparty'>{makeDisplayName(counterparty)}</span> ?
+      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)}</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'><RenderNickname agentId={counterparty} /></span> ?
     </div>
     <div styleName='modal-buttons'>
       <Button
@@ -175,40 +197,11 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
   </Modal>
 }
 
-// Utils - Helper Functions:
-export const makeDisplayName = agentHash => agentHash.substring(agentHash.length - 7) || ''
-
-export function formatDateTime (isoDate) {
-  const dateDifference = moment(isoDate).fromNow()
-  // If over a year ago, include the year in date
-  if (dateDifference.split(' ')[1] === 'years' || dateDifference.split(' ')[1] === 'year') {
-    return {
-      date: moment(isoDate).format('MMMM D YYYY'),
-      time: moment(isoDate).format('kk:mm')
-    }
-  // If over a week ago, include the month and day in date
-  } else if (
-    dateDifference.split(' ')[1] === 'months' || dateDifference.split(' ')[1] === 'month' ||
-    (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 7)) {
-    return {
-      date: moment(isoDate).format('MMMM D'),
-      time: moment(isoDate).format('kk:mm')
-    }
-  // If within a week ago, state days lapsed in date
-  } else if (dateDifference.split(' ')[1] === 'days' && parseInt(dateDifference.split(' ')[0]) >= 1) {
-    return {
-      date: dateDifference,
-      time: moment(isoDate).format('kk:mm')
-    }
-  // If less than a day ago, state hours, minutes, or seconds lapsed in time
-  } else if (
-    dateDifference.split(' ')[1] === 'hours' || dateDifference.split(' ')[1] === 'hour' ||
-    dateDifference.split(' ')[1] === 'minutes' || dateDifference.split(' ')[1] === 'minute' ||
-    dateDifference.split(' ')[2] === 'seconds' || dateDifference.split(' ')[1] === 'second') {
-    return {
-      date: 'Today',
-      time: moment(isoDate).fromNow()
-    }
-    // Throw Error, iso-timedate cannot be parsed into valid format
-  } else throw new Error('Iso timedate is unable to be parsed.', isoDate)
+export function RenderNickname ({ agentId }) {
+  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+    variables: { agentId }
+  })
+  if (loading) return <React.Fragment>Loading...</React.Fragment>
+  if (error) { console.log(`ERROR! : ${error}`); return presentAgentId(agentId) }
+  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }

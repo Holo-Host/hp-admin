@@ -10,6 +10,7 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
+// Creates an array of all counterparties for a provided transaction list
 export async function getTxCounterparties (transactionList) {
   const counterpartyList = transactionList.map(tx => {
     const { counterparty } = tx
@@ -151,11 +152,6 @@ const HoloFuelDnaInterface = {
     getCounterparty: async ({ agentId }) => {
       const result = await createZomeCall('transactions/whoami')({ agentId })
       if (result.error) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
-
-      // console.log('--->>  --->>  agent counterparty return object <<--- <<--- ', {
-      //   pubkey: result.pub_sign_key,
-      //   nickname: result.nick
-      // })
 
       return {
         pubkey: result.pub_sign_key,

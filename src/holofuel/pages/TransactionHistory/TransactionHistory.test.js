@@ -1,7 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 import _ from 'lodash'
-import { render, within, act, fireEvent, cleanup } from '@testing-library/react' // fireEvent,
+import { render, within, act, fireEvent, cleanup } from '@testing-library/react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
@@ -9,9 +9,11 @@ import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
 import wait from 'waait'
 import { TYPE } from 'models/Transaction'
-import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, makeDisplayName, formatDateTime } from './TransactionHistory'
+import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, RenderNickname, formatDateTime } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
@@ -71,17 +73,21 @@ describe('TransactionsHistory', () => {
           expect(rows).toHaveLength(hfInterfaceCompletedTxList.length + hfInterfaceWaitingTxList.length)
           const fullRowContent = hfInterfaceWaitingTxList.concat(hfInterfaceCompletedTxList)
           // cell content check
-          rows.forEach((row, rowIndex) => {
+          rows.forEach(async (row, rowIndex) => {
             const { getByTestId } = within(row)
+
+            const whoisNickname = await HoloFuelDnaInterface.user.getCounterparty({ agentId: fullRowContent[rowIndex].counterparty })
             const notesDisplay = fullRowContent[rowIndex].notes === null ? 'none' : fullRowContent[rowIndex].notes
             const dateDisplay = formatDateTime(fullRowContent[rowIndex].timestamp).date
             const timeDisplay = formatDateTime(fullRowContent[rowIndex].timestamp).time
 
             expect(within(getByTestId('cell-date')).getByText(dateDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-time')).getByText(timeDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-counterparty')).getByText(makeDisplayName(fullRowContent[rowIndex].counterparty.toUpperCase()))).toBeInTheDocument()
+
+            expect(within(getByTestId('cell-counterparty')).getByText(whoisNickname.nickname) || within(getByTestId('cell-counterparty')).getByText(presentAgentId(fullRowContent[rowIndex].counterparty))).toBeInTheDocument()
+
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-amount')).getByText(fullRowContent[rowIndex].amount)).toBeInTheDocument()
+            expect(within(getByTestId('cell-amount')).getByText(presentHolofuelAmount(fullRowContent[rowIndex].amount))).toBeInTheDocument()
             expect(within(getByTestId('cell-fees')).getByText(fullRowContent[rowIndex].fees)).toBeInTheDocument()
             if (fullRowContent[rowIndex].presentBalance) expect(within(getByTestId('cell-present-balance')).getByText(fullRowContent[rowIndex].presentBalance)).toBeInTheDocument()
             else expect(within(getByTestId('cell-pending-item')).getByRole('button')).toBeInTheDocument()
@@ -101,9 +107,14 @@ describe('TransactionsHistory', () => {
       jest.clearAllMocks()
     })
 
+    const mockAgent1 = {
+      nick: 'Perry',
+      pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+    }
+
     const pendingRequest = {
       id: 'QmMockEntryAddress123',
-      counterparty: 'AgentMockHash2',
+      counterparty: mockAgent1.pub_sign_key,
       amount: 8000.88,
       type: TYPE.request,
       timestamp: currentDataTimeIso(),
@@ -123,23 +134,140 @@ describe('TransactionsHistory', () => {
       status: ''
     }
 
+    const mockWhoIsAgent1 = {
+      id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+      nickname: 'Perry'
+    }
+
+    const counterpartyQueryMock = {
+      request: {
+        query: HolofuelCounterpartyQuery,
+        variables: { agentId: pendingRequest.counterparty.id }
+      },
+      result: {
+        data: { holofuelCounterparty: mockWhoIsAgent1 }
+      }
+    }
+
+    const waitingTransactionsQueryMock = {
+      request: {
+        query: HolofuelWaitingTransactionsQuery
+      },
+      result: {
+        data: {
+          holofuelWaitingTransactions: []
+        }
+      }
+    }
+
+    const cancelPendingRequestMock = {
+      request: {
+        query: HolofuelCancelMutation, // mutation ??
+        variables: { transactionId: pendingRequest.id }
+      },
+      result: {
+        data: { holofuelCancel: mockTransaction }
+      },
+      newData: jest.fn()
+    }
+
+    const cancelPendingOfferMock = {
+      request: {
+        query: HolofuelCancelMutation, // mutation ??
+        variables: { transactionId: pendingOffer.id }
+      },
+      result: {
+        data: { holofuelCancel: mockTransaction }
+      },
+      newData: jest.fn()
+    }
+
+    // it('should render and display (Counterparty) Agent Nickname', async () => {
+    //   afterEach(() => {
+    //     jest.clearAllMocks()
+    //   })
+
+    //   const mocks = [
+    //     counterpartyQueryMock,
+    //     cancelPendingRequestMock,
+    //     waitingTransactionsQueryMock
+    //   ]
+
+    //   // let getByText
+    //   // await act(async () => {
+    //   //   ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+    //   //     <RenderNickname agentId={mockAgent1.pub_sign_key} />
+    //   //   </MockedProvider>))
+    //   //   await wait(0)
+    //   // })
+
+    //   const props = {
+    //     transaction: pendingRequest,
+    //     key: pendingRequest.id,
+    //     showCancellationModal: jest.fn()
+    //   }
+
+    //   let getByTestId
+    //   await act(async () => {
+    //     ({ getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
+    //       <table>
+    //         <tbody>
+    //           <TransactionRow {...props} />
+    //         </tbody>
+    //       </table>
+    //     </MockedProvider>))
+    //     await wait(0)
+    //   })
+
+    //   expect(within(getByTestId('cell-counterparty')).getByText(mockWhoIsAgent1.nickname)).toEqual(mockAgent1.nick)
+    //   expect(within(getByTestId('cell-counterparty')).getByText(mockWhoIsAgent1.nickname)).toBeVisible()
+    // })
+
     it('should display correct text for CancellationModal for a Pending Request', async () => {
-      const { getByRole } = render(<ConfirmCancellationModal transaction={pendingRequest} />)
+      const mocks = [
+        counterpartyQueryMock,
+        cancelPendingRequestMock,
+        waitingTransactionsQueryMock
+      ]
+
+      let getByRole
+      await act(async () => {
+        ({ getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
+          <ConfirmCancellationModal
+            transaction={pendingRequest} />
+        </MockedProvider>))
+        await wait(0)
+      })
+
       const capitalizedType = _.capitalize(pendingRequest.type)
 
       const heading = getByRole('heading')
-      const { getByText } = within(heading) // , getByTestId
+      const { getByText } = within(heading)
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('for', { exact: false })).toBeInTheDocument()
       expect(getByText('from', { exact: false })).toBeInTheDocument()
     })
 
     it('should display correct text for CancellationModal for a Pending Offer', async () => {
-      const { getByRole } = render(<ConfirmCancellationModal transaction={pendingOffer} />)
+      const mocks = [
+        counterpartyQueryMock,
+        cancelPendingOfferMock,
+        waitingTransactionsQueryMock
+      ]
+
+      let getByRole
+      await act(async () => {
+        ({ getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
+          <ConfirmCancellationModal
+            transaction={pendingOffer} />
+        </MockedProvider>))
+        await wait(0)
+      })
+
       const capitalizedType = _.capitalize(pendingOffer.type)
 
       const heading = getByRole('heading')
-      const { getByText } = within(heading) // , getByTestId
+      const { getByText } = within(heading)
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('of', { exact: false })).toBeInTheDocument()
       expect(getByText('to', { exact: false })).toBeInTheDocument()
@@ -150,29 +278,10 @@ describe('TransactionsHistory', () => {
         jest.clearAllMocks()
       })
 
-      const cancelPendingRequestMock = {
-        request: {
-          query: HolofuelCancelMutation,
-          variables: { transactionId: pendingRequest.id }
-        },
-        result: {
-          data: { holofuelCancel: mockTransaction }
-        },
-        newData: jest.fn()
-      }
-
       const mocks = [
+        counterpartyQueryMock,
         cancelPendingRequestMock,
-        {
-          request: {
-            query: HolofuelWaitingTransactionsQuery
-          },
-          result: {
-            data: {
-              holofuelWaitingTransactions: []
-            }
-          }
-        }
+        waitingTransactionsQueryMock
       ]
 
       const props = {
@@ -212,29 +321,10 @@ describe('TransactionsHistory', () => {
         jest.clearAllMocks()
       })
 
-      const cancelPendingOfferMock = {
-        request: {
-          query: HolofuelCancelMutation,
-          variables: { transactionId: pendingOffer.id }
-        },
-        result: {
-          data: { holofuelCancel: mockTransaction }
-        },
-        newData: jest.fn()
-      }
-
       const mocks = [
+        counterpartyQueryMock,
         cancelPendingOfferMock,
-        {
-          request: {
-            query: HolofuelWaitingTransactionsQuery
-          },
-          result: {
-            data: {
-              holofuelWaitingTransactions: []
-            }
-          }
-        }
+        waitingTransactionsQueryMock
       ]
 
       const props = {
@@ -271,13 +361,22 @@ describe('TransactionsHistory', () => {
   })
 
   //* ******************************* *//
-  // Helper Functions Tests :
+  // Utils / Helper Functions Tests :
 
-  describe('Helper function : makeDisplayName() - PubKey Truncation and Formatting', () => {
-    it('should accept a full hashString and return the last 7 chars', async () => {
+  describe('Helper function : presentHolofuelAmount() - Presenation of HoloFuel Float', () => {
+    it('should accept a float and return a locale string', async () => {
+      const { balance } = await HoloFuelDnaInterface.ledger.get({})
+      const holofuelAmount = presentAgentId(balance)
+      expect(typeof holofuelAmount).toBe('string')
+      expect(Number(holofuelAmount) % 1 !== 0).toBeTruthy()
+    })
+  })
+
+  describe('Helper function : presentAgentId() - PubKey Truncation and Formatting', () => {
+    it('should accept a full hashString and return the last 6 chars', async () => {
       const { id } = await HoloFuelDnaInterface.user.get({})
-      const displayName = makeDisplayName(id)
-      expect(displayName.length).toEqual(7)
+      const displayName = presentAgentId(id)
+      expect(displayName.length).toEqual(6)
       expect(displayName).toBe(displayName.substring(displayName.length - 7))
     })
   })

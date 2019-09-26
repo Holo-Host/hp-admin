@@ -2,7 +2,7 @@ import HyloDnaInterface from 'data-interfaces/HyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from 'data-interfaces/HappStoreDnaInterface'
 import HhaDnaInterface from 'data-interfaces/HhaDnaInterface'
 import EnvoyInterface from 'data-interfaces/EnvoyInterface'
-import HoloFuelDnaInterface, { getTxCounterparties } from 'data-interfaces/HoloFuelDnaInterface'
+import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 import { promiseMap } from 'utils'
 import {
   dataMappedCall,
@@ -25,20 +25,6 @@ export const resolvers = {
     holofuelUser: () => HoloFuelDnaInterface.user.get(),
 
     holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
-
-    holofuelHistoryCounterparties: async () => {
-      const completed = await HoloFuelDnaInterface.transactions.allCompleted()
-      const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
-      const historyTransactions = completed.concat(waiting)
-      return getTxCounterparties(historyTransactions)
-    },
-
-    holofuelInboxCounterparties: () => {
-      const historyTransactions = HoloFuelDnaInterface.transactions.allActionable()
-      const transactionCounterparties = historyTransactions.then(getTxCounterparties)
-      console.log('+++++++++++++++ IN INBOX (ALLACTIONABLE) RESOLVER transactionCounterparties : ', transactionCounterparties)
-      return transactionCounterparties
-    },
 
     holofuelWaitingTransactions: () => HoloFuelDnaInterface.transactions.allWaiting(),
 
