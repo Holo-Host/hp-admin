@@ -1,6 +1,9 @@
 import React from 'react'
+import Modal from 'react-modal'
 import moment from 'moment'
 import _ from 'lodash'
+import { useQuery } from '@apollo/react-hooks'
+import { renderHook } from '@testing-library/react-hooks'
 import { render, within, act, fireEvent, cleanup } from '@testing-library/react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
@@ -182,45 +185,32 @@ describe('TransactionsHistory', () => {
       newData: jest.fn()
     }
 
-    // it('should render and display (Counterparty) Agent Nickname', async () => {
-    //   afterEach(() => {
-    //     jest.clearAllMocks()
-    //   })
-
+    // /////////////
+    // it('useQuery Hook performs HolofuelCounterpartyQuery request', async () => {
     //   const mocks = [
-    //     counterpartyQueryMock,
-    //     cancelPendingRequestMock,
-    //     waitingTransactionsQueryMock
+    //     counterpartyQueryMock
     //   ]
 
-    //   // let getByText
-    //   // await act(async () => {
-    //   //   ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-    //   //     <RenderNickname agentId={mockAgent1.pub_sign_key} />
-    //   //   </MockedProvider>))
-    //   //   await wait(0)
-    //   // })
-
-    //   const props = {
-    //     transaction: pendingRequest,
-    //     key: pendingRequest.id,
-    //     showCancellationModal: jest.fn()
-    //   }
-
-    //   let getByTestId
+    //   let component
     //   await act(async () => {
-    //     ({ getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-    //       <table>
-    //         <tbody>
-    //           <TransactionRow {...props} />
-    //         </tbody>
-    //       </table>
+    //     (component = render(<MockedProvider mocks={mocks} addTypename={false}>
+    //       <ConfirmCancellationModal
+    //         transaction={pendingRequest} />
     //     </MockedProvider>))
     //     await wait(0)
     //   })
 
-    //   expect(within(getByTestId('cell-counterparty')).getByText(mockWhoIsAgent1.nickname)).toEqual(mockAgent1.nick)
-    //   expect(within(getByTestId('cell-counterparty')).getByText(mockWhoIsAgent1.nickname)).toBeVisible()
+    //   const { result, waitForNextUpdate } = renderHook(() =>
+    //     component.useQuery(counterpartyQueryMock, { agentId: pendingRequest.counterparty })
+    //   )
+
+    //   expect(result.current.data.holofuelCounterparty).toEqual({})
+    //   expect(result.current.loading).toBeTruthy()
+
+    //   await waitForNextUpdate()
+
+    //   expect(result.current.data.holofuelCounterparty).toEqual(counterpartyQueryMock.data)
+    //   expect(result.current.loading).toBeFalsy()
     // })
 
     it('should display correct text for CancellationModal for a Pending Request', async () => {
@@ -230,13 +220,14 @@ describe('TransactionsHistory', () => {
         waitingTransactionsQueryMock
       ]
 
-      let getByRole
+      let container, getByRole
       await act(async () => {
-        ({ getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        ({ container, getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
           <ConfirmCancellationModal
             transaction={pendingRequest} />
         </MockedProvider>))
         await wait(0)
+        Modal.setAppElement(container)
       })
 
       const capitalizedType = _.capitalize(pendingRequest.type)
@@ -249,6 +240,10 @@ describe('TransactionsHistory', () => {
     })
 
     it('should display correct text for CancellationModal for a Pending Offer', async () => {
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
       const mocks = [
         counterpartyQueryMock,
         cancelPendingOfferMock,
@@ -257,17 +252,20 @@ describe('TransactionsHistory', () => {
 
       let getByRole
       await act(async () => {
-        ({ getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        let container
+        ({ container, getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
           <ConfirmCancellationModal
             transaction={pendingOffer} />
         </MockedProvider>))
         await wait(0)
+        Modal.setAppElement(container)
       })
 
       const capitalizedType = _.capitalize(pendingOffer.type)
 
       const heading = getByRole('heading')
-      const { getByText } = within(heading)
+      const { container, getByText } = within(heading)
+      await Modal.setAppElement(container)
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('of', { exact: false })).toBeInTheDocument()
       expect(getByText('to', { exact: false })).toBeInTheDocument()
@@ -289,9 +287,9 @@ describe('TransactionsHistory', () => {
         key: pendingRequest.id,
         showCancellationModal: jest.fn()
       }
-      let getByText
+      let container, getByText
       await act(async () => {
-        ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
           <table>
             <tbody>
               <TransactionRow {...props} />
@@ -299,6 +297,7 @@ describe('TransactionsHistory', () => {
           </table>
         </MockedProvider>))
         await wait(0)
+        Modal.setAppElement(container)
       })
       fireEvent.click(getByText('Cancel'))
       expect(props.showCancellationModal).toHaveBeenCalledWith(pendingRequest)
@@ -332,9 +331,9 @@ describe('TransactionsHistory', () => {
         key: pendingRequest.id,
         showCancellationModal: jest.fn()
       }
-      let getByText
+      let container, getByText
       await act(async () => {
-        ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
           <table>
             <tbody>
               <TransactionRow {...props} />
@@ -342,6 +341,7 @@ describe('TransactionsHistory', () => {
           </table>
         </MockedProvider>))
         await wait(0)
+        Modal.setAppElement(container)
       })
       fireEvent.click(getByText('Cancel'))
       expect(props.showCancellationModal).toHaveBeenCalledWith(pendingOffer)
