@@ -401,31 +401,6 @@ describe('TransactionsHistory', () => {
       expect(getByText('to', { exact: false })).toBeInTheDocument()
     })
 
-    // it('should return Agent Nickname in RenderNickname Component when HolofuelCounterpartyQuery request is *successful*', async () => {
-    //   afterEach(() => {
-    //     jest.clearAllMocks()
-    //   })
-
-    //   const rowContent = completedTransactionsQueryMock.result.data.holofuelCompletedTransactions[0]
-    //   const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: rowContent.counterparty })
-
-    //   const mocks = [
-    //     counterpartyQueryMock
-    //   ]
-
-    //   let container, getByText
-    //   await act(async () => {
-    //     ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-    //       <RenderNickname agentId={rowContent.counterparty} />
-    //     </MockedProvider>))
-    //     await wait(0)
-    //     Modal.setAppElement(container)
-    //   })
-
-    //   const nameDiv = getByText(whois.nickname)
-    //   expect(nameDiv).toBeInTheDocument()
-    // })
-
     it('should return last 6 of AgentId in RenderNickname Component when HolofuelCounterpartyQuery request is *unsuccessful*', async () => {
       afterEach(() => {
         jest.clearAllMocks()
