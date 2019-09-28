@@ -202,6 +202,6 @@ export function RenderNickname ({ agentId }) {
     variables: { agentId }
   })
   if (loading) return <React.Fragment>Loading...</React.Fragment>
-  if (error) { console.log(`ERROR! : ${error}`); return presentAgentId(agentId) }
+  if (error) { return presentAgentId(agentId) }
   return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }

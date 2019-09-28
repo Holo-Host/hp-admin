@@ -2,8 +2,7 @@ import React from 'react'
 import Modal from 'react-modal'
 import moment from 'moment'
 import _ from 'lodash'
-import { useQuery } from '@apollo/react-hooks'
-import { renderHook } from '@testing-library/react-hooks'
+// import { renderHook } from '@testing-library/react-hooks'
 import { render, within, act, fireEvent, cleanup } from '@testing-library/react'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
@@ -14,6 +13,7 @@ import wait from 'waait'
 import { TYPE } from 'models/Transaction'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
+import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, RenderNickname, formatDateTime } from './TransactionHistory'
@@ -152,6 +152,25 @@ describe('TransactionsHistory', () => {
       }
     }
 
+    const counterpartyQueryMockError = {
+      request: {
+        query: HolofuelCounterpartyQuery,
+        variables: { agentId: pendingRequest.counterparty.id }
+      },
+      error: new Error('ERROR! : <Error Message>')
+    }
+
+    const completedTransactionsQueryMock = {
+      request: {
+        query: HolofuelCompletedTransactionsQuery
+      },
+      result: {
+        data: {
+          holofuelCompletedTransactions: []
+        }
+      }
+    }
+
     const waitingTransactionsQueryMock = {
       request: {
         query: HolofuelWaitingTransactionsQuery
@@ -165,8 +184,13 @@ describe('TransactionsHistory', () => {
 
     const cancelPendingRequestMock = {
       request: {
-        query: HolofuelCancelMutation, // mutation ??
-        variables: { transactionId: pendingRequest.id }
+        query: HolofuelCancelMutation, // mutations ALSO live on the 'query' key for mocks.
+        variables: { transactionId: pendingRequest.id },
+        refetchQueries: [{
+          query: completedTransactionsQueryMock
+        }, {
+          query: waitingTransactionsQueryMock
+        }]
       },
       result: {
         data: { holofuelCancel: mockTransaction }
@@ -176,8 +200,13 @@ describe('TransactionsHistory', () => {
 
     const cancelPendingOfferMock = {
       request: {
-        query: HolofuelCancelMutation, // mutation ??
-        variables: { transactionId: pendingOffer.id }
+        query: HolofuelCancelMutation, // mutations ALSO live on the 'query' key for mocks.
+        variables: { transactionId: pendingOffer.id },
+        refetchQueries: [{
+          query: completedTransactionsQueryMock
+        }, {
+          query: waitingTransactionsQueryMock
+        }]
       },
       result: {
         data: { holofuelCancel: mockTransaction }
@@ -189,8 +218,6 @@ describe('TransactionsHistory', () => {
     // it('useQuery Hook performs HolofuelCounterpartyQuery request', async () => {
     //   const mocks = [
     //     counterpartyQueryMock
-    //   ]
-
     //   let component
     //   await act(async () => {
     //     (component = render(<MockedProvider mocks={mocks} addTypename={false}>
@@ -213,64 +240,6 @@ describe('TransactionsHistory', () => {
     //   expect(result.current.loading).toBeFalsy()
     // })
 
-    it('should display correct text for CancellationModal for a Pending Request', async () => {
-      const mocks = [
-        counterpartyQueryMock,
-        cancelPendingRequestMock,
-        waitingTransactionsQueryMock
-      ]
-
-      let container, getByRole
-      await act(async () => {
-        ({ container, getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <ConfirmCancellationModal
-            transaction={pendingRequest} />
-        </MockedProvider>))
-        await wait(0)
-        Modal.setAppElement(container)
-      })
-
-      const capitalizedType = _.capitalize(pendingRequest.type)
-
-      const heading = getByRole('heading')
-      const { getByText } = within(heading)
-      expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
-      expect(getByText('for', { exact: false })).toBeInTheDocument()
-      expect(getByText('from', { exact: false })).toBeInTheDocument()
-    })
-
-    it('should display correct text for CancellationModal for a Pending Offer', async () => {
-      afterEach(() => {
-        jest.clearAllMocks()
-      })
-
-      const mocks = [
-        counterpartyQueryMock,
-        cancelPendingOfferMock,
-        waitingTransactionsQueryMock
-      ]
-
-      let getByRole
-      await act(async () => {
-        let container
-        ({ container, getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <ConfirmCancellationModal
-            transaction={pendingOffer} />
-        </MockedProvider>))
-        await wait(0)
-        Modal.setAppElement(container)
-      })
-
-      const capitalizedType = _.capitalize(pendingOffer.type)
-
-      const heading = getByRole('heading')
-      const { container, getByText } = within(heading)
-      await Modal.setAppElement(container)
-      expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
-      expect(getByText('of', { exact: false })).toBeInTheDocument()
-      expect(getByText('to', { exact: false })).toBeInTheDocument()
-    })
-
     it('should open CancellationModal and trigger HolofuelCancelMutation for Pending Request', async () => {
       afterEach(() => {
         jest.clearAllMocks()
@@ -279,7 +248,8 @@ describe('TransactionsHistory', () => {
       const mocks = [
         counterpartyQueryMock,
         cancelPendingRequestMock,
-        waitingTransactionsQueryMock
+        waitingTransactionsQueryMock,
+        completedTransactionsQueryMock
       ]
 
       const props = {
@@ -323,12 +293,13 @@ describe('TransactionsHistory', () => {
       const mocks = [
         counterpartyQueryMock,
         cancelPendingOfferMock,
-        waitingTransactionsQueryMock
+        waitingTransactionsQueryMock,
+        completedTransactionsQueryMock
       ]
 
       const props = {
         transaction: pendingOffer,
-        key: pendingRequest.id,
+        key: pendingOffer.id,
         showCancellationModal: jest.fn()
       }
       let container, getByText
@@ -357,6 +328,60 @@ describe('TransactionsHistory', () => {
       })
       fireEvent.click(getByText('Yes'))
       expect(cancelPendingOfferMock.newData).toHaveBeenCalled()
+    })
+
+    it('should display correct text for CancellationModal for a Pending Request', async () => {
+      const mocks = [
+        counterpartyQueryMock
+      ]
+
+      let container, getByRole
+      await act(async () => {
+        ({ container, getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
+          <ConfirmCancellationModal
+            transaction={pendingRequest} />
+        </MockedProvider>))
+        await wait(0)
+        Modal.setAppElement(container)
+      })
+
+      const capitalizedType = _.capitalize(pendingRequest.type)
+
+      const heading = getByRole('heading')
+      const { getByText } = within(heading)
+      expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
+      expect(getByText('for', { exact: false })).toBeInTheDocument()
+      expect(getByText('from', { exact: false })).toBeInTheDocument()
+    })
+
+    it('should display correct text for CancellationModal for a Pending Offer', async () => {
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
+      const mocks = [
+        counterpartyQueryMock
+      ]
+
+      let getByRole
+      await act(async () => {
+        let container
+        ({ container, getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
+          <ConfirmCancellationModal
+            transaction={pendingOffer} />
+        </MockedProvider>))
+        await wait(0)
+        Modal.setAppElement(container)
+      })
+
+      const capitalizedType = _.capitalize(pendingOffer.type)
+
+      const heading = getByRole('heading')
+      const { container, getByText } = within(heading)
+      await Modal.setAppElement(container)
+      expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
+      expect(getByText('of', { exact: false })).toBeInTheDocument()
+      expect(getByText('to', { exact: false })).toBeInTheDocument()
     })
   })
 
