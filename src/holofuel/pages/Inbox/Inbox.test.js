@@ -1,16 +1,20 @@
 import React from 'react'
+import Modal from 'react-modal'
 import { render, fireEvent, act, within } from '@testing-library/react'
 import wait from 'waait'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import moment from 'moment'
 import apolloClient from 'apolloClient'
-import Inbox, { TransactionRow } from './Inbox'
+import Inbox, { TransactionRow, RenderNickname } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
+import { presentAgentId } from 'utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).reverse().map(item => {
   if (item.event[2].Request) {
@@ -25,7 +29,7 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 
-describe('Inbox Connected', () => {
+describe('Inbox Connected (with Agent Nicknames)', () => {
   it('renders', async () => {
     let getAllByRole
 
@@ -39,10 +43,12 @@ describe('Inbox Connected', () => {
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)
 
-    listItems.forEach((item, index) => {
+    listItems.forEach(async (item, index) => {
+      const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
       const { getByText } = within(item)
       expect(getByText(actionableTransactions[index].notes)).toBeInTheDocument()
       expect(getByText(`${Number(actionableTransactions[index].amount).toLocaleString()}`)).toBeInTheDocument()
+      expect(getByText(whois.nickname)).toBeInTheDocument()
     })
   })
 })
@@ -189,5 +195,58 @@ describe('TransactionRow', () => {
 
       expect(acceptOfferMock.newData).toHaveBeenCalled()
     })
+  })
+
+  const mockWhoIsAgent1 = {
+    id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+    nickname: 'Perry'
+  }
+
+  const newRequest = {
+    ...request,
+    counterparty: mockWhoIsAgent1.id
+  }
+
+  const counterpartyQueryMockError = {
+    request: {
+      query: HolofuelCounterpartyQuery,
+      variables: { agentId: newRequest.counterparty }
+    },
+    error: new Error('ERROR! : <Error Message>')
+  }
+
+  const actionableTransactionsQueryMock = {
+    request: {
+      query: HolofuelActionableTransactionsQuery
+    },
+    result: {
+      data: {
+        holofuelActionableTransactions: [newRequest]
+      }
+    }
+  }
+
+  it('should default to rendering last 6 of AgentId', async () => {
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    const rowContent = actionableTransactionsQueryMock.result.data.holofuelActionableTransactions[0]
+
+    const mocks = [
+      counterpartyQueryMockError
+    ]
+
+    let container, getByText
+    await act(async () => {
+      ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
+        <RenderNickname agentId={rowContent.counterparty} />
+      </MockedProvider>))
+      await wait(0)
+      Modal.setAppElement(container)
+    })
+
+    const nameDiv = getByText(presentAgentId(rowContent.counterparty))
+    expect(nameDiv).toBeInTheDocument()
   })
 })

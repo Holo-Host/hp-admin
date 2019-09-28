@@ -177,11 +177,11 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
   </Modal>
 }
 
-function RenderNickname ({ agentId }) {
+export function RenderNickname ({ agentId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
   if (loading) return <React.Fragment>Loading...</React.Fragment>
-  if (error) { console.log(`ERROR! : ${error}`); return presentAgentId(agentId) }
+  if (error) { return presentAgentId(agentId) }
   return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }
