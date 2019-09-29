@@ -1,6 +1,5 @@
 import React from 'react'
-// import Modal from 'react-modal'
-import { render, fireEvent, within } from '@testing-library/react' // act
+import { render, fireEvent } from '@testing-library/react'
 // import wait from 'waait'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
@@ -8,7 +7,6 @@ import { createMemoryHistory } from 'history'
 // testing the named export Header rather than the default export which is wrapped in withRouter
 import { Header } from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
-import HashAvatar from 'components/HashAvatar'
 
 function renderWithRouter (
   ui,
