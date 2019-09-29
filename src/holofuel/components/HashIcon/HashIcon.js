@@ -8,11 +8,13 @@ export default function HashIcon ({
   size = 64,
   className
 }) {
-  return <Identicon
-    seed={hash}
-    size={size}
-    className={className}
-    circle />
+  return <div data-testid='hash-icon'>
+    <Identicon
+      seed={hash}
+      size={size}
+      className={className}
+      circle />
+  </div>
 }
 
 HashIcon.propTypes = {

@@ -73,11 +73,11 @@ describe('CreateRequest', () => {
       await wait(0)
     })
 
-    expect(queryByTestId('hash-icon-wrapper')).not.toBeInTheDocument()
+    expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
     fireEvent.change(getByLabelText('From'), { target: { value: counterparty } })
 
-    expect(getByTestId('hash-icon-wrapper')).toBeInTheDocument()
+    expect(getByTestId('hash-icon')).toBeInTheDocument()
 
     fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
 
