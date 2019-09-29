@@ -19,6 +19,7 @@ import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, RenderNi
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
+jest.mock('holofuel/contexts/useFlashMessageContext')
 
 function renderWithRouter (
   ui,
@@ -393,11 +394,11 @@ describe('TransactionsHistory', () => {
       const capitalizedType = _.capitalize(pendingOffer.type)
 
       const heading = getByRole('heading')
-      const { container, getByText } = within(heading)
+      const { container, getAllByText, getByText } = within(heading)
       await Modal.setAppElement(container)
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('of', { exact: false })).toBeInTheDocument()
-      expect(getByText('to', { exact: false })).toBeInTheDocument()
+      expect(getAllByText('to', { exact: false })[0]).toBeInTheDocument() // NB: 2 instances of the word two exist, due to the tooltip.
     })
 
     it('should return last 6 of AgentId in RenderNickname Component when HolofuelCounterpartyQuery request is *unsuccessful*', async () => {

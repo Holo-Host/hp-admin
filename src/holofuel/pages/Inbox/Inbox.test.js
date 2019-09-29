@@ -28,6 +28,7 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
+jest.mock('holofuel/contexts/useFlashMessageContext')
 
 describe('Inbox Connected (with Agent Nicknames)', () => {
   it('renders', async () => {
