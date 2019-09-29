@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
-import { useMutation } from '@apollo/react-hooks'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
+import Loader from 'react-loader-spinner'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
 import './CreateOffer.module.css'
@@ -37,6 +40,8 @@ export default function CreateOffer ({ history: { push } }) {
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
+  // const { newMessage } = useFlashMessageContext()
+
   const onAmountChange = amount => {
     if (isNaN(amount)) return
     setFee((amount * FEE_PERCENTAGE).toFixed(2))
@@ -65,6 +70,9 @@ export default function CreateOffer ({ history: { push } }) {
         <div styleName='hash-icon-wrapper'>
           {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} />}
         </div>
+        <div styleName='hash-nickname-wrapper'>
+          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'><RenderNickname agentId={counterparty} /></h4>}
+        </div>
       </div>
       <div styleName='form-row'>
         <label htmlFor='amount' styleName='form-label'>Amount</label>
@@ -90,4 +98,29 @@ export default function CreateOffer ({ history: { push } }) {
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
     </form>
   </PrimaryLayout>
+}
+
+export function RenderNickname ({ agentId }) {
+  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+    variables: { agentId }
+  })
+
+  // const { newMessage } = useFlashMessageContext()
+
+  if (loading) {
+    return <React.Fragment>
+      <Loader
+        type='ThreeDots'
+        color='#00BFFF'
+        height={30}
+        width={30}
+        timeout={5000}
+      />
+     Loading
+    </React.Fragment>
+  }
+  // NB: TODO: Resolve the Flash Message ERROR:
+  // if (error || !data.holofuelCounterparty.nickname) { return newMessage(`No nickname available.`, 5000) }
+  if (error || !data.holofuelCounterparty.nickname) { return 'No nickname available.' }
+  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }
