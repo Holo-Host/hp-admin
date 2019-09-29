@@ -2,7 +2,8 @@ import React from 'react'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
-import { presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount } from 'utils' // presentAgentId
+import CopyToClipboard from 'holofuel/components/CopyToClipboard'
 
 import './SideMenu.module.css'
 
@@ -21,10 +22,15 @@ export function SideMenu ({
     <div styleName='container'>
       <header styleName='header'>
         <h1 styleName='appName'>HoloFuel</h1>
+        <CopyToClipboard hash={agent.id} nickname={agent.nickname || ''}>
+          <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
+        </CopyToClipboard>
 
-        <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
-
-        <span styleName='header-account'>{agent.nickname || agentLoading}</span>
+        <span styleName='header-account'>
+          <CopyToClipboard hash={agent.id} nickname={agent.nickname || ''}>
+            {agent.nickname || agentLoading}
+          </CopyToClipboard>
+        </span>
         <strong styleName='header-balance'>{presentHolofuelAmount(holofuelBalance)}</strong>
       </header>
 

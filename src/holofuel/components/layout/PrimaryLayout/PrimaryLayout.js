@@ -9,7 +9,6 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
-import { presentAgentId } from 'utils'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -27,7 +26,7 @@ export function PrimaryLayout ({
   let agent = {}
   let agentLoading
   if (holofuelUserLoading) agentLoading = true
-  else agent = { ...holofuelUser, id: presentAgentId(holofuelUser.id) }
+  else agent = { ...holofuelUser }
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
