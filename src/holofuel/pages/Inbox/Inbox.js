@@ -86,7 +86,7 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} txId={transaction.id} /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <div styleName={cx('amount', { debit: isRequest })}>{presentHolofuelAmount(amount)}</div>
@@ -178,17 +178,22 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
   </Modal>
 }
 
-export function RenderNickname ({ agentId }) {
+export function RenderNickname ({ agentId, txId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+
+  let toolTipId
+  if (txId)toolTipId = `inboxRenderNickname-${txId}`
+  else toolTipId = `inboxRenderNickname-modal`
+
   if (loading) return <React.Fragment>Loading...</React.Fragment>
   if (error) {
-    return <CopyToClipboard hash={agentId} nickname='' toolTipId='inboxNicknameError'>
+    return <CopyToClipboard hash={agentId} nickname='' {...toolTipId}>
       {presentAgentId(agentId)}
     </CopyToClipboard>
   }
-  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} toolTipId='inboxNicknameSuccess'>
+  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} {...toolTipId}>
     {data.holofuelCounterparty.nickname}
   </CopyToClipboard>
 }

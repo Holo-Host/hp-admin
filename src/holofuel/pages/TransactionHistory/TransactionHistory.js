@@ -143,7 +143,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p data-testid='cell-time'>{formatDateTime(timestamp).time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} /></h4>
+      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} txId={id} /></h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -198,17 +198,22 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
   </Modal>
 }
 
-export function RenderNickname ({ agentId }) {
+export function RenderNickname ({ agentId, txId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+
+  let toolTipId
+  if (txId)toolTipId = `historyRenderNickname-${txId}`
+  else toolTipId = `historyRenderNickname-modal`
+
   if (loading) return <React.Fragment>Loading...</React.Fragment>
   if (error) {
-    return <CopyToClipboard hash={agentId} nickname='' toolTipId='historyNicknameError'>
+    return <CopyToClipboard hash={agentId} nickname='' {...toolTipId}>
       {presentAgentId(agentId)}
     </CopyToClipboard>
   }
-  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} toolTipId='historyNicknameSuccess'>
+  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} {...toolTipId}>
     {data.holofuelCounterparty.nickname}
   </CopyToClipboard>
 }
