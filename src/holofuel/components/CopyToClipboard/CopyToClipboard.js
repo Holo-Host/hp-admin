@@ -14,6 +14,7 @@ export default function CopyToClipboard ({
 }) {
   if (!nickname)nickname = 'User'
   if (isMe)nickname = 'Your'
+  else nickname = `${nickname}'s`
   const { newMessage } = useFlashMessageContext()
 
   const [copied, setCopied] = useState(false)
@@ -21,7 +22,7 @@ export default function CopyToClipboard ({
     console.log('COPYING HASH : ', hash)
     copy(hash)
     setCopied(true)
-    newMessage(`${nickname}'s HoloFuel Agent ID has been copied!`, 5000)
+    newMessage(`${nickname} HoloFuel Agent ID has been copied!`, 5000)
   }
 
   return <div styleName='copy-item'>
@@ -33,7 +34,7 @@ export default function CopyToClipboard ({
       delayShow={250}
       afterHide={() => setCopied(false)}
       getContent={() => hash
-        ? `${nickname}'s ID: ${hash} - ${copied ? 'Copied to clipboard' : 'Click to copy'}`
+        ? `${nickname} ID: ${hash} - ${copied ? 'Copied to clipboard' : 'Click to copy'}`
         : null
       }
     />
