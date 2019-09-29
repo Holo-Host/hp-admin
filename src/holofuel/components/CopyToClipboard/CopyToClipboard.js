@@ -4,6 +4,7 @@ import ReactTooltip from 'react-tooltip'
 import copy from 'copy-to-clipboard'
 import './CopyToClipboard.module.css'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import { presentAgentId } from 'utils'
 
 export default function CopyToClipboard ({
   hash,
@@ -12,7 +13,7 @@ export default function CopyToClipboard ({
   toolTipId,
   children
 }) {
-  if (!nickname)nickname = 'User'
+  if (!nickname)nickname = `${presentAgentId(hash)}'s`
   if (isMe)nickname = 'Your'
   else nickname = `${nickname}'s`
   const { newMessage } = useFlashMessageContext()

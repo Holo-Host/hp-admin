@@ -10,6 +10,7 @@ import { title as menuIconTitle } from 'components/icons/MenuIcon'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+
 function renderWithRouter (
   ui,
   {

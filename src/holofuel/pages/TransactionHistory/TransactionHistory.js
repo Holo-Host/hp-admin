@@ -8,6 +8,7 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
+import CopyToClipboard from 'holofuel/components/CopyToClipboard'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -202,6 +203,12 @@ export function RenderNickname ({ agentId }) {
     variables: { agentId }
   })
   if (loading) return <React.Fragment>Loading...</React.Fragment>
-  if (error) { return presentAgentId(agentId) }
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+  if (error) {
+    return <CopyToClipboard hash={agentId} nickname='' toolTipId='historyNicknameError'>
+      {presentAgentId(agentId)}
+    </CopyToClipboard>
+  }
+  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} toolTipId='historyNicknameSuccess'>
+    {data.holofuelCounterparty.nickname}
+  </CopyToClipboard>
 }

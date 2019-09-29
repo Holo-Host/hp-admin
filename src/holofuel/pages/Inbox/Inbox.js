@@ -9,6 +9,7 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import CopyToClipboard from 'holofuel/components/CopyToClipboard'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
@@ -182,6 +183,12 @@ export function RenderNickname ({ agentId }) {
     variables: { agentId }
   })
   if (loading) return <React.Fragment>Loading...</React.Fragment>
-  if (error) { return presentAgentId(agentId) }
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+  if (error) {
+    return <CopyToClipboard hash={agentId} nickname='' toolTipId='inboxNicknameError'>
+      {presentAgentId(agentId)}
+    </CopyToClipboard>
+  }
+  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} toolTipId='inboxNicknameSuccess'>
+    {data.holofuelCounterparty.nickname}
+  </CopyToClipboard>
 }
