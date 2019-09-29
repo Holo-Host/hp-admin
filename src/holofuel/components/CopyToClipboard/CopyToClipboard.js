@@ -7,25 +7,30 @@ import './CopyToClipboard.module.css'
 export default function CopyToClipboard ({
   hash,
   nickname,
+  toolTipId,
   children
 }) {
   const [copied, setCopied] = useState(false)
   const copyHash = () => {
+    console.log('COPYING HASH : ', hash)
     copy(hash)
     setCopied(true)
   }
+  if (!nickname)nickname = 'User'
 
-  return <div data-tip={hash} onClick={copyHash} data-testid='hash-icon' styleName='copy-item'>
-    {children}
+  return <div styleName='copy-item'>
+    <div data-for={toolTipId} data-tip='' onClick={copyHash} data-testid='hash-display'>
+      {children}
+    </div>
     <ReactTooltip
+      id={toolTipId}
       delayShow={250}
       afterHide={() => setCopied(false)}
-      getContent={dataTip => dataTip === hash && nickname
+      getContent={() => hash
         ? `${nickname}'s ID: ${hash} - ${copied ? 'Copied to clipboard' : 'Click to copy'}`
-        : dataTip === hash
-          ? `Agent ID: ${hash} - ${copied ? 'Copied to clipboard' : 'Click to copy'}`
-          : null
-      } />
+        : null
+      }
+    />
   </div>
 }
 
