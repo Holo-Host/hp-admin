@@ -19,11 +19,15 @@ export function PrimaryLayout ({
   headerProps = {}
 }) {
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
-  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
   const inboxCount = transactions.length
-  const agentId = presentAgentId(holofuelUser.id)
+
+  let agent = {}
+  let agentLoading
+  if (holofuelUserLoading) agentLoading = true
+  else agent = { ...holofuelUser, id: presentAgentId(holofuelUser.id) }
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -31,11 +35,12 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agentId={agentId} hamburgerClick={hamburgerClick} />
+    <Header {...headerProps} agent={agent} agentLoading={agentLoading} hamburgerClick={hamburgerClick} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      agentId={agentId}
+      agent={agent}
+      agentLoading={agentLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
     />

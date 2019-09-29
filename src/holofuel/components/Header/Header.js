@@ -6,10 +6,12 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
-export function Header ({ title, agentId, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard') }) {
+export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard') }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />
   </Button>
+
+  if (agentLoading) agentLoading = <h4>Loading...</h4>
 
   return <header>
     <section styleName='header'>
@@ -17,9 +19,9 @@ export function Header ({ title, agentId, avatarUrl, history: { push }, hamburge
         {leftNav}
         <span styleName='title header-font'>HoloFuel</span>
       </div>
-      <div styleName='right-nav account-number header-font'>{agentId}</div>
+      <div styleName='right-nav account-number header-font'>{agent.nickname || agentLoading}</div>
       <Link to='/history' styleName='avatar-link'>
-        <HashAvatar avatarUrl={avatarUrl} seed={agentId} size={32} />
+        <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} />
       </Link>
     </section>
     {title && <section styleName='sub-header'>

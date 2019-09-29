@@ -1,33 +1,35 @@
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+// import Modal from 'react-modal'
+import { render, fireEvent, within } from '@testing-library/react' // act
+// import wait from 'waait'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 
 // testing the named export Header rather than the default export which is wrapped in withRouter
 import { Header } from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
+import HashAvatar from 'components/HashAvatar'
 
-const renderHeader = (
-  props,
+function renderWithRouter (
+  ui,
   {
     route = '/',
     history = createMemoryHistory({ initialEntries: [route] })
   } = {}
-) => ({
-  ...render(
-    <Router history={history}>
-      <Header {...props} />
-    </Router>
-  ),
-  history
-})
+) {
+  return {
+    ...render(<Router history={history}>{ui}</Router>),
+    history
+  }
+}
 
 it('should render the title and a menu icon', () => {
   const props = {
     title: 'the title',
-    history: { push: jest.fn() }
+    history: { push: jest.fn() },
+    agent: 'AGENT NICKNAME'
   }
-  const { getByText, getByTestId } = renderHeader(props)
+  const { getByText, getByTestId } = renderWithRouter(<Header {...props} />)
 
   expect(getByText(props.title)).toBeInTheDocument()
   expect(getByText(menuIconTitle)).toBeInTheDocument()
@@ -35,4 +37,26 @@ it('should render the title and a menu icon', () => {
   fireEvent.click(getByTestId('menu-button'))
 
   expect(props.history.push).toHaveBeenCalledWith('/dashboard')
+})
+
+it('should render the agent nickname', () => {
+  const props = {
+    title: 'the title',
+    history: { push: jest.fn() },
+    agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
+  }
+  const { getByText } = renderWithRouter(<Header {...props} />)
+
+  expect(getByText(props.agent.nickname)).toBeInTheDocument()
+})
+
+it('should render loading indicator when agent is loading', () => {
+  const props = {
+    title: 'the title',
+    history: { push: jest.fn() },
+    agent: {},
+    agentLoading: true
+  }
+  const { getByText } = renderWithRouter(<Header {...props} />)
+  expect(getByText('Loading...')).toBeInTheDocument()
 })
