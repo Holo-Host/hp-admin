@@ -7,7 +7,6 @@ import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import ScreenWidthContext from 'contexts/screenWidth'
 import SideMenu from 'holofuel/components/SideMenu'
-import { presentAgentId } from 'utils'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -27,7 +26,7 @@ export function PrimaryLayout ({
   let agent = {}
   let agentLoading
   if (holofuelUserLoading) agentLoading = true
-  else agent = { ...holofuelUser, id: presentAgentId(holofuelUser.id) }
+  else agent = { ...holofuelUser }
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
