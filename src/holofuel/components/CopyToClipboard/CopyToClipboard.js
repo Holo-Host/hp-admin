@@ -16,10 +16,9 @@ export default function CopyToClipboard ({
   else nickname = `${nickname}'s`
   const { newMessage } = useFlashMessageContext()
 
-  const copyHash = () => {
-    console.log('COPYING HASH : ', hash)
-    copy(hash)
-    newMessage(`${nickname} HoloFuel Agent ID has been copied!`, 5000)
+  const copyHash = async () => {
+    const wasCopied = await copy(hash, { debug: true })
+    if (wasCopied === true) newMessage(`${nickname} HoloFuel Agent ID has been copied!`, 5000)
   }
 
   return <div onClick={copyHash} data-testid='hash-display' styleName='copy-item'>
