@@ -7,9 +7,11 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import './CreateRequest.module.css'
 
-// TODO: these constants should come from somewhere more scientific
+// TODO: this constants should come from somewhere more scientific
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
@@ -35,9 +37,12 @@ export default function CreateRequest ({ history: { push } }) {
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
+  const { newMessage } = useFlashMessageContext()
+
   const onSubmit = ({ amount, counterparty, notes }) => {
     createRequest(amount, counterparty, notes)
     push('/history')
+    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
   }
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)
