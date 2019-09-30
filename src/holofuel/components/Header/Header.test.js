@@ -1,7 +1,9 @@
-import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
-// import wait from 'waait'
+import React, { createContext } from 'react'
+import { render, fireEvent, act } from '@testing-library/react'
+import wait from 'waait'
 import { Router } from 'react-router-dom'
+import { MockedProvider } from '@apollo/react-testing'
+import FlashMessage from 'holofuel/components/FlashMessage'
 import { createMemoryHistory } from 'history'
 
 // testing the named export Header rather than the default export which is wrapped in withRouter
@@ -28,7 +30,7 @@ it('should render the title and a menu icon', () => {
   const props = {
     title: 'the title',
     history: { push: jest.fn() },
-    agent: 'AGENT NICKNAME'
+    agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
   }
   const { getByText, getByTestId } = renderWithRouter(<Header {...props} />)
 
@@ -60,4 +62,44 @@ it('should render loading indicator when agent is loading', () => {
   }
   const { getByText } = renderWithRouter(<Header {...props} />)
   expect(getByText('Loading...')).toBeInTheDocument()
+})
+
+// TODO: Resolve Provider Context Conflicts >
+it.skip('should copy the agentId when clicked and trigger the proper flash message', async () => {
+  const FlashMessageContext = createContext()
+  const MockFlashContextProvider = ({ message, time = 5000, newMessage = jest.fn(), children }) => (
+    <FlashMessageContext.Provider value={{ message, time, newMessage }}>
+      {children}
+    </FlashMessageContext.Provider>
+  )
+
+  const mockMyIdMessage = `Your HoloFuel Agent ID has been copied!`
+  const props = {
+    title: 'the title',
+    history: { push: jest.fn() },
+    agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
+  }
+
+  let getByText, queryByText, queryAllByTestId
+  await act(async () => {
+    ({ getByText, queryByText, queryAllByTestId } = render(<MockedProvider mocks={[]} addTypename={false}>
+      <MockFlashContextProvider>
+        <FlashMessage />
+        <Header {...props} />
+      </MockFlashContextProvider>
+    </MockedProvider>))
+    await wait(0)
+  })
+
+  expect(getByText(props.agent.nickname)).toBeInTheDocument()
+  expect(queryByText(mockMyIdMessage)).not.toBeInTheDocument()
+
+  await act(async () => {
+    const hashDisplay = queryAllByTestId('hash-display')
+    fireEvent.click(hashDisplay[0])
+    await MockFlashContextProvider({ message: mockMyIdMessage })
+    await wait(0)
+  })
+
+  expect(getByText(mockMyIdMessage)).toBeInTheDocument()
 })
