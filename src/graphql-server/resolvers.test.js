@@ -133,9 +133,10 @@ describe('resolvers', () => {
       it('calls create request and constructs the result transaction', async () => {
         const counterparty = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
         const amount = 200.01
-        resolvers.Mutation.holofuelRequest(null, { counterparty, amount })
+        const notes = 'Hi there'
+        resolvers.Mutation.holofuelRequest(null, { counterparty, amount, notes })
         await wait(0)
-        expect(mockHoloFuelInterface.requests.create).toHaveBeenCalledWith(counterparty, amount)
+        expect(mockHoloFuelInterface.requests.create).toHaveBeenCalledWith(counterparty, amount, notes)
       })
     })
 
@@ -143,10 +144,11 @@ describe('resolvers', () => {
       it('calls create offer and constructs the result transaction', async () => {
         const counterparty = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
         const amount = 200.01
+        const notes = 'Hi there'
         const requestId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
-        resolvers.Mutation.holofuelOffer(null, { counterparty, amount, requestId })
+        resolvers.Mutation.holofuelOffer(null, { counterparty, amount, notes, requestId })
         await wait(0)
-        expect(mockHoloFuelInterface.offers.create).toHaveBeenCalledWith(counterparty, amount, requestId)
+        expect(mockHoloFuelInterface.offers.create).toHaveBeenCalledWith(counterparty, amount, notes, requestId)
       })
     })
 

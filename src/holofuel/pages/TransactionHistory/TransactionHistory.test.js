@@ -1,5 +1,4 @@
 import React from 'react'
-import moment from 'moment'
 import _ from 'lodash'
 import { render, within, act, fireEvent, cleanup } from '@testing-library/react' // fireEvent,
 import { Router } from 'react-router-dom'
@@ -11,8 +10,9 @@ import wait from 'waait'
 import { TYPE } from 'models/Transaction'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, makeDisplayName, formatDateTime } from './TransactionHistory'
+import TransactionsHistory, { TransactionRow, ConfirmCancellationModal } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
+import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 
@@ -72,18 +72,20 @@ describe('TransactionsHistory', () => {
           const fullRowContent = hfInterfaceWaitingTxList.concat(hfInterfaceCompletedTxList)
           // cell content check
           rows.forEach((row, rowIndex) => {
+            const transaction = fullRowContent[rowIndex]
             const { getByTestId } = within(row)
-            const notesDisplay = fullRowContent[rowIndex].notes === null ? 'none' : fullRowContent[rowIndex].notes
-            const dateDisplay = formatDateTime(fullRowContent[rowIndex].timestamp).date
-            const timeDisplay = formatDateTime(fullRowContent[rowIndex].timestamp).time
+            const notesDisplay = transaction.notes === null ? 'none' : transaction.notes
+            const dateDisplay = presentDateAndTime(transaction.timestamp).date
+            const timeDisplay = presentDateAndTime(transaction.timestamp).time
+            const amountToMatch = transaction.direction === 'outgoing' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
 
             expect(within(getByTestId('cell-date')).getByText(dateDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-time')).getByText(timeDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-counterparty')).getByText(makeDisplayName(fullRowContent[rowIndex].counterparty.toUpperCase()))).toBeInTheDocument()
+            expect(within(getByTestId('cell-counterparty')).getByText(presentAgentId(transaction.counterparty))).toBeInTheDocument()
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-amount')).getByText(fullRowContent[rowIndex].amount)).toBeInTheDocument()
-            expect(within(getByTestId('cell-fees')).getByText(fullRowContent[rowIndex].fees)).toBeInTheDocument()
-            if (fullRowContent[rowIndex].presentBalance) expect(within(getByTestId('cell-present-balance')).getByText(fullRowContent[rowIndex].presentBalance)).toBeInTheDocument()
+            expect(within(getByTestId('cell-amount')).getByText(amountToMatch)).toBeInTheDocument()
+            expect(within(getByTestId('cell-fees')).getByText(transaction.fees)).toBeInTheDocument()
+            if (transaction.presentBalance) expect(within(getByTestId('cell-present-balance')).getByText(transaction.presentBalance)).toBeInTheDocument()
             else expect(within(getByTestId('cell-pending-item')).getByRole('button')).toBeInTheDocument()
           })
         } else {
@@ -267,68 +269,6 @@ describe('TransactionsHistory', () => {
       })
       fireEvent.click(getByText('Yes'))
       expect(cancelPendingOfferMock.newData).toHaveBeenCalled()
-    })
-  })
-
-  //* ******************************* *//
-  // Helper Functions Tests :
-
-  describe('Helper function : makeDisplayName() - PubKey Truncation and Formatting', () => {
-    it('should accept a full hashString and return the last 7 chars', async () => {
-      const { id } = await HoloFuelDnaInterface.user.get({})
-      const displayName = makeDisplayName(id)
-      expect(displayName.length).toEqual(7)
-      expect(displayName).toBe(displayName.substring(displayName.length - 7))
-    })
-  })
-
-  describe('Helper function : formatDateTime() - Semantic timedate formatting.', () => {
-    const currentYear = new Date().getFullYear()
-    const currentMonth = new Date().getMonth()
-    const currentHour = new Date().getHours()
-    const currentMinute = new Date().getMinutes()
-
-    const tenYearsAgo = new Date().setFullYear(currentYear - 10)
-    const monthAgo = new Date().setMonth(currentMonth - 1)
-    const hourAgo = new Date().setHours(currentHour - 1)
-    const minAgo = new Date().setMinutes(currentMinute - 1)
-
-    const MOCK_TIMEDATE = {
-      semanticSameMinute: new Date().toISOString(),
-      semanticSameHour: new Date(minAgo).toISOString(),
-      semanticSameDay: new Date(hourAgo).toISOString(),
-      semanticSameYear: new Date(monthAgo).toISOString(),
-      semanticOverAYear: new Date(tenYearsAgo).toISOString()
-    }
-
-    it('should format timedate older than a year ago', () => {
-      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticOverAYear)
-      expect(date).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('MMMM D YYYY'))
-      expect(time).toBe(moment(MOCK_TIMEDATE.semanticOverAYear).format('kk:mm'))
-    })
-
-    it('should format timedate within past year', () => {
-      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameYear)
-      expect(date).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('MMMM D'))
-      expect(time).toBe(moment(MOCK_TIMEDATE.semanticSameYear).format('kk:mm'))
-    })
-
-    it('should format timedate within same day', () => {
-      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameDay)
-      expect(date).toBe('Today')
-      expect(time).toBe('an hour ago')
-    })
-
-    it('should format timedate within same hour', () => {
-      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameHour)
-      expect(date).toBe('Today')
-      expect(time).toBe('a minute ago')
-    })
-
-    it('should format timedate within same minute', () => {
-      const { date, time } = formatDateTime(MOCK_TIMEDATE.semanticSameMinute)
-      expect(date).toBe('Today')
-      expect(time).toBe('a few seconds ago')
     })
   })
 })
