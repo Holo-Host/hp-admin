@@ -95,8 +95,8 @@ type Mutation {
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
-  holofuelRequest(counterparty:String, amount:Float): Transaction
-  holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
+  holofuelRequest(counterparty:String, amount:Float, notes: String): Transaction
+  holofuelOffer(counterparty:String, amount:Float, notes: String, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction # NOTE: holofuelAcceptOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
   holofuelDecline(transactionId: ID): Transaction # ""
   holofuelCancel(transactionId: ID): Transaction # ""

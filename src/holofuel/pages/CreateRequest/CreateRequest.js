@@ -25,8 +25,8 @@ const FormValidationSchema = yup.object().shape({
 
 function useRequestMutation () {
   const [offer] = useMutation(HolofuelRequestMutation)
-  return (amount, counterparty) => offer({
-    variables: { amount, counterparty }
+  return (amount, counterparty, notes) => offer({
+    variables: { amount, counterparty, notes }
   })
 }
 
@@ -39,8 +39,8 @@ export default function CreateRequest ({ history: { push } }) {
 
   const { newMessage } = useFlashMessageContext()
 
-  const onSubmit = ({ amount, counterparty }) => {
-    createRequest(amount, counterparty)
+  const onSubmit = ({ amount, counterparty, notes }) => {
+    createRequest(amount, counterparty, notes)
     push('/history')
     newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
   }
@@ -74,6 +74,11 @@ export default function CreateRequest ({ history: { push } }) {
           ref={register} />
         <span styleName='hf'>HF</span>
       </div>
+      <textarea
+        styleName='notes-input'
+        name='notes'
+        placeholder='Notes'
+        ref={register} />
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
     </form>
   </PrimaryLayout>
