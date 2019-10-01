@@ -15,11 +15,12 @@ jest.mock('holofuel/components/layout/PrimaryLayout')
 
 const counterparty = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
 const amount = 35674
+const notes = 'Hi there'
 
 const offerMock = {
   request: {
     query: HolofuelOfferMutation,
-    variables: { amount, counterparty }
+    variables: { amount, counterparty, notes }
   },
   result: {
     data: {
@@ -63,9 +64,9 @@ describe('CreateOffer', () => {
   it('renders a form that can be filled out and submitted', async () => {
     const push = jest.fn()
 
-    let getByLabelText, getByText, queryByTestId, getByTestId
+    let getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText
     await act(async () => {
-      ({ getByLabelText, getByText, queryByTestId, getByTestId } = renderWithRouter(<CreateOffer history={{ push }} />))
+      ({ getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText } = renderWithRouter(<CreateOffer history={{ push }} />))
       await wait(0)
     })
 
@@ -77,7 +78,11 @@ describe('CreateOffer', () => {
 
     fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
 
-    expect(getByLabelText('Fee').value).toEqual((amount * FEE_PERCENTAGE).toFixed(2))
+    expect(getByLabelText('Fee (1%)').value).toEqual((amount * FEE_PERCENTAGE).toFixed(2))
+
+    expect(getByLabelText('Total').value).toEqual((amount + (amount * FEE_PERCENTAGE)).toFixed(2))
+
+    fireEvent.change(getByPlaceholderText('Notes'), { target: { value: notes } })
 
     await act(async () => {
       fireEvent.click(getByText('Send'))

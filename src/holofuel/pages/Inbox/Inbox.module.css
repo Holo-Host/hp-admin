@@ -41,15 +41,6 @@
   color: var(--color-gray);
 }
 
-.amount {
-  margin-left: auto;
-  margin-right: 10px;
-}
-
-.debit {
-  color: red;
-}
-
 .actions {
   display: flex;
   flex-direction: column;
@@ -61,6 +52,17 @@
   padding: 5px;
   width: 75px;
   margin-bottom: 10px;
+}
+
+/* AmountCell */
+
+.amount {
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.debit {
+  color: red;
 }
 
 .accept-button {
