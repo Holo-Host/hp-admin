@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import cx from 'classnames'
+import _ from 'lodash'
 import { isEmpty } from 'lodash/fp'
 import moment from 'moment'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -12,12 +14,24 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
-import cx from 'classnames'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 
+
+function useOffer () {
+  console.log('INSIDE THE USEOFFER - inbox : ')
+  const [offer] = useMutation(HolofuelOfferMutation)
+  return ({ id, amount, counterparty }) => offer({
+    variables: { amount, counterparty, requestId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
+}
+
 function useDecline () {
+  console.log('INSIDE THE USEDECLINE - inbox : ')
   const [decline] = useMutation(HolofuelDeclineMutation)
-  return id => decline({
+  return ({ id }) => decline({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
@@ -27,6 +41,7 @@ function useDecline () {
 
 export default function Inbox () {
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+  const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
   const isTransactionsEmpty = isEmpty(transactions)
@@ -44,9 +59,10 @@ export default function Inbox () {
         key={transaction.id} />)}
     </div>}
 
-    <ConfirmRejectionModal
+    <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
+      payTransaction={payTransaction}
       declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
@@ -91,7 +107,7 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
     <div styleName={cx('amount', { debit: isRequest })}>{presentHolofuelAmount(amount)}</div>
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
-      {isRequest && <PayButton transaction={transaction} />}
+      {isRequest && <PayButton transaction={transaction} showRejectionModal={showRejectionModal} />}
       <RejectButton transaction={transaction} showRejectionModal={showRejectionModal} />
     </div>
   </div>
@@ -117,20 +133,10 @@ function AcceptButton ({ transaction: { id } }) {
   </Button>
 }
 
-function useOffer (id, amount, counterparty) {
-  const [offer] = useMutation(HolofuelOfferMutation)
-  return () => offer({
-    variables: { amount, counterparty, requestId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    }]
-  })
-}
-
-function PayButton ({ transaction: { id, amount, counterparty } }) {
-  const pay = useOffer(id, amount, counterparty)
+function PayButton ({ showRejectionModal, transaction }) {
+  // const pay = useOffer(id, amount, counterparty)
   return <Button
-    onClick={pay}
+    onClick={showRejectionModal(transaction)}
     styleName='pay-button'>
     Pay
   </Button>
@@ -144,24 +150,45 @@ function RejectButton ({ showRejectionModal, transaction }) {
   </Button>
 }
 
-function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }) {
+function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   if (!transaction) return null
-
   const { id, counterparty, amount, type } = transaction
+
+  const action = type === TYPE.request ? 'pay' : 'decline'
+
+  let message, actionHook, actionParams
+  switch (action) {
+    case 'pay': {
+      actionParams = { id, amount, counterparty }
+      actionHook = payTransaction
+      message = <div styleName='modal-text'>Pay <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span><span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      break
+    }
+    case 'decline': {
+      actionParams = id
+      actionHook = declineTransaction
+      message = <div styleName='modal-text'>Reject <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      break
+    }
+    default:
+      throw new Error('Error: Transaction action was not matched with a modal action. Current transaction action : ', action)
+  }
+
+  console.log('MODAL message, actionHook, actionParams : ', message, actionHook, actionParams)
+  // console.log('MODAL actionHook(actionParams): ', actionHook(actionParams))
+
   const onYes = () => {
-    declineTransaction(id)
+    actionHook(actionParams)
     handleClose()
   }
 
   return <Modal
-    contentLabel={`Reject ${type}?`}
+    contentLabel={`${_.capitalize(action)} ${type}?`} // WAS: contentLabel={`Reject ${type}?`}
     isOpen={!!transaction}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
-    <div styleName='modal-text'>
-      Reject <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?
-    </div>
+    {message}
     <div styleName='modal-buttons'>
       <Button
         onClick={handleClose}
