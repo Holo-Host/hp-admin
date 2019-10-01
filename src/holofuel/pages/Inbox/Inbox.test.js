@@ -6,12 +6,14 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import moment from 'moment'
 import apolloClient from 'apolloClient'
-import Inbox, { TransactionRow, RenderNickname } from './Inbox'
+import Inbox, { TransactionRow, ConfirmationModal, RenderNickname, useOffer, useDecline } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
+import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
@@ -145,9 +147,21 @@ describe('TransactionRow', () => {
     newData: jest.fn()
   }
 
+  const declineMock = {
+    request: {
+      query: HolofuelDeclineMutation,
+      variables: { transactionId: request.id }
+    },
+    result: {
+      data: { holofuelDecline: mockTransaction }
+    },
+    newData: jest.fn()
+  }
+
   const mocks = [
     offerMock,
     acceptOfferMock,
+    declineMock,
     {
       request: {
         query: HolofuelActionableTransactionsQuery
@@ -174,16 +188,37 @@ describe('TransactionRow', () => {
         await wait(0)
       })
 
+      fireEvent.click(getByText('Pay'))
+      expect(props.showConfirmationModal).toHaveBeenCalledWith(request)
+      const modalProps = {
+        handleClose: jest.fn(),
+        transaction: request,
+        payTransaction: { useOffer },
+        declineTransaction: { useDecline }
+      }
       await act(async () => {
-        fireEvent.click(getByText('Pay'))
+        let getByText, getByTestId
+        await act(async () => {
+          ({ getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
+            <ConfirmationModal {...modalProps} />
+          </MockedProvider>))
+          await wait(0)
+        })
+        expect(getByTestId('modal-message')).toBeInTheDocument()
+
+        fireEvent.click(getByText('Yes'))
         await wait(0)
       })
-      expect(props.showConfirmationModal).toHaveBeenCalledWith(request)
-      // expect(offerMock.newData).toHaveBeenCalled()
+      expect(offerMock.newData).toHaveBeenCalled()
 
       fireEvent.click(getByText('Reject'))
-
       expect(props.showConfirmationModal).toHaveBeenCalledWith(request)
+
+      await act(async () => {
+        fireEvent.click(getByText('Yes'))
+        await wait(0)
+      })
+      expect(declineMock.newData).toHaveBeenCalled()
     })
   })
 
