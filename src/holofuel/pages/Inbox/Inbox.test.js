@@ -9,7 +9,7 @@ import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow, RenderNickname } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
-import { presentAgentId } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -18,9 +18,15 @@ import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).reverse().map(item => {
   if (item.event[2].Request) {
-    return item.event[2].Request
+    return {
+      type: 'request',
+      ...item.event[2].Request
+    }
   } else if (item.event[2].Promise) {
-    return item.event[2].Promise.tx
+    return {
+      type: 'offer',
+      ...item.event[2].Promise.tx
+    }
   } else {
     throw new Error('unrecognized transaction type', item.toString())
   }
@@ -46,8 +52,10 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
     listItems.forEach(async (item, index) => {
       const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
       const { getByText } = within(item)
-      expect(getByText(actionableTransactions[index].notes)).toBeInTheDocument()
-      expect(getByText(`${Number(actionableTransactions[index].amount).toLocaleString()}`)).toBeInTheDocument()
+      const transaction = actionableTransactions[index]
+      expect(getByText(transaction.notes)).toBeInTheDocument()
+      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
+      expect(getByText(amountToMatch)).toBeInTheDocument()
       expect(getByText(whois.nickname)).toBeInTheDocument()
     })
   })
@@ -81,8 +89,8 @@ describe('TransactionRow', () => {
       await wait(0)
     })
 
-    expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is requesting')).toBeInTheDocument()
     expect(getByText(request.notes)).toBeInTheDocument()
@@ -99,8 +107,8 @@ describe('TransactionRow', () => {
       await wait(0)
     })
 
-    expect(getByText(request.timestamp.format('MMM D'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.format('kk:mm'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
+    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is offering')).toBeInTheDocument()
     expect(getByText(offer.notes)).toBeInTheDocument()

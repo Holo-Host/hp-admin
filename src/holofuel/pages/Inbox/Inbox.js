@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
-import moment from 'moment'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -13,7 +12,7 @@ import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
 import cx from 'classnames'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
@@ -51,27 +50,13 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-function presentDate (dateTime) {
-  const daysDifferent = moment().diff(dateTime, 'days')
-  if (daysDifferent < 1) {
-    return 'Today'
-  } else if (daysDifferent < 7) {
-    return dateTime.fromNow()
-  } else {
-    return dateTime.format('MMM D')
-  }
-}
-
 export function TransactionRow ({ transaction, showRejectionModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
-  const dateTime = moment(timestamp)
-
-  const date = presentDate(dateTime)
-  const time = dateTime.format('kk:mm')
+  const { date, time } = presentDateAndTime(timestamp)
 
   const story = isOffer ? ' is offering' : ' is requesting'
 
@@ -88,13 +73,19 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
       <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
-    <div styleName={cx('amount', { debit: isRequest })}>{presentHolofuelAmount(amount)}</div>
+    <AmountCell amount={amount} isRequest={isRequest} />
+
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} />}
       <RejectButton transaction={transaction} showRejectionModal={showRejectionModal} />
     </div>
   </div>
+}
+
+function AmountCell ({ amount, isRequest }) {
+  const amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
+  return <div styleName={cx('amount', { debit: isRequest })}>{amountDisplay}</div>
 }
 
 // these are pulled out into custom hooks ready for if we need to move them to their own file for re-use elsewhere
