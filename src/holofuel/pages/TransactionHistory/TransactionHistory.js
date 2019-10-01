@@ -7,13 +7,11 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
-import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
-import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
 // Data - Mutation hook with refetch:
 function useCancel () {
