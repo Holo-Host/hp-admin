@@ -7,17 +7,21 @@ import { createMemoryHistory } from 'history'
 import moment from 'moment'
 import CreateRequest from './CreateRequest'
 import { TYPE } from 'models/Transaction'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
+import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
+jest.mock('holofuel/contexts/useFlashMessageContext')
 
 const counterparty = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
 const amount = 35674
+const notes = 'Hi there'
 
 const requestMock = {
   request: {
     query: HolofuelRequestMutation,
-    variables: { amount, counterparty }
+    variables: { amount, counterparty, notes }
   },
   result: {
     data: {
@@ -61,9 +65,9 @@ describe('CreateRequest', () => {
   it('renders a form that can be filled out and submitted', async () => {
     const push = jest.fn()
 
-    let getByLabelText, getByText, queryByTestId, getByTestId
+    let getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText
     await act(async () => {
-      ({ getByLabelText, getByText, queryByTestId, getByTestId } = renderWithRouter(
+      ({ getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText } = renderWithRouter(
         <CreateRequest history={{ push }} />
       ))
       await wait(0)
@@ -77,6 +81,8 @@ describe('CreateRequest', () => {
 
     fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
 
+    fireEvent.change(getByPlaceholderText('Notes'), { target: { value: notes } })
+
     await act(async () => {
       fireEvent.click(getByText('Send'))
       await wait(0)
@@ -84,6 +90,7 @@ describe('CreateRequest', () => {
 
     expect(requestMock.newData).toHaveBeenCalled()
     expect(push).toHaveBeenCalledWith('/history')
+    expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
   })
 
   it.skip('responds appropriately to bad input', () => {

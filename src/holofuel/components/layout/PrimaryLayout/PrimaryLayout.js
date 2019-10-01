@@ -5,13 +5,13 @@ import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import ScreenWidthContext from 'contexts/screenWidth'
+import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import SideMenu from 'holofuel/components/SideMenu'
+import Header from 'holofuel/components/Header'
+import FlashMessage from 'holofuel/components/FlashMessage'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
-
-import Header from 'holofuel/components/Header'
 
 export function PrimaryLayout ({
   children,
@@ -44,6 +44,7 @@ export function PrimaryLayout ({
       holofuelBalance={holofuelBalance}
     />
     <div styleName='styles.content'>
+      <FlashMessage />
       {children}
     </div>
   </div>
