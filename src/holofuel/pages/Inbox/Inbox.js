@@ -16,9 +16,7 @@ import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 
-
 function useOffer () {
-  console.log('INSIDE THE USEOFFER - inbox : ')
   const [offer] = useMutation(HolofuelOfferMutation)
   return ({ id, amount, counterparty }) => offer({
     variables: { amount, counterparty, requestId: id },
@@ -29,7 +27,6 @@ function useOffer () {
 }
 
 function useDecline () {
-  console.log('INSIDE THE USEDECLINE - inbox : ')
   const [decline] = useMutation(HolofuelDeclineMutation)
   return ({ id }) => decline({
     variables: { transactionId: id },
@@ -48,13 +45,13 @@ export default function Inbox () {
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
 
-  const showRejectionModal = transaction => setModalTransaction(transaction)
+  const showConfirmationModal = transaction => setModalTransaction(transaction)
 
   return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
-        showRejectionModal={showRejectionModal}
+        showConfirmationModal={showConfirmationModal}
         role='list'
         key={transaction.id} />)}
     </div>}
@@ -78,7 +75,7 @@ function presentDate (dateTime) {
   }
 }
 
-export function TransactionRow ({ transaction, showRejectionModal }) {
+export function TransactionRow ({ transaction, showConfirmationModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
@@ -97,7 +94,7 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
         {date}
       </div>
       <div styleName='time'>
-        {time}
+        {time}  
       </div>
     </div>
     <div styleName='description-cell'>
@@ -107,8 +104,8 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
     <div styleName={cx('amount', { debit: isRequest })}>{presentHolofuelAmount(amount)}</div>
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
-      {isRequest && <PayButton transaction={transaction} showRejectionModal={showRejectionModal} />}
-      <RejectButton transaction={transaction} showRejectionModal={showRejectionModal} />
+      {isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
+      <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
     </div>
   </div>
 }
@@ -133,18 +130,18 @@ function AcceptButton ({ transaction: { id } }) {
   </Button>
 }
 
-function PayButton ({ showRejectionModal, transaction }) {
+function PayButton ({ showConfirmationModal, transaction }) {
   // const pay = useOffer(id, amount, counterparty)
   return <Button
-    onClick={showRejectionModal(transaction)}
+    onClick={() => showConfirmationModal(transaction)}
     styleName='pay-button'>
     Pay
   </Button>
 }
 
-function RejectButton ({ showRejectionModal, transaction }) {
+function RejectButton ({ showConfirmationModal, transaction }) {
   return <Button
-    onClick={() => showRejectionModal(transaction)}
+    onClick={() => showConfirmationModal(transaction)}
     styleName='reject-button'>
     Reject
   </Button>
@@ -174,8 +171,9 @@ function ConfirmationModal ({ transaction, handleClose, declineTransaction, payT
       throw new Error('Error: Transaction action was not matched with a modal action. Current transaction action : ', action)
   }
 
-  console.log('MODAL message, actionHook, actionParams : ', message, actionHook, actionParams)
-  // console.log('MODAL actionHook(actionParams): ', actionHook(actionParams))
+  // console.log('MODAL message : ', message)
+  // console.log('MODAL actionHook : ', actionHook)
+  // console.log('MODAL actionParams : ', actionParams)
 
   const onYes = () => {
     actionHook(actionParams)
