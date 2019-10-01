@@ -8,7 +8,7 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
-import CopyToClipboard from 'holofuel/components/CopyToClipboard'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
@@ -174,17 +174,13 @@ export function RenderNickname ({ agentId, txId }) {
     variables: { agentId }
   })
 
-  let toolTipId
-  if (txId)toolTipId = `inboxRenderNickname-${txId}`
-  else toolTipId = `inboxRenderNickname-modal`
-
   if (loading) return <React.Fragment>Loading...</React.Fragment>
   if (error) {
-    return <CopyToClipboard hash={agentId} nickname='' {...toolTipId}>
+    return <CopyAgentId hash={agentId} nickname=''>
       {presentAgentId(agentId)}
-    </CopyToClipboard>
+    </CopyAgentId>
   }
-  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} {...toolTipId}>
+  return <CopyAgentId hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''}>
     {data.holofuelCounterparty.nickname}
-  </CopyToClipboard>
+  </CopyAgentId>
 }

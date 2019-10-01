@@ -7,7 +7,7 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
-import CopyToClipboard from 'holofuel/components/CopyToClipboard'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -172,17 +172,13 @@ export function RenderNickname ({ agentId, txId }) {
     variables: { agentId }
   })
 
-  let toolTipId
-  if (txId)toolTipId = `historyRenderNickname-${txId}`
-  else toolTipId = `historyRenderNickname-modal`
-
   if (loading) return <React.Fragment>Loading...</React.Fragment>
   if (error) {
-    return <CopyToClipboard hash={agentId} nickname='' {...toolTipId}>
+    return <CopyAgentId hash={agentId} nickname=''>
       {presentAgentId(agentId)}
-    </CopyToClipboard>
+    </CopyAgentId>
   }
-  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} {...toolTipId}>
+  return <CopyAgentId hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''}>
     {data.holofuelCounterparty.nickname}
-  </CopyToClipboard>
+  </CopyAgentId>
 }

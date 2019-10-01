@@ -3,30 +3,24 @@ import React from 'react'
 import copy from 'copy-to-clipboard'
 import './CopyToClipboard.module.css'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import { presentAgentId } from 'utils'
 
-export default function CopyToClipboard ({
-  hash,
-  nickname,
-  isMe,
+export default function CopyAgentId ({
+  copyContent,
+  messageText,
   children
 }) {
-  if (!nickname)nickname = `${presentAgentId(hash)}'s`
-  if (isMe)nickname = 'Your'
-  else nickname = `${nickname}'s`
   const { newMessage } = useFlashMessageContext()
-
-  const copyHash = async () => {
-    const wasCopied = await copy(hash, { debug: true })
-    if (wasCopied === true) newMessage(`${nickname} HoloFuel Agent ID has been copied!`, 5000)
+  const handleCopyItem = async () => {
+    const wasCopied = await copy(copyContent)
+    if (wasCopied === true) newMessage(messageText, 5000)
   }
 
-  return <div onClick={copyHash} data-testid='hash-display' styleName='copy-item'>
+  return <div onClick={handleCopyItem} data-testid='copy-content' styleName='copy-item'>
     {children}
   </div>
 }
 
-CopyToClipboard.propTypes = {
-  hash: string,
-  nickname: string
+CopyAgentId.propTypes = {
+  copyContent: string,
+  messageText: string
 }
