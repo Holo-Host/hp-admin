@@ -143,7 +143,7 @@ const HoloFuelDnaInterface = {
   user: {
     get: async () => {
       const result = await createZomeCall('transactions/whoami')()
-      if (result.error) throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.error)
+      if (result.error) return new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.error)
       return {
         id: result.pub_sign_key,
         nickname: result.nick
@@ -151,7 +151,7 @@ const HoloFuelDnaInterface = {
     },
     getCounterparty: async ({ agentId }) => {
       const result = await createZomeCall('transactions/whoami')({ agentId })
-      if (result.error) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
+      if (result.error) return new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
 
       return {
         pubkey: result.pub_sign_key,
@@ -221,8 +221,8 @@ const HoloFuelDnaInterface = {
     }
   },
   requests: {
-    create: async (counterparty, amount) => {
-      const origin = await createZomeCall('transactions/request')({ from: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE })
+    create: async (counterparty, amount, notes) => {
+      const origin = await createZomeCall('transactions/request')({ from: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE, notes })
       return {
         id: origin,
         amount,
@@ -235,8 +235,8 @@ const HoloFuelDnaInterface = {
     }
   },
   offers: {
-    create: async (counterparty, amount, requestId) => {
-      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE, requestId }))
+    create: async (counterparty, amount, notes, requestId) => {
+      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE, notes, requestId }))
       return {
         id: requestId || origin, // NOTE: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
         amount,

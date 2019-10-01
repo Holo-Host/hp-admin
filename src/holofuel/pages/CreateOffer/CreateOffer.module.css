@@ -24,7 +24,7 @@
   font-size: 16px;
   font-weight: bold;
   color: var(--color-tundora);
-  width: 60px;
+  width: 65px;
   text-align: right;
 }
 
@@ -42,20 +42,38 @@
   text-align: right;
 }
 
-.fee-input {
+.readonly-input {
   composes: number-input;
   border: none;
   background-color: var(--color-alto);
 }
 
-.hash-icon-wrapper {
-  width: 60px;
+.hash-wrapper {
   margin-top: 4px;
+}
+
+.hash-icon-wrapper {
+  composes: hash-wrapper;
+  width: 30px;
+}
+
+.hash-nickname-wrapper {
+  composes: hash-wrapper;
 }
 
 .hf {
   composes: form-label;
   text-align: left;
+}
+
+.notes-input {
+  border: 1px solid var(--color-gray);
+  font-family: "Roboto";
+  font-size: 16px;
+  width: 340px;
+  height: 100px;
+  align-self: center;
+  margin-top: 50px;
 }
 
 .send-button {

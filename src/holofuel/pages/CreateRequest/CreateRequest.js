@@ -1,15 +1,19 @@
 import React, { useState } from 'react'
-import { useMutation } from '@apollo/react-hooks'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
+import Loader from 'react-loader-spinner'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import './CreateRequest.module.css'
 
-// TODO: these constants should come from somewhere more scientific
+// TODO: this constants should come from somewhere more scientific
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
@@ -23,8 +27,8 @@ const FormValidationSchema = yup.object().shape({
 
 function useRequestMutation () {
   const [offer] = useMutation(HolofuelRequestMutation)
-  return (amount, counterparty) => offer({
-    variables: { amount, counterparty }
+  return (amount, counterparty, notes) => offer({
+    variables: { amount, counterparty, notes }
   })
 }
 
@@ -35,9 +39,12 @@ export default function CreateRequest ({ history: { push } }) {
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
-  const onSubmit = ({ amount, counterparty }) => {
-    createRequest(amount, counterparty)
+  const { newMessage } = useFlashMessageContext()
+
+  const onSubmit = ({ amount, counterparty, notes }) => {
+    createRequest(amount, counterparty, notes)
     push('/history')
+    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
   }
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)
@@ -58,6 +65,9 @@ export default function CreateRequest ({ history: { push } }) {
         <div styleName='hash-icon-wrapper'>
           {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} />}
         </div>
+        <div styleName='hash-nickname-wrapper'>
+          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'><RenderNickname agentId={counterparty} /></h4>}
+        </div>
       </div>
       <div styleName='form-row'>
         <label htmlFor='amount' styleName='form-label'>Amount</label>
@@ -69,7 +79,37 @@ export default function CreateRequest ({ history: { push } }) {
           ref={register} />
         <span styleName='hf'>HF</span>
       </div>
+      <textarea
+        styleName='notes-input'
+        name='notes'
+        placeholder='Notes'
+        ref={register} />
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
     </form>
   </PrimaryLayout>
+}
+
+export function RenderNickname ({ agentId }) {
+  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+    variables: { agentId }
+  })
+
+  // const { newMessage } = useFlashMessageContext()
+
+  if (loading) {
+    return <React.Fragment>
+      <Loader
+        type='ThreeDots'
+        color='#00BFFF'
+        height={30}
+        width={30}
+        timeout={5000}
+      />
+       Loading
+    </React.Fragment>
+  }
+  // NB: TODO: Resolve the Flash Message ERROR:
+  // if (error || !data.holofuelCounterparty.nickname) { return newMessage(`No nickname available.`, 5000) }
+  if (error || !data.holofuelCounterparty.nickname) { return 'No nickname available.' }
+  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }

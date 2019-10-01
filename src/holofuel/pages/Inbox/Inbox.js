@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import _ from 'lodash'
 import { isEmpty } from 'lodash/fp'
-import moment from 'moment'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -11,10 +10,11 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import CopyToClipboard from 'holofuel/components/CopyToClipboard'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -48,6 +48,7 @@ export default function Inbox () {
   const showConfirmationModal = transaction => setModalTransaction(transaction)
 
   return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
+
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
@@ -64,27 +65,13 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-function presentDate (dateTime) {
-  const daysDifferent = moment().diff(dateTime, 'days')
-  if (daysDifferent < 1) {
-    return 'Today'
-  } else if (daysDifferent < 7) {
-    return dateTime.fromNow()
-  } else {
-    return dateTime.format('MMM D')
-  }
-}
-
 export function TransactionRow ({ transaction, showConfirmationModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
-  const dateTime = moment(timestamp)
-
-  const date = presentDate(dateTime)
-  const time = dateTime.format('kk:mm')
+  const { date, time } = presentDateAndTime(timestamp)
 
   const story = isOffer ? ' is offering' : ' is requesting'
 
@@ -94,20 +81,26 @@ export function TransactionRow ({ transaction, showConfirmationModal }) {
         {date}
       </div>
       <div styleName='time'>
-        {time}  
+        {time}
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} txId={transaction.id} /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
-    <div styleName={cx('amount', { debit: isRequest })}>{presentHolofuelAmount(amount)}</div>
+    <AmountCell amount={amount} isRequest={isRequest} />
+
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
     </div>
   </div>
+}
+
+function AmountCell ({ amount, isRequest }) {
+  const amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
+  return <div styleName={cx('amount', { debit: isRequest })}>{amountDisplay}</div>
 }
 
 // these are pulled out into custom hooks ready for if we need to move them to their own file for re-use elsewhere
@@ -147,7 +140,7 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
-function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   if (!transaction) return null
   const { id, counterparty, amount, type } = transaction
 
@@ -158,22 +151,18 @@ function ConfirmationModal ({ transaction, handleClose, declineTransaction, payT
     case 'pay': {
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text'>Pay <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span><span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span><span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     case 'decline': {
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text'>Reject <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
       throw new Error('Error: Transaction action was not matched with a modal action. Current transaction action : ', action)
   }
-
-  // console.log('MODAL message : ', message)
-  // console.log('MODAL actionHook : ', actionHook)
-  // console.log('MODAL actionParams : ', actionParams)
 
   const onYes = () => {
     actionHook(actionParams)
@@ -202,11 +191,22 @@ function ConfirmationModal ({ transaction, handleClose, declineTransaction, payT
   </Modal>
 }
 
-export function RenderNickname ({ agentId }) {
+export function RenderNickname ({ agentId, txId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+
+  let toolTipId
+  if (txId)toolTipId = `inboxRenderNickname-${txId}`
+  else toolTipId = `inboxRenderNickname-modal`
+
   if (loading) return <React.Fragment>Loading...</React.Fragment>
-  if (error) { return presentAgentId(agentId) }
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+  if (error) {
+    return <CopyToClipboard hash={agentId} nickname='' {...toolTipId}>
+      {presentAgentId(agentId)}
+    </CopyToClipboard>
+  }
+  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} {...toolTipId}>
+    {data.holofuelCounterparty.nickname}
+  </CopyToClipboard>
 }

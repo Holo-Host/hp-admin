@@ -5,25 +5,28 @@ import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import ScreenWidthContext from 'contexts/screenWidth'
+import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import SideMenu from 'holofuel/components/SideMenu'
-import { presentAgentId } from 'utils'
+import Header from 'holofuel/components/Header'
+import FlashMessage from 'holofuel/components/FlashMessage'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
-
-import Header from 'holofuel/components/Header'
 
 export function PrimaryLayout ({
   children,
   headerProps = {}
 }) {
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
-  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
   const inboxCount = transactions.length
-  const agentId = presentAgentId(holofuelUser.id)
+
+  let agent = {}
+  let agentLoading
+  if (holofuelUserLoading) agentLoading = true
+  else agent = { ...holofuelUser }
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -31,15 +34,17 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agentId={agentId} hamburgerClick={hamburgerClick} />
+    <Header {...headerProps} agent={agent} agentLoading={agentLoading} hamburgerClick={hamburgerClick} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      agentId={agentId}
+      agent={agent}
+      agentLoading={agentLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
     />
     <div styleName='styles.content'>
+      <FlashMessage />
       {children}
     </div>
   </div>
