@@ -37,7 +37,7 @@ const renderWithRouter = (
   history
 })
 
-it.skip('should copy the HolofuelUser Agent Hash to clipboard and display proper Flash Message ', async () => {
+it('should copy the HolofuelUser Agent Hash to clipboard and display proper Flash Message ', async () => {
   const mockWhoAmIAgent1 = {
     id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry'
@@ -73,7 +73,7 @@ it.skip('should copy the HolofuelUser Agent Hash to clipboard and display proper
   expect(getByText(mockMyIdMessage)).toBeInTheDocument()
 })
 
-it.skip('should copy the HolofuelCounterparty Hash to clipboard and display proper Flash Message ', async () => {
+it('should copy the HolofuelCounterparty Hash to clipboard and display proper Flash Message ', async () => {
   const mockWhoIsAgent2 = {
     id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
     nickname: 'Sam'
@@ -108,7 +108,7 @@ it.skip('should copy the HolofuelCounterparty Hash to clipboard and display prop
   expect(getByText(mockCounterpartyIdMessage)).toBeInTheDocument()
 })
 
-it.skip('should display the last 6 chars of Agent Hash in Flash Message when Nickname not found', async () => {
+it('should display the last 6 chars of Agent Hash in Flash Message when Nickname not found', async () => {
   const mockWhoIsAgent2 = {
     id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
     nickname: undefined
