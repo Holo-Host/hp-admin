@@ -9,7 +9,6 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
-import { presentAgentId } from 'utils'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -19,11 +18,10 @@ export function PrimaryLayout ({
   headerProps = {}
 }) {
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
-  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
   const inboxCount = transactions.length
-  const agentId = presentAgentId(holofuelUser.id)
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -31,11 +29,12 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agentId={agentId} hamburgerClick={hamburgerClick} />
+    <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      agentId={agentId}
+      agent={holofuelUser}
+      agentLoading={holofuelUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
     />

@@ -10,18 +10,21 @@ export function SideMenu ({
   isOpen,
   handleClose,
   avatarUrl = '',
-  agentId,
+  agent,
+  agentLoading,
   inboxCount,
   holofuelBalance
 }) {
+  if (agentLoading) agentLoading = <h4>Loading...</h4>
+
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
         <h1 styleName='appName'>HoloFuel</h1>
 
-        <HashAvatar avatarUrl={avatarUrl} seed={agentId} size={100} styleName='avatar' />
+        <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
 
-        <span styleName='header-account'>{agentId}</span>
+        <span styleName='header-account'>{agent.nickname || agentLoading}</span>
         <strong styleName='header-balance'>{presentHolofuelAmount(holofuelBalance)}</strong>
       </header>
 
