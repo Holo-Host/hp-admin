@@ -7,7 +7,6 @@ import Loader from 'react-loader-spinner'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
-// import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
 import './CreateOffer.module.css'
@@ -40,8 +39,6 @@ export default function CreateOffer ({ history: { push } }) {
   const [total, setTotal] = useState(0)
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
-
-  // const { newMessage } = useFlashMessageContext()
 
   const onAmountChange = amount => {
     if (isNaN(amount)) return
@@ -123,8 +120,6 @@ export function RenderNickname ({ agentId }) {
     variables: { agentId }
   })
 
-  // const { newMessage } = useFlashMessageContext()
-
   if (loading) {
     return <React.Fragment>
       <Loader
@@ -137,8 +132,6 @@ export function RenderNickname ({ agentId }) {
      Loading
     </React.Fragment>
   }
-  // NB: TODO: Resolve the Flash Message ERROR:
-  // if (error || !data.holofuelCounterparty.nickname) { return newMessage(`No nickname available.`, 5000) }
-  if (error || !data.holofuelCounterparty.nickname) { return 'No nickname available.' }
+  if (error || !data.holofuelCounterparty.nickname) return <React.Fragment>No nickname available.</React.Fragment>
   return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }

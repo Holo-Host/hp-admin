@@ -93,9 +93,6 @@ export function RenderNickname ({ agentId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-
-  // const { newMessage } = useFlashMessageContext()
-
   if (loading) {
     return <React.Fragment>
       <Loader
@@ -108,8 +105,6 @@ export function RenderNickname ({ agentId }) {
        Loading
     </React.Fragment>
   }
-  // NB: TODO: Resolve the Flash Message ERROR:
-  // if (error || !data.holofuelCounterparty.nickname) { return newMessage(`No nickname available.`, 5000) }
-  if (error || !data.holofuelCounterparty.nickname) { return 'No nickname available.' }
+  if (error || !data.holofuelCounterparty.nickname) return <React.Fragment>No nickname available.</React.Fragment>
   return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }
