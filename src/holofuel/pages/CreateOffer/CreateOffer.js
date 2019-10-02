@@ -71,7 +71,9 @@ export default function CreateOffer ({ history: { push } }) {
           {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} />}
         </div>
         <div styleName='hash-nickname-wrapper'>
-          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'><RenderNickname agentId={counterparty} /></h4>}
+          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
+            <RenderNickname agentId={counterparty} />
+          </h4>}
         </div>
       </div>
       <div styleName='form-row'>

@@ -8,6 +8,7 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
@@ -172,7 +173,14 @@ export function RenderNickname ({ agentId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+
   if (loading) return <React.Fragment>Loading...</React.Fragment>
-  if (error) { return presentAgentId(agentId) }
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+  if (error) {
+    return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
+      {presentAgentId(agentId)}
+    </CopyAgentId>
+  }
+  return <CopyAgentId agent={data.holofuelCounterparty}>
+    {data.holofuelCounterparty.nickname}
+  </CopyAgentId>
 }

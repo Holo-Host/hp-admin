@@ -3,8 +3,8 @@ import Button from 'components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
 import { withRouter } from 'react-router'
-import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 import { presentAgentId } from 'utils'
 
 export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard') }) {
@@ -20,10 +20,14 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
         {leftNav}
         <span styleName='title header-font'>HoloFuel</span>
       </div>
-      <div styleName='right-nav account-number header-font'>{agent.nickname || presentAgentId(agent.id)}</div>
-      <Link to='/history' styleName='avatar-link'>
-        <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} />
-      </Link>
+      <div styleName='right-nav account-number header-font'>
+        <CopyAgentId agent={agent} isMe>
+          {agent.nickname || presentAgentId(agent.id)}
+        </CopyAgentId>
+      </div>
+      <CopyAgentId agent={agent} isMe>
+        <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} data-testid='hash-icon' />
+      </CopyAgentId>
     </section>
     {title && <section styleName='sub-header'>
       <div styleName='sub-title'>{title}</div>

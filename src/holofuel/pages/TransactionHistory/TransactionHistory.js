@@ -7,8 +7,9 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
-import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
+import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
@@ -170,7 +171,14 @@ export function RenderNickname ({ agentId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+
   if (loading) return <React.Fragment>Loading...</React.Fragment>
-  if (error) { return presentAgentId(agentId) }
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+  if (error) {
+    return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
+      {presentAgentId(agentId)}
+    </CopyAgentId>
+  }
+  return <CopyAgentId agent={data.holofuelCounterparty}>
+    {data.holofuelCounterparty.nickname}
+  </CopyAgentId>
 }
