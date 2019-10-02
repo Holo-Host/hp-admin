@@ -1,4 +1,4 @@
-import { string, bool } from 'prop-types'
+import { bool, object } from 'prop-types'
 import React from 'react'
 import CopyToClipboard from 'holofuel/components/CopyToClipboard'
 import { presentAgentId } from 'utils'
@@ -20,14 +20,16 @@ export default function CopyAgentId ({
 
   const messageText = `${nickname} HoloFuel Agent ID has been copied!`
 
-  return <React.Fragment>
-    <CopyToClipboard copyContent={hash} messageText={messageText}>
-      {children}
-    </CopyToClipboard>
-  </React.Fragment>
+  // console.log('AGENT hash : ', hash)
+  // console.log('AGENT nickname : ', nickname)
+  // console.log('COPY AGENT ID messageText : ', messageText)
+
+  return <CopyToClipboard copyContent={hash} messageText={messageText}>
+    {children}
+  </CopyToClipboard>
 }
 
 CopyAgentId.propTypes = {
-  agent: string,
+  agent: object,
   isMe: bool
 }

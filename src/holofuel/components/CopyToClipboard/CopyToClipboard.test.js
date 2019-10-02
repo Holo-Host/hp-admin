@@ -7,7 +7,7 @@ import { createMemoryHistory } from 'history'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import CopyToClipboard from './CopyToClipboard.js'
 
-jest.mock('/CopyToClipboard')
+jest.mock('holofuel/components/CopyToClipboard')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
@@ -38,7 +38,7 @@ const renderWithRouter = (
 
 it('should copy the HolofuelUser Agent Hash to clipboard and display flash message feedback', async () => {
   const mockChildContent = 'MOCK STRING CHILD'
-  const mockMessage = 'AGENT_HASH_123 mock message'
+  const mockMessage = 'mock message'
 
   const props = {
     copyContent: 'AGENT_HASH_123',

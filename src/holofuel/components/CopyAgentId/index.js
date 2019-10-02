@@ -1,3 +1,3 @@
-import component from './CopyAgentIds'
+import component from './CopyAgentId'
 
 export default component

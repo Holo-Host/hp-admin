@@ -8,7 +8,7 @@ import { createMemoryHistory } from 'history'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import CopyAgentId from './CopyAgentId.js'
 
-jest.mock('/CopyToClipboard')
+jest.mock('holofuel/components/CopyToClipboard')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
@@ -37,7 +37,7 @@ const renderWithRouter = (
   history
 })
 
-it('should copy the HolofuelUser Agent Hash to clipboard and display proper Flash Message ', async () => {
+it.skip('should copy the HolofuelUser Agent Hash to clipboard and display proper Flash Message ', async () => {
   const mockWhoAmIAgent1 = {
     id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry'
@@ -50,8 +50,6 @@ it('should copy the HolofuelUser Agent Hash to clipboard and display proper Flas
 
   const props = {
     agent: mockWhoAmIAgent1,
-    // hash: mockWhoAmIAgent1.id,
-    // nickname: mockWhoAmIAgent1.nickname,
     isme: true
   }
 
@@ -75,7 +73,7 @@ it('should copy the HolofuelUser Agent Hash to clipboard and display proper Flas
   expect(getByText(mockMyIdMessage)).toBeInTheDocument()
 })
 
-it('should copy the HolofuelCounterparty Hash to clipboard and display proper Flash Message ', async () => {
+it.skip('should copy the HolofuelCounterparty Hash to clipboard and display proper Flash Message ', async () => {
   const mockWhoIsAgent2 = {
     pubkey: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
     nickname: 'Sam'
@@ -110,7 +108,7 @@ it('should copy the HolofuelCounterparty Hash to clipboard and display proper Fl
   expect(getByText(mockCounterpartyIdMessage)).toBeInTheDocument()
 })
 
-it('should display the last 6 chars of Agent Hash in Flash Message when Nickname not found', async () => {
+it.skip('should display the last 6 chars of Agent Hash in Flash Message when Nickname not found', async () => {
   const mockWhoIsAgent2 = {
     pubkey: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
     nickname: undefined
