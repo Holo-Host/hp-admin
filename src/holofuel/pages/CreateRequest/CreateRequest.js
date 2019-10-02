@@ -10,7 +10,7 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount } from 'utils'
 import './CreateRequest.module.css'
 
 // TODO: this constants should come from somewhere more scientific
@@ -36,6 +36,7 @@ export default function CreateRequest ({ history: { push } }) {
   const createRequest = useRequestMutation()
 
   const [counterparty, setCounterparty] = useState('')
+  const [counterpartyNick, setCounterpartyNick] = useState('')
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
@@ -44,7 +45,7 @@ export default function CreateRequest ({ history: { push } }) {
   const onSubmit = ({ amount, counterparty, notes }) => {
     createRequest(amount, counterparty, notes)
     push('/history')
-    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
+    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
   }
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)
@@ -66,7 +67,7 @@ export default function CreateRequest ({ history: { push } }) {
           {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} />}
         </div>
         <div styleName='hash-nickname-wrapper'>
-          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'><RenderNickname agentId={counterparty} /></h4>}
+          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'><RenderNickname agentId={counterparty} setAgentNick={setCounterpartyNick} /></h4>}
         </div>
       </div>
       <div styleName='form-row'>
@@ -89,7 +90,7 @@ export default function CreateRequest ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId }) {
+export function RenderNickname ({ agentId, setAgentNick }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
@@ -106,5 +107,6 @@ export function RenderNickname ({ agentId }) {
     </React.Fragment>
   }
   if (error || !data.holofuelCounterparty.nickname) return <React.Fragment>No nickname available.</React.Fragment>
+  else setAgentNick(data.holofuelCounterparty.nickname)
   return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }
