@@ -91,7 +91,7 @@ describe('CreateRequest', () => {
 
     expect(requestMock.newData).toHaveBeenCalled()
     expect(push).toHaveBeenCalledWith('/history')
-    expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
+    expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} HF sent.`, 5000)
   })
 
   it('renders the counterparty nickname upon *successful* fetch', async () => {

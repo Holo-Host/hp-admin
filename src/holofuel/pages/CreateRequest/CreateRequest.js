@@ -10,7 +10,7 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount } from 'utils'
 import './CreateRequest.module.css'
 
 // TODO: this constants should come from somewhere more scientific
@@ -45,7 +45,8 @@ export default function CreateRequest ({ history: { push } }) {
   const onSubmit = ({ amount, counterparty, notes }) => {
     createRequest(amount, counterparty, notes)
     push('/history')
-    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
+    const counterpartyString = counterpartyNick ? ` to ${counterpartyNick}` : ''
+    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent${counterpartyString}.`, 5000)
   }
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)
