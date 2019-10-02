@@ -5,6 +5,7 @@ import './Header.module.css'
 import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
+import { presentAgentId } from 'utils'
 
 export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard') }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
@@ -19,7 +20,7 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
         {leftNav}
         <span styleName='title header-font'>HoloFuel</span>
       </div>
-      <div styleName='right-nav account-number header-font'>{agent.nickname || agentLoading}</div>
+      <div styleName='right-nav account-number header-font'>{agent.nickname || presentAgentId(agent.id)}</div>
       <Link to='/history' styleName='avatar-link'>
         <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} />
       </Link>

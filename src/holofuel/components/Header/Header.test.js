@@ -3,6 +3,7 @@ import { render, fireEvent } from '@testing-library/react'
 // import wait from 'waait'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
+import { presentAgentId } from 'utils'
 
 // testing the named export Header rather than the default export which is wrapped in withRouter
 import { Header } from './Header'
@@ -27,12 +28,13 @@ it('should render the title and a menu icon', () => {
   const props = {
     title: 'the title',
     history: { push: jest.fn() },
-    agent: 'AGENT NICKNAME'
+    agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
   }
   const { getByText, getByTestId } = renderWithRouter(<Header {...props} />)
 
   expect(getByText(props.title)).toBeInTheDocument()
   expect(getByText(menuIconTitle)).toBeInTheDocument()
+  expect(getByText(props.agent.nickname) || getByText(presentAgentId(props.agent.id))).toBeInTheDocument()
 
   fireEvent.click(getByTestId('menu-button'))
 
@@ -50,13 +52,13 @@ it('should render the agent nickname', () => {
   expect(getByText(props.agent.nickname)).toBeInTheDocument()
 })
 
-it('should render loading indicator when agent is loading', () => {
+it('should render lst 6 of agent id when agent is loading', () => {
   const props = {
     title: 'the title',
     history: { push: jest.fn() },
-    agent: {},
+    agent: { id: 'QmAGENTHASH', nickname: undefined },
     agentLoading: true
   }
   const { getByText } = renderWithRouter(<Header {...props} />)
-  expect(getByText('Loading...')).toBeInTheDocument()
+  expect(getByText(presentAgentId(props.agent.id))).toBeInTheDocument()
 })

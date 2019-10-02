@@ -23,23 +23,18 @@ export function PrimaryLayout ({
 
   const inboxCount = transactions.length
 
-  let agent = {}
-  let agentLoading
-  if (holofuelUserLoading) agentLoading = true
-  else agent = { ...holofuelUser }
-
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={agent} agentLoading={agentLoading} hamburgerClick={hamburgerClick} />
+    <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      agent={agent}
-      agentLoading={agentLoading}
+      agent={holofuelUser}
+      agentLoading={holofuelUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
     />
