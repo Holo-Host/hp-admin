@@ -4,11 +4,15 @@ import copy from 'copy-to-clipboard'
 import './CopyToClipboard.module.css'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 
-export default function CopyAgentId ({
+export default function CopyToClipboard ({
   copyContent,
   messageText,
   children
 }) {
+  if (!messageText) messageText = `${copyContent} has been copied!`
+
+  console.log('MessageText INSIDE CopyToClipboard : ', messageText)
+
   const { newMessage } = useFlashMessageContext()
   const handleCopyItem = async () => {
     const wasCopied = await copy(copyContent)
@@ -20,7 +24,7 @@ export default function CopyAgentId ({
   </div>
 }
 
-CopyAgentId.propTypes = {
+CopyToClipboard.propTypes = {
   copyContent: string,
   messageText: string
 }

@@ -21,12 +21,12 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
         <span styleName='title header-font'>HoloFuel</span>
       </div>
       <div styleName='right-nav account-number header-font'>
-        <CopyAgentId hash={agent.id} nickname={agent.nickname || ''} isMe toolTipId='headerHashNickname'>
+        <CopyAgentId agent={agent} isMe>
           {agent.nickname || agentLoading}
         </CopyAgentId>
       </div>
       <Link to='/history' styleName='avatar-link'>
-        <CopyAgentId hash={agent.id} nickname={agent.nickname || ''} isMe toolTipId='headerHashAvatar'>
+        <CopyAgentId agent={agent} isMe>
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} data-testid='hash-icon' />
         </CopyAgentId>
       </Link>

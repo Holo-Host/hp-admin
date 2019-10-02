@@ -95,7 +95,7 @@ it.skip('should copy the agentId when clicked and trigger the proper flash messa
   expect(queryByText(mockMyIdMessage)).not.toBeInTheDocument()
 
   await act(async () => {
-    const hashDisplay = queryAllByTestId('hash-display')
+    const hashDisplay = queryAllByTestId('copy-content')
     fireEvent.click(hashDisplay[0])
     await MockFlashContextProvider({ message: mockMyIdMessage })
     await wait(0)

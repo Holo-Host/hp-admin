@@ -176,11 +176,11 @@ export function RenderNickname ({ agentId, txId }) {
 
   if (loading) return <React.Fragment>Loading...</React.Fragment>
   if (error) {
-    return <CopyAgentId hash={agentId} nickname=''>
+    return <CopyAgentId agent={{ pubkey: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
   }
-  return <CopyAgentId hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''}>
+  return <CopyAgentId agent={data.holofuelCounterparty}>
     {data.holofuelCounterparty.nickname}
   </CopyAgentId>
 }

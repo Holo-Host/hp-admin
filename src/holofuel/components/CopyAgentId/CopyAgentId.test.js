@@ -39,7 +39,7 @@ const renderWithRouter = (
 
 it('should copy the HolofuelUser Agent Hash to clipboard and display proper Flash Message ', async () => {
   const mockWhoAmIAgent1 = {
-    pubkey: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+    id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry'
   }
 
@@ -49,8 +49,9 @@ it('should copy the HolofuelUser Agent Hash to clipboard and display proper Flas
   // const mockMyIdMessage = `Your HoloFuel Agent ID has been copied!`
 
   const props = {
-    hash: mockWhoAmIAgent1.pubkey,
-    nickname: mockWhoAmIAgent1.nickname,
+    agent: mockWhoAmIAgent1,
+    // hash: mockWhoAmIAgent1.id,
+    // nickname: mockWhoAmIAgent1.nickname,
     isme: true
   }
 
@@ -67,7 +68,7 @@ it('should copy the HolofuelUser Agent Hash to clipboard and display proper Flas
   // TODO: Once Provider Context Conflicts = Resolved, uncomment the following :
   // expect(queryByText(mockMyIdMessage)).not.toBeInTheDocument()
   await act(async () => {
-    fireEvent.click(queryByTestId('hash-display'))
+    fireEvent.click(queryByTestId('copy-content'))
     // await MockFlashContextProvider({ message: mockMyIdMessage })
     await wait(0)
   })
@@ -86,8 +87,7 @@ it('should copy the HolofuelCounterparty Hash to clipboard and display proper Fl
   // const mockCounterpartyIdMessage = `${mockWhoIsAgent2.nickname}'s HoloFuel Agent ID has been copied!`
 
   const props = {
-    hash: mockWhoIsAgent2.pubkey,
-    nickname: mockWhoIsAgent2.nickname
+    agent: mockWhoIsAgent2
   }
 
   let container, getByText, queryByTestId // queryByText,
@@ -103,7 +103,7 @@ it('should copy the HolofuelCounterparty Hash to clipboard and display proper Fl
   // TODO: Once Provider Context Conflicts = Resolved, uncomment the following :
   // expect(queryByText(mockCounterpartyIdMessage)).not.toBeInTheDocument()
   await act(async () => {
-    fireEvent.click(queryByTestId('hash-display'))
+    fireEvent.click(queryByTestId('copy-content'))
     // await MockFlashContextProvider({ message: mockMyIdMessage })
     await wait(0)
   })
@@ -122,8 +122,7 @@ it('should display the last 6 chars of Agent Hash in Flash Message when Nickname
   // const mockCounterpartyIdMessage = `${presentAgentId(mockWhoIsAgent2.pubkey)}'s HoloFuel Agent ID has been copied!`
 
   const props = {
-    hash: mockWhoIsAgent2.pubkey,
-    nickname: mockWhoIsAgent2.nickname
+    agent: mockWhoIsAgent2
   }
 
   let container, getByText, queryByTestId // queryByText,
@@ -139,7 +138,7 @@ it('should display the last 6 chars of Agent Hash in Flash Message when Nickname
   // TODO: Once Provider Context Conflicts = Resolved, uncomment the following :
   // expect(queryByText(mockCounterpartyIdMessage)).not.toBeInTheDocument()
   await act(async () => {
-    fireEvent.click(queryByTestId('hash-display'))
+    fireEvent.click(queryByTestId('copy-content'))
     await wait(0)
   })
   expect(getByText(mockCounterpartyIdMessage)).toBeInTheDocument()

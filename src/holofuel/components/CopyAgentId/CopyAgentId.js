@@ -1,32 +1,33 @@
-import { string } from 'prop-types'
+import { string, bool } from 'prop-types'
 import React from 'react'
-import copy from 'copy-to-clipboard'
-import './CopyAgentId.module.css'
-import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import CopyToClipboard from 'holofuel/components/CopyToClipboard'
 import { presentAgentId } from 'utils'
 
 export default function CopyAgentId ({
-  hash,
-  nickname,
+  agent,
   isMe,
   children
 }) {
+  // const { id: hash } = agent
+  let hash
+  if (agent.pubkey) { const { pubkey } = agent; hash = pubkey }
+  if (agent.id) { const { id } = agent; hash = id }
+  let { nickname } = agent
+
   if (!nickname)nickname = `${presentAgentId(hash)}'s`
   if (isMe)nickname = 'Your'
   else nickname = `${nickname}'s`
-  const { newMessage } = useFlashMessageContext()
 
-  const copyHash = async () => {
-    const wasCopied = await copy(hash, { debug: true })
-    if (wasCopied === true) newMessage(`${nickname} HoloFuel Agent ID has been copied!`, 5000)
-  }
+  const messageText = `${nickname} HoloFuel Agent ID has been copied!`
 
-  return <div onClick={copyHash} data-testid='hash-display' styleName='copy-item'>
-    {children}
-  </div>
+  return <React.Fragment>
+    <CopyToClipboard copyContent={hash} messageText={messageText}>
+      {children}
+    </CopyToClipboard>
+  </React.Fragment>
 }
 
 CopyAgentId.propTypes = {
-  hash: string,
-  nickname: string
+  agent: string,
+  isMe: bool
 }

@@ -4,7 +4,6 @@ import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
-// import { presentAgentId } from 'utils'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import CopyToClipboard from './CopyToClipboard.js'
 
@@ -39,10 +38,11 @@ const renderWithRouter = (
 
 it('should copy the HolofuelUser Agent Hash to clipboard and display flash message feedback', async () => {
   const mockChildContent = 'MOCK STRING CHILD'
-  const mockMessage = 'mock message'
+  const mockMessage = 'AGENT_HASH_123 mock message'
 
   const props = {
-    copyContent: 'AGENT_HASH_123'
+    copyContent: 'AGENT_HASH_123',
+    messageText: mockMessage
   }
 
   let container, getByText, queryByTestId
@@ -56,7 +56,7 @@ it('should copy the HolofuelUser Agent Hash to clipboard and display flash messa
   })
 
   await act(async () => {
-    fireEvent.click(queryByTestId('hash-display'))
+    fireEvent.click(queryByTestId('copy-content'))
     await wait(0)
   })
   expect(getByText(mockMessage)).toBeInTheDocument()

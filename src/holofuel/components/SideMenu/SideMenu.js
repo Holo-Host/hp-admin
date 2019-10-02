@@ -22,12 +22,12 @@ export function SideMenu ({
     <div styleName='container'>
       <header styleName='header'>
         <h1 styleName='appName'>HoloFuel</h1>
-        <CopyAgentId hash={agent.id} nickname={agent.nickname || ''} isMe toolTipId='menuHashAvatar'>
+        <CopyAgentId agent={agent} isMe>
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
         </CopyAgentId>
 
         <span styleName='header-account'>
-          <CopyAgentId hash={agent.id} nickname={agent.nickname || ''} isMe toolTipId='menuHashNickname'>
+          <CopyAgentId agent={agent} isMe>
             {agent.nickname || agentLoading}
           </CopyAgentId>
         </span>
