@@ -8,7 +8,7 @@ import { createMemoryHistory } from 'history'
 import moment from 'moment'
 import CreateRequest from './CreateRequest'
 import { TYPE } from 'models/Transaction'
-import { presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
@@ -91,7 +91,7 @@ describe('CreateRequest', () => {
 
     expect(requestMock.newData).toHaveBeenCalled()
     expect(push).toHaveBeenCalledWith('/history')
-    expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} HF sent.`, 5000)
+    expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
   })
 
   it('renders the counterparty nickname upon *successful* fetch', async () => {
