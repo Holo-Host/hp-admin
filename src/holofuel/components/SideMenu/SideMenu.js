@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import { presentHolofuelAmount } from 'utils' // presentAgentId
-import CopyToClipboard from 'holofuel/components/CopyToClipboard'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 
 import './SideMenu.module.css'
 
@@ -22,14 +22,14 @@ export function SideMenu ({
     <div styleName='container'>
       <header styleName='header'>
         <h1 styleName='appName'>HoloFuel</h1>
-        <CopyToClipboard hash={agent.id} nickname={agent.nickname || ''} isMe toolTipId='menuHashAvatar'>
+        <CopyAgentId agent={agent} isMe>
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
-        </CopyToClipboard>
+        </CopyAgentId>
 
         <span styleName='header-account'>
-          <CopyToClipboard hash={agent.id} nickname={agent.nickname || ''} isMe toolTipId='menuHashNickname'>
+          <CopyAgentId agent={agent} isMe>
             {agent.nickname || agentLoading}
-          </CopyToClipboard>
+          </CopyAgentId>
         </span>
         <strong styleName='header-balance'>{presentHolofuelAmount(holofuelBalance)}</strong>
       </header>

@@ -7,7 +7,7 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
-import CopyToClipboard from 'holofuel/components/CopyToClipboard'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -103,7 +103,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p data-testid='cell-time'>{time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} txId={id} /></h4>
+      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} /></h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -167,22 +167,18 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
   </Modal>
 }
 
-export function RenderNickname ({ agentId, txId }) {
+export function RenderNickname ({ agentId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  let toolTipId
-  if (txId)toolTipId = `historyRenderNickname-${txId}`
-  else toolTipId = `historyRenderNickname-modal`
-
   if (loading) return <React.Fragment>Loading...</React.Fragment>
   if (error) {
-    return <CopyToClipboard hash={agentId} nickname='' {...toolTipId}>
+    return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
-    </CopyToClipboard>
+    </CopyAgentId>
   }
-  return <CopyToClipboard hash={data.holofuelCounterparty.pubkey} nickname={data.holofuelCounterparty.nickname || ''} {...toolTipId}>
+  return <CopyAgentId agent={data.holofuelCounterparty}>
     {data.holofuelCounterparty.nickname}
-  </CopyToClipboard>
+  </CopyAgentId>
 }
