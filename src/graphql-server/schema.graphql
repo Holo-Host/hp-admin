@@ -34,7 +34,6 @@ type HostPricing {
 
 type HolofuelUser {
   id: ID
-  pubkey: String
   nickname: String
 }
 
