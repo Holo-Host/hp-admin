@@ -103,7 +103,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p data-testid='cell-time'>{time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} txId={id} /></h4>
+      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} /></h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -167,7 +167,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
   </Modal>
 }
 
-export function RenderNickname ({ agentId, txId }) {
+export function RenderNickname ({ agentId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })

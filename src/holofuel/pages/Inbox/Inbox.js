@@ -71,7 +71,7 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} txId={transaction.id} /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />
@@ -169,7 +169,7 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
   </Modal>
 }
 
-export function RenderNickname ({ agentId, txId }) {
+export function RenderNickname ({ agentId }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
