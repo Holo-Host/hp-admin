@@ -176,7 +176,7 @@ export function RenderNickname ({ agentId }) {
 
   if (loading) return <React.Fragment>Loading...</React.Fragment>
   if (error) {
-    return <CopyAgentId agent={{ pubkey: agentId, nickname: '' }}>
+    return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
   }

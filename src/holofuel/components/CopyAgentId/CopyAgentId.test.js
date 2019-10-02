@@ -75,7 +75,7 @@ it.skip('should copy the HolofuelUser Agent Hash to clipboard and display proper
 
 it.skip('should copy the HolofuelCounterparty Hash to clipboard and display proper Flash Message ', async () => {
   const mockWhoIsAgent2 = {
-    pubkey: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+    id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
     nickname: 'Sam'
   }
 
@@ -110,14 +110,14 @@ it.skip('should copy the HolofuelCounterparty Hash to clipboard and display prop
 
 it.skip('should display the last 6 chars of Agent Hash in Flash Message when Nickname not found', async () => {
   const mockWhoIsAgent2 = {
-    pubkey: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+    id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
     nickname: undefined
   }
 
   const mockChildContent = mockWhoIsAgent2.nickname
   const mockCounterpartyIdMessage = 'mock message'
   // TODO: Resolve Provider Context Conflicts >> above var should be following :
-  // const mockCounterpartyIdMessage = `${presentAgentId(mockWhoIsAgent2.pubkey)}'s HoloFuel Agent ID has been copied!`
+  // const mockCounterpartyIdMessage = `${presentAgentId(mockWhoIsAgent2.id)}'s HoloFuel Agent ID has been copied!`
 
   const props = {
     agent: mockWhoIsAgent2

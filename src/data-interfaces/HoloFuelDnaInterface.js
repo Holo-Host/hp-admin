@@ -10,24 +10,6 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
-// Creates an array of all counterparties for a provided transaction list
-export async function getTxCounterparties (transactionList) {
-  const counterpartyList = transactionList.map(tx => {
-    const { counterparty } = tx
-    return counterparty
-  })
-  const agentDetailsList = []
-  for (let i = 0; i < counterpartyList.length; i++) {
-    const agentId = counterpartyList[i]
-    const agent = await new Promise(resolve => {
-      const findAgent = HoloFuelDnaInterface.user.getCounterparty({ agentId })
-      resolve(findAgent)
-    })
-    agentDetailsList.push(agent)
-  }
-  return agentDetailsList
-}
-
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes, fees }) => {
   return {
     id: origin,
@@ -143,7 +125,7 @@ const HoloFuelDnaInterface = {
   user: {
     get: async () => {
       const result = await createZomeCall('transactions/whoami')()
-      if (result.error) return new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.error)
+      if (result.error) throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.error)
       return {
         id: result.pub_sign_key,
         nickname: result.nick
@@ -151,10 +133,10 @@ const HoloFuelDnaInterface = {
     },
     getCounterparty: async ({ agentId }) => {
       const result = await createZomeCall('transactions/whoami')({ agentId })
-      if (result.error) return new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
+      if (result.error) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
 
       return {
-        pubkey: result.pub_sign_key,
+        id: result.pub_sign_key,
         nickname: result.nick
       }
     }

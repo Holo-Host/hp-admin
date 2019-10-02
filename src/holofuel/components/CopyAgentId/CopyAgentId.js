@@ -8,10 +8,7 @@ export default function CopyAgentId ({
   isMe,
   children
 }) {
-  // const { id: hash } = agent
-  let hash
-  if (agent.pubkey) { const { pubkey } = agent; hash = pubkey }
-  if (agent.id) { const { id } = agent; hash = id }
+  const { id: hash } = agent
   let { nickname } = agent
 
   if (!nickname)nickname = `${presentAgentId(hash)}'s`

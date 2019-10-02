@@ -6,6 +6,7 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import { presentAgentId } from 'utils'
 
 export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard') }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
@@ -22,7 +23,7 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
       </div>
       <div styleName='right-nav account-number header-font'>
         <CopyAgentId agent={agent} isMe>
-          {agent.nickname || agentLoading}
+          {agent.nickname || presentAgentId(agent.id)}
         </CopyAgentId>
       </div>
       <Link to='/history' styleName='avatar-link'>

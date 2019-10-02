@@ -134,7 +134,6 @@ export function RenderNickname ({ agentId }) {
      Loading
     </React.Fragment>
   }
-
-  if (error || !data.holofuelCounterparty.nickname) { return 'No nickname available.' }
+  if (error || !data.holofuelCounterparty.nickname) return <React.Fragment>No nickname available.</React.Fragment>
   return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }
