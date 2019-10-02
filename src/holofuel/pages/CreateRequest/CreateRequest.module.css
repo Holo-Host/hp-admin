@@ -48,9 +48,17 @@
   background-color: var(--color-alto);
 }
 
-.hash-icon-wrapper {
-  width: 60px;
+.hash-wrapper {
   margin-top: 4px;
+}
+
+.hash-icon-wrapper {
+  composes: hash-wrapper;
+  width: 30px;
+}
+
+.hash-nickname-wrapper {
+  composes: hash-wrapper;
 }
 
 .hf {
