@@ -124,7 +124,6 @@ function AcceptButton ({ transaction: { id } }) {
 }
 
 function PayButton ({ showConfirmationModal, transaction }) {
-  // const pay = useOffer(id, amount, counterparty)
   return <Button
     onClick={() => showConfirmationModal(transaction)}
     styleName='pay-button'>
@@ -145,6 +144,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   const { id, counterparty, amount, type } = transaction
 
   const action = type === TYPE.request ? 'pay' : 'decline'
+  const contentLabel = `${_.capitalize(action)} ${type}?`
 
   let message, actionHook, actionParams
   switch (action) {
@@ -170,7 +170,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   }
 
   return <Modal
-    contentLabel={`${_.capitalize(action)} ${type}?`} // WAS: contentLabel={`Reject ${type}?`}
+    contentLabel={contentLabel}
     isOpen={!!transaction}
     handleClose={handleClose}
     styleName='modal'>
