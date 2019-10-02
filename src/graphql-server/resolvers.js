@@ -22,7 +22,9 @@ export const resolvers = {
 
     hostPricing: () => HhaDnaInterface.hostPricing.get(),
 
-    holofuelUser: (_, { agentId }) => HoloFuelDnaInterface.user.get({ agentId }),
+    holofuelUser: () => HoloFuelDnaInterface.user.get(),
+
+    holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
 
     holofuelWaitingTransactions: () => HoloFuelDnaInterface.transactions.allWaiting(),
 

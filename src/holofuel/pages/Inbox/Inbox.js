@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
@@ -57,8 +58,6 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
 
   const { date, time } = presentDateAndTime(timestamp)
 
-  const shortCounterparty = presentAgentId(counterparty)
-
   const story = isOffer ? ' is offering' : ' is requesting'
 
   return <div styleName='transaction-row' role='listitem'>
@@ -71,7 +70,7 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'>{shortCounterparty}</span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />
@@ -152,7 +151,7 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text'>
-      Reject <span styleName='modal-counterparty'>{presentAgentId(counterparty)}</span>'s {type} of <span styleName='modal-amount'>{Number(amount).toLocaleString()} HF</span>?
+      Reject <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?
     </div>
     <div styleName='modal-buttons'>
       <Button
@@ -167,4 +166,13 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
       </Button>
     </div>
   </Modal>
+}
+
+export function RenderNickname ({ agentId }) {
+  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+    variables: { agentId }
+  })
+  if (loading) return <React.Fragment>Loading...</React.Fragment>
+  if (error) { return presentAgentId(agentId) }
+  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }

@@ -1,0 +1,6 @@
+query HolofuelCounterparty($agentId: String!) {
+  holofuelCounterparty(agentId: $agentId) {
+    id
+    nickname
+  }
+}

@@ -57,7 +57,7 @@ enum TransactionDirection {
 type Transaction {
   id: ID # ID will be the originCommitHash
   amount: Float
-  counterparty: String
+  counterparty: String # HolofuelUser
   direction: TransactionDirection
   status: TransactionStatus
   type: TransactionType
@@ -86,7 +86,10 @@ type Query {
   holofuelWaitingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
-  holofuelUser(agentId: String): HolofuelUser
+  holofuelUser: HolofuelUser
+  holofuelCounterparty(agentId: String!): HolofuelUser
+  holofuelHistoryCounterparties: [HolofuelUser]
+  holofuelInboxCounterparties: [HolofuelUser]
 }
 
 type Mutation {
@@ -95,9 +98,9 @@ type Mutation {
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
-  holofuelRequest(counterparty:String, amount:Float, notes: String): Transaction
-  holofuelOffer(counterparty:String, amount:Float, notes: String, requestId:ID): Transaction
-  holofuelAcceptOffer(transactionId: ID): Transaction # NOTE: holofuelAcceptOffer DOES NOT return the amount or counterparty. IF need these values, query from cache, as they will not change via this API.
-  holofuelDecline(transactionId: ID): Transaction # ""
-  holofuelCancel(transactionId: ID): Transaction # ""
+  holofuelRequest(counterparty:String, amount:Float): Transaction
+  holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
+  holofuelAcceptOffer(transactionId: ID): Transaction 
+  holofuelDecline(transactionId: ID): Transaction
+  holofuelCancel(transactionId: ID): Transaction
 }

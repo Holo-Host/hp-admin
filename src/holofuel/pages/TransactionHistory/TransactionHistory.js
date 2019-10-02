@@ -7,11 +7,11 @@ import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
-import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
-
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
+import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
 // Data - Mutation hook with refetch:
 function useCancel () {
@@ -102,12 +102,11 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p data-testid='cell-time'>{time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'>{presentAgentId(counterparty)}</h4>
+      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} /></h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
     <AmountCell amount={amount} direction={direction} />
-
     { completed
       ? <td styleName='completed-tx-col table-content' data-testid='cell-present-balance'><p>*Awaiting DNA update*</p>{presentBalance}</td>
       : <td styleName='completed-tx-col table-content' data-testid='cell-pending-item'>
@@ -138,7 +137,6 @@ function CancelButton ({ showCancellationModal, transaction }) {
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
 export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
   if (!transaction) return null
-
   const { id, counterparty, amount, type, direction } = transaction
   const onYes = () => {
     cancelTransaction(id)
@@ -151,7 +149,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{Number(amount).toLocaleString()} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' data-testid='modal-counterparty'>{presentAgentId(counterparty)}</span> ?
+      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'><RenderNickname agentId={counterparty} /></span> ?
     </div>
     <div styleName='modal-buttons'>
       <Button
@@ -166,4 +164,13 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
       </Button>
     </div>
   </Modal>
+}
+
+export function RenderNickname ({ agentId }) {
+  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+    variables: { agentId }
+  })
+  if (loading) return <React.Fragment>Loading...</React.Fragment>
+  if (error) { return presentAgentId(agentId) }
+  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
 }

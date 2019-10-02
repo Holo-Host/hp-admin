@@ -1,5 +1,5 @@
-query HolofuelUser($agentId: String) {
-  holofuelUser(agentId: $agentId) {
+query HolofuelUser {
+  holofuelUser {
     id
     nickname
   }
