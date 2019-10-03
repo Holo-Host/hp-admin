@@ -175,7 +175,7 @@ export function RenderNickname ({ agentId }) {
   })
 
   if (loading) return <>Loading...</>
-  
+
   if (error) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
