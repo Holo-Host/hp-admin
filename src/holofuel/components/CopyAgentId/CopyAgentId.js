@@ -17,10 +17,6 @@ export default function CopyAgentId ({
 
   const messageText = `${nickname} HoloFuel Agent ID has been copied!`
 
-  // console.log('AGENT hash : ', hash)
-  // console.log('AGENT nickname : ', nickname)
-  // console.log('COPY AGENT ID messageText : ', messageText)
-
   return <CopyToClipboard copyContent={hash} messageText={messageText}>
     {children}
   </CopyToClipboard>

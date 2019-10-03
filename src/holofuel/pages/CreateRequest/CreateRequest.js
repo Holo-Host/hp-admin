@@ -98,7 +98,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick }) {
     variables: { agentId }
   })
   if (loading) {
-    return <React.Fragment>
+    return <>
       <Loader
         type='ThreeDots'
         color='#00BFFF'
@@ -107,13 +107,13 @@ export function RenderNickname ({ agentId, setCounterpartyNick }) {
         timeout={5000}
       />
        Loading
-    </React.Fragment>
+    </>
   }
 
   if (error || !data.holofuelCounterparty.nickname) {
-    return <React.Fragment>No nickname available.</React.Fragment>
+    return <>No nickname available.</>
   } else {
     setCounterpartyNick(data.holofuelCounterparty.nickname)
   }
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+  return <>{data.holofuelCounterparty.nickname}</>
 }
