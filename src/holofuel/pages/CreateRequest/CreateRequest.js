@@ -70,7 +70,9 @@ export default function CreateRequest ({ history: { push } }) {
           {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} />}
         </div>
         <div styleName='hash-nickname-wrapper'>
-          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'><RenderNickname agentId={counterparty} setCounterpartyNick={setCounterpartyNick} /></h4>}
+          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
+            <RenderNickname agentId={counterparty} setCounterpartyNick={setCounterpartyNick} />
+          </h4>}
         </div>
       </div>
       <div styleName='form-row'>
@@ -94,9 +96,14 @@ export default function CreateRequest ({ history: { push } }) {
 }
 
 export function RenderNickname ({ agentId, setCounterpartyNick }) {
-  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+  const { nickname } = holofuelCounterparty
+  useEffect(() => {
+    setCounterpartyNick(nickname)
+  }, [setCounterpartyNick, nickname])
+
   if (loading) {
     return <>
       <Loader
@@ -110,10 +117,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick }) {
     </>
   }
 
-  if (error || !data.holofuelCounterparty.nickname) {
-    return <>No nickname available.</>
-  } else {
-    setCounterpartyNick(data.holofuelCounterparty.nickname)
-  }
-  return <>{data.holofuelCounterparty.nickname}</>
+  if (error || !nickname) return <>No nickname available.</>
+
+  return <>{nickname}</>
 }

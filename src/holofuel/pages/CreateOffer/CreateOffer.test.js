@@ -8,10 +8,13 @@ import { createMemoryHistory } from 'history'
 import moment from 'moment'
 import CreateOffer, { FEE_PERCENTAGE } from './CreateOffer'
 import { TYPE } from 'models/Transaction'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
+jest.mock('holofuel/contexts/useFlashMessageContext')
 
 const counterparty = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
 const amount = 35674
@@ -91,6 +94,7 @@ describe('CreateOffer', () => {
 
     expect(offerMock.newData).toHaveBeenCalled()
     expect(push).toHaveBeenCalledWith('/history')
+    expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
   })
 
   it('renders the counterparty nickname upon *successful* fetch', async () => {
