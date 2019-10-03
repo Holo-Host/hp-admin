@@ -123,17 +123,16 @@ export function RenderNickname ({ agentId }) {
   })
 
   if (loading) {
-    return <React.Fragment>
+    return <>
       <Loader
         type='ThreeDots'
         color='#00BFFF'
         height={30}
         width={30}
-        timeout={5000}
-      />
+        timeout={5000} />
      Loading
-    </React.Fragment>
+    </>
   }
-  if (error || !data.holofuelCounterparty.nickname) return <React.Fragment>No nickname available.</React.Fragment>
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+  if (error || !data.holofuelCounterparty.nickname) return <>No nickname available.</>
+  return <>{data.holofuelCounterparty.nickname}</>
 }

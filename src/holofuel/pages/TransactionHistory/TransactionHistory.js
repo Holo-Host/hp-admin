@@ -109,7 +109,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
     <AmountCell amount={amount} direction={direction} />
     { completed
-      ? <td styleName='completed-tx-col table-content' data-testid='cell-present-balance'><p>*Awaiting DNA update*</p>{presentBalance}</td>
+      ? <td styleName='completed-tx-col table-content' data-testid='cell-present-balance'>{presentBalance}</td>
       : <td styleName='completed-tx-col table-content' data-testid='cell-pending-item'>
         <p styleName='italic'>Pending</p>
         <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />
@@ -172,7 +172,7 @@ export function RenderNickname ({ agentId }) {
     variables: { agentId }
   })
 
-  if (loading) return <React.Fragment>Loading...</React.Fragment>
+  if (loading) return <>Loading...</>
   if (error) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
