@@ -15,7 +15,8 @@ export const resolvers = {
   Query: {
     me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
 
-    happStoreUser: HappStoreDnaInterface.currentUser.get,
+    // factoring out the function call here breaks tests. Don't understand why
+    happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
     hostingUser: HhaDnaInterface.currentUser.get,
 
