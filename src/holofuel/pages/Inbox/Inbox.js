@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import _ from 'lodash'
 import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -147,20 +146,21 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   const { id, counterparty, amount, type } = transaction
 
   const action = type === TYPE.request ? 'pay' : 'decline'
-  const contentLabel = `${_.capitalize(action)} ${type}?`
 
-  let message, actionHook, actionParams
+  let message, actionHook, actionParams, contentLabel
   switch (action) {
     case 'pay': {
+      contentLabel = 'Pay request'
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Pay  {counterpartyNick}<span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay {counterpartyNick} <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     case 'decline': {
+      contentLabel = `Reject ${type}?`
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Reject  {counterpartyNick}'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject {counterpartyNick}'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
