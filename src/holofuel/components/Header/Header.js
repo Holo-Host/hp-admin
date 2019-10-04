@@ -3,7 +3,6 @@ import Button from 'components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
 import { withRouter } from 'react-router'
-import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import { presentAgentId } from 'utils'
@@ -26,11 +25,9 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
           {agent.nickname || presentAgentId(agent.id)}
         </CopyAgentId>
       </div>
-      <Link to='/history' styleName='avatar-link'>
-        <CopyAgentId agent={agent} isMe>
-          <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} data-testid='hash-icon' />
-        </CopyAgentId>
-      </Link>
+      <CopyAgentId agent={agent} isMe>
+        <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} data-testid='hash-icon' />
+      </CopyAgentId>
     </section>
     {title && <section styleName='sub-header'>
       <div styleName='sub-title'>{title}</div>

@@ -41,6 +41,7 @@ export default function Inbox () {
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
+  const [counterpartyNick, setCounterpartyNick] = useState('')
   const isTransactionsEmpty = isEmpty(transactions)
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
@@ -52,7 +53,8 @@ export default function Inbox () {
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
-        showConfirmationModal={showConfirmationModal}
+        showRejectionModal={showRejectionModal}
+        setCounterpartyNick={setCounterpartyNick}
         role='list'
         key={transaction.id} />)}
     </div>}
@@ -61,11 +63,12 @@ export default function Inbox () {
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       payTransaction={payTransaction}
+      counterpartyNick={counterpartyNick}
       declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showConfirmationModal }) {
+export function TransactionRow ({ transaction, showRejectionModal, setCounterpartyNick }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
@@ -85,7 +88,7 @@ export function TransactionRow ({ transaction, showConfirmationModal }) {
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} setAgentNick={setCounterpartyNick} /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />
@@ -139,7 +142,7 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, counterpartyNick }) {
   if (!transaction) return null
   const { id, counterparty, amount, type } = transaction
 
@@ -151,13 +154,13 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     case 'pay': {
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Pay <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span><span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay  {counterpartyNick}<span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     case 'decline': {
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Reject <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject  {counterpartyNick}'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
@@ -191,7 +194,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   </Modal>
 }
 
-export function RenderNickname ({ agentId }) {
+export function RenderNickname ({ agentId, setAgentNick }) {
   const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
@@ -201,7 +204,8 @@ export function RenderNickname ({ agentId }) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
-  }
+  } else setAgentNick(data.holofuelCounterparty.nickname)
+
   return <CopyAgentId agent={data.holofuelCounterparty}>
     {data.holofuelCounterparty.nickname}
   </CopyAgentId>
