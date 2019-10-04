@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -172,18 +172,24 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
 }
 
 export function RenderNickname ({ agentId, setAgentNick }) {
-  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  if (loading) return <React.Fragment>Loading...</React.Fragment>
+  const { nickname } = holofuelCounterparty
+  useEffect(() => {
+    setAgentNick(nickname)
+  }, [setAgentNick, nickname])
+
+  if (loading) return <>Loading...</>
   if (error) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
-  } else setAgentNick(data.holofuelCounterparty.nickname)
+  }
+  if (error || !nickname) return <>No nickname available.</>
 
-  return <CopyAgentId agent={data.holofuelCounterparty}>
-    {data.holofuelCounterparty.nickname}
+  return <CopyAgentId agent={holofuelCounterparty}>
+    {nickname}
   </CopyAgentId>
 }

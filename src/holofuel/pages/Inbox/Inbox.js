@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
-import Loader from 'react-loader-spinner'
 import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -10,10 +9,11 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
-import { presentHolofuelAmount, presentDateAndTime } from 'utils'
+import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -194,29 +194,25 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   </Modal>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick }) {
+export function RenderNickname ({ agentId, setAgentNick }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
   const { nickname } = holofuelCounterparty
-
   useEffect(() => {
-    setCounterpartyNick(nickname)
-  }, [setCounterpartyNick, nickname])
+    setAgentNick(nickname)
+  }, [setAgentNick, nickname])
 
-  if (loading) {
-    return <>
-      <Loader
-        type='ThreeDots'
-        color='#00BFFF'
-        height={30}
-        width={30}
-        timeout={5000}
-      />
-       Loading
-    </>
+  if (loading) return <>Loading...</>
+  if (error) {
+    return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
+      {presentAgentId(agentId)}
+    </CopyAgentId>
   }
   if (error || !nickname) return <>No nickname available.</>
-  return <>{nickname}</>
+
+  return <CopyAgentId agent={holofuelCounterparty}>
+    {nickname}
+  </CopyAgentId>
 }
