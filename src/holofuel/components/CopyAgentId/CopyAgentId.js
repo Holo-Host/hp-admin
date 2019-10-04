@@ -8,18 +8,17 @@ export default function CopyAgentId ({
   isMe,
   children
 }) {
-  const { id: hash } = agent
-  let { nickname } = agent
+  const { id: hash, nickname } = agent
 
-  if (!nickname)nickname = `${presentAgentId(hash)}'s`
-  if (isMe)nickname = 'Your'
-  else nickname = `${nickname}'s`
+  let messageText
 
-  const messageText = `${nickname} HoloFuel Agent ID has been copied!`
-
-  // console.log('AGENT hash : ', hash)
-  // console.log('AGENT nickname : ', nickname)
-  // console.log('COPY AGENT ID messageText : ', messageText)
+  if (isMe) {
+    messageText = 'Your HoloFuel Agent ID has been copied!'
+  } else if (nickname) {
+    messageText = `${nickname}'s HoloFuel Agent ID has been copied!`
+  } else {
+    messageText = `Full Agent ID of ${presentAgentId(hash)} has been copied!`
+  }
 
   return <CopyToClipboard copyContent={hash} messageText={messageText}>
     {children}

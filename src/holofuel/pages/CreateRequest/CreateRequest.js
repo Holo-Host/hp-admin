@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
@@ -10,7 +10,7 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import { presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import './CreateRequest.module.css'
 
 // TODO: this constants should come from somewhere more scientific
@@ -37,6 +37,9 @@ export default function CreateRequest ({ history: { push } }) {
 
   const [counterparty, setCounterparty] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
+  useEffect(() => {
+    setCounterpartyNick(presentAgentId(counterparty))
+  }, [counterparty])
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
@@ -45,8 +48,7 @@ export default function CreateRequest ({ history: { push } }) {
   const onSubmit = ({ amount, counterparty, notes }) => {
     createRequest(amount, counterparty, notes)
     push('/history')
-    const counterpartyString = counterpartyNick ? ` to ${counterpartyNick}` : ''
-    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent${counterpartyString}.`, 5000)
+    newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
   }
 
   !isEmpty(errors) && console.log('Request form errors (leave here until proper error handling is implemented):', errors)
@@ -68,7 +70,9 @@ export default function CreateRequest ({ history: { push } }) {
           {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} />}
         </div>
         <div styleName='hash-nickname-wrapper'>
-          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'><RenderNickname agentId={counterparty} setAgentNick={setCounterpartyNick} /></h4>}
+          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
+            <RenderNickname agentId={counterparty} setCounterpartyNick={setCounterpartyNick} />
+          </h4>}
         </div>
       </div>
       <div styleName='form-row'>
@@ -91,12 +95,17 @@ export default function CreateRequest ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setAgentNick }) {
-  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+export function RenderNickname ({ agentId, setCounterpartyNick }) {
+  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+  const { nickname } = holofuelCounterparty
+  useEffect(() => {
+    setCounterpartyNick(nickname)
+  }, [setCounterpartyNick, nickname])
+
   if (loading) {
-    return <React.Fragment>
+    return <>
       <Loader
         type='ThreeDots'
         color='#00BFFF'
@@ -105,9 +114,10 @@ export function RenderNickname ({ agentId, setAgentNick }) {
         timeout={5000}
       />
        Loading
-    </React.Fragment>
+    </>
   }
-  if (error || !data.holofuelCounterparty.nickname) return <React.Fragment>No nickname available.</React.Fragment>
-  else setAgentNick(data.holofuelCounterparty.nickname)
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+
+  if (error || !nickname) return <>No nickname available.</>
+
+  return <>{nickname}</>
 }

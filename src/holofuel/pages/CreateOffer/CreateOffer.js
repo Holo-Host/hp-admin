@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
@@ -9,6 +9,8 @@ import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import './CreateOffer.module.css'
 
 // TODO: these constants should come from somewhere more scientific
@@ -35,10 +37,17 @@ export default function CreateOffer ({ history: { push } }) {
   const createOffer = useOfferMutation()
 
   const [counterparty, setCounterparty] = useState('')
+  const [counterpartyNick, setCounterpartyNick] = useState('')
+  useEffect(() => {
+    setCounterpartyNick(presentAgentId(counterparty))
+  }, [counterparty])
+
   const [fee, setFee] = useState(0)
   const [total, setTotal] = useState(0)
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
+
+  const { newMessage } = useFlashMessageContext()
 
   const onAmountChange = amount => {
     if (isNaN(amount)) return
@@ -50,6 +59,7 @@ export default function CreateOffer ({ history: { push } }) {
   const onSubmit = ({ amount, counterparty, notes }) => {
     createOffer(amount, counterparty, notes)
     push('/history')
+    newMessage(`Offer of ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
   }
 
   !isEmpty(errors) && console.log('Offer form errors (leave here until proper error handling is implemented):', errors)
@@ -72,7 +82,7 @@ export default function CreateOffer ({ history: { push } }) {
         </div>
         <div styleName='hash-nickname-wrapper'>
           {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
-            <RenderNickname agentId={counterparty} />
+            <RenderNickname agentId={counterparty} setCounterpartyNick={setCounterpartyNick} />
           </h4>}
         </div>
       </div>
@@ -117,13 +127,17 @@ export default function CreateOffer ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId }) {
-  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+export function RenderNickname ({ agentId, setCounterpartyNick }) {
+  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+  const { nickname } = holofuelCounterparty
+  useEffect(() => {
+    setCounterpartyNick(nickname)
+  }, [setCounterpartyNick, nickname])
 
   if (loading) {
-    return <React.Fragment>
+    return <>
       <Loader
         type='ThreeDots'
         color='#00BFFF'
@@ -131,9 +145,10 @@ export function RenderNickname ({ agentId }) {
         width={30}
         timeout={5000}
       />
-     Loading
-    </React.Fragment>
+       Loading
+    </>
   }
-  if (error || !data.holofuelCounterparty.nickname) return <React.Fragment>No nickname available.</React.Fragment>
-  return <React.Fragment>{data.holofuelCounterparty.nickname}</React.Fragment>
+
+  if (error || !nickname) return <>No nickname available.</>
+  return <>{nickname}</>
 }
