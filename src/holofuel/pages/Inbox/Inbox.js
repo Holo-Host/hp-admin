@@ -53,7 +53,7 @@ export default function Inbox () {
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
-        showRejectionModal={showRejectionModal}
+        showConfirmationModal={showConfirmationModal}
         setCounterpartyNick={setCounterpartyNick}
         role='list'
         key={transaction.id} />)}
@@ -68,7 +68,7 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showRejectionModal, setCounterpartyNick }) {
+export function TransactionRow ({ transaction, showConfirmationModal, setCounterpartyNick }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
