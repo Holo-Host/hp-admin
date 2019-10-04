@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { MOCK_ENVOY_CONNECTION } from '../holochainClient'
+
+export const MOCK_ENVOY_CONNECTION = true || process.env.NODE_ENV === 'test'
 
 const axiosConfig = {
   headers: {
