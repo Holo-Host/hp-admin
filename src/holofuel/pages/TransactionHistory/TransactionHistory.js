@@ -139,7 +139,7 @@ function CancelButton ({ showCancellationModal, transaction }) {
   </Button>
 }
 
-// NOTE: Check to see if/agree as to whether we can abstract out the below modal component
+// NOTE: Check to see if team agrees as to whether we can abstract out the below modal component
 export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, counterpartyNick }) {
   if (!transaction) return null
   const { id, amount, type, direction } = transaction

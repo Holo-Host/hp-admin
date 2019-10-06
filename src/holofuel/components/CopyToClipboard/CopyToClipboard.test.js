@@ -10,8 +10,8 @@ jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('copy-to-clipboard')
 
 it('should copy the HolofuelUser Agent Hash to clipboard and display flash message feedback 2', async () => {
-  const childContent = 'MOCK STRING CHILD'
-  const messageText = 'mock message'
+  const childContent = 'Mock String Child'
+  const messageText = 'New message.'
   const copyContent = 'AGENT_HASH_123'
 
   const props = {
