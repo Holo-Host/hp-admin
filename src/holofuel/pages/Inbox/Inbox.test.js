@@ -83,11 +83,11 @@ describe('TransactionRow', () => {
     type: TYPE.offer
   }
 
-  it.skip('renders a request', async () => {
+  it('renders a request', async () => {
     let getByText
     await act(async () => {
       ({ getByText } = render(<MockedProvider addTypename={false}>
-        <TransactionRow transaction={request} />
+        <TransactionRow transaction={request} setCounterpartyNick={jest.fn()} />
       </MockedProvider>))
       await wait(0)
     })
@@ -101,11 +101,11 @@ describe('TransactionRow', () => {
     expect(getByText('Reject')).toBeInTheDocument()
   })
 
-  it.skip('renders an offer', async () => {
+  it('renders an offer', async () => {
     let getByText
     await act(async () => {
       ({ getByText } = render(<MockedProvider addTypename={false}>
-        <TransactionRow transaction={offer} />
+        <TransactionRow transaction={offer} setCounterpartyNick={jest.fn()} />
       </MockedProvider>))
       await wait(0)
     })
@@ -174,10 +174,11 @@ describe('TransactionRow', () => {
     }
   ]
 
-  describe.skip('Pay and reject buttons', () => {
+  describe('Pay and reject buttons', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
+        setCounterpartyNick: jest.fn(),
         showConfirmationModal: jest.fn()
       }
       let getByText
@@ -200,12 +201,12 @@ describe('TransactionRow', () => {
     })
   })
 
-  describe.skip('Accept button', () => {
+  describe('Accept button', () => {
     it('responds properly', async () => {
       let getByText
       await act(async () => {
         ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <TransactionRow transaction={offer} />
+          <TransactionRow transaction={offer} setCounterpartyNick={jest.fn()} />
         </MockedProvider>))
         await wait(0)
       })
@@ -248,7 +249,7 @@ describe('TransactionRow', () => {
     }
   }
 
-  it.skip('should default to rendering last 6 of AgentId', async () => {
+  it('should default to rendering last 6 of AgentId', async () => {
     afterEach(() => {
       jest.clearAllMocks()
     })
@@ -262,7 +263,7 @@ describe('TransactionRow', () => {
     let container, getByText
     await act(async () => {
       ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <RenderNickname agentId={rowContent.counterparty} />
+        <RenderNickname agentId={rowContent.counterparty} setAgentNick={jest.fn()} />
       </MockedProvider>))
       await wait(0)
       Modal.setAppElement(container)
