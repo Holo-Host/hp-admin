@@ -29,6 +29,11 @@ let
     };
   }) config.agents;
 
+
+  multiInterfaceInstanceConfig = dna: map (agent: {
+    id = dna.name+"::"+agent.id;
+  }) config.agents;
+
   flatten = x:
     if builtins.isList x
     then builtins.concatMap (y: flatten y) x
@@ -92,16 +97,16 @@ in
           port = 3400;
           type = "websocket";
         };
-        instances = map (dna: { id = dna.name; }) dnas;
+        instances = flatten(map multiInterfaceInstanceConfig dnas);
       }
       {
         id = "http-interface";
         admin = true;
         driver = {
           port = 3300;
-          type = "websocket";
+          type = "http";
         };
-        instances = map (dna: { id = dna.name; }) dnas;
+        instances = flatten(map multiInterfaceInstanceConfig dnas);
       }
     ];
     logger = {
