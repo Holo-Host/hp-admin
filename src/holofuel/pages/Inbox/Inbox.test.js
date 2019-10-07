@@ -174,7 +174,7 @@ describe('TransactionRow', () => {
     }
   ]
 
-  describe.skip('Pay and reject buttons', () => {
+  describe('Pay and reject buttons', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
@@ -194,13 +194,11 @@ describe('TransactionRow', () => {
         await wait(0)
       })
 
-      let modalTransaction = { ...request, action: 'pay' }
-      expect(props.showConfirmationModal).toHaveBeenCalledWith(modalTransaction)
+      expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'pay')
 
       fireEvent.click(getByText('Reject'))
 
-      modalTransaction = { ...request, action: 'decline' }
-      expect(props.showConfirmationModal).toHaveBeenCalledWith(modalTransaction)
+      expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'decline')
     })
   })
 
