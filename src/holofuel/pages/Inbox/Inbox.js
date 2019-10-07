@@ -205,9 +205,9 @@ export function RenderNickname ({ agentId, setAgentNick }) {
       {presentAgentId(agentId)}
     </CopyAgentId>
   }
-  if (error || !holofuelCounterparty) return <>No nickname available.</>
+  if (error || !holofuelCounterparty.nickname) return <>No nickname available.</>
 
   return <CopyAgentId agent={holofuelCounterparty}>
-    {holofuelCounterparty}
+    {holofuelCounterparty.nickname}
   </CopyAgentId>
 }
