@@ -170,18 +170,19 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
 }
 
 export function RenderNickname ({ agentId }) {
-  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+  const { error, data } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  if (loading) return <>Loading...</>
+  if (error) console.error('Error: ', error)
 
-  if (error) {
+  if (data.holofuelCounterparty.nickname) {
+    return <CopyAgentId agent={data.holofuelCounterparty}>
+      {data.holofuelCounterparty.nickname}
+    </CopyAgentId>
+  } else {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
   }
-  return <CopyAgentId agent={data.holofuelCounterparty}>
-    {data.holofuelCounterparty.nickname}
-  </CopyAgentId>
 }
