@@ -40,7 +40,6 @@ export default function Inbox () {
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
-  const [counterpartyNick, setCounterpartyNick] = useState('')
   const isTransactionsEmpty = isEmpty(transactions)
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
@@ -53,7 +52,6 @@ export default function Inbox () {
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
         showConfirmationModal={showConfirmationModal}
-        setCounterpartyNick={setCounterpartyNick}
         role='list'
         key={transaction.id} />)}
     </div>}
@@ -62,12 +60,11 @@ export default function Inbox () {
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       payTransaction={payTransaction}
-      counterpartyNick={counterpartyNick}
       declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showConfirmationModal, setCounterpartyNick }) {
+export function TransactionRow ({ transaction, showConfirmationModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
@@ -87,7 +84,7 @@ export function TransactionRow ({ transaction, showConfirmationModal, setCounter
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} setAgentNick={setCounterpartyNick} /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />
@@ -153,14 +150,14 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = 'Pay request'
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Pay <RenderNickname agentId={counterparty} setAgentNick={counterparty} className='modal-counterparty' /><span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay <RenderNickname agentId={counterparty} className='modal-counterparty' /><span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     case 'decline': {
       contentLabel = `Reject ${type}?`
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Reject <RenderNickname agentId={counterparty} setAgentNick={counterparty} className='modal-counterparty' />'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject <RenderNickname agentId={counterparty} className='modal-counterparty' />'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
@@ -194,7 +191,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   </Modal>
 }
 
-export function RenderNickname ({ agentId, setAgentNick }) {
+export function RenderNickname ({ agentId }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
