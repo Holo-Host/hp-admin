@@ -44,7 +44,10 @@ export default function Inbox () {
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
 
-  const showConfirmationModal = transaction => setModalTransaction(transaction)
+  const showConfirmationModal = (transaction, action) => {
+    const modalTransaction = { ...transaction, action }
+    setModalTransaction(modalTransaction)
+  }
 
   return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
 
@@ -123,16 +126,18 @@ function AcceptButton ({ transaction: { id } }) {
 }
 
 function PayButton ({ showConfirmationModal, transaction }) {
+  const action = 'pay'
   return <Button
-    onClick={() => showConfirmationModal(transaction)}
+    onClick={() => showConfirmationModal(transaction, action)}
     styleName='pay-button'>
     Pay
   </Button>
 }
 
 function RejectButton ({ showConfirmationModal, transaction }) {
+  const action = 'decline'
   return <Button
-    onClick={() => showConfirmationModal(transaction)}
+    onClick={() => showConfirmationModal(transaction, action)}
     styleName='reject-button'>
     Reject
   </Button>
@@ -140,9 +145,7 @@ function RejectButton ({ showConfirmationModal, transaction }) {
 
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   if (!transaction) return null
-  const { id, counterparty, amount, type } = transaction
-
-  const action = type === TYPE.request ? 'pay' : 'decline'
+  const { id, counterparty, amount, type, action } = transaction
 
   let message, actionHook, actionParams, contentLabel
   switch (action) {
