@@ -6,12 +6,9 @@ import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 
 export default function CopyToClipboard ({
   copyContent,
-  messageText,
-  className,
+  messageText = `${copyContent} has been copied!`,
   children
 }) {
-  if (!messageText) messageText = `${copyContent} has been copied!`
-
   const { newMessage } = useFlashMessageContext()
 
   const handleCopyItem = async () => {
@@ -19,7 +16,7 @@ export default function CopyToClipboard ({
     if (wasCopied === true) newMessage(messageText, 5000)
   }
 
-  return <div onClick={handleCopyItem} styleName='copy-item' className={className}>
+  return <div onClick={handleCopyItem} styleName='copy-item'>
     {children}
   </div>
 }

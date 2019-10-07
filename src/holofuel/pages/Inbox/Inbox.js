@@ -87,7 +87,7 @@ export function TransactionRow ({ transaction, showConfirmationModal }) {
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} copyId /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />
@@ -153,14 +153,14 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = 'Pay request'
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Pay <RenderNickname agentId={counterparty} className='modal-counterparty' /><span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay <RenderNickname agentId={counterparty} /> <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     case 'decline': {
       contentLabel = `Reject ${type}?`
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Reject <RenderNickname agentId={counterparty} className='modal-counterparty' />'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject <RenderNickname agentId={counterparty} />'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
@@ -194,20 +194,19 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   </Modal>
 }
 
-export function RenderNickname ({ agentId }) {
+export function RenderNickname ({ agentId, copyId }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  if (loading) return <>Loading...</>
-  if (error) {
+  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
+  else if ((loading || error) && copyId) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
-  }
-  if (error || !holofuelCounterparty.nickname) return <>No nickname available.</>
-
-  return <CopyAgentId agent={holofuelCounterparty}>
-    {holofuelCounterparty.nickname}
-  </CopyAgentId>
+  } else if (holofuelCounterparty.nickname && copyId) {
+    return <CopyAgentId agent={holofuelCounterparty}>
+      {holofuelCounterparty.nickname}
+    </CopyAgentId>
+  } else return <>{holofuelCounterparty.nickname}</>
 }
