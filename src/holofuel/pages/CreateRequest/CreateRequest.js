@@ -66,10 +66,8 @@ export default function CreateRequest ({ history: { push } }) {
           styleName='form-input'
           ref={register}
           onChange={({ target: { value } }) => setCounterparty(value)} />
-        <div styleName='hash-icon-wrapper'>
-          {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} />}
-        </div>
-        <div styleName='hash-nickname-wrapper'>
+        <div styleName='hash-and-nick'>
+          {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} styleName='hash-icon' />}
           {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
             <RenderNickname agentId={counterparty} setCounterpartyNick={setCounterpartyNick} />
           </h4>}
