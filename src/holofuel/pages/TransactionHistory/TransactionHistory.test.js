@@ -272,7 +272,6 @@ describe('TransactionsHistory', () => {
       const props = {
         transaction: waitingTransactionsQueryMock.result.data.holofuelWaitingTransactions[0],
         key: waitingTransactionsQueryMock.result.data.holofuelWaitingTransactions[0].id,
-        setCounterpartyNick: jest.fn(),
         showCancellationModal: jest.fn()
       }
       let container, getByText
@@ -318,7 +317,6 @@ describe('TransactionsHistory', () => {
       const props = {
         transaction: waitingTransactionsQueryMock.result.data.holofuelWaitingTransactions[1],
         key: waitingTransactionsQueryMock.result.data.holofuelWaitingTransactions[1].id,
-        setCounterpartyNick: jest.fn(),
         showCancellationModal: jest.fn()
       }
       let container, getByText
@@ -417,7 +415,7 @@ describe('TransactionsHistory', () => {
       let container, getByText
       await act(async () => {
         ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <RenderNickname agentId={rowContent.counterparty} setAgentNick={jest.fn()} />
+          <RenderNickname agentId={rowContent.counterparty} />
         </MockedProvider>))
         await wait(0)
         Modal.setAppElement(container)

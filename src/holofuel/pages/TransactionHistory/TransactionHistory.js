@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -34,7 +34,6 @@ export default function TransactionsHistory () {
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
-  const [counterpartyNick, setCounterpartyNick] = useState('')
 
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
@@ -67,7 +66,6 @@ export default function TransactionsHistory () {
             return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
-              setCounterpartyNick={setCounterpartyNick}
               showCancellationModal={showCancellationModal}
             />
           })}
@@ -76,7 +74,6 @@ export default function TransactionsHistory () {
             return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
-              setCounterpartyNick={setCounterpartyNick}
               showCancellationModal={showCancellationModal}
               completed />
           })}
@@ -87,7 +84,6 @@ export default function TransactionsHistory () {
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
-      counterpartyNick={counterpartyNick}
       cancelTransaction={cancelTransaction} />
   </PrimaryLayout>
 }
@@ -98,7 +94,7 @@ const TransactionTableHeading = ({ content }) => {
   </th>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed, setCounterpartyNick }) {
+export function TransactionRow ({ transaction, showCancellationModal, completed }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
   const { date, time } = presentDateAndTime(timestamp)
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
@@ -107,7 +103,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
       <p data-testid='cell-time'>{time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} setAgentNick={setCounterpartyNick} /></h4>
+      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} /></h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -140,9 +136,9 @@ function CancelButton ({ showCancellationModal, transaction }) {
 }
 
 // NOTE: Check to see if team agrees as to whether we can abstract out the below modal component
-export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, counterpartyNick }) {
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
   if (!transaction) return null
-  const { id, amount, type, direction } = transaction
+  const { id, counterparty, amount, type, direction } = transaction
   const onYes = () => {
     cancelTransaction(id)
     handleClose()
@@ -154,7 +150,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} {counterpartyNick}?
+      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span data-testid='modal-counterparty'><RenderNickname agentId={counterparty} className='modal-counterparty' /></span>?
     </div>
     <div styleName='modal-buttons'>
       <Button
@@ -171,15 +167,12 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
   </Modal>
 }
 
-export function RenderNickname ({ agentId, setAgentNick }) {
+export function RenderNickname ({ agentId, className }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
   const { nickname } = holofuelCounterparty
-  useEffect(() => {
-    setAgentNick(nickname)
-  }, [setAgentNick, nickname])
 
   if (loading) return <>Loading...</>
   if (error) {
@@ -189,7 +182,7 @@ export function RenderNickname ({ agentId, setAgentNick }) {
   }
   if (error || !nickname) return <>No nickname available.</>
 
-  return <CopyAgentId agent={holofuelCounterparty}>
+  return <CopyAgentId agent={holofuelCounterparty} className={className}>
     {nickname}
   </CopyAgentId>
 }
