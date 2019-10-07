@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -40,7 +40,6 @@ export default function Inbox () {
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
-  const [counterpartyNick, setCounterpartyNick] = useState('')
   const isTransactionsEmpty = isEmpty(transactions)
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
@@ -56,7 +55,6 @@ export default function Inbox () {
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
         showConfirmationModal={showConfirmationModal}
-        setCounterpartyNick={setCounterpartyNick}
         role='list'
         key={transaction.id} />)}
     </div>}
@@ -65,12 +63,11 @@ export default function Inbox () {
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       payTransaction={payTransaction}
-      counterpartyNick={counterpartyNick}
       declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showConfirmationModal, setCounterpartyNick }) {
+export function TransactionRow ({ transaction, showConfirmationModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
@@ -90,7 +87,7 @@ export function TransactionRow ({ transaction, showConfirmationModal, setCounter
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} setAgentNick={setCounterpartyNick} /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} copyId /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />
@@ -146,7 +143,7 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, counterpartyNick }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   if (!transaction) return null
   const { id, counterparty, amount, type, action } = transaction
 
@@ -156,14 +153,14 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = 'Pay request'
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Pay {counterpartyNick} <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay <RenderNickname agentId={counterparty} /> <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     case 'decline': {
       contentLabel = `Reject ${type}?`
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Reject {counterpartyNick}'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject <RenderNickname agentId={counterparty} />'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
@@ -197,25 +194,19 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   </Modal>
 }
 
-export function RenderNickname ({ agentId, setAgentNick }) {
+export function RenderNickname ({ agentId, copyId }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  const { nickname } = holofuelCounterparty
-  useEffect(() => {
-    setAgentNick(nickname)
-  }, [setAgentNick, nickname])
-
-  if (loading) return <>Loading...</>
-  if (error) {
+  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
+  else if ((loading || error) && copyId) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
-  }
-  if (error || !nickname) return <>No nickname available.</>
-
-  return <CopyAgentId agent={holofuelCounterparty}>
-    {nickname}
-  </CopyAgentId>
+  } else if (holofuelCounterparty.nickname && copyId) {
+    return <CopyAgentId agent={holofuelCounterparty}>
+      {holofuelCounterparty.nickname}
+    </CopyAgentId>
+  } else return <>{holofuelCounterparty.nickname}</>
 }

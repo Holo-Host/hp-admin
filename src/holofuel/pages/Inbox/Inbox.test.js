@@ -87,7 +87,7 @@ describe('TransactionRow', () => {
     let getByText
     await act(async () => {
       ({ getByText } = render(<MockedProvider addTypename={false}>
-        <TransactionRow transaction={request} setCounterpartyNick={jest.fn()} />
+        <TransactionRow transaction={request} />
       </MockedProvider>))
       await wait(0)
     })
@@ -105,7 +105,7 @@ describe('TransactionRow', () => {
     let getByText
     await act(async () => {
       ({ getByText } = render(<MockedProvider addTypename={false}>
-        <TransactionRow transaction={offer} setCounterpartyNick={jest.fn()} />
+        <TransactionRow transaction={offer} />
       </MockedProvider>))
       await wait(0)
     })
@@ -178,7 +178,6 @@ describe('TransactionRow', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
-        setCounterpartyNick: jest.fn(),
         showConfirmationModal: jest.fn()
       }
       let getByText
@@ -207,7 +206,7 @@ describe('TransactionRow', () => {
       let getByText
       await act(async () => {
         ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <TransactionRow transaction={offer} setCounterpartyNick={jest.fn()} />
+          <TransactionRow transaction={offer} />
         </MockedProvider>))
         await wait(0)
       })
@@ -264,7 +263,7 @@ describe('TransactionRow', () => {
     let container, getByText
     await act(async () => {
       ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <RenderNickname agentId={rowContent.counterparty} setAgentNick={jest.fn()} />
+        <RenderNickname agentId={rowContent.counterparty} className='mock-style' />
       </MockedProvider>))
       await wait(0)
       Modal.setAppElement(container)
