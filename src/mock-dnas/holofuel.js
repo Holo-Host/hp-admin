@@ -300,7 +300,7 @@ function receivedPaymentsHashMap (promises) {
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
-    whoami: ({ agent }) => agent ? [whoamiObj(agent)] : [agents[0]],
+    whoami: ({ agent }) => agent ? [whoamiObj(agent)] : agents[0],
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: listPending,
