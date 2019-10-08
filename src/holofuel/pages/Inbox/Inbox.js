@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import cx from 'classnames'
 import { isEmpty } from 'lodash/fp'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -12,12 +13,21 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import './Inbox.module.css'
-import cx from 'classnames'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
+
+function useOffer () {
+  const [offer] = useMutation(HolofuelOfferMutation)
+  return ({ id, amount, counterparty }) => offer({
+    variables: { amount, counterparty, requestId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
+}
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
-  return id => decline({
+  return ({ id }) => decline({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
@@ -27,31 +37,37 @@ function useDecline () {
 
 export default function Inbox () {
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+  const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
   const isTransactionsEmpty = isEmpty(transactions)
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
 
-  const showRejectionModal = transaction => setModalTransaction(transaction)
+  const showConfirmationModal = (transaction, action) => {
+    const modalTransaction = { ...transaction, action }
+    setModalTransaction(modalTransaction)
+  }
 
   return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
+
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
-        showRejectionModal={showRejectionModal}
+        showConfirmationModal={showConfirmationModal}
         role='list'
         key={transaction.id} />)}
     </div>}
 
-    <ConfirmRejectionModal
+    <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
+      payTransaction={payTransaction}
       declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showRejectionModal }) {
+export function TransactionRow ({ transaction, showConfirmationModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
@@ -71,15 +87,15 @@ export function TransactionRow ({ transaction, showRejectionModal }) {
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} copyId /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />
 
     <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
-      {isRequest && <PayButton transaction={transaction} />}
-      <RejectButton transaction={transaction} showRejectionModal={showRejectionModal} />
+      {isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
+      <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
     </div>
   </div>
 }
@@ -109,51 +125,60 @@ function AcceptButton ({ transaction: { id } }) {
   </Button>
 }
 
-function useOffer (id, amount, counterparty) {
-  const [offer] = useMutation(HolofuelOfferMutation)
-  return () => offer({
-    variables: { amount, counterparty, requestId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    }]
-  })
-}
-
-function PayButton ({ transaction: { id, amount, counterparty } }) {
-  const pay = useOffer(id, amount, counterparty)
+function PayButton ({ showConfirmationModal, transaction }) {
+  const action = 'pay'
   return <Button
-    onClick={pay}
+    onClick={() => showConfirmationModal(transaction, action)}
     styleName='pay-button'>
     Pay
   </Button>
 }
 
-function RejectButton ({ showRejectionModal, transaction }) {
+function RejectButton ({ showConfirmationModal, transaction }) {
+  const action = 'decline'
   return <Button
-    onClick={() => showRejectionModal(transaction)}
+    onClick={() => showConfirmationModal(transaction, action)}
     styleName='reject-button'>
     Reject
   </Button>
 }
 
-function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   if (!transaction) return null
+  const { id, counterparty, amount, type, action } = transaction
 
-  const { id, counterparty, amount, type } = transaction
+  let message, actionHook, actionParams, contentLabel
+  switch (action) {
+    case 'pay': {
+      contentLabel = 'Pay request'
+      actionParams = { id, amount, counterparty }
+      actionHook = payTransaction
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay <RenderNickname agentId={counterparty} /> <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      break
+    }
+    case 'decline': {
+      contentLabel = `Reject ${type}?`
+      actionParams = id
+      actionHook = declineTransaction
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject <RenderNickname agentId={counterparty} />'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      break
+    }
+    default:
+      throw new Error('Error: Transaction action was not matched with a modal action. Current transaction action : ', action)
+  }
+
   const onYes = () => {
-    declineTransaction(id)
+    actionHook(actionParams)
     handleClose()
   }
 
   return <Modal
-    contentLabel={`Reject ${type}?`}
+    contentLabel={contentLabel}
     isOpen={!!transaction}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
-    <div styleName='modal-text'>
-      Reject <span styleName='modal-counterparty'><RenderNickname agentId={counterparty} /></span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?
-    </div>
+    {message}
     <div styleName='modal-buttons'>
       <Button
         onClick={handleClose}
@@ -169,18 +194,19 @@ function ConfirmRejectionModal ({ transaction, handleClose, declineTransaction }
   </Modal>
 }
 
-export function RenderNickname ({ agentId }) {
-  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+export function RenderNickname ({ agentId, copyId }) {
+  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  if (!loading && !error && data.holofuelCounterparty.nickname) {
-    return <CopyAgentId agent={data.holofuelCounterparty}>
-      {data.holofuelCounterparty.nickname}
-    </CopyAgentId>
-  } else {
+  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
+  else if ((loading || error) && copyId) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
-  }
+  } else if (holofuelCounterparty.nickname && copyId) {
+    return <CopyAgentId agent={holofuelCounterparty}>
+      {holofuelCounterparty.nickname}
+    </CopyAgentId>
+  } else return <>{holofuelCounterparty.nickname}</>
 }

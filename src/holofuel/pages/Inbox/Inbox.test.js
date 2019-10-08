@@ -12,6 +12,8 @@ import { TYPE } from 'models/Transaction'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
+import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 // import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
@@ -81,7 +83,7 @@ describe('TransactionRow', () => {
     type: TYPE.offer
   }
 
-  it.skip('renders a request', async () => {
+  it('renders a request', async () => {
     let getByText
     await act(async () => {
       ({ getByText } = render(<MockedProvider addTypename={false}>
@@ -99,7 +101,7 @@ describe('TransactionRow', () => {
     expect(getByText('Reject')).toBeInTheDocument()
   })
 
-  it.skip('renders an offer', async () => {
+  it('renders an offer', async () => {
     let getByText
     await act(async () => {
       ({ getByText } = render(<MockedProvider addTypename={false}>
@@ -145,9 +147,21 @@ describe('TransactionRow', () => {
     newData: jest.fn()
   }
 
+  const declineMock = {
+    request: {
+      query: HolofuelDeclineMutation,
+      variables: { transactionId: request.id }
+    },
+    result: {
+      data: { holofuelDecline: mockTransaction }
+    },
+    newData: jest.fn()
+  }
+
   const mocks = [
     offerMock,
     acceptOfferMock,
+    declineMock,
     {
       request: {
         query: HolofuelActionableTransactionsQuery
@@ -160,11 +174,11 @@ describe('TransactionRow', () => {
     }
   ]
 
-  describe.skip('Pay and reject buttons', () => {
+  describe('Pay and reject buttons', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
-        showRejectionModal: jest.fn()
+        showConfirmationModal: jest.fn()
       }
       let getByText
       await act(async () => {
@@ -179,15 +193,15 @@ describe('TransactionRow', () => {
         await wait(0)
       })
 
-      expect(offerMock.newData).toHaveBeenCalled()
+      expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'pay')
 
       fireEvent.click(getByText('Reject'))
 
-      expect(props.showRejectionModal).toHaveBeenCalledWith(request)
+      expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'decline')
     })
   })
 
-  describe.skip('Accept button', () => {
+  describe('Accept button', () => {
     it('responds properly', async () => {
       let getByText
       await act(async () => {
@@ -235,7 +249,7 @@ describe('TransactionRow', () => {
     }
   }
 
-  it.skip('should default to rendering last 6 of AgentId', async () => {
+  it('should default to rendering last 6 of AgentId', async () => {
     afterEach(() => {
       jest.clearAllMocks()
     })
@@ -249,7 +263,7 @@ describe('TransactionRow', () => {
     let container, getByText
     await act(async () => {
       ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <RenderNickname agentId={rowContent.counterparty} />
+        <RenderNickname agentId={rowContent.counterparty} className='mock-style' />
       </MockedProvider>))
       await wait(0)
       Modal.setAppElement(container)

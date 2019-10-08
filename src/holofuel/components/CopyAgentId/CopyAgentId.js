@@ -6,6 +6,7 @@ import { presentAgentId } from 'utils'
 export default function CopyAgentId ({
   agent,
   isMe,
+  className,
   children
 }) {
   const { id: hash, nickname } = agent
@@ -20,7 +21,7 @@ export default function CopyAgentId ({
     messageText = `Full Agent ID of ${presentAgentId(hash)} has been copied!`
   }
 
-  return <CopyToClipboard copyContent={hash} messageText={messageText}>
+  return <CopyToClipboard copyContent={hash} messageText={messageText} className={className}>
     {children}
   </CopyToClipboard>
 }
