@@ -4,11 +4,13 @@ import mockHhaDnaInterface from 'data-interfaces/HhaDnaInterface'
 import { getHappDetails as mockGetHappDetails } from 'data-interfaces/HappStoreDnaInterface'
 import mockEnvoyInterface from 'data-interfaces/EnvoyInterface'
 import mockHoloFuelInterface from 'data-interfaces/HoloFuelDnaInterface'
+import mockHposInterface from 'data-interfaces/HposInterface'
 
 jest.mock('data-interfaces/HhaDnaInterface')
 jest.mock('data-interfaces/HappStoreDnaInterface')
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('data-interfaces/HoloFuelDnaInterface')
+jest.mock('data-interfaces/HposInterface')
 
 describe('resolvers', () => {
   describe('Query', () => {
@@ -81,6 +83,14 @@ describe('resolvers', () => {
         resolvers.Query.holofuelUser()
         await wait(0)
         expect(mockHoloFuelInterface.user.get).toHaveBeenCalled()
+      })
+    })
+
+    describe('.hposSettings', () => {
+      it('calls HposInterface.os.settings', async () => {
+        resolvers.Query.hposSettings()
+        await wait(0)
+        expect(mockHposInterface.os.settings).toHaveBeenCalled()
       })
     })
   })
