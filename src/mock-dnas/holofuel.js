@@ -103,7 +103,7 @@ export const transactionList = {
           fees: '0'
         }
       },
-      available: '0'
+      available: '10.01'
     },
     {
       index: 3,
