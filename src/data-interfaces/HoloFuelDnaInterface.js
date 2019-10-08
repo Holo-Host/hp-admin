@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { mapValues, pickBy } from 'lodash/fp'
+import { pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 
@@ -95,7 +95,7 @@ function presentTransaction (transaction) {
   const { state, origin, event, timestamp, adjustment, available } = transaction
   const stateStage = state.split('/')[1]
   const stateDirection = state.split('/')[0] // NOTE: This returns either 'incoming' or 'outgoing,' wherein, 'incoming' indicates the recipient of funds, 'outgoing' indicates the spender of funds.
-  const parsedAdjustment = mapValues('Ok', adjustment)
+  const parsedAdjustment = adjustment.Ok
 
   switch (stateStage) {
     case 'completed': {
@@ -107,11 +107,12 @@ function presentTransaction (transaction) {
       // We have decided not to return the reject case into the Ledger
       break
     }
-    // The below two cases are 'waitingTransaction' cases :
+    // NOTE:
+    // The below two cases are 'waitingTransaction' cases.
     case 'requested': {
       return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
-    // NOTE: 'approved' only indicates that a payment was offered (could be in response to a request or an isolate payment)
+    // 'approved' only indicates that a payment was offered (could be in response to a request or an isolate payment)
     case 'approved': {
       return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }

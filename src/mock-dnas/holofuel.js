@@ -50,23 +50,14 @@ export const transactionList = {
         event: '2019-08-30T11:45:10+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '0'
-        },
-        payable: {
-          Ok: '40.01'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '40.01',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     },
     {
       index: 2,
@@ -105,23 +96,14 @@ export const transactionList = {
         event: '2019-08-30T11:19:33+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '10.01'
-        },
-        payable: {
-          Ok: '0'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     },
     {
       index: 3,
@@ -155,23 +137,14 @@ export const transactionList = {
         event: '2019-08-30T11:19:32+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '-10.01'
-        },
-        payable: {
-          Ok: '0'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     },
     {
       index: 1,
@@ -196,23 +169,14 @@ export const transactionList = {
         event: '2019-08-30T10:57:29+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '0'
-        },
-        payable: {
-          Ok: '202.0101'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     },
     {
       index: 0,
@@ -234,23 +198,14 @@ export const transactionList = {
         event: '2019-08-30T00:18:00+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '0'
-        },
-        payable: {
-          Ok: '0'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     }
   ]
 }
