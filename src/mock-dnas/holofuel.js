@@ -332,17 +332,27 @@ function listPending ({ origins }) {
   throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
 }
 
+function receivedPaymentsHashMap (promises) {
+  return promises.forEach(promise => {
+    return {
+      [promise]: {
+        Ok: { result: bcrypt.hashSync((promise + 'accepted'), NUM_SALT_ROUNDS) }
+      }
+    }
+  })
+}
+
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
-    whoami: ({ agentId }) => agentId ? whoamiObj(agentId) : agents[0],
+    whoami: ({ agent }) => agent ? [whoamiObj(agent)] : [agents[0]],
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: listPending,
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
     receive_payment: ({ promise, promise_sig: sig, promise_commit: commit }) => bcrypt.hashSync((promise + sig + commit + 'accepted'), NUM_SALT_ROUNDS),
-    receive_payments_pending: ({ promises }) => bcrypt.hashSync((promises + 'accepted'), NUM_SALT_ROUNDS),
+    receive_payments_pending: ({ promises }) => receivedPaymentsHashMap(promises),
     decline: ({ origin }) => bcrypt.hashSync((origin + 'declined'), NUM_SALT_ROUNDS),
     cancel: ({ origin }) => bcrypt.hashSync((origin + 'cancelled'), NUM_SALT_ROUNDS)
   }

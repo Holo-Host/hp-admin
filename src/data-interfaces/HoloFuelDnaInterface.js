@@ -92,16 +92,15 @@ function presentPendingOffer (transaction) {
 }
 
 function presentTransaction (transaction) {
-  const { state, origin, event, timestamp, adjustment } = transaction
+  const { state, origin, event, timestamp, adjustment, available } = transaction
   const stateStage = state.split('/')[1]
   const stateDirection = state.split('/')[0] // NOTE: This returns either 'incoming' or 'outgoing,' wherein, 'incoming' indicates the recipient of funds, 'outgoing' indicates the spender of funds.
-  // NOTE: *Holofuel does NOT yet provide a balance that represents the 'RESULTING ACCT BALANCE after this transaction adjustment', instead of the only the tx adjustment balance or real-time balance.*
   const parsedAdjustment = mapValues('Ok', adjustment)
 
   switch (stateStage) {
     case 'completed': {
-      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.resulting_balance })
-      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: parsedAdjustment.resulting_balance })
+      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
+      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
       throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     case 'rejected': {
@@ -132,13 +131,27 @@ const HoloFuelDnaInterface = {
       }
     },
     getCounterparty: async ({ agentId }) => {
-      const result = await createZomeCall('transactions/whoami')({ agentId })
+      const result = await createZomeCall('transactions/whoami')({ agent: agentId })
       if (result.error) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
 
       return {
-        id: result.pub_sign_key,
-        nickname: result.nick
+        id: result[0].pub_sign_key,
+        nickname: result[0].nick
       }
+    },
+    getCounterparties: async ({ agentId }) => {
+      const result = await createZomeCall('transactions/whoami')({ agent: agentId })
+      if (result.error) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
+
+      // Returning the Agent ID detials for more than 1 agent:
+      const agentList = []
+      result.forEach(agent => {
+        agentList.push({
+          id: agent.pub_sign_key,
+          nickname: agent.nick
+        })
+      })
+      return agentList
     }
   },
   ledger: {
@@ -232,7 +245,14 @@ const HoloFuelDnaInterface = {
 
     accept: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
+      const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
+
+      console.log('Result from PAYMENTS_PENDING : ', result)
+      if (Object.entries(result).length > 1) throw new Error('Multiple accepted offers were returned, when only one was triggered. -  Transaction Origin ID : ', transactionId)
+
+      const acceptedPayment = Object.entries(result)[0]
+      if (acceptedPayment.includes('Err')) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPayment[1])
+
       return {
         ...transaction,
         id: transactionId,
