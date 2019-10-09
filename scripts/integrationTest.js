@@ -49,4 +49,4 @@ if (
 
 console.log('argvsss', argv)
 
-jest.run(argv)
+jest.run(argv.concat(['--config=jest.integration.config.js']))

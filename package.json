@@ -12,6 +12,7 @@
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js",
+    "test:integration": "node scripts/integrationTest.js",
     "ci": "CI=1 npm run test:unit"
   },
   "dependencies": {
@@ -47,7 +48,8 @@
     "toml": "^3.0.0",
     "waait": "^1.0.5",
     "ws": "^7.1.1",
-    "yup": "^0.27.0"
+    "yup": "^0.27.0",
+    "zombie": "^6.1.4"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",

@@ -7,7 +7,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import schema from 'graphql-server'
 
 let links = [new SchemaLink({ schema })]
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && false) {
   links = [apolloLogger].concat(links)
 }
 
