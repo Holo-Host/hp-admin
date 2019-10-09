@@ -1,16 +1,20 @@
-const Browser = require('zombie')
+import puppeteer from 'puppeteer'
 
-jest.mock('react-identicon-variety-pack')
+describe('Inbox', () => {
+  it("CopyToClipboard contains 'Perry'", async () => {
+    const browser = await puppeteer.launch({
+      headless: true
+    })
 
-Browser.localhost('example.com', 3100)
+    const page = await browser.newPage()
 
-const browser = new Browser()
+    await page.goto('http://localhost:3100/inbox')
 
-describe('the test', () => {
-  beforeEach(() => browser.visit('/inbox'))
+    await page.waitForSelector("[data-testid='copy-content']")
 
-  it('passes', () => {
-    browser.assert.success()
-    browser.assert.text('#sub-title', 'Inbox (2)')
-  })
+    const html = await page.$eval("[data-testid='copy-content']", e => e.innerHTML)
+    expect(html).toBe('Perry')
+
+    browser.close()
+  }, 10000)
 })
