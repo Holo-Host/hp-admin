@@ -1,0 +1,11 @@
+mutation HoloFuelAcceptManyOffersMutation ($transactionIdArray: [ID]) {
+  holoFuelAcceptManyOffers(transactionIdArray: $transactionIdArray) {
+    id
+    amount
+    counterparty
+    direction
+    status
+    type
+    timestamp
+  }
+}

@@ -1,0 +1,11 @@
+mutation HoloFuelAcceptAllOffersMutation {
+  holoFuelAcceptAllOffers {
+    id
+    amount
+    counterparty
+    direction
+    status
+    type
+    timestamp
+  }
+}

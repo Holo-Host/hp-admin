@@ -5,6 +5,8 @@ import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
+import HolofuelAcceptAllOffersMutation from 'graphql/HolofuelAcceptAllOffersMutation.gql'
+import HolofuelAcceptManyOffersMutation from 'graphql/HolofuelAcceptManyOffersMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
@@ -40,6 +42,7 @@ export default function Inbox () {
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
+  const [selectedTransactions, setSelectedTransactions] = useState([])
   const isTransactionsEmpty = isEmpty(transactions)
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
@@ -49,12 +52,18 @@ export default function Inbox () {
     setModalTransaction(modalTransaction)
   }
 
+  const handleSelectTransaction = (transaction) => {
+    console.log('INSIDE THE SELECTE Tx. Transaction === ', transaction)
+    setSelectedTransactions([...selectedTransactions, transaction])
+  }
+
   return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
 
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
         showConfirmationModal={showConfirmationModal}
+        handleSelectTransaction={handleSelectTransaction}
         role='list'
         key={transaction.id} />)}
     </div>}
@@ -64,10 +73,16 @@ export default function Inbox () {
       transaction={modalTransaction}
       payTransaction={payTransaction}
       declineTransaction={declineTransaction} />
+
+    <div styleName='actions'>
+      {transactions.type === TYPE.offer && <AcceptManyButton transactions={selectedTransactions} />}
+      {transactions.type === TYPE.offer && <AcceptAllButton />}
+    </div>
+
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showConfirmationModal }) {
+export function TransactionRow ({ transaction, showConfirmationModal, handleSelectTransaction }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
@@ -97,6 +112,8 @@ export function TransactionRow ({ transaction, showConfirmationModal }) {
       {isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
     </div>
+
+    <input type='checkbox' value={transaction} name={`accept-${transaction}`} onClick={handleSelectTransaction}>Select Offer</input>
   </div>
 }
 
@@ -116,12 +133,52 @@ function useAcceptOffer (id) {
   })
 }
 
+function useAcceptAllOffers () {
+  const [acceptOffer] = useMutation(HolofuelAcceptAllOffersMutation)
+  return () => acceptOffer({
+    variables: {},
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
+}
+
+function useAcceptManyOffers (transactionIdArray) {
+  const [acceptOffer] = useMutation(HolofuelAcceptManyOffersMutation)
+  return () => acceptOffer({
+    variables: { transactionIdArray },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
+}
+
 function AcceptButton ({ transaction: { id } }) {
   const acceptOffer = useAcceptOffer(id)
   return <Button
     onClick={acceptOffer}
     styleName='accept-button'>
     Accept
+  </Button>
+}
+
+function AcceptAllButton () {
+  const acceptOffer = useAcceptAllOffers()
+  return <Button
+    onClick={acceptOffer}
+    styleName='accept-button'>
+    Accept All Offers
+  </Button>
+}
+
+function AcceptManyButton ({ transactions }) {
+  const transactionIdArray = transactions.map(tx => tx.id)
+  console.log('transactionIdArray', transactionIdArray)
+  const acceptOffer = useAcceptManyOffers(transactionIdArray)
+  return <Button
+    onClick={acceptOffer}
+    styleName='accept-button'>
+    Accept Selected Offers
   </Button>
 }
 

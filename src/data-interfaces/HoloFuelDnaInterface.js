@@ -38,6 +38,24 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
   }
 }
 
+const presentAcceptedPayment = async (acceptedPayment) => {
+  const acceptedPaymentHash = acceptedPayment[1]
+  if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPaymentHash.Err)
+
+  const transactionId = acceptedPayment[0]
+  console.log('RECEIVE_PAYMENTS_PENDING transactionId : ', transactionId)
+  console.log('RECEIVE_PAYMENTS_PENDING SUCCESS HASH : ', acceptedPaymentHash.Ok)
+
+  const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
+  return {
+    ...transaction,
+    id: transactionId,
+    direction: DIRECTION.incoming, // this indicates the hf recipient
+    status: STATUS.completed,
+    type: TYPE.offer
+  }
+}
+
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterparty = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
   return {
@@ -252,9 +270,6 @@ const HoloFuelDnaInterface = {
     accept: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
-
-      if (Object.entries(result).length > 1) throw new Error('Multiple accepted offers were returned, when only one was triggered. \n Here is the Tansaction Origin ID of requested accept payment, and the resulting payments accepted : ', transactionId, Object.entries(result))
-
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPaymentHash.Err)
       console.log('RECEIVE_PAYMENTS_PENDING SUCCESS HASH : ', acceptedPaymentHash.Ok)
@@ -266,6 +281,20 @@ const HoloFuelDnaInterface = {
         status: STATUS.completed,
         type: TYPE.offer
       }
+    },
+
+    acceptMany: async (transactionIdArray) => {
+      const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionIdArray })
+      const transactionArray = Object.entries(result).map(presentAcceptedPayment)
+      console.log('ACCEPT_MANY > receive_payments_pending >>>>> transactionArray: ', transactionArray)
+      return transactionArray.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+    },
+
+    acceptAll: async () => {
+      const result = await createZomeCall('transactions/receive_payments_pending')({})
+      const transactionArray = Object.entries(result).map(presentAcceptedPayment)
+      console.log('ACCEPT_ALL > receive_payments_pending >>>>> transactionArray: ', transactionArray)
+      return transactionArray.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     }
   }
 }
