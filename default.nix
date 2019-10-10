@@ -3,12 +3,9 @@
 with pkgs;
 
 let
-
   config = import ./config.nix;
 
-  name = "hp-test";
-
-  script = pkgs.writeShellScriptBin name
+  hp-test = pkgs.writeShellScriptBin "hp-test"
   ''
    ( npm install ) \
    && npm run test
@@ -63,14 +60,24 @@ in
     nativeBuildInputs = [
       holochain-cli
       holochain-conductor
+      hp-test
       nodejs-12_x
+      pkgconfig
     ];
 
     checkPhase = ''
       npm run test:unit
     '';
 
-    buildInputs = [ script ];
+    buildInputs = [
+      cairo
+      giflib
+      libjpeg
+      libpng
+      libuuid
+      pango
+      pixman
+    ];
 
     doCheck = true;
   };
