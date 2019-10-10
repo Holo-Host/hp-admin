@@ -117,7 +117,7 @@ function presentTransaction (transaction) {
       return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
     default:
-      throw new Error('Error: No transaction stateState was matched. Current transaction stateStage : ', stateStage)
+      throw new Error('Error: No transaction stateStag  e was matched. Current transaction stateStage : ', stateStage)
   }
 }
 
@@ -126,31 +126,36 @@ const HoloFuelDnaInterface = {
     get: async () => {
       const result = await createZomeCall('transactions/whoami')()
       if (result.error) throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.error)
+
       return {
-        id: result.pub_sign_key,
-        nickname: result.nick
+        id: result.agent_id.pub_sign_key,
+        nickname: result.agent_id.nick
       }
     },
     getCounterparty: async ({ agentId }) => {
-      const result = await createZomeCall('transactions/whoami')({ agent: agentId })
-      if (result.error) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
+      const result = await createZomeCall('transactions/whois')({ agents: agentId })
+      if (result.error || !result[0].Ok) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
 
       return {
-        id: result[0].pub_sign_key,
-        nickname: result[0].nick
+        id: result[0].Ok.agent_id.pub_sign_key,
+        nickname: result[0].Ok.agent_id.nick
       }
     },
-    getCounterparties: async ({ agentId }) => {
-      const result = await createZomeCall('transactions/whoami')({ agent: agentId })
-      if (result.error) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
+    getCounterparties: async (agentIdArray) => {
+      const result = await createZomeCall('transactions/whois')({ agents: agentIdArray })
+      if (result.error) throw new Error('There was an error fetching the agent nicknames for the referenced counterparties. ERROR: ', result.error)
 
       // Returning the Agent ID detials for more than 1 agent:
       const agentList = []
-      result.forEach(agent => {
-        agentList.push({
-          id: agent.pub_sign_key,
-          nickname: agent.nick
-        })
+      result.forEach((agent, index) => {
+        if (agent[index].Ok) {
+          agentList.push({
+            id: agent[index].Ok.agent_id.pub_sign_key,
+            nickname: agent[index].Ok.agent_id.nick
+          })
+        } else {
+          throw new Error('There was an error locating one of the holofuel agent nicknames. ERROR: ', agent[index].Err)
+        }
       })
       return agentList
     }
@@ -186,7 +191,7 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
-    getPending: async transactionId => {
+    getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
       const transactionArray = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
       if (transactionArray.length === 0) {
@@ -196,7 +201,7 @@ const HoloFuelDnaInterface = {
       }
     },
     // decline pending proposed transaction (NB: proposed by another agent).
-    decline: async transactionId => {
+    decline: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/decline')({ origin: transactionId })
       return {
@@ -206,7 +211,7 @@ const HoloFuelDnaInterface = {
       }
     },
     // cancel pending authored transaction.
-    cancel: async transactionId => {
+    cancel: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       await createZomeCall('transactions/cancel')({ origin: transactionId })
       return {
@@ -248,15 +253,15 @@ const HoloFuelDnaInterface = {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
 
-      console.log('Result from PAYMENTS_PENDING : ', result)
-      if (Object.entries(result).length > 1) throw new Error('Multiple accepted offers were returned, when only one was triggered. -  Transaction Origin ID : ', transactionId)
+      if (Object.entries(result).length > 1) throw new Error('Multiple accepted offers were returned, when only one was triggered. \n Here is the Tansaction Origin ID of requested accept payment, and the resulting payments accepted : ', transactionId, Object.entries(result))
 
-      const acceptedPayment = Object.entries(result)[0]
-      if (acceptedPayment.includes('Err')) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPayment[1])
+      const acceptedPaymentHash = Object.entries(result)[0][1]
+      if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPaymentHash.Err)
+      console.log('RECEIVE_PAYMENTS_PENDING SUCCESS HASH : ', acceptedPaymentHash.Ok)
 
       return {
         ...transaction,
-        id: transactionId,
+        id: transactionId, // should always match `Object.entries(result)[0][0]`
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.completed,
         type: TYPE.offer

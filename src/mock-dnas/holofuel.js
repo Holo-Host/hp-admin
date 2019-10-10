@@ -264,16 +264,26 @@ export const pendingList = {
 
 const agents = [
   {
-    nick: 'Perry',
-    pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+    agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
+    agent_id: {
+      nick: 'Perry',
+      pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+    },
+    dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
+    dna_name: 'Holo Fuel Transactor'
   },
   {
-    nick: 'Sam',
-    pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+    agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
+    agent_id: {
+      nick: 'Sam',
+      pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+    },
+    dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
+    dna_name: 'Holo Fuel Transactor'
   }
 ]
 
-const whoamiObj = (agentId) => agents.find(agent => agent.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
+const whois = (agentId) => agents.find(agent => agent.agent_id.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
 
 function listPending ({ origins }) {
   if (!origins) return pendingList
@@ -300,7 +310,8 @@ function receivedPaymentsHashMap (promises) {
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
-    whoami: ({ agent }) => agent ? [whoamiObj(agent)] : agents[0],
+    whoami: () => agents[0],
+    whois: ({ agents }) => agents.map(agent => whois(agent)),
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: listPending,
