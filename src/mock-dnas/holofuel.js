@@ -298,10 +298,11 @@ function listPending ({ origins }) {
 }
 
 function receivedPaymentsHashMap (promises) {
-  return promises.forEach(promise => {
+  return promises.map(promise => {
     return {
       [promise]: {
-        Ok: { result: bcrypt.hashSync((promise + 'accepted'), NUM_SALT_ROUNDS) }
+        promise,
+        Ok: bcrypt.hashSync((promise + 'accepted'), NUM_SALT_ROUNDS)
       }
     }
   })
