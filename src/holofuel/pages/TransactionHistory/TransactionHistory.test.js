@@ -286,6 +286,7 @@ describe('TransactionsHistory', () => {
         await wait(0)
         Modal.setAppElement(container)
       })
+
       fireEvent.click(getByText('Cancel'))
       expect(props.showCancellationModal).toHaveBeenCalledWith(pendingRequest)
 
@@ -414,7 +415,7 @@ describe('TransactionsHistory', () => {
       let container, getByText
       await act(async () => {
         ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <RenderNickname agentId={rowContent.counterparty} />
+          <RenderNickname agentId={rowContent.counterparty} className='mock-style' />
         </MockedProvider>))
         await wait(0)
         Modal.setAppElement(container)

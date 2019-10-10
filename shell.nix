@@ -7,8 +7,7 @@ let
 in
 
 mkShell {
-  buildInputs = project.hp-admin.nativeBuildInputs
-  ++ [libuuid pkgconfig pixman cairo libpng libjpeg giflib pango];
+  inputsFrom = lib.attrValues (import ./. { inherit pkgs; });
 
   shellHook = ''
     rm -f conductor-config.toml

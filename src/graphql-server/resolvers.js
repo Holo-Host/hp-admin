@@ -3,6 +3,7 @@ import HappStoreDnaInterface, { getHappDetails } from 'data-interfaces/HappStore
 import HhaDnaInterface from 'data-interfaces/HhaDnaInterface'
 import EnvoyInterface from 'data-interfaces/EnvoyInterface'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
+import HposInterface from 'data-interfaces/HposInterface'
 import { promiseMap } from 'utils'
 import {
   dataMappedCall,
@@ -14,37 +15,40 @@ export const resolvers = {
   Query: {
     me: async () => toUiData('person', await HyloDnaInterface.currentUser.get()),
 
+    // factoring out the function call here breaks tests. Don't understand why
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    hostingUser: () => HhaDnaInterface.currentUser.get(),
+    hostingUser: HhaDnaInterface.currentUser.get,
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
-    hostPricing: () => HhaDnaInterface.hostPricing.get(),
+    hostPricing: HhaDnaInterface.hostPricing.get,
 
-    holofuelUser: () => HoloFuelDnaInterface.user.get(),
+    holofuelUser: HoloFuelDnaInterface.user.get,
 
     holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
 
-    holofuelWaitingTransactions: () => HoloFuelDnaInterface.transactions.allWaiting(),
+    holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
 
-    holofuelActionableTransactions: () => HoloFuelDnaInterface.transactions.allActionable(),
+    holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
 
-    holofuelCompletedTransactions: () => HoloFuelDnaInterface.transactions.allCompleted(),
+    holofuelCompletedTransactions: HoloFuelDnaInterface.transactions.allCompleted,
 
-    holofuelLedger: () => HoloFuelDnaInterface.ledger.get(),
+    holofuelLedger: HoloFuelDnaInterface.ledger.get,
 
     happ: (_, { id }) => {
       const happ = HhaDnaInterface.happs.get(id)
       const happmapped = happ.then(getHappDetails)
       return happmapped
-    }
+    },
+
+    hposSettings: HposInterface.os.settings
   },
 
   Mutation: {
     registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
-    registerHostingUser: () => HhaDnaInterface.currentUser.create(),
+    registerHostingUser: HhaDnaInterface.currentUser.create,
 
     enableHapp: async (_, { appId }) => {
       const success = await EnvoyInterface.happs.install(appId)
@@ -77,7 +81,9 @@ export const resolvers = {
 
     holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId),
 
-    holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId)
+    holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
+
+    hposUpdateSettings: (_, { version }) => HposInterface.os.updateSettings({ version })
   }
 }
 

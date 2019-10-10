@@ -24,7 +24,7 @@
   font-size: 16px;
   font-weight: bold;
   color: var(--color-tundora);
-  width: 60px;
+  width: 150px;
   text-align: right;
 }
 
@@ -37,6 +37,16 @@
   color: var(--color-dove-gray);
 }
 
+.hash-and-nick {
+  width: 150px;
+  display: flex;
+  margin-top: 3px;
+}
+
+.hash-icon {
+  margin-right: 5px;
+}
+
 .number-input {
   composes: form-input;
   text-align: right;
@@ -46,19 +56,6 @@
   composes: number-input;
   border: none;
   background-color: var(--color-alto);
-}
-
-.hash-wrapper {
-  margin-top: 4px;
-}
-
-.hash-icon-wrapper {
-  composes: hash-wrapper;
-  width: 30px;
-}
-
-.hash-nickname-wrapper {
-  composes: hash-wrapper;
 }
 
 .hf {
