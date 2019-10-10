@@ -2,12 +2,12 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-export const MOCK_DNA_CONNECTION = true || process.env.NODE_ENV === 'test'
+export const MOCK_DNA_CONNECTION = false || process.env.NODE_ENV === 'test'
 export const MOCK_INDIVIDUAL_DNAS = {
   hylo: true,
   'happ-store': true,
   hha: true,
-  holofuel: true
+  holofuel: false
 }
 export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
 
