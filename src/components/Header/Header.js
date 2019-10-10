@@ -23,7 +23,7 @@ export function Header ({ title, avatarUrl, email, backTo, history: { push } }) 
       </Link>
     </section>
     {title && <section styleName='sub-header'>
-      <h5 id='sub=title' styleName='sub-title'>{title}</h5>
+      <div id='sub=title' styleName='sub-title'>{title}</div>
     </section>}
   </header>
 }
