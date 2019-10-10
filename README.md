@@ -3,6 +3,11 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# Use with `nix-shell`
+
+Setup:
+Create a config.nix referencing the [example.config.nix](./example.config.nix)
+
 ## Available Scripts
 
 In the project directory, you can run:
