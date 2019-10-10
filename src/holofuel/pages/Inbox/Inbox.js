@@ -31,8 +31,6 @@ export default function Inbox () {
   const [modalTransaction, setModalTransaction] = useState()
   const isTransactionsEmpty = isEmpty(transactions)
 
-  console.log('INBOX YO', process.env.NODE_ENV)
-
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
 
   const showRejectionModal = transaction => setModalTransaction(transaction)

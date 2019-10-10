@@ -11,8 +11,8 @@
     "holofuel-load": "node scripts/HoloFuelDataEntry/index.js",
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
-    "test:unit": "node scripts/test.js",
-    "test:integration": "node scripts/integrationTest.js",
+    "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
+    "test:integration": "node scripts/test.js --config=./jest.integration.config.js",
     "ci": "CI=1 npm run test:unit"
   },
   "dependencies": {

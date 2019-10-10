@@ -11,9 +11,6 @@ export default function CopyToClipboard ({
 }) {
   if (!messageText) messageText = `${copyContent} has been copied!`
 
-  // console.log('AGENT hash : ', copyContent)
-  // console.log('COPY AGENT ID messageText : ', messageText)
-
   const { newMessage } = useFlashMessageContext()
   const handleCopyItem = async () => {
     const wasCopied = await copy(copyContent)
