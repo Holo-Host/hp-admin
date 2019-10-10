@@ -75,6 +75,10 @@ type Ledger {
   fees: Float
 }
 
+type HposSettings {
+  version: String
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser
@@ -90,6 +94,7 @@ type Query {
   holofuelCounterparty(agentId: String!): HolofuelUser
   holofuelHistoryCounterparties: [HolofuelUser]
   holofuelInboxCounterparties: [HolofuelUser]
+  hposSettings: HposSettings
 }
 
 type Mutation {
@@ -103,4 +108,5 @@ type Mutation {
   holofuelAcceptOffer(transactionId: ID): Transaction 
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
+  hposUpdateSettings(version: String): HposSettings
 }

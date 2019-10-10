@@ -1,11 +1,10 @@
-import React, { createContext } from 'react'
+import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import { Router } from 'react-router-dom'
-import { MockedProvider } from '@apollo/react-testing'
-import FlashMessage from 'holofuel/components/FlashMessage'
 import { createMemoryHistory } from 'history'
 import { presentAgentId } from 'utils'
+import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 
 // testing the named export Header rather than the default export which is wrapped in withRouter
 import { Header } from './Header'
@@ -54,7 +53,7 @@ it('should render the agent nickname', () => {
   expect(getByText(props.agent.nickname)).toBeInTheDocument()
 })
 
-it('should render lst 6 of agent id when agent is loading', () => {
+it('should render last 6 of agent id when agent is loading', () => {
   const props = {
     title: 'the title',
     history: { push: jest.fn() },
@@ -65,42 +64,23 @@ it('should render lst 6 of agent id when agent is loading', () => {
   expect(getByText(presentAgentId(props.agent.id))).toBeInTheDocument()
 })
 
-// TODO: Resolve Provider Context Conflicts >
-it.skip('should copy the agentId when clicked and trigger the proper flash message', async () => {
-  const FlashMessageContext = createContext()
-  const MockFlashContextProvider = ({ message, time = 5000, newMessage = jest.fn(), children }) => (
-    <FlashMessageContext.Provider value={{ message, time, newMessage }}>
-      {children}
-    </FlashMessageContext.Provider>
-  )
-
-  const mockMyIdMessage = `Your HoloFuel Agent ID has been copied!`
+it('should copy the agentId when clicked and trigger the proper flash message', async () => {
+  const nickname = 'My rad nickname'
   const props = {
     title: 'the title',
-    history: { push: jest.fn() },
-    agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
+    history: {
+      push: () => {}
+    },
+    agent: {
+      id: 'QmAGENTHASH',
+      nickname
+    }
   }
 
-  let getByText, queryByText, queryAllByTestId
+  const { getByText } = render(<Header {...props} />)
   await act(async () => {
-    ({ getByText, queryByText, queryAllByTestId } = render(<MockedProvider mocks={[]} addTypename={false}>
-      <MockFlashContextProvider>
-        <FlashMessage />
-        <Header {...props} />
-      </MockFlashContextProvider>
-    </MockedProvider>))
-    await wait(0)
+    fireEvent.click(getByText(nickname))
+    await wait(100)
   })
-
-  expect(getByText(props.agent.nickname)).toBeInTheDocument()
-  expect(queryByText(mockMyIdMessage)).not.toBeInTheDocument()
-
-  await act(async () => {
-    const hashDisplay = queryAllByTestId('copy-content')
-    fireEvent.click(hashDisplay[0])
-    await MockFlashContextProvider({ message: mockMyIdMessage })
-    await wait(0)
-  })
-
-  expect(getByText(mockMyIdMessage)).toBeInTheDocument()
+  expect(mockNewMessage).toHaveBeenCalledWith(`Your HoloFuel Agent ID has been copied!`, 5000)
 })

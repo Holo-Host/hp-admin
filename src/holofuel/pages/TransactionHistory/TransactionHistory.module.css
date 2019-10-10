@@ -94,6 +94,7 @@
 
 .modal-counterparty {
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .modal-amount {

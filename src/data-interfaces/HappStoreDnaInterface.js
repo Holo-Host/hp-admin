@@ -4,7 +4,7 @@ import { pick } from 'lodash/fp'
 export const INSTANCE_ID = 'happ-store'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
-export const HappStoreDnaInterface = {
+const HappStoreDnaInterface = {
   currentUser: {
     get: () => createZomeCall('whoami/get_user')()
   },

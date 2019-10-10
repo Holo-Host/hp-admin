@@ -103,7 +103,7 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p data-testid='cell-time'>{time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} /></h4>
+      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} copyId /></h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -167,18 +167,19 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
   </Modal>
 }
 
-export function RenderNickname ({ agentId }) {
-  const { loading, error, data } = useQuery(HolofuelCounterpartyQuery, {
+export function RenderNickname ({ agentId, copyId }) {
+  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  if (loading) return <>Loading...</>
-  if (error) {
+  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
+  else if ((loading || error) && copyId) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
-  }
-  return <CopyAgentId agent={data.holofuelCounterparty}>
-    {data.holofuelCounterparty.nickname}
-  </CopyAgentId>
+  } else if (holofuelCounterparty.nickname && copyId) {
+    return <CopyAgentId agent={holofuelCounterparty}>
+      {holofuelCounterparty.nickname}
+    </CopyAgentId>
+  } else return <>{holofuelCounterparty.nickname}</>
 }
