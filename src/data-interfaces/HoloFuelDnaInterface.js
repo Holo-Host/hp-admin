@@ -135,7 +135,7 @@ function presentTransaction (transaction) {
       return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
     default:
-      throw new Error('Error: No transaction stateStag  e was matched. Current transaction stateStage : ', stateStage)
+      throw new Error('Error: No transaction stateStage was matched. Current transaction stateStage : ', stateStage)
   }
 }
 
@@ -272,7 +272,6 @@ const HoloFuelDnaInterface = {
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPaymentHash.Err)
-      console.log('RECEIVE_PAYMENTS_PENDING SUCCESS HASH : ', acceptedPaymentHash.Ok)
 
       return {
         ...transaction,
