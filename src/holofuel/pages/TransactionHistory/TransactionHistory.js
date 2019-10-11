@@ -11,6 +11,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
@@ -27,12 +28,22 @@ function useCancel () {
   })
 }
 
+function useFetchCounterparties () {
+  const { loading, error, data: { holofuelHistoryCounterparties } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  let response
+  if (loading) response = { loading: true }
+  if (error) response = { error: `Error: ${error}` }
+  else response = holofuelHistoryCounterparties
+  return response
+}
+
 // Display - Functional Components with Hooks :
 export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
   const cancelTransaction = useCancel()
+  const counterpartyList = useFetchCounterparties()
   const [modalTransaction, setModalTransaction] = useState()
 
   const showCancellationModal = transaction => setModalTransaction(transaction)
@@ -66,6 +77,7 @@ export default function TransactionsHistory () {
             return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
+              counterpartyList={counterpartyList}
               showCancellationModal={showCancellationModal}
             />
           })}
@@ -74,6 +86,7 @@ export default function TransactionsHistory () {
             return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
+              counterpartyList={counterpartyList}
               showCancellationModal={showCancellationModal}
               completed />
           })}
@@ -94,8 +107,13 @@ const TransactionTableHeading = ({ content }) => {
   </th>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed }) {
+export function TransactionRow ({ transaction, showCancellationModal, completed, counterpartyList }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
+
+  let counterpartyNick = 'Loading...'
+  if (counterpartyList) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty).nickname
+  // console.log('COUNTERPARTY NICKNAME : ', counterpartyNick)
+
   const { date, time } = presentDateAndTime(timestamp)
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
@@ -103,7 +121,10 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p data-testid='cell-time'>{time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} copyId /></h4>
+      <h4 data-testid='cell-counterparty'>
+        {/* <RenderNickname agentId={counterparty} copyId /> */}
+        {counterpartyNick}
+      </h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
