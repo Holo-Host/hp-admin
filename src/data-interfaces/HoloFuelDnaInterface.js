@@ -135,7 +135,7 @@ function presentTransaction (transaction) {
       return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
     default:
-      throw new Error('Error: No transaction stateStag  e was matched. Current transaction stateStage : ', stateStage)
+      throw new Error('Error: No transaction stateStage was matched. Current transaction stateStage : ', stateStage)
   }
 }
 
