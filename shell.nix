@@ -16,6 +16,7 @@ mkShell {
     echo $! > conductor.pid
     cleanup() {
       kill $(cat conductor.pid)
+      rm -rf .holochain
     }
     trap cleanup EXIT
   '';

@@ -7,7 +7,7 @@ let
 
   hp-test = pkgs.writeShellScriptBin "hp-test"
   ''
-   ( npm install ) \
+   ( npm install --build-from-source  ) \
    && npm run test
   '';
 
