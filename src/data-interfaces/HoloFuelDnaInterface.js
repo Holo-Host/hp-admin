@@ -44,7 +44,7 @@ const presentAcceptedPayment = async (acceptedPayment) => {
 
   const transactionId = acceptedPayment[0]
   const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
- 
+
   return {
     ...transaction,
     id: transactionId,
