@@ -273,6 +273,9 @@ const HoloFuelDnaInterface = {
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPaymentHash.Err)
+      console.log('RECEIVE_PAYMENTS_PENDNG result: ', result)
+      console.log('Object.entries(result): ', Object.entries(result))
+      console.log('RECEIVE_PAYMENTS_PENDING acceptedPaymentHash: ', acceptedPaymentHash)
       console.log('RECEIVE_PAYMENTS_PENDING SUCCESS HASH : ', acceptedPaymentHash.Ok)
 
       return {

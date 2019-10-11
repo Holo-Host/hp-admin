@@ -262,8 +262,8 @@ export const pendingList = {
   ]
 }
 
-const agents = [
-  {
+const agentArray = [{
+  Ok: {
     agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
     agent_id: {
       nick: 'Perry',
@@ -271,8 +271,9 @@ const agents = [
     },
     dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
     dna_name: 'Holo Fuel Transactor'
-  },
-  {
+  }
+}, {
+  Ok: {
     agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
     agent_id: {
       nick: 'Sam',
@@ -281,9 +282,9 @@ const agents = [
     dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
     dna_name: 'Holo Fuel Transactor'
   }
-]
+}]
 
-const whois = (agentId) => agents.find(agent => agent.agent_id.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
+const whois = (agentId) => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
 
 function listPending ({ origins }) {
   if (!origins) return pendingList
@@ -298,28 +299,27 @@ function listPending ({ origins }) {
 }
 
 function receivedPaymentsHashMap (promises) {
-  return promises.map(promise => {
+  for (const promise of promises) {
     return {
       [promise]: {
-        promise,
         Ok: bcrypt.hashSync((promise + 'accepted'), NUM_SALT_ROUNDS)
       }
     }
-  })
+  }
 }
 
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
-    whoami: () => agents[0],
-    whois: ({ agents }) => agents.map(agent => whois(agent)),
+    whoami: () => agentArray[0].Ok,
+    whois: ({ agents }) => typeof agents === 'string' ? Array.of(whois(agents)) : Array.of(agents.map(agent => whois(agent))),
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: listPending,
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
     receive_payment: ({ promise, promise_sig: sig, promise_commit: commit }) => bcrypt.hashSync((promise + sig + commit + 'accepted'), NUM_SALT_ROUNDS),
-    receive_payments_pending: ({ promises }) => receivedPaymentsHashMap(promises),
+    receive_payments_pending: ({ promises }) => typeof promises === 'string' ? receivedPaymentsHashMap([promises]) : receivedPaymentsHashMap(promises),
     decline: ({ origin }) => bcrypt.hashSync((origin + 'declined'), NUM_SALT_ROUNDS),
     cancel: ({ origin }) => bcrypt.hashSync((origin + 'cancelled'), NUM_SALT_ROUNDS)
   }
