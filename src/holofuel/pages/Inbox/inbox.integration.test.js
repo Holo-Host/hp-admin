@@ -22,7 +22,7 @@
 import React from 'react'
 // import { render, act } from '@testing-library/react'
 // import wait from 'waait'
-import { renderAndWait } from 'utils/test'
+import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
 
 jest.mock('react-media-hook')
