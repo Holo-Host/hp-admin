@@ -10,6 +10,7 @@ import Inbox, { TransactionRow, RenderNickname } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { renderAndWait } from 'utils/test'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
@@ -41,6 +42,8 @@ jest.mock('holofuel/contexts/useFlashMessageContext')
 describe('Inbox Connected (with Agent Nicknames)', () => {
   it('renders', async () => {
     let getAllByRole
+
+    
 
     await act(async () => {
       ({ getAllByRole } = render(<ApolloProvider client={apolloClient}>
