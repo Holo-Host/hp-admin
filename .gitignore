@@ -22,10 +22,12 @@ tmp-storage
 tmp
 holofuel-conductor-config.toml
 conductor-config.toml
+conductor.pid
+conductor.log
+config.nix
 keystores
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 yarn.lock
-config.nix
