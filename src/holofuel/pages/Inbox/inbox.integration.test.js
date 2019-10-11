@@ -25,7 +25,10 @@ import React from 'react'
 import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
 
+console.log('process.env.REACT_APP_INTEGRATION_TEST', process.env.REACT_APP_INTEGRATION_TEST)
+
 jest.mock('react-media-hook')
+jest.mock('react-identicon-variety-pack')
 
 describe('CreateOffer', () => {
   it('Creates the offer', async () => {

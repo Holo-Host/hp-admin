@@ -12,7 +12,7 @@
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
-    "test:integration": "node scripts/test.js --config=./jest.integration.config.js",
+    "test:integration": "nix-shell --run 'node scripts/integration-test-setup.js && REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "ci": "CI=1 npm run test:unit"
   },
   "dependencies": {
@@ -25,7 +25,6 @@
     "apollo-link-logger": "^1.2.3",
     "apollo-link-schema": "^1.2.3",
     "bcryptjs": "^2.4.3",
-    "canvas": "^2.5.0",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
     "lodash": "^4.17.15",
@@ -34,7 +33,6 @@
     "postcss-custom-properties": "^9.0.2",
     "postcss-import": "^12.0.1",
     "postcss-sassy-mixins": "^2.1.0",
-    "puppeteer": "^1.20.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-hook-form": "^3.23.0",

@@ -2,7 +2,15 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-export const MOCK_DNA_CONNECTION = true || process.env.NODE_ENV === 'test'
+// This can be written as a boolean expression then it's even less readable
+const developmentMockDnaConnection = false // this is the value MOCK_DNA_CONNECTION will have in the dev server
+export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
+  ? false
+  : process.env.NODE_ENV === 'test'
+    ? true
+    : developmentMockDnaConnection
+
+// These are overwritten when MOCK_DNA_CONNECTION is true, so they only take effect when that is false
 export const MOCK_INDIVIDUAL_DNAS = {
   hylo: true,
   'happ-store': true,
