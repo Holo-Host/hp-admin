@@ -20,6 +20,7 @@
 .env.production.local
 tmp-storage
 tmp
+holofuel-conductor-config.toml
 conductor-config.toml
 keystores
 
