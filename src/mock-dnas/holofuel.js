@@ -298,14 +298,15 @@ function listPending ({ origins }) {
   throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
 }
 
-function receivedPaymentsHashMap (promises) {
-  for (const promise of promises) {
+function receivedPaymentsHashMap (promiseArr) {
+  return promiseArr.reduce((currentHashMap, promise) => {
     return {
+      ...currentHashMap,
       [promise]: {
         Ok: bcrypt.hashSync((promise + 'accepted'), NUM_SALT_ROUNDS)
       }
     }
-  }
+  }, {})
 }
 
 const NUM_SALT_ROUNDS = 10
