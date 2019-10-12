@@ -24,8 +24,8 @@ keystore_file = "keystores/myagent.keystore"
 # -- All DNAs
 [[dnas]]
 id = "holofuel_dna"
-file = "/PATH/TO/holofuel.dna.json" # Be sure to point to the version tied to hc v28-alpha1
-hash = "QmeTGfQmKxdVa2ocEFNamo8vZK7QVKZYvQp9BkTQYvjnzm" # This is the hash tied to hc v28-alpha1
+file = "path/to/dnav11"
+hash = "QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9"
 
 # -- Agent Instances for each DNA
 [[instances]]
