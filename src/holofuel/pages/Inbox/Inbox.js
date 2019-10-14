@@ -37,6 +37,8 @@ function useDecline () {
 
 export default function Inbox () {
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+  console.log('holofuelActionableTransactions : ', transactions)
+
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()

@@ -96,6 +96,7 @@ export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
+  console.log('holofuelWaitingTransactions : ', pendingTransactions)
   console.log('holofuelCompletedTransactions : ', completedTransactions)
 
   const cancelTransaction = useCancel()
@@ -168,8 +169,8 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
 
   console.log('counterparty : ', counterparty)
 
-  let counterpartyNick = 'Loading...'
-  if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
+  // let counterpartyNick = 'Loading...'
+  // if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
   // console.log('COUNTERPARTY NICKNAME : ', counterpartyNick)
 
   const { date, time } = presentDateAndTime(timestamp)
@@ -180,8 +181,8 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
     </td>
     <td styleName='completed-tx-col table-content align-left'>
       <h4 data-testid='cell-counterparty'>
-        {/* <RenderNickname agentId={counterparty} copyId /> */}
-        {counterpartyNick}
+        <RenderNickname agentId={counterparty.id} copyId />
+        {/* {counterpartyNick} */}
       </h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
