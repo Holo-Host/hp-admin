@@ -13,8 +13,6 @@ const params = {
   }
 }
 
-process.env.INTEGRATION_TESTS = true
-
 async function waitForConductor (interval = 30000) {
   console.log('Waiting for conductor to boot up')
 
