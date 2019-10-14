@@ -29,64 +29,72 @@ function useCancel () {
 }
 
 function useFetchCounterparties () {
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  // const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  // const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
-  const { loading, error, data: { holofuelHistoryCounterparties } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, {
-    update: (cache, { data: { holofuelHistoryCounterparties } }) => {
+  const { loading, error, data: { holofuelHistoryCounterparties } = {}, cache } = useQuery(HolofuelHistoryCounterpartiesQuery, {
+    update: () => {
       if (holofuelHistoryCounterparties) {
+        console.log('>>>>>>>>>>>>> INSIDE CACHE R/W && UPDATE')
+        const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
+        const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
+          const matchingTx = filterTransactionsByAgentId(agent, txListType)
+          return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+        })
+
+        // cache Read/Write/Update for HolofuelCompletedTransactionsQuery
         const { holofuelCompletedTransactions } = cache.readQuery({
           query: HolofuelCompletedTransactionsQuery
         })
-        console.log('>>>>>>>>>>>>> INSIDE UPDATE')
 
-        const filterTransactions = (agent) => holofuelCompletedTransactions.filter(transaction => transaction.counterparty === agent.id)
-
-        const updateTxCounterparty = holofuelHistoryCounterparties.map(agent => {
-          const matchingTx = filterTransactions(agent)
-          const newTx = matchingTx.map(({ counterparty }) => Object.assign(counterparty, agent))
-          console.log('>>>>>>>>>>>>> newTx', newTx)
-          return newTx
-        })
-
-        const result = _.flatten(updateTxCounterparty)
-        console.log('RESULT >> flattened arrays : ', result)
+        const newCompletedTxList = _.flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
+        console.log('RESULT >> flattened holofuelCompletedTransactions Array : ', newCompletedTxList)
 
         cache.writeQuery({
           query: HolofuelCompletedTransactionsQuery,
           data: {
-            holofuelCompletedTransactions: { ...result }
+            holofuelCompletedTransactions: { ...newCompletedTxList }
+          }
+        })
+
+        // cache Read/Write/Update for HolofuelWaitingTransactionsQuery
+        const { holofuelWaitingTransactions } = cache.readQuery({
+          query: HolofuelWaitingTransactionsQuery
+        })
+
+        const newWaitingTxList = _.flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
+        console.log('RESULT >> flattened holofuelWaitingTransactions Array : ', newWaitingTxList)
+
+        cache.writeQuery({
+          query: HolofuelWaitingTransactionsQuery,
+          data: {
+            holofuelWaitingTransactions: { ...newWaitingTxList }
           }
         })
       }
     }
   })
-  // HolofuelWaitingTransactionsQuery
-  // HolofuelActionableTransactionsQuery
 
   let response
   if (loading) response = { loading: true }
   if (error) response = { error: `Error: ${error}` }
   else response = holofuelHistoryCounterparties
 
-  if (holofuelHistoryCounterparties) {
-    // console.log('holofuelCompletedTransactions : ', holofuelCompletedTransactions)
+  // if (holofuelHistoryCounterparties) {
+  //   // console.log('holofuelCompletedTransactions : ', holofuelCompletedTransactions)
+  //   // console.log('holofuelWaitingTransactions : ', holofuelWaitingTransactions)
 
-    const filterTransactions = (agent) => holofuelCompletedTransactions.filter(transaction => {
-      // console.log('agent, transaction', agent, transaction)
-      return transaction.counterparty.id === agent.id
-    })
+  //   const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
+  //   const updateTxListCounterparties = (txListType) => holofuelHistoryCounterparties.map(agent => {
+  //     const matchingTx = filterTransactionsByAgentId(agent, txListType)
+  //     return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+  //   })
 
-    const updateTxCounterparty = holofuelHistoryCounterparties.map(agent => {
-      const matchingTx = filterTransactions(agent)
-      console.log('>>>>>>>>>>>>> agent', agent)
-      console.log('>>>>>>>>>>>>> matchingTx', matchingTx)
-      const newTx = matchingTx.map(({ counterparty }) => Object.assign(counterparty, agent))
-      console.log('>>>>>>>>>>>>> newTx', newTx)
-      return newTx
-    })
-    const result = _.flatten(updateTxCounterparty)
-    console.log('RESULT >> flattened arrays : ', result)
-  }
+  //   const completedTxresult = _.flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
+  //   console.log('RESULT >> flattened holofuelCompletedTransactions Array : ', completedTxresult)
+  //   const waitingTxresult = _.flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
+  //   console.log('RESULT >> flattened holofuelWaitingTransactions Array : ', waitingTxresult)
+  // }
 
   return response
 }
@@ -95,8 +103,6 @@ function useFetchCounterparties () {
 export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-
-  console.log('holofuelCompletedTransactions : ', completedTransactions)
 
   const cancelTransaction = useCancel()
   const counterpartyList = useFetchCounterparties()
@@ -166,8 +172,6 @@ const TransactionTableHeading = ({ content }) => {
 export function TransactionRow ({ transaction, showCancellationModal, completed, counterpartyList }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
 
-  console.log('counterparty : ', counterparty)
-
   let counterpartyNick = 'Loading...'
   if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
   // console.log('COUNTERPARTY NICKNAME : ', counterpartyNick)
@@ -180,8 +184,9 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
     </td>
     <td styleName='completed-tx-col table-content align-left'>
       <h4 data-testid='cell-counterparty'>
-        {/* <RenderNickname agentId={counterparty} copyId /> */}
+        {/* <RenderNickname agentId={counterparty.id} copyId /> */}
         {counterpartyNick}
+        {/* {counterparty.nickname || counterparty.id} */}
       </h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
@@ -251,8 +256,10 @@ export function RenderNickname ({ agentId, copyId }) {
     variables: { agentId }
   })
 
-  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
-  else if ((loading || error) && copyId) {
+  console.log('RENDERNICKNAME >>> holofuelCounterparty : ', holofuelCounterparty)
+
+  if ((loading || error || holofuelCounterparty === {}) && !copyId) return <>{presentAgentId(agentId)}</>
+  else if ((loading || error || holofuelCounterparty === {}) && copyId) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
