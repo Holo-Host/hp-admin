@@ -29,7 +29,7 @@ const FormValidationSchema = yup.object().shape({
 function useOfferMutation () {
   const [offer] = useMutation(HolofuelOfferMutation)
   return (amount, counterparty, notes) => offer({
-    variables: { amount, counterparty, notes }
+    variables: { amount, counterpartyId: counterparty.id, notes }
   })
 }
 

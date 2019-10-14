@@ -42,11 +42,23 @@ export const resolvers = {
       return transactionCounterparties
     },
 
-    holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
+    holofuelWaitingTransactions: async () => {
+      const result = await HoloFuelDnaInterface.transactions.allWaiting()
+      console.log('WAITING TX with the counterparty OBJECTS >>>>> INSIDE the resolvers : ', result)
+      return result
+    },
 
-    holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
+    holofuelActionableTransactions: async () => {
+      const result = await HoloFuelDnaInterface.transactions.allActionable()
+      console.log('ACTIONABLE TX with the counterparty OBJECTS >>>>> INSIDE the resolvers : ', result)
+      return result
+    },
 
-    holofuelCompletedTransactions: HoloFuelDnaInterface.transactions.allCompleted,
+    holofuelCompletedTransactions: async () => {
+      const result = await HoloFuelDnaInterface.transactions.allCompleted()
+      console.log('Completed TX with the counterparty OBJECTS >>>>> INSIDE the resolvers : ', result)
+      return result
+    },
 
     holofuelLedger: HoloFuelDnaInterface.ledger.get,
 
@@ -87,9 +99,9 @@ export const resolvers = {
 
     updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit),
 
-    holofuelRequest: async (_, { counterparty, amount, notes }) => HoloFuelDnaInterface.requests.create(counterparty, amount, notes),
+    holofuelRequest: async (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
 
-    holofuelOffer: async (_, { counterparty, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterparty, amount, notes, requestId),
+    holofuelOffer: async (_, { counterpartyId, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterpartyId, amount, notes, requestId),
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 

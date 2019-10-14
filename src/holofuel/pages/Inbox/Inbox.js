@@ -18,7 +18,7 @@ import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
   return ({ id, amount, counterparty }) => offer({
-    variables: { amount, counterparty, requestId: id },
+    variables: { amount, counterpartyId: counterparty.id, requestId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     }]
@@ -87,7 +87,7 @@ export function TransactionRow ({ transaction, showConfirmationModal }) {
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty} copyId /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty.id} copyId /></span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />

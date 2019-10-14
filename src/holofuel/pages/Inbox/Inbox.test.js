@@ -71,7 +71,7 @@ describe('TransactionRow', () => {
 
   const request = {
     id: '123',
-    counterparty: 'only care about the last 6',
+    counterparty: { id: 'only care about the last 6' },
     amount: 100,
     type: TYPE.request,
     timestamp: moment().subtract(14, 'days'),
@@ -128,7 +128,7 @@ describe('TransactionRow', () => {
   const offerMock = {
     request: {
       query: HolofuelOfferMutation,
-      variables: { amount: request.amount, counterparty: request.counterparty, requestId: request.id }
+      variables: { amount: request.amount, counterpartyId: request.counterparty.id, requestId: request.id }
     },
     result: {
       data: { holofuelOffer: mockTransaction }
@@ -227,13 +227,13 @@ describe('TransactionRow', () => {
 
   const newRequest = {
     ...request,
-    counterparty: mockWhoIsAgent1.id
+    counterparty: { id: mockWhoIsAgent1.id }
   }
 
   const counterpartyQueryMockError = {
     request: {
       query: HolofuelCounterpartyQuery,
-      variables: { agentId: newRequest.counterparty }
+      variables: { agentId: newRequest.counterparty.id }
     },
     error: new Error('ERROR! : <Error Message>')
   }
@@ -263,13 +263,13 @@ describe('TransactionRow', () => {
     let container, getByText
     await act(async () => {
       ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <RenderNickname agentId={rowContent.counterparty} className='mock-style' />
+        <RenderNickname agentId={rowContent.counterparty.id} className='mock-style' />
       </MockedProvider>))
       await wait(0)
       Modal.setAppElement(container)
     })
 
-    const nameDiv = getByText(presentAgentId(rowContent.counterparty))
+    const nameDiv = getByText(presentAgentId(rowContent.counterparty.id))
     expect(nameDiv).toBeInTheDocument()
   })
 })

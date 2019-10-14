@@ -28,7 +28,7 @@ const FormValidationSchema = yup.object().shape({
 function useRequestMutation () {
   const [offer] = useMutation(HolofuelRequestMutation)
   return (amount, counterparty, notes) => offer({
-    variables: { amount, counterparty, notes }
+    variables: { amount, counterpartyId: counterparty.id, notes }
   })
 }
 
@@ -69,7 +69,7 @@ export default function CreateRequest ({ history: { push } }) {
         <div styleName='hash-and-nick'>
           {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} styleName='hash-icon' />}
           {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
-            <RenderNickname agentId={counterparty} setCounterpartyNick={setCounterpartyNick} />
+            <RenderNickname agentId={counterparty.id} setCounterpartyNick={setCounterpartyNick} />
           </h4>}
         </div>
       </div>

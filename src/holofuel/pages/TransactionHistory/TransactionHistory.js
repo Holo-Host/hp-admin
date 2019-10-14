@@ -29,11 +29,65 @@ function useCancel () {
 }
 
 function useFetchCounterparties () {
-  const { loading, error, data: { holofuelHistoryCounterparties } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+
+  const { loading, error, data: { holofuelHistoryCounterparties } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, {
+    update: (cache, { data: { holofuelHistoryCounterparties } }) => {
+      if (holofuelHistoryCounterparties) {
+        const { holofuelCompletedTransactions } = cache.readQuery({
+          query: HolofuelCompletedTransactionsQuery
+        })
+        console.log('>>>>>>>>>>>>> INSIDE UPDATE')
+
+        const filterTransactions = (agent) => holofuelCompletedTransactions.filter(transaction => transaction.counterparty === agent.id)
+
+        const updateTxCounterparty = holofuelHistoryCounterparties.map(agent => {
+          const matchingTx = filterTransactions(agent)
+          const newTx = matchingTx.map(({ counterparty }) => Object.assign(counterparty, agent))
+          console.log('>>>>>>>>>>>>> newTx', newTx)
+          return newTx
+        })
+
+        const result = _.flatten(updateTxCounterparty)
+        console.log('RESULT >> flattened arrays : ', result)
+
+        cache.writeQuery({
+          query: HolofuelCompletedTransactionsQuery,
+          data: {
+            holofuelCompletedTransactions: { ...result }
+          }
+        })
+      }
+    }
+  })
+  // HolofuelWaitingTransactionsQuery
+  // HolofuelActionableTransactionsQuery
+
   let response
   if (loading) response = { loading: true }
   if (error) response = { error: `Error: ${error}` }
   else response = holofuelHistoryCounterparties
+
+  if (holofuelHistoryCounterparties) {
+    // console.log('holofuelCompletedTransactions : ', holofuelCompletedTransactions)
+
+    const filterTransactions = (agent) => holofuelCompletedTransactions.filter(transaction => {
+      // console.log('agent, transaction', agent, transaction)
+      return transaction.counterparty.id === agent.id
+    })
+
+    const updateTxCounterparty = holofuelHistoryCounterparties.map(agent => {
+      const matchingTx = filterTransactions(agent)
+      console.log('>>>>>>>>>>>>> agent', agent)
+      console.log('>>>>>>>>>>>>> matchingTx', matchingTx)
+      const newTx = matchingTx.map(({ counterparty }) => Object.assign(counterparty, agent))
+      console.log('>>>>>>>>>>>>> newTx', newTx)
+      return newTx
+    })
+    const result = _.flatten(updateTxCounterparty)
+    console.log('RESULT >> flattened arrays : ', result)
+  }
+
   return response
 }
 
@@ -41,6 +95,8 @@ function useFetchCounterparties () {
 export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
+
+  console.log('holofuelCompletedTransactions : ', completedTransactions)
 
   const cancelTransaction = useCancel()
   const counterpartyList = useFetchCounterparties()
@@ -110,8 +166,10 @@ const TransactionTableHeading = ({ content }) => {
 export function TransactionRow ({ transaction, showCancellationModal, completed, counterpartyList }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
 
+  console.log('counterparty : ', counterparty)
+
   let counterpartyNick = 'Loading...'
-  if (counterpartyList) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty).nickname
+  if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
   // console.log('COUNTERPARTY NICKNAME : ', counterpartyNick)
 
   const { date, time } = presentDateAndTime(timestamp)
@@ -171,7 +229,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'><RenderNickname agentId={counterparty} /></span> ?
+      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'><RenderNickname agentId={counterparty.id} /></span> ?
     </div>
     <div styleName='modal-buttons'>
       <Button

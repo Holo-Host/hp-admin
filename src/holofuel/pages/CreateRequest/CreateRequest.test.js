@@ -16,14 +16,14 @@ import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageC
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
-const counterparty = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+const counterparty = { id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi' }
 const amount = 35674
 const notes = 'Hi there'
 
 const requestMock = {
   request: {
     query: HolofuelRequestMutation,
-    variables: { amount, counterparty, notes }
+    variables: { amount, counterpartyId: counterparty.id, notes }
   },
   result: {
     data: {

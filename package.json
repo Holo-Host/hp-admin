@@ -6,7 +6,6 @@
     "start": "rm -rf ./node_modules/.cache/babel-loader && node scripts/start.js",
     "start:holofuel": "REACT_APP_HOLOFUEL_APP=true npm start",
     "build": "node scripts/build.js",
-    "build:holofuel": "REACT_APP_HOLOFUEL_APP=true npm run build",
     "hc:start": "mkdir -p tmp && holochain -c ./conductor-config.toml",
     "provider-flow": "node scripts/HHAProviderFlow/index.js",
     "holofuel-load": "node scripts/HoloFuelDataEntry/index.js",
