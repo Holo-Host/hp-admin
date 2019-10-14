@@ -201,8 +201,8 @@ export function RenderNickname ({ agentId, copyId }) {
     variables: { agentId }
   })
 
-  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
-  else if ((loading || error) && copyId) {
+  if ((loading || error || holofuelCounterparty === {}) && !copyId) return <>{presentAgentId(agentId)}</>
+  else if ((loading || error || holofuelCounterparty === {}) && copyId) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>

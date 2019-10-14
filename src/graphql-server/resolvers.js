@@ -42,23 +42,11 @@ export const resolvers = {
       return transactionCounterparties
     },
 
-    holofuelWaitingTransactions: async () => {
-      const result = await HoloFuelDnaInterface.transactions.allWaiting()
-      console.log('WAITING TX with the counterparty OBJECTS >>>>> INSIDE the resolvers : ', result)
-      return result
-    },
+    holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
 
-    holofuelActionableTransactions: async () => {
-      const result = await HoloFuelDnaInterface.transactions.allActionable()
-      console.log('ACTIONABLE TX with the counterparty OBJECTS >>>>> INSIDE the resolvers : ', result)
-      return result
-    },
+    holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
 
-    holofuelCompletedTransactions: async () => {
-      const result = await HoloFuelDnaInterface.transactions.allCompleted()
-      console.log('Completed TX with the counterparty OBJECTS >>>>> INSIDE the resolvers : ', result)
-      return result
-    },
+    holofuelCompletedTransactions: HoloFuelDnaInterface.transactions.allCompleted,
 
     holofuelLedger: HoloFuelDnaInterface.ledger.get,
 

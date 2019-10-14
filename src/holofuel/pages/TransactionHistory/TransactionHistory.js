@@ -29,7 +29,8 @@ function useCancel () {
 }
 
 function useFetchCounterparties () {
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  // const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  // const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
   const { loading, error, data: { holofuelHistoryCounterparties } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, {
     update: (cache, { data: { holofuelHistoryCounterparties } }) => {
@@ -39,15 +40,12 @@ function useFetchCounterparties () {
         })
         console.log('>>>>>>>>>>>>> INSIDE UPDATE')
 
-        const filterTransactions = (agent) => holofuelCompletedTransactions.filter(transaction => transaction.counterparty === agent.id)
+        const filterTransactions = (agent) => holofuelCompletedTransactions.filter(transaction => transaction.counterparty.id === agent.id)
 
         const updateTxCounterparty = holofuelHistoryCounterparties.map(agent => {
           const matchingTx = filterTransactions(agent)
-          const newTx = matchingTx.map(({ counterparty }) => Object.assign(counterparty, agent))
-          console.log('>>>>>>>>>>>>> newTx', newTx)
-          return newTx
+          return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
         })
-
         const result = _.flatten(updateTxCounterparty)
         console.log('RESULT >> flattened arrays : ', result)
 
@@ -68,25 +66,41 @@ function useFetchCounterparties () {
   if (error) response = { error: `Error: ${error}` }
   else response = holofuelHistoryCounterparties
 
-  if (holofuelHistoryCounterparties) {
-    // console.log('holofuelCompletedTransactions : ', holofuelCompletedTransactions)
+  // if (holofuelHistoryCounterparties) {
+  //   // console.log('holofuelCompletedTransactions : ', holofuelCompletedTransactions)
+  //   const filterTransactions = (agent) => holofuelCompletedTransactions.filter(transaction => {
+  //     console.log('agent, transaction', agent, transaction)
+  //     return transaction.counterparty.id === agent.id
+  //   })
 
-    const filterTransactions = (agent) => holofuelCompletedTransactions.filter(transaction => {
-      // console.log('agent, transaction', agent, transaction)
-      return transaction.counterparty.id === agent.id
-    })
+  //   const updateTxCounterparty = holofuelHistoryCounterparties.map(agent => {
+  //     const matchingTx = filterTransactions(agent)
+  //     // console.log('>>>>>>>>>>>>> agent', agent)
+  //     console.log('>>>>>>>>>>>>> matchingTx', matchingTx)
+  //     const newTx = matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+  //     console.log('>>>>>>>>>>>>> newTx', newTx)
+  //     return newTx
+  //   })
+  //   const result = _.flatten(updateTxCounterparty)
+  //   console.log('RESULT >> flattened arrays : ', result)
 
-    const updateTxCounterparty = holofuelHistoryCounterparties.map(agent => {
-      const matchingTx = filterTransactions(agent)
-      console.log('>>>>>>>>>>>>> agent', agent)
-      console.log('>>>>>>>>>>>>> matchingTx', matchingTx)
-      const newTx = matchingTx.map(({ counterparty }) => Object.assign(counterparty, agent))
-      console.log('>>>>>>>>>>>>> newTx', newTx)
-      return newTx
-    })
-    const result = _.flatten(updateTxCounterparty)
-    console.log('RESULT >> flattened arrays : ', result)
-  }
+  //   // console.log('holofuelWaitingTransactions : ', holofuelWaitingTransactions)
+  //   const filterTransactions = (agent) => holofuelWaitingTransactions.filter(transaction => {
+  //     console.log('agent, transaction', agent, transaction)
+  //     return transaction.counterparty.id === agent.id
+  //   })
+
+  //   const updateTxCounterparty = holofuelHistoryCounterparties.map(agent => {
+  //     const matchingTx = filterTransactions(agent)
+  //     // console.log('>>>>>>>>>>>>> agent', agent)
+  //     console.log('>>>>>>>>>>>>> matchingTx', matchingTx)
+  //     const newTx = matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+  //     console.log('>>>>>>>>>>>>> newTx', newTx)
+  //     return newTx
+  //   })
+  //   const result = _.flatten(updateTxCounterparty)
+  //   console.log('RESULT >> flattened arrays : ', result)
+  // }
 
   return response
 }
@@ -95,9 +109,6 @@ function useFetchCounterparties () {
 export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-
-  console.log('holofuelWaitingTransactions : ', pendingTransactions)
-  console.log('holofuelCompletedTransactions : ', completedTransactions)
 
   const cancelTransaction = useCancel()
   const counterpartyList = useFetchCounterparties()
@@ -167,10 +178,8 @@ const TransactionTableHeading = ({ content }) => {
 export function TransactionRow ({ transaction, showCancellationModal, completed, counterpartyList }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
 
-  console.log('counterparty : ', counterparty)
-
-  // let counterpartyNick = 'Loading...'
-  // if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
+  let counterpartyNick = 'Loading...'
+  if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
   // console.log('COUNTERPARTY NICKNAME : ', counterpartyNick)
 
   const { date, time } = presentDateAndTime(timestamp)
@@ -181,8 +190,8 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
     </td>
     <td styleName='completed-tx-col table-content align-left'>
       <h4 data-testid='cell-counterparty'>
-        <RenderNickname agentId={counterparty.id} copyId />
-        {/* {counterpartyNick} */}
+        {/* <RenderNickname agentId={counterparty.id} copyId /> */}
+        {counterpartyNick}
       </h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
@@ -252,8 +261,10 @@ export function RenderNickname ({ agentId, copyId }) {
     variables: { agentId }
   })
 
-  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
-  else if ((loading || error) && copyId) {
+  console.log('RENDERNICKNAME >>> holofuelCounterparty : ', holofuelCounterparty)
+
+  if ((loading || error || holofuelCounterparty === {}) && !copyId) return <>{presentAgentId(agentId)}</>
+  else if ((loading || error || holofuelCounterparty === {}) && copyId) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
