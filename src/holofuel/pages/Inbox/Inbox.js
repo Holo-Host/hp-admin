@@ -41,18 +41,18 @@ function useFetchCounterparties () {
   const { loading, error, data: { holofuelInboxCounterparties } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, {
     update: (cache, { data: { holofuelInboxCounterparties } }) => {
       if (holofuelInboxCounterparties) {
+        const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
+        const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
+          const matchingTx = filterTransactionsByAgentId(agent, txListType)
+          return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+        })
+
+        // cache Read/Write/Update for holofuelActionableTransactions
         const { holofuelActionableTransactions } = cache.readQuery({
           query: HolofuelActionableTransactionsQuery
         })
 
-        const filterTransactions = (agent) => holofuelActionableTransactions.filter(transaction => transaction.counterparty.id === agent.id)
-
-        const updateTxCounterparty = holofuelInboxCounterparties.map(agent => {
-          const matchingTx = filterTransactions(agent)
-          return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
-        })
-        const result = _.flatten(updateTxCounterparty)
-        console.log('RESULT (flattened array) : ', result)
+        const result = _.flatten(updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties))
 
         cache.writeQuery({
           query: HolofuelActionableTransactionsQuery,
@@ -133,6 +133,7 @@ export function TransactionRow ({ transaction, showConfirmationModal, counterpar
       <div styleName='story'><span styleName='counterparty'>
         <RenderNickname agentId={counterparty.id} copyId />
         {/* {counterpartyNick} */}
+        {/* {counterparty.nickname || counterparty.id} */}
       </span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
