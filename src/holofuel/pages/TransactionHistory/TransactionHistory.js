@@ -29,73 +29,45 @@ function useCancel () {
 }
 
 function useFetchCounterparties () {
-  // const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
-  // const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
+  const { loading, error, data: { holofuelHistoryCounterparties } = {}, cache } = useQuery(HolofuelHistoryCounterpartiesQuery)
 
-  const { loading, error, data: { holofuelHistoryCounterparties } = {}, cache } = useQuery(HolofuelHistoryCounterpartiesQuery, {
-    update: () => {
-      if (holofuelHistoryCounterparties) {
-        console.log('>>>>>>>>>>>>> INSIDE CACHE R/W && UPDATE')
-        const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
-        const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
-          const matchingTx = filterTransactionsByAgentId(agent, txListType)
-          return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
-        })
+  if (holofuelHistoryCounterparties && cache) {
+    console.log('>>>>>>>>>>>>> INSIDE CACHE R/W && UPDATE')
+    const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
+    const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
+      const matchingTx = filterTransactionsByAgentId(agent, txListType)
+      return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+    })
 
-        // cache Read/Write/Update for HolofuelCompletedTransactionsQuery
-        const { holofuelCompletedTransactions } = cache.readQuery({
-          query: HolofuelCompletedTransactionsQuery
-        })
-
-        const newCompletedTxList = _.flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
-        console.log('RESULT >> flattened holofuelCompletedTransactions Array : ', newCompletedTxList)
-
-        cache.writeQuery({
-          query: HolofuelCompletedTransactionsQuery,
-          data: {
-            holofuelCompletedTransactions: { ...newCompletedTxList }
-          }
-        })
-
-        // cache Read/Write/Update for HolofuelWaitingTransactionsQuery
-        const { holofuelWaitingTransactions } = cache.readQuery({
-          query: HolofuelWaitingTransactionsQuery
-        })
-
-        const newWaitingTxList = _.flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
-        console.log('RESULT >> flattened holofuelWaitingTransactions Array : ', newWaitingTxList)
-
-        cache.writeQuery({
-          query: HolofuelWaitingTransactionsQuery,
-          data: {
-            holofuelWaitingTransactions: { ...newWaitingTxList }
-          }
-        })
+    // cache Read/Write/Update for HolofuelCompletedTransactionsQuery
+    const { holofuelCompletedTransactions } = cache.readQuery({
+      query: HolofuelCompletedTransactionsQuery
+    })
+    const newCompletedTxList = _.flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
+    cache.writeQuery({
+      query: HolofuelCompletedTransactionsQuery,
+      data: {
+        holofuelCompletedTransactions: { ...newCompletedTxList }
       }
-    }
-  })
+    })
+
+    // cache Read/Write/Update for HolofuelWaitingTransactionsQuery
+    const { holofuelWaitingTransactions } = cache.readQuery({
+      query: HolofuelWaitingTransactionsQuery
+    })
+    const newWaitingTxList = _.flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
+    cache.writeQuery({
+      query: HolofuelWaitingTransactionsQuery,
+      data: {
+        holofuelWaitingTransactions: { ...newWaitingTxList }
+      }
+    })
+  }
 
   let response
   if (loading) response = { loading: true }
   if (error) response = { error: `Error: ${error}` }
   else response = holofuelHistoryCounterparties
-
-  // if (holofuelHistoryCounterparties) {
-  //   // console.log('holofuelCompletedTransactions : ', holofuelCompletedTransactions)
-  //   // console.log('holofuelWaitingTransactions : ', holofuelWaitingTransactions)
-
-  //   const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
-  //   const updateTxListCounterparties = (txListType) => holofuelHistoryCounterparties.map(agent => {
-  //     const matchingTx = filterTransactionsByAgentId(agent, txListType)
-  //     return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
-  //   })
-
-  //   const completedTxresult = _.flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
-  //   console.log('RESULT >> flattened holofuelCompletedTransactions Array : ', completedTxresult)
-  //   const waitingTxresult = _.flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
-  //   console.log('RESULT >> flattened holofuelWaitingTransactions Array : ', waitingTxresult)
-  // }
-
   return response
 }
 

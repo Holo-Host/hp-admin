@@ -38,8 +38,8 @@ function useDecline () {
 }
 
 function useFetchCounterparties () {
-  const { loading, error, data: { holofuelInboxCounterparties } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, {
-    update: (cache, { data: { holofuelInboxCounterparties } }) => {
+  const { loading, error, data: { holofuelInboxCounterparties } = {}, cache } = useQuery(HolofuelInboxCounterpartiesQuery, {
+    update: () => {
       if (holofuelInboxCounterparties) {
         const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
         const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
