@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
+import _ from 'lodash'
 import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
@@ -35,10 +37,46 @@ function useDecline () {
   })
 }
 
+function useFetchCounterparties () {
+  const { loading, error, data: { holofuelInboxCounterparties } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, {
+    update: (cache, { data: { holofuelInboxCounterparties } }) => {
+      if (holofuelInboxCounterparties) {
+        const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
+        const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
+          const matchingTx = filterTransactionsByAgentId(agent, txListType)
+          return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+        })
+
+        // cache Read/Write/Update for holofuelActionableTransactions
+        const { holofuelActionableTransactions } = cache.readQuery({
+          query: HolofuelActionableTransactionsQuery
+        })
+
+        const result = _.flatten(updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties))
+
+        cache.writeQuery({
+          query: HolofuelActionableTransactionsQuery,
+          data: {
+            holofuelActionableTransactions: { ...result }
+          }
+        })
+      }
+    }
+  })
+
+  let response
+  if (loading) response = { loading: true }
+  if (error) response = { error: `Error: ${error}` }
+  else response = holofuelInboxCounterparties
+  return response
+}
+
 export default function Inbox () {
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
+  const counterpartyList = useFetchCounterparties()
   const [modalTransaction, setModalTransaction] = useState()
   const isTransactionsEmpty = isEmpty(transactions)
 
@@ -54,6 +92,7 @@ export default function Inbox () {
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
+        counterpartyList={counterpartyList}
         showConfirmationModal={showConfirmationModal}
         role='list'
         key={transaction.id} />)}
@@ -61,13 +100,14 @@ export default function Inbox () {
 
     <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
+      counterpartyList={counterpartyList}
       transaction={modalTransaction}
       payTransaction={payTransaction}
       declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showConfirmationModal }) {
+export function TransactionRow ({ transaction, showConfirmationModal, counterpartyList }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
@@ -76,6 +116,9 @@ export function TransactionRow ({ transaction, showConfirmationModal }) {
   const { date, time } = presentDateAndTime(timestamp)
 
   const story = isOffer ? ' is offering' : ' is requesting'
+
+  // let counterpartyNick = 'Loading...'
+  // if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
 
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='date-time'>
@@ -87,7 +130,11 @@ export function TransactionRow ({ transaction, showConfirmationModal }) {
       </div>
     </div>
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'><RenderNickname agentId={counterparty.id} copyId /></span>{story}</div>
+      <div styleName='story'><span styleName='counterparty'>
+        <RenderNickname agentId={counterparty.id} copyId />
+        {/* {counterpartyNick} */}
+        {/* {counterparty.nickname || counterparty.id} */}
+      </span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
     <AmountCell amount={amount} isRequest={isRequest} />
@@ -143,9 +190,12 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, counterpartyList }) {
   if (!transaction) return null
   const { id, counterparty, amount, type, action } = transaction
+
+  let counterpartyNick = 'Loading...'
+  if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
 
   let message, actionHook, actionParams, contentLabel
   switch (action) {
@@ -153,14 +203,14 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = 'Pay request'
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Pay <RenderNickname agentId={counterparty} /> <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay {counterpartyNick} <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     case 'decline': {
       contentLabel = `Reject ${type}?`
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Reject <RenderNickname agentId={counterparty} />'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject {counterpartyNick}'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
@@ -199,8 +249,8 @@ export function RenderNickname ({ agentId, copyId }) {
     variables: { agentId }
   })
 
-  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
-  else if ((loading || error) && copyId) {
+  if ((loading || error || holofuelCounterparty === {}) && !copyId) return <>{presentAgentId(agentId)}</>
+  else if ((loading || error || holofuelCounterparty === {}) && copyId) {
     return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
       {presentAgentId(agentId)}
     </CopyAgentId>
