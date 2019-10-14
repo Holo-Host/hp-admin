@@ -38,7 +38,6 @@ export const resolvers = {
     holofuelInboxCounterparties: () => {
       const historyTransactions = HoloFuelDnaInterface.transactions.allActionable()
       const transactionCounterparties = historyTransactions.then(getTxCounterparties)
-      console.log('+++++++++++++++ IN INBOX (ALL ACTIONABLE) RESOLVER transactionCounterparties : ', transactionCounterparties)
       return transactionCounterparties
     },
 

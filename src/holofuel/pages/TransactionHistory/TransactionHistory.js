@@ -59,7 +59,6 @@ function useFetchCounterparties () {
     }
   })
   // HolofuelWaitingTransactionsQuery
-  // HolofuelActionableTransactionsQuery
 
   let response
   if (loading) response = { loading: true }
