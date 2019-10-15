@@ -19,7 +19,7 @@ let
     && npm run build
   '';
 
-  build-holofuel = pkgs.writeShellScriptBin "build-hp"
+  build-holofuel = pkgs.writeShellScriptBin "build-holofuel"
   ''
     ( rm -rf node_modules  ) \
     &&  npm install --build-from-source  \
