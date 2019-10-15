@@ -71,7 +71,7 @@ describe('TransactionRow', () => {
 
   const request = {
     id: '123',
-    counterparty: { id: 'only care about the last 6' },
+    counterparty: { id: 'last 6' },
     amount: 100,
     type: TYPE.request,
     timestamp: moment().subtract(14, 'days'),

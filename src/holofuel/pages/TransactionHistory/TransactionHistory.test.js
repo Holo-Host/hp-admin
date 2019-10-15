@@ -79,7 +79,7 @@ describe('TransactionsHistory', () => {
           rows.forEach(async (row, rowIndex) => {
             const transaction = fullRowContent[rowIndex]
             const { getByTestId } = within(row)
-            const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: fullRowContent[rowIndex].counterparty })
+            const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: fullRowContent[rowIndex].counterparty.id })
             const notesDisplay = transaction.notes === null ? 'none' : transaction.notes
             const dateDisplay = presentDateAndTime(transaction.timestamp).date
             const timeDisplay = presentDateAndTime(transaction.timestamp).time
@@ -87,7 +87,7 @@ describe('TransactionsHistory', () => {
 
             expect(within(getByTestId('cell-date')).getByText(dateDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-time')).getByText(timeDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-counterparty')).getByText(whois.nickname) || within(getByTestId('cell-counterparty')).getByText(presentAgentId(transaction.counterparty))).toBeInTheDocument()
+            expect(within(getByTestId('cell-counterparty')).getByText(whois.nickname) || within(getByTestId('cell-counterparty')).getByText(presentAgentId(transaction.counterparty.id))).toBeInTheDocument()
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-amount')).getByText(amountToMatch)).toBeInTheDocument()
             expect(within(getByTestId('cell-fees')).getByText(transaction.fees)).toBeInTheDocument()
@@ -116,7 +116,7 @@ describe('TransactionsHistory', () => {
 
     const pendingRequest = {
       id: 'QmMockEntryAddress123',
-      counterparty: mockAgent1.pub_sign_key,
+      counterparty: { id: mockAgent1.pub_sign_key },
       amount: 8000.88,
       status: STATUS.pending,
       type: TYPE.request,
@@ -231,7 +231,7 @@ describe('TransactionsHistory', () => {
       })
 
       const rowContent = completedTransactionsQueryMock.result.data.holofuelCompletedTransactions[0]
-      const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: rowContent.counterparty })
+      const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: rowContent.counterparty.id })
       const notesDisplay = rowContent === null ? 'none' : rowContent.notes
 
       const mocks = [
@@ -251,7 +251,7 @@ describe('TransactionsHistory', () => {
       const row = getAllByRole('row')
       const { getByTestId } = within(row[1])
       expect(rowContent.status).toBe('completed')
-      expect(within(getByTestId('cell-counterparty')).getByText(presentAgentId(rowContent.counterparty)) || within(getByTestId('cell-counterparty')).getByText(whois.nickname)).toBeInTheDocument()
+      expect(within(getByTestId('cell-counterparty')).getByText(presentAgentId(rowContent.counterparty.id)) || within(getByTestId('cell-counterparty')).getByText(whois.nickname)).toBeInTheDocument()
       expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
       expect(within(getByTestId('cell-fees')).getByText(rowContent.fees)).toBeInTheDocument()
       expect(within(getByTestId('cell-present-balance')).getByText(rowContent.presentBalance)).toBeInTheDocument()
@@ -415,13 +415,13 @@ describe('TransactionsHistory', () => {
       let container, getByText
       await act(async () => {
         ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <RenderNickname agentId={rowContent.counterparty} className='mock-style' />
+          <RenderNickname agentId={rowContent.counterparty.id} className='mock-style' />
         </MockedProvider>))
         await wait(0)
         Modal.setAppElement(container)
       })
 
-      const nameDiv = getByText(presentAgentId(rowContent.counterparty))
+      const nameDiv = getByText(presentAgentId(rowContent.counterparty.id))
       expect(nameDiv).toBeInTheDocument()
     })
   })

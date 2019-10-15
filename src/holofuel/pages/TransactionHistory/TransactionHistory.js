@@ -35,7 +35,6 @@ function useFetchCounterparties () {
   const { loading, error, data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
 
   if (holofuelHistoryCounterparties) {
-    console.log('>>>>>>>>>>>>> INSIDE client R/W && UPDATE')
     const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
     const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
       const matchingTx = filterTransactionsByAgentId(agent, txListType)
@@ -149,7 +148,9 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
     </td>
     <td styleName='completed-tx-col table-content align-left'>
       <h4 data-testid='cell-counterparty'>
-        {counterparty.nickname || counterparty.id}
+        <CopyAgentId agent={counterparty}>
+          {counterparty.nickname || presentAgentId(counterparty.id)}
+        </CopyAgentId>
       </h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
@@ -218,8 +219,6 @@ export function RenderNickname ({ agentId, copyId }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-
-  console.log('RENDERNICKNAME >>> holofuelCounterparty : ', holofuelCounterparty)
 
   if ((loading || error || holofuelCounterparty === {}) && !copyId) return <>{presentAgentId(agentId)}</>
   else if ((loading || error || holofuelCounterparty === {}) && copyId) {

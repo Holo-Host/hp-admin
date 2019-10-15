@@ -123,7 +123,9 @@ export function TransactionRow ({ transaction, showConfirmationModal, counterpar
     </div>
     <div styleName='description-cell'>
       <div styleName='story'><span styleName='counterparty'>
-        {counterparty.nickname || counterparty.id}
+        <CopyAgentId agent={counterparty}>
+          {counterparty.nickname || presentAgentId(counterparty.id)}
+        </CopyAgentId>
       </span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>
