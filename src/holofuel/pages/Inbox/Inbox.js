@@ -40,26 +40,24 @@ function useDecline () {
 function useFetchCounterparties () {
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
 
-  const { loading, error, data: { holofuelInboxCounterparties } = {}, client } = useQuery(HolofuelInboxCounterpartiesQuery, {
-    update: () => {
-      if (holofuelInboxCounterparties) {
-        const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
-        const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
-          const matchingTx = filterTransactionsByAgentId(agent, txListType)
-          return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
-        })
+  const { loading, error, data: { holofuelInboxCounterparties } = {}, client } = useQuery(HolofuelInboxCounterpartiesQuery)
 
-        const result = _.flatten(updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties))
+  if (holofuelInboxCounterparties) {
+    const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
+    const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
+      const matchingTx = filterTransactionsByAgentId(agent, txListType)
+      return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+    })
 
-        client.writeQuery({
-          query: HolofuelActionableTransactionsQuery,
-          data: {
-            holofuelActionableTransactions: { ...result }
-          }
-        })
+    const result = _.flatten(updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties))
+
+    client.writeQuery({
+      query: HolofuelActionableTransactionsQuery,
+      data: {
+        holofuelActionableTransactions: { ...result }
       }
-    }
-  })
+    })
+  }
 
   let response
   if (loading) response = { loading: true }
@@ -128,9 +126,9 @@ export function TransactionRow ({ transaction, showConfirmationModal, counterpar
     </div>
     <div styleName='description-cell'>
       <div styleName='story'><span styleName='counterparty'>
-        <RenderNickname agentId={counterparty.id} copyId />
+        {/* <RenderNickname agentId={counterparty.id} copyId /> */}
         {/* {counterpartyNick} */}
-        {/* {counterparty.nickname || counterparty.id} */}
+        {counterparty.nickname || counterparty.id}
       </span>{story}</div>
       <div styleName='notes'>{notes}</div>
     </div>

@@ -141,8 +141,8 @@ const TransactionTableHeading = ({ content }) => {
 export function TransactionRow ({ transaction, showCancellationModal, completed, counterpartyList }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
 
-  let counterpartyNick = 'Loading...'
-  if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
+  // let counterpartyNick = 'Loading...'
+  // if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
   // console.log('COUNTERPARTY NICKNAME : ', counterpartyNick)
 
   const { date, time } = presentDateAndTime(timestamp)
@@ -154,8 +154,8 @@ export function TransactionRow ({ transaction, showCancellationModal, completed,
     <td styleName='completed-tx-col table-content align-left'>
       <h4 data-testid='cell-counterparty'>
         {/* <RenderNickname agentId={counterparty.id} copyId /> */}
-        {counterpartyNick}
-        {/* {counterparty.nickname || counterparty.id} */}
+        {/* {counterpartyNick} */}
+        {counterparty.nickname || counterparty.id}
       </h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
