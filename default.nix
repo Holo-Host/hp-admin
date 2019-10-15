@@ -42,16 +42,16 @@ let
   multiInstanceConfig = dna: map (agent: {
     agent = agent.id;
     dna = dna.name;
-    id = dna.name+"::"+agent.id;
+    id = agent.public_address+"::<happ_id>-"+dna.name;
     storage = {
-      path = ".holochain/holo/storage/${dna.name+"::"+agent.id}";
+      path = ".holochain/holo/storage/${agent.public_address+"::<happ_id>-"+dna.name}";
       type = "file";
     };
   }) config.agents;
 
 
   multiInterfaceInstanceConfig = dna: map (agent: {
-    id = dna.name+"::"+agent.id;
+    id = agent.public_address+"::<happ_id>-"+dna.name;
   }) config.agents;
 
   flatten = x:
