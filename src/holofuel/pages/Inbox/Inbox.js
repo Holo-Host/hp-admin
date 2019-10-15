@@ -112,9 +112,6 @@ export function TransactionRow ({ transaction, showConfirmationModal, counterpar
 
   const story = isOffer ? ' is offering' : ' is requesting'
 
-  // let counterpartyNick = 'Loading...'
-  // if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
-
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='date-time'>
       <div styleName='date'>
@@ -126,8 +123,6 @@ export function TransactionRow ({ transaction, showConfirmationModal, counterpar
     </div>
     <div styleName='description-cell'>
       <div styleName='story'><span styleName='counterparty'>
-        {/* <RenderNickname agentId={counterparty.id} copyId /> */}
-        {/* {counterpartyNick} */}
         {counterparty.nickname || counterparty.id}
       </span>{story}</div>
       <div styleName='notes'>{notes}</div>
