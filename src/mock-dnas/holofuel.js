@@ -312,7 +312,9 @@ function receivedPaymentsHashMap (promiseArr) {
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
+    // whomai is only for discovering current / personal agent
     whoami: () => agentArray[0].Ok,
+    // whois is for discovering all other agents
     whois: ({ agents }) => typeof agents === 'string' ? Array.of(whois(agents)) : Array.of(agents.map(agent => whois(agent))),
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
