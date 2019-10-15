@@ -13,7 +13,7 @@
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js",
-    "ci": "CI=1 npm run test:unit"
+    "test:all": "CI=1 npm run test"
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",

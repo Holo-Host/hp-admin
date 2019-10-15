@@ -9,7 +9,7 @@ let
   ''
     ( rm -rf node_modules  ) \
     &&  npm install --build-from-source  \
-    && npm run test
+    && npm run test:all
   '';
 
   build-hp-admin = pkgs.writeShellScriptBin "build-hp-admin"
@@ -107,7 +107,7 @@ in
     '';
 
     checkPhase = ''
-      npm run test
+      npm run test:all
     '';
 
     doCheck = true;
