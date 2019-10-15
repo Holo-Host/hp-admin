@@ -23,7 +23,7 @@ let
   ''
     ( rm -rf node_modules  ) \
     &&  npm install --build-from-source  \
-    && npm run build
+    && npm run build:holofuel
   '';
 
   dnaConfig = dna: {
