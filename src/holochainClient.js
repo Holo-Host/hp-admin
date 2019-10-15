@@ -22,9 +22,9 @@ export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
 
-export function conductorInstanceId (instanceId) {
-  const agentId = process.env.REACT_APP_AGENT_ID
+const agentId = process.env.REACT_APP_AGENT_ID
 
+export function conductorInstanceId (instanceId) {
   return {
     hylo: 'hylo::' + agentId,
     'happ-store': 'happ-store::' + agentId,

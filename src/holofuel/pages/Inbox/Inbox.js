@@ -36,7 +36,6 @@ function useDecline () {
 }
 
 export default function Inbox () {
-  console.log('process.env.REACT_APP_INTEGRATION_TEST', process.env.REACT_APP_INTEGRATION_TEST)
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
