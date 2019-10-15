@@ -29,34 +29,31 @@ function useCancel () {
 }
 
 function useFetchCounterparties () {
-  const { loading, error, data: { holofuelHistoryCounterparties } = {}, cache } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
-  if (holofuelHistoryCounterparties && cache) {
-    console.log('>>>>>>>>>>>>> INSIDE CACHE R/W && UPDATE')
+  const { loading, error, data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
+
+  if (holofuelHistoryCounterparties) {
+    console.log('>>>>>>>>>>>>> INSIDE client R/W && UPDATE')
     const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
     const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
       const matchingTx = filterTransactionsByAgentId(agent, txListType)
       return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
     })
 
-    // cache Read/Write/Update for HolofuelCompletedTransactionsQuery
-    const { holofuelCompletedTransactions } = cache.readQuery({
-      query: HolofuelCompletedTransactionsQuery
-    })
+    // Cache Write/Update for HolofuelCompletedTransactionsQuery
     const newCompletedTxList = _.flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
-    cache.writeQuery({
+    client.writeQuery({
       query: HolofuelCompletedTransactionsQuery,
       data: {
         holofuelCompletedTransactions: { ...newCompletedTxList }
       }
     })
 
-    // cache Read/Write/Update for HolofuelWaitingTransactionsQuery
-    const { holofuelWaitingTransactions } = cache.readQuery({
-      query: HolofuelWaitingTransactionsQuery
-    })
+    // Cache Write/Update for HolofuelWaitingTransactionsQuery
     const newWaitingTxList = _.flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
-    cache.writeQuery({
+    client.writeQuery({
       query: HolofuelWaitingTransactionsQuery,
       data: {
         holofuelWaitingTransactions: { ...newWaitingTxList }

@@ -38,7 +38,9 @@ function useDecline () {
 }
 
 function useFetchCounterparties () {
-  const { loading, error, data: { holofuelInboxCounterparties } = {}, cache } = useQuery(HolofuelInboxCounterpartiesQuery, {
+  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+
+  const { loading, error, data: { holofuelInboxCounterparties } = {}, client } = useQuery(HolofuelInboxCounterpartiesQuery, {
     update: () => {
       if (holofuelInboxCounterparties) {
         const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
@@ -47,14 +49,9 @@ function useFetchCounterparties () {
           return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
         })
 
-        // cache Read/Write/Update for holofuelActionableTransactions
-        const { holofuelActionableTransactions } = cache.readQuery({
-          query: HolofuelActionableTransactionsQuery
-        })
-
         const result = _.flatten(updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties))
 
-        cache.writeQuery({
+        client.writeQuery({
           query: HolofuelActionableTransactionsQuery,
           data: {
             holofuelActionableTransactions: { ...result }
