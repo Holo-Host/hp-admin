@@ -18,7 +18,7 @@ export const resolvers = {
     // factoring out the function call here breaks tests. Don't understand why
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    hostingUser: HhaDnaInterface.currentUser.get,
+    hostingUser: () => HhaDnaInterface.currentUser.get(),
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
