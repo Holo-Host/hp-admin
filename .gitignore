@@ -21,6 +21,7 @@
 tmp-storage
 tmp
 conductor-config.toml
+holofuel-conductor-config.toml
 keystores
 
 npm-debug.log*
