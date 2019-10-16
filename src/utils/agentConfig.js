@@ -9,3 +9,5 @@ if (config.agents.length < 1) throw new Error('No agents defined in conductor-co
 export const publicAddress = config.agents[0].public_address
 
 export const agentId = config.agents[0].id
+
+export const nickname = config.agents[0].name

@@ -10,6 +10,9 @@ export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
     ? true
     : developmentMockDnaConnection
 
+console.log('process.env.REACT_APP_INTEGRATION_TEST', process.env.REACT_APP_INTEGRATION_TEST)
+console.log('MOCK_DNA_CONNECTION', MOCK_DNA_CONNECTION)
+
 // These are overwritten when MOCK_DNA_CONNECTION is true, so they only take effect when that is false
 export const MOCK_INDIVIDUAL_DNAS = {
   hylo: true,
