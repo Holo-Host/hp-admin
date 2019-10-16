@@ -6,6 +6,7 @@
     "start": "rm -rf ./node_modules/.cache/babel-loader && node scripts/start.js",
     "start:holofuel": "REACT_APP_HOLOFUEL_APP=true npm start",
     "build": "node scripts/build.js",
+    "build:holofuel": "REACT_APP_HOLOFUEL_APP=true node scripts/build.js",
     "hc:start": "mkdir -p tmp && holochain -c ./conductor-config.toml",
     "provider-flow": "node scripts/HHAProviderFlow/index.js",
     "holofuel-load": "node scripts/HoloFuelDataEntry/index.js",
@@ -14,7 +15,7 @@
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
     "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
     "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",    
-    "ci": "CI=1 npm run test:unit"
+    "test:all": "CI=1 npm run test"
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",
