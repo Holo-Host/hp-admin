@@ -12,7 +12,9 @@
     "holofuel-load": "node scripts/HoloFuelDataEntry/index.js",
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
-    "test:unit": "node scripts/test.js",
+    "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
+    "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
+    "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",    
     "test:all": "CI=1 npm run test"
   },
   "dependencies": {
@@ -25,7 +27,6 @@
     "apollo-link-logger": "^1.2.3",
     "apollo-link-schema": "^1.2.3",
     "bcryptjs": "^2.4.3",
-    "canvas": "^2.5.0",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
     "lodash": "^4.17.15",

@@ -48,5 +48,8 @@ export function HPAdminApp () {
   </ApolloProvider>
 }
 
-ReactDOM.render(<App />, document.getElementById('root'))
-ReactModal.setAppElement('#root')
+const rootElement = document.getElementById('root')
+if (rootElement) {
+  ReactDOM.render(<App />, rootElement)
+  ReactModal.setAppElement('#root')
+}
