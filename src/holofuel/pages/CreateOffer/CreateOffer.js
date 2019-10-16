@@ -37,10 +37,7 @@ export default function CreateOffer ({ history: { push } }) {
   const createOffer = useOfferMutation()
 
   const [counterpartyId, setCounterpartyId] = useState('')
-  const [counterpartyNick, setCounterpartyNick] = useState('')
-  useEffect(() => {
-    setCounterpartyNick(presentAgentId(counterpartyId))
-  }, [counterpartyId])
+  const [counterpartyNick, setCounterpartyNick] = useState(presentAgentId(counterpartyId))
 
   const [fee, setFee] = useState(0)
   const [total, setTotal] = useState(0)

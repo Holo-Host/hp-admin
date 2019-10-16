@@ -36,10 +36,7 @@ export default function CreateRequest ({ history: { push } }) {
   const createRequest = useRequestMutation()
 
   const [counterpartyId, setCounterpartyId] = useState('')
-  const [counterpartyNick, setCounterpartyNick] = useState('')
-  useEffect(() => {
-    setCounterpartyNick(presentAgentId(counterpartyId))
-  }, [counterpartyId])
+  const [counterpartyNick, setCounterpartyNick] = useState(presentAgentId(counterpartyId))
 
   const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
 
