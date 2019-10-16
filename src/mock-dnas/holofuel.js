@@ -50,23 +50,14 @@ export const transactionList = {
         event: '2019-08-30T11:45:10+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '0'
-        },
-        payable: {
-          Ok: '40.01'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '40.01',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     },
     {
       index: 2,
@@ -105,23 +96,14 @@ export const transactionList = {
         event: '2019-08-30T11:19:33+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '10.01'
-        },
-        payable: {
-          Ok: '0'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '10.01'
     },
     {
       index: 3,
@@ -155,23 +137,14 @@ export const transactionList = {
         event: '2019-08-30T11:19:32+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '-10.01'
-        },
-        payable: {
-          Ok: '0'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     },
     {
       index: 1,
@@ -196,23 +169,14 @@ export const transactionList = {
         event: '2019-08-30T10:57:29+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '0'
-        },
-        payable: {
-          Ok: '202.0101'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     },
     {
       index: 0,
@@ -234,23 +198,14 @@ export const transactionList = {
         event: '2019-08-30T00:18:00+00:00'
       },
       adjustment: {
-        balance: {
-          Ok: '0'
-        },
-        payable: {
-          Ok: '0'
-        },
-        receivable: {
-          Ok: '0'
-        },
-        fees: {
-          Ok: '0'
-        },
-        resulting_balance: {
-          // 'This endpoint is a WIP'
-          Ok: '0'
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
-      }
+      },
+      available: '0'
     }
   ]
 }
@@ -307,18 +262,29 @@ export const pendingList = {
   ]
 }
 
-const agents = [
-  {
-    nick: 'Perry',
-    pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
-  },
-  {
-    nick: 'Sam',
-    pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+const agentArray = [{
+  Ok: {
+    agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
+    agent_id: {
+      nick: 'Perry',
+      pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+    },
+    dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
+    dna_name: 'Holo Fuel Transactor'
   }
-]
+}, {
+  Ok: {
+    agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
+    agent_id: {
+      nick: 'Sam',
+      pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+    },
+    dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
+    dna_name: 'Holo Fuel Transactor'
+  }
+}]
 
-const whoamiObj = (agentId) => agents.find(agent => agent.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
+const whois = (agentId) => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
 
 function listPending ({ origins }) {
   if (!origins) return pendingList
@@ -332,17 +298,31 @@ function listPending ({ origins }) {
   throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
 }
 
+function receivedPaymentsHashMap (promiseArr) {
+  return promiseArr.reduce((currentHashMap, promise) => {
+    return {
+      ...currentHashMap,
+      [promise]: {
+        Ok: bcrypt.hashSync((promise + 'accepted'), NUM_SALT_ROUNDS)
+      }
+    }
+  }, {})
+}
+
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
-    whoami: ({ agentId }) => agentId ? whoamiObj(agentId) : agents[0],
+    // whomai is only for discovering current / personal agent
+    whoami: () => agentArray[0].Ok,
+    // whois is for discovering all other agents
+    whois: ({ agents }) => typeof agents === 'string' ? Array.of(whois(agents)) : Array.of(agents.map(agent => whois(agent))),
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: listPending,
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
     receive_payment: ({ promise, promise_sig: sig, promise_commit: commit }) => bcrypt.hashSync((promise + sig + commit + 'accepted'), NUM_SALT_ROUNDS),
-    receive_payments_pending: ({ promises }) => bcrypt.hashSync((promises + 'accepted'), NUM_SALT_ROUNDS),
+    receive_payments_pending: ({ promises }) => typeof promises === 'string' ? receivedPaymentsHashMap([promises]) : receivedPaymentsHashMap(promises),
     decline: ({ origin }) => bcrypt.hashSync((origin + 'declined'), NUM_SALT_ROUNDS),
     cancel: ({ origin }) => bcrypt.hashSync((origin + 'cancelled'), NUM_SALT_ROUNDS)
   }
