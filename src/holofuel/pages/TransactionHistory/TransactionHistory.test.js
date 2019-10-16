@@ -13,7 +13,7 @@ import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import TransactionsHistory, { TransactionRow, ConfirmCancellationModal, RenderNickname } from './TransactionHistory'
+import TransactionsHistory, { TransactionRow, ConfirmCancellationModal } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
@@ -159,14 +159,6 @@ describe('TransactionsHistory', () => {
       result: {
         data: { holofuelCounterparty: mockWhoIsAgent1 }
       }
-    }
-
-    const counterpartyQueryMockError = {
-      request: {
-        query: HolofuelCounterpartyQuery,
-        variables: { agentId: pendingRequest.counterparty.id }
-      },
-      error: new Error('ERROR! : <Error Message>')
     }
 
     const completedTransactionsQueryMock = {
@@ -400,30 +392,6 @@ describe('TransactionsHistory', () => {
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('of', { exact: false })).toBeInTheDocument()
       expect(getAllByText('to', { exact: false })[0]).toBeInTheDocument() // NB: 2 instances of the word two exist, due to the tooltip.
-    })
-
-    it('should return last 6 of AgentId in RenderNickname Component when HolofuelCounterpartyQuery request is *unsuccessful*', async () => {
-      afterEach(() => {
-        jest.clearAllMocks()
-      })
-
-      const rowContent = completedTransactionsQueryMock.result.data.holofuelCompletedTransactions[0]
-
-      const mocks = [
-        counterpartyQueryMockError
-      ]
-
-      let container, getByText
-      await act(async () => {
-        ({ container, getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <RenderNickname agentId={rowContent.counterparty.id} className='mock-style' />
-        </MockedProvider>))
-        await wait(0)
-        Modal.setAppElement(container)
-      })
-
-      const nameDiv = getByText(presentAgentId(rowContent.counterparty.id))
-      expect(nameDiv).toBeInTheDocument()
     })
   })
 

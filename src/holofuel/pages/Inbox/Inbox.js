@@ -3,7 +3,6 @@ import cx from 'classnames'
 import _ from 'lodash'
 import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -186,23 +185,20 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   if (!transaction) return null
   const { id, counterparty, amount, type, action } = transaction
 
-  let counterpartyNick = 'Loading...'
-  if (counterpartyList && !counterpartyList.loading) counterpartyNick = counterpartyList.find(agent => agent.id === counterparty.id).nickname
-
   let message, actionHook, actionParams, contentLabel
   switch (action) {
     case 'pay': {
       contentLabel = 'Pay request'
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Pay {counterpartyNick} <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Pay {counterparty.id} <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     case 'decline': {
       contentLabel = `Reject ${type}?`
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Reject {counterpartyNick}'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Reject {counterparty.id}'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
@@ -234,21 +230,4 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       </Button>
     </div>
   </Modal>
-}
-
-export function RenderNickname ({ agentId, copyId }) {
-  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    variables: { agentId }
-  })
-
-  if ((loading || error || holofuelCounterparty === {}) && !copyId) return <>{presentAgentId(agentId)}</>
-  else if ((loading || error || holofuelCounterparty === {}) && copyId) {
-    return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
-      {presentAgentId(agentId)}
-    </CopyAgentId>
-  } else if (holofuelCounterparty.nickname && copyId) {
-    return <CopyAgentId agent={holofuelCounterparty}>
-      {holofuelCounterparty.nickname}
-    </CopyAgentId>
-  } else return <>{holofuelCounterparty.nickname}</>
 }

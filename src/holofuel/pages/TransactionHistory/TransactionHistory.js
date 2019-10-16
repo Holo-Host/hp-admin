@@ -10,7 +10,6 @@ import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
@@ -198,7 +197,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'><RenderNickname agentId={counterparty.id} /></span> ?
+      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
     </div>
     <div styleName='modal-buttons'>
       <Button
@@ -213,21 +212,4 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
       </Button>
     </div>
   </Modal>
-}
-
-export function RenderNickname ({ agentId, copyId }) {
-  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    variables: { agentId }
-  })
-
-  if ((loading || error || holofuelCounterparty === {}) && !copyId) return <>{presentAgentId(agentId)}</>
-  else if ((loading || error || holofuelCounterparty === {}) && copyId) {
-    return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
-      {presentAgentId(agentId)}
-    </CopyAgentId>
-  } else if (holofuelCounterparty.nickname && copyId) {
-    return <CopyAgentId agent={holofuelCounterparty}>
-      {holofuelCounterparty.nickname}
-    </CopyAgentId>
-  } else return <>{holofuelCounterparty.nickname}</>
 }
