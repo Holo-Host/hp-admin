@@ -6,8 +6,6 @@ const config = toml.parse(readFileSync('./conductor-config.toml', 'utf-8'))
 
 if (config.agents.length < 1) throw new Error('No agents defined in conductor-config.toml')
 
-export const publicAddress = config.agents[0].public_address
-
-export const agentId = config.agents[0].id
+export const id = config.agents[0].public_address
 
 export const nickname = config.agents[0].name

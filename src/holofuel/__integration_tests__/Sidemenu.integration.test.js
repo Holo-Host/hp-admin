@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
-import { publicAddress } from 'utils/agentConfig'
+import { nickname } from 'utils/agentConfig'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
@@ -12,6 +12,6 @@ describe('Sidemenu', () => {
     const { getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
     const menuButton = getByTestId('menu-button')
     fireEvent.click(menuButton)
-    await wait(() => getByText(publicAddress))
+    await wait(() => getByText(nickname))
   }, 20000)
 })

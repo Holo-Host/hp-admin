@@ -6,7 +6,7 @@ const params = {
   jsonrpc: '2.0',
   method: 'call',
   params: {
-    instance_id: 'holofuel::agent-1-id',
+    instance_id: 'HcScJyCCFZ83Mgt74vxzU5fabdtw8vcmbc7nkkY9HNabig36PUinfDzjebbu54r::<happ_id>-holofuel',
     zome: 'transactions',
     function: 'list_pending',
     args: {}

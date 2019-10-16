@@ -3,15 +3,12 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
 // This can be written as a boolean expression then it's even less readable
-const developmentMockDnaConnection = false // this is the value MOCK_DNA_CONNECTION will have in the dev server
+const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
   : process.env.NODE_ENV === 'test'
     ? true
     : developmentMockDnaConnection
-
-console.log('process.env.REACT_APP_INTEGRATION_TEST', process.env.REACT_APP_INTEGRATION_TEST)
-console.log('MOCK_DNA_CONNECTION', MOCK_DNA_CONNECTION)
 
 // These are overwritten when MOCK_DNA_CONNECTION is true, so they only take effect when that is false
 export const MOCK_INDIVIDUAL_DNAS = {
@@ -28,11 +25,13 @@ let holochainClient
 const agentId = process.env.REACT_APP_AGENT_ID
 
 export function conductorInstanceId (instanceId) {
+  const formatInstanceId = instanceId => agentId + '::<happ_id>-' + instanceId
+
   return {
-    hylo: 'hylo::' + agentId,
-    'happ-store': 'happ-store::' + agentId,
-    hha: 'holo-hosting-app::' + agentId,
-    holofuel: 'holofuel::' + agentId
+    hylo: formatInstanceId('hylo'),
+    'happ-store': formatInstanceId('happ-store'),
+    hha: formatInstanceId('holo-hosting-app'),
+    holofuel: formatInstanceId('holofuel')
   }[instanceId]
 }
 
