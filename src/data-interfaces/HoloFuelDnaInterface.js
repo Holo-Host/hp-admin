@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
+import { promiseMap } from 'utils'
 
 export const currentDataTimeIso = () => new Date().toISOString()
 
@@ -13,15 +14,7 @@ const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 // Creates an array of all counterparties for a provided transaction list
 export async function getTxCounterparties (transactionList) {
   const counterpartyList = transactionList.map(({ counterparty }) => counterparty.id)
-  const agentDetailsList = []
-  for (let i = 0; i < counterpartyList.length; i++) {
-    const agentId = counterpartyList[i]
-    const agent = await new Promise(resolve => {
-      const findAgent = HoloFuelDnaInterface.user.getCounterparty({ agentId })
-      resolve(findAgent)
-    })
-    agentDetailsList.push(agent)
-  }
+  const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
   const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
   return noDuplicatesAgentList
 }
