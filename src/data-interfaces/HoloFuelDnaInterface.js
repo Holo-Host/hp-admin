@@ -15,9 +15,7 @@ const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 export async function getTxCounterparties (transactionList) {
   const counterpartyList = transactionList.map(({ counterparty }) => counterparty.id)
   const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
-  console.log('>>>>>>>>>>>> agentDetailsList', agentDetailsList)
   const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
-  console.log('>>>>>>>>>>>> noDuplicatesAgentList', noDuplicatesAgentList)
   return noDuplicatesAgentList
 }
 
