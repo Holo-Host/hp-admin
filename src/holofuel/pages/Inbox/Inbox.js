@@ -88,7 +88,6 @@ export default function Inbox () {
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
-
         showConfirmationModal={showConfirmationModal}
         role='list'
         key={transaction.id} />)}
