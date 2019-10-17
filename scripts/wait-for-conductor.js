@@ -26,10 +26,13 @@ async function waitForConductor (interval = 30000) {
       }
       isUp = true
     } catch (error) {
-      console.log(error)
-      console.log(`Pausing for ${Math.ceil(interval / 1000)} seconds`)
-      console.log('')
-      await wait(interval)
+      if (error.code === 'ECONNREFUSED') {
+        console.log(`Pausing for ${Math.ceil(interval / 1000)} seconds`)
+        console.log('')
+        await wait(interval)
+      } else {
+        throw error
+      }
     }
   }
   return true

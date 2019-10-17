@@ -29,7 +29,7 @@ const SettingsValidationSchema = yup.object().shape({
 export function Settings ({
   settings,
   updateSettings,
-  factoryReset,
+  history: { push },
   toggleSshAccess
 }) {
   const { register, handleSubmit, errors } = useForm({
@@ -105,7 +105,7 @@ export function Settings ({
       checked={sshAccessVal}
       onChange={handleToggleSshAccess} />
 
-    <Button name='factory-reset' variant='danger' wide onClick={() => factoryReset()}>Factory Reset</Button>
+    <Button name='factory-reset' variant='danger' wide onClick={() => push('/factory-reset')}>Factory Reset</Button>
   </PrimaryLayout>
 }
 

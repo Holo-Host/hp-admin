@@ -24,8 +24,5 @@ describe('CreateRequest', () => {
     fireEvent.click(getByText('Send'))
 
     await wait(() => getByLabelText('History'))
-
-
-    
   }, 20000)
 })
