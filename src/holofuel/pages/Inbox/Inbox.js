@@ -53,14 +53,14 @@ function useFetchCounterparties () {
     client.writeQuery({
       query: HolofuelActionableTransactionsQuery,
       data: {
-        holofuelActionableTransactions: { ...result }
+        holofuelActionableTransactions: result
       }
     })
   }
 
   let response
   if (loading) response = { loading: true }
-  if (error) response = { error: `Error: ${error}` }
+  else if (error) response = { error: `Error: ${error}` }
   else response = holofuelInboxCounterparties
   return response
 }
@@ -70,9 +70,11 @@ export default function Inbox () {
 
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
-  const counterpartyList = useFetchCounterparties()
   const [modalTransaction, setModalTransaction] = useState()
   const isTransactionsEmpty = isEmpty(transactions)
+
+  // const counterpartyList = useFetchCounterparties()
+  useFetchCounterparties()
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
 
@@ -86,7 +88,7 @@ export default function Inbox () {
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
-        counterpartyList={counterpartyList}
+
         showConfirmationModal={showConfirmationModal}
         role='list'
         key={transaction.id} />)}
@@ -94,14 +96,13 @@ export default function Inbox () {
 
     <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
-      counterpartyList={counterpartyList}
       transaction={modalTransaction}
       payTransaction={payTransaction}
       declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showConfirmationModal, counterpartyList }) {
+export function TransactionRow ({ transaction, showConfirmationModal }) {
   const { counterparty, amount, type, timestamp, notes } = transaction
 
   const isOffer = type === TYPE.offer
@@ -181,7 +182,7 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, counterpartyList }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   if (!transaction) return null
   const { id, counterparty, amount, type, action } = transaction
 

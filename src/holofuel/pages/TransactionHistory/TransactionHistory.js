@@ -45,7 +45,7 @@ function useFetchCounterparties () {
     client.writeQuery({
       query: HolofuelCompletedTransactionsQuery,
       data: {
-        holofuelCompletedTransactions: { ...newCompletedTxList }
+        holofuelCompletedTransactions: newCompletedTxList
       }
     })
 
@@ -54,14 +54,14 @@ function useFetchCounterparties () {
     client.writeQuery({
       query: HolofuelWaitingTransactionsQuery,
       data: {
-        holofuelWaitingTransactions: { ...newWaitingTxList }
+        holofuelWaitingTransactions: newWaitingTxList
       }
     })
   }
 
   let response
   if (loading) response = { loading: true }
-  if (error) response = { error: `Error: ${error}` }
+  else if (error) response = { error: `Error: ${error}` }
   else response = holofuelHistoryCounterparties
   return response
 }
@@ -72,7 +72,10 @@ export default function TransactionsHistory () {
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
   const cancelTransaction = useCancel()
-  const counterpartyList = useFetchCounterparties()
+
+  useFetchCounterparties()
+  // const counterpartyList = useFetchCounterparties()
+
   const [modalTransaction, setModalTransaction] = useState()
 
   const showCancellationModal = transaction => setModalTransaction(transaction)
@@ -106,7 +109,6 @@ export default function TransactionsHistory () {
             return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
-              counterpartyList={counterpartyList}
               showCancellationModal={showCancellationModal}
             />
           })}
@@ -115,7 +117,6 @@ export default function TransactionsHistory () {
             return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
-              counterpartyList={counterpartyList}
               showCancellationModal={showCancellationModal}
               completed />
           })}
@@ -136,7 +137,7 @@ const TransactionTableHeading = ({ content }) => {
   </th>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed, counterpartyList }) {
+export function TransactionRow ({ transaction, showCancellationModal, completed }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
 
   const { date, time } = presentDateAndTime(timestamp)
