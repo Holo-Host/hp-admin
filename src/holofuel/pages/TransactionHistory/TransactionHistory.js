@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, flatten, capitalize } from 'lodash/fp'
 import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
@@ -33,15 +32,22 @@ function useFetchCounterparties () {
 
   const { loading, error, data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
 
+  console.log('1!!!!!')
+
   if (holofuelHistoryCounterparties) {
-    const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
-    const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
-      const matchingTx = filterTransactionsByAgentId(agent, txListType)
-      return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+    console.log('2!!!!!')
+    const filterTransactionsByAgentId = (agent, transactions) => transactions.filter(transaction => transaction.counterparty.id === agent.id)
+    const updateTxListCounterparties = (transactions, counterpartyList) => counterpartyList.map(agent => {
+      const matchingTx = filterTransactionsByAgentId(agent, transactions)
+      return matchingTx.map(transaction => ({ ...transaction, counterparty: agent }))
     })
 
     // Cache Write/Update for HolofuelCompletedTransactionsQuery
-    const newCompletedTxList = _.flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
+    const newCompletedTxList = flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
+
+
+      console.log('???', { ...newCompletedTxList })
+
     client.writeQuery({
       query: HolofuelCompletedTransactionsQuery,
       data: {
@@ -50,7 +56,7 @@ function useFetchCounterparties () {
     })
 
     // Cache Write/Update for HolofuelWaitingTransactionsQuery
-    const newWaitingTxList = _.flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
+    const newWaitingTxList = flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
     client.writeQuery({
       query: HolofuelWaitingTransactionsQuery,
       data: {
@@ -197,7 +203,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
+      Cancel your {capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
     </div>
     <div styleName='modal-buttons'>
       <Button
