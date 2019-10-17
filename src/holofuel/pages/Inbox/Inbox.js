@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import _ from 'lodash'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, flatten } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -48,7 +47,7 @@ function useFetchCounterparties () {
       return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
     })
 
-    const result = _.flatten(updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties))
+    const result = flatten(updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties))
 
     client.writeQuery({
       query: HolofuelActionableTransactionsQuery,
