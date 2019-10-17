@@ -39,14 +39,13 @@ function useFetchCounterparties () {
     const filterTransactionsByAgentId = (agent, transactions) => transactions.filter(transaction => transaction.counterparty.id === agent.id)
     const updateTxListCounterparties = (transactions, counterpartyList) => counterpartyList.map(agent => {
       const matchingTx = filterTransactionsByAgentId(agent, transactions)
-      return matchingTx.map(transaction => ({ ...transaction, counterparty: agent }))
+      return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
     })
 
     // Cache Write/Update for HolofuelCompletedTransactionsQuery
     const newCompletedTxList = flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
 
-
-      console.log('???', { ...newCompletedTxList })
+    console.log('???', { ...newCompletedTxList })
 
     client.writeQuery({
       query: HolofuelCompletedTransactionsQuery,
