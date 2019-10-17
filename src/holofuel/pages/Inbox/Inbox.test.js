@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, fireEvent, act, within } from '@testing-library/react'
+import { fireEvent, act, within } from '@testing-library/react'
 import wait from 'waait'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
@@ -8,7 +8,8 @@ import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
-import { presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { renderAndWait } from 'utils/test-utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
@@ -37,16 +38,10 @@ jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
 describe('Inbox Connected (with Agent Nicknames)', () => {
-  // TODO : Determine why are no transactions be delivered to component with ApolloProvider!!
-  it.skip('renders', async () => {
-    let getAllByRole
-
-    await act(async () => {
-      ({ getAllByRole } = render(<ApolloProvider client={apolloClient}>
-        <Inbox />
-      </ApolloProvider>))
-      await wait(15)
-    })
+  it('renders', async () => {
+    const { getAllByRole } = await renderAndWait(<ApolloProvider client={apolloClient}>
+      <Inbox />
+    </ApolloProvider>, 15)
 
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)
@@ -83,13 +78,9 @@ describe('TransactionRow', () => {
   }
 
   it('renders a request', async () => {
-    let getByText
-    await act(async () => {
-      ({ getByText } = render(<MockedProvider addTypename={false}>
-        <TransactionRow transaction={request} />
-      </MockedProvider>))
-      await wait(0)
-    })
+    const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
+      <TransactionRow transaction={request} />
+    </MockedProvider>, 0)
 
     expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
     expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
@@ -101,13 +92,9 @@ describe('TransactionRow', () => {
   })
 
   it('renders an offer', async () => {
-    let getByText
-    await act(async () => {
-      ({ getByText } = render(<MockedProvider addTypename={false}>
-        <TransactionRow transaction={offer} />
-      </MockedProvider>))
-      await wait(0)
-    })
+    const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
+      <TransactionRow transaction={offer} />
+    </MockedProvider>, 0)
 
     expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
     expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
@@ -179,13 +166,9 @@ describe('TransactionRow', () => {
         transaction: request,
         showConfirmationModal: jest.fn()
       }
-      let getByText
-      await act(async () => {
-        ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <TransactionRow {...props} />
-        </MockedProvider>))
-        await wait(0)
-      })
+      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <TransactionRow {...props} />
+      </MockedProvider>, 0)
 
       await act(async () => {
         fireEvent.click(getByText('Pay'))
@@ -202,13 +185,9 @@ describe('TransactionRow', () => {
 
   describe('Accept button', () => {
     it('responds properly', async () => {
-      let getByText
-      await act(async () => {
-        ({ getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <TransactionRow transaction={offer} />
-        </MockedProvider>))
-        await wait(0)
-      })
+      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <TransactionRow transaction={offer} />
+      </MockedProvider>, 0)
 
       await act(async () => {
         fireEvent.click(getByText('Accept'))
