@@ -25,7 +25,7 @@ const renderWithRouter = (
     history = createMemoryHistory({ initialEntries: [route] })
   } = {}
 ) => render(<Router history={history}>
-  <Settings {...props} />
+  <Settings history={{ push: () => {} }} {...props} />
 </Router>)
 
 describe('Settings', () => {

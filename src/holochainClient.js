@@ -2,17 +2,38 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-export const MOCK_DNA_CONNECTION = true || process.env.NODE_ENV === 'test'
+// This can be written as a boolean expression then it's even less readable
+const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
+export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
+  ? false
+  : process.env.NODE_ENV === 'test'
+    ? true
+    : developmentMockDnaConnection
+
+// These are overwritten when MOCK_DNA_CONNECTION is true, so they only take effect when that is false
 export const MOCK_INDIVIDUAL_DNAS = {
   hylo: true,
   'happ-store': true,
   hha: true,
-  holofuel: true
+  holofuel: false
 }
 export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
 
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
+
+const agentId = process.env.REACT_APP_AGENT_ID
+
+export function conductorInstanceId (instanceId) {
+  const formatInstanceId = instanceId => agentId + '::<happ_id>-' + instanceId
+
+  return {
+    hylo: formatInstanceId('hylo'),
+    'happ-store': formatInstanceId('happ-store'),
+    hha: formatInstanceId('holo-hosting-app'),
+    holofuel: formatInstanceId('holofuel')
+  }[instanceId]
+}
 
 async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
@@ -50,7 +71,8 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()
-        zomeCall = holochainClient.callZome(instanceId, zome, zomeFunc)
+        const realInstanceId = conductorInstanceId(instanceId)
+        zomeCall = holochainClient.callZome(realInstanceId, zome, zomeFunc)
       }
 
       const rawResult = await zomeCall(args)

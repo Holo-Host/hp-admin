@@ -5,8 +5,6 @@ import './Header.module.css'
 import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
-// import BackIcon from 'components/icons/BackIcon'
-// import { gray } from 'utils/colors'
 
 export function Header ({ title, avatarUrl, email, backTo, history: { push } }) {
   const goToMenu = () => push('/dashboard')
@@ -25,7 +23,7 @@ export function Header ({ title, avatarUrl, email, backTo, history: { push } }) 
       </Link>
     </section>
     {title && <section styleName='sub-header'>
-      <div styleName='sub-title'>{title}</div>
+      <div id='sub=title' styleName='sub-title'>{title}</div>
     </section>}
   </header>
 }
