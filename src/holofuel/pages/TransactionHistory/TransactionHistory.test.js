@@ -78,7 +78,7 @@ describe('TransactionsHistory', () => {
 
           rows.forEach(async (row, rowIndex) => {
             const transaction = fullRowContent[rowIndex]
-            const { getByTestId, debug } = within(row)
+            const { getByTestId } = within(row)
             const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: fullRowContent[rowIndex].counterparty.id })
             const notesDisplay = transaction.notes === null ? 'none' : transaction.notes
             const dateDisplay = presentDateAndTime(transaction.timestamp).date
@@ -87,7 +87,7 @@ describe('TransactionsHistory', () => {
 
             expect(within(getByTestId('cell-date')).getByText(dateDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-time')).getByText(timeDisplay)).toBeInTheDocument()
-            expect(within(getByTestId('cell-counterparty')).getByText(whois.nickname)).toBeInTheDocument()
+            expect(within(getByTestId('cell-counterparty')).getByText(whois.nickname) || within(getByTestId('cell-counterparty')).getByText(presentAgentId(transaction.counterparty.id))).toBeInTheDocument()
             expect(within(getByTestId('cell-notes')).getByText(notesDisplay)).toBeInTheDocument()
             expect(within(getByTestId('cell-amount')).getByText(amountToMatch)).toBeInTheDocument()
             expect(within(getByTestId('cell-fees')).getByText(transaction.fees)).toBeInTheDocument()
