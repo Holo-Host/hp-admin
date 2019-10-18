@@ -71,9 +71,7 @@ export default function TransactionsHistory () {
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
   const cancelTransaction = useCancel()
-
   useFetchCounterparties()
-  // const counterpartyList = useFetchCounterparties()
 
   const [modalTransaction, setModalTransaction] = useState()
 

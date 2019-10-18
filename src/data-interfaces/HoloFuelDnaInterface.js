@@ -19,22 +19,6 @@ export async function getTxCounterparties (transactionList) {
   return noDuplicatesAgentList
 }
 
-// // Creates an array of all counterparties for a provided transaction list
-// export async function getTxCounterparties (transactionList) {
-//   const counterpartyList = transactionList.map(({ counterparty }) => counterparty.id)
-//   const agentDetailsList = []
-//   for (let i = 0; i < counterpartyList.length; i++) {
-//     const agentId = counterpartyList[i]
-//     const agent = await new Promise(resolve => {
-//       const findAgent = HoloFuelDnaInterface.user.getCounterparty({ agentId })
-//       resolve(findAgent)
-//     })
-//     agentDetailsList.push(agent)
-//   }
-//   const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
-//   return noDuplicatesAgentList
-// }
-
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
   return {
     id: origin,

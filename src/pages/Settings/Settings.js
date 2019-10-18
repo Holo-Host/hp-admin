@@ -37,6 +37,9 @@ export function Settings ({
     validationSchema: SettingsValidationSchema
   })
 
+  const [softwareUpdatelVersion, setSoftwareUpdateVersion] = useState()
+  const showSoftwareUpdateModal = availableVersion => setSoftwareUpdateVersion(availableVersion)
+  
   const [sshAccessVal, setSshAccess] = useState(false)
   const handleToggleSshAccess = (e) => {
     e.preventDefault()
@@ -65,7 +68,7 @@ export function Settings ({
     </p>
 
     <strong>Access Port Numbers</strong>
-
+{/* 
     <form styleName='settings-form' onSubmit={handleSubmit(onSubmit)}>
       <SettingsFormInput
         label='Device Admin'
@@ -92,37 +95,141 @@ export function Settings ({
         errors={errors} />
 
       <Button variant='primary' wide name='update-settings' value='Submit'>Save Changes</Button>
-    </form>
+    </form> */}
+
+    <section styleName='account-ledger-table'>
+      {!isEmpty(pendingTransactions) && pendingTransactions.map((pendingTx, index) => {
+        return <SettingsRow
+          header='Software Version'
+          key={index}
+          showSoftwareUpdateModal={showSoftwareUpdateModal}
+          updateAvailable={updateAvailable}
+        />
+      })}
+
+      {!isEmpty(completedTransactions) && completedTransactions.map((completeTx, index) => {
+        return <SettingsRow
+          header='About this HoloPort'
+          key={index}
+          showSoftwareUpdateModal={showSoftwareUpdateModal}
+          completed />
+      })}
+
+      {!isEmpty(completedTransactions) && completedTransactions.map((completeTx, index) => {
+        return <SettingsRow
+          header='Acess Port Numbers'
+          key={index}
+          showSoftwareUpdateModal={showSoftwareUpdateModal}
+          completed />
+      })}
+    </section>
+
+    <UpdateSoftwareModal
+      handleClose={() => setModalTransaction(null)}
+      transaction={modalTransaction} />
+
+    <hr />
 
     <hr />
 
     <h2 >Support Access and Factory Reset</h2>
-
-    <SettingsFormInput
+    {/* <SettingsFormInput
       label='Access for HoloPort support (SSH)'
       name='sshAccess'
       type='checkbox'
       checked={sshAccessVal}
-      onChange={handleToggleSshAccess} />
+      onChange={handleToggleSshAccess} /> */}
 
     <Button name='factory-reset' variant='danger' wide onClick={() => push('/factory-reset')}>Factory Reset</Button>
   </PrimaryLayout>
 }
 
-export function SettingsFormInput ({
-  name,
-  label,
-  type = 'number',
-  register,
-  errors = {},
-  ...inputProps
-}) {
-  return <>
-    {label && <label styleName='settingsLabel' htmlFor={name}>{label}</label>}
-    <Input name={name} id={name} type={type} placeholder={label} ref={register} {...inputProps} />
-    {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
-  </>
+export function SettingsRow ({ header, label, content, key, showSoftwareUpdateModal, updateAvailable }) {
+  return <table styleName='completed-transactions-table'>
+    <thead>
+      <tr key='heading'>
+        <th id={`${header.toLowerCase().trim()}-row-${key}`} styleName='settings-row-header'>
+          {header}
+        </th>
+        { updateAvailable
+          ? <th id={`updateSoftwareNotice-row-${key}`} styleName='settings-row-header red-text'>
+            Update Available
+          </th>
+          : null
+        }
+      </tr>
+    </thead>
+    <tbody>
+      <tr key={key} styleName='settings-row' data-testid='settings-row'>
+        <td styleName='settings-col row-label'>
+          <h4 data-testid='settings-label'>{label}</h4>
+        </td>
+        <td styleName='settings-col row-content align-left'>
+          { updateAvailable && header === 'Software Version'
+            ? <SoftwareUpdateButton availableVersion={content} showSoftwareUpdateModal={showSoftwareUpdateModal} />
+            : updateAvailable
+              ? <h4>Your Software is up-to-date</h4>
+              : <h4>{content}</h4>
+          }
+        </td>
+      </tr>
+    </tbody>
+  </table>
 }
+
+function SoftwareUpdateButton ({ softwareUpdateModal, availableVersion }) {
+  return <Button
+    onClick={() => softwareUpdateModal(availableVersion)}
+    styleName='update-version-button'>
+    Update Software
+  </Button>
+}
+
+export function UpdateSoftwareModal ({ availableVersion, handleClose }) {
+  if (!transaction) return null
+  const { id, counterparty, amount, type, direction } = transaction
+  const onYes = () => {
+    cancelTransaction(id)
+    handleClose()
+  }
+  return <Modal
+    contentLabel={`Cancel ${type}?`}
+    isOpen={!!transaction}
+    handleClose={handleClose}
+    styleName='modal'>
+    <div styleName='modal-title'>Are you sure?</div>
+    <div styleName='modal-text' role='heading'>
+      Cancel your {capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
+    </div>
+    <div styleName='modal-buttons'>
+      <Button
+        onClick={handleClose}
+        styleName='modal-button-no'>
+        No
+      </Button>
+      <Button
+        onClick={onYes}
+        styleName='modal-button-yes'>
+        Yes
+      </Button>
+    </div>
+  </Modal>
+}
+
+// export function SettingsFormInput ({
+//   name,
+//   label,
+//   type = 'number',
+//   register,
+//   errors = {},
+//   ...inputProps
+// }) {
+//   return <>
+//     {label && <label styleName='settingsLabel' htmlFor={name}>{label}</label>}
+//     <Input name={name} id={name} type={type} placeholder={label} ref={register} {...inputProps} />
+//     {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
+//   </>
+// }
 
 const mockedProps = {
   settings: {

@@ -1,5 +1,4 @@
 /* Menu */
-
 .title {
   font-style: normal;
   font-weight: bold;
@@ -10,7 +9,6 @@
 }
 
 /* page */
-
 .settings-form {
   display: flex;
   flex-direction: column;
@@ -19,9 +17,15 @@
   border-radius: 10px;
 }
 
+/* tables */
+.transaction-row {
+  display: flex;
+  border-bottom: 1px solid black;
+  font-size: 14px;
+  padding: 10px 20px 15px;
+}
+
 /* form */
-
-
 .input-list {
   padding-top: 20px;
 }
@@ -35,7 +39,6 @@
 
 
 /* icons */
-
 .side-icon {
   display: inline-block;
   padding-left: 5px;
