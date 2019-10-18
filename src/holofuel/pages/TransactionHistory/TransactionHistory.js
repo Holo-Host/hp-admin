@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, flatten, capitalize } from 'lodash/fp'
 import './TransactionHistory.module.css'
