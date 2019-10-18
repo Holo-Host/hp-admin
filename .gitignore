@@ -30,3 +30,4 @@ yarn.lock
 .holochain
 conductor.log
 conductor.pid
+conductor-config.toml
