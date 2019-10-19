@@ -55,7 +55,9 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: HposInterface.os.settings
+    hposSettings: HposInterface.os.settings,
+
+    hposStatus: HposInterface.os.status
   },
 
   Mutation: {
@@ -96,7 +98,9 @@ export const resolvers = {
 
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    hposUpdateSettings: (_, { version }) => HposInterface.os.updateSettings({ version })
+    hposUpdateSettings: (_, { hposSettings }) => HposInterface.os.updateSettings(hposSettings),
+
+    hposUpdateVersion: (_, { hposVersion }) => HposInterface.os.updateVersion(hposVersion)
   }
 }
 

@@ -3,7 +3,7 @@ import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
-import Input from 'components/Input'
+// import Input from 'components/Input'
 
 import './Settings.module.css'
 
@@ -26,16 +26,33 @@ const SettingsValidationSchema = yup.object().shape({
   hostingPort: portValidationRules
 })
 
+const mockedProps = {
+  settings: {
+    hostName: 'My Host',
+    hostUrl: 'https://288f092.holo.host',
+    hostPubKey: 'hcsFAkeHashSTring2443223ee',
+    registrationEmail: 'iamahost@hosting.com',
+    deviceName: 'My Very First HoloPort',
+    networkId: 'my-holoport',
+    sshAccess: false,
+    deviceAdminPort: 6609,
+    hcAdminPort: 8800,
+    hcNetworkPort: 35353,
+    hostingPort: 8080
+  },
+  updateSettings: () => Promise.resolve(true),
+  factoryReset: () => Promise.resolve(true),
+  toggleSshAccess: () => Promise.resolve(true)
+}
+
 export function Settings ({
-  settings,
-  updateSettings,
+  // settings,
+  // updateSettings,
   history: { push },
   toggleSshAccess
 }) {
-  const { register, handleSubmit, errors } = useForm({
-    defaultValues: settings,
-    validationSchema: SettingsValidationSchema
-  })
+  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const { data: { hposStatus: status = [] } = {} } = useQuery(HposStatusQuery)
 
   const [softwareUpdatelVersion, setSoftwareUpdateVersion] = useState()
   const showSoftwareUpdateModal = availableVersion => setSoftwareUpdateVersion(availableVersion)
@@ -47,9 +64,14 @@ export function Settings ({
     toggleSshAccess()
   }
 
-  const onSubmit = settings => {
-    updateSettings(settings)
-  }
+  // const { register, handleSubmit, errors } = useForm({
+  //   defaultValues: settings,
+  //   validationSchema: SettingsValidationSchema
+  // })
+
+  // const onSubmit = settings => {
+  //   updateSettings(settings)
+  // }
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
     <strong style={{ marginTop: '20px' }}>Name</strong>
@@ -68,37 +90,9 @@ export function Settings ({
     </p>
 
     <strong>Access Port Numbers</strong>
-{/* 
-    <form styleName='settings-form' onSubmit={handleSubmit(onSubmit)}>
-      <SettingsFormInput
-        label='Device Admin'
-        name='deviceAdminPort'
-        register={register}
-        errors={errors} />
-
-      <SettingsFormInput
-        label='HC Admin'
-        name='hcAdminPort'
-        register={register}
-        errors={errors} />
-
-      <SettingsFormInput
-        label='HC Network'
-        name='hcNetworkPort'
-        register={register}
-        errors={errors} />
-
-      <SettingsFormInput
-        label='Hosting'
-        name='hostingPort'
-        register={register}
-        errors={errors} />
-
-      <Button variant='primary' wide name='update-settings' value='Submit'>Save Changes</Button>
-    </form> */}
 
     <section styleName='account-ledger-table'>
-      {!isEmpty(pendingTransactions) && pendingTransactions.map((pendingTx, index) => {
+      {settings. && pendingTransactions.map((pendingTx, index) => {
         return <SettingsRow
           header='Software Version'
           key={index}
@@ -230,24 +224,5 @@ export function UpdateSoftwareModal ({ availableVersion, handleClose }) {
 //     {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
 //   </>
 // }
-
-const mockedProps = {
-  settings: {
-    hostName: 'My Host',
-    hostUrl: 'https://288f092.holo.host',
-    hostPubKey: 'hcsFAkeHashSTring2443223ee',
-    registrationEmail: 'iamahost@hosting.com',
-    deviceName: 'My Very First HoloPort',
-    networkId: 'my-holoport',
-    sshAccess: false,
-    deviceAdminPort: 6609,
-    hcAdminPort: 8800,
-    hcNetworkPort: 35353,
-    hostingPort: 8080
-  },
-  updateSettings: () => Promise.resolve(true),
-  factoryReset: () => Promise.resolve(true),
-  toggleSshAccess: () => Promise.resolve(true)
-}
 
 export default props => <Settings {...mockedProps} {...props} />
