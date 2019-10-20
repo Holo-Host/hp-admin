@@ -28,8 +28,12 @@ const fs = require('fs')
 const toml = require('toml')
 const { connect } = require('@holochain/hc-web-client')
 const startTestConductor = require('../startTestConductor.js')
+// HoloFuel User Transactions Logs :
 const Agent1TransactionLedger = require('./Agent1HFLedger.js')
 const Agent2TransactionLedger = require('./Agent2HFLedger.js')
+
+// const AGENT_1_TRANSACTIONS = Agent1TransactionLedger
+// const AGENT_2_TRANSACTIONS = Agent2TransactionLedger
 
 // HoloFuel Users :
 const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
@@ -45,23 +49,20 @@ const Agent2 = {
 }
 const AGENT_1_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[0].id).id
 const AGENT_2_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[1].id).id
-// HoloFuel User Transactions Log :
-const AGENT_1_TRANSACTIONS = Agent1TransactionLedger
-const AGENT_2_TRANSACTIONS = Agent2TransactionLedger
+
 // Transaction Types :
 const REQUEST = 'requests'
 const OFFER = 'offers.initated'
 const PAY = 'offers.responding'
 const ACCEPT = 'offers.accepted'
 
-const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, originId }) => {
+const transactHoloFuel = (agentId, DNA_INSTANCE, type, ZomeCall, { index, transactionTrace, originId }) => {
   const txType = type === OFFER ? agentId[`offers`][`initated`] : agentId[type]
-  const counterparty = agentId === AGENT_1_TRANSACTIONS ? Agent2.agentId : Agent1.agentId
-  const DNA_INSTANCE = agentId === AGENT_1_TRANSACTIONS ? AGENT_1_DNA_INSTANCE : AGENT_2_DNA_INSTANCE
+  const counterparty = agentId === Agent1TransactionLedger ? Agent2.agentId : Agent1.agentId
   let origininatingTx = null
   if (transactionTrace || transactionTrace === 0) {
     // For payment of a request :
-    const otherAgent = agentId === AGENT_1_TRANSACTIONS ? AGENT_2_TRANSACTIONS : AGENT_1_TRANSACTIONS
+    const otherAgent = agentId === Agent1TransactionLedger ? Agent2TransactionLedger : Agent1TransactionLedger
     origininatingTx = otherAgent[REQUEST][transactionTrace]
   }
   switch (type) {
@@ -162,19 +163,19 @@ startTestConductor()
 
       // *************************************************************************************************** //
       // INPUT DATA:
-      const agentScenarioFlow = async (agentNum) => {
+      const agentScenarioFlow = async (agentTransactionLedger, DNA_INSTANCE) => {
         console.log(' \n\n\n\n *********************************************************************************************************** ')
-        console.log(`                                       ${agentNum === AGENT_1_TRANSACTIONS ? 'AGENT 1' : 'AGENT 2'} Scenario Flow `)
+        console.log(`                                       ${agentTransactionLedger === Agent1TransactionLedger ? 'AGENT 1' : 'AGENT 2'} Scenario Flow `)
         console.log(' *********************************************************************************************************** ')
         let CURRENT_AGENT, COUNTERPARTY_AGENT
-        if (agentNum === AGENT_1_TRANSACTIONS) {
-          CURRENT_AGENT = AGENT_1_TRANSACTIONS
-          COUNTERPARTY_AGENT = AGENT_2_TRANSACTIONS
-        } else if (agentNum === AGENT_2_TRANSACTIONS) {
-          CURRENT_AGENT = AGENT_2_TRANSACTIONS
-          COUNTERPARTY_AGENT = AGENT_1_TRANSACTIONS
+        if (agentTransactionLedger === Agent1TransactionLedger) {
+          CURRENT_AGENT = Agent1TransactionLedger
+          COUNTERPARTY_AGENT = Agent2TransactionLedger
+        } else if (agentTransactionLedger === Agent2TransactionLedger) {
+          CURRENT_AGENT = Agent2TransactionLedger
+          COUNTERPARTY_AGENT = Agent1TransactionLedger
         } else {
-          throw new Error('Invalid agent number provided : ', agentNum)
+          throw new Error('Invalid agent number provided : ', agentTransactionLedger)
         }
 
         const halfArrayLength = (array) => Math.ceil((array.length - 1) / 2)
@@ -195,16 +196,16 @@ startTestConductor()
               console.log('\n Full Request Array Iteration Number (index) : ', i)
               let txOriginId
               // Agent 1 Requests HF
-              transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index: i })
+              transactHoloFuel(CURRENT_AGENT, DNA_INSTANCE, REQUEST, holochainZomeCall, { index: i })
               // Agent 2 Offers HF in response to Agent 1's request
                 .then(r => {
                   const { Ok: originId } = JSON.parse(r)
                   txOriginId = originId
-                  return transactHoloFuel(COUNTERPARTY_AGENT, PAY, holochainZomeCall, { transactionTrace: i, originId })
+                  return transactHoloFuel(COUNTERPARTY_AGENT, DNA_INSTANCE, PAY, holochainZomeCall, { transactionTrace: i, originId })
                 })
                 // Agent 1 Accepts HF offered by Agent 2 and completes originating Request
                 .then(res => {
-                  setTimeout(() => resolve(transactHoloFuel(CURRENT_AGENT, ACCEPT, holochainZomeCall, { originId: txOriginId })), 5000)
+                  setTimeout(() => resolve(transactHoloFuel(CURRENT_AGENT, DNA_INSTANCE, ACCEPT, holochainZomeCall, { originId: txOriginId })), 5000)
                 })
                 .catch(error => { return error })
             })
@@ -225,11 +226,11 @@ startTestConductor()
               console.log('\n Full Request Array Iteration Number (index) : ', index)
               console.log('\n MAKING CALL TO REQUEST')
               // Current Agent Requests HF
-              transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index })
+              transactHoloFuel(CURRENT_AGENT, DNA_INSTANCE, REQUEST, holochainZomeCall, { index })
                 // Transactee Agent Offers HF in response to Current Agent's request
                 .then(r => {
                   const { Ok: originId } = JSON.parse(r)
-                  resolve(transactHoloFuel(COUNTERPARTY_AGENT, PAY, holochainZomeCall, { transactionTrace: index, originId }))
+                  resolve(transactHoloFuel(COUNTERPARTY_AGENT, DNA_INSTANCE, PAY, holochainZomeCall, { transactionTrace: index, originId }))
                 })
                 .catch(error => { return error })
             })
@@ -248,7 +249,7 @@ startTestConductor()
               const index = i + halfRequestsLength + forthRequestsLength
               console.log('\n Full Request Array Iteration Number (index) : ', index)
               // Current Agent Requests HF
-              resolve(transactHoloFuel(CURRENT_AGENT, REQUEST, holochainZomeCall, { index }))
+              resolve(transactHoloFuel(CURRENT_AGENT, DNA_INSTANCE, REQUEST, holochainZomeCall, { index }))
             })
               .catch(error => { return error })
           }
@@ -264,11 +265,11 @@ startTestConductor()
             await new Promise(resolve => {
               console.log('\n Full Offer Array Iteration Number (index) : ', i)
               // Current Agent Offers HF
-              transactHoloFuel(CURRENT_AGENT, OFFER, holochainZomeCall, { index: i })
+              transactHoloFuel(CURRENT_AGENT, DNA_INSTANCE, OFFER, holochainZomeCall, { index: i })
                 // Transactee Accepts HF offered by Current Agent and completes originating Promise/Offer
                 .then(r => {
                   const { Ok: originId } = JSON.parse(r)
-                  setTimeout(() => resolve(transactHoloFuel(COUNTERPARTY_AGENT, ACCEPT, holochainZomeCall, { transactionTrace: i, originId })), 5000)
+                  setTimeout(() => resolve(transactHoloFuel(COUNTERPARTY_AGENT, DNA_INSTANCE, ACCEPT, holochainZomeCall, { transactionTrace: i, originId })), 5000)
                 })
                 .catch(error => { return error })
             })
@@ -288,7 +289,7 @@ startTestConductor()
               console.log('\n Full Offer Array Iteration Number (index) : ', index)
 
               // Current Agent Offers HF
-              resolve(transactHoloFuel(CURRENT_AGENT, OFFER, holochainZomeCall, { index }))
+              resolve(transactHoloFuel(CURRENT_AGENT, DNA_INSTANCE, OFFER, holochainZomeCall, { index }))
             })
               .catch(error => { return error })
           }
@@ -303,7 +304,7 @@ startTestConductor()
       }
 
       // Invoke Scenario Flow for Agents 1 & 2
-      await agentScenarioFlow(AGENT_1_TRANSACTIONS)
-      await agentScenarioFlow(AGENT_2_TRANSACTIONS).then(r => process.exit())
+      await agentScenarioFlow(Agent1TransactionLedger, AGENT_1_DNA_INSTANCE)
+      await agentScenarioFlow(Agent2TransactionLedger, AGENT_2_DNA_INSTANCE).then(r => process.exit())
     })
   })
