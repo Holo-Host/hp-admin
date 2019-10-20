@@ -104,11 +104,11 @@ export function Settings ({
       <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
       <h2> {`${settings.hostName}'s` || 'Your'} HoloPort </h2>
 
-      {/* TODO: Find out what the below number should represent?  - If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
+      {/* TODO: Find out what the below number should represent... If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
       <p> 80348F</p>
     </header>
 
-    <section styleName='hpos-settings'>
+    <section className='hpos-settings'>
       <SettingsTable header='Software Version' updateAvailable={updateAvailable}>
         {!isEmpty(settings.versionInfo) && <SettingsRow
           label={presentHash(settings.versionInfo.currentVersion)}

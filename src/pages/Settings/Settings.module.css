@@ -17,12 +17,63 @@
   border-radius: 10px;
 }
 
+.avatar-image {
+  display: block;
+  margin: 20px auto 30px;
+}
+
 /* tables */
-.transaction-row {
+.settings-table {
+  padding: 5px 20px;
+}
+
+.settings-table-headers {
+  text-align: center;
+  padding: 5px 20px;
+}
+
+.settings-row {
   display: flex;
   border-bottom: 1px solid black;
   font-size: 14px;
   padding: 10px 20px 15px;
+}
+
+.settings-row-header {
+  background: #939393;
+}
+
+.row-content {
+  /*  */
+}
+
+.row-label {
+  /*  */
+}
+
+.settings-col {
+  min-width: 50px;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.red-text {
+  color: red;
+}
+
+/* Table-Button */
+.update-version-button {
+  border: none !important;
+  text-decoration: underline;
+  color: #0000EE !important;
+  background-color: transparent !important;
+  font-weight: normal !important;
 }
 
 /* form */
@@ -48,3 +99,44 @@
   padding: 5px;
 }
 
+/* Modal */
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-title {
+  margin-bottom: 10px;
+}
+
+.modal-text {
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.modal-counterparty {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.modal-amount {
+  font-weight: bold;
+}
+
+.modal-buttons {
+  margin-top: auto;
+  margin-left: auto;
+}
+
+.modal-button, .modal-button-no, .modal-button-yes {
+  border: none !important;
+  text-decoration: underline;
+  color: #0000EE !important;
+  font-weight: normal !important;
+  margin: 2px 10px;
+}
+
+.modal-button-yes {
+  font-weight: bold;
+}

@@ -26,10 +26,37 @@ export function hposCall (method = 'get', apiVersion = 'v1', path) {
   }
 }
 
+const presentHposStatus = (hposStatus) => {
+  const { holo_nixpkgs: holoNixPkgs, zerotier } = hposStatus
+  return {
+    versionInfo: {
+      availableVersion: holoNixPkgs.channel,
+      currentVersion: holoNixPkgs.current_system
+    },
+    networkId: zerotier.publicIdentity,
+    ports: {
+      primaryPort: zerotier.config.settings.primaryPort
+    }
+  }
+}
+
+const presentHposSettings = (hposSettings) => {
+  const { admin, holoportos, name } = hposSettings
+  return {
+    hostPubKey: admin.public_key,
+    hostName: admin.name,
+    registrationEmail: admin.email,
+    networkStatus: holoportos.network, // ie: 'live'
+    sshAccess: holoportos.sshAccess,
+    deviceName: name
+  }
+}
+
 const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
     settings: hposCall('get', 'config'),
+
     updateSettings: async (hposSettings) => {
       const settingsConfig = {
         admin: {
@@ -42,11 +69,16 @@ const HposInterface = {
       }
 
       const result = await hposCall('post', 'config')(settingsConfig)
-      console.log('HPOST INTERFACEUPDATE SETTINGS (POST) result: ', result)
-      return result
+      console.log('HPOS INTERFACE >>>> UPDATE SETTINGS (POST) result: ', result)
+      const newHposSettings = presentHposSettings(result)
+      console.log('HPOS INTERFACE >>>>>> hposSettings: ', newHposSettings)
+
+      return newHposSettings
     },
+
     // HOLOPORT_OS STATUS
     status: hposCall('get', 'status'),
+
     updateVersion: async (hposVersion) => {
       const holoNixVersions = {
         channel: {
@@ -59,7 +91,10 @@ const HposInterface = {
 
       const result = await hposCall('post', 'upgrade')(holoNixVersions)
       console.log('HPOS INTERFACE UPDATE VERSION (POST) result: ', result)
-      return result
+      const newHposStatus = presentHposStatus(result)
+      console.log('HPOS INTERFACE >>>>>> hposStatus: ', newHposStatus)
+
+      return newHposStatus
     }
   }
 }

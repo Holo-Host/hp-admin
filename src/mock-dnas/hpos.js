@@ -13,6 +13,7 @@ const data = {
       },
       name: 'My HoloPort'
     },
+
     // Returns immutable HoloPort status data.
     '/v1/status': {
       holo_nixpkgs: {
@@ -64,6 +65,7 @@ const data = {
         ...params
       }
     },
+
     // Forces HoloPortOS upgrade. - Returns Status Code ONLY (200 if OK/Successful, 400 if Bad Request, or 401 if Unauthorized).
     // TODO: Verify that NO PARAMS are needed.  Talk to HCen to see if they can return new Status Obj upon successful update.
     '/v1/upgrade': params => {

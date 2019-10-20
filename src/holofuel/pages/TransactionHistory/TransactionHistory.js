@@ -74,7 +74,6 @@ export default function TransactionsHistory () {
   useFetchCounterparties()
 
   const [modalTransaction, setModalTransaction] = useState()
-
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
   // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.

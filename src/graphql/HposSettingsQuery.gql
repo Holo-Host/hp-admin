@@ -1,0 +1,10 @@
+query HposSettings {
+  hposSettings {
+    hostPubKey
+    hostName
+    registrationEmail
+    networkStatus
+    sshAccess
+    deviceName
+  }
+}
