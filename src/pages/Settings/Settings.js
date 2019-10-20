@@ -1,30 +1,44 @@
 import React, { useState } from 'react'
-import useForm from 'react-hook-form'
-import * as yup from 'yup'
+import { useQuery, useMutation } from '@apollo/react-hooks'
+import { isEmpty } from 'lodash/fp'
+import './Settings.module.css'
+import { presentAgentId as presentHash } from 'utils'
+import HashAvatar from 'components/HashAvatar'
+import Modal from 'components/Modal'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
+import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import HposStatusQuery from 'graphql/HposStatusQuery.gql'
+import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
+// import useForm from 'react-hook-form'
+// import * as yup from 'yup'
 // import Input from 'components/Input'
 
-import './Settings.module.css'
+const createLabel = (string) => {
+  const label = string.replace('[A-Z]', ' $0').capitalize
+  console.log('THIS IS YOUR NEW LABEL >>>>>>>>>> : ', label)
+  return label
+}
 
-const portValidationRules = yup.number()
-  .typeError('Port must be specified.') // TypeError because empty value gets cast into NaN
-  .min(1000, 'Ports must be between 1000 and 65000.')
-  .max(65000, 'Ports must be between 1000 and 65000.')
-  .required()
-const SettingsValidationSchema = yup.object().shape({
-  hostName: yup.string().required(),
-  hostPubKey: yup.string().required(),
-  registrationEmail: yup.string()
-    .email()
-    .required(),
-  deviceName: yup.string().required(),
-  networkId: yup.string().required(),
-  deviceAdminPort: portValidationRules,
-  hcAdminPort: portValidationRules,
-  hcNetworkPort: portValidationRules,
-  hostingPort: portValidationRules
-})
+// const portValidationRules = yup.number()
+//   .typeError('Port must be specified.') // TypeError because empty value gets cast into NaN
+//   .min(1000, 'Ports must be between 1000 and 65000.')
+//   .max(65000, 'Ports must be between 1000 and 65000.')
+//   .required()
+
+// const SettingsValidationSchema = yup.object().shape({
+//   hostName: yup.string().required(),
+//   hostPubKey: yup.string().required(),
+//   registrationEmail: yup.string()
+//     .email()
+//     .required(),
+//   deviceName: yup.string().required(),
+//   networkId: yup.string().required(),
+//   deviceAdminPort: portValidationRules,
+//   hcAdminPort: portValidationRules,
+//   hcNetworkPort: portValidationRules,
+//   hostingPort: portValidationRules
+// })
 
 const mockedProps = {
   settings: {
@@ -45,82 +59,95 @@ const mockedProps = {
   toggleSshAccess: () => Promise.resolve(true)
 }
 
+// Data - Mutation hook with refetch:
+function useUpdateVersion () {
+  const [hposUpdateVersion] = useMutation(HposUpdateVersionMutation)
+  return (id) => hposUpdateVersion({
+    variables: { transactionId: id }
+  })
+}
+
 export function Settings ({
   // settings,
   // updateSettings,
-  history: { push },
-  toggleSshAccess
+  // toggleSshAccess,
+  history: { push }
 }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
   const { data: { hposStatus: status = [] } = {} } = useQuery(HposStatusQuery)
 
-  const [softwareUpdatelVersion, setSoftwareUpdateVersion] = useState()
-  const showSoftwareUpdateModal = availableVersion => setSoftwareUpdateVersion(availableVersion)
-  
-  const [sshAccessVal, setSshAccess] = useState(false)
-  const handleToggleSshAccess = (e) => {
-    e.preventDefault()
-    setSshAccess(e.target.checked)
-    toggleSshAccess()
-  }
+  const updateVersion = useUpdateVersion()
+  const [updateAvailable, setUpdateAvailable] = useState(false)
+  if (status.versionInfo.availableVersion !== status.versionInfo.currentVersion) setUpdateAvailable(true)
 
+  const [softwareUpdateVersion, setSoftwareUpdateVersion] = useState()
+  const showSoftwareUpdateModal = availableVersion => setSoftwareUpdateVersion(availableVersion)
+
+  // const [sshAccessVal, setSshAccess] = useState(false)
+  // const handleToggleSshAccess = (e) => {
+  //   e.preventDefault()
+  //   setSshAccess(e.target.checked)
+  //   toggleSshAccess()
+  // }
+  //
   // const { register, handleSubmit, errors } = useForm({
   //   defaultValues: settings,
   //   validationSchema: SettingsValidationSchema
   // })
-
+  //
   // const onSubmit = settings => {
   //   updateSettings(settings)
   // }
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
-    <strong style={{ marginTop: '20px' }}>Name</strong>
-    <p>
-      {settings.deviceName}
-    </p>
+    <header className='jumbotron'>
+      <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
+      <h2> {`${settings.hostName}'s` || 'Your'} HoloPort </h2>
 
-    <strong>URL</strong>
-    <p>
-      {settings.hostUrl}
-    </p>
+      {/* TODO: Find out what the below number should represent?  - If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
+      <p> 80348F</p>
+    </header>
 
-    <strong>Network ID</strong>
-    <p>
-      {settings.networkId}
-    </p>
-
-    <strong>Access Port Numbers</strong>
-
-    <section styleName='account-ledger-table'>
-      {settings. && pendingTransactions.map((pendingTx, index) => {
-        return <SettingsRow
-          header='Software Version'
-          key={index}
+    <section styleName='hpos-settings'>
+      <SettingsTable header='Software Version' updateAvailable={updateAvailable}>
+        {!isEmpty(settings.versionInfo) && <SettingsRow
+          label={presentHash(settings.versionInfo.currentVersion)}
+          content={settings.versionInfo.availableVersion}
           showSoftwareUpdateModal={showSoftwareUpdateModal}
           updateAvailable={updateAvailable}
-        />
-      })}
+          versionTable />
+        }
+      </SettingsTable>
 
-      {!isEmpty(completedTransactions) && completedTransactions.map((completeTx, index) => {
-        return <SettingsRow
-          header='About this HoloPort'
-          key={index}
-          showSoftwareUpdateModal={showSoftwareUpdateModal}
-          completed />
-      })}
+      <SettingsTable header='About this HoloPort' >
+        {!isEmpty(settings) && <SettingsRow
+          label='Device Name'
+          content={settings.deviceName}
+          showSoftwareUpdateModal={showSoftwareUpdateModal} />
+        }
 
-      {!isEmpty(completedTransactions) && completedTransactions.map((completeTx, index) => {
-        return <SettingsRow
-          header='Acess Port Numbers'
-          key={index}
-          showSoftwareUpdateModal={showSoftwareUpdateModal}
-          completed />
-      })}
+        {!isEmpty(status) && <SettingsRow
+          label='Network ID'
+          content={status.networkId}
+          showSoftwareUpdateModal={showSoftwareUpdateModal} />
+        })}
+      </SettingsTable>
+
+      <SettingsTable header='Access Port Numbers'>
+        {!isEmpty(settings.ports) && Object.entries(settings.ports).map((port, index) => {
+          return <SettingsRow
+            label={createLabel(port[0])}
+            content={port[1]}
+            showSoftwareUpdateModal={showSoftwareUpdateModal} />
+        })}
+      </SettingsTable>
     </section>
 
     <UpdateSoftwareModal
-      handleClose={() => setModalTransaction(null)}
-      transaction={modalTransaction} />
+      settings={settings}
+      handleClose={() => setSoftwareUpdateVersion(null)}
+      availableVersion={softwareUpdateVersion}
+      updateVersion={updateVersion} />
 
     <hr />
 
@@ -138,15 +165,15 @@ export function Settings ({
   </PrimaryLayout>
 }
 
-export function SettingsRow ({ header, label, content, key, showSoftwareUpdateModal, updateAvailable }) {
-  return <table styleName='completed-transactions-table'>
+export function SettingsTable ({ updateAvailable, header, children }) {
+  return <table styleName='settings-table' data-testid='settings-table'>
     <thead>
       <tr key='heading'>
-        <th id={`${header.toLowerCase().trim()}-row-${key}`} styleName='settings-row-header'>
+        <th id={header.toLowerCase().trim()} styleName='settings-row-header'>
           {header}
         </th>
         { updateAvailable
-          ? <th id={`updateSoftwareNotice-row-${key}`} styleName='settings-row-header red-text'>
+          ? <th id='updateSoftwareNotice' styleName='settings-row-header red-text'>
             Update Available
           </th>
           : null
@@ -154,46 +181,49 @@ export function SettingsRow ({ header, label, content, key, showSoftwareUpdateMo
       </tr>
     </thead>
     <tbody>
-      <tr key={key} styleName='settings-row' data-testid='settings-row'>
-        <td styleName='settings-col row-label'>
-          <h4 data-testid='settings-label'>{label}</h4>
-        </td>
-        <td styleName='settings-col row-content align-left'>
-          { updateAvailable && header === 'Software Version'
-            ? <SoftwareUpdateButton availableVersion={content} showSoftwareUpdateModal={showSoftwareUpdateModal} />
-            : updateAvailable
-              ? <h4>Your Software is up-to-date</h4>
-              : <h4>{content}</h4>
-          }
-        </td>
-      </tr>
+      {children}
     </tbody>
   </table>
 }
 
-function SoftwareUpdateButton ({ softwareUpdateModal, availableVersion }) {
+export function SettingsRow ({ label, content, showSoftwareUpdateModal, updateAvailable, versionTable }) {
+  return <tr key={content} styleName='settings-row' data-testid='settings-row'>
+    <td styleName='settings-col row-label'>
+      <h4 data-testid='settings-label'>{label}</h4>
+    </td>
+    <td styleName='settings-col row-content align-left'>
+      { updateAvailable && versionTable
+        ? <SoftwareUpdateButton availableVersion={content} showSoftwareUpdateModal={showSoftwareUpdateModal} />
+        : versionTable
+          ? <h4>Your Software is up-to-date</h4>
+          : <h4>{content}</h4>
+      }
+    </td>
+  </tr>
+}
+
+function SoftwareUpdateButton ({ availableVersion, showSoftwareUpdateModal }) {
   return <Button
-    onClick={() => softwareUpdateModal(availableVersion)}
+    onClick={() => showSoftwareUpdateModal(availableVersion)}
     styleName='update-version-button'>
     Update Software
   </Button>
 }
 
-export function UpdateSoftwareModal ({ availableVersion, handleClose }) {
-  if (!transaction) return null
-  const { id, counterparty, amount, type, direction } = transaction
+export function UpdateSoftwareModal ({ availableVersion, updateVersion, handleClose, settings }) {
+  if (!availableVersion) return null
   const onYes = () => {
-    cancelTransaction(id)
+    updateVersion(availableVersion)
     handleClose()
   }
   return <Modal
-    contentLabel={`Cancel ${type}?`}
-    isOpen={!!transaction}
+    contentLabel={`Update your ${settings.deviceName}?`}
+    isOpen={!!availableVersion}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
+      Do you wish to confirm ?
     </div>
     <div styleName='modal-buttons'>
       <Button

@@ -79,9 +79,9 @@ type HposSettings {
   hostPubKey: String
   hostName: String
   registrationEmail: String
-  networkType: String
+  networkStatus: String # ie: 'live'
   sshAccess: Boolean
-  
+  deviceName: String
 }
 
 type HposVersion {
@@ -89,11 +89,14 @@ type HposVersion {
   currentVersion: String
 }
 
-type HposStatus {
-  availableVersion: String
-  currentVersion: String
+type HposPorts {
   primaryPort: String
+}
+
+type HposStatus {
+  versionInfo: HposVersion
   networkId: String # ZT publicIdentity
+  ports: HposPorts
 }
 
 type Query {

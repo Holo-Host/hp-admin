@@ -4,6 +4,7 @@ const data = {
     '/v1/config': {
       admin: {
         email: 'sam.rose@holo.host',
+        name: 'Holo Naut',
         public_key: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8'
       },
       holoportos: {
