@@ -51,7 +51,7 @@ const Agent2 = {
   nick: config.agents[1].id || 'Sam'
 }
 const AGENT_1_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[0].id).id
-const AGENT_2_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[1].id).id
+// const AGENT_2_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[1].id).id
 
 // Transaction Types :
 const REQUEST = 'requests'
@@ -285,6 +285,7 @@ startTestConductor()
 
       // Invoke Scenario Flow for Agents 1 & 2
       await agentScenarioFlow(Agent1TransactionLedger, AGENT_1_DNA_INSTANCE)
-      await agentScenarioFlow(Agent2TransactionLedger, AGENT_2_DNA_INSTANCE).then(r => process.exit())
+      // TODO: REPLACE DNA INSTNCE BELOW WITH `AGENT_2_DNA_INSTANCE` ONCE RELIABLE NETWORKING IS IN PLACE....
+      await agentScenarioFlow(Agent2TransactionLedger, AGENT_1_DNA_INSTANCE).then(r => process.exit())
     })
   })
