@@ -27,7 +27,7 @@
 const fs = require('fs')
 const toml = require('toml')
 const { connect } = require('@holochain/hc-web-client')
-const axios = require('axios')
+const startTestConductor = require('../startTestConductor.js')
 const Agent1TransactionLedger = require('./Agent1HFLedger.js')
 const Agent2TransactionLedger = require('./Agent2HFLedger.js')
 
@@ -41,38 +41,34 @@ const Agent2 = {
   agentId: config.agents[1].public_address || 'ERROR: No Agent Pub Key Found',
   nick: config.agents[1].id || 'Sam'
 }
+const AGENT_1_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[0].id).id
+const AGENT_2_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[1].id).id
 // HoloFuel User Transactions Log :
-const AGENT_1 = Agent1TransactionLedger
-const AGENT_2 = Agent2TransactionLedger
+const AGENT_1_TRANSACTIONS = Agent1TransactionLedger
+const AGENT_2_TRANSACTIONS = Agent2TransactionLedger
 // Transaction Types :
 const REQUEST = 'requests'
 const OFFER = 'offers.initated'
 const PAY = 'offers.responding'
 const ACCEPT = 'offers.accepted'
 
-const startTestConductor = async () => {
-  return new Promise((resolve, reject) => {
-    const callToHC = axios.post('http://localhost:3300/admin/agent/list', {})
-    resolve(callToHC)
-  })
-    .catch(e => { throw new Error(` \n \n >>>>>>>>>>>>>>>>>>> NO HC Conductor Found. <<<<<<<<<<<<<<< \n >>>>>>>>> NOTE: Make sure your HC conductor is running! <<<<<<<<< \n \n`) })
-}
-
 const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, originId }) => {
   const txType = type === OFFER ? agentId[`offers`][`initated`] : agentId[type]
-  const counterparty = agentId === AGENT_1 ? Agent2.agentId : Agent1.agentId
+  const counterparty = agentId === AGENT_1_TRANSACTIONS ? Agent2.agentId : Agent1.agentId
+  const DNA_INSTANCE = agentId === AGENT_1_TRANSACTIONS ? AGENT_1_DNA_INSTANCE : AGENT_2_DNA_INSTANCE
   let origininatingTx = null
   if (transactionTrace || transactionTrace === 0) {
     // For payment of a request :
-    const otherAgent = agentId === AGENT_1 ? AGENT_2 : AGENT_1
+    const otherAgent = agentId === AGENT_1_TRANSACTIONS ? AGENT_2_TRANSACTIONS : AGENT_1_TRANSACTIONS
     origininatingTx = otherAgent[REQUEST][transactionTrace]
   }
   switch (type) {
     case REQUEST: {
       console.log('\n INVOKING REQUEST CALL ****************************')
+      console.log(' > DNA_INSTANCE for the current REQUEST ZomeCall : \n', DNA_INSTANCE)
       // initate request
       return ZomeCall(
-        'holofuel',
+        DNA_INSTANCE,
         'transactions',
         'request',
         { from: counterparty,
@@ -84,9 +80,10 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
     }
     case OFFER: {
       console.log('\n INVOKING OFFER CALL ****************************')
+      console.log(' > DNA_INSTANCE for the current REQUEST ZomeCall : \n', DNA_INSTANCE)
       // initiate offer
       return ZomeCall(
-        'holofuel',
+        DNA_INSTANCE,
         'transactions',
         'promise',
         { to: counterparty,
@@ -98,9 +95,10 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
     }
     case PAY: {
       console.log('\n INVOKING PAY CALL ****************************')
+      console.log(' > DNA_INSTANCE for the current REQUEST ZomeCall : \n', DNA_INSTANCE)
       // offer in response to request
       return ZomeCall(
-        'holofuel',
+        DNA_INSTANCE,
         'transactions',
         'promise',
         {
@@ -114,9 +112,10 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
     }
     case ACCEPT: {
       console.log('\n INVOKING ACCEPT CALL ****************************')
+      console.log(' > DNA_INSTANCE for the current REQUEST ZomeCall : \n', DNA_INSTANCE)
       // accept offer
       return ZomeCall(
-        'holofuel',
+        DNA_INSTANCE,
         'transactions',
         'receive_payments_pending',
         {
@@ -131,6 +130,7 @@ const transactHoloFuel = (agentId, type, ZomeCall, { index, transactionTrace, or
 
 startTestConductor()
   .then(() => {
+    console.log('Successful connection to Conductor!')
     connect({ url: 'ws://localhost:3400' }).then(async ({ callZome }) => {
       // *************************************************************************************************** //
       // Zome Call :
@@ -146,10 +146,12 @@ startTestConductor()
           })
             .catch(e => {
               console.log('****************************************************************** \n')
-              console.log('*************************** !!!!!! ZOME_CALL ERROR OCCURED !!!!!! ************************ \n')
+              console.log('************* !!!!!! ZOME_CALL ERROR OCCURED !!!!!! ************** \n')
               console.log('ERROR :  ', e)
               console.log('****************************************************************** \n')
               console.log('****************************************************************** \n')
+
+              if (e.message === 'instance identifier invalid') process.exit()
             })
         } catch (e) {
           console.log(`Error occured when connecting to HC CONDUCTOR. >>>>>>>>>>>> ERROR: (${e}) <<<<<<<<<<<<<<<<< `)
@@ -160,15 +162,15 @@ startTestConductor()
       // INPUT DATA:
       const agentScenarioFlow = async (agentNum) => {
         console.log(' \n\n\n\n *********************************************************************************************************** ')
-        console.log(`                                       ${agentNum === AGENT_1 ? 'AGENT 1' : 'AGENT 2'} Scenario Flow `)
+        console.log(`                                       ${agentNum === AGENT_1_TRANSACTIONS ? 'AGENT 1' : 'AGENT 2'} Scenario Flow `)
         console.log(' *********************************************************************************************************** ')
         let CURRENT_AGENT, COUNTERPARTY_AGENT
-        if (agentNum === AGENT_1) {
-          CURRENT_AGENT = AGENT_1
-          COUNTERPARTY_AGENT = AGENT_2
-        } else if (agentNum === AGENT_2) {
-          CURRENT_AGENT = AGENT_2
-          COUNTERPARTY_AGENT = AGENT_1
+        if (agentNum === AGENT_1_TRANSACTIONS) {
+          CURRENT_AGENT = AGENT_1_TRANSACTIONS
+          COUNTERPARTY_AGENT = AGENT_2_TRANSACTIONS
+        } else if (agentNum === AGENT_2_TRANSACTIONS) {
+          CURRENT_AGENT = AGENT_2_TRANSACTIONS
+          COUNTERPARTY_AGENT = AGENT_1_TRANSACTIONS
         } else {
           throw new Error('Invalid agent number provided : ', agentNum)
         }
@@ -299,7 +301,7 @@ startTestConductor()
       }
 
       // Invoke Scenario Flow for Agents 1 & 2
-      await agentScenarioFlow(AGENT_1)
-      await agentScenarioFlow(AGENT_2).then(r => process.exit())
+      await agentScenarioFlow(AGENT_1_TRANSACTIONS)
+      await agentScenarioFlow(AGENT_2_TRANSACTIONS).then(r => process.exit())
     })
   })

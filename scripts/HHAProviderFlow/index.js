@@ -1,36 +1,39 @@
+const fs = require('fs')
+const toml = require('toml')
 const { connect } = require('@holochain/hc-web-client')
-const axios = require('axios')
+const startTestConductor = require('../startTestConductor.js')
 const HAPP_CONFIG = require('./HappConfig.js')
 
-function startTestConductor () {
-  return new Promise((resolve, reject) => {
-    const callToHC = axios.post('http://localhost:3300/admin/agent/list', {})
-    resolve(callToHC)
-  })
-    .catch(e => console.log(' >>>>>>>>> Make sure your HC conductor is running! <<<<<<<<<  '))
-}
+// DNA Instance Identifiers :
+const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
+const HAPP_STORE_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'happ-store').id
+const HHA_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holo-hosting-app').id
 
 startTestConductor()
   .then(() => {
+    console.log('Successful connection to Conductor!')
     connect({ url: 'ws://localhost:3400' }).then(({ callZome }) => {
       const holochainZomeCall = (instance, zomeName, zomeFuncName, args) => {
         try {
           return callZome(instance, zomeName, zomeFuncName)(args).then(r => {
-            console.log(`${zomeFuncName} SUCCESS!  Entry address : `, r)
+            console.log('zomeFuncName SUCCESS!  Entry address : ', r)
             return r
           })
-            .catch(e => console.log('HC ZomeCall error occured. >> ERROR :  ', e))
+            .catch(e => console.log('HC ZomeCall error occured. >> ERROR :', e))
         } catch (e) {
-          console.log(`Error occured when connecting to HC conductor. >> ERROR: (${e})`)
+          console.log('Error occured when connecting to HC conductor. >> ERROR: ', e)
         }
       }
+
+      console.log('HAPP_STORE_DNA_INSTANCE : ', HAPP_STORE_DNA_INSTANCE)
+      console.log('HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
 
       const PROVIDER_SHIMS = {
         // 1. registerProvider
         registerAsProvider: () => {
           return new Promise((resolve, reject) => {
             const regProviderCall = holochainZomeCall(
-              'hha',
+              HAPP_STORE_DNA_INSTANCE,
               'provider',
               'register_as_provider',
               {
@@ -47,7 +50,7 @@ startTestConductor()
         createHapp: (happId) => {
           const happ = HAPP_CONFIG[happId]
           return holochainZomeCall(
-            'happ-store',
+            HHA_DNA_INSTANCE,
             'happs',
             'create_app',
             {
@@ -66,7 +69,7 @@ startTestConductor()
           const happ = HAPP_CONFIG[happId]
 
           return holochainZomeCall(
-            'hha',
+            HAPP_STORE_DNA_INSTANCE,
             'provider',
             'register_app',
             {
@@ -82,7 +85,7 @@ startTestConductor()
         addHolofuelAccount: () => holochainZomeCall('hha', 'provider', 'add_holofuel_account', { account_number: 'not currently used' })
       }
 
-      const registerProvider = new Promise((resolve, reject) => resolve(PROVIDER_SHIMS.registerAsProvider()))
+      const registerProvider = new Promise((resolve) => resolve(PROVIDER_SHIMS.registerAsProvider()))
       const happConfigKeys = Object.keys(HAPP_CONFIG)
       const fillHappStore = () => {
         happConfigKeys.forEach(happId => {
@@ -98,6 +101,7 @@ startTestConductor()
       return registerProvider
         .then(_ => fillHappStore())
         .then(_ => PROVIDER_SHIMS.addHolofuelAccount())
-        .catch(e => console.log(`Error when registering Provider. >> ERROR : ${e}`))
+        .then(r => process.exit())
+        .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
     }) // end of SHIMS
   })
