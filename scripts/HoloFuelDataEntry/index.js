@@ -33,6 +33,8 @@ const Agent2TransactionLedger = require('./Agent2HFLedger.js')
 
 // HoloFuel Users :
 const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
+// NOTE: Following alt var for the config file is for testing out with manual conductor(ie: not nix auto-gen)
+// const config = toml.parse(fs.readFileSync('./hpadmin-conductor-config.toml', 'utf-8'))
 const Agent1 = {
   agentId: config.agents[0].public_address || 'ERROR: No Agent Pub Key Found',
   nick: config.agents[0].i || 'Perry'

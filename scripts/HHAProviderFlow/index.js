@@ -6,6 +6,8 @@ const HAPP_CONFIG = require('./HappConfig.js')
 
 // DNA Instance Identifiers :
 const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
+// NOTE: Following alt var for the config file is for testing out with manual conductor(ie: not nix auto-gen)
+// const config = toml.parse(fs.readFileSync('./hpadmin-conductor-config.toml', 'utf-8'))
 const HAPP_STORE_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'happ-store').id
 const HHA_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holo-hosting-app').id
 
