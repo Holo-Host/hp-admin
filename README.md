@@ -1,6 +1,6 @@
 # HoloPort Admin
 > The entry point into the world of Holo as a Host.
-# HoloPort Admin Setup Instructions
+## HoloPort Admin Setup Instructions
 
 1. Clone local instance of repo with `git clone https://github.com/Holo-Host/hp-admin.git`
 2. Install all dependencies with `npm i`
@@ -10,7 +10,7 @@
     >- HP Admin [calls HHA (host's side), HAS, and Hylo DNA endpoints]
     >- HoloFuel (solely calls holofuel DNA endpoints)
 
-## HP Admin:
+### HP Admin:
 
 **Decide if you'll be using Mock or Live data.**
 
@@ -28,7 +28,7 @@ If referencing **Live** Data :
 - Start HP Admin by running`npm run start` & head over to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
 
 ---
-## HoloFuel:
+### HoloFuel:
 
 **Decide if you'll be using Mock or Live data.**
 
