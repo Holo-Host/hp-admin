@@ -1,0 +1,102 @@
+[[agents]]
+id = 'hApp-agent'
+name = 'First Agent'
+keystore_file = '/home/lisa/.config/holochain/keys/HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
+public_address = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
+
+[[agents]]
+id = 'second-hApp-agent'
+name = 'Second Agent'
+keystore_file = '/home/lisa/.config/holochain/keys/HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+public_address = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+
+# [[dnas]]
+# id = "happ_store"
+# file = "/home/lisa/Documents/gitrepos/holochain/holo/HApps-Store/dist/hApp-Store.dna.json"
+# hash = "Qmd6pArbijQ3ija5FnyrMaZirXJL83afbj8DJGuAENAdM9"
+
+# [[dnas]]
+# id = "holo-hosting-app"
+# file = "/home/lisa/Documents/gitrepos/holochain/holo/holo-hosting/Holo-Hosting-App/dna-src/dist/Holo-Hosting-App.dna.json"
+# hash = "QmbTLCyz5qEELA16vHuiWGvZK269GSeRxbWttKbz24EmyV"
+
+[[dnas]]
+id = 'holofuel'
+file = '/home/lisa/Documents/gitrepos/holochain/holo/HoloFuel/holofuel/dist/holofuel-hpadmin.dna.json'
+hash = "QmeTGfQmKxdVa2ocEFNamo8vZK7QVKZYvQp9BkTQYvjnzm"
+
+# [[instances]]
+# id = "happ-store"
+# dna = "happ_store"
+# agent = "hApp-agent"
+# [instances.logger]
+# type = "simple"
+# file = "app_spec.log"
+# [instances.storage]
+# type = "file"
+# path = "tmp/tmp-storage-1"
+
+# [[instances]]
+# id = "hha"
+# dna = "holo-hosting-app"
+# agent = "hApp-agent"
+# [instances.logger]
+# type = "simple"
+# file = "app_spec.log"
+# [instances.storage]
+# type = "file"
+# path = "tmp/tmp-storage-2"
+
+[[instances]]
+id = "holofuel"
+dna = "holofuel"
+agent = "hApp-agent"
+[instances.logger]
+type = "simple"
+file = "app_spec.log"
+[instances.storage]
+type = "file"
+path = "tmp/tmp-storage-3"
+
+[[instances]]
+id = "holofuel2"
+dna = "holofuel"
+agent = "second-hApp-agent"
+[instances.logger]
+type = "simple"
+file = "app_spec.log"
+[instances.storage]
+type = "file"
+path = "tmp/tmp-storage-4"
+
+[[interfaces]]
+id = "websocket_interface"
+admin = false
+[interfaces.driver]
+type = "websocket"
+port = 3400
+# [[interfaces.instances]]
+# id = "happ-store"
+# [[interfaces.instances]]
+# id = "hha"
+[[interfaces.instances]]
+id = "holofuel"
+[[interfaces.instances]]
+id = "holofuel2"
+
+
+[[interfaces]]
+id = "http_interface"
+admin = true
+[interfaces.driver]
+type = "http"
+port = 3300
+# [[interfaces.instances]]
+# id = "happ-store"
+# [[interfaces.instances]]
+# id = "hha"
+[[interfaces.instances]]
+id = "holofuel"
+[[interfaces.instances]]
+id = "holofuel2"
+
