@@ -3,24 +3,26 @@
 // HF ACTION FLOWS (for all successful cases):
 // ===========================================
 // AGENT 1 FLOW:
+// (NB: The AGENT 2 FLOW is the same as above with Agent actions inversed.)
+
 // >> Full Request Case
 // >>>> Agent 1 Requests HF
 // >>>> Agent 2 Offers HF (response to requested)
 // >>>> Agent 1 Accepts Offered HF
 
+// >> 2/3 Request Case
+// >>>> Agent 1 Requests HF
+// >>>> Agent 2 Offers HF (response to requested)
+
+// >> 1/3 Request Case
+// >>>> Agent 1 Requests HF
+
 // >> Full Promise Case
 // >>>> Agent 1 Offers HF (initiated)
 // >>>> Agent 2 Accepts Offered HF
 
-// AGENT 2 FLOW:
-// >> Full Request Case
-// >>>> Agent 2 Requests HF
-// >>>> Agent 1 Offers HF (response to requested)
-// >>>> Agent 2 Accepts HF
-
-// >> Full Promise Case
-// >>>> Agent 2 Offers HF (initiated)
-// >>>> Agent 1 Accepts Offered HF
+// >> 1/2 Promise Case
+// >>>> Agent 1 Offers HF (initiated)
 
 // //////////////////////////////////////////////////////////////////////////////////// //
 
