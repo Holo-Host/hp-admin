@@ -57,14 +57,15 @@ const HposInterface = {
     // HOLOPORT_OS SETTINGS
     settings: hposCall('get', 'config'),
 
-    updateSettings: async (hposSettings) => {
+    // TODO: Disucss options and implications for updating a Host's registration email.
+    updateSettings: async (hostPubKey, hostName, sshAccess) => {
       const settingsConfig = {
         admin: {
-          name: hposSettings.hostName,
-          public_key: hposSettings.hostPubKey
+          name: hostName,
+          public_key: hostPubKey
         },
         holoportos: {
-          sshAccess: hposSettings.sshAccess
+          sshAccess: sshAccess
         }
       }
 
@@ -79,13 +80,13 @@ const HposInterface = {
     // HOLOPORT_OS STATUS
     status: hposCall('get', 'status'),
 
-    updateVersion: async (hposVersion) => {
+    updateVersion: async (availableVersion, currentVersion) => {
       const holoNixVersions = {
         channel: {
-          rev: hposVersion.availableVersion
+          rev: availableVersion
         },
         current_system: {
-          rev: hposVersion.currentVersion
+          rev: currentVersion
         }
       }
 

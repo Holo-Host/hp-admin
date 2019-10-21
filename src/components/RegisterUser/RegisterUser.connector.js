@@ -11,9 +11,6 @@ const registerHostingUser = graphql(RegisterHostingUserMutation, {
   props: ({ mutate, result: { loading, called } }) => ({
     registerHostingUser: () => mutate({
       update: (cache, { data: { registerHostingUser } }) => {
-
-        console.log('registerHostingUser has been called')
-
         if (registerHostingUser) {
           cache.writeQuery({
             query: HostingUserQuery,

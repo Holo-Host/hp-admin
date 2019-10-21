@@ -98,9 +98,9 @@ export const resolvers = {
 
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    hposUpdateSettings: (_, { hposSettings }) => HposInterface.os.updateSettings(hposSettings),
+    hposUpdateSettings: (_, { hostPubKey, hostName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, sshAccess),
 
-    hposUpdateVersion: (_, { hposVersion }) => HposInterface.os.updateVersion(hposVersion)
+    hposUpdateVersion: (_, { availableVersion, currentVersion }) => HposInterface.os.updateVersion(availableVersion, currentVersion)
   }
 }
 

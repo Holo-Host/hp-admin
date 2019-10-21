@@ -1,5 +1,5 @@
-mutation HposUpdateSettings ($hposSettings: HposSettings) {
-  hposUpdateSettings (hposSettings: $hposSettings) {
+mutation HposUpdateSettings ($hostPubKey: String, $hostName: String, $sshAccess: Boolean) {
+  hposUpdateSettings (hostPubKey: $hostPubKey, hostName: $hostName, sshAccess: $sshAccess) {
     hostPubKey
     hostName
     registrationEmail

@@ -124,11 +124,11 @@ type Mutation {
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
-  holofuelRequest(counterpartyId:String, amount:Float): Transaction
-  holofuelOffer(counterpartyId:String, amount:Float, requestId:ID): Transaction
+  holofuelRequest(counterpartyId: String, amount: Float): Transaction
+  holofuelOffer(counterpartyId: String, amount: Float, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction 
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
-  hposUpdateSettings(hposSettings: HposSettings): HposSettings
-  hposUpdateVersion(hposVersion: HposVersion): HposStatus
+  hposUpdateSettings(hostPubKey: String, hostName: String, registrationEmail: String, networkStatus: String, sshAccess: Boolean): HposSettings
+  hposUpdateVersion(availableVersion: String, currentVersion: String, networkId: String, primaryPort: String): HposStatus
 }

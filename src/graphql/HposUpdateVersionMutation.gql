@@ -1,5 +1,5 @@
-mutation HposUpdateVersion ($hposVersion: HposVersion) {
-  hposUpdateVersion(hposVersion: $hposVersion) {
+mutation HposUpdateVersion ($availableVersion: String, $currentVersion: String) {
+  hposUpdateVersion (availableVersion: $availableVersion, currentVersion: $currentVersion) {
     versionInfo { availableVersion, currentVersion }
     networkId
     ports { primaryPort }
