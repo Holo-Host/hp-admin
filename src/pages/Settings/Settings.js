@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, capitalize } from 'lodash/fp'
 import './Settings.module.css'
 import { presentAgentId as presentHash } from 'utils'
 import HashAvatar from 'components/HashAvatar'
@@ -10,18 +10,12 @@ import Button from 'components/Button'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
-// import useForm from 'react-hook-form'
-// import * as yup from 'yup'
 // import Input from 'components/Input'
 
-const NOT_AVAILABLE = 'Not Available'
-const DEFAULT_PORT_NAMES = ['Device Admin', 'HC Network', 'Hosting']
+const createLabelfromSnakeCase = string => string.replace(/([A-Z])/g, ' $1').split(' ').map(word => capitalize(word)).join(' ')
 
-const createLabel = (string) => {
-  const label = string.replace('[A-Z]', ' $0').capitalize
-  console.log('THIS IS YOUR NEW LABEL >>>>>>>>>> : ', label)
-  return label
-}
+const DEFAULT_PORT_NAMES = ['Device Admin', 'HC Network', 'Hosting']
+const NOT_AVAILABLE = 'Not Available'
 
 // const mockedProps = {
 //   toggleSshAccess: () => Promise.resolve(true)
@@ -103,7 +97,7 @@ export function Settings ({
         {!isEmpty(settings) && !isEmpty(settings.ports)
           ? Object.entries(settings.ports).map(port => <SettingsRow
             key={port[0] + port[1]}
-            label={createLabel(port[0])}
+            label={createLabelfromSnakeCase(port[0])}
             content={port[1]} />)
           : DEFAULT_PORT_NAMES.map(port => <SettingsRow
             key={port}
