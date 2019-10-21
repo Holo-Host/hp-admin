@@ -1,0 +1,10 @@
+mutation HposUpdateSettings ($hposSettings: HposSettings) {
+  hposUpdateSettings (hposSettings: $hposSettings) {
+    hostPubKey
+    hostName
+    registrationEmail
+    networkStatus
+    sshAccess
+    deviceName
+  }
+}
