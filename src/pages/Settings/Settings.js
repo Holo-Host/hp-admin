@@ -23,44 +23,9 @@ const createLabel = (string) => {
   return label
 }
 
-// const portValidationRules = yup.number()
-//   .typeError('Port must be specified.') // TypeError because empty value gets cast into NaN
-//   .min(1000, 'Ports must be between 1000 and 65000.')
-//   .max(65000, 'Ports must be between 1000 and 65000.')
-//   .required()
-
-// const SettingsValidationSchema = yup.object().shape({
-//   hostName: yup.string().required(),
-//   hostPubKey: yup.string().required(),
-//   registrationEmail: yup.string()
-//     .email()
-//     .required(),
-//   deviceName: yup.string().required(),
-//   networkId: yup.string().required(),
-//   deviceAdminPort: portValidationRules,
-//   hcAdminPort: portValidationRules,
-//   hcNetworkPort: portValidationRules,
-//   hostingPort: portValidationRules
-// })
-
-const mockedProps = {
-  settings: {
-    hostName: 'My Host',
-    hostUrl: 'https://288f092.holo.host',
-    hostPubKey: 'hcsFAkeHashSTring2443223ee',
-    registrationEmail: 'iamahost@hosting.com',
-    deviceName: 'My Very First HoloPort',
-    networkId: 'my-holoport',
-    sshAccess: false,
-    deviceAdminPort: 6609,
-    hcAdminPort: 8800,
-    hcNetworkPort: 35353,
-    hostingPort: 8080
-  },
-  updateSettings: () => Promise.resolve(true),
-  factoryReset: () => Promise.resolve(true),
-  toggleSshAccess: () => Promise.resolve(true)
-}
+// const mockedProps = {
+//   toggleSshAccess: () => Promise.resolve(true)
+// }
 
 // Data - Mutation hook with refetch:
 function useUpdateVersion () {
@@ -71,8 +36,6 @@ function useUpdateVersion () {
 }
 
 export function Settings ({
-  // settings,
-  // updateSettings,
   // toggleSshAccess,
   history: { push }
 }) {
@@ -166,7 +129,7 @@ export function Settings ({
       checked={sshAccessVal}
       onChange={handleToggleSshAccess} /> */}
 
-    <Button name='factory-reset' variant='danger' wide onClick={() => push('/factory-reset')}>Factory Reset</Button>
+    <Button name='factory-reset' variant='danger' wide styleName='factory-reset-btn' onClick={() => push('/factory-reset')}>Factory Reset</Button>
   </PrimaryLayout>
 }
 
@@ -260,4 +223,4 @@ export function UpdateSoftwareModal ({ availableVersion, updateVersion, handleCl
 //   </>
 // }
 
-export default props => <Settings {...mockedProps} {...props} />
+export default props => <Settings {...props} />
