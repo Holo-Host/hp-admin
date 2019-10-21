@@ -18,7 +18,7 @@ export const resolvers = {
     // factoring out the function call here breaks tests. Don't understand why
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    hostingUser: () => HhaDnaInterface.currentUser.get(),
+    hostingUser: () => { console.log('about to call hostingUser (Query)'); return HhaDnaInterface.currentUser.get() },
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
@@ -61,7 +61,7 @@ export const resolvers = {
   },
 
   Mutation: {
-    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
+    registerUser: (_, userData) => { console.log('about to call registerUserMutation'); return dataMappedCall('person', userData, HyloDnaInterface.currentUser.create) },
 
     registerHostingUser: HhaDnaInterface.currentUser.create,
 
