@@ -14,6 +14,8 @@ import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 // import * as yup from 'yup'
 // import Input from 'components/Input'
 
+const NOT_AVAILABLE = 'Not Available'
+
 const createLabel = (string) => {
   const label = string.replace('[A-Z]', ' $0').capitalize
   console.log('THIS IS YOUR NEW LABEL >>>>>>>>>> : ', label)
@@ -78,7 +80,7 @@ export function Settings ({
 
   const updateVersion = useUpdateVersion()
   const [updateAvailable, setUpdateAvailable] = useState(false)
-  if (status.versionInfo.availableVersion !== status.versionInfo.currentVersion) setUpdateAvailable(true)
+  if (!isEmpty(settings) && !isEmpty(settings.versionInfo) && status.versionInfo.availableVersion !== status.versionInfo.currentVersion) setUpdateAvailable(true)
 
   const [softwareUpdateVersion, setSoftwareUpdateVersion] = useState()
   const showSoftwareUpdateModal = availableVersion => setSoftwareUpdateVersion(availableVersion)
@@ -100,17 +102,18 @@ export function Settings ({
   // }
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
-    <header className='jumbotron'>
-      <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
-      <h2> {`${settings.hostName}'s` || 'Your'} HoloPort </h2>
-
-      {/* TODO: Find out what the below number should represent... If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
-      <p> 80348F</p>
+    <header styleName='jumbotron-header'>
+      {!isEmpty(settings) && <>
+        <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
+        <h2> {settings.hostName ? `${settings.hostName}'s` : 'Your'} HoloPort </h2>
+      </> }
+      {/* TODO: Find out what the below number should represent and where it should link to... If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
+      <p><a href='#'>80348F</a></p>
     </header>
 
     <section className='hpos-settings'>
       <SettingsTable header='Software Version' updateAvailable={updateAvailable}>
-        {!isEmpty(settings.versionInfo) && <SettingsRow
+        {!isEmpty(settings) && !isEmpty(settings.versionInfo) && <SettingsRow
           label={presentHash(settings.versionInfo.currentVersion)}
           content={settings.versionInfo.availableVersion}
           showSoftwareUpdateModal={showSoftwareUpdateModal}
@@ -120,21 +123,20 @@ export function Settings ({
       </SettingsTable>
 
       <SettingsTable header='About this HoloPort' >
-        {!isEmpty(settings) && <SettingsRow
+        <SettingsRow
           label='Device Name'
-          content={settings.deviceName}
+          content={settings.deviceName || NOT_AVAILABLE}
           showSoftwareUpdateModal={showSoftwareUpdateModal} />
-        }
 
-        {!isEmpty(status) && <SettingsRow
+        <SettingsRow
           label='Network ID'
-          content={status.networkId}
+          content={!isEmpty(status) ? status.networkId : NOT_AVAILABLE}
           showSoftwareUpdateModal={showSoftwareUpdateModal} />
-        })}
+
       </SettingsTable>
 
       <SettingsTable header='Access Port Numbers'>
-        {!isEmpty(settings.ports) && Object.entries(settings.ports).map((port, index) => {
+        {!isEmpty(settings) && !isEmpty(settings.ports) && Object.entries(settings.ports).map((port, index) => {
           return <SettingsRow
             label={createLabel(port[0])}
             content={port[1]}
@@ -150,10 +152,8 @@ export function Settings ({
       updateVersion={updateVersion} />
 
     <hr />
-
     <hr />
 
-    <h2 >Support Access and Factory Reset</h2>
     {/* <SettingsFormInput
       label='Access for HoloPort support (SSH)'
       name='sshAccess'
@@ -170,7 +170,7 @@ export function SettingsTable ({ updateAvailable, header, children }) {
     <thead>
       <tr key='heading'>
         <th id={header.toLowerCase().trim()} styleName='settings-row-header'>
-          {header}
+          <h5 styleName='row-header-title'>{header}</h5>
         </th>
         { updateAvailable
           ? <th id='updateSoftwareNotice' styleName='settings-row-header red-text'>
@@ -188,15 +188,15 @@ export function SettingsTable ({ updateAvailable, header, children }) {
 
 export function SettingsRow ({ label, content, showSoftwareUpdateModal, updateAvailable, versionTable }) {
   return <tr key={content} styleName='settings-row' data-testid='settings-row'>
-    <td styleName='settings-col row-label'>
-      <h4 data-testid='settings-label'>{label}</h4>
+    <td styleName='settings-col align-left'>
+      <h3 styleName='row-label' data-testid='settings-label'>{label}</h3>
     </td>
-    <td styleName='settings-col row-content align-left'>
+    <td styleName='settings-col align-right'>
       { updateAvailable && versionTable
         ? <SoftwareUpdateButton availableVersion={content} showSoftwareUpdateModal={showSoftwareUpdateModal} />
         : versionTable
-          ? <h4>Your Software is up-to-date</h4>
-          : <h4>{content}</h4>
+          ? <h3 styleName='row-content'>Your Software is up-to-date</h3>
+          : <h3 styleName='row-content'>{content}</h3>
       }
     </td>
   </tr>

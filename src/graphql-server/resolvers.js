@@ -55,7 +55,7 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: HposInterface.os.settings,
+    hposSettings: () => { console.log('inside hposSettings'); return HposInterface.os.settings },
 
     hposStatus: HposInterface.os.status
   },

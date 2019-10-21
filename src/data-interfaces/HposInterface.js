@@ -15,6 +15,8 @@ export function hposCall (method = 'get', apiVersion = 'v1', path) {
     return mockCallHpos(method, apiVersion, path)
   } else {
     const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
+    console.log('fullPath : ', fullPath)
+
     switch (method) {
       case 'get':
         return params => axios.get(fullPath, params, axiosConfig)
