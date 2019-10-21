@@ -15,6 +15,7 @@ import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 // import Input from 'components/Input'
 
 const NOT_AVAILABLE = 'Not Available'
+const DEFAULT_PORT_NAMES = ['Device Admin', 'HC Network', 'Hosting']
 
 const createLabel = (string) => {
   const label = string.replace('[A-Z]', ' $0').capitalize
@@ -111,37 +112,41 @@ export function Settings ({
       <p><a href='#'>80348F</a></p>
     </header>
 
-    <section className='hpos-settings'>
+    <section styleName='settings-section'>
       <SettingsTable header='Software Version' updateAvailable={updateAvailable}>
-        {!isEmpty(settings) && !isEmpty(settings.versionInfo) && <SettingsRow
-          label={presentHash(settings.versionInfo.currentVersion)}
-          content={settings.versionInfo.availableVersion}
-          showSoftwareUpdateModal={showSoftwareUpdateModal}
-          updateAvailable={updateAvailable}
-          versionTable />
+        {!isEmpty(settings) && !isEmpty(settings.versionInfo)
+          ? <SettingsRow
+            label={presentHash(settings.versionInfo.currentVersion)}
+            content={settings.versionInfo.availableVersion}
+            showSoftwareUpdateModal={showSoftwareUpdateModal}
+            updateAvailable={updateAvailable}
+            versionTable />
+          : <SettingsRow
+            label='Version Number'
+            content={NOT_AVAILABLE} />
         }
       </SettingsTable>
 
       <SettingsTable header='About this HoloPort' >
         <SettingsRow
           label='Device Name'
-          content={settings.deviceName || NOT_AVAILABLE}
-          showSoftwareUpdateModal={showSoftwareUpdateModal} />
-
+          content={settings.deviceName || NOT_AVAILABLE} />
         <SettingsRow
           label='Network ID'
-          content={!isEmpty(status) ? status.networkId : NOT_AVAILABLE}
-          showSoftwareUpdateModal={showSoftwareUpdateModal} />
-
+          content={!isEmpty(status) ? status.networkId : NOT_AVAILABLE} />
       </SettingsTable>
 
       <SettingsTable header='Access Port Numbers'>
-        {!isEmpty(settings) && !isEmpty(settings.ports) && Object.entries(settings.ports).map((port, index) => {
-          return <SettingsRow
+        {!isEmpty(settings) && !isEmpty(settings.ports)
+          ? Object.entries(settings.ports).map(port => <SettingsRow
+            key={port[0] + port[1]}
             label={createLabel(port[0])}
-            content={port[1]}
-            showSoftwareUpdateModal={showSoftwareUpdateModal} />
-        })}
+            content={port[1]} />)
+          : DEFAULT_PORT_NAMES.map(port => <SettingsRow
+            key={port}
+            label={port}
+            content={NOT_AVAILABLE} />)
+        }
       </SettingsTable>
     </section>
 
@@ -187,7 +192,7 @@ export function SettingsTable ({ updateAvailable, header, children }) {
 }
 
 export function SettingsRow ({ label, content, showSoftwareUpdateModal, updateAvailable, versionTable }) {
-  return <tr key={content} styleName='settings-row' data-testid='settings-row'>
+  return <tr styleName='settings-row' data-testid='settings-row'>
     <td styleName='settings-col align-left'>
       <h3 styleName='row-label' data-testid='settings-label'>{label}</h3>
     </td>

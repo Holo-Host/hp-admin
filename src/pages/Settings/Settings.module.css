@@ -91,13 +91,17 @@
   color: red;
 }
 
-/* Table-Button */
+/* buttons */
 .update-version-button {
   border: none !important;
   text-decoration: underline;
   color: #0000EE !important;
   background-color: transparent !important;
   font-weight: normal !important;
+}
+
+.factory-reset-btn {
+  margin-bottom: 50px;
 }
 
 /* form */
