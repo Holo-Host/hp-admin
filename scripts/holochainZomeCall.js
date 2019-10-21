@@ -16,7 +16,7 @@ const holochainZomeCall = (callZome, instance, zomeName, zomeFuncName, args) => 
         console.log('****************************************************************** \n')
         console.log('****************************************************************** \n')
 
-        if (e.message === 'instance identifier invalid') process.exit()
+        process.exit()
       })
   } catch (e) {
     console.log(`Error occured when connecting to HC CONDUCTOR. >>>>>>>>>>>> ERROR: (${e}) <<<<<<<<<<<<<<<<< `)
