@@ -1,6 +1,6 @@
 query HposStatus {
   hposStatus {
-    versionInfo { availableVersion, currentVersion }
+    versionInfo { availableVersion { rev }, currentVersion { rev } }
     networkId
     ports { primaryPort }
   }

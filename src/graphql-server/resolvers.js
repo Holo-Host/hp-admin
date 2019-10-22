@@ -18,7 +18,7 @@ export const resolvers = {
     // factoring out the function call here breaks tests. Don't understand why
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    hostingUser: () => { console.log('about to call hostingUser (Query)'); return HhaDnaInterface.currentUser.get() },
+    hostingUser: HhaDnaInterface.currentUser.get,
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
@@ -55,9 +55,9 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: () => { console.log('inside hposSettings'); return HposInterface.os.settings },
+    hposSettings: () => { console.log('inside Resolvers - about to call hposSettings (Query)'); return HposInterface.os.settings() },
 
-    hposStatus: HposInterface.os.status
+    hposStatus: () => { console.log('inside Resolvers - about to call hposStatus (Query)'); return HposInterface.os.status() }
   },
 
   Mutation: {

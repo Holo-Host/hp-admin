@@ -84,9 +84,13 @@ type HposSettings {
   deviceName: String
 }
 
+type hydraStruct {
+  rev: String
+}
+
 type HposVersion {
-  availableVersion: String
-  currentVersion: String
+  availableVersion: hydraStruct
+  currentVersion: hydraStruct
 }
 
 type HposPorts {
@@ -129,6 +133,6 @@ type Mutation {
   holofuelAcceptOffer(transactionId: ID): Transaction 
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
-  hposUpdateSettings(hostPubKey: String, hostName: String, registrationEmail: String, networkStatus: String, sshAccess: Boolean): HposSettings
-  hposUpdateVersion(availableVersion: String, currentVersion: String, networkId: String, primaryPort: String): HposStatus
+  hposUpdateSettings(hostPubKey: String, hostName: String, sshAccess: Boolean): HposSettings
+  hposUpdateVersion(availableVersion: String): HposStatus
 }

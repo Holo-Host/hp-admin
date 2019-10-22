@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize } from 'lodash/fp'
+import { isEmpty, capitalize, get } from 'lodash/fp'
 import './Settings.module.css'
 import { presentAgentId as presentHash } from 'utils'
 import HashAvatar from 'components/HashAvatar'
@@ -21,11 +21,11 @@ const NOT_AVAILABLE = 'Not Available'
 //   toggleSshAccess: () => Promise.resolve(true)
 // }
 
-// Data - Mutation hook with refetch:
+// Data - Mutation hook
 function useUpdateVersion () {
   const [hposUpdateVersion] = useMutation(HposUpdateVersionMutation)
-  return (id) => hposUpdateVersion({
-    variables: { transactionId: id }
+  return (availableVersion) => hposUpdateVersion({
+    variables: { availableVersion }
   })
 }
 
@@ -37,11 +37,16 @@ export function Settings ({
   const { data: { hposStatus: status = [] } = {} } = useQuery(HposStatusQuery)
 
   const updateVersion = useUpdateVersion()
-  const [updateAvailable, setUpdateAvailable] = useState(false)
-  if (!isEmpty(settings) && !isEmpty(settings.versionInfo) && status.versionInfo.availableVersion !== status.versionInfo.currentVersion) setUpdateAvailable(true)
-
   const [softwareUpdateVersion, setSoftwareUpdateVersion] = useState()
   const showSoftwareUpdateModal = availableVersion => setSoftwareUpdateVersion(availableVersion)
+
+  let updateAvailable = false
+  let availableVersion, currentVersion
+  if (!isEmpty(status) && !isEmpty(status.versionInfo)) {
+    availableVersion = get('rev', status.versionInfo.availableVersion)
+    currentVersion = get('rev', status.versionInfo.currentVersion)
+  }
+  if (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion)) updateAvailable = true
 
   // const [sshAccessVal, setSshAccess] = useState(false)
   // const handleToggleSshAccess = (e) => {
@@ -71,10 +76,10 @@ export function Settings ({
 
     <section styleName='settings-section'>
       <SettingsTable header='Software Version' updateAvailable={updateAvailable}>
-        {!isEmpty(settings) && !isEmpty(settings.versionInfo)
+        {!isEmpty(status) && !isEmpty(status.versionInfo)
           ? <SettingsRow
-            label={presentHash(settings.versionInfo.currentVersion)}
-            content={settings.versionInfo.availableVersion}
+            label={presentHash(currentVersion)}
+            content={availableVersion}
             showSoftwareUpdateModal={showSoftwareUpdateModal}
             updateAvailable={updateAvailable}
             versionTable />
@@ -87,18 +92,22 @@ export function Settings ({
       <SettingsTable header='About this HoloPort' >
         <SettingsRow
           label='Device Name'
-          content={settings.deviceName || NOT_AVAILABLE} />
+          content={!isEmpty(settings) && settings.deviceName ? settings.deviceName : NOT_AVAILABLE} />
         <SettingsRow
           label='Network ID'
-          content={!isEmpty(status) ? status.networkId : NOT_AVAILABLE} />
+          // TODO : Determine desired approch for diplaying full networkId Hash...
+          content={!isEmpty(status) && status.networkId ? presentHash(status.networkId) : NOT_AVAILABLE} />
       </SettingsTable>
 
       <SettingsTable header='Access Port Numbers'>
-        {!isEmpty(settings) && !isEmpty(settings.ports)
-          ? Object.entries(settings.ports).map(port => <SettingsRow
-            key={port[0] + port[1]}
-            label={createLabelfromSnakeCase(port[0])}
-            content={port[1]} />)
+        {!isEmpty(status) && !isEmpty(status.ports)
+          ? Object.entries(status.ports).map(port => {
+            if (port[0] === '__typename') return
+            return <SettingsRow
+              key={port[0] + port[1]}
+              label={createLabelfromSnakeCase(port[0])}
+              content={port[1]} />
+          })
           : DEFAULT_PORT_NAMES.map(port => <SettingsRow
             key={port}
             label={port}

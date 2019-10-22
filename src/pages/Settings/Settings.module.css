@@ -80,6 +80,7 @@
 
 .row-content {
   composes: align-right;
+  font-weight: 500;
 }
 
 .settings-col {

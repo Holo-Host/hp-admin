@@ -10,7 +10,7 @@ const axiosConfig = {
   }
 }
 
-export function hposCall (method = 'get', apiVersion = 'v1', path) {
+export function hposCall (method = 'get', path, apiVersion = 'v1') {
   if (MOCK_HPOS_CONNECTION) {
     return mockCallHpos(method, apiVersion, path)
   } else {
@@ -57,7 +57,10 @@ const presentHposSettings = (hposSettings) => {
 const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
-    settings: hposCall('get', 'config'),
+    settings: async () => {
+      const result = await hposCall('get', 'config')()
+      return presentHposSettings(result)
+    },
 
     // TODO: Disucss options and implications for updating a Host's registration email.
     updateSettings: async (hostPubKey, hostName, sshAccess) => {
@@ -80,15 +83,18 @@ const HposInterface = {
     },
 
     // HOLOPORT_OS STATUS
-    status: hposCall('get', 'status'),
+    status: async () => {
+      const result = await hposCall('get', 'status')()
+      return presentHposStatus(result)
+    },
 
-    updateVersion: async (availableVersion, currentVersion) => {
+    updateVersion: async (availableVersion) => {
       const holoNixVersions = {
         channel: {
           rev: availableVersion
         },
         current_system: {
-          rev: currentVersion
+          rev: availableVersion
         }
       }
 
