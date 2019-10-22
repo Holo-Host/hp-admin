@@ -17,3 +17,12 @@ wasm-pack build
 ```
 wasm-pack test --headless --firefox
 ```
+
+### ⏰ Profile in the browser
+
+```
+wasm-pack build
+cd profiling
+npm install && npm run start
+```
+see profiling results in browser console at http://localhost:8080
