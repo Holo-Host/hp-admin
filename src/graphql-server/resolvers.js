@@ -55,13 +55,13 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: () => { console.log('inside Resolvers - about to call hposSettings (Query)'); return HposInterface.os.settings() },
+    hposSettings: HposInterface.os.settings,
 
-    hposStatus: () => { console.log('inside Resolvers - about to call hposStatus (Query)'); return HposInterface.os.status() }
+    hposStatus: HposInterface.os.status
   },
 
   Mutation: {
-    registerUser: (_, userData) => { console.log('about to call registerUserMutation'); return dataMappedCall('person', userData, HyloDnaInterface.currentUser.create) },
+    registerUser: (_, userData) => { dataMappedCall('person', userData, HyloDnaInterface.currentUser.create) },
 
     registerHostingUser: HhaDnaInterface.currentUser.create,
 
