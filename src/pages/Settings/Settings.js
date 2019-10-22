@@ -10,16 +10,11 @@ import Button from 'components/Button'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
-// import Input from 'components/Input'
 
 const createLabelfromSnakeCase = string => string.replace(/([A-Z])/g, ' $1').split(' ').map(word => capitalize(word)).join(' ')
 
 const DEFAULT_PORT_NAMES = ['Device Admin', 'HC Network', 'Hosting']
 const NOT_AVAILABLE = 'Not Available'
-
-// const mockedProps = {
-//   toggleSshAccess: () => Promise.resolve(true)
-// }
 
 // Data - Mutation hook
 function useUpdateVersion () {
@@ -29,10 +24,7 @@ function useUpdateVersion () {
   })
 }
 
-export function Settings ({
-  // toggleSshAccess,
-  history: { push }
-}) {
+export function Settings ({ history: { push } }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
   const { data: { hposStatus: status = [] } = {} } = useQuery(HposStatusQuery)
 
@@ -47,22 +39,6 @@ export function Settings ({
     currentVersion = get('rev', status.versionInfo.currentVersion)
   }
   if (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion)) updateAvailable = true
-
-  // const [sshAccessVal, setSshAccess] = useState(false)
-  // const handleToggleSshAccess = (e) => {
-  //   e.preventDefault()
-  //   setSshAccess(e.target.checked)
-  //   toggleSshAccess()
-  // }
-  //
-  // const { register, handleSubmit, errors } = useForm({
-  //   defaultValues: settings,
-  //   validationSchema: SettingsValidationSchema
-  // })
-  //
-  // const onSubmit = settings => {
-  //   updateSettings(settings)
-  // }
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
     <header styleName='jumbotron-header'>
@@ -124,13 +100,6 @@ export function Settings ({
 
     <hr />
     <hr />
-
-    {/* <SettingsFormInput
-      label='Access for HoloPort support (SSH)'
-      name='sshAccess'
-      type='checkbox'
-      checked={sshAccessVal}
-      onChange={handleToggleSshAccess} /> */}
 
     <Button name='factory-reset' variant='danger' wide styleName='factory-reset-button' onClick={() => push('/factory-reset')}>Factory Reset</Button>
   </PrimaryLayout>
@@ -209,20 +178,5 @@ export function UpdateSoftwareModal ({ availableVersion, updateVersion, handleCl
     </div>
   </Modal>
 }
-
-// export function SettingsFormInput ({
-//   name,
-//   label,
-//   type = 'number',
-//   register,
-//   errors = {},
-//   ...inputProps
-// }) {
-//   return <>
-//     {label && <label styleName='settingsLabel' htmlFor={name}>{label}</label>}
-//     <Input name={name} id={name} type={type} placeholder={label} ref={register} {...inputProps} />
-//     {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
-//   </>
-// }
 
 export default props => <Settings {...props} />
