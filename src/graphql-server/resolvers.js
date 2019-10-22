@@ -100,7 +100,7 @@ export const resolvers = {
 
     hposUpdateSettings: (_, { hostPubKey, hostName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, sshAccess),
 
-    hposUpdateVersion: (_, { availableVersion, currentVersion }) => HposInterface.os.updateVersion(availableVersion, currentVersion)
+    hposUpdateVersion: HposInterface.os.updateVersion
   }
 }
 
