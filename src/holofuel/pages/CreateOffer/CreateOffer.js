@@ -18,7 +18,7 @@ export const FEE_PERCENTAGE = 0.01
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
-  counterparty: yup.string()
+  counterpartyId: yup.string()
     .required()
     .length(AGENT_ID_LENGTH),
   amount: yup.number()
@@ -28,19 +28,19 @@ const FormValidationSchema = yup.object().shape({
 
 function useOfferMutation () {
   const [offer] = useMutation(HolofuelOfferMutation)
-  return (amount, counterparty, notes) => offer({
-    variables: { amount, counterparty, notes }
+  return (amount, counterpartyId, notes) => offer({
+    variables: { amount, counterpartyId, notes }
   })
 }
 
 export default function CreateOffer ({ history: { push } }) {
   const createOffer = useOfferMutation()
 
-  const [counterparty, setCounterparty] = useState('')
+  const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
   useEffect(() => {
-    setCounterpartyNick(presentAgentId(counterparty))
-  }, [counterparty])
+    setCounterpartyNick(presentAgentId(counterpartyId))
+  }, [counterpartyId])
 
   const [fee, setFee] = useState(0)
   const [total, setTotal] = useState(0)
@@ -56,8 +56,8 @@ export default function CreateOffer ({ history: { push } }) {
     setTotal(Number(amount) + newFee)
   }
 
-  const onSubmit = ({ amount, counterparty, notes }) => {
-    createOffer(amount, counterparty, notes)
+  const onSubmit = ({ amount, counterpartyId, notes }) => {
+    createOffer(amount, counterpartyId, notes)
     push('/history')
     newMessage(`Offer of ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
   }
@@ -70,17 +70,17 @@ export default function CreateOffer ({ history: { push } }) {
     </div>
     <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
       <div styleName='form-row'>
-        <label htmlFor='counterparty' styleName='form-label'>To</label>
+        <label htmlFor='counterpartyId' styleName='form-label'>To</label>
         <input
-          name='counterparty'
-          id='counterparty'
+          name='counterpartyId'
+          id='counterpartyId'
           styleName='form-input'
           ref={register}
-          onChange={({ target: { value } }) => setCounterparty(value)} />
+          onChange={({ target: { value } }) => setCounterpartyId(value)} />
         <div styleName='hash-and-nick'>
-          {counterparty.length === AGENT_ID_LENGTH && <HashIcon hash={counterparty} size={26} styleName='hash-icon' />}
-          {counterparty.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
-            <RenderNickname agentId={counterparty} setCounterpartyNick={setCounterpartyNick} />
+          {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
+          {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
+            <RenderNickname agentId={counterpartyId} setCounterpartyNick={setCounterpartyNick} />
           </h4>}
         </div>
       </div>

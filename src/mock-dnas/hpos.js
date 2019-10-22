@@ -6,7 +6,6 @@ const data = {
   },
   post: {
     'os-update': params => {
-      console.log('calling os-update with', params)
       return {
         ...data.get['os-update'],
         ...params
