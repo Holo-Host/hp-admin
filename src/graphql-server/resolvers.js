@@ -61,7 +61,7 @@ export const resolvers = {
   },
 
   Mutation: {
-    registerUser: (_, userData) => { dataMappedCall('person', userData, HyloDnaInterface.currentUser.create) },
+    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
     registerHostingUser: HhaDnaInterface.currentUser.create,
 
