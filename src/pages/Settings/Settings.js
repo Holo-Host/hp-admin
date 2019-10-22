@@ -11,7 +11,7 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 
-const createLabelfromSnakeCase = string => string.replace(/([A-Z])/g, ' $1').split(' ').map(word => capitalize(word)).join(' ')
+export const createLabelfromSnakeCase = string => string.replace(/([A-Z])/g, ' $1').split(' ').map(word => capitalize(word)).join(' ')
 
 const DEFAULT_PORT_NAMES = ['Device Admin', 'HC Network', 'Hosting']
 const NOT_AVAILABLE = 'Not Available'
