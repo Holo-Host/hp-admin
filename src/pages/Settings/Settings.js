@@ -35,8 +35,8 @@ export function Settings ({ history: { push } }) {
   let updateAvailable = false
   let availableVersion, currentVersion
   if (!isEmpty(status) && !isEmpty(status.versionInfo)) {
-    availableVersion = get('rev', status.versionInfo.availableVersion)
-    currentVersion = get('rev', status.versionInfo.currentVersion)
+    availableVersion = status.versionInfo.availableVersion
+    currentVersion = status.versionInfo.currentVersion
   }
   if (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion)) updateAvailable = true
 

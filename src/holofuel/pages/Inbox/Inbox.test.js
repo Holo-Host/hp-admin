@@ -15,18 +15,20 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-// import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
+import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).reverse().map(item => {
   if (item.event[2].Request) {
     return {
       type: 'request',
-      ...item.event[2].Request
+      ...item.event[2].Request,
+      counterparty: item.event[2].Request.from
     }
   } else if (item.event[2].Promise) {
     return {
       type: 'offer',
-      ...item.event[2].Promise.tx
+      ...item.event[2].Promise.tx,
+      counterparty: item.event[2].Promise.tx.from
     }
   } else {
     throw new Error('unrecognized transaction type', item.toString())
@@ -47,13 +49,14 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
     expect(listItems).toHaveLength(2)
 
     listItems.forEach(async (item, index) => {
-      // const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
+      const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
+
       const { getByText } = within(item)
       const transaction = actionableTransactions[index]
       expect(getByText(transaction.notes)).toBeInTheDocument()
       const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
       expect(getByText(amountToMatch)).toBeInTheDocument()
-      // expect(getByText(whois.nickname)).toBeInTheDocument()
+      expect(getByText(whois.nickname)).toBeInTheDocument()
     })
   })
 })

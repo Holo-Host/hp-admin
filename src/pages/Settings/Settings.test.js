@@ -1,13 +1,7 @@
 import React from 'react'
 import { MockedProvider } from '@apollo/react-testing'
-// import { ApolloProvider } from '@apollo/react-hooks'
-// import apolloClient from 'apolloClient'
-// import { within } from '@testing-library/react'
-import { SettingsRow, createLabelfromSnakeCase } from './Settings' // Settings,
+import { SettingsRow, createLabelfromSnakeCase } from './Settings'
 import { renderAndWait } from 'utils/test-utils'
-// import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
-// import HposStatusQuery from 'graphql/HposStatusQuery.gql'
-// import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 
 jest.mock('components/layout/PrimaryLayout')
 
@@ -22,8 +16,8 @@ const mockedSettings = {
 
 const mockedStatus = {
   versionInfo: {
-    availableVersion: { rev: 'b13891c28d78f1e916fdefb5edc1d386e4f533c8' },
-    currentVersion: { rev: '4707080a5cba68e8bc215e22ef1c8e7d8e70791b' }
+    availableVersion: 'b13891c28d78f1e916fdefb5edc1d386e4f533c8',
+    currentVersion: '4707080a5cba68e8bc215e22ef1c8e7d8e70791b'
   },
   networkId: '505688f5c97313e5c7e34547e49a6ac46a05746b2e3faad724103b8ed34a4b108e15d08051db09eedd53ed089b19a5bfae9b1afdb7a9c65ad6f8aa9d98e4f2f2',
   ports: { primaryPort: '9993' }

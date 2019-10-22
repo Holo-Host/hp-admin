@@ -61,7 +61,7 @@ export const resolvers = {
   },
 
   Mutation: {
-    registerUser: (_, userData) => { dataMappedCall('person', userData, HyloDnaInterface.currentUser.create) },
+    registerUser: (_, userData) => dataMappedCall('person', userData, HyloDnaInterface.currentUser.create),
 
     registerHostingUser: HhaDnaInterface.currentUser.create,
 
@@ -100,7 +100,7 @@ export const resolvers = {
 
     hposUpdateSettings: (_, { hostPubKey, hostName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, sshAccess),
 
-    hposUpdateVersion: (_, { availableVersion, currentVersion }) => HposInterface.os.updateVersion(availableVersion, currentVersion)
+    hposUpdateVersion: HposInterface.os.updateVersion
   }
 }
 

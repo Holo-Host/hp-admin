@@ -31,8 +31,8 @@ const presentHposStatus = (hposStatus) => {
   const { holo_nixpkgs: holoNixPkgs, zerotier } = hposStatus
   return {
     versionInfo: {
-      availableVersion: holoNixPkgs.channel,
-      currentVersion: holoNixPkgs.current_system
+      availableVersion: holoNixPkgs.channel.rev,
+      currentVersion: holoNixPkgs.current_system.rev
     },
     networkId: zerotier.publicIdentity,
     ports: {
@@ -83,17 +83,8 @@ const HposInterface = {
       return presentHposStatus(result)
     },
 
-    updateVersion: async (availableVersion) => {
-      const holoNixVersions = {
-        channel: {
-          rev: availableVersion
-        },
-        current_system: {
-          rev: availableVersion
-        }
-      }
-
-      const result = await hposCall('post', 'upgrade')(holoNixVersions)
+    updateVersion: async () => {
+      const result = await hposCall('post', 'upgrade')()
       return presentHposStatus(result)
     }
   }
