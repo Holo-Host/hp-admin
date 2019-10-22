@@ -1,8 +1,51 @@
 # HoloPort Admin
 > The entry point into the world of Holo as a Host.
+## HoloPort Admin Setup Instructions
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. Clone local instance of repo with `git clone https://github.com/Holo-Host/hp-admin.git`
+2. Install all dependencies with `npm i`
 
+3. Decide which Root you'd like to run and follow the respective steps below.
+    > Roots:
+    >- HP Admin [calls HHA (host's side), HAS, and Hylo DNA endpoints]
+    >- HoloFuel (solely calls holofuel DNA endpoints)
+
+### HP Admin:
+
+**Decide if you'll be using Mock or Live data.**
+
+If referencing **Mock** Data :
+ - Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **true**. *NB: This is the default behavior.
+- If running HP Admin, run `npm run start` & proceed to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
+
+If referencing **Live** Data :
+- Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **false**. *(Tip: If running HoloFuel root, you can leave the hylo, happ-store, and hha DNA vars as true.)*
+- Create a *.env* file at root and set contents to : `REACT_APP_DNA_INTERFACE_URL=ws://localhost:3400`
+- Create the *./conductor-config.toml* file at root
+- If running HP Admin, copy contents from *./conductor-config.example.toml* into the new conductor file
+> NB: Make sure the ws driver port is the same number as the one listed in your *.env* file.
+- Load HAS & HHA(provider's side) DHTs; run `npm run provider:flow`
+- Start HP Admin by running`npm run start` & head over to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
+
+---
+### HoloFuel:
+
+**Decide if you'll be using Mock or Live data.**
+
+If referencing **Mock** Data :
+- Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **true**. *NB: This is the default behavior.
+- If running Holofuel, run `npm run start:holofuel` & proceed to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
+    
+If referencing **Live** Data :
+- Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **false**. *(Tip: If running HoloFuel root, you can leave the hylo, happ-store, and hha DNA vars as true.)*
+- Create a *.env* file at root and set contents to : `REACT_APP_DNA_INTERFACE_URL=ws://localhost:3400`
+- Create the *./conductor-config.toml* file at root
+- If running Holofuel, copy contents from *./holofuel-conductor-config.example.toml* into the new conductor file
+> NB: Make sure the ws driver port is the same number as the one listed in your *.env* file.
+- Load holofuel DHT; run `npm run load:holofuel`
+- Start Holofuel by running`npm run start:holofuel` & head over to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
+
+---
 ## Use with `nix-shell`
 
 **What nix-shell does in the background?**
@@ -30,69 +73,6 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - `hp-test` - run all the unit test
 - ... more coming soon
 
-## Available Scripts
+---
 
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br>
-Open [http://localhost:3100](http://localhost:3100) to view it in the browser.
-
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

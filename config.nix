@@ -12,7 +12,7 @@
   {
     id = "hp-admin-agent-2";
     name = "HP Admin 2";
-    keystore_file = "/home/lisa/.config/holochain/keys/HcScJNpnC8kabp59w89Z9GhfHw7VdycrmZP7yaBAP7i3sxynx6KO8Pvm3ai6iiz";
+    keystore_file = "agent-2.key";
     public_address = "HcScJNpnC8kabp59w89Z9GhfHw7VdycrmZP7yaBAP7i3sxynx6KO8Pvm3ai6iiz";
   }];
 
