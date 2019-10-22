@@ -1,9 +1,9 @@
 import React from 'react'
 import { MockedProvider } from '@apollo/react-testing'
-import { ApolloProvider } from '@apollo/react-hooks'
-import apolloClient from 'apolloClient'
-import { within } from '@testing-library/react'
-import Settings, { SettingsRow, createLabelfromSnakeCase } from './Settings'
+// import { ApolloProvider } from '@apollo/react-hooks'
+// import apolloClient from 'apolloClient'
+// import { within } from '@testing-library/react'
+import { SettingsRow, createLabelfromSnakeCase } from './Settings' // Settings,
 import { renderAndWait } from 'utils/test-utils'
 // import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 // import HposStatusQuery from 'graphql/HposStatusQuery.gql'
