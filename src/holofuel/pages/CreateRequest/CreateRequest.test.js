@@ -20,29 +20,8 @@ const counterparty = { id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3
 const amount = 35674
 const notes = 'Hi there'
 
-const requestMock = {
-  request: {
-    query: HolofuelRequestMutation,
-    variables: { amount, counterpartyId: counterparty.id, notes }
-  },
-  result: {
-    data: {
-      holofuelRequest: {
-        notes: 'Nothing in this object matters except we need the key to be here to avoid apollo warnings',
-        id: '123',
-        counterparty,
-        amount,
-        type: TYPE.request,
-        timestamp: moment().subtract(14, 'days'),
-        direction: '',
-        status: ''
-      }
-    }
-  },
-  newData: jest.fn()
-}
-
 const renderWithRouter = (
+  mocks,
   ui,
   {
     route = '/',
@@ -51,7 +30,9 @@ const renderWithRouter = (
 ) => ({
   ...render(
     <Router history={history}>
-      {ui}
+      <MockedProvider mocks={mocks} addTypename={false}>
+        {ui}
+      </MockedProvider>
     </Router>
   ),
   history
@@ -59,18 +40,37 @@ const renderWithRouter = (
 
 describe('CreateRequest', () => {
   it('renders a form that can be filled out and submitted', async () => {
-    const push = jest.fn()
+    const requestMock = {
+      request: {
+        query: HolofuelRequestMutation,
+        variables: { amount, counterpartyId: counterparty.id, notes }
+      },
+      result: {
+        data: {
+          holofuelRequest: {
+            notes: 'Nothing in this object matters except we need the keys to be here to avoid apollo warnings',
+            id: '123',
+            counterparty,
+            amount,
+            type: TYPE.request,
+            timestamp: moment().subtract(14, 'days'),
+            direction: '',
+            status: ''
+          }
+        }
+      },
+      newData: jest.fn()
+    }
 
     const mocks = [
       requestMock
     ]
 
+    const push = jest.fn()
+
     let getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText
     await act(async () => {
-      ({ getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
-        <CreateRequest history={{ push }} />
-      </MockedProvider>
-      ))
+      ({ getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText } = renderWithRouter(mocks, <CreateRequest history={{ push }} />))
       await wait(0)
     })
 
@@ -127,9 +127,7 @@ describe('CreateRequest', () => {
 
     let container, getByLabelText, queryByTestId, getByTestId
     await act(async () => {
-      ({ container, getByLabelText, queryByTestId, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <CreateRequest history={{ push }} />
-      </MockedProvider>))
+      ({ container, getByLabelText, queryByTestId, getByTestId } = renderWithRouter(mocks, <CreateRequest history={{ push }} />))
       await wait(0)
       Modal.setAppElement(container)
     })
@@ -172,9 +170,7 @@ describe('CreateRequest', () => {
 
     let container, getByLabelText, queryByTestId, getByTestId
     await act(async () => {
-      ({ container, getByLabelText, queryByTestId, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <CreateRequest history={{ push }} />
-      </MockedProvider>))
+      ({ container, getByLabelText, queryByTestId, getByTestId } = renderWithRouter(mocks, <CreateRequest history={{ push }} />))
       await wait(0)
       Modal.setAppElement(container)
     })
@@ -216,9 +212,7 @@ describe('CreateRequest', () => {
 
     let container, getByLabelText, queryByTestId, getByTestId
     await act(async () => {
-      ({ container, getByLabelText, queryByTestId, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <CreateRequest history={{ push }} />
-      </MockedProvider>))
+      ({ container, getByLabelText, queryByTestId, getByTestId } = renderWithRouter(mocks, <CreateRequest history={{ push }} />))
       await wait(0)
       Modal.setAppElement(container)
     })
