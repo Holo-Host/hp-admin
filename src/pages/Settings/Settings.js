@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, get } from 'lodash/fp'
+import { isEmpty, capitalize } from 'lodash/fp'
 import './Settings.module.css'
 import { sliceHash as presentHash } from 'utils'
 import HashAvatar from 'components/HashAvatar'
