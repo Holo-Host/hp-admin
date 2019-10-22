@@ -29,8 +29,7 @@ function useCancel () {
 function useFetchCounterparties () {
   const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-
-  const { loading, error, data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
 
   if (holofuelHistoryCounterparties) {
     const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
@@ -57,12 +56,6 @@ function useFetchCounterparties () {
       }
     })
   }
-
-  let response
-  if (loading) response = { loading: true }
-  else if (error) response = { error: `Error: ${error}` }
-  else response = holofuelHistoryCounterparties
-  return response
 }
 
 // Display - Functional Components with Hooks :
@@ -70,13 +63,9 @@ export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
 
-  const cancelTransaction = useCancel()
-
   useFetchCounterparties()
-  // const counterpartyList = useFetchCounterparties()
-
+  const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
-
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
   // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.

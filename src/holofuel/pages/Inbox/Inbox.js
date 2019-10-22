@@ -38,7 +38,7 @@ function useDecline () {
 function useFetchCounterparties () {
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
 
-  const { loading, error, data: { holofuelInboxCounterparties } = {}, client } = useQuery(HolofuelInboxCounterpartiesQuery)
+  const { data: { holofuelInboxCounterparties } = {}, client } = useQuery(HolofuelInboxCounterpartiesQuery)
 
   if (holofuelInboxCounterparties) {
     const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
@@ -56,24 +56,16 @@ function useFetchCounterparties () {
       }
     })
   }
-
-  let response
-  if (loading) response = { loading: true }
-  else if (error) response = { error: `Error: ${error}` }
-  else response = holofuelInboxCounterparties
-  return response
 }
 
 export default function Inbox () {
   const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
 
+  useFetchCounterparties()
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
   const isTransactionsEmpty = isEmpty(transactions)
-
-  // const counterpartyList = useFetchCounterparties()
-  useFetchCounterparties()
 
   const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
 
