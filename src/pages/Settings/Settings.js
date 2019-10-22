@@ -1,182 +1,146 @@
 import React, { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, get } from 'lodash/fp'
-import './Settings.module.css'
-import { sliceHash as presentHash } from 'utils'
-import HashAvatar from 'components/HashAvatar'
-import Modal from 'components/Modal'
+import useForm from 'react-hook-form'
+import * as yup from 'yup'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
-import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
-import HposStatusQuery from 'graphql/HposStatusQuery.gql'
-import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
+import Input from 'components/Input'
 
-export const createLabelfromSnakeCase = string => string.replace(/([A-Z])/g, ' $1').split(' ').map(word => capitalize(word)).join(' ')
+import './Settings.module.css'
 
-const DEFAULT_PORT_NAMES = ['Device Admin', 'HC Network', 'Hosting']
-const NOT_AVAILABLE = 'Not Available'
+const portValidationRules = yup.number()
+  .typeError('Port must be specified.') // TypeError because empty value gets cast into NaN
+  .min(1000, 'Ports must be between 1000 and 65000.')
+  .max(65000, 'Ports must be between 1000 and 65000.')
+  .required()
+const SettingsValidationSchema = yup.object().shape({
+  hostName: yup.string().required(),
+  hostPubKey: yup.string().required(),
+  registrationEmail: yup.string()
+    .email()
+    .required(),
+  deviceName: yup.string().required(),
+  networkId: yup.string().required(),
+  deviceAdminPort: portValidationRules,
+  hcAdminPort: portValidationRules,
+  hcNetworkPort: portValidationRules,
+  hostingPort: portValidationRules
+})
 
-// Data - Mutation hook
-function useUpdateVersion () {
-  const [hposUpdateVersion] = useMutation(HposUpdateVersionMutation)
-  return (availableVersion) => hposUpdateVersion({
-    variables: { availableVersion }
+export function Settings ({
+  settings,
+  updateSettings,
+  history: { push },
+  toggleSshAccess
+}) {
+  const { register, handleSubmit, errors } = useForm({
+    defaultValues: settings,
+    validationSchema: SettingsValidationSchema
   })
-}
 
-export function Settings ({ history: { push } }) {
-  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
-  const { data: { hposStatus: status = [] } = {} } = useQuery(HposStatusQuery)
-
-  const updateVersion = useUpdateVersion()
-  const [softwareUpdateVersion, setSoftwareUpdateVersion] = useState()
-  const showSoftwareUpdateModal = availableVersion => setSoftwareUpdateVersion(availableVersion)
-
-  let updateAvailable = false
-  let availableVersion, currentVersion
-  if (!isEmpty(status) && !isEmpty(status.versionInfo)) {
-    availableVersion = get('rev', status.versionInfo.availableVersion)
-    currentVersion = get('rev', status.versionInfo.currentVersion)
+  const [sshAccessVal, setSshAccess] = useState(false)
+  const handleToggleSshAccess = (e) => {
+    e.preventDefault()
+    setSshAccess(e.target.checked)
+    toggleSshAccess()
   }
-  if (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion)) updateAvailable = true
+
+  const onSubmit = settings => {
+    updateSettings(settings)
+  }
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
-    <header styleName='jumbotron-header'>
-      {!isEmpty(settings) && <>
-        <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
-        <h2> {settings.hostName ? `${settings.hostName}'s` : 'Your'} HoloPort </h2>
-      </> }
-      {/* TODO: Find out what the below number should represent and where it should link to... If it is the last 6 of the Host's HP Admin PubKey, then should state so (tooltip / header).... If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
-      <Button styleName='header-button'>80348F</Button>
-    </header>
+    <strong style={{ marginTop: '20px' }}>Name</strong>
+    <p>
+      {settings.deviceName}
+    </p>
 
-    <section styleName='settings-section'>
-      <SettingsTable header='Software Version' updateAvailable={updateAvailable}>
-        {!isEmpty(status) && !isEmpty(status.versionInfo)
-          ? <SettingsRow
-            label={presentHash(currentVersion)}
-            content={availableVersion}
-            showSoftwareUpdateModal={showSoftwareUpdateModal}
-            updateAvailable={updateAvailable}
-            versionTable />
-          : <SettingsRow
-            label='Version Number'
-            content={NOT_AVAILABLE} />
-        }
-      </SettingsTable>
+    <strong>URL</strong>
+    <p>
+      {settings.hostUrl}
+    </p>
 
-      <SettingsTable header='About this HoloPort' >
-        <SettingsRow
-          label='Device Name'
-          content={!isEmpty(settings) && settings.deviceName ? settings.deviceName : NOT_AVAILABLE} />
-        <SettingsRow
-          label='Network ID'
-          // TODO : Determine desired approach for diplaying full networkId Hash...
-          content={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : NOT_AVAILABLE} />
-      </SettingsTable>
+    <strong>Network ID</strong>
+    <p>
+      {settings.networkId}
+    </p>
 
-      <SettingsTable header='Access Port Numbers'>
-        {!isEmpty(status) && !isEmpty(status.ports)
-          ? Object.entries(status.ports).map(port => {
-            if (port[0] === '__typename') return
-            return <SettingsRow
-              key={port[0] + port[1]}
-              label={createLabelfromSnakeCase(port[0])}
-              content={port[1]} />
-          })
-          : DEFAULT_PORT_NAMES.map(port => <SettingsRow
-            key={port}
-            label={port}
-            content={NOT_AVAILABLE} />)
-        }
-      </SettingsTable>
-    </section>
+    <strong>Access Port Numbers</strong>
 
-    <UpdateSoftwareModal
-      settings={settings}
-      handleClose={() => setSoftwareUpdateVersion(null)}
-      availableVersion={softwareUpdateVersion}
-      updateVersion={updateVersion} />
+    <form styleName='settings-form' onSubmit={handleSubmit(onSubmit)}>
+      <SettingsFormInput
+        label='Device Admin'
+        name='deviceAdminPort'
+        register={register}
+        errors={errors} />
+
+      <SettingsFormInput
+        label='HC Admin'
+        name='hcAdminPort'
+        register={register}
+        errors={errors} />
+
+      <SettingsFormInput
+        label='HC Network'
+        name='hcNetworkPort'
+        register={register}
+        errors={errors} />
+
+      <SettingsFormInput
+        label='Hosting'
+        name='hostingPort'
+        register={register}
+        errors={errors} />
+
+      <Button variant='primary' wide name='update-settings' value='Submit'>Save Changes</Button>
+    </form>
 
     <hr />
-    <hr />
 
-    <Button name='factory-reset' variant='danger' wide styleName='factory-reset-button' onClick={() => push('/factory-reset')}>Factory Reset</Button>
+    <h2 >Support Access and Factory Reset</h2>
+
+    <SettingsFormInput
+      label='Access for HoloPort support (SSH)'
+      name='sshAccess'
+      type='checkbox'
+      checked={sshAccessVal}
+      onChange={handleToggleSshAccess} />
+
+    <Button name='factory-reset' variant='danger' wide onClick={() => push('/factory-reset')}>Factory Reset</Button>
   </PrimaryLayout>
 }
 
-export function SettingsTable ({ updateAvailable, header, children }) {
-  return <table styleName='settings-table' data-testid='settings-table'>
-    <thead>
-      <tr key='heading'>
-        <th id={header.toLowerCase().trim()} styleName='settings-row-header'>
-          <h5 styleName='row-header-title'>{header}
-            { updateAvailable
-              ? <span styleName='second-header'> Update Available</span>
-              : null
-            }
-          </h5>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {children}
-    </tbody>
-  </table>
+export function SettingsFormInput ({
+  name,
+  label,
+  type = 'number',
+  register,
+  errors = {},
+  ...inputProps
+}) {
+  return <>
+    {label && <label styleName='settingsLabel' htmlFor={name}>{label}</label>}
+    <Input name={name} id={name} type={type} placeholder={label} ref={register} {...inputProps} />
+    {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
+  </>
 }
 
-export function SettingsRow ({ label, content, showSoftwareUpdateModal, updateAvailable, versionTable }) {
-  return <tr styleName='settings-row' data-testid='settings-row'>
-    <td styleName='settings-col align-left'>
-      <h3 styleName='row-label' data-testid='settings-label'>{label}</h3>
-    </td>
-    <td styleName='settings-col align-right'>
-      { updateAvailable && versionTable
-        ? <SoftwareUpdateButton availableVersion={content} showSoftwareUpdateModal={showSoftwareUpdateModal} />
-        : versionTable
-          ? <h3 styleName='row-content'>Your Software is up-to-date</h3>
-          : <h3 styleName='row-content'>{content}</h3>
-      }
-    </td>
-  </tr>
+const mockedProps = {
+  settings: {
+    hostName: 'My Host',
+    hostUrl: 'https://288f092.holo.host',
+    hostPubKey: 'hcsFAkeHashSTring2443223ee',
+    registrationEmail: 'iamahost@hosting.com',
+    deviceName: 'My Very First HoloPort',
+    networkId: 'my-holoport',
+    sshAccess: false,
+    deviceAdminPort: 6609,
+    hcAdminPort: 8800,
+    hcNetworkPort: 35353,
+    hostingPort: 8080
+  },
+  updateSettings: () => Promise.resolve(true),
+  factoryReset: () => Promise.resolve(true),
+  toggleSshAccess: () => Promise.resolve(true)
 }
 
-function SoftwareUpdateButton ({ availableVersion, showSoftwareUpdateModal }) {
-  return <Button
-    onClick={() => showSoftwareUpdateModal(availableVersion)}
-    styleName='update-version-button'>
-    Update Software
-  </Button>
-}
-
-export function UpdateSoftwareModal ({ availableVersion, updateVersion, handleClose, settings }) {
-  if (!availableVersion) return null
-  const onYes = () => {
-    updateVersion(availableVersion)
-    handleClose()
-  }
-  return <Modal
-    contentLabel={`Update ${settings.deviceName}?`}
-    isOpen={!!availableVersion}
-    handleClose={handleClose}
-    styleName='modal'>
-    <div styleName='modal-title'>Are you sure?</div>
-    <div styleName='modal-text' role='heading'>
-      Would you like to update {settings.deviceName} to version {presentHash(availableVersion)}?
-    </div>
-    <div styleName='modal-buttons'>
-      <Button
-        onClick={handleClose}
-        styleName='modal-button-no'>
-        No
-      </Button>
-      <Button
-        onClick={onYes}
-        styleName='modal-button-yes'>
-        Yes
-      </Button>
-    </div>
-  </Modal>
-}
-
-export default props => <Settings {...props} />
+export default props => <Settings {...mockedProps} {...props} />
