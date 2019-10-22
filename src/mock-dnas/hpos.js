@@ -54,12 +54,7 @@ const data = {
   },
   post: {
     '/v1/config': params => {
-      // TODO: DELETE FOLLOWING LOG
-      console.log('calling HPOS Settings Config update with', params)
       data.get['/v1/config'] = { ...data.get['/v1/config'], ...params }
-
-      // TODO: DELETE FOLLOWING LOG
-      console.log('>>>>>>> NEW data.get[/v1/config]', data.get['/v1/config'])
       return {
         ...data.get['/v1/config'],
         ...params
@@ -69,13 +64,8 @@ const data = {
     // Forces HoloPortOS upgrade. - Returns Status Code ONLY (200 if OK/Successful, 400 if Bad Request, or 401 if Unauthorized).
     // TODO: Verify that NO PARAMS are needed.  Talk to HCen to see if they can return new Status Obj upon successful update.
     '/v1/upgrade': params => {
-      // TODO: DELETE FOLLOWING LOG
-      console.log('calling version upgrade to NixOS (`system.holoportos`) with', params)
       const statusObj = data.get['/v1/status']
       statusObj.holo_nixpkgs = params
-
-      // TODO: DELETE FOLLOWING LOG
-      console.log('>>>>>> NEW data.get[/v1/status]', data.get['/v1/status'])
       return {
         ...data.get['/v1/status']
       }

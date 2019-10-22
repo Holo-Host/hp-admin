@@ -15,7 +15,6 @@ export function hposCall (method = 'get', path, apiVersion = 'v1') {
     return mockCallHpos(method, apiVersion, path)
   } else {
     const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
-    console.log('fullPath : ', fullPath)
 
     switch (method) {
       case 'get':
@@ -75,11 +74,7 @@ const HposInterface = {
       }
 
       const result = await hposCall('post', 'config')(settingsConfig)
-      console.log('HPOS INTERFACE >>>> UPDATE SETTINGS (POST) result: ', result)
-      const newHposSettings = presentHposSettings(result)
-      console.log('HPOS INTERFACE >>>>>> hposSettings: ', newHposSettings)
-
-      return newHposSettings
+      return presentHposSettings(result)
     },
 
     // HOLOPORT_OS STATUS
@@ -99,11 +94,7 @@ const HposInterface = {
       }
 
       const result = await hposCall('post', 'upgrade')(holoNixVersions)
-      console.log('HPOS INTERFACE UPDATE VERSION (POST) result: ', result)
-      const newHposStatus = presentHposStatus(result)
-      console.log('HPOS INTERFACE >>>>>> hposStatus: ', newHposStatus)
-
-      return newHposStatus
+      return presentHposStatus(result)
     }
   }
 }
