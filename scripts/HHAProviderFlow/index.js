@@ -27,7 +27,7 @@ startTestConductor()
           return new Promise((resolve, reject) => {
             const regProviderCall = holochainZomeCall(
               callZome,
-              HAPP_STORE_DNA_INSTANCE,
+              HHA_DNA_INSTANCE,
               'provider',
               'register_as_provider',
               {
@@ -45,7 +45,7 @@ startTestConductor()
           const happ = HAPP_CONFIG[happId]
           return holochainZomeCall(
             callZome,
-            HHA_DNA_INSTANCE,
+            HAPP_STORE_DNA_INSTANCE,
             'happs',
             'create_app',
             {
@@ -65,7 +65,7 @@ startTestConductor()
 
           return holochainZomeCall(
             callZome,
-            HAPP_STORE_DNA_INSTANCE,
+            HHA_DNA_INSTANCE,
             'provider',
             'register_app',
             {
@@ -78,7 +78,7 @@ startTestConductor()
         },
 
         // Register Provider's HF account. > NB: currently adds dummy data
-        addHolofuelAccount: () => holochainZomeCall(HHA_DNA_INSTANCE, 'provider', 'add_holofuel_account', { account_number: 'not currently used' })
+        addHolofuelAccount: () => holochainZomeCall(callZome, HHA_DNA_INSTANCE, 'provider', 'add_holofuel_account', { holofuel_account_details: { account_number: 'not currently used' } })
       }
 
       const registerProvider = new Promise((resolve) => resolve(PROVIDER_SHIMS.registerAsProvider()))
@@ -97,7 +97,7 @@ startTestConductor()
       return registerProvider
         .then(_ => fillHappStore())
         .then(_ => PROVIDER_SHIMS.addHolofuelAccount())
-        .then(r => process.exit())
+        .then(_ => process.exit())
         .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
     }) // end of SHIMS
   })

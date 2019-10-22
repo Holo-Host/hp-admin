@@ -62,7 +62,6 @@ function useFetchCounterparties () {
 export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-
   useFetchCounterparties()
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()

@@ -18,7 +18,7 @@ export const resolvers = {
     // factoring out the function call here breaks tests. Don't understand why
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    hostingUser: () => HhaDnaInterface.currentUser.get(),
+    hostingUser: HhaDnaInterface.currentUser.get,
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
@@ -55,7 +55,9 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: HposInterface.os.settings
+    hposSettings: HposInterface.os.settings,
+
+    hposStatus: HposInterface.os.status
   },
 
   Mutation: {
@@ -96,7 +98,9 @@ export const resolvers = {
 
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    hposUpdateSettings: (_, { version }) => HposInterface.os.updateSettings({ version })
+    hposUpdateSettings: (_, { hostPubKey, hostName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, sshAccess),
+
+    hposUpdateVersion: HposInterface.os.updateVersion
   }
 }
 

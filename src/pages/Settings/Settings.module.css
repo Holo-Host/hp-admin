@@ -1,5 +1,16 @@
-/* Menu */
+.red-text {
+  color: #b51212;
+}
 
+.align-left {
+  text-align: left;
+}
+
+.align-right {
+  text-align: right;
+}
+
+/* Menu */
 .title {
   font-style: normal;
   font-weight: bold;
@@ -9,8 +20,16 @@
   color: #484848;
 }
 
-/* page */
+.jumbotron-header {
+  padding: 1rem 2rem;
+  margin: 0rem 2rem;
+  border-radius: .3rem;
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+}
 
+/* page */
 .settings-form {
   display: flex;
   flex-direction: column;
@@ -19,9 +38,92 @@
   border-radius: 10px;
 }
 
+.avatar-image {
+  display: block;
+  margin: 20px auto 30px;
+}
+
+.settings-section {
+  margin: 0 auto;
+}
+
+/* tables */
+.settings-table {
+  padding: 5px 20px;
+}
+
+.settings-table-headers {
+  text-align: center;
+  padding: 5px 20px;
+}
+
+.settings-row-header {
+  border-right: none !important;
+  width: 80vw;
+}
+
+.second-header {
+  composes: red-text;
+}
+
+.row-header-title {
+  margin-top: 20px;
+  padding: 0px 20px;
+  font-weight: 600;
+  border-bottom: 1.5px solid #c8c8c8;
+  display: flex;
+  justify-content: space-between;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  border-left: none;
+  border-bottom: 1px solid #c8c8c8;
+  font-size: 14px;
+  padding: 0px 20px;
+}
+
+.row-label {
+  composes: align-left;
+  color: #8c8c8c;
+}
+
+.row-content {
+  composes: align-right;
+  font-weight: 500;
+}
+
+.settings-col {
+  min-width: 50px;
+  border: none;
+}
+
+/* buttons */
+.header-button {
+  border: none !important;
+  text-decoration: underline;
+  color: #484848 !important;
+  background-color: transparent !important;
+  font-weight: normal !important;
+}
+
+.update-version-button {
+  font-weight: normal;
+  background-color: #e1e0e0;
+  border: 1px solid black;
+  padding: 5px 30px;
+  margin-bottom: 10px;
+}
+
+.factory-reset-button {
+  color: white;
+  background-color: #b51212;
+  border: 1px solid #8c8c8c;
+  margin-bottom: 50px;
+}
+
 /* form */
-
-
 .input-list {
   padding-top: 20px;
 }
@@ -35,7 +137,6 @@
 
 
 /* icons */
-
 .side-icon {
   display: inline-block;
   padding-left: 5px;
@@ -45,3 +146,44 @@
   padding: 5px;
 }
 
+/* Modal */
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-title {
+  margin-bottom: 10px;
+}
+
+.modal-text {
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.modal-counterparty {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.modal-amount {
+  font-weight: bold;
+}
+
+.modal-buttons {
+  margin-top: auto;
+  margin-left: auto;
+}
+
+.modal-button, .modal-button-no, .modal-button-yes {
+  border: none !important;
+  text-decoration: underline;
+  color: #0000EE !important;
+  font-weight: normal !important;
+  margin: 2px 10px;
+}
+
+.modal-button-yes {
+  font-weight: bold;
+}
