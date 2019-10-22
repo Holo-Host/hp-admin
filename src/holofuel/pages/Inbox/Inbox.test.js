@@ -49,7 +49,6 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
     expect(listItems).toHaveLength(2)
 
     listItems.forEach(async (item, index) => {
-      console.log('INBOX : actionableTransactions[index].counterparty', actionableTransactions[index].counterparty)
       const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
 
       const { getByText } = within(item)
