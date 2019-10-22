@@ -30,5 +30,9 @@ export default function HPAdminRouter () {
 
     <Route path='/style-demo' component={StyleDemo} />
 
+    <Route path='/holofuel' render={() => <div>
+      This page will redirect to the HoloFuel app
+    </div>} />
+
   </>
 }
