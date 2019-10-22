@@ -46,8 +46,8 @@ export function Settings ({ history: { push } }) {
         <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
         <h2> {settings.hostName ? `${settings.hostName}'s` : 'Your'} HoloPort </h2>
       </> }
-      {/* TODO: Find out what the below number should represent and where it should link to... If it is the last 6 of the Host's HP Admin PubKey, then should state so (tooltip / header).... If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
-      <Button styleName='header-button'>80348F</Button>
+      {/* TODO: Find out what the below number should link to... */}
+      <Button styleName='header-button'>{presentHash(settings.hostPubKey)}</Button>
     </header>
 
     <section styleName='settings-section'>
