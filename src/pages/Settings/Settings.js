@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, capitalize, get } from 'lodash/fp'
 import './Settings.module.css'
-import { presentAgentId as presentHash } from 'utils'
+import { sliceHash as presentHash } from 'utils'
 import HashAvatar from 'components/HashAvatar'
 import Modal from 'components/Modal'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
@@ -70,8 +70,8 @@ export function Settings ({
         <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
         <h2> {settings.hostName ? `${settings.hostName}'s` : 'Your'} HoloPort </h2>
       </> }
-      {/* TODO: Find out what the below number should represent and where it should link to... If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
-      <p><a href='#'>80348F</a></p>
+      {/* TODO: Find out what the below number should represent and where it should link to... If it is the last 6 of the Host's HP Admin PubKey, then should state so (tooltip / header).... If it should represent the HPOS Device, ...then this info/data is now returned as a name >> IE: {settings.deviceName}. */}
+      <Button styleName='header-button'>80348F</Button>
     </header>
 
     <section styleName='settings-section'>
@@ -95,8 +95,8 @@ export function Settings ({
           content={!isEmpty(settings) && settings.deviceName ? settings.deviceName : NOT_AVAILABLE} />
         <SettingsRow
           label='Network ID'
-          // TODO : Determine desired approch for diplaying full networkId Hash...
-          content={!isEmpty(status) && status.networkId ? presentHash(status.networkId) : NOT_AVAILABLE} />
+          // TODO : Determine desired approach for diplaying full networkId Hash...
+          content={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : NOT_AVAILABLE} />
       </SettingsTable>
 
       <SettingsTable header='Access Port Numbers'>
@@ -132,7 +132,7 @@ export function Settings ({
       checked={sshAccessVal}
       onChange={handleToggleSshAccess} /> */}
 
-    <Button name='factory-reset' variant='danger' wide styleName='factory-reset-btn' onClick={() => push('/factory-reset')}>Factory Reset</Button>
+    <Button name='factory-reset' variant='danger' wide styleName='factory-reset-button' onClick={() => push('/factory-reset')}>Factory Reset</Button>
   </PrimaryLayout>
 }
 
@@ -141,14 +141,13 @@ export function SettingsTable ({ updateAvailable, header, children }) {
     <thead>
       <tr key='heading'>
         <th id={header.toLowerCase().trim()} styleName='settings-row-header'>
-          <h5 styleName='row-header-title'>{header}</h5>
+          <h5 styleName='row-header-title'>{header}
+            { updateAvailable
+              ? <span styleName='second-header'> Update Available</span>
+              : null
+            }
+          </h5>
         </th>
-        { updateAvailable
-          ? <th id='updateSoftwareNotice' styleName='settings-row-header red-text'>
-            Update Available
-          </th>
-          : null
-        }
       </tr>
     </thead>
     <tbody>
@@ -188,13 +187,13 @@ export function UpdateSoftwareModal ({ availableVersion, updateVersion, handleCl
     handleClose()
   }
   return <Modal
-    contentLabel={`Update your ${settings.deviceName}?`}
+    contentLabel={`Update ${settings.deviceName}?`}
     isOpen={!!availableVersion}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Do you wish to confirm ?
+      Would you like to update {settings.deviceName} to version {presentHash(availableVersion)}?
     </div>
     <div styleName='modal-buttons'>
       <Button

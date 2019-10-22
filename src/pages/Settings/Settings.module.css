@@ -1,3 +1,15 @@
+.red-text {
+  color: #b51212;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-right {
+  text-align: right;
+}
+
 /* Menu */
 .title {
   font-style: normal;
@@ -46,15 +58,12 @@
 }
 
 .settings-row-header {
+  border-right: none !important;
   width: 80vw;
 }
 
-.settings-row {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #c8c8c8;
-  font-size: 14px;
-  padding: 0px 20px;
+.second-header {
+  composes: red-text;
 }
 
 .row-header-title {
@@ -62,15 +71,17 @@
   padding: 0px 20px;
   font-weight: 600;
   border-bottom: 1.5px solid #c8c8c8;
-  /* margin-left: 15px; */
+  display: flex;
+  justify-content: space-between;
 }
 
-.align-left {
-  text-align: left;
-}
-
-.align-right {
-  text-align: right;
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  border-left: none;
+  border-bottom: 1px solid #c8c8c8;
+  font-size: 14px;
+  padding: 0px 20px;
 }
 
 .row-label {
@@ -88,20 +99,27 @@
   border: none;
 }
 
-.red-text {
-  color: red;
-}
-
 /* buttons */
-.update-version-button {
+.header-button {
   border: none !important;
   text-decoration: underline;
-  color: #0000EE !important;
+  color: #484848 !important;
   background-color: transparent !important;
   font-weight: normal !important;
 }
 
-.factory-reset-btn {
+.update-version-button {
+  font-weight: normal;
+  background-color: #e1e0e0;
+  border: 1px solid black;
+  padding: 5px 30px;
+  margin-bottom: 10px;
+}
+
+.factory-reset-button {
+  color: white;
+  background-color: #b51212;
+  border: 1px solid #8c8c8c;
   margin-bottom: 50px;
 }
 
