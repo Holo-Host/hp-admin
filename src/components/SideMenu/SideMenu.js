@@ -1,28 +1,33 @@
 import React from 'react'
+import { useQuery } from '@apollo/react-hooks'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
-// import { presentHolofuelAmount } from 'utils' // presentAgentId
+import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import { sliceHash as presentHash } from 'utils'
 import './SideMenu.module.css'
-
-const MOCK_HOLO_HPOS_AGENT = {
-  nickname: 'Holo Naut',
-  id: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8'
-}
 
 export function SideMenu ({
   isOpen,
   handleClose,
   avatarUrl = ''
 }) {
+  const { loading, data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+
+  let loadingDisplay
+  if (loading) loadingDisplay = '...Loading'
+
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <h1 styleName='appName'>HoloFuel</h1>
-        <HashAvatar seed={MOCK_HOLO_HPOS_AGENT.id} size={100} styleName='avatar' />
+        <h1 styleName='appName'>HP Admin</h1>
+        {loading
+          ? <div />
+          : <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} size={100} styleName='avatar' />
+        }
 
         <span styleName='header-account'>
-          {MOCK_HOLO_HPOS_AGENT.nickname}
+          {settings.hostName || loadingDisplay || presentHash(settings.hostPubKey)}
         </span>
       </header>
 
