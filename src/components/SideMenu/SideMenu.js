@@ -52,9 +52,15 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to='/hpadmin/holofuel' styleName='nav-link'>
+            <Link to='/holofuel' styleName='nav-link'>
               <div styleName='nav-icon' />
               HoloFuel
+            </Link>
+          </li>
+          <li>
+            <Link to='/settings' styleName='nav-link'>
+              <div styleName='nav-icon' />
+              Settings
             </Link>
           </li>
         </ul>
