@@ -8,8 +8,8 @@ pub use error::HoloCryptoError;
 pub struct KeyPair(EdKeypair);
 
 const ARGON2_ADDITIONAL_DATA: &[u8] = b"holocrypto";
-const ARGON2_MAX_PASSPHRASE_LEN: usize = 2 ^ 32 - 1;
-const ARGON2_MAX_SALT_LEN: usize = 2 ^ 32 - 1;
+const ARGON2_MAX_PASSPHRASE_LEN: usize = (2 ^ 32) - 1;
+const ARGON2_MAX_SALT_LEN: usize = (2 ^ 32) - 1;
 const ARGON2_MIN_SALT_LEN: usize = 8;
 
 impl KeyPair {

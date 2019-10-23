@@ -2,7 +2,7 @@ mod utils;
 
 use wasm_bindgen::prelude::*;
 
-use holo_crypto::{error::HoloCryptoError, KeyPair};
+use holo_crypto::{KeyPair};
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
