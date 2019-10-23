@@ -52,7 +52,10 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
+<<<<<<< HEAD
             {/* THIS SHOULD NAVEGATE TO HF APP */}
+=======
+>>>>>>> 1997-sidebar-nav
             <Link to='/holofuel' styleName='nav-link'>
               <div styleName='nav-icon' />
               HoloFuel

@@ -13,7 +13,10 @@ import MyProfile from 'pages/MyProfile'
 import StyleDemo from 'pages/StyleDemo'
 import Login from 'pages/Login'
 import FactoryResetInstructions from 'pages/FactoryResetInstructions'
-import { HoloFuelApp } from 'root'
+
+// NB: This is a placeholder for the ticket to holofuel build compatible with hp admin
+// import { HoloFuelApp } from 'root'
+const placeholderHF = () => <h1>This link will redirect to the HololFuel App</h1>
 
 export default function HPAdminRouter () {
   return <>
@@ -29,7 +32,7 @@ export default function HPAdminRouter () {
     <Route path='/my-profile' component={MyProfile} />
     <Route path='/factory-reset' component={FactoryResetInstructions} />
 
-    <Route path='/holofuel' exact component={HoloFuelApp} />
+    <Route path='/holofuel' exact component={placeholderHF} />
 
     <Route path='/style-demo' component={StyleDemo} />
 
