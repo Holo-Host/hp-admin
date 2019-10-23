@@ -13,6 +13,7 @@ import MyProfile from 'pages/MyProfile'
 import StyleDemo from 'pages/StyleDemo'
 import Login from 'pages/Login'
 import FactoryResetInstructions from 'pages/FactoryResetInstructions'
+import HpAdminHolofuel from 'pages/HpAdminHolofuel'
 
 export default function HPAdminRouter () {
   return <>
@@ -27,6 +28,8 @@ export default function HPAdminRouter () {
     <Route path='/earnings' component={HostingEarnings} />
     <Route path='/my-profile' component={MyProfile} />
     <Route path='/factory-reset' component={FactoryResetInstructions} />
+
+    <Route path='/hpadmin/holofuel' exact component={HpAdminHolofuel} />
 
     <Route path='/style-demo' component={StyleDemo} />
 
