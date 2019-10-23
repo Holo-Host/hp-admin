@@ -9,6 +9,9 @@ crate-type = ["lib"]
 
 [dependencies]
 base64 = "0.10.1"
-rust-argon2 = "0.5.1"
 ed25519-dalek = "1.0.0-pre.2"
 wasm-bindgen = "0.2"
+
+[dependencies.argon2min]
+git = "https://github.com/Holo-Host/argon2min"
+branch = "2019-10-13-holo-config"

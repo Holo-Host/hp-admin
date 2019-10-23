@@ -35,7 +35,7 @@ const profile_signing = (reps) => {
   }, reps)
 }
 
-const keygen_avg =  profile_keygen(100)
+const keygen_avg =  profile_keygen(10)
 const signing_avg = profile_signing(100)
 
 console.log("Admin key pair generation:", keygen_avg, "ms (average)")
