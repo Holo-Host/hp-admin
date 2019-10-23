@@ -1,4 +1,4 @@
-import { AdminKeyPair } from "holo-crypto";
+import { AdminKeyPair } from "holo-crypto-wasm";
 
 /// Profiles a given function 'reps' times and returns the average
 const profile = (name, f, reps) => {
