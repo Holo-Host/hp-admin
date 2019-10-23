@@ -1,5 +1,5 @@
 [package]
-name = "holo-crypto"
+name = "holo-crypto-wasm"
 version = "0.1.0"
 authors = ["Willem Olding <willemolding@gmail.com>"]
 edition = "2018"
@@ -25,9 +25,8 @@ console_error_panic_hook = { version = "0.1.1", optional = true }
 #
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
 wee_alloc = { version = "0.4.2", optional = true }
-base64 = "0.10.1"
-rust-argon2 = "0.5.1"
-ed25519-dalek = "1.0.0-pre.2"
+
+holo-crypto = { path = "../holo-crypto" }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.2"

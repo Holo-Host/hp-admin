@@ -4,7 +4,7 @@
 
 extern crate wasm_bindgen_test;
 use wasm_bindgen_test::*;
-use holo_crypto::{AdminKeyPair, WebUserKeyPair};
+use holo_crypto_wasm::{AdminKeyPair, WebUserKeyPair};
 
 wasm_bindgen_test_configure!(run_in_browser);
 
