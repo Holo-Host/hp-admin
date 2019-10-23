@@ -15,7 +15,7 @@ import Login from 'pages/Login'
 import FactoryResetInstructions from 'pages/FactoryResetInstructions'
 
 // NB: This is a placeholder for the ticket to holofuel build compatible with hp admin
-// import Holofuel from 'pages/HoloFuelApp'
+// import { HoloFuelApp } from 'root'
 const placeholderHF = () => <h1>This link will redirect to the HololFuel App</h1>
 
 export default function HPAdminRouter () {
