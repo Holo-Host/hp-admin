@@ -15,7 +15,7 @@
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
     "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
     "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
-    "test:all": "CI=1 npm run test"
+    "test:ci": "CI=1 npm run test"
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",
