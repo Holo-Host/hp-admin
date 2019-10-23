@@ -8,7 +8,7 @@ import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
 import './Dashboard.module.css'
 
-export default function Dashboard ({ me, happStoreUser, registerUser }) {
+export default function Dashboard () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { nickname } = holofuelUser
 
@@ -33,7 +33,7 @@ export default function Dashboard ({ me, happStoreUser, registerUser }) {
     <Link styleName='card' to='/earnings'>
       <h2 styleName='card-title'>Earnings</h2>
       {balance === 0 && <div styleName='small-text'>
-        You haven't earned any HoloFuel yet.
+        You haven't earned any HoloFuel yet
       </div>}
       {balance > 0 && <div>
         Today: {presentHolofuelAmount(balance)}
