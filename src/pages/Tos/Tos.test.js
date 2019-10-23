@@ -5,6 +5,8 @@ import { createMemoryHistory } from 'history'
 import wait from 'waait'
 import Tos from './Tos'
 
+jest.mock('components/layout/PrimaryLayout')
+
 const renderTos = (
   ui,
   {
