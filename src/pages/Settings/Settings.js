@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize } from 'lodash/fp'
+import { isEmpty, get } from 'lodash/fp'
 import './Settings.module.css'
 import { sliceHash as presentHash } from 'utils'
 import HashAvatar from 'components/HashAvatar'
@@ -11,7 +11,10 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 
-export const createLabelfromSnakeCase = string => string.replace(/([A-Z])/g, ' $1').split(' ').map(word => capitalize(word)).join(' ')
+// Dictionary of all dislay relevant Ports
+export const getLabelFromPortName = portname => ({
+  primaryPort: 'Primary Port'
+}[portname])
 
 const DEFAULT_PORT_NAMES = ['Device Admin', 'HC Network', 'Hosting']
 const NOT_AVAILABLE = 'Not Available'
@@ -28,17 +31,17 @@ export function Settings ({ history: { push } }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
   const { data: { hposStatus: status = [] } = {} } = useQuery(HposStatusQuery)
 
-  const updateVersion = useUpdateVersion()
-  const [softwareUpdateVersion, setSoftwareUpdateVersion] = useState()
-  const showSoftwareUpdateModal = availableVersion => setSoftwareUpdateVersion(availableVersion)
+  const [toggleModal, setToggleModal] = useState()
+  const showModal = () => setToggleModal(true)
 
-  let updateAvailable = false
+  const updateVersion = useUpdateVersion()
+
   let availableVersion, currentVersion
   if (!isEmpty(status) && !isEmpty(status.versionInfo)) {
-    availableVersion = status.versionInfo.availableVersion
-    currentVersion = status.versionInfo.currentVersion
+    availableVersion = get('versionInfo.availableVersion', status)
+    currentVersion = get('versionInfo.currentVersion', status)
   }
-  if (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion)) updateAvailable = true
+  const updateAvailable = (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion))
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
     <header styleName='jumbotron-header'>
@@ -53,13 +56,12 @@ export function Settings ({ history: { push } }) {
     <section styleName='settings-section'>
       <SettingsTable header='Software Version' updateAvailable={updateAvailable}>
         {!isEmpty(status) && !isEmpty(status.versionInfo)
-          ? <SettingsRow
+          ? <SoftwareUpdateRow
             label={presentHash(currentVersion)}
             content={availableVersion}
-            showSoftwareUpdateModal={showSoftwareUpdateModal}
-            updateAvailable={updateAvailable}
-            versionTable />
-          : <SettingsRow
+            showModal={showModal}
+            updateAvailable={updateAvailable} />
+          : <SoftwareUpdateRow
             label='Version Number'
             content={NOT_AVAILABLE} />
         }
@@ -78,10 +80,10 @@ export function Settings ({ history: { push } }) {
       <SettingsTable header='Access Port Numbers'>
         {!isEmpty(status) && !isEmpty(status.ports)
           ? Object.entries(status.ports).map(port => {
-            if (port[0] === '__typename') return
+            if (port[0] === '__typename') return null
             return <SettingsRow
               key={port[0] + port[1]}
-              label={createLabelfromSnakeCase(port[0])}
+              label={getLabelFromPortName(port[0])}
               content={port[1]} />
           })
           : DEFAULT_PORT_NAMES.map(port => <SettingsRow
@@ -94,8 +96,9 @@ export function Settings ({ history: { push } }) {
 
     <UpdateSoftwareModal
       settings={settings}
-      handleClose={() => setSoftwareUpdateVersion(null)}
-      availableVersion={softwareUpdateVersion}
+      handleClose={() => setToggleModal(null)}
+      toggleModal={toggleModal}
+      availableVersion={availableVersion}
       updateVersion={updateVersion} />
 
     <hr />
@@ -125,39 +128,48 @@ export function SettingsTable ({ updateAvailable, header, children }) {
   </table>
 }
 
-export function SettingsRow ({ label, content, showSoftwareUpdateModal, updateAvailable, versionTable }) {
+export function SettingsRow ({ label, content }) {
   return <tr styleName='settings-row' data-testid='settings-row'>
     <td styleName='settings-col align-left'>
       <h3 styleName='row-label' data-testid='settings-label'>{label}</h3>
     </td>
     <td styleName='settings-col align-right'>
-      { updateAvailable && versionTable
-        ? <SoftwareUpdateButton availableVersion={content} showSoftwareUpdateModal={showSoftwareUpdateModal} />
-        : versionTable
-          ? <h3 styleName='row-content'>Your Software is up-to-date</h3>
-          : <h3 styleName='row-content'>{content}</h3>
+      <h3 styleName='row-content'>{content}</h3>
+    </td>
+  </tr>
+}
+
+export function SoftwareUpdateRow ({ label, showModal, updateAvailable }) {
+  return <tr styleName='settings-row' data-testid='settings-row'>
+    <td styleName='settings-col align-left'>
+      <h3 styleName='row-label' data-testid='settings-label'>{label}</h3>
+    </td>
+    <td styleName='settings-col align-right'>
+      { updateAvailable
+        ? <SoftwareUpdateButton showModal={showModal} />
+        : <h3 styleName='row-content'>Your Software is up-to-date</h3>
       }
     </td>
   </tr>
 }
 
-function SoftwareUpdateButton ({ availableVersion, showSoftwareUpdateModal }) {
+function SoftwareUpdateButton ({ showModal }) {
   return <Button
-    onClick={() => showSoftwareUpdateModal(availableVersion)}
+    onClick={showModal}
     styleName='update-version-button'>
     Update Software
   </Button>
 }
 
-export function UpdateSoftwareModal ({ availableVersion, updateVersion, handleClose, settings }) {
+export function UpdateSoftwareModal ({ settings, handleClose, toggleModal, availableVersion, updateVersion }) {
   if (!availableVersion) return null
   const onYes = () => {
-    updateVersion(availableVersion)
+    updateVersion()
     handleClose()
   }
   return <Modal
     contentLabel={`Update ${settings.deviceName}?`}
-    isOpen={!!availableVersion}
+    isOpen={!!toggleModal}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>

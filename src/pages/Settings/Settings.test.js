@@ -1,6 +1,6 @@
 import React from 'react'
 import { MockedProvider } from '@apollo/react-testing'
-import { SettingsRow, createLabelfromSnakeCase } from './Settings'
+import { SettingsRow, getLabelFromPortName } from './Settings'
 import { renderAndWait } from 'utils/test-utils'
 
 jest.mock('components/layout/PrimaryLayout')
@@ -55,7 +55,7 @@ describe('Settings', () => {
 
     it('renders HoloPort Ports from props', async () => {
       const props = {
-        label: createLabelfromSnakeCase(Object.entries(mockedStatus.ports)[0][0]),
+        label: getLabelFromPortName(Object.entries(mockedStatus.ports)[0][0]),
         content: mockedStatus.ports.primaryPort
       }
 
