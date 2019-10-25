@@ -23,10 +23,7 @@ export function SideMenu ({
   if (agentLoading) agentLoading = <h4>Loading...</h4>
 
   const [toggleModal, setToggleModal] = useState()
-  const showModal = () => {
-    console.log('+++++++++++++')
-    setToggleModal(true)
-  }
+  const showModal = () => setToggleModal(true)
 
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
