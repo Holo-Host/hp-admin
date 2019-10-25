@@ -73,21 +73,19 @@ export function SideMenu ({
           </li>
           <li>
             {isWide
-              ? <>
-                <Link data-tip='' data-for='hf-redemption' styleName='nav-link'>
-                  <div styleName='nav-icon disabled-link' />
-                  Redeem
-                  <ReactTooltip
-                    id='hf-redemption'
-                    delayShow={250}
-                    getContent={() => <>'Feature is to come... '</>}
-                  />
-                </Link>
-              </>
+              ? <Link data-tip='' data-for='hf-redemption' styleName='nav-link'>
+                <div styleName='nav-icon disabled-link' />
+                Redeem
+                <ReactTooltip
+                  id='hf-redemption'
+                  delayShow={250}
+                  getContent={() => <>'Feature is to come... '</>}
+                />
+              </Link>
               : <>
                 <Link styleName='nav-link' onClick={() => showModal()}>
                   <div styleName='nav-icon disabled-link' />
-                Redeem
+                  Redeem
                 </Link>
               </>
             }
