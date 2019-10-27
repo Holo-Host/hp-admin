@@ -36,11 +36,8 @@ export function Settings ({ history: { push } }) {
 
   const updateVersion = useUpdateVersion()
 
-  let availableVersion, currentVersion
-  if (!isEmpty(status) && !isEmpty(status.versionInfo)) {
-    availableVersion = get('versionInfo.availableVersion', status)
-    currentVersion = get('versionInfo.currentVersion', status)
-  }
+  const availableVersion = get('versionInfo.availableVersion', status)
+  const currentVersion = get('versionInfo.currentVersion', status)
   const updateAvailable = (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion))
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
