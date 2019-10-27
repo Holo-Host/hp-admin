@@ -35,9 +35,6 @@ const holochainZomeCall = require('../holochainZomeCall.js')
 const Agent1TransactionLedger = require('./Agent1HFLedger.js')
 const Agent2TransactionLedger = require('./Agent2HFLedger.js')
 
-// const AGENT_1_TRANSACTIONS = Agent1TransactionLedger
-// const AGENT_2_TRANSACTIONS = Agent2TransactionLedger
-
 // HoloFuel Users :
 const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
 // NOTE: Following alt var for the config file is for testing out with manual conductor(ie: not nix auto-gen)
@@ -176,14 +173,17 @@ startTestConductor()
               console.log('\n Full Request Array Iteration Number (index) : ', i)
               let txOriginId
               // Agent 1 Requests HF
+              // AGENT_1_DNA_INSTANCE
               transactHoloFuel(CURRENT_AGENT, DNA_INSTANCE, REQUEST, holochainZomeCall, callZome, { index: i })
               // Agent 2 Offers HF in response to Agent 1's request
                 .then(r => {
                   const { Ok: originId } = JSON.parse(r)
                   txOriginId = originId
+                  // AGENT_2_DNA_INSTANCE
                   return transactHoloFuel(COUNTERPARTY_AGENT, DNA_INSTANCE, PAY, holochainZomeCall, callZome, { transactionTrace: i, originId })
                 })
                 // Agent 1 Accepts HF offered by Agent 2 and completes originating Request
+                // AGENT_1_DNA_INSTANCE
                 .then(res => {
                   setTimeout(() => resolve(transactHoloFuel(CURRENT_AGENT, DNA_INSTANCE, ACCEPT, holochainZomeCall, callZome, { originId: txOriginId })), 5000)
                 })
