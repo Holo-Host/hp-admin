@@ -4,6 +4,8 @@ import { SettingsRow, getLabelFromPortName } from './Settings'
 import { renderAndWait } from 'utils/test-utils'
 
 jest.mock('components/layout/PrimaryLayout')
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
 
 const mockedSettings = {
   deviceName: 'My HoloPort',
