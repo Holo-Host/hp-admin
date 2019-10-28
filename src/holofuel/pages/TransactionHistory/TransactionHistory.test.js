@@ -19,6 +19,8 @@ import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
 
 function renderWithRouter (
   ui,

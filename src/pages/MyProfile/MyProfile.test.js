@@ -3,9 +3,10 @@ import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
-
-// testing the named export Header rather than the default export which is wrapped in withRouter
 import MyProfile from './MyProfile'
+
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
 
 const renderMyProfile = (
   props,
