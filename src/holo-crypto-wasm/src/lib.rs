@@ -27,7 +27,7 @@ impl AdminKeyPair {
     /// Returns a base64 encoded signature of the payload
     pub fn sign(&self, payload: &str) -> Result<String, JsValue> {
         let sig_bytes = self.0.sign(payload.as_bytes()).to_bytes();
-        Ok(base64::encode(&sig_bytes[..]))
+        Ok(base64::encode_config(&sig_bytes[..], base64::STANDARD_NO_PAD))
     }
 }
 
@@ -57,6 +57,6 @@ impl WebUserKeyPair {
     /// Returns a base64 encoded signature of the payload
     pub fn sign(&self, payload: &str) -> Result<String, JsValue> {
         let sig_bytes = self.0.sign(payload.as_bytes()).to_bytes();
-        Ok(base64::encode(&sig_bytes[..]))
+        Ok(base64::encode_config(&sig_bytes[..], base64::STANDARD_NO_PAD))
     }
 }
