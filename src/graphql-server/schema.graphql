@@ -57,7 +57,7 @@ enum TransactionDirection {
 type Transaction {
   id: ID # ID will be the originCommitHash
   amount: Float
-  counterparty: String # HolofuelUser
+  counterparty: HolofuelUser
   direction: TransactionDirection
   status: TransactionStatus
   type: TransactionType
@@ -76,7 +76,27 @@ type Ledger {
 }
 
 type HposSettings {
-  version: String
+  hostPubKey: String
+  hostName: String
+  registrationEmail: String
+  networkStatus: String # ie: 'live'
+  sshAccess: Boolean
+  deviceName: String
+}
+
+type HposVersion {
+  availableVersion: String
+  currentVersion: String
+}
+
+type HposPorts {
+  primaryPort: String
+}
+
+type HposStatus {
+  versionInfo: HposVersion
+  networkId: String # ZT publicIdentity
+  ports: HposPorts
 }
 
 type Query {
@@ -95,6 +115,7 @@ type Query {
   holofuelHistoryCounterparties: [HolofuelUser]
   holofuelInboxCounterparties: [HolofuelUser]
   hposSettings: HposSettings
+  hposStatus: HposStatus
 }
 
 type Mutation {
@@ -103,10 +124,11 @@ type Mutation {
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
-  holofuelRequest(counterparty:String, amount:Float): Transaction
-  holofuelOffer(counterparty:String, amount:Float, requestId:ID): Transaction
+  holofuelRequest(counterpartyId: String, amount: Float): Transaction
+  holofuelOffer(counterpartyId: String, amount: Float, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction 
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
-  hposUpdateSettings(version: String): HposSettings
+  hposUpdateSettings(hostPubKey: String, hostName: String, sshAccess: Boolean): HposSettings
+  hposUpdateVersion: HposStatus
 }

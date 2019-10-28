@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import _ from 'lodash'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, flatten, capitalize } from 'lodash/fp'
 import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
@@ -10,7 +9,7 @@ import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
@@ -27,14 +26,45 @@ function useCancel () {
   })
 }
 
+function useFetchCounterparties () {
+  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
+  const { data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
+
+  if (holofuelHistoryCounterparties) {
+    const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
+    const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
+      const matchingTx = filterTransactionsByAgentId(agent, txListType)
+      return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
+    })
+
+    // Cache Write/Update for HolofuelCompletedTransactionsQuery
+    const newCompletedTxList = flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
+    client.writeQuery({
+      query: HolofuelCompletedTransactionsQuery,
+      data: {
+        holofuelCompletedTransactions: newCompletedTxList
+      }
+    })
+
+    // Cache Write/Update for HolofuelWaitingTransactionsQuery
+    const newWaitingTxList = flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
+    client.writeQuery({
+      query: HolofuelWaitingTransactionsQuery,
+      data: {
+        holofuelWaitingTransactions: newWaitingTxList
+      }
+    })
+  }
+}
+
 // Display - Functional Components with Hooks :
 export default function TransactionsHistory () {
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-
+  useFetchCounterparties()
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
-
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
   // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.
@@ -96,6 +126,7 @@ const TransactionTableHeading = ({ content }) => {
 
 export function TransactionRow ({ transaction, showCancellationModal, completed }) {
   const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
+
   const { date, time } = presentDateAndTime(timestamp)
   return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
     <td styleName='completed-tx-col table-content'>
@@ -103,7 +134,11 @@ export function TransactionRow ({ transaction, showCancellationModal, completed 
       <p data-testid='cell-time'>{time}</p>
     </td>
     <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'><RenderNickname agentId={counterparty} copyId /></h4>
+      <h4 data-testid='cell-counterparty'>
+        <CopyAgentId agent={counterparty}>
+          {counterparty.nickname || presentAgentId(counterparty.id)}
+        </CopyAgentId>
+      </h4>
       <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
     </td>
     <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
@@ -150,7 +185,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {_.capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'><RenderNickname agentId={counterparty} /></span> ?
+      Cancel your {capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
     </div>
     <div styleName='modal-buttons'>
       <Button
@@ -165,21 +200,4 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
       </Button>
     </div>
   </Modal>
-}
-
-export function RenderNickname ({ agentId, copyId }) {
-  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    variables: { agentId }
-  })
-
-  if ((loading || error) && !copyId) return <>{presentAgentId(agentId)}</>
-  else if ((loading || error) && copyId) {
-    return <CopyAgentId agent={{ id: agentId, nickname: '' }}>
-      {presentAgentId(agentId)}
-    </CopyAgentId>
-  } else if (holofuelCounterparty.nickname && copyId) {
-    return <CopyAgentId agent={holofuelCounterparty}>
-      {holofuelCounterparty.nickname}
-    </CopyAgentId>
-  } else return <>{holofuelCounterparty.nickname}</>
 }

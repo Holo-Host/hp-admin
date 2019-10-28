@@ -1,0 +1,12 @@
+mutation HposUpdateVersion {
+  hposUpdateVersion {
+    versionInfo {
+      availableVersion,
+      currentVersion
+    }
+    networkId
+    ports {
+      primaryPort
+    }
+  }
+}

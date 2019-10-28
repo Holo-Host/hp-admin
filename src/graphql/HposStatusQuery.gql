@@ -1,0 +1,12 @@
+query HposStatus {
+  hposStatus {
+    versionInfo { 
+      availableVersion,
+      currentVersion
+    }
+    networkId
+    ports {
+      primaryPort
+    }
+  }
+}

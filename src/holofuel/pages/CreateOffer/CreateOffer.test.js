@@ -18,14 +18,14 @@ jest.mock('holofuel/contexts/useFlashMessageContext')
 // TODO: switch to mock pattern for Router
 jest.unmock('react-router-dom')
 
-const counterparty = 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+const counterparty = { id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi' }
 const amount = 35674
 const notes = 'Hi there'
 
 const offerMock = {
   request: {
     query: HolofuelOfferMutation,
-    variables: { amount, counterparty, notes }
+    variables: { amount, counterpartyId: counterparty.id, notes }
   },
   result: {
     data: {
@@ -77,7 +77,7 @@ describe('CreateOffer', () => {
 
     expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
-    fireEvent.change(getByLabelText('To'), { target: { value: counterparty } })
+    fireEvent.change(getByLabelText('To'), { target: { value: counterparty.id } })
 
     expect(getByTestId('hash-icon')).toBeInTheDocument()
 
@@ -96,7 +96,7 @@ describe('CreateOffer', () => {
 
     expect(offerMock.newData).toHaveBeenCalled()
     expect(push).toHaveBeenCalledWith('/history')
-    expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty)}.`, 5000)
+    expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty.id)}.`, 5000)
   })
 
   it('renders the counterparty nickname upon *successful* fetch', async () => {

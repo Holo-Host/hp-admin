@@ -1,33 +1,34 @@
 import React from 'react'
 import { fireEvent, act, within } from '@testing-library/react'
 import wait from 'waait'
+import moment from 'moment'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
-import moment from 'moment'
 import apolloClient from 'apolloClient'
-import Inbox, { TransactionRow, RenderNickname } from './Inbox'
+import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-// import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
+import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).reverse().map(item => {
   if (item.event[2].Request) {
     return {
       type: 'request',
-      ...item.event[2].Request
+      ...item.event[2].Request,
+      counterparty: item.event[2].Request.from
     }
   } else if (item.event[2].Promise) {
     return {
       type: 'offer',
-      ...item.event[2].Promise.tx
+      ...item.event[2].Promise.tx,
+      counterparty: item.event[2].Promise.tx.from
     }
   } else {
     throw new Error('unrecognized transaction type', item.toString())
@@ -48,13 +49,14 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
     expect(listItems).toHaveLength(2)
 
     listItems.forEach(async (item, index) => {
-      // const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
+      const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
+
       const { getByText } = within(item)
       const transaction = actionableTransactions[index]
       expect(getByText(transaction.notes)).toBeInTheDocument()
       const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
       expect(getByText(amountToMatch)).toBeInTheDocument()
-      // expect(getByText(whois.nickname)).toBeInTheDocument()
+      expect(getByText(whois.nickname)).toBeInTheDocument()
     })
   })
 })
@@ -66,7 +68,7 @@ describe('TransactionRow', () => {
 
   const request = {
     id: '123',
-    counterparty: 'only care about the last 6',
+    counterparty: { id: 'last 6' },
     amount: 100,
     type: TYPE.request,
     timestamp: moment().subtract(14, 'days'),
@@ -115,7 +117,7 @@ describe('TransactionRow', () => {
   const offerMock = {
     request: {
       query: HolofuelOfferMutation,
-      variables: { amount: request.amount, counterparty: request.counterparty, requestId: request.id }
+      variables: { amount: request.amount, counterpartyId: request.counterparty.id, requestId: request.id }
     },
     result: {
       data: { holofuelOffer: mockTransaction }
@@ -197,53 +199,5 @@ describe('TransactionRow', () => {
 
       expect(acceptOfferMock.newData).toHaveBeenCalled()
     })
-  })
-
-  const mockWhoIsAgent1 = {
-    id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-    nickname: 'Sam'
-  }
-
-  const newRequest = {
-    ...request,
-    counterparty: mockWhoIsAgent1.id
-  }
-
-  const counterpartyQueryMockError = {
-    request: {
-      query: HolofuelCounterpartyQuery,
-      variables: { agentId: newRequest.counterparty }
-    },
-    error: new Error('ERROR! : <Error Message>')
-  }
-
-  const actionableTransactionsQueryMock = {
-    request: {
-      query: HolofuelActionableTransactionsQuery
-    },
-    result: {
-      data: {
-        holofuelActionableTransactions: [newRequest]
-      }
-    }
-  }
-
-  it('should default to rendering last 6 of AgentId', async () => {
-    afterEach(() => {
-      jest.clearAllMocks()
-    })
-
-    const rowContent = actionableTransactionsQueryMock.result.data.holofuelActionableTransactions[0]
-
-    const mocks = [
-      counterpartyQueryMockError
-    ]
-
-    const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-      <RenderNickname agentId={rowContent.counterparty} className='mock-style' />
-    </MockedProvider>, 0)
-
-    const nameDiv = getByText(presentAgentId(rowContent.counterparty))
-    expect(nameDiv).toBeInTheDocument()
   })
 })

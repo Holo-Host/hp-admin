@@ -2,7 +2,7 @@ import HyloDnaInterface from 'data-interfaces/HyloDnaInterface'
 import HappStoreDnaInterface, { getHappDetails } from 'data-interfaces/HappStoreDnaInterface'
 import HhaDnaInterface from 'data-interfaces/HhaDnaInterface'
 import EnvoyInterface from 'data-interfaces/EnvoyInterface'
-import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
+import HoloFuelDnaInterface, { getTxCounterparties } from 'data-interfaces/HoloFuelDnaInterface'
 import HposInterface from 'data-interfaces/HposInterface'
 import { promiseMap } from 'utils'
 import {
@@ -18,7 +18,7 @@ export const resolvers = {
     // factoring out the function call here breaks tests. Don't understand why
     happStoreUser: () => HappStoreDnaInterface.currentUser.get(),
 
-    hostingUser: () => HhaDnaInterface.currentUser.get(),
+    hostingUser: HhaDnaInterface.currentUser.get,
 
     happs: () => promiseMap(HhaDnaInterface.happs.all(), getHappDetails),
 
@@ -27,6 +27,19 @@ export const resolvers = {
     holofuelUser: HoloFuelDnaInterface.user.get,
 
     holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
+
+    holofuelHistoryCounterparties: async () => {
+      const completed = await HoloFuelDnaInterface.transactions.allCompleted()
+      const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
+      const historyTransactions = completed.concat(waiting)
+      return getTxCounterparties(historyTransactions)
+    },
+
+    holofuelInboxCounterparties: () => {
+      const historyTransactions = HoloFuelDnaInterface.transactions.allActionable()
+      const transactionCounterparties = historyTransactions.then(getTxCounterparties)
+      return transactionCounterparties
+    },
 
     holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
 
@@ -42,7 +55,9 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: HposInterface.os.settings
+    hposSettings: HposInterface.os.settings,
+
+    hposStatus: HposInterface.os.status
   },
 
   Mutation: {
@@ -73,9 +88,9 @@ export const resolvers = {
 
     updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit),
 
-    holofuelRequest: async (_, { counterparty, amount, notes }) => HoloFuelDnaInterface.requests.create(counterparty, amount, notes),
+    holofuelRequest: async (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
 
-    holofuelOffer: async (_, { counterparty, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterparty, amount, notes, requestId),
+    holofuelOffer: async (_, { counterpartyId, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterpartyId, amount, notes, requestId),
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
@@ -83,7 +98,9 @@ export const resolvers = {
 
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    hposUpdateSettings: (_, { version }) => HposInterface.os.updateSettings({ version })
+    hposUpdateSettings: (_, { hostPubKey, hostName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, sshAccess),
+
+    hposUpdateVersion: HposInterface.os.updateVersion
   }
 }
 

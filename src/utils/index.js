@@ -13,8 +13,13 @@ export async function promiseMap (array, fn) {
   return resolved
 }
 
+export function sliceHash (hashString = '', desiredLength = 6) {
+  if (typeof desiredLength !== 'number') throw new Error('Fn sliceHash requires a number input.')
+  return (hashString).slice(-desiredLength)
+}
+
 export function presentAgentId (agentId) {
-  return (agentId || '').slice(-6)
+  return sliceHash(agentId, 6)
 }
 
 export function presentHolofuelAmount (amount) {

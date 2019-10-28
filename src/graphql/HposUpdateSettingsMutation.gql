@@ -1,0 +1,10 @@
+mutation HposUpdateSettings ($hostPubKey: String, $hostName: String, $sshAccess: Boolean) {
+  hposUpdateSettings (hostPubKey: $hostPubKey, hostName: $hostName, sshAccess: $sshAccess) {
+    hostPubKey
+    hostName
+    registrationEmail
+    networkStatus
+    sshAccess
+    deviceName
+  }
+}

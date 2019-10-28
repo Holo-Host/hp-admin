@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
+import { promiseMap } from 'utils'
 
 export const currentDataTimeIso = () => new Date().toISOString()
 
@@ -10,11 +11,21 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes, fees }) => {
+// Creates an array of all counterparties for a provided transaction list
+export async function getTxCounterparties (transactionList) {
+  const counterpartyList = transactionList.map(({ counterparty }) => counterparty.id)
+  const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
+  const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
+  return noDuplicatesAgentList
+}
+
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
-    counterparty: counterparty || event.Request.from,
+    counterparty: {
+      id: counterpartyId || event.Request.from
+    },
     direction: stateDirection,
     status: STATUS.pending,
     type: TYPE.request,
@@ -24,11 +35,13 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterparty, amount, notes, fees }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
-    counterparty: counterparty || event.Promise.tx.to,
+    counterparty: {
+      id: counterpartyId || event.Promise.tx.to
+    },
     direction: stateDirection,
     status: STATUS.pending,
     type: TYPE.offer,
@@ -55,11 +68,13 @@ const presentAcceptedPayment = async (acceptedPayment) => {
 }
 
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
-  const counterparty = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
+  const counterpartyId = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
   return {
     id: origin,
     amount: event.Receipt.cheque.invoice.promise.tx.amount,
-    counterparty,
+    counterparty: {
+      id: counterpartyId
+    },
     direction: stateDirection,
     status: STATUS.completed,
     type: event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
@@ -72,11 +87,13 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
 
 // TODO: Review whether we should be showing this in addition to the receipt
 const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
-  const counterparty = stateDirection === DIRECTION.incoming ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
+  const counterpartyId = stateDirection === DIRECTION.incoming ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
   return {
     id: origin,
     amount: event.Cheque.invoice.promise.tx.amount,
-    counterparty,
+    counterparty: {
+      id: counterpartyId
+    },
     direction: stateDirection,
     status: STATUS.completed,
     type: event.Cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
@@ -92,9 +109,9 @@ function presentPendingRequest (transaction) {
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the recipient of funds
   const eventTimestamp = event[1]
-  const counterparty = provenance[0]
+  const counterpartyId = provenance[0]
   const { amount, notes, fee } = event[2].Request
-  return presentRequest({ origin, event: event[2], stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
+  return presentRequest({ origin, event: event[2], stateDirection, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
 function presentPendingOffer (transaction) {
@@ -102,9 +119,9 @@ function presentPendingOffer (transaction) {
   const origin = event[2].Promise.request ? event[2].Promise.request : event[0]
   const stateDirection = DIRECTION.outgoing // this indicates the spender of funds
   const eventTimestamp = event[1]
-  const counterparty = provenance[0]
+  const counterpartyId = provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
-  return presentOffer({ origin, event: event[2], stateDirection, eventTimestamp, counterparty, amount, notes, fees: fee })
+  return presentOffer({ origin, event: event[2], stateDirection, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
 function presentTransaction (transaction) {
@@ -238,12 +255,14 @@ const HoloFuelDnaInterface = {
     }
   },
   requests: {
-    create: async (counterparty, amount, notes) => {
-      const origin = await createZomeCall('transactions/request')({ from: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE, notes })
+    create: async (counterpartyId, amount, notes) => {
+      const origin = await createZomeCall('transactions/request')({ from: counterpartyId, amount: amount.toString(), deadline: MOCK_DEADLINE, notes })
       return {
         id: origin,
         amount,
-        counterparty,
+        counterparty: {
+          id: counterpartyId
+        },
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.pending,
         type: TYPE.request,
@@ -252,12 +271,14 @@ const HoloFuelDnaInterface = {
     }
   },
   offers: {
-    create: async (counterparty, amount, notes, requestId) => {
-      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterparty, amount: amount.toString(), deadline: MOCK_DEADLINE, notes, requestId }))
+    create: async (counterpartyId, amount, notes, requestId) => {
+      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: MOCK_DEADLINE, notes, requestId }))
       return {
         id: requestId || origin, // NOTE: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
         amount,
-        counterparty,
+        counterparty: {
+          id: counterpartyId
+        },
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,
         type: TYPE.offer,
