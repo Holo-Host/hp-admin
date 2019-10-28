@@ -1,6 +1,5 @@
 import React from 'react'
-import { Route } from 'react-router-dom'
-
+import { Route, Link } from 'react-router-dom'
 import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
 import Settings from 'pages/Settings'
@@ -34,8 +33,24 @@ export default function HPAdminRouter () {
     <Route path='/style-demo' component={StyleDemo} />
 
     {/* <Route path='/holofuel' exact component={HoloFuelApp} /> */}
-    <Route path='/holofuel' render={() => <div>
+    <Route path='/holofuel' render={() => <div style={{ marginTop: 50, textAlign: 'center' }}>
       This page will redirect to the HoloFuel app
+      <br />
+      <br />
+      <br />
+      <Link to='/dashboard'
+        style={{
+          marginLeft: 'auto',
+          color: '#484848',
+          backgroundColor: '#CDCDCD',
+          fontWeight: 'bold',
+          fontSize: 14,
+          minWidth: 67,
+          padding: 10,
+          borderRadius: 5
+        }}>
+        Home
+      </Link>
     </div>} />
 
   </>
