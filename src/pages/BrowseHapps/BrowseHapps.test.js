@@ -15,6 +15,8 @@ import BrowseHapps from './BrowseHapps'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('components/layout/PrimaryLayout')
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
 
 function renderWithRouter (
   ui,
