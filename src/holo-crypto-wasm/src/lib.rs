@@ -1,13 +1,9 @@
 mod utils;
+mod arg_checks;
 
 use wasm_bindgen::prelude::*;
 
-// use holo_crypto::{KeyPair};
 use holo_config_core::{admin_keypair_from, keypair_from, Keypair, PublicKey};
-
-const ARGON2_MAX_PASSPHRASE_LEN: usize = (2 ^ 32) - 1;
-const ARGON2_MAX_SALT_LEN: usize = (2 ^ 32) - 1;
-const ARGON2_MIN_SALT_LEN: usize = 8;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -26,41 +22,6 @@ impl From<HoloCryptoError> for JsValue {
     }
 }
 
-fn check_passphrase(passphrase_bytes: &[u8]) -> Result<(), HoloCryptoError> {
-    if passphrase_bytes.len() > ARGON2_MAX_PASSPHRASE_LEN {
-        return Err(HoloCryptoError::Custom(
-            "Passphrase exceeds maximum allowable number of bytes".to_string(),
-        ))
-    } else {
-        return Ok(())
-    }
-}
-
-fn check_pubkey(hc_pub_key: &str) -> Result<(), HoloCryptoError> {
-    // TODO: Actually decode this properly
-    let hc_pub_key_bytes = hc_pub_key.as_bytes();
-    if hc_pub_key_bytes.len() != 32 {
-        return Err(HoloCryptoError::Custom(format!(
-            "Expected hc_pub_key to be 32 bytes long, found {}",
-            hc_pub_key_bytes.len()
-        )))
-    } else {
-        Ok(())
-    }
-}
-
-fn check_salt(salt_bytes: &[u8]) -> Result<(), HoloCryptoError> {
-    match salt_bytes.len() {
-        0..=ARGON2_MIN_SALT_LEN if salt_bytes.len() < ARGON2_MIN_SALT_LEN => Err(
-            HoloCryptoError::Custom("Salt must be at least 8 bytes".to_string()),
-        ),
-        ARGON2_MIN_SALT_LEN..=ARGON2_MAX_SALT_LEN => Ok(()),
-        _ => Err(HoloCryptoError::Custom(
-            "Salt exceeds maximum allowable number of bytes".to_string(),
-        )),
-    }
-}
-
 #[wasm_bindgen]
 pub struct AdminKeyPair(Keypair);
 
@@ -71,14 +32,14 @@ impl AdminKeyPair {
         let hc_pub_key_bytes = hc_pub_key.as_bytes();
         let passphrase_bytes = pass.as_bytes();
 
-        check_pubkey(hc_pub_key)?;
-        check_passphrase(passphrase_bytes)?;
+        arg_checks::check_pubkey(hc_pub_key)?;
+        arg_checks::check_passphrase(passphrase_bytes)?;
 
         let hc_pub_key = PublicKey::from_bytes(hc_pub_key_bytes)
             .map_err(|e| HoloCryptoError::Custom(format!("{}", e)))?;
         Ok(Self(
             admin_keypair_from(hc_pub_key, email, pass)
-                .map_err(|e| HoloCryptoError::Custom(format!("{}", e)))?,
+                .map_err(|e| HoloCryptoError::Custom(format!("keypair generation failed: {}", e)))?,
         ))
     }
 
@@ -110,8 +71,8 @@ impl WebUserKeyPair {
         let salt_bytes = salt.as_bytes();
         let passphrase_bytes = pass.as_bytes();
 
-        check_passphrase(passphrase_bytes)?;
-        check_salt(salt_bytes)?;
+        arg_checks::check_passphrase(passphrase_bytes)?;
+        arg_checks::check_salt(salt_bytes)?;
 
         Ok(Self(
             keypair_from(
@@ -120,7 +81,7 @@ impl WebUserKeyPair {
                 happ_hash.as_bytes(),
                 WEBUSER_ARGON_ADDITIONAL_DATA,
             )
-            .map_err(|e| HoloCryptoError::Custom(format!("{}", e)))?,
+            .map_err(|e| HoloCryptoError::Custom(format!("keypair generation failed: {}", e)))?,
         ))
     }
 
