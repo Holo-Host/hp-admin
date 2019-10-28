@@ -84,6 +84,7 @@ in
       libuuid
       pango
       pixman
+      rustc
     ];
 
     buildInputs = [
