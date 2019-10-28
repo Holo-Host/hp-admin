@@ -26,8 +26,6 @@ console_error_panic_hook = { version = "0.1.1", optional = true }
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
 wee_alloc = { version = "0.4.2", optional = true }
 
-# holo-crypto = { path = "../holo-crypto" }
-
 holo-config-core = { git = "https://github.com/Holo-Host/holo-config", rev = "d70f1f9b8fd7ab76df739abd12b9019ebef3ac44" }
 base64 = "0.11.0"
 
