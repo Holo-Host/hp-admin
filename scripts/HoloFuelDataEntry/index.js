@@ -41,7 +41,7 @@ const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
 // const config = toml.parse(fs.readFileSync('./hpadmin-conductor-config.toml', 'utf-8'))
 const Agent1 = {
   agentId: config.agents[0].public_address || 'ERROR: No Agent Pub Key Found',
-  nick: config.agents[0].i || 'Perry'
+  nick: config.agents[0].id || 'Perry'
 }
 const Agent2 = {
   agentId: config.agents[1].public_address || 'ERROR: No Agent Pub Key Found',
