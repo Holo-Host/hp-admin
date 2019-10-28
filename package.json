@@ -14,7 +14,7 @@
     "test:lint": "standard",
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
     "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
-    "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
+    "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",    
     "test:ci": "CI=1 npm run test"
   },
   "dependencies": {

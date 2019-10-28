@@ -4,6 +4,9 @@ import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import Settings from './Settings'
 
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
+
 const mockedProps = {
   hostName: 'My Host',
   hostUrl: 'https://some-host-url.holo.host',

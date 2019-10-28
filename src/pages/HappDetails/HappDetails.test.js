@@ -11,6 +11,8 @@ import { appOne as appHoloFuel } from 'mock-dnas/happStore'
 import HappDetails from './HappDetails'
 
 jest.mock('data-interfaces/EnvoyInterface')
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
 
 afterEach(() => {
   apolloClient.resetStore()
