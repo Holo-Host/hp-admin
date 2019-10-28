@@ -11,6 +11,8 @@ import { Header } from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
 
 jest.mock('holofuel/contexts/useFlashMessageContext')
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
 
 function renderWithRouter (
   ui,

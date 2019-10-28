@@ -31,9 +31,12 @@ export default function HPAdminRouter () {
     <Route path='/my-profile' component={MyProfile} />
     <Route path='/factory-reset' component={FactoryResetInstructions} />
 
-    {/* <Route path='/holofuel' exact component={HoloFuelApp} /> */}
-
     <Route path='/style-demo' component={StyleDemo} />
+
+    {/* <Route path='/holofuel' exact component={HoloFuelApp} /> */}
+    <Route path='/holofuel' render={() => <div>
+      This page will redirect to the HoloFuel app
+    </div>} />
 
   </>
 }
