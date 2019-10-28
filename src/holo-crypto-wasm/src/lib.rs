@@ -35,6 +35,7 @@ impl AdminKeyPair {
         arg_checks::check_pubkey(hc_pub_key)?;
         arg_checks::check_passphrase(passphrase_bytes)?;
 
+        // TODO: use the hcid encoding
         let hc_pub_key = PublicKey::from_bytes(hc_pub_key_bytes)
             .map_err(|e| HoloCryptoError::Custom(format!("{}", e)))?;
         Ok(Self(

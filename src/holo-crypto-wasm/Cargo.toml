@@ -28,6 +28,7 @@ wee_alloc = { version = "0.4.2", optional = true }
 
 holo-config-core = { git = "https://github.com/Holo-Host/holo-config", rev = "d70f1f9b8fd7ab76df739abd12b9019ebef3ac44" }
 base64 = "0.11.0"
+hcid = "0.0.6"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.2"
