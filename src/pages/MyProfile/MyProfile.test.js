@@ -5,6 +5,7 @@ import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 import MyProfile from './MyProfile'
 
+jest.mock('components/layout/PrimaryLayout')
 // TODO: switch to mock pattern for Router
 jest.unmock('react-router-dom')
 
@@ -24,12 +25,6 @@ const renderMyProfile = (
 })
 
 describe('Rendering', () => {
-  it('should render the header', () => {
-    const { getByText } = renderMyProfile()
-
-    expect(getByText('Edit Profile')).toBeInTheDocument()
-  })
-
   it('should render the avatar url input', async () => {
     const { getByLabelText } = renderMyProfile()
     const input = getByLabelText('Avatar URL')

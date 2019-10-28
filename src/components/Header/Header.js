@@ -6,11 +6,8 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
-export function Header ({ title, avatarUrl, email, backTo, history: { push } }) {
-  const goToMenu = () => push('/dashboard')
-  // const goBack = () => push(backTo)
-
-  const leftNav = <Button onClick={goToMenu} styleName='menu-button' dataTestId='menu-button'>
+export function Header ({ title, avatarUrl, email, backTo, history: { push }, hamburgerClick = () => push('/dashboard') }) {
+  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />
   </Button>
 

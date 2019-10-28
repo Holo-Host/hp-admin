@@ -49,5 +49,9 @@ export default function Dashboard () {
         <div styleName='balance'>{presentHolofuelAmount(balance)}</div>
       </div>}
     </Link>
+    {/* TODO: Determine if we want a card that links to the Settings Page too... */}
+    {/* <Link styleName='card' to='/settings'>
+      <h2 styleName='card-title'>Settings</h2>
+    </Link> */}
   </PrimaryLayout>
 }
