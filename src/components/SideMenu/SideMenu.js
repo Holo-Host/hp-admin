@@ -69,6 +69,9 @@ export function SideMenu ({
       <footer styleName='footer'>
         <ul styleName='footer-list'>
           <li>
+            <a href='https://holo.freshdesk.com/support/home' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
+          </li>
+          <li>
             <Link to='/tos' styleName='footer-link'>View Disclaimer</Link>
           </li>
           <li>

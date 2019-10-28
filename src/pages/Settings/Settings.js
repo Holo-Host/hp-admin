@@ -171,7 +171,7 @@ export function UpdateSoftwareModal ({ settings, handleClose, toggleModal, avail
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Would you like to update {settings.deviceName} to version {presentHash(availableVersion)}?
+      Would you like to update the HoloPort, "{settings.deviceName}", to version {presentHash(availableVersion)}?
     </div>
     <div styleName='modal-buttons'>
       <Button
