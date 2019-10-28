@@ -15,6 +15,8 @@ import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageC
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
 
 const counterparty = { id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi' }
 const amount = 35674
