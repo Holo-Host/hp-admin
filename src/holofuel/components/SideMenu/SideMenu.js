@@ -70,8 +70,8 @@ export function SideMenu ({
           </li>
           <li>
             {isWide
-              ? <Link data-tip='' data-for='hf-redemption' styleName='nav-link'>
-                <div styleName='nav-icon disabled-link' />
+              ? <Link to='#/' data-tip='' data-for='hf-redemption' styleName='nav-link disabled-link'>
+                <div styleName='nav-icon disabled' />
                 Redeem
                 <ReactTooltip
                   id='hf-redemption'
@@ -80,8 +80,8 @@ export function SideMenu ({
                 />
               </Link>
               : <>
-                <Link styleName='nav-link' onClick={() => showModal()}>
-                  <div styleName='nav-icon disabled-link' />
+                <Link to='#/' styleName='nav-link disabled-link' onClick={() => showModal()}>
+                  <div styleName='nav-icon disabled' />
                   Redeem
                 </Link>
               </>
@@ -115,7 +115,7 @@ function HfRedemptionDescriptionModal ({ toggleModal, handleClose }) {
     contentLabel='HoloFuel Redemption'
     isOpen={!!toggleModal}
     handleClose={handleClose}
-    styleName='modal'>
+    styleName='modal topmost'>
     <div styleName='modal-title'>How to Redeem HoloFuel</div>
     <div styleName='modal-text' role='heading'>
       Feature is to come...

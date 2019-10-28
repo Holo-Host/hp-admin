@@ -78,7 +78,7 @@ export function Settings ({ history: { push } }) {
       <SettingsTable header='Access Port Numbers'>
         {!isEmpty(status) && !isEmpty(status.ports)
           ? Object.entries(status.ports).map(port => {
-            if (port[0] === '__typename') return
+            if (port[0] === '__typename') return null
             return <SettingsRow
               key={port[0] + port[1]}
               label={createLabelfromSnakeCase(port[0])}

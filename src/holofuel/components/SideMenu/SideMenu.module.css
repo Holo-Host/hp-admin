@@ -116,6 +116,10 @@
   margin-top: -3px;
 }
 
+.disabled {
+  background-color: #615e5e !important;
+}
+
 /* We should turn this into a design-system component */
 .nav-badge {
   box-sizing: border-box;
@@ -133,8 +137,8 @@
 }
 
 .disabled-link {
-  pointer-events: none;
-  background-color: #888 !important;
+  /* pointer-events: none; */
+  color: #615e5e;
 }
 
 /* Footer */
@@ -156,6 +160,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.topmost {
+  z-index: 999;
 }
 
 .modal-title {
