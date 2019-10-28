@@ -1,75 +1,72 @@
 import React from 'react'
-import { render } from '@testing-library/react'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory } from 'history'
-import Settings from './Settings'
+import { MockedProvider } from '@apollo/react-testing'
+import { SettingsRow, getLabelFromPortName } from './Settings'
+import { renderAndWait } from 'utils/test-utils'
 
+jest.mock('components/layout/PrimaryLayout')
 // TODO: switch to mock pattern for Router
 jest.unmock('react-router-dom')
 
-const mockedProps = {
-  hostName: 'My Host',
-  hostUrl: 'https://some-host-url.holo.host',
-  hostPubKey: 'hcsFAkeHashSTring2443223ee',
-  registrationEmail: 'iamahost@hosting.com',
-  deviceName: 'My Very First HoloPort',
-  networkId: 'my-holoport-network-id',
-  sshAccess: false,
-  deviceAdminPort: 6609,
-  hcAdminPort: 8800,
-  hcNetworkPort: 35353,
-  hostingPort: 8080
+const mockedSettings = {
+  deviceName: 'My HoloPort',
+  hostName: 'Holo Naut',
+  hostPubKey: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8',
+  networkStatus: 'live',
+  registrationEmail: 'sam.rose@holo.host',
+  sshAccess: true
 }
 
-const renderWithRouter = (
-  props,
-  {
-    route = '/',
-    history = createMemoryHistory({ initialEntries: [route] })
-  } = {}
-) => render(<Router history={history}>
-  <Settings history={{ push: () => {} }} {...props} />
-</Router>)
+const mockedStatus = {
+  versionInfo: {
+    availableVersion: 'b13891c28d78f1e916fdefb5edc1d386e4f533c8',
+    currentVersion: '4707080a5cba68e8bc215e22ef1c8e7d8e70791b'
+  },
+  networkId: '505688f5c97313e5c7e34547e49a6ac46a05746b2e3faad724103b8ed34a4b108e15d08051db09eedd53ed089b19a5bfae9b1afdb7a9c65ad6f8aa9d98e4f2f2',
+  ports: { primaryPort: '9993' }
+}
 
 describe('Settings', () => {
   describe('Rendering', () => {
-    it('renders HoloPort name from props', () => {
-      const { getByText } = renderWithRouter({ settings: mockedProps })
+    it('renders HoloPort Device Name from props', async () => {
+      const props = {
+        label: 'Device Name',
+        content: mockedSettings.deviceName
+      }
 
-      expect(getByText('Name')).toBeInTheDocument()
-      expect(getByText(mockedProps.deviceName)).toBeInTheDocument()
+      const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
+        <SettingsRow {...props} />
+      </MockedProvider>, 0)
+
+      expect(getByText('Device Name')).toBeInTheDocument()
+      expect(getByText(mockedSettings.deviceName)).toBeInTheDocument()
     })
 
-    it('renders HoloPort host url from props', () => {
-      const { getByText } = renderWithRouter({ settings: mockedProps })
+    it('renders HoloPort Device Network ID from props', async () => {
+      const props = {
+        label: 'Network ID',
+        content: mockedStatus.networkId
+      }
 
-      expect(getByText('URL')).toBeInTheDocument()
-      expect(getByText(mockedProps.hostUrl)).toBeInTheDocument()
-    })
-
-    it('renders network id from props', () => {
-      const { getByText } = renderWithRouter({ settings: mockedProps })
+      const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
+        <SettingsRow {...props} />
+      </MockedProvider>, 0)
 
       expect(getByText('Network ID')).toBeInTheDocument()
-      expect(getByText(mockedProps.networkId)).toBeInTheDocument()
+      expect(getByText(mockedStatus.networkId)).toBeInTheDocument()
     })
 
-    it('renders port numbers from props', () => {
-      const { getByText, getByPlaceholderText } = renderWithRouter({ settings: mockedProps })
+    it('renders HoloPort Ports from props', async () => {
+      const props = {
+        label: getLabelFromPortName(Object.entries(mockedStatus.ports)[0][0]),
+        content: mockedStatus.ports.primaryPort
+      }
 
-      expect(getByText('Access Port Numbers')).toBeInTheDocument()
+      const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
+        <SettingsRow {...props} />
+      </MockedProvider>, 0)
 
-      expect(getByText('Device Admin')).toBeInTheDocument()
-      expect(getByPlaceholderText('Device Admin').value).toEqual(String(mockedProps.deviceAdminPort))
-
-      expect(getByText('HC Admin')).toBeInTheDocument()
-      expect(getByPlaceholderText('HC Admin').value).toEqual(String(mockedProps.hcAdminPort))
-
-      expect(getByText('HC Network')).toBeInTheDocument()
-      expect(getByPlaceholderText('HC Network').value).toEqual(String(mockedProps.hcNetworkPort))
-
-      expect(getByText('Hosting')).toBeInTheDocument()
-      expect(getByPlaceholderText('Hosting').value).toEqual(String(mockedProps.hostingPort))
+      expect(getByText('Primary Port')).toBeInTheDocument()
+      expect(getByText(mockedStatus.ports.primaryPort)).toBeInTheDocument()
     })
   })
 })
