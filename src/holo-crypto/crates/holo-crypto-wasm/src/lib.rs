@@ -1,10 +1,10 @@
 mod utils;
 
-use std::convert::TryInto;
+
 use wasm_bindgen::prelude::*;
 
 // use holo_crypto::{KeyPair};
-use holo_config_core::Config;
+use holo_config_core::{admin_keypair_from, keypair_from, Keypair, PublicKey};
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -13,49 +13,50 @@ use holo_config_core::Config;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
-pub struct AdminKeyPair(Config);
+pub struct AdminKeyPair(Keypair);
 
 #[wasm_bindgen]
 impl AdminKeyPair {
     #[wasm_bindgen(constructor)]
     pub fn new(email: &str, pass: &str, hc_pub_key: &str) -> Result<AdminKeyPair, JsValue> {
-        // let combined_passphrase = pass.to_owned() + email;
-        // Ok(Self(KeyPair::new(&combined_passphrase, &hc_pub_key)?))
-        let seed: [u8; 32] = hc_pub_key.as_bytes().try_into().unwrap();
-        let (config, _pub_key) = Config::new(email.to_string(), pass.to_string(), Some(seed)).unwrap();
-        Ok(Self(config))
+        let hc_pub_key = PublicKey::from_bytes(hc_pub_key.as_bytes()).unwrap();
+        Ok(Self(admin_keypair_from(hc_pub_key, email, pass).unwrap()))
     }
 
     #[wasm_bindgen]
     /// Returns a base64 encoded signature of the payload
     pub fn sign(&self, payload: &str) -> Result<String, JsValue> {
-        match self.0 {
-            Config::V1{admin, ..} => {
-                Ok(admin.public_key.sign(payload)?)
-            }
-        }
+        let sig_bytes = self.0.sign(payload.as_bytes()).to_bytes();
+        Ok(base64::encode(&sig_bytes[..]))
     }
 }
 
 #[wasm_bindgen]
-pub struct WebUserKeyPair(KeyPair);
+pub struct WebUserKeyPair(Keypair);
+
+const WEBUSER_ARGON_ADDITIONAL_DATA: &[u8] = b"holo-crypto webuser ed25519 key v1";
 
 #[wasm_bindgen]
 impl WebUserKeyPair {
     #[wasm_bindgen(constructor)]
     pub fn new(
-        email: &str,
+        _email: &str,
         pass: &str,
         salt: &str,
         happ_hash: &str,
     ) -> Result<WebUserKeyPair, JsValue> {
-        let combined_passphrase = pass.to_owned() + email + happ_hash;
-        Ok(Self(KeyPair::new(&combined_passphrase, salt)?))
+        Ok(Self(keypair_from(
+            pass.as_bytes(),
+            salt.as_bytes(),
+            happ_hash.as_bytes(),
+            WEBUSER_ARGON_ADDITIONAL_DATA,
+        ).unwrap()))
     }
 
     #[wasm_bindgen]
     /// Returns a base64 encoded signature of the payload
     pub fn sign(&self, payload: &str) -> Result<String, JsValue> {
-        Ok(self.0.sign(payload)?)
+        let sig_bytes = self.0.sign(payload.as_bytes()).to_bytes();
+        Ok(base64::encode(&sig_bytes[..]))
     }
 }
