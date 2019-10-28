@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
-// import { id } from 'utils/agentConfig'
+import { id } from 'utils/agentConfig'
 // import startScenario from '/__integration_tests__/StartScenario.integration.test.js'
 
 jest.mock('react-media-hook')
