@@ -1,3 +1,5 @@
+import fs from 'fs'
+import toml from 'toml'
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
@@ -22,11 +24,18 @@ export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
 
-const agentId = process.env.REACT_APP_AGENT_ID
+// const agentId = process.env.REACT_APP_AGENT_ID
+const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
+const agentId = config.agents[0].public_address
+
+const formatInstanceId = instanceId => {
+  if (MOCK_DNA_CONNECTION) return agentId + '::<happ_id>-' + instanceId
+  else {
+    return config.instances.find(instance => instance.dna === instanceId).id
+  }
+}
 
 export function conductorInstanceId (instanceId) {
-  const formatInstanceId = instanceId => agentId + '::<happ_id>-' + instanceId
-
   return {
     hylo: formatInstanceId('hylo'),
     'happ-store': formatInstanceId('happ-store'),
@@ -36,6 +45,10 @@ export function conductorInstanceId (instanceId) {
 }
 
 async function initAndGetHolochainClient () {
+  if (process.env.REACT_APP_INTEGRATION_TEST) {
+    console.log('INTEGATION TESTS')
+    console.log('🎉 Successfully connected to Holochain!')
+  }
   if (holochainClient) return holochainClient
   try {
     holochainClient = await hcWebClientConnect({

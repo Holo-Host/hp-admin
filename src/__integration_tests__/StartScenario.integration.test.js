@@ -1,36 +1,24 @@
-import fs from 'fs'
-import toml from 'toml'
 import { connect } from '@holochain/hc-web-client'
 import startTestConductor from '../scripts/startTestConductor.js'
 
-// Conductor Agents/Instances :
-const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
-const Agent1 = {
-  agentId: config.agents[0].public_address,
-  nick: config.agents[0].id
-}
-const HAPP_STORE_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'happ-store').id
-const HHA_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holo-hosting-app').id
-
-const instances = {
-  has: HAPP_STORE_DNA_INSTANCE,
-  hha: HHA_DNA_INSTANCE
-}
-
-const startScenario = (children, { options }) => {
+const startScenario = async (testingFn) => {
   startTestConductor()
     .then(() => {
       console.log('Successful connection to Conductor!')
-      connect({ url: 'ws://localhost:3400' })
+      // async
+      return connect({ url: process.env.REACT_APP_DNA_INTERFACE_URL })
         .then(async ({ callZome }) => {
-          const scenarioTest = async (AgentNo, DnaInstances, zomeCallFn, { options }) => {
-            return <>
-              {children}
-            </>
-          }
-          await scenarioTest(Agent1, instances, callZome, { options })
+          const scenarioTest = async () => testingFn(callZome)
+          await scenarioTest()
             .then(_ => process.exit())
         })
+      // await console.log('Testing Scenario Closed.')
+      // await console.log('Shutting down conductor...')
+      // // TODO: LOOK AT ENVOY
+
+      // await console.log('Deleting Storage Files...')
+      // // TODO: REMOVE TMP FILES (all DNA PERSISTED STORAGE)...
+      // await deleteDirectoryRecursive('../../tmp')
     })
 }
 

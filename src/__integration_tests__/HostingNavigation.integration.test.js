@@ -1,29 +1,35 @@
 import React from 'react'
+import runConductor from '/__integration_test__/RunConductor.integration.test.js'
 import { fireEvent, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
 // import { id } from 'utils/agentConfig'
-import startScenario from '/__integration_test__/StartScenario.integration.test.js'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 
-describe('CreateRequest', () => {
-  it('user can create a request and then view it in the transaction history', async () => {
-    const amount = 123
+const runScenario = (callZome) => {
+  console.log('CALLZOME : ', callZome)
 
-    const { getByTestId, getByText, getByLabelText } = await renderAndWait(<HPAdminApp />)
-    fireEvent.click(getByTestId('menu-button'))
-    await wait(() => getByText('Request'))
+  describe('TESTING => Hosting Navigation Integration Test', () => {
+    it('user can create a request and then view it in the transaction history', async () => {
+      const amount = 123
 
-    fireEvent.click(getByText('Request'))
+      const { getByTestId, getByText, getByLabelText } = await renderAndWait(<HPAdminApp />)
+      fireEvent.click(getByTestId('menu-button'))
+      await wait(() => getByText('Request'))
 
-    await wait(() => getByLabelText('From'))
-    // request from ourselves
-    fireEvent.change(getByLabelText('From'), { target: { value: id } })
-    fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
-    fireEvent.click(getByText('Send'))
+      fireEvent.click(getByText('Request'))
 
-    await wait(() => getByLabelText('History'))
-  }, 20000)
-})
+      await wait(() => getByLabelText('From'))
+      // request from ourselves
+      fireEvent.change(getByLabelText('From'), { target: { value: id } })
+      fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
+      fireEvent.click(getByText('Send'))
+
+      await wait(() => getByLabelText('History'))
+    }, 20000)
+  })
+}
+
+runConductor(runScenario)
