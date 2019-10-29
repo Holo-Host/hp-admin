@@ -26,7 +26,6 @@
     "apollo-client": "^2.6.4",
     "apollo-link-logger": "^1.2.3",
     "apollo-link-schema": "^1.2.3",
-    "app-root-path": "^2.2.1",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
