@@ -147,8 +147,7 @@
       "expect",
       "it",
       "jest",
-      "test",
-      "__srcdir"
+      "test"
     ]
   },
   "babel": {
