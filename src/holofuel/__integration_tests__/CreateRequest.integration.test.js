@@ -28,5 +28,5 @@ const runScenario = async () => {
 }
 
 describe('CreateRequest', () => {
-  it('user can create a request and then view it in the transaction history', ()=>runConductor(runScenario), 20000)
+  it('user can create a request and then view it in the transaction history', () => runConductor(runScenario), 20000)
 })
