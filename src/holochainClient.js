@@ -1,9 +1,10 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
+import { findInstanceForAgent } from 'utils/conductorConfig'
 
+const developmentMockDnaConnection = false // this is the value MOCK_DNA_CONNECTION will have in the dev server
 // This can be written as a boolean expression then it's even less readable
-const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
   : process.env.NODE_ENV === 'test'
@@ -22,17 +23,16 @@ export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
 
-const agentId = process.env.REACT_APP_AGENT_ID
+export function conductorInstanceId (instanceId, agentIndex) {
+  const realInstanceId = instanceId => findInstanceForAgent(instanceId, agentIndex).id
 
-export function conductorInstanceId (instanceId) {
-  const formatInstanceId = instanceId => agentId + '::<happ_id>-' + instanceId
-
-  return {
-    hylo: formatInstanceId('hylo'),
-    'happ-store': formatInstanceId('happ-store'),
-    hha: formatInstanceId('holo-hosting-app'),
-    holofuel: formatInstanceId('holofuel')
-  }[instanceId]
+  // TODO: name holo-hosting-app hha in nix setup, then we can get rid of this dictionary lookup
+  return realInstanceId({
+    hylo: 'hylo',
+    'happ-store': 'happ-store',
+    hha: 'holo-hosting-app',
+    holofuel: 'holofuel'
+  }[instanceId])
 }
 
 async function initAndGetHolochainClient () {
@@ -53,7 +53,7 @@ async function initAndGetHolochainClient () {
   }
 }
 
-export function createZomeCall (zomeCallPath, callOpts = {}) {
+export function createZomeCall (zomeCallPath, agentIndex = 0, callOpts = {}) {
   const DEFAULT_OPTS = {
     logging: HOLOCHAIN_LOGGING,
     resultParser: null
@@ -71,7 +71,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()
-        const realInstanceId = conductorInstanceId(instanceId)
+        const realInstanceId = conductorInstanceId(instanceId, agentIndex)
         zomeCall = holochainClient.callZome(realInstanceId, zome, zomeFunc)
       }
 
@@ -113,11 +113,11 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   }
 }
 
-export function instanceCreateZomeCall (instanceId) {
+export function instanceCreateZomeCall (instanceId, agentIndex) {
   return (partialZomeCallPath, callOpts = {}) => {
     // regex removes leading slash
     const zomeCallPath = `${instanceId}/${partialZomeCallPath.replace(/^\/+/, '')}`
-    return createZomeCall(zomeCallPath, callOpts)
+    return createZomeCall(zomeCallPath, agentIndex, callOpts)
   }
 }
 

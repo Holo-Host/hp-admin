@@ -26,6 +26,7 @@
     "apollo-client": "^2.6.4",
     "apollo-link-logger": "^1.2.3",
     "apollo-link-schema": "^1.2.3",
+    "app-root-path": "^2.2.1",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
@@ -47,6 +48,7 @@
     "regenerator-runtime": "^0.13.3",
     "rpc-websockets": "^4.5.1",
     "toml": "^3.0.0",
+    "toml-loader": "^1.0.0",
     "waait": "^1.0.5",
     "ws": "^7.1.1",
     "yup": "^0.27.0"
@@ -146,7 +148,8 @@
       "expect",
       "it",
       "jest",
-      "test"
+      "test",
+      "__srcdir"
     ]
   },
   "babel": {

@@ -44,11 +44,11 @@ const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
 // const config = toml.parse(fs.readFileSync('./hpadmin-conductor-config.toml', 'utf-8'))
 const Agent1 = {
   agentId: config.agents[0].public_address || 'ERROR: No Agent Pub Key Found',
-  nick: config.agents[0].i || 'Perry'
+  nick: config.agents[0].id
 }
 const Agent2 = {
   agentId: config.agents[1].public_address || 'ERROR: No Agent Pub Key Found',
-  nick: config.agents[1].id || 'Sam'
+  nick: config.agents[1].id
 }
 const AGENT_1_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[0].id).id
 // const AGENT_2_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holofuel' && instance.agent === config.agents[1].id).id
@@ -59,13 +59,13 @@ const OFFER = 'offers.initated'
 const PAY = 'offers.responding'
 const ACCEPT = 'offers.accepted'
 
-const transactHoloFuel = (agentId, DNA_INSTANCE, type, ZomeCall, callZomeFn, { index, transactionTrace, originId }) => {
-  const txType = type === OFFER ? agentId[`offers`][`initated`] : agentId[type]
-  const counterparty = agentId === Agent1TransactionLedger ? Agent2.agentId : Agent1.agentId
+const transactHoloFuel = (agentTransactionLedger, DNA_INSTANCE, type, ZomeCall, callZomeFn, { index, transactionTrace, originId }) => {
+  const txType = type === OFFER ? agentTransactionLedger[`offers`][`initated`] : agentTransactionLedger[type]
+  const counterparty = agentTransactionLedger === Agent1TransactionLedger ? Agent2.agentId : Agent1.agentId
   let origininatingTx = null
   if (transactionTrace || transactionTrace === 0) {
     // For payment of a request :
-    const otherAgent = agentId === Agent1TransactionLedger ? Agent2TransactionLedger : Agent1TransactionLedger
+    const otherAgent = agentTransactionLedger === Agent1TransactionLedger ? Agent2TransactionLedger : Agent1TransactionLedger
     origininatingTx = otherAgent[REQUEST][transactionTrace]
   }
   switch (type) {

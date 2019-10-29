@@ -173,24 +173,6 @@ const HoloFuelDnaInterface = {
         id: result[0].Ok.agent_id.pub_sign_key,
         nickname: result[0].Ok.agent_id.nick
       }
-    },
-    getCounterparties: async (agentIdArray) => {
-      const result = await createZomeCall('transactions/whois')({ agents: agentIdArray })
-      if (result.error) throw new Error('There was an error fetching the agent nicknames for the referenced counterparties. ERROR: ', result.error)
-
-      // Returning the Agent ID detials for more than 1 agent:
-      const agentList = []
-      result.forEach((agent, index) => {
-        if (agent[index].Ok) {
-          agentList.push({
-            id: agent[index].Ok.agent_id.pub_sign_key,
-            nickname: agent[index].Ok.agent_id.nick
-          })
-        } else {
-          throw new Error('There was an error locating one of the holofuel agent nicknames. ERROR: ', agent[index].Err)
-        }
-      })
-      return agentList
     }
   },
   ledger: {
