@@ -1,5 +1,5 @@
 import { connect } from '@holochain/hc-web-client'
-import startTestConductor from '../scripts/startTestConductor.js'
+import startTestConductor from './startTestConductor.js'
 
 const startScenario = async (testingFn) => {
   startTestConductor()
@@ -12,13 +12,6 @@ const startScenario = async (testingFn) => {
           await scenarioTest()
             .then(_ => process.exit())
         })
-      // await console.log('Testing Scenario Closed.')
-      // await console.log('Shutting down conductor...')
-      // // TODO: LOOK AT ENVOY
-
-      // await console.log('Deleting Storage Files...')
-      // // TODO: REMOVE TMP FILES (all DNA PERSISTED STORAGE)...
-      // await deleteDirectoryRecursive('../../tmp')
     })
 }
 

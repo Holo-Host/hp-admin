@@ -26,7 +26,7 @@ let holochainClient
 
 // const agentId = process.env.REACT_APP_AGENT_ID
 const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
-const agentId = config.agents[0].public_address
+const agentId = config.agents[0].public_address || process.env.REACT_APP_AGENT_ID
 
 const formatInstanceId = instanceId => {
   if (MOCK_DNA_CONNECTION) return agentId + '::<happ_id>-' + instanceId
@@ -47,7 +47,7 @@ export function conductorInstanceId (instanceId) {
 async function initAndGetHolochainClient () {
   if (process.env.REACT_APP_INTEGRATION_TEST) {
     console.log('INTEGATION TESTS')
-    console.log('🎉 Successfully connected to Holochain!')
+    console.log('holochainClient')
   }
   if (holochainClient) return holochainClient
   try {
