@@ -14,16 +14,21 @@ pub(crate) fn check_passphrase(passphrase_bytes: &[u8]) -> Result<(), HoloCrypto
     }
 }
 
-pub(crate) fn check_pubkey(hc_pub_key: &str) -> Result<(), HoloCryptoError> {
-    // TODO: Actually decode this properly
-    let hc_pub_key_bytes = hc_pub_key.as_bytes();
+pub(crate) fn check_decode_pubkey(hc_pub_key: &str) -> Result<[u8; 32], HoloCryptoError> {
+    let enc = hcid::HcidEncoding::with_kind("hcs0")
+        .expect("Could not create hdic decoder");
+    let hc_pub_key_bytes = enc.decode(&hc_pub_key).map_err(|_| {
+        HoloCryptoError::Custom("Could not decode holochain public key".to_string())
+    })?;
     if hc_pub_key_bytes.len() != 32 {
         return Err(HoloCryptoError::Custom(format!(
             "Expected hc_pub_key to be 32 bytes long, found {}",
             hc_pub_key_bytes.len()
         )))
     } else {
-        Ok(())
+        let mut byte_array: [u8; 32] = [0; 32];
+        byte_array.copy_from_slice(&hc_pub_key_bytes);
+        Ok(byte_array)
     }
 }
 

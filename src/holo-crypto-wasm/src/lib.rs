@@ -29,14 +29,12 @@ pub struct AdminKeyPair(Keypair);
 impl AdminKeyPair {
     #[wasm_bindgen(constructor)]
     pub fn new(email: &str, pass: &str, hc_pub_key: &str) -> Result<AdminKeyPair, JsValue> {
-        let hc_pub_key_bytes = hc_pub_key.as_bytes();
         let passphrase_bytes = pass.as_bytes();
 
-        arg_checks::check_pubkey(hc_pub_key)?;
+        let hc_pub_key_bytes = arg_checks::check_decode_pubkey(hc_pub_key)?;
         arg_checks::check_passphrase(passphrase_bytes)?;
 
-        // TODO: use the hcid encoding
-        let hc_pub_key = PublicKey::from_bytes(hc_pub_key_bytes)
+        let hc_pub_key = PublicKey::from_bytes(&hc_pub_key_bytes)
             .map_err(|e| HoloCryptoError::Custom(format!("{}", e)))?;
         Ok(Self(
             admin_keypair_from(hc_pub_key, email, pass)

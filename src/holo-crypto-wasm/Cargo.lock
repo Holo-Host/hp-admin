@@ -263,6 +263,7 @@ version = "0.1.0"
 dependencies = [
  "base64 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "console_error_panic_hook 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hcid 0.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "holo-config-core 0.0.0 (git+https://github.com/Holo-Host/holo-config?rev=d70f1f9b8fd7ab76df739abd12b9019ebef3ac44)",
  "wasm-bindgen 0.2.51 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasm-bindgen-test 0.2.50 (registry+https://github.com/rust-lang/crates.io-index)",

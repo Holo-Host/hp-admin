@@ -13,7 +13,7 @@ fn admin_can_derive_key_and_sign() {
     let akp = AdminKeyPair::new(
         "some@email.test",
         "p4ssw0rd",
-        "HCA01adefasdtbeodbgahfawnfsdegds",
+        "HcSciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     )
     .expect("Could not generate keypair");
 
@@ -25,7 +25,7 @@ fn admin_can_derive_key_and_sign() {
 
 #[wasm_bindgen_test]
 fn admin_will_error_if_hc_pub_key_incorrect_length() {
-    assert!(AdminKeyPair::new("some@email.test", "pwd", "HCA01..").is_err())
+    assert!(AdminKeyPair::new("some@email.test", "pwd", "HcSciaaaa").is_err())
 }
 
 #[wasm_bindgen_test]

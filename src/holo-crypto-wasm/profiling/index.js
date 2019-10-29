@@ -19,7 +19,7 @@ const profile_keygen = (reps) => {
     const kp = new AdminKeyPair(
       "some@email.test",
       "p4ssw0rd",
-      "HCA01adefasdtbeodbgahfawnfsdegds"
+      "HcSciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     )
   }, reps)
 }
@@ -28,7 +28,7 @@ const profile_signing = (reps) => {
   const kp = new AdminKeyPair(
     "some@email.test",
     "p4ssw0rd",
-    "HCA01adefasdtbeodbgahfawnfsdegds"
+    "HcSciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   )
   return profile("Admin signing", () => {
     kp.sign("some message")
