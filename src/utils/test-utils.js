@@ -32,7 +32,7 @@ export function renderWithApolloRouter (
   }
 }
 
-export async function renderWithRouterAwait (ui, ms = 0) {
+export async function renderWithApolloRouterAwait (ui, ms = 0) {
   let queries
   await act(async () => {
     queries = renderWithApolloRouter(ui)
