@@ -4,15 +4,11 @@ import * as rimraf from 'rimraf'
 import wait from 'waait'
 
 export const defaultStorage = process.env.REACT_APP_STORAGE_PATH
-// export const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export const runConductor = async (testingFn) => {
   // NB: REMOVE all DNA PERSISTED STORAGE FILES...
-  if (defaultStorage) {
-    console.log('Located Storage Files...')
-    rimraf.sync(defaultStorage)
-    console.log('Deleted Storage Files...')
-  }
+  rimraf.sync(defaultStorage)
+  console.log('Deleted Existing Storage Files...')
 
   await exec("nix-shell --run 'node scripts/wait-for-conductor.js'", (err, out, code) => {
     if (err instanceof Error) throw err

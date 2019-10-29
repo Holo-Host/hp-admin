@@ -1,9 +1,9 @@
 import React from 'react'
+import { fireEvent, wait, act } from '@testing-library/react'
 import { runConductor } from 'utils/runConductor.js'
-import { fireEvent, wait } from '@testing-library/react'
-import { renderAndWait } from 'utils/test-utils'
-import { HoloFuelApp } from 'root'
+import { renderAndWait, renderWithApolloRouterAwait, renderWithApolloRouter } from 'utils/test-utils'
 import { id } from 'utils/agentConfig'
+import { HoloFuelApp } from 'root'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
@@ -11,7 +11,13 @@ jest.mock('react-identicon-variety-pack')
 const runScenario = async () => {
   const amount = 123
 
-  const { getByTestId, getByText, getByLabelText } = await renderAndWait(<HoloFuelApp />)
+  let getByTestId, getByText, getByLabelText
+  await act(async () => {
+    ({ getByTestId, getByText, getByLabelText } = renderWithApolloRouter(<HoloFuelApp />))
+    await wait(0)
+  })
+
+  // const { getByTestId, getByText, getByLabelText } = await renderWithApolloRouterAwait(<HoloFuelApp />)
   fireEvent.click(getByTestId('menu-button'))
   await wait(() => getByText('Request'))
 

@@ -21,6 +21,8 @@ export function App () {
 }
 
 export function HoloFuelApp () {
+  console.log('INSIDE HOLOFUEL APP')
+
   const isWide = useMediaPredicate('(min-width: 550px)')
 
   return <ApolloProvider client={apolloClient}>
