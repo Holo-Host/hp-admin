@@ -2,10 +2,12 @@ import React from 'react'
 import { fireEvent, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
-import { id } from 'utils/agentConfig'
+import { getAgent } from 'utils/conductorConfig'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
+
+const agentId = getAgent().id
 
 describe('CreateRequest', () => {
   it('user can create a request and then view it in the transaction history', async () => {
@@ -19,7 +21,7 @@ describe('CreateRequest', () => {
 
     await wait(() => getByLabelText('From'))
     // request from ourselves
-    fireEvent.change(getByLabelText('From'), { target: { value: id } })
+    fireEvent.change(getByLabelText('From'), { target: { value: agentId } })
     fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
     fireEvent.click(getByText('Send'))
 

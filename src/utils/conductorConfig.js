@@ -1,5 +1,15 @@
 // Note, this is not really a config file. It's just a way for the JS to access the nix config
-import config from 'utils/conductor-config.toml'
+import fs from 'fs'
+import toml from 'toml'
+
+let config
+
+// This is such a hack
+if (process.env.NODE_ENV === 'test') {
+  config = toml.parse(fs.readFileSync('./conductor-config.toml'))
+} else {
+  config = require('utils/conductor-config.toml')
+}
 
 export function getAgent (index = 0) {
   if (index >= config.agents.length) throw new Error(`There are less than ${index - 1} agents in the config`)

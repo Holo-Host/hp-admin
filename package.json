@@ -15,17 +15,20 @@
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
     "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
     "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
-    "test:ci": "CI=1 npm run test"
+    "test:ci": "CI=1 npm run test",
+    "test:initialize-conductor-data": "NODE_ENV=test babel-node scripts/initialize-conductor-data"
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",
     "@apollo/react-hooks": "^3.0.1",
     "@apollo/react-testing": "^3.0.1",
+    "@babel/node": "^7.6.3",
     "@holochain/hc-web-client": "^0.5.0",
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-client": "^2.6.4",
     "apollo-link-logger": "^1.2.3",
     "apollo-link-schema": "^1.2.3",
+    "babel-node": "0.0.1-security",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
@@ -53,7 +56,7 @@
     "yup": "^0.27.0"
   },
   "devDependencies": {
-    "@babel/core": "7.4.3",
+    "@babel/core": "^7.4.3",
     "@babel/plugin-syntax-jsx": "^7.2.0",
     "@svgr/webpack": "4.1.0",
     "@testing-library/jest-dom": "^4.0.0",
