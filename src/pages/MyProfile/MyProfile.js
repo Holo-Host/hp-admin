@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
+import { useQuery } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
-
+import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
-
 import Button from 'components/Button'
 import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
@@ -12,9 +12,8 @@ import './MyProfile.module.css'
 // eslint-disable-next-line no-useless-escape
 const EMAIL_REGEXP = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-const MyProfile = ({
-  history: { push }
-}) => {
+const MyProfile = ({ history: { push } }) => {
+  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
   const [isTosOpen, setTosOpen] = useState(false)
   const { register, handleSubmit, errors, watch } = useForm()
   const onSubmit = data => {
@@ -35,7 +34,7 @@ const MyProfile = ({
     }}
   >
     <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
-      <HashAvatar avatarUrl={avatarUrl} seed={email} styleName='avatar-image' />
+      <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} styleName='avatar-image' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
         <Input
