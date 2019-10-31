@@ -7,6 +7,7 @@ const HOLOCHAIN_LOGGING = true
 let holochainClient
 
 async function initAndGetHolochainClient () {
+  console.log('holochainClient : ', holochainClient)
   if (holochainClient) return holochainClient
   try {
     holochainClient = await hcWebClientConnect({
@@ -24,11 +25,11 @@ async function initAndGetHolochainClient () {
   }
 }
 
-async function createZomeCall (instanceId, zomeName, functionName, agentIndex = 0) {
-  await initAndGetHolochainClient()
+function createZomeCall (instanceId, zomeName, functionName, agentIndex = 0) {
   const realInstanceId = findInstanceForAgent(instanceId, agentIndex).id
 
   return async function (args = {}) {
+    await initAndGetHolochainClient()
     return holochainClient.callZome(realInstanceId, zomeName, functionName)(args)
   }
 }

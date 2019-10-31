@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 export function getAgent (index = 0) {
-  if (index >= config.agents.length) throw new Error(`There are less than ${index - 1} agents in the config`)
+  if (index && index >= config.agents.length) throw new Error(`There are less than ${index} agent(s) in the config`)
   return {
     id: config.agents[index].public_address,
     nickname: config.agents[index].name,
