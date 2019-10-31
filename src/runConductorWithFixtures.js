@@ -1,0 +1,23 @@
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
+const ncp = util.promisify(require('ncp').ncp)
+const rimraf = require('rimraf')
+
+export default async function runConductorWithFixtures (testFn) {
+  console.log('1')
+  await exec('npm run hc:stop')
+  console.log('2')
+  rimraf.sync(process.env.REACT_APP_DEFAULT_STORAGE)
+  console.log('3')
+  await ncp(process.env.REACT_APP_STORAGE_SNAPSHOT, process.env.REACT_APP_DEFAULT_STORAGE)
+  console.log('4')
+  await exec('npm run hc:start')
+  console.log('5')
+  await exec('npm run test:wait-for-conductor')
+  // const { stdout, stderr } = await exec('npm run test:wait-for-conductor')
+  // const { stdout, stderr } = await exec('ls')
+  // process.stderr.write(stderr)
+  // process.stdout.write(stdout)
+  console.log('6')
+  return testFn()
+}
