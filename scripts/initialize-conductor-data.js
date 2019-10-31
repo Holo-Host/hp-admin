@@ -1,6 +1,9 @@
 const createZomeCall = require('./create-zome-call')
 const { getAgent } = require('../src/utils/conductorConfig')
 const moment = require('moment')
+const util = require('util')
+const ncp = util.promisify(require('ncp').ncp)
+require('dotenv').config()
 
 const randomNumber = (number = 10000) => {
   return Math.round(Math.random() * number)
@@ -10,6 +13,10 @@ const txParams = {
   amount: randomNumber,
   notes: 'Pre-Seed Data',
   deadline: moment().subtract(10, 'days').toISOString()
+}
+
+function snapshotStrorage () {
+  return ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT)
 }
 
 async function populateData () {
@@ -67,8 +74,14 @@ async function populateData () {
 }
 
 populateData()
-  .then(_ => process.exit())
+  .then(() => snapshotStrorage())
+  .then(() => process.exit())
   .catch(e => {
     console.log('error', e)
     process.exit(-1)
   })
+
+module.exports = {
+  DEFAULT_STORAGE,
+  STORAGE_SNAPSHOT
+}

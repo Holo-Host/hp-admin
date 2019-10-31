@@ -8,6 +8,7 @@
     "build": "node scripts/build.js",
     "build:holofuel": "REACT_APP_HOLOFUEL_APP=true node scripts/build.js",
     "hc:start": "mkdir -p tmp && holochain -c ./conductor-config.toml",
+    "hc:stop": "killall holochain",
     "provider-flow": "node scripts/HHAProviderFlow/index.js",
     "holofuel-load": "node scripts/HoloFuelDataEntry/index.js",
     "test": "npm run test:lint && npm run test:unit",
@@ -16,7 +17,8 @@
     "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
     "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
     "test:ci": "CI=1 npm run test",
-    "test:initialize-conductor-data": "NODE_ENV=test babel-node scripts/initialize-conductor-data"
+    "test:initialize-conductor-data": "NODE_ENV=test babel-node scripts/initialize-conductor-data",
+    "test:wait-for-conductor": "node scripts/wait-for-conductor.js"
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",
@@ -35,6 +37,7 @@
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "namor": "^1.1.2",
+    "ncp": "^2.0.0",
     "postcss-custom-properties": "^9.0.2",
     "postcss-import": "^12.0.1",
     "postcss-sassy-mixins": "^2.1.0",
