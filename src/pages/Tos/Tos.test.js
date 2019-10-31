@@ -5,6 +5,10 @@ import { createMemoryHistory } from 'history'
 import wait from 'waait'
 import Tos from './Tos'
 
+jest.mock('components/layout/PrimaryLayout')
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
+
 const renderTos = (
   ui,
   {
