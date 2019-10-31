@@ -1,7 +1,10 @@
 const createZomeCall = require('./create-zome-call')
+const { getAgent } = require('../src/utils/conductorConfig')
 
-createZomeCall('holofuel', 'transactions', 'whoami')
-  .then(zomeCall => zomeCall())
-  .then(result => {
-    console.log('result of zome call', result)
-  })
+async function populateData () {
+  const zomeCall = await createZomeCall('holofuel', 'transactions', 'whoami')
+  const result = await zomeCall()
+  console.log('result of zome call', result)
+}
+
+populateData()
