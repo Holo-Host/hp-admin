@@ -7,7 +7,6 @@ const HOLOCHAIN_LOGGING = true
 let holochainClient
 
 async function initAndGetHolochainClient () {
-  console.log('holochainClient : ', holochainClient)
   if (holochainClient) return holochainClient
   try {
     holochainClient = await hcWebClientConnect({
