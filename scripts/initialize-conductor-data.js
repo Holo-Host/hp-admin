@@ -29,7 +29,7 @@ async function populateData () {
   // Seed Data:
   // Scenario: A request from agent2 to agent1
   console.log('Agent 2 sends Request to Agent 1')
-  const initiateRequest = await createZomeCall('holofuel', 'transactions', 'request', agent2Index)({ ...txParams, from: agent1.id })
+  const initiateRequest = await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, to: agent2.id, from: agent1.id })
   console.log('>> Initiate Request Success Hash', initiateRequest)
 
   // // Scenario: An offer from agent2 to agent1

@@ -13,7 +13,7 @@ const params = {
   }
 }
 
-async function waitForConductor (interval = 30000) {
+async function waitForConductor (interval = 10000) {
   console.log('Waiting for conductor to boot up')
 
   let isUp = false
@@ -39,4 +39,4 @@ async function waitForConductor (interval = 30000) {
 }
 
 waitForConductor()
-  .then(() => console.log('Conductor is up!'))
+  .then(() => { console.log('Conductor is up!'); return true })
