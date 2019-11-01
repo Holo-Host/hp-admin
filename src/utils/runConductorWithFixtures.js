@@ -20,7 +20,7 @@ export default function runConductorWithFixtures (testFn) {
     const hcStart = async () => {
       const { stderr, stdout } = await exec('npm run hc:start &')
       console.log('hc:start stdout:', stdout)
-      if (stderr) throw new Error('hc:start stderr:', stderr)
+      if (stderr) throw new Error(`hc:start error: ${stderr}`)
     }
 
     hcStart()

@@ -12,17 +12,15 @@ describe('Inbox', () => {
   it('A request is displayed', runConductor(async () => {
     console.log('6')
 
-    const { debug, getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
+    const { getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
     fireEvent.click(getByTestId('menu-button'))
     await wait(() => getByTestId('inbox-link'))
 
     fireEvent.click(getByTestId('inbox-link'))
 
-    debug()
-
     // This is the test. If an element with text 'Pay' doesn't appear before timeout interval, the test will timeout
     await wait(() => getByText('Pay'))
 
     console.log('found "Pay", all is good')
-  }), 150000)
+  }), 240000)
 })
