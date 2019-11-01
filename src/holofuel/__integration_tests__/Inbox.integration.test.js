@@ -21,10 +21,7 @@ describe('Inbox', () => {
     debug()
 
     // This is the test. If an element with text 'Pay' doesn't appear before timeout interval, the test will timeout
-    await wait(() => {
-      console.log('trying to find "Pay"')
-      return getByText('Pay')
-    })
+    await wait(() => getByText('Pay'))
 
     console.log('found "Pay", all is good')
   }), 150000)

@@ -159,7 +159,7 @@ function PayButton ({ showConfirmationModal, transaction }) {
   return <Button
     onClick={() => showConfirmationModal(transaction, action)}
     styleName='pay-button'>
-    I dont have any good string
+    Pay
   </Button>
 }
 
