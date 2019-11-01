@@ -31,12 +31,17 @@ export default function runConductorWithFixtures (testFn) {
 
     return waitConductor()
       .then(() => {
-        // console.log('Conductor is up!')
         console.log('5')
-        return testFn()
+        testFn()
+          .catch(e => { throw new Error('Test Error : ', e) })
+      })
+      .then(async () => {
+        console.log('7')
+        await exec('npm run hc:stop')
+          .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS'))
       })
       .catch(e => console.log('test:wait-for-conductor wrapper error ; ', e))
 
-    // todo: test took 123 long to start conductor ...
+    // TODO: test took 123 long to start conductor ...
   }
 }
