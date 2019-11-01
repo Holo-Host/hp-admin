@@ -36,7 +36,6 @@ export default function runConductorWithFixtures (testFn) {
         console.log('Conductor is up...')
         console.log('5')
         return testFn()
-          .catch(e => { throw console.error('Error : ', e) })
       })
       .then(() => { return console.log('Scenario Test Complete') })
 
