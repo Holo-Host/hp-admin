@@ -22,22 +22,22 @@ export default function runConductorWithFixtures (testFn) {
       console.log('hc:start stdout:', stdout)
       if (stderr) throw new Error(`hc:start error: ${stderr}`)
     }
-
     hcStart()
 
     console.log('4.5')
 
     const waitConductor = async () => {
-      const { stdout, stderr } = await exec('npm run test:wait-for-conductor')
-      console.log('wait-for-conductor stdout:', stdout)
+      const { stderr } = await exec('npm run test:wait-for-conductor')
       if (stderr) console.error('wait-for-conductor stderr:', stderr)
     }
 
     return waitConductor()
       .then(() => {
+        console.log('Conductor is up...')
         console.log('5')
         return testFn()
       })
+      .then(() => { return console.log('Scenario Test Complete') })
 
     // TODO: test took 123 long to start conductor ...
   }
