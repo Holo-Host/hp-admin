@@ -3,7 +3,7 @@ import { fireEvent, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
 import { getAgent } from 'utils/conductorConfig'
-import runConductor from 'utils/runConductorWithFixtures'
+import { runConductorWithFixtures } from 'runConductorWithFixtures.js'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
@@ -11,7 +11,7 @@ jest.mock('react-identicon-variety-pack')
 const agentId = getAgent().id
 
 describe('CreateRequest', () => {
-  it('user can create a request and then view it in the transaction history', runConductor(async () => {
+  it('user can create a request and then view it in the transaction history', runConductorWithFixtures(async () => {
     const amount = 123
 
     const { getByTestId, getByText, getByLabelText } = await renderAndWait(<HoloFuelApp />)
