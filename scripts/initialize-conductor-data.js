@@ -10,7 +10,8 @@ const randomNumber = (number = 10000) => {
 }
 
 const txParams = {
-  amount: '100', // randomNumber().toString(),
+  // amount: '100',
+  amount: randomNumber().toString(),
   notes: 'Pre-Seed Data',
   deadline: moment().subtract(10, 'days').toISOString()
 }
@@ -73,7 +74,7 @@ populateData()
   })
 
 // //
-// Node REPL Script to test out calls : 
+// Node REPL Script to test out calls :
 // const { connect } = require('@holochain/hc-web-client')
 //
 // const args = {
