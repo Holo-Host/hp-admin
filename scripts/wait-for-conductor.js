@@ -1,6 +1,7 @@
 const axios = require('axios')
 const wait = require('waait')
 
+// this should get the instance id from conductorConfig.js
 const params = {
   id: '0',
   jsonrpc: '2.0',
@@ -31,6 +32,7 @@ async function waitForConductor (interval = 10000) {
         console.log('')
         await wait(interval)
       } else {
+        console.log('AXIOS ERRORRORORR', error)
         throw error
       }
     }

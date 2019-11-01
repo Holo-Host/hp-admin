@@ -44,7 +44,7 @@ export function SideMenu ({
       <nav styleName='nav'>
         <ul styleName='nav-list'>
           <li>
-            <Link to='/inbox' styleName='nav-link'>
+            <Link to='/inbox' styleName='nav-link' data-testid='inbox-link'>
               <div styleName='nav-icon' />
               Inbox
               {inboxCount > 0 && <span styleName='nav-badge'>{inboxCount}</span>}

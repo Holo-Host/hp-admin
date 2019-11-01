@@ -7,8 +7,8 @@ const rimraf = require('rimraf')
 export default function runConductorWithFixtures (testFn) {
   return async function () {
     console.log('1')
-    await exec('npm run hc:stop')
-      .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS')) // console.log('hc:stop error: ', e)
+    // await exec('npm run hc:stop')
+    //   .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS')) // console.log('hc:stop error: ', e)
 
     console.log('2')
     rimraf.sync(process.env.REACT_APP_DEFAULT_STORAGE)
@@ -17,30 +17,27 @@ export default function runConductorWithFixtures (testFn) {
     await ncp(process.env.REACT_APP_STORAGE_SNAPSHOT, process.env.REACT_APP_DEFAULT_STORAGE)
 
     console.log('4')
-    const hcStart = async () => {
-      const { stderr } = await exec('npm run hc:start &')
-      if (stderr) throw new Error('stderr:', stderr)
-    }
-    hcStart()
+    // const hcStart = async () => {
+    //   const { stderr, stdout } = await exec('npm run hc:start &')
+    //   console.log('hc:start stdout:', stdout)
+    //   if (stderr) throw new Error('hc:start stderr:', stderr)
+    // }
+
+    // hcStart()
+
+    console.log('4.5')
 
     const waitConductor = async () => {
       const { stdout, stderr } = await exec('npm run test:wait-for-conductor')
-      console.log('stdout:', stdout)
-      if (stderr) console.error('stderr:', stderr)
+      console.log('wait-for-conductor stdout:', stdout)
+      if (stderr) console.error('wait-for-conductor stderr:', stderr)
     }
 
     return waitConductor()
       .then(() => {
         console.log('5')
-        testFn()
-          .catch(e => { throw new Error('Test Error : ', e) })
+        return testFn()
       })
-      .then(async () => {
-        console.log('7')
-        await exec('npm run hc:stop')
-          .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS'))
-      })
-      .catch(e => console.log('test:wait-for-conductor wrapper error ; ', e))
 
     // TODO: test took 123 long to start conductor ...
   }
