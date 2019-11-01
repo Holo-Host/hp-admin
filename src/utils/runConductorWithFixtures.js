@@ -8,7 +8,7 @@ export default function runConductorWithFixtures (testFn) {
   return async function () {
     console.log('1')
     await exec('npm run hc:stop')
-      .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS')) // console.log('hc:stop error: ', e)
+      .catch(e => console.log('hc:stop error:', e))
 
     console.log('2')
     rimraf.sync(process.env.REACT_APP_DEFAULT_STORAGE)
