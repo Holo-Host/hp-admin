@@ -7,8 +7,8 @@ const rimraf = require('rimraf')
 export default function runConductorWithFixtures (testFn) {
   return async function () {
     console.log('1')
-    // await exec('npm run hc:stop')
-    //   .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS')) // console.log('hc:stop error: ', e)
+    await exec('npm run hc:stop')
+      .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS')) // console.log('hc:stop error: ', e)
 
     console.log('2')
     rimraf.sync(process.env.REACT_APP_DEFAULT_STORAGE)
@@ -17,13 +17,13 @@ export default function runConductorWithFixtures (testFn) {
     await ncp(process.env.REACT_APP_STORAGE_SNAPSHOT, process.env.REACT_APP_DEFAULT_STORAGE)
 
     console.log('4')
-    // const hcStart = async () => {
-    //   const { stderr, stdout } = await exec('npm run hc:start &')
-    //   console.log('hc:start stdout:', stdout)
-    //   if (stderr) throw new Error('hc:start stderr:', stderr)
-    // }
+    const hcStart = async () => {
+      const { stderr, stdout } = await exec('npm run hc:start &')
+      console.log('hc:start stdout:', stdout)
+      if (stderr) throw new Error('hc:start stderr:', stderr)
+    }
 
-    // hcStart()
+    hcStart()
 
     console.log('4.5')
 
