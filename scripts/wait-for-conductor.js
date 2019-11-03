@@ -1,4 +1,6 @@
 const axios = require('axios')
+const util = require('util')
+const exec = util.promisify(require('child_process').exec)
 const wait = require('waait')
 
 // this should get the instance id from conductorConfig.js
@@ -32,8 +34,17 @@ async function waitForConductor (interval = 10000) {
         console.log('')
         await wait(interval)
       } else {
-        console.log('AXIOS ERRORRORORR', error)
-        throw error
+        console.log('Stopping Conductor...')
+        await exec('npm run hc:stop')
+          .then(async () => {
+            console.log('Restarting Conductor...')
+            await exec('npm run hc:start-and-wait')
+          })
+          .catch(e => {
+            console.log('hc:stop error: ', e)
+            console.log('AXIOS Error when connecting to Holochain Conductor', error)
+            throw error
+          })
       }
     }
   }

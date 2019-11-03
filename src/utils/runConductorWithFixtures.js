@@ -14,48 +14,44 @@ export default function runConductorWithFixtures (testFn) {
       .catch(e => console.log('hc:stop error: ', e))
 
     console.log('2')
-    fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, async (e) => {
+    fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, e => {
       if (e) console.log('Defaulting to residual Default Storage dir. \n Error locating Storage Snapshot dir : ', e)
       else {
-        rimraf(process.env.REACT_APP_DEFAULT_STORAGE, e => {
+        rimraf(process.env.REACT_APP_DEFAULT_STORAGE, async (e) => {
           if (e) {
             console.error(e)
             throw new Error('Error deleting residual Default Storage dir: ')
-          } else console.log('Deleted residual Default Storage dir.')
+          } else {
+            console.log('Deleted residual Default Storage dir.')
+            console.log('3')
+            const { stderr } = await exec(`cp -r ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+            if (stderr) {
+              console.error(e)
+              throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
+            } else {
+              console.log('Copied Snapshot Storage into Default Storage!')
+              console.log('4')
+            }
+          }
         })
-
-        console.log('3')
-
-        const { stderr } = await exec(`cp -r ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
-        if (stderr) {
-          console.error(e)
-          throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
-        } else {
-          console.log('Copied Snapshot Storage into Default Storage!')
-          console.log('4')
-        }
-
-        // await ncp(process.env.REACT_APP_STORAGE_SNAPSHOT, process.env.REACT_APP_DEFAULT_STORAGE)
-        //   ncp(process.env.REACT_APP_STORAGE_SNAPSHOT, process.env.REACT_APP_DEFAULT_STORAGE, { clobber: true }, e => {
-        //   if (e) {
-        //     console.error(e)
-        //     throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
-        //   }
-        //   console.log('Copied Snapshot Storage into Default Storage!')
-        //   console.log('4')
-        // })
       }
     })
 
     const hcStart = async () => {
       const { stderr } = await exec('npm run hc:start &')
-      if (stderr) throw new Error('hc:start stderr:', stderr)
+      if (stderr) {
+        console.log('hc:start error')
+        console.log('\n******************************************************')
+        console.log('\n!! Recommendation: Stop and restart your conductor !!\n')
+        console.log('******************************************************\n')
+        throw console.error(stderr)
+      }
     }
     hcStart()
 
     const waitConductor = async () => {
       const { stderr } = await exec('npm run test:wait-for-conductor')
-      if (stderr) console.error('wait-for-conductor stderr:', stderr)
+      if (stderr) console.error('wait-for-conductor error:', stderr)
     }
 
     return waitConductor()
@@ -63,6 +59,7 @@ export default function runConductorWithFixtures (testFn) {
         console.log('Conductor is up...')
         console.log('5')
         return testFn()
+          .catch(e => { throw console.error(e) })
       })
       .then(() => { return console.log('Scenario Test Complete') })
   }

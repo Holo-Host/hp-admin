@@ -1,7 +1,7 @@
 import React from 'react'
-import { fireEvent, wait } from '@testing-library/react'
+import { fireEvent, within, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
-import { mockNavigateTo } from 'react-router-dom'
+// import { mockNavigateTo } from 'react-router-dom'
 import { HoloFuelApp } from 'root'
 import { getAgent } from 'utils/conductorConfig'
 import runConductor from 'utils/runConductorWithFixtures'
@@ -18,7 +18,7 @@ describe('CreateRequest', () => {
 
     const amount = 123
 
-    const { getByTestId, getByText, getByLabelText } = await renderAndWait(<HoloFuelApp />)
+    const { getByTestId, getByText, getByLabelText, getAllByRole, debug } = await renderAndWait(<HoloFuelApp />)
     fireEvent.click(getByTestId('menu-button'))
     await wait(() => getByText('Request'))
 
@@ -30,7 +30,14 @@ describe('CreateRequest', () => {
     fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
     fireEvent.click(getByText('Send'))
 
-    expect(mockNavigateTo).toHaveBeenCalledWith('/history')
-    await wait(() => getByLabelText('History'))
+    const header = getAllByRole('region')[1]
+
+    // debug()
+
+    await wait(() => within(header).getByText('History'))
+
+    // debug()
+
+    console.log('found "History", rerouted to TX Hitory Page, all is good')
   }), 20000)
 })
