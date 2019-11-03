@@ -11,7 +11,11 @@ export default function runConductorWithFixtures (testFn) {
   return async function () {
     console.log('1')
     await exec('npm run hc:stop')
+<<<<<<< HEAD
       .catch(e => console.log('hc:stop error: ', e))
+=======
+      .catch(e => console.log('hc:stop error:', e))
+>>>>>>> adea34eb44831fef8a8d99e17d221258b970f181
 
     console.log('2')
     fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, e => {
@@ -38,6 +42,7 @@ export default function runConductorWithFixtures (testFn) {
     })
 
     const hcStart = async () => {
+<<<<<<< HEAD
       const { stderr } = await exec('npm run hc:start &')
       if (stderr) {
         console.log('hc:start error')
@@ -46,6 +51,11 @@ export default function runConductorWithFixtures (testFn) {
         console.log('******************************************************\n')
         throw console.error(stderr)
       }
+=======
+      const { stderr, stdout } = await exec('npm run hc:start &')
+      console.log('hc:start stdout:', stdout)
+      if (stderr) throw new Error(`hc:start error: ${stderr}`)
+>>>>>>> adea34eb44831fef8a8d99e17d221258b970f181
     }
     hcStart()
 

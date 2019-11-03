@@ -12,7 +12,7 @@ describe('Inbox', () => {
   it('A request is displayed', runConductor(async () => {
     console.log('6')
 
-    const { debug, getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
+    const { getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
     fireEvent.click(getByTestId('menu-button'))
     await wait(() => getByTestId('inbox-link'))
 
@@ -24,5 +24,5 @@ describe('Inbox', () => {
     debug()
 
     console.log('found "Pay", all is good')
-  }), 150000)
+  }), 240000)
 })
