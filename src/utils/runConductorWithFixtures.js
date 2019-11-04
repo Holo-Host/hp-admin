@@ -10,8 +10,8 @@ export default function runConductorWithFixtures (testFn) {
     console.log('1')
     await exec('npm run hc:stop')
       // TODO: ADD BACK THE ERROR REFERENCE BEFORE PUSHING UP!!
-      .catch(e => console.log('hc:stop error: ', e))
-      // .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS'))
+      // .catch(e => console.log('hc:stop error: ', e))
+      .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS'))
 
     console.log('2')
     fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, e => {
@@ -61,6 +61,11 @@ export default function runConductorWithFixtures (testFn) {
         return testFn()
           .catch(e => { throw console.error(e) })
       })
-      .then(() => { return console.log('Scenario Test Complete') })
+      .then(async () => {
+        console.log('Scenario Test Complete')
+        await exec('npm run hc:stop')
+          .then(() => console.log('Conductor Successfully Closed.'))
+          .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS'))
+      })
   }
 }
