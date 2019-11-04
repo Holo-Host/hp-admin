@@ -39,6 +39,7 @@ async function waitForConductor (interval = 10000) {
           .then(async () => {
             console.log('Restarting Conductor...')
             await exec('npm run hc:start-and-wait')
+              .catch(e => 'hc:start-and-wait')
           })
           .catch(e => {
             console.log('hc:stop error: ', e)

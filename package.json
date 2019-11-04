@@ -15,7 +15,7 @@
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
-    "test:integration-with-nix-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
+    "test:integration-with-nix-setup": "nix-shell --run 'npm run test:integration'",
     "test:integration-with-wait": "node scripts/wait-for-conductor.js && npm run test:integration",
     "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
     "test:ci": "CI=1 npm run test",

@@ -3,15 +3,15 @@ const fs = require('fs')
 // const fsPromises = fs.promises
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-// const ncp = util.promisify(require('ncp').ncp)
-// const ncp = require('ncp').ncp
 const rimraf = require('rimraf')
 
 export default function runConductorWithFixtures (testFn) {
   return async function () {
     console.log('1')
     await exec('npm run hc:stop')
+      // TODO: ADD BACK THE ERROR REFERENCE BEFORE PUSHING UP!!
       .catch(e => console.log('hc:stop error: ', e))
+      // .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS'))
 
     console.log('2')
     fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, e => {
@@ -24,7 +24,7 @@ export default function runConductorWithFixtures (testFn) {
           } else {
             console.log('Deleted residual Default Storage dir.')
             console.log('3')
-            const { stderr } = await exec(`cp -r ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+            const { stderr } = await exec(`cp -rf ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
             if (stderr) {
               console.error(e)
               throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
