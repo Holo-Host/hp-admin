@@ -38,13 +38,13 @@ export default function runConductorWithFixtures (testFn) {
     })
 
     const hcStart = async () => {
-      const { stderr } = await exec('npm run hc:start &')
+      const { stderr } = await exec('holochain -c ./conductor-config.toml &> conductor.log &')
       if (stderr) {
-        console.log('hc:start error')
         console.log('\n******************************************************')
         console.log('\n!! Recommendation: Stop and restart your conductor !!\n')
         console.log('******************************************************\n')
-        throw console.error(stderr)
+        console.error(stderr)
+        throw new Error('hc:start error')
       }
     }
     hcStart()

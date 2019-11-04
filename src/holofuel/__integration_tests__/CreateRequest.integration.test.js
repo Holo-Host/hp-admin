@@ -34,9 +34,9 @@ describe('CreateRequest', () => {
 
     // debug()
 
-    await wait(() => within(header).getByText('History'))
+    await wait(() => within(header).getByText('Request'))
 
-    // debug()
+    debug()
 
     console.log('found "History", rerouted to TX Hitory Page, all is good')
   }), 20000)
