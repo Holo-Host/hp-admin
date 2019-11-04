@@ -1,9 +1,8 @@
-// import { exec } from 'child_process'
 const fs = require('fs')
-// const fsPromises = fs.promises
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const rimraf = require('rimraf')
+const wait = require('waait')
 
 export default function runConductorWithFixtures (testFn) {
   return async function () {
@@ -11,27 +10,45 @@ export default function runConductorWithFixtures (testFn) {
     await exec('npm run hc:stop')
       // TODO: ADD BACK THE ERROR REFERENCE BEFORE PUSHING UP!!
       // .catch(e => console.log('hc:stop error: ', e))
-      .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS'))
+      .catch(e => console.log('hc:stop error'))
+
+    const verifyConductorClosed = async () => {
+      const { stderr, stdout } = await exec('ps aux | grep holochain')
+      if (stderr) console.error('wait-for-conductor error:', stderr)
+      console.log('ps aux | grep holochain : ', stdout)
+    }
+    verifyConductorClosed()
+
+    await wait(50000)
 
     console.log('2')
-    fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, e => {
-      if (e) console.log('Defaulting to residual Default Storage dir. \n Error locating Storage Snapshot dir : ', e)
-      else {
+    fs.access(process.env.REACT_APP_DEFAULT_STORAGE, fs.constants.F_OK, async (e) => {
+      if (e) {
+        console.error('Error locating Default Storage dir')
+        console.log('Defaulting to auto generated Storage dir. \n')
+      } else {
         rimraf(process.env.REACT_APP_DEFAULT_STORAGE, async (e) => {
           if (e) {
             console.error(e)
             throw new Error('Error deleting residual Default Storage dir: ')
           } else {
-            console.log('Deleted residual Default Storage dir.')
-            console.log('3')
-            const { stderr } = await exec(`cp -rf ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
-            if (stderr) {
-              console.error(e)
-              throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
-            } else {
-              console.log('Copied Snapshot Storage into Default Storage!')
-              console.log('4')
-            }
+            fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, async (e) => {
+              if (e) {
+                console.log('Error locating Storage Snapshot dir : ', e)
+                console.log('\nDefaulting to auto generated Storage dir. \n')
+              } else {
+                console.log('Deleted residual Default Storage dir.')
+                console.log('3')
+                const { stderr } = await exec(`cp -rf ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+                if (stderr) {
+                  console.error(e)
+                  throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
+                } else {
+                  console.log('Copied Snapshot Storage into Default Storage!')
+                  console.log('4')
+                }
+              }
+            })
           }
         })
       }
@@ -59,7 +76,13 @@ export default function runConductorWithFixtures (testFn) {
         console.log('Conductor is up...')
         console.log('5')
         return testFn()
-          .catch(e => { throw console.error(e) })
+          .catch(async (e) => {
+            await exec('npm run hc:stop')
+              .then(() => console.log('Conductor Shut Down...'))
+              .catch()
+            console.error('Jest Test Error: ', e)
+            throw new Error('!! Test Failed !!')
+          })
       })
       .then(async () => {
         console.log('Scenario Test Complete')

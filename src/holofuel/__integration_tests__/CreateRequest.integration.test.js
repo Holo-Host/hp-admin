@@ -32,12 +32,14 @@ describe('CreateRequest', () => {
 
     const header = getAllByRole('region')[1]
 
-    // debug()
+    debug()
 
     await wait(() => within(header).getByText('Request'))
 
     debug()
 
+    await wait(() => within(header).getByText('History'))
+
     console.log('found "History", rerouted to TX Hitory Page, all is good')
-  }), 20000)
+  }), 150000)
 })
