@@ -10,13 +10,15 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-const hposSettings = HposInterface.os.settings
-const newHostName = 'Host-Name-Test-123'
-const avatar = <HashAvatar seed={hposSettings.hostPubKey} styleName='avatar-image' />
-
 describe('HP Admin : MyProfile', () => {
   it('User navigates to Profile Page, updates avatar url and name, then reviews TOS', runHposApi(async () => {
     console.log('6')
+
+    const hposSettings = await HposInterface.os.settings()
+    const avatar = <HashAvatar seed={hposSettings.hostPubKey} styleName='avatar-image' />
+    const newHostName = 'Host-Name-Test-123'
+
+    console.log('hposSettings : ', hposSettings)
 
     const { getByTestId, getByLabelText, getByText } = await renderAndWait(<HPAdminApp />) // getByAltText
     const profileLink = getByTestId('profile-link')

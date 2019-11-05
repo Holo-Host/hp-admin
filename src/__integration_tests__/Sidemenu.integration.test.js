@@ -9,11 +9,10 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-const hposSettings = HposInterface.os.settings
-
 describe('HP Admin : Sidemenu', () => {
   it('Contains the host HPOS API PubKey and Name', runHposApi(async () => {
-    console.log('6')
+    const hposSettings = await HposInterface.os.settings()
+    console.log('hposSettings : ', hposSettings)
 
     const { getByTestId, getByText } = await renderAndWait(<HPAdminApp />)
     const menuButton = getByTestId('menu-button')

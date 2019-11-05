@@ -3,6 +3,7 @@ const { providerShims, HAPP_STORE_DNA_INSTANCE, HHA_DNA_INSTANCE } = require('./
 const happConfig = require('./happ-data.js')
 const happConfigKeys = Object.keys(happConfig)
 
+// promiseMap needs to be applied twice for each happ... currently it is only promisifying and sequencing the first zome call.
 const promiseMap = async (array, fn) => {
   const resolvedArray = await array
   const promiseArray = resolvedArray.map(fn)
@@ -24,16 +25,8 @@ startTestConductor()
     console.log(' HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
     console.log(' ************************************************************* \n')
 
-    console.log('happConfigKeys ARRAY : ', happConfigKeys)
-
     const registerProvider = new Promise((resolve) => resolve(providerShims.registerAsProvider()))
     const fillHappStore = () => promiseMap(happConfigKeys, happId => createAndRegister(happId))
-
-    // const fillHappStore = async () => {
-    //   const outcome = await promiseMap(happConfigKeys, happId => createAndRegister(happId))
-    //   console.log('outcome : ', outcome)
-    //   return outcome
-    // }
 
     return registerProvider
       .then(_ => fillHappStore())

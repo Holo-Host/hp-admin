@@ -10,13 +10,14 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-const hposSettings = HposInterface.os.settings
-const hposStatus = HposInterface.os.status
 // TODO: Look into setting-up mock api data in HPOS API such that software update is needed...
 
 describe('HP Admin : Settings', () => {
   it('User navigates to Settings Page, updates software, reviews factory reset instructions', runHposApi(async () => {
-    console.log('6')
+    const hposSettings = await HposInterface.os.settings()
+    const hposStatus = await HposInterface.os.status()
+    console.log('hposSettings : ', hposSettings)
+    console.log('hposStatus : ', hposStatus)
 
     const { getByTestId, getByText } = await renderAndWait(<HPAdminApp />)
     // navigate to earnings page
