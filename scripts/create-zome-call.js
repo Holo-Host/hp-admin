@@ -1,34 +1,11 @@
-const { findInstanceForAgent } = require('../src/utils/conductorConfig')
-const { connect: hcWebClientConnect } = require('@holochain/hc-web-client')
-require('dotenv').config()
-
-const HOLOCHAIN_LOGGING = true
-
-let holochainClient
-
-async function initAndGetHolochainClient () {
-  if (holochainClient) return holochainClient
-  try {
-    holochainClient = await hcWebClientConnect({
-      url: process.env.REACT_APP_DNA_INTERFACE_URL,
-      wsClient: { max_reconnects: 0 }
-    })
-    if (HOLOCHAIN_LOGGING) {
-      console.log('🎉 Successfully connected to Holochain!')
-    }
-  } catch (error) {
-    if (HOLOCHAIN_LOGGING) {
-      console.log('😞 Holochain client connection failed -- ', error.toString())
-    }
-    throw (error)
-  }
-}
+const { findInstanceForAgent } = require('../src/utils/integration-testing/conductorConfig')
+const initAndGetHolochainClient = require('./holochain-client.js')
 
 function createZomeCall (instanceId, zomeName, functionName, agentIndex = 0) {
   const realInstanceId = findInstanceForAgent(instanceId, agentIndex).id
 
   return async function (args = {}) {
-    await initAndGetHolochainClient()
+    const holochainClient = await initAndGetHolochainClient()
     return holochainClient.callZome(realInstanceId, zomeName, functionName)(args)
   }
 }

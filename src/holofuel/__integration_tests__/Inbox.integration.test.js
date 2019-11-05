@@ -2,13 +2,13 @@ import React from 'react'
 import { fireEvent, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
-import runConductor from 'utils/runConductorWithFixtures'
+import runConductor from 'utils/integration-testing/runConductorWithFixtures'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-describe('Inbox', () => {
+describe('HOLOFUEL : Inbox', () => {
   it('A request is displayed', runConductor(async () => {
     console.log('6')
 

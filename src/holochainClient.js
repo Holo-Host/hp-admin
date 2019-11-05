@@ -1,7 +1,7 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
-import { findInstanceForAgent } from 'utils/conductorConfig'
+import { findInstanceForAgent } from 'utils/integration-testing/conductorConfig'
 
 const developmentMockDnaConnection = false // this is the value MOCK_DNA_CONNECTION will have in the dev server
 // This can be written as a boolean expression then it's even less readable
@@ -45,6 +45,7 @@ async function initAndGetHolochainClient () {
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
+    return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())

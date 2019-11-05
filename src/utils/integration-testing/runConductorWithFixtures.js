@@ -12,13 +12,6 @@ export default function runConductorWithFixtures (testFn) {
       // .catch(e => console.log('hc:stop error: ', e))
       .catch(e => console.log('hc:stop error'))
 
-    const verifyConductorClosed = async () => {
-      const { stderr, stdout } = await exec('ps aux | grep holochain')
-      if (stderr) console.error('wait-for-conductor error:', stderr)
-      console.log('ps aux | grep holochain : ', stdout)
-    }
-    verifyConductorClosed()
-
     await wait(50000)
 
     console.log('2')
@@ -39,7 +32,8 @@ export default function runConductorWithFixtures (testFn) {
               } else {
                 console.log('Deleted residual Default Storage dir.')
                 console.log('3')
-                const { stderr } = await exec(`cp -rf ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+                // eslint-disable-next-line no-unused-vars
+                const { _, stderr } = await exec(`cp -rf ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
                 if (stderr) {
                   console.error(e)
                   throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
@@ -54,20 +48,12 @@ export default function runConductorWithFixtures (testFn) {
       }
     })
 
-    const hcStart = async () => {
-      const { stderr } = await exec('holochain -c ./conductor-config.toml &> conductor.log &')
-      if (stderr) {
-        console.log('\n******************************************************')
-        console.log('\n!! Recommendation: Stop and restart your conductor !!\n')
-        console.log('******************************************************\n')
-        console.error(stderr)
-        throw new Error('hc:start error')
-      }
-    }
+    const hcStart = async () => exec('holochain -c ./conductor-config.toml &> conductor.log &')
     hcStart()
 
     const waitConductor = async () => {
-      const { stderr } = await exec('npm run test:wait-for-conductor')
+      // eslint-disable-next-line no-unused-vars
+      const { _, stderr } = await exec('npm run test:wait-for-conductor')
       if (stderr) console.error('wait-for-conductor error:', stderr)
     }
 
@@ -81,14 +67,14 @@ export default function runConductorWithFixtures (testFn) {
               .then(() => console.log('Conductor Shut Down...'))
               .catch()
             console.error('Jest Test Error: ', e)
-            throw new Error('!! Test Failed !!')
+            throw new Error('Test Failed')
           })
       })
       .then(async () => {
         console.log('Scenario Test Complete')
         await exec('npm run hc:stop')
           .then(() => console.log('Conductor Successfully Closed.'))
-          .catch(e => console.log('hc:stop error: NO HOLOCHAIN PROCESS EXISTS'))
+          .catch()
       })
   }
 }

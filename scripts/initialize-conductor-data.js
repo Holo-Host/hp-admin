@@ -1,5 +1,5 @@
 const createZomeCall = require('./create-zome-call')
-const { getAgent } = require('../src/utils/conductorConfig')
+const { getAgent } = require('../src/utils/integration-testing/conductorConfig')
 const moment = require('moment')
 const util = require('util')
 const ncp = util.promisify(require('ncp').ncp)

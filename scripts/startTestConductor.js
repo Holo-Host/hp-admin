@@ -1,6 +1,6 @@
 const axios = require('axios')
 const startTestConductor = async () => {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const callToHC = axios.post('http://localhost:3300/admin/agent/list', {})
     resolve(callToHC)
   })

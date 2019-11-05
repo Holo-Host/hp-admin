@@ -16,7 +16,7 @@ export function Header ({ title, avatarUrl, email, backTo, history: { push }, ha
       <div styleName='left-nav'>{leftNav}</div>
       <div styleName='title'>My HoloPort</div>
       <Link to='/my-profile' styleName='avatar-link'>
-        <HashAvatar avatarUrl={avatarUrl} seed={email} size={32} />
+        <HashAvatar avatarUrl={avatarUrl} seed={email} size={32} data-testid='profile-link' />
       </Link>
     </section>
     {title && <section styleName='sub-header'>

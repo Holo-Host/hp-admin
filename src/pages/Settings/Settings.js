@@ -69,8 +69,8 @@ export function Settings ({ history: { push } }) {
           label='Device Name'
           content={!isEmpty(settings) && settings.deviceName ? settings.deviceName : NOT_AVAILABLE} />
         <SettingsRow
-          label='Network ID'
-          // TODO : Determine desired approach for diplaying full networkId Hash...
+          label='Network ID'// change to 'Network'
+          // TODO : Change content (below) to `settings.networkStatus`
           content={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : NOT_AVAILABLE} />
       </SettingsTable>
 

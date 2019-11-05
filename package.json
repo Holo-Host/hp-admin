@@ -7,11 +7,10 @@
     "start:holofuel": "REACT_APP_HOLOFUEL_APP=true npm start",
     "build": "node scripts/build.js",
     "build:holofuel": "REACT_APP_HOLOFUEL_APP=true node scripts/build.js",
-    "hc:start": "holochain -c ./conductor-config.toml &> conductor.log",
-    "hc:start-and-wait": "npm run hc:start && node scripts/wait-for-conductor.js",
+    "hc:start": "holochain -c ./conductor-config.toml &> conductor.log &",
+    "hc:start-and-wait": "npm run hc:start && npm run test:wait-for-conductor",
     "hc:stop": "killall holochain",
-    "provider-flow": "node scripts/HHAProviderFlow/index.js",
-    "holofuel-load": "node scripts/HoloFuelDataEntry/index.js",
+    "test:wait-for-conductor": "node scripts/wait-for-conductor.js",
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
@@ -20,7 +19,8 @@
     "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
     "test:ci": "CI=1 npm run test",
     "test:initialize-conductor-data": "NODE_ENV=test babel-node scripts/initialize-conductor-data",
-    "test:wait-for-conductor": "node scripts/wait-for-conductor.js"
+    "load-holofuel-dna": "node scripts/LoadHoloFuel/index.js",
+    "complete-provider-flow": "node scripts/RunHhaProviderFlow/index.js"
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",

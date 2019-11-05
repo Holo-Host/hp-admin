@@ -204,7 +204,8 @@ export default function HostingEarnings () {
         {transactions.map(transaction =>
           <TransactionRow
             transaction={transaction}
-            key={transaction.id} />)}
+            key={transaction.id}
+            data-testid='earnings-table-row' />)}
       </tbody>
     </table>}
 
