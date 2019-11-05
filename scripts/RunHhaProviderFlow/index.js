@@ -6,7 +6,7 @@ const happConfigKeys = Object.keys(happConfig)
 const promiseMap = async (array, fn) => {
   const resolvedArray = await array
   let promiseArray =[]
-  for(i=0; i<resolvedArray.length; i++){
+  for(let i=0; i<resolvedArray.length; i++){
     let v = await fn(resolvedArray[i])
     promiseArray.push(v)
   }
