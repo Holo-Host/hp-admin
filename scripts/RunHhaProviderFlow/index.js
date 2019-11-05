@@ -20,30 +20,30 @@ const createAndRegister = async (happId) => {
   return registerResult
 }
 
-startTestConductor()
-  .then(() => {
-    console.log('\n ************************************************************* ')
-    console.log(' HAPP_STORE_DNA_INSTANCE : ', HAPP_STORE_DNA_INSTANCE)
-    console.log(' HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
-    console.log(' ************************************************************* \n')
-
-    console.log('happConfigKeys ARRAY : ', happConfigKeys)
-
-    const registerProvider = new Promise((resolve) => resolve(providerShims.registerAsProvider()))
-    const fillHappStore = () => promiseMap(happConfigKeys, happId => createAndRegister(happId))
-
-    // const fillHappStore = async () => {
-    //   const outcome = await promiseMap(happConfigKeys, happId => createAndRegister(happId))
-    //   console.log('outcome : ', outcome)
-    //   return outcome
-    // }
-
-    return registerProvider
-      .then(_ => fillHappStore())
-      .then(_ => providerShims.addHolofuelAccount())
-      .then(_ => process.exit())
-      .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
-  })
+// startTestConductor()
+//   .then(() => {
+//     console.log('\n ************************************************************* ')
+//     console.log(' HAPP_STORE_DNA_INSTANCE : ', HAPP_STORE_DNA_INSTANCE)
+//     console.log(' HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
+//     console.log(' ************************************************************* \n')
+//
+//     console.log('happConfigKeys ARRAY : ', happConfigKeys)
+//
+//     const registerProvider = new Promise((resolve) => resolve(providerShims.registerAsProvider()))
+//     const fillHappStore = () => promiseMap(happConfigKeys, happId => createAndRegister(happId))
+//
+//     // const fillHappStore = async () => {
+//     //   const outcome = await promiseMap(happConfigKeys, happId => createAndRegister(happId))
+//     //   console.log('outcome : ', outcome)
+//     //   return outcome
+//     // }
+//
+//     return registerProvider
+//       .then(_ => fillHappStore())
+//       .then(_ => providerShims.addHolofuelAccount())
+//       .then(_ => process.exit())
+//       .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
+//   })
 
 module.exports = {
   promiseMap,
