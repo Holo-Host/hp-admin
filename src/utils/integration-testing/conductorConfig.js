@@ -8,7 +8,7 @@ let config
 if (process.env.NODE_ENV === 'test') {
   config = toml.parse(fs.readFileSync('./conductor-config.toml'))
 } else {
-  config = require('utils/conductor-config.toml')
+  config = require('utils/integration-testing/conductor-config.toml')
 }
 
 export function getAgent (index = 0) {

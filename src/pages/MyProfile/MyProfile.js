@@ -14,15 +14,16 @@ import './MyProfile.module.css'
 // const EMAIL_REGEXP = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
 // Data - Mutation hook
-function useUpdateVersion (hostName) {
+function useUpdateDeviceName () {
   const [hposUpdateSettings] = useMutation(HposUpdateSettingsMutation)
-  return () => hposUpdateSettings({
+  return (hostName) => hposUpdateSettings({
     variables: { hostName }
   })
 }
 
 const MyProfile = ({ history: { push } }) => {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const updateDeviceName = useUpdateDeviceName()
 
   const [isTosOpen, setTosOpen] = useState(false)
   const { register, handleSubmit, errors, watch } = useForm()
@@ -30,7 +31,7 @@ const MyProfile = ({ history: { push } }) => {
     console.log('SUBMITTED DATA : ', data)
     if (data.name) {
       // call HPOS Settings Mutation to update HPOS Host Name
-      useUpdateVersion(data.name)
+      updateDeviceName(data.name)
     }
     // TODO : Determine how we would like to handle avatar link data persistance.
     push('/dashboard')

@@ -14,26 +14,26 @@ const agentId = getAgent().id
 const amount = 123
 const notes = 'Testing 123'
 
-describe('HOLOFUEL : CreateRequest', () => {
-  it('user can create a request and then view it in the transaction history', runConductor(async () => {
+describe('HOLOFUEL : CreateOffer', () => {
+  it('user can create an offer and then view it in the transaction history', runConductor(async () => {
     console.log('6')
 
     const { getByTestId, getByText, getByLabelText, getByPlaceholderText, getAllByRole, debug } = await renderAndWait(<HoloFuelApp />)
     fireEvent.click(getByTestId('menu-button'))
-    await wait(() => getByText('Request'))
+    await wait(() => getByText('Offer'))
 
-    fireEvent.click(getByText('Request'))
+    fireEvent.click(getByText('Offer'))
 
-    await wait(() => getByLabelText('From'))
-    // request from ourself
-    fireEvent.change(getByLabelText('From'), { target: { value: agentId } })
+    await wait(() => getByLabelText('To'))
+    // offer to ourself
+    fireEvent.change(getByLabelText('To'), { target: { value: agentId } })
     fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
     fireEvent.change(getByPlaceholderText(/notes/i), { target: { value: notes } })
     fireEvent.click(getByText('Send'))
 
     const header = getAllByRole('region')[1]
     debug()
-    await wait(() => within(header).getByText('Request'))
+    await wait(() => within(header).getByText('Offer'))
     debug()
     await wait(() => within(header).getByText('History'))
     expect(getByText(agentId)).toBeInTheDocument()
