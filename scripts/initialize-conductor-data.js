@@ -107,18 +107,17 @@ const populateHpAdminData = async () => {
   return registerProvider
     .then(_ => fillHappStore())
     .then(_ => providerShims.addHolofuelAccount())
-    .then(_ => process.exit())
     .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
 }
 
 populateHoloFuelData()
-  .then(() => 'Finished loading HoloFuel data...')
+  .then(() => console.log('Finished loading HoloFuel data...'))
   .then(() => populateHpAdminData())
-  .then(() => 'Finished loading HP Admin data...')
+  .then(() => console.log('Finished loading HPAdmin data...'))
   .then(() => snapshotStrorage())
+  .then(() => console.log('Loaded Snapshot Storage'))
   .then(() => process.exit())
   .catch(e => {
     console.log('error', e)
     process.exit(-1)
   })
-
