@@ -12,8 +12,6 @@ import MyProfile from 'pages/MyProfile'
 import StyleDemo from 'pages/StyleDemo'
 import Login from 'pages/Login'
 import FactoryResetInstructions from 'pages/FactoryResetInstructions'
-
-// NB: This is a placeholder for the ticket to holofuel build compatible with hp admin
 // import { HoloFuelApp } from 'root'
 
 export default function HPAdminRouter () {
@@ -31,7 +29,8 @@ export default function HPAdminRouter () {
     <Route path='/factory-reset' component={FactoryResetInstructions} />
 
     <Route path='/style-demo' component={StyleDemo} />
-
+  
+    // NB: This is a placeholder for the ticket to holofuel build compatible with hp admin
     {/* <Route path='/holofuel' exact component={HoloFuelApp} /> */}
     <Route path='/holofuel' render={() => <div style={{ marginTop: 50, textAlign: 'center' }}>
       This page will redirect to the HoloFuel app
