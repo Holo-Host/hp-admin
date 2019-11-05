@@ -24,8 +24,16 @@ startTestConductor()
     console.log(' HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
     console.log(' ************************************************************* \n')
 
+    console.log('happConfigKeys ARRAY : ', happConfigKeys)
+
     const registerProvider = new Promise((resolve) => resolve(providerShims.registerAsProvider()))
     const fillHappStore = () => promiseMap(happConfigKeys, happId => createAndRegister(happId))
+
+    // const fillHappStore = async () => {
+    //   const outcome = await promiseMap(happConfigKeys, happId => createAndRegister(happId))
+    //   console.log('outcome : ', outcome)
+    //   return outcome
+    // }
 
     return registerProvider
       .then(_ => fillHappStore())
@@ -33,3 +41,9 @@ startTestConductor()
       .then(_ => process.exit())
       .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
   })
+
+module.exports = {
+  promiseMap,
+  createAndRegister,
+  happConfigKeys
+}

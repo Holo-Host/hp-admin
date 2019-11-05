@@ -5,6 +5,8 @@ const moment = require('moment')
 const util = require('util')
 const ncp = util.promisify(require('ncp').ncp)
 const wait = require('waait')
+const { promiseMap, createAndRegister, happConfigKeys } = require('./RunHhaProviderFlow')
+const { providerShims, HAPP_STORE_DNA_INSTANCE, HHA_DNA_INSTANCE } = require('./RunHhaProviderFlow/provider-shims.js')
 require('dotenv').config()
 
 const txParams = {
@@ -17,7 +19,7 @@ function snapshotStrorage () {
   return ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT)
 }
 
-async function populateData () {
+async function populateHoloFuelData () {
   const agent1Index = 0
   const agent2Index = 1
   const agent1 = getAgent(agent1Index)
@@ -46,6 +48,7 @@ async function populateData () {
   //   .then(async (r) => {
   //     const { Ok: originId } = JSON.parse(r)
   //     console.log(' Transaction `originId` : ', originId)
+  //     console.log('Waiting to allow for data propagation...')
   //     await wait(6000)
   //     console.log(' Part 1, Step 2 : searching to find pending transaction....')
   //     const response = await createZomeCall('holofuel', 'transactions', 'list_pending', agent2Index)({ origins: originId })
@@ -75,6 +78,7 @@ async function populateData () {
   //     return acceptOffer
   //   })
 
+  console.log('Waiting to allow for data propagation...')
   await wait(0)
   console.log('\n\n*****************')
   // Agent 1 Ledger Check :
@@ -91,8 +95,26 @@ async function populateData () {
   return wait(0)
 }
 
-populateData()
-  .then(() => 'FINISHED LOADING DATA...')
+const populateHpAdminData = async () => {
+  console.log('\n ************************************************************* ')
+  console.log(' HAPP_STORE_DNA_INSTANCE : ', HAPP_STORE_DNA_INSTANCE)
+  console.log(' HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
+  console.log(' ************************************************************* \n')
+
+  const registerProvider = new Promise((resolve) => resolve(providerShims.registerAsProvider()))
+  const fillHappStore = () => promiseMap(happConfigKeys, happId => createAndRegister(happId))
+
+  return registerProvider
+    .then(_ => fillHappStore())
+    .then(_ => providerShims.addHolofuelAccount())
+    .then(_ => process.exit())
+    .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
+}
+
+populateHoloFuelData()
+  .then(() => 'Finished loading HoloFuel data...')
+  .then(() => populateHpAdminData())
+  .then(() => 'Finished loading HoloFuel data...')
   .then(() => snapshotStrorage())
   .then(() => process.exit())
   .catch(e => {
