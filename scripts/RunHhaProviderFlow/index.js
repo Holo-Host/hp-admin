@@ -6,9 +6,12 @@ const happConfigKeys = Object.keys(happConfig)
 // promiseMap needs to be applied twice for each happ... currently it is only promisifying and sequencing the first zome call.
 const promiseMap = async (array, fn) => {
   const resolvedArray = await array
-  const promiseArray = resolvedArray.map(fn)
-  const resolved = await Promise.all(promiseArray)
-  return resolved
+  let promiseArray =[]
+  for(i=0; i<resolvedArray.length; i++){
+    let v = await fn(resolvedArray[i])
+    promiseArray.push(v)
+  }
+  return promiseArray
 }
 
 const createAndRegister = async (happId) => {
