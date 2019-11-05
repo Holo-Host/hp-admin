@@ -5,9 +5,12 @@ const happConfigKeys = Object.keys(happConfig)
 
 const promiseMap = async (array, fn) => {
   const resolvedArray = await array
-  const promiseArray = resolvedArray.map(fn)
-  const resolved = await Promise.all(promiseArray)
-  return resolved
+  let promiseArray =[]
+  for(i=0; i<resolvedArray.length; i++){
+    let v = await fn(resolvedArray[i])
+    promiseArray.push(v)
+  }
+  return promiseArray
 }
 
 const createAndRegister = async (happId) => {
