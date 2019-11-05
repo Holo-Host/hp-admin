@@ -122,16 +122,3 @@ populateHoloFuelData()
     process.exit(-1)
   })
 
-// //
-// Node REPL Script to test out calls :
-// const { connect } = require('@holochain/hc-web-client')
-//
-// const args = {
-//   from: 'HcScJNpnC8kabp59w89Z9GhfHw7VdycrmZP7yaBAP7i3sxynx6KO8Pvm3ai6iiz::<happ_id>-holofuel',
-//   amount: '100',
-//   notes: 'Pre-Seed Data',
-//   deadline: '2042-01-01'
-// }
-//
-// connect({ url: 'ws://localhost:3400' }).then(({ callZome}) => callZome('HcScJNpnC8kabp59w89Z9GhfHw7VdycrmZP7yaBAP7i3sxynx6KO8Pvm3ai6iiz::<happ_id>-holofuel', 'transactions', 'request')({ args })).then(result => console.log('result', result))
-// //
