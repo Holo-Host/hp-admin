@@ -205,7 +205,7 @@ export default function HostingEarnings () {
           <TransactionRow
             transaction={transaction}
             key={transaction.id}
-            data-testid='earnings-table-row' />)}
+            data-testid='earnings-row' />)}
       </tbody>
     </table>}
 

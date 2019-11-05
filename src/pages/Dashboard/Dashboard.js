@@ -26,13 +26,13 @@ export default function Dashboard () {
       {noInstalledHapps === 0 && <div>
         + Host your first app
       </div>}
-      {noInstalledHapps > 0 && <div dataTestId='hosted-apps'>
+      {noInstalledHapps > 0 && <div data-testid='hosted-apps'>
         {noInstalledHapps} Application{noInstalledHapps > 1 && 's'}
       </div>}
     </Link>
     <Link styleName='card' to='/earnings'>
       <h2 styleName='card-title'>Earnings</h2>
-      {balance === 0 && <div styleName='small-text' dataTestId='hosted-earnings'>
+      {balance === 0 && <div styleName='small-text' data-testid='hosted-earnings'>
         You haven't earned any HoloFuel yet
       </div>}
       {balance > 0 && <div>

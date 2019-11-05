@@ -12,13 +12,14 @@ export default function runConductorWithFixtures (testFn) {
       // .catch(e => console.log('hc:stop error: ', e))
       .catch(e => console.log('hc:stop error'))
 
-    await wait(50000)
+    await wait(5000)
 
     console.log('2')
     fs.access(process.env.REACT_APP_DEFAULT_STORAGE, fs.constants.F_OK, async (e) => {
       if (e) {
         console.error('Error locating Default Storage dir')
         console.log('Defaulting to auto generated Storage dir. \n')
+        console.log('Skipping 3 & 4... \n')
       } else {
         rimraf(process.env.REACT_APP_DEFAULT_STORAGE, async (e) => {
           if (e) {
@@ -29,11 +30,12 @@ export default function runConductorWithFixtures (testFn) {
               if (e) {
                 console.log('Error locating Storage Snapshot dir : ', e)
                 console.log('\nDefaulting to auto generated Storage dir. \n')
+                console.log('Skipping 3 & 4... \n')
               } else {
                 console.log('Deleted residual Default Storage dir.')
                 console.log('3')
                 // eslint-disable-next-line no-unused-vars
-                const { _, stderr } = await exec(`cp -rf ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+                const { _, stderr } = await exec(`cp -r --remove-destination ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
                 if (stderr) {
                   console.error(e)
                   throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')

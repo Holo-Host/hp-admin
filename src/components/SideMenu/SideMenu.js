@@ -46,7 +46,7 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to='/earnings' styleName='nav-link'>
+            <Link to='/earnings' styleName='nav-link' data-testid='sidebar-earnings'>
               <div styleName='nav-icon' />
               Earnings
             </Link>

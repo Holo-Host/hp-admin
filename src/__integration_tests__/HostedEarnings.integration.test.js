@@ -34,11 +34,11 @@ describe('HP Admin : HostedEarnings', () => {
     const { getByTestId, getAllByTestId, getByText } = await renderAndWait(<HPAdminApp />)
     // navigate to earnings page
     fireEvent.click(getByTestId('menu-button'))
-    await wait(() => getByText('Earnings'))
-    fireEvent.click(getByText('Earnings'))
+    await wait(() => getByTestId('sidebar-earnings'))
+    fireEvent.click(getByTestId('sidebar-earnings'))
 
     await wait(() => getByText('1 Day'))
-    const rows = getAllByTestId('earnings-table-row')
+    const rows = getAllByTestId('earnings-row')
 
     // Confirm earnings content for 1 DAY (placeholder)
     fireEvent.click(getByText('1 Day'))

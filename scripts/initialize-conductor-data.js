@@ -1,7 +1,7 @@
 const createZomeCall = require('./create-zome-call')
 const { getAgent } = require('../src/utils/integration-testing/conductorConfig')
 const moment = require('moment')
-const _ = require('lodash/fp')
+// const _ = require('lodash/fp')
 const util = require('util')
 const ncp = util.promisify(require('ncp').ncp)
 const wait = require('waait')
@@ -88,12 +88,13 @@ async function populateData () {
   console.log('>> Initiate Request Success Hash', agent2LedgerState)
   console.log('\n\n*****************')
 
-  await wait(0)
-  return process.exit()
+  return wait(0)
 }
 
 populateData()
+  .then(() => 'FINISHED LOADING DATA...')
   .then(() => snapshotStrorage())
+  .then(() => process.exit())
   .catch(e => {
     console.log('error', e)
     process.exit(-1)
