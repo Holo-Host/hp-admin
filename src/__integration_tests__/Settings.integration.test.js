@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, wait } from '@testing-library/react'
+import { fireEvent, within, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { sliceHash as presentHash } from 'utils'
 import { HPAdminApp } from 'root'
@@ -19,7 +19,7 @@ describe('HP Admin : Settings', () => {
     console.log('hposSettings : ', hposSettings)
     console.log('hposStatus : ', hposStatus)
 
-    const { getByTestId, getByText } = await renderAndWait(<HPAdminApp />)
+    const { getByTestId, getByLabelText, getByText } = await renderAndWait(<HPAdminApp />)
     // navigate to earnings page
     fireEvent.click(getByTestId('menu-button'))
     await wait(() => getByText('Settings'))
@@ -30,13 +30,16 @@ describe('HP Admin : Settings', () => {
     // Confirm HPOS Data Returned :
     // *************************************************
     // find HPOS Device Name
-    await wait(() => getByText(hposSettings.deviceName))
+    await wait(() => getByTestId('settings-header'))
+    const deviceName = getByLabelText('Device Name')
+    expect(within(deviceName).getByText(hposSettings.deviceName)).toBeInTheDocument()
     // find (last 6 of) Host's HPOS PubKey
     await wait(() => getByText(presentHash(hposSettings.hostPubKey)))
     // find Network Setting
-    await wait(() => getByText(hposSettings.networkStatus))
-    // find Port Number
-    await wait(() => getByText('443'))
+    const networkStatus = getByLabelText('Network Id')
+    expect(within(networkStatus).getByText(hposSettings.networkStatus)).toBeInTheDocument()
+    // // find Port Number
+    // await wait(() => getByText('443'))
     // find Software Version
     const currentVersion = await wait(() => getByText(hposStatus.versionInfo.currentVersion))
     const availableVersion = await wait(() => getByText(hposStatus.versionInfo.availableVersion))

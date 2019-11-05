@@ -15,20 +15,18 @@ describe('HP Admin : MyProfile', () => {
     console.log('6')
 
     const hposSettings = await HposInterface.os.settings()
-    const avatar = <HashAvatar seed={hposSettings.hostPubKey} styleName='avatar-image' />
     const newHostName = 'Host-Name-Test-123'
 
     console.log('hposSettings : ', hposSettings)
 
-    const { getByTestId, getByLabelText, getByText } = await renderAndWait(<HPAdminApp />) // getByAltText
+    const { getByTestId, getByAltText, getByLabelText, getByText } = await renderAndWait(<HPAdminApp />)
     const profileLink = getByTestId('profile-link')
     fireEvent.click(profileLink)
 
     await wait(() => getByText(hposSettings.hostName))
-    // TODO : Find good way to test avatar seed :
-    expect(avatar).toBeInTheDocument()
-    // const avatarImage = getByAltText(/personal.*avatar$/i)
-    // expect(avatarImage).toBe(avatar)
+    // Testing avatar seed :
+    const avatarImage = getByAltText(/personal.*avatar$/i)
+    expect(avatarImage.prop('src')).toEqual(hposSettings.hostPubKey)
 
     // Update HPOS Host Name
     fireEvent.change(getByLabelText('Name'), { target: { value: newHostName } })

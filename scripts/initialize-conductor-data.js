@@ -114,7 +114,7 @@ const populateHpAdminData = async () => {
 populateHoloFuelData()
   .then(() => 'Finished loading HoloFuel data...')
   .then(() => populateHpAdminData())
-  .then(() => 'Finished loading HoloFuel data...')
+  .then(() => 'Finished loading HP Admin data...')
   .then(() => snapshotStrorage())
   .then(() => process.exit())
   .catch(e => {

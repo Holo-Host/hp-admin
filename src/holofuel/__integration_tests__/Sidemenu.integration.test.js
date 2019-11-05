@@ -6,6 +6,7 @@ import { getAgent } from 'utils/integration-testing/conductorConfig'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
+jest.unmock('react-router-dom')
 
 const agentNickname = getAgent().nickname
 

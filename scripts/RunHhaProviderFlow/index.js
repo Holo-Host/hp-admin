@@ -7,8 +7,8 @@ const promiseMap = async (array, fn) => {
   const resolvedArray = await array
   const promiseArray = []
   for (let i = 0; i < resolvedArray.length; i++) {
-    const vector = await fn(resolvedArray[i])
-    promiseArray.push(vector)
+    const promisifiedFnVector = await fn(resolvedArray[i])
+    promiseArray.push(promisifiedFnVector)
   }
   return promiseArray
 }
