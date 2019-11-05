@@ -13,6 +13,8 @@ const hposSettings = HposInterface.os.settings
 
 describe('HP Admin : Sidemenu', () => {
   it('Contains the host HPOS API PubKey and Name', runHposApi(async () => {
+    console.log('6')
+
     const { getByTestId, getByText } = await renderAndWait(<HPAdminApp />)
     const menuButton = getByTestId('menu-button')
     fireEvent.click(menuButton)

@@ -16,6 +16,8 @@ const hposStatus = HposInterface.os.status
 
 describe('HP Admin : Settings', () => {
   it('User navigates to Settings Page, updates software, reviews factory reset instructions', runHposApi(async () => {
+    console.log('6')
+
     const { getByTestId, getByText } = await renderAndWait(<HPAdminApp />)
     // navigate to earnings page
     fireEvent.click(getByTestId('menu-button'))

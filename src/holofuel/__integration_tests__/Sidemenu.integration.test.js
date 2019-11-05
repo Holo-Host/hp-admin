@@ -11,6 +11,8 @@ const agentNickname = getAgent().nickname
 
 describe('HOLOFUEL : Sidemenu', () => {
   it('Contains the agent public address', async () => {
+    console.log('6')
+
     const { getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
     const menuButton = getByTestId('menu-button')
     fireEvent.click(menuButton)

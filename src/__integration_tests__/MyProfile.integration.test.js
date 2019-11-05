@@ -2,6 +2,7 @@ import React from 'react'
 import { fireEvent, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
+import HashAvatar from 'components/HashAvatar'
 import runHposApi from 'utils/integration-testing/runHposApiWithSetup'
 import HposInterface from 'data-interfaces/HposInterface'
 
@@ -11,16 +12,21 @@ jest.unmock('react-router-dom')
 
 const hposSettings = HposInterface.os.settings
 const newHostName = 'Host-Name-Test-123'
+const avatar = <HashAvatar seed={hposSettings.hostPubKey} styleName='avatar-image' />
 
 describe('HP Admin : MyProfile', () => {
   it('User navigates to Profile Page, updates avatar url and name, then reviews TOS', runHposApi(async () => {
-    const { getByTestId, getByLabelText, getByText } = await renderAndWait(<HPAdminApp />)
+    console.log('6')
+
+    const { getByTestId, getByLabelText, getByText } = await renderAndWait(<HPAdminApp />) // getByAltText
     const profileLink = getByTestId('profile-link')
     fireEvent.click(profileLink)
 
     await wait(() => getByText(hposSettings.hostName))
     // TODO : Find good way to test avatar seed :
-    // await wait(() => getByImageSeed(hposSettings.hostPubKey))
+    expect(avatar).toBeInTheDocument()
+    // const avatarImage = getByAltText(/personal.*avatar$/i)
+    // expect(avatarImage).toBe(avatar)
 
     // Update HPOS Host Name
     fireEvent.change(getByLabelText('Name'), { target: { value: newHostName } })

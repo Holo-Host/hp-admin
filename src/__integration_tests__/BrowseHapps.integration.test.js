@@ -55,6 +55,8 @@ const apps = [{
 // TODO: Setup seed data in such that two happs are available for hosting...
 describe('HP Admin : BrowseHapps', () => {
   it('User navigates to Hosting Page, adds a happ to host, & manages pricing', runConductor(async () => {
+    console.log('6')
+
     const { getByTestId, getAllByRole, getByText } = await renderAndWait(<HPAdminApp />)
     // navigate to hosting page
     fireEvent.click(getByTestId('menu-button'))

@@ -39,19 +39,19 @@ describe('Rendering', () => {
     expect(input).toBeInTheDocument()
   })
 
-  it('should render the email input', async () => {
-    const { getByLabelText } = renderMyProfile()
-    const input = getByLabelText('Email')
+  // it('should render the email input', async () => {
+  //   const { getByLabelText } = renderMyProfile()
+  //   const input = getByLabelText('Email')
 
-    expect(input).toBeInTheDocument()
-  })
+  //   expect(input).toBeInTheDocument()
+  // })
 
-  it('should render the password input', async () => {
-    const { getByLabelText } = renderMyProfile()
-    const input = getByLabelText('Password')
+  // it('should render the password input', async () => {
+  //   const { getByLabelText } = renderMyProfile()
+  //   const input = getByLabelText('Password')
 
-    expect(input).toBeInTheDocument()
-  })
+  //   expect(input).toBeInTheDocument()
+  // })
 
   it('should render the submit button', async () => {
     const { getByText } = renderMyProfile()
@@ -80,55 +80,55 @@ describe('Validation', () => {
     expect(pushSpy).not.toHaveBeenCalled()
   })
 
-  it('should reject empty email', async () => {
-    const pushSpy = jest.fn()
-    const { getByLabelText, getByText } = renderMyProfile({
-      history: { push: pushSpy }
-    })
-    const input = getByLabelText('Email')
-    fireEvent.change(input, { target: { value: '' } })
+  // it('should reject empty email', async () => {
+  //   const pushSpy = jest.fn()
+  //   const { getByLabelText, getByText } = renderMyProfile({
+  //     history: { push: pushSpy }
+  //   })
+  //   const input = getByLabelText('Email')
+  //   fireEvent.change(input, { target: { value: '' } })
 
-    await act(async () => {
-      fireEvent.click(getByText('Save Changes'))
-      await wait(0)
-    })
+  //   await act(async () => {
+  //     fireEvent.click(getByText('Save Changes'))
+  //     await wait(0)
+  //   })
 
-    const error = getByText('You need to provide a valid email address.')
-    expect(error).toBeInTheDocument()
-    expect(pushSpy).not.toHaveBeenCalled()
-  })
+  //   const error = getByText('You need to provide a valid email address.')
+  //   expect(error).toBeInTheDocument()
+  //   expect(pushSpy).not.toHaveBeenCalled()
+  // })
 
-  it('should reject incorrect email', async () => {
-    const pushSpy = jest.fn()
-    const { getByLabelText, getByText } = renderMyProfile({
-      history: { push: pushSpy }
-    })
-    const input = getByLabelText('Email')
-    fireEvent.change(input, { target: { value: 'some value' } })
+  // it('should reject incorrect email', async () => {
+  //   const pushSpy = jest.fn()
+  //   const { getByLabelText, getByText } = renderMyProfile({
+  //     history: { push: pushSpy }
+  //   })
+  //   const input = getByLabelText('Email')
+  //   fireEvent.change(input, { target: { value: 'some value' } })
 
-    await act(async () => {
-      fireEvent.click(getByText('Save Changes'))
-      await wait(0)
-    })
+  //   await act(async () => {
+  //     fireEvent.click(getByText('Save Changes'))
+  //     await wait(0)
+  //   })
 
-    const error = getByText('You need to provide a valid email address.')
-    expect(error).toBeInTheDocument()
-    expect(pushSpy).not.toHaveBeenCalled()
-  })
+  //   const error = getByText('You need to provide a valid email address.')
+  //   expect(error).toBeInTheDocument()
+  //   expect(pushSpy).not.toHaveBeenCalled()
+  // })
 
-  it('should not show error for correct email', async () => {
-    const { getByLabelText, getByText, queryByText } = renderMyProfile()
-    const input = getByLabelText('Email')
-    fireEvent.change(input, { target: { value: 'alice@example.com' } })
+  // it('should not show error for correct email', async () => {
+  //   const { getByLabelText, getByText, queryByText } = renderMyProfile()
+  //   const input = getByLabelText('Email')
+  //   fireEvent.change(input, { target: { value: 'alice@example.com' } })
 
-    await act(async () => {
-      fireEvent.click(getByText('Save Changes'))
-      await wait(0)
-    })
+  //   await act(async () => {
+  //     fireEvent.click(getByText('Save Changes'))
+  //     await wait(0)
+  //   })
 
-    const error = queryByText('You need to provide a valid email address.')
-    expect(error).not.toBeInTheDocument()
-  })
+  //   const error = queryByText('You need to provide a valid email address.')
+  //   expect(error).not.toBeInTheDocument()
+  // })
 
   it('should not show error for name when provided', async () => {
     const { getByLabelText, getByText, queryByText } = renderMyProfile()

@@ -29,6 +29,8 @@ const hostEarningTransactions = [{
 
 describe('HP Admin : HostedEarnings', () => {
   it('User navigates to Earnings Page, toggles between 1, 7, & 30 day views', runConductor(async () => {
+    console.log('6')
+
     const { getByTestId, getAllByTestId, getByText } = await renderAndWait(<HPAdminApp />)
     // navigate to earnings page
     fireEvent.click(getByTestId('menu-button'))

@@ -51,7 +51,7 @@ const MyProfile = ({ history: { push } }) => {
     }}
   >
     <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
-      <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} styleName='avatar-image' />
+      <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} styleName='avatar-image' alt='Personal Avatar' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
         <Input
