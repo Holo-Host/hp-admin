@@ -1,36 +1,57 @@
 import React from 'react'
-import Btn from 'components/Button'
-import PrimaryLayout from 'components/layout/PrimaryLayout'
+import { isEmpty } from 'lodash/fp'
+import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
+import PrimaryLayout from 'components/layout/PrimaryLayout'
+import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import HappsQuery from 'graphql/HappsQuery.gql'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import { presentHolofuelAmount } from 'utils'
 import './Dashboard.module.css'
 
-export default function Dashboard ({ me, happStoreUser, registerUser }) {
+export default function Dashboard () {
+  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+
+  const { data: { happs = [] } = {} } = useQuery(HappsQuery)
+  const noInstalledHapps = happs.reduce((total, happ) => happ.isEnabled ? total + 1 : total, 0)
+
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
+
+  const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
+
   return <PrimaryLayout>
-    <div styleName='linkBox'>
-      <h2><Link to='/browse-happs'>Hosting</Link></h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-    </div>
-
-    <div styleName='linkBox'>
-      <h2><Link to='/earnings'>Earnings</Link></h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-    </div>
-
-    <div styleName='linkBox'>
-      <h2><Link to='/settings'>Settings</Link></h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-    </div>
-
-    <div styleName='testing'>
-      <Btn variant='primary' onClick={() => registerUser('Test User', 'testuserface.png')}>Register a test user</Btn>
-
-      <p>
-        <strong>User data:</strong> {me && JSON.stringify(me)}
-      </p>
-
-      <p>
-        <strong>Happ Store User data:</strong> {happStoreUser && JSON.stringify(happStoreUser)}
-      </p>
-    </div>
+    <div styleName='greeting'>{greeting}</div>
+    <Link styleName='card' to='/browse-happs'>
+      <h2 styleName='card-title'>Hosting</h2>
+      {noInstalledHapps === 0 && <div>
+        + Host your first app
+      </div>}
+      {noInstalledHapps > 0 && <div>
+        {noInstalledHapps} Application{noInstalledHapps > 1 && 's'}
+      </div>}
+    </Link>
+    <Link styleName='card' to='/earnings'>
+      <h2 styleName='card-title'>Earnings</h2>
+      {balance === 0 && <div styleName='small-text'>
+        You haven't earned any HoloFuel yet
+      </div>}
+      {balance > 0 && <div>
+        Today: {presentHolofuelAmount(balance)}
+      </div>}
+    </Link>
+    <Link styleName='card' to='/holofuel'>
+      <h2 styleName='card-title'>HoloFuel</h2>
+      {balance === 0 && <div styleName='small-text'>
+        You have no HoloFuel
+      </div>}
+      {balance > 0 && <div>
+        <div styleName='small-text'>HoloFuel Balance</div>
+        <div styleName='balance'>{presentHolofuelAmount(balance)}</div>
+      </div>}
+    </Link>
+    {/* TODO: Determine if we want a card that links to the Settings Page too... */}
+    {/* <Link styleName='card' to='/settings'>
+      <h2 styleName='card-title'>Settings</h2>
+    </Link> */}
   </PrimaryLayout>
 }

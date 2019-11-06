@@ -3,9 +3,11 @@ import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
-
-// testing the named export Header rather than the default export which is wrapped in withRouter
 import MyProfile from './MyProfile'
+
+jest.mock('components/layout/PrimaryLayout')
+// TODO: switch to mock pattern for Router
+jest.unmock('react-router-dom')
 
 const renderMyProfile = (
   props,
@@ -23,12 +25,6 @@ const renderMyProfile = (
 })
 
 describe('Rendering', () => {
-  it('should render the header', () => {
-    const { getByText } = renderMyProfile()
-
-    expect(getByText('Edit Profile')).toBeInTheDocument()
-  })
-
   it('should render the avatar url input', async () => {
     const { getByLabelText } = renderMyProfile()
     const input = getByLabelText('Avatar URL')

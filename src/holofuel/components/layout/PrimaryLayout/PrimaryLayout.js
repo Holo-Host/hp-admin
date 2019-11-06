@@ -37,6 +37,7 @@ export function PrimaryLayout ({
       agentLoading={holofuelUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
+      isWide={isWide}
     />
     <div styleName='styles.content'>
       <FlashMessage />
