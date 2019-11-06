@@ -25,7 +25,6 @@ export function hposCall (method = 'get', path, authToken, apiVersion = 'v1') {
       case 'get':
         return async params => {
           const { data } = await axios.get(fullPath, { params, headers })
-          console.log('data', data)
           return data
         }
       case 'post':
@@ -69,9 +68,7 @@ const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
     settings: async (authToken) => {
-      console.log('HposInterface', authToken)
       const result = await hposCall('get', 'config', authToken)()
-      console.log('HposInterface result', result)
       return presentHposSettings(result)
     },
 

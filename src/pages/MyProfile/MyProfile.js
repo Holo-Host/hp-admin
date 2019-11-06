@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { useQuery } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import { useHPAuthQuery } from 'graphql/hpAuthHooks'
+
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
 import Input from 'components/Input'
@@ -13,7 +14,7 @@ import './MyProfile.module.css'
 const EMAIL_REGEXP = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
 const MyProfile = ({ history: { push } }) => {
-  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
   const [isTosOpen, setTosOpen] = useState(false)
   const { register, handleSubmit, errors, watch } = useForm()
   const onSubmit = data => {

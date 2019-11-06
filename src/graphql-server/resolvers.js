@@ -56,7 +56,6 @@ export const resolvers = {
     },
 
     hposSettings: (_, { authToken }) => {
-      console.log('resolvers.hposSettings', authToken)
       return HposInterface.os.settings(authToken)
     },
 
@@ -101,15 +100,14 @@ export const resolvers = {
 
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    hposUpdateSettings: (_, { hostPubKey, hostName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, sshAccess),
+    hposUpdateSettings: (_, { hostPubKey, hostName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, sshAccess, authToken),
 
-    hposUpdateVersion: HposInterface.os.updateVersion,
+    hposUpdateVersion: (_, { authToken }) => HposInterface.os.updateVersion(authToken),
 
     hposCheckAuth: async (_, { authToken }) => {
       try {
         await HposInterface.os.settings(authToken)
       } catch (error) {
-        console.log('error', error)
         return {
           isAuthed: false
         }

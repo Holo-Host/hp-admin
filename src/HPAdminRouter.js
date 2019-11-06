@@ -1,10 +1,6 @@
 import React from 'react'
-<<<<<<< HEAD
-import { Route } from 'react-router-dom'
-import AuthRoute from 'components/AuthRoute'
-=======
 import { Route, Link } from 'react-router-dom'
->>>>>>> develop
+import AuthRoute from 'components/AuthRoute'
 import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
 import Settings from 'pages/Settings'
