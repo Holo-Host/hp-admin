@@ -1,6 +1,5 @@
 import React from 'react'
-import { Route } from 'react-router-dom'
-
+import { Route, Link } from 'react-router-dom'
 import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
 import Settings from 'pages/Settings'
@@ -13,10 +12,6 @@ import MyProfile from 'pages/MyProfile'
 import StyleDemo from 'pages/StyleDemo'
 import Login from 'pages/Login'
 import FactoryResetInstructions from 'pages/FactoryResetInstructions'
-
-// NB: This is a placeholder for the ticket to holofuel build compatible with hp admin
-// import { HoloFuelApp } from 'root'
-const placeholderHF = () => <h1>This link will redirect to the HololFuel App</h1>
 
 export default function HPAdminRouter () {
   return <>
@@ -32,12 +27,27 @@ export default function HPAdminRouter () {
     <Route path='/my-profile' component={MyProfile} />
     <Route path='/factory-reset' component={FactoryResetInstructions} />
 
-    <Route path='/holofuel' exact component={placeholderHF} />
-
     <Route path='/style-demo' component={StyleDemo} />
-
-    <Route path='/holofuel' render={() => <div>
+  
+    // NB: This is a placeholder for the ticket to holofuel build compatible with hp admin
+    <Route path='/holofuel' render={() => <div style={{ marginTop: 50, textAlign: 'center' }}>
       This page will redirect to the HoloFuel app
+      <br />
+      <br />
+      <br />
+      <Link to='/dashboard'
+        style={{
+          marginLeft: 'auto',
+          color: '#484848',
+          backgroundColor: '#CDCDCD',
+          fontWeight: 'bold',
+          fontSize: 14,
+          minWidth: 67,
+          padding: 10,
+          borderRadius: 5
+        }}>
+        Home
+      </Link>
     </div>} />
 
   </>
