@@ -107,6 +107,7 @@ const populateHpAdminData = async () => {
   return registerProvider
     .then(_ => fillHappStore())
     .then(_ => providerShims.addHolofuelAccount())
+    // .then(_ => process.exit())
     .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
 }
 
