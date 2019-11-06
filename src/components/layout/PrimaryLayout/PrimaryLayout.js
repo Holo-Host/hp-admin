@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import ScreenWidthContext from 'contexts/screenWidth'
+import FlashMessage from 'components/FlashMessage'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -16,6 +17,7 @@ export function PrimaryLayout ({
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} />
+    <FlashMessage />
     {children}
   </div>
 }
