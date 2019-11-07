@@ -31,7 +31,6 @@ function HoloFuelAppCore () {
 }
 
 export function HoloFuelApp () {
-
   return <ApolloProvider client={apolloClient}>
     <Router>
       <HoloFuelAppCore />
