@@ -8,9 +8,9 @@ import CreateRequest from 'holofuel/pages/CreateRequest'
 
 export default function HFRouter () {
   return <>
-    <Route path='/(|inbox)' exact component={Inbox} />
-    <Route path='/offer' exact component={CreateOffer} />
-    <Route path='/request' exact component={CreateRequest} />
-    <Route path='/history' component={TransactionHistory} />
+    <Route path='/holofuel/(|inbox)' exact component={Inbox} />
+    <Route path='/holofuel/offer' exact component={CreateOffer} />
+    <Route path='/holofuel/request' exact component={CreateRequest} />
+    <Route path='/holofuel/history' component={TransactionHistory} />
   </>
 }
