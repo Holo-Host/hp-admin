@@ -10,10 +10,13 @@ import useAuthTokenContext from 'contexts/useAuthTokenContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
 
+// exported for testing
+export const authToken = 'EGeYSAmjxp1kNBzXAR2kv7m3BNxyREZnVwSfh3FX7Ew'
+
 const mockWebCryptoModule = (email, password) => {
   if (email === 'a.b@c.com') return 'badauthkey'
 
-  return 'EGeYSAmjxp1kNBzXAR2kv7m3BNxyREZnVwSfh3FX7Ew'
+  return authToken
 }
 
 export default function Login ({ history: { push } }) {
@@ -47,17 +50,19 @@ export default function Login ({ history: { push } }) {
         variant='big'
         type='email'
         name='email'
+        id='email'
         placeholder='Email address'
         ref={register({ required: true })} />
       {errors.email && <small styleName='field-error'>
         You need to provide a valid email address.
       </small>}
 
-      <label styleName='login-label' htmlFor='email'>Password</label>
+      <label styleName='login-label' htmlFor='password'>Password</label>
       <Input
         variant='big'
         type='password'
         name='password'
+        id='password'
         placeholder='Password'
         ref={register({ required: true, minLength: 6 })} />
       {errors.password && <small styleName='field-error'>
