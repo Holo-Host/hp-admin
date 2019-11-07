@@ -2,7 +2,7 @@ import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import FlashMessage from './FlashMessage.js'
-import useFlashMessageContext, { FlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
+import useFlashMessageContext, { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 
 // Think about ways to refactor this to test fewer implementation details.
 

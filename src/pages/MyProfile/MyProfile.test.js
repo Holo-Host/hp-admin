@@ -6,6 +6,7 @@ import { createMemoryHistory } from 'history'
 import MyProfile from './MyProfile'
 
 jest.mock('components/layout/PrimaryLayout')
+jest.mock('contexts/useAuthTokenContext')
 // TODO: switch to mock pattern for Router
 jest.unmock('react-router-dom')
 
