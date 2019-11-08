@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Link } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import AuthRoute from 'components/AuthRoute'
 import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
@@ -28,6 +28,6 @@ export default function HPAdminRouter () {
     <AuthRoute path='/earnings' component={HostingEarnings} />
     <AuthRoute path='/my-profile' component={MyProfile} />
     <AuthRoute path='/factory-reset' component={FactoryResetInstructions} />
-    <AuthRoute path='/style-demo' component={StyleDemo} />  
+    <AuthRoute path='/style-demo' component={StyleDemo} />
   </>
 }
