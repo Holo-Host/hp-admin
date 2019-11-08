@@ -66,7 +66,7 @@ describe('Dashboard', () => {
               hostPubKey: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8',
               hostName: 'Holo Naut',
               registrationEmail: 'sam.rose@holo.host',
-              networkStatus:'live',
+              networkStatus: 'live',
               sshAccess: true,
               deviceName: 'My HoloPort'
             }
