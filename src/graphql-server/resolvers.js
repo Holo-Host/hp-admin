@@ -55,9 +55,7 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: (_, { authToken }) => {
-      return HposInterface.os.settings(authToken)
-    },
+    hposSettings: (_, { authToken }) => HposInterface.os.settings(authToken),
 
     hposStatus: HposInterface.os.status
   },
