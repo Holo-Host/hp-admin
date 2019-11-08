@@ -11,19 +11,3 @@ export async function renderAndWait (ui, ms = 0, options = {}) {
   })
   return queries
 }
-
-export const wrapWithRouter = (
-  ui,
-  options = {},
-  {
-    route = '/',
-    history = createMemoryHistory({ initialEntries: [route] })
-  } = {}
-) => ({
-  ...render(
-    <Router history={history}>
-      {ui}
-    </Router>
-  ),
-  history
-})
