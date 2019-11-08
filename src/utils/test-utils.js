@@ -1,6 +1,4 @@
 import { render, act } from '@testing-library/react'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory } from 'history'
 import wait from 'waait'
 
 export async function renderAndWait (ui, ms = 0, options = {}) {
