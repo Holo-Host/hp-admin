@@ -1,23 +1,23 @@
 import React from 'react'
+import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
 import './Dashboard.module.css'
 
 export default function Dashboard () {
-  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { nickname } = holofuelUser
+  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
 
   const { data: { happs = [] } = {} } = useQuery(HappsQuery)
   const noInstalledHapps = happs.reduce((total, happ) => happ.isEnabled ? total + 1 : total, 0)
 
   const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
-  const greeting = nickname ? `Hi ${nickname}!` : 'Hi!'
+  const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
 
   return <PrimaryLayout>
     <div styleName='greeting'>{greeting}</div>
