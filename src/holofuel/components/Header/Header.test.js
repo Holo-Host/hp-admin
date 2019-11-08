@@ -40,7 +40,6 @@ it('should render the title and a menu icon', () => {
   expect(getByText(props.agent.nickname) || getByText(presentAgentId(props.agent.id))).toBeInTheDocument()
 
   fireEvent.click(getByTestId('menu-button'))
-
   expect(props.history.push).toHaveBeenCalledWith('/dashboard')
 })
 
@@ -51,7 +50,6 @@ it('should render the agent nickname', () => {
     agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
   }
   const { getByText } = renderWithRouter(<Header {...props} />)
-
   expect(getByText(props.agent.nickname)).toBeInTheDocument()
 })
 

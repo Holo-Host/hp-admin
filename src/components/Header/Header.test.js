@@ -23,7 +23,7 @@ const renderHeader = (
   ...render(
     <Router history={history}>
       <ApolloProvider client={apolloClient}>
-        <Header {...props} />
+        <Header history={history} {...props} />
       </ApolloProvider>
     </Router>
   ),
@@ -46,7 +46,6 @@ it('should render the title and a menu icon', async () => {
   expect(getByText(menuIconTitle)).toBeInTheDocument()
 
   fireEvent.click(getByTestId('menu-button'))
-
   expect(props.history.push).toHaveBeenCalledWith('/dashboard')
 })
 

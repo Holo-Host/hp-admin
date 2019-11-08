@@ -8,10 +8,10 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
-export function Header ({ title, avatarUrl, email, backTo, history: { push }, hamburgerClick = () => push('/dashboard') }) {
+export function Header ({ title, avatarUrl, backTo, history: { push }, hamburgerClick = () => push('/dashboard') }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
 
-  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
+  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />
   </Button>
 
