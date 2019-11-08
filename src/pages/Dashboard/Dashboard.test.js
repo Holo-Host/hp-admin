@@ -5,12 +5,17 @@ import { MockedProvider } from '@apollo/react-testing'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+// this is importing from the mock.
+import { authToken } from 'contexts/useAuthTokenContext'
+
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import { defaultHapp } from 'models/Happ'
 import Dashboard from './Dashboard'
 
 jest.mock('components/layout/PrimaryLayout')
+jest.mock('contexts/useAuthTokenContext')
 
 describe('Dashboard', () => {
   it('renders empty states', async () => {
@@ -53,14 +58,34 @@ describe('Dashboard', () => {
             }
           }
         }
+      },
+      {
+        request: {
+          query: HposSettingsQuery,
+          variables: {
+            authToken
+          }
+        },
+        result: {
+          data: {
+            hposSettings: {
+              hostPubKey: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8',
+              hostName: 'Holo Naut',
+              registrationEmail: 'sam.rose@holo.host',
+              networkStatus: 'live',
+              sshAccess: true,
+              deviceName: 'My HoloPort'
+            }
+          }
+        }
       }
     ]
 
     const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <Dashboard />
-    </MockedProvider>, 0)
+    </MockedProvider>)
 
-    expect(getByText('Hi!')).toBeInTheDocument()
+    expect(getByText('Hi Holo Naut!')).toBeInTheDocument()
 
     const hosting = getByText('+ Host your first app')
     expect(hosting).toBeInTheDocument()
@@ -129,6 +154,26 @@ describe('Dashboard', () => {
             }
           }
         }
+      },
+      {
+        request: {
+          query: HposSettingsQuery,
+          variables: {
+            authToken
+          }
+        },
+        result: {
+          data: {
+            hposSettings: {
+              hostPubKey: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8',
+              hostName: 'Holo Naut',
+              registrationEmail: 'sam.rose@holo.host',
+              networkStatus: 'live',
+              sshAccess: true,
+              deviceName: 'My HoloPort'
+            }
+          }
+        }
       }
     ]
 
@@ -136,7 +181,7 @@ describe('Dashboard', () => {
       <Dashboard />
     </MockedProvider>, 0)
 
-    expect(getByText('Hi Jane!')).toBeInTheDocument()
+    expect(getByText('Hi Holo Naut!')).toBeInTheDocument()
 
     expect(getByText('1 Application')).toBeInTheDocument()
 
