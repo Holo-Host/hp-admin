@@ -7,9 +7,10 @@ import MenuIcon from 'components/icons/MenuIcon'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import { presentAgentId } from 'utils'
 
-export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard') }) {
+export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />
+    {inboxCount > 0 && <span styleName='nav-badge'>{inboxCount}</span>}
   </Button>
 
   if (agentLoading) agentLoading = <h4>Loading...</h4>
@@ -18,6 +19,8 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
     <section styleName='header'>
       <div styleName='left-nav'>
         {leftNav}
+      </div>
+      <div styleName='center-nav'>
         <span styleName='title header-font'>HoloFuel</span>
       </div>
       <div styleName='right-nav account-number header-font'>

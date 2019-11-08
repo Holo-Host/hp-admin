@@ -29,7 +29,7 @@ export default function HPAdminRouter () {
 
     <Route path='/style-demo' component={StyleDemo} />
 
-    // NB: This is a placeholder for the ticket to holofuel build compatible with hp admin
+    {/* // NB: This is a placeholder for the ticket to holofuel build compatible with hp admin */}
     <Route path='/holofuel' render={() => <div style={{ marginTop: 50, textAlign: 'center' }}>
       This page will redirect to the HoloFuel app
       <br />
