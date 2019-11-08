@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
@@ -20,16 +20,20 @@ export function App () {
   }
 }
 
-export function HoloFuelApp () {
+function HoloFuelAppCore () {
   const isWide = useMediaPredicate('(min-width: 550px)')
 
+  return <HFScreenWidthContext.Provider value={isWide}>
+    <FlashMessageProvider>
+      <HFRouter />
+    </FlashMessageProvider>
+  </HFScreenWidthContext.Provider>
+}
+
+export function HoloFuelApp () {
   return <ApolloProvider client={apolloClient}>
     <Router>
-      <HFScreenWidthContext.Provider value={isWide}>
-        <FlashMessageProvider>
-          <HFRouter />
-        </FlashMessageProvider>
-      </HFScreenWidthContext.Provider>
+      <HoloFuelAppCore />
     </Router>
   </ApolloProvider>
 }
@@ -42,6 +46,7 @@ export function HPAdminApp () {
       <RegisterUser>
         <ScreenWidthContext.Provider value={isWide}>
           <HPAdminRouter />
+          <Route path='/holofuel' component={HoloFuelAppCore} />
         </ScreenWidthContext.Provider>
       </RegisterUser>
     </Router>

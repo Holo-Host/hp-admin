@@ -14,7 +14,7 @@
     "test:lint": "standard",
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
     "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
-    "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",    
+    "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
     "test:ci": "CI=1 npm run test"
   },
   "dependencies": {
@@ -42,6 +42,7 @@
     "react-loader-spinner": "^3.1.4",
     "react-media-hook": "^0.4.4",
     "react-modal": "^3.9.1",
+    "react-router-dom": "^5.1.2",
     "react-test-renderer": "^16.9.0",
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",
@@ -105,8 +106,6 @@
     "postcss-safe-parser": "4.0.1",
     "react-app-polyfill": "^1.0.1",
     "react-dev-utils": "^9.0.1",
-    "react-router": "~5.0.1",
-    "react-router-dom": "~5.0.1",
     "resolve": "1.10.0",
     "sass-loader": "7.1.0",
     "semver": "6.0.0",
