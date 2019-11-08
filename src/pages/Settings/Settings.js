@@ -11,7 +11,7 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 
-// Dictionary of all dislay relevant Ports
+// Dictionary of all relevant display ports
 export const getLabelFromPortName = portname => ({
   primaryPort: 'Primary Port'
 }[portname])
@@ -41,7 +41,7 @@ export function Settings ({ history: { push } }) {
   const updateAvailable = (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion))
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
-    <header styleName='jumbotron-header'>
+    <header styleName='jumbotron-header' data-testid='settings-header'>
       {!isEmpty(settings) && <>
         <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
         <h2> {settings.hostName ? `${settings.hostName}'s` : 'Your'} HoloPort </h2>
@@ -67,10 +67,12 @@ export function Settings ({ history: { push } }) {
       <SettingsTable header='About this HoloPort' >
         <SettingsRow
           label='Device Name'
+          dataTestId='device-name'
           content={!isEmpty(settings) && settings.deviceName ? settings.deviceName : NOT_AVAILABLE} />
         <SettingsRow
           label='Network ID'// change to 'Network'
           // TODO : Change content (below) to `settings.networkStatus`
+          dataTestId='network-type'
           content={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : NOT_AVAILABLE} />
       </SettingsTable>
 
@@ -125,13 +127,13 @@ export function SettingsTable ({ updateAvailable, header, children }) {
   </table>
 }
 
-export function SettingsRow ({ label, content }) {
+export function SettingsRow ({ label, content, dataTestId }) {
   return <tr styleName='settings-row' data-testid='settings-row'>
     <td styleName='settings-col align-left'>
       <h3 styleName='row-label' data-testid='settings-label'>{label}</h3>
     </td>
     <td styleName='settings-col align-right'>
-      <h3 styleName='row-content'>{content}</h3>
+      <h3 styleName='row-content' data-testid={dataTestId}>{content}</h3>
     </td>
   </tr>
 }
@@ -170,7 +172,7 @@ export function UpdateSoftwareModal ({ settings, handleClose, toggleModal, avail
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
-    <div styleName='modal-text' role='heading'>
+    <div styleName='modal-text' role='heading' data-testid='modal-message'>
       Would you like to update the HoloPort, "{settings.deviceName}", to version {presentHash(availableVersion)}?
     </div>
     <div styleName='modal-buttons'>

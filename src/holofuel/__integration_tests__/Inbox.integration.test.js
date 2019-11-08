@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, wait } from '@testing-library/react'
+import { fireEvent, within, act, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
@@ -12,29 +12,30 @@ jest.unmock('react-router-dom')
 
 describe('HOLOFUEL : Inbox', () => {
   it('A request is displayed', runConductor(async () => {
-    console.log('6')
-
-    const { debug, getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
-    fireEvent.click(getByTestId('menu-button'))
-    await wait(() => getByText('Inbox'))
-    fireEvent.click(getByText('Inbox'))
+    const { getByTestId, getByText, getAllByRole } = await renderAndWait(<HoloFuelApp />) // debug,
+    const header = getAllByRole('region')[1]
+    await wait(() => within(header).getByText('Inbox'))
 
     // This is the test. If an element with text 'Pay' doesn't appear before timeout interval, the test will timeout.
     await wait(() => getByText('Pay'))
-    // await wait(() => getByText('Pre-Seed Data'))
     expect(getByText('Pre-Seed Data')).toBeInTheDocument()
     expect(getByText('(100)')).toBeInTheDocument()
-    debug()
+    // debug()
 
     // pay transaction
-    fireEvent.click(getByText('Pay'))
-    debug()
+    await act(async () => {
+      fireEvent.click(getByText('Pay'))
+      await wait(0)
+    })
 
     // accept transaction
     await wait(() => getByText('Accept'))
     expect(getByText('100')).toBeInTheDocument()
-    fireEvent.click(getByText('Accept'))
-    debug()
+    await act(async () => {
+      fireEvent.click(getByText('Accept'))
+      await wait(0)
+    })
+    // debug()
 
     expect(getByText('Accept')).not.toBeInTheDocument()
 
@@ -47,7 +48,7 @@ describe('HOLOFUEL : Inbox', () => {
     expect(getByText('100')).toBeInTheDocument()
     expect(getByText('(100)')).toBeInTheDocument()
     expect(getByText('none')).toBeInTheDocument()
-    debug()
+    // debug()
 
     console.log('found "Pay", all is good')
   }), 150000)

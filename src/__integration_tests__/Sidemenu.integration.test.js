@@ -12,7 +12,6 @@ jest.unmock('react-router-dom')
 describe('HP Admin : Sidemenu', () => {
   it('Contains the host HPOS API PubKey and Name', runHposApi(async () => {
     const hposSettings = await HposInterface.os.settings()
-    console.log('hposSettings : ', hposSettings)
 
     const { getByTestId, getByText } = await renderAndWait(<HPAdminApp />)
     const menuButton = getByTestId('menu-button')

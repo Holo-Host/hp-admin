@@ -20,7 +20,7 @@ const createAndRegister = async (happId) => {
   return registerResult
 }
 
-// TODO: Wrap in a fn that determines if running initizialzie-conductor-data 
+// TODO: Wrap in a fn that determines if running initizialzie-conductor-data
 //  >> if so, return null, if not, return this script
 // startTestConductor()
 //   .then(() => {

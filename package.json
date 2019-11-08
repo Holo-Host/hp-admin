@@ -19,6 +19,7 @@
     "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
     "test:ci": "CI=1 npm run test",
     "test:initialize-conductor-data": "NODE_ENV=test babel-node scripts/initialize-conductor-data",
+    "test:integration-setup": "npm run hc:start && npm run test:wait-for-conductor && test:initialize-conductor-data",
     "load-holofuel-dna": "node scripts/LoadHoloFuel/index.js",
     "complete-provider-flow": "node scripts/RunHhaProviderFlow/index.js"
   },

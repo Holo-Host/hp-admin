@@ -204,8 +204,7 @@ export default function HostingEarnings () {
         {transactions.map(transaction =>
           <TransactionRow
             transaction={transaction}
-            key={transaction.id}
-            data-testid='earnings-row' />)}
+            key={transaction.id} />)}
       </tbody>
     </table>}
 
@@ -216,7 +215,7 @@ export function TransactionRow ({ transaction }) {
   const { timestamp, amount, pricePerUnit, units, happName } = transaction
   const prettyDate = moment(timestamp).format('D MMM YYYY')
   const prettyTime = moment(timestamp).format('kk:mm')
-  return <tr data-testid='transaction-row'>
+  return <tr data-testid='earnings-row'>
     <td>{prettyDate}<br />{prettyTime}</td>
     <td>{amount} HF</td>
     <td>{pricePerUnit} / {units}</td>

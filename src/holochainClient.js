@@ -18,7 +18,7 @@ export const MOCK_INDIVIDUAL_DNAS = {
   hha: true,
   holofuel: false
 }
-export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
+// export const MOCK_HP_CONNECTION = true || process.env.NODE_ENV === 'test'
 
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
@@ -63,6 +63,9 @@ export function createZomeCall (zomeCallPath, agentIndex = 0, callOpts = {}) {
     ...DEFAULT_OPTS,
     ...callOpts
   }
+
+  const prevErr = []
+
   return async function (args = {}) {
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
@@ -102,14 +105,24 @@ export function createZomeCall (zomeCallPath, agentIndex = 0, callOpts = {}) {
       }
       return result
     } catch (error) {
-      console.log(
-        `👎 %c${zomeCallPath}%c zome call ERROR using args: `,
-        'font-weight: bold; color: rgb(220, 208, 120); color: red',
-        'font-weight: normal; color: rgb(160, 160, 160)',
-        args,
-        ' -- ',
-        error
-      )
+      const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
+      if (repeatingError) return null
+      else if (process.env.REACT_APP_INTEGRATION_TEST) {
+        prevErr.push({
+          error: error.message,
+          path: zomeCallPath
+        })
+        console.log(prevErr)
+      } else {
+        console.log(
+          `👎 %c${zomeCallPath}%c zome call ERROR using args: `,
+          'font-weight: bold; color: rgb(220, 208, 120); color: red',
+          'font-weight: normal; color: rgb(160, 160, 160)',
+          args,
+          ' -- ',
+          error
+        )
+      }
     }
   }
 }

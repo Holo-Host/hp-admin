@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, within, wait } from '@testing-library/react'
+import { fireEvent, within, act, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
@@ -8,9 +8,11 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-// TODO : Update to pull data straight from pre-seed happ-data source. (NB: The app list below is a copy...)
-const apps = [{
-  happ1: {
+// TODO: Setup seed data in such that two happs are available for hosting...
+
+describe('HP Admin : BrowseHapps', () => {
+  // TODO : Update to pull data straight from pre-seed happ-data source. (NB: The app list below is a copy...)
+  const happ1 = {
     title: 'HoloFuel',
     description: 'Manage and redeem payments for hosting',
     thumbnail_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cMFvYqaw7TtcTkPFcwE8pupKWqLFMCFu2opap9jqUoqIcAKB',
@@ -29,9 +31,8 @@ const apps = [{
       dns_name: 'hf-client-facing.domain.xyz'
     }
   }
-},
-{
-  happ2: {
+
+  const happ2 = {
     title: 'Holo Community',
     description: 'Connect with other hosts in the Holo network',
     thumbnail_url: 'https://d3ngex8q79bk55.cloudfront.net/misc/default_community_avatar.png',
@@ -50,39 +51,44 @@ const apps = [{
       dns_name: 'holo-community-client-facing.domain.xyz'
     }
   }
-}]
 
-// TODO: Setup seed data in such that two happs are available for hosting...
-describe('HP Admin : BrowseHapps', () => {
+  const apps = [happ1, happ2]
+
   it('User navigates to Hosting Page, adds a happ to host, & manages pricing', runConductor(async () => {
-    console.log('6')
-
-    const { getByTestId, getAllByRole, getByText } = await renderAndWait(<HPAdminApp />)
+    const { getByTestId, getAllByRole, getByText } = await renderAndWait(<HPAdminApp />) // debug,
     // navigate to hosting page
     fireEvent.click(getByTestId('menu-button'))
-    await wait(() => getByText('Hosting'))
-    fireEvent.click(getByText('Hosting'))
+    await wait(() => getByTestId('hosting-link'))
+    fireEvent.click(getByTestId('hosting-link'))
 
-    await wait(() => getByText('Hosting'))
-    await wait(() => getByText('HoloFuel'))
-    await wait(() => getByText('Holo Community'))
+    const header = getAllByRole('region')[1]
+    await wait(() => within(header).getByText('Hosting'))
 
     // confirm dna content display
-    const listItems = getAllByRole('listitem')
+    const listItems = within(getByTestId('happ-row')).getAllByRole('listitem')
     expect(listItems).toHaveLength(2)
 
-    listItems.forEach((item, index) => {
+    listItems.forEach(async (item, index) => {
       const { getByText } = within(item)
       expect(getByText(apps[index].title)).toBeInTheDocument()
       expect(getByText(apps[index].description)).toBeInTheDocument()
-      expect(getByText('Host')).toBeInTheDocument()
 
-      // host the happ
-      fireEvent.click(getByText('Host'))
-      expect(getByText('Un-Host')).toBeInTheDocument()
+      if (apps[index].title === 'HoloFuel') {
+        // holofuel happ is already hosted in mocks..
+        expect(getByText('Un-Host')).toBeInTheDocument()
+      } else {
+        // host the happ
+        expect(getByText('Host')).toBeInTheDocument()
+        await act(async () => {
+          fireEvent.click(getByText('Host'))
+          await wait(0)
+        })
+        expect(getByText('Un-Host')).toBeInTheDocument()
+      }
     })
 
     // update the pricing options
+    fireEvent.click(getByText('Manage Pricing'))
     await wait(() => getByText('Manage Pricing'))
     fireEvent.change(getByTestId('price-input'), { target: { value: 10 } })
     fireEvent.change(getByTestId('units-dropdown'), { target: { value: 'cpu' } })
@@ -95,7 +101,6 @@ describe('HP Admin : BrowseHapps', () => {
 
     // confirm that dashboard reflects the updated # of hosted happs
     await wait(() => getByText('My HoloPort'))
-    const hostedHapps = await wait(() => getByTestId('hosted-apps'))
-    expect(hostedHapps).toEqual('2 Applications')
+    await wait(() => within(getByTestId('hosted-apps')).getByText('2 Applications'))
   }), 150000)
 })

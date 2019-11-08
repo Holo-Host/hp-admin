@@ -10,9 +10,7 @@ jest.unmock('react-router-dom')
 
 describe('HOLOFUEL : Transaction History', () => {
   it('A request is displayed', runConductor(async () => {
-    console.log('6')
-
-    const { debug, getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
+    const { getByTestId, getByText } = await renderAndWait(<HoloFuelApp />) // debug,
     fireEvent.click(getByTestId('menu-button'))
     await wait(() => getByText('History'))
     fireEvent.click(getByText('History'))
@@ -20,8 +18,6 @@ describe('HOLOFUEL : Transaction History', () => {
     // This is the test. If an element with text 'Pending' doesn't appear before timeout interval, the test will timeout.
     await wait(() => getByText('Pending'))
     await wait(() => getByText('Pre-Seed Data'))
-    debug()
-
-    console.log('found "Pay", all is good')
+    // debug()
   }), 150000)
 })

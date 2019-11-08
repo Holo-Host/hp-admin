@@ -28,7 +28,7 @@ const MyProfile = ({ history: { push } }) => {
   const [isTosOpen, setTosOpen] = useState(false)
   const { register, handleSubmit, errors, watch } = useForm()
   const onSubmit = data => {
-    console.log('SUBMITTED DATA : ', data)
+    // console.log('SUBMITTED DATA : ', data)
     if (data.name) {
       // call HPOS Settings Mutation to update HPOS Host Name
       updateDeviceName(data.name)
@@ -51,7 +51,7 @@ const MyProfile = ({ history: { push } }) => {
     }}
   >
     <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
-      <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} styleName='avatar-image' alt='Personal Avatar' />
+      <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} styleName='avatar-image' data-testid='host-avatar' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
         <Input
@@ -105,7 +105,7 @@ const MyProfile = ({ history: { push } }) => {
         />
       </label> */}
 
-      <Button variant='link' onClick={showTos}>
+      <Button variant='link' onClick={showTos} dataTestId='tos-button'>
         View Terms of Service
       </Button>
 

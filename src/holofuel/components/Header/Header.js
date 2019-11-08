@@ -8,7 +8,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import { presentAgentId } from 'utils'
 
 export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard') }) {
-  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' data-testid='menu-button'>
+  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />
   </Button>
 
@@ -16,7 +16,7 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
 
   return <header>
     <section styleName='header'>
-      <div styleName='left-nav'>
+      <div styleName='left-nav' data-testid='menu-button'>
         {leftNav}
         <span styleName='title header-font'>HoloFuel</span>
       </div>

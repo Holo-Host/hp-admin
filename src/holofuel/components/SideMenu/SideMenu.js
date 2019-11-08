@@ -28,7 +28,7 @@ export function SideMenu ({
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <h1 styleName='appName'>HoloFuel</h1>
+        <h1 styleName='appName' data-testid='sidemenu-header'>HoloFuel</h1>
         <CopyAgentId agent={agent} isMe>
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
         </CopyAgentId>
@@ -63,7 +63,7 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to='/history' styleName='nav-link'>
+            <Link to='/history' styleName='nav-link' data-testid='history-link'>
               <div styleName='nav-icon' />
               History
             </Link>
