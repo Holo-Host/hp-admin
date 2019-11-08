@@ -1,7 +1,10 @@
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, act } from '@testing-library/react'
+import wait from 'waait'
 import { Router } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
+import { ApolloProvider } from '@apollo/react-hooks'
+import apolloClient from 'apolloClient'
 
 // testing the named export Header rather than the default export which is wrapped in withRouter
 import { Header } from './Header'
@@ -20,18 +23,25 @@ const renderHeader = (
 ) => ({
   ...render(
     <Router history={history}>
-      <Header {...props} />
+      <ApolloProvider client={apolloClient}>
+        <Header {...props} />
+      </ApolloProvider>
     </Router>
   ),
   history
 })
 
-it('should render the title and a menu icon', () => {
+it('should render the title and a menu icon', async () => {
   const props = {
     title: 'the title',
     history: { push: jest.fn() }
   }
-  const { getByText, getByTestId } = renderHeader(props)
+
+  let getByText, getByTestId
+  await act(async () => {
+    ({ getByText, getByTestId } = renderHeader(props))
+    await wait(0)
+  })
 
   expect(getByText(props.title)).toBeInTheDocument()
   expect(getByText(menuIconTitle)).toBeInTheDocument()
