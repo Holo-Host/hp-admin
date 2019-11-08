@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { useQuery } from '@apollo/react-hooks'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
 import Input from 'components/Input'
@@ -9,18 +10,29 @@ import HashAvatar from 'components/HashAvatar'
 import TosModal from 'components/TosModal'
 import './MyProfile.module.css'
 
-// eslint-disable-next-line no-useless-escape
-const EMAIL_REGEXP = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+// Data - Mutation hook
+function useUpdateDeviceName () {
+  const [hposUpdateSettings] = useMutation(HposUpdateSettingsMutation)
+  return (hostName) => hposUpdateSettings({
+    variables: { hostName }
+  })
+}
 
 const MyProfile = ({ history: { push } }) => {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const updateDeviceName = useUpdateDeviceName()
+
   const [isTosOpen, setTosOpen] = useState(false)
   const { register, handleSubmit, errors, watch } = useForm()
   const onSubmit = data => {
+    // TODO : Determine how we would like to handle the data persistance for avatar link updates (not currently apart of any DNA).
+    if (data.name) {
+      // call HPOS Settings Mutation to update HPOS Host Name
+      updateDeviceName(data.name)
+    }
     push('/dashboard')
   }
   const avatarUrl = watch('avatar')
-  const email = watch('email')
   const showTos = e => {
     e.preventDefault()
     setTosOpen(true)
@@ -29,12 +41,11 @@ const MyProfile = ({ history: { push } }) => {
   return <PrimaryLayout
     headerProps={{
       title: 'Edit Profile',
-      avatarUrl,
-      email
+      avatarUrl
     }}
   >
     <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
-      <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} styleName='avatar-image' />
+      <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} styleName='avatar-image' data-testid='host-avatar' />
       <label styleName='field'>
         <span styleName='field-name'>Avatar URL</span>
         <Input
@@ -60,31 +71,6 @@ const MyProfile = ({ history: { push } }) => {
           You need to set your name.
         </small>}
       </label>
-
-      <label styleName='field'>
-        <span styleName='field-name'>Email</span>
-        <Input
-          name='email'
-          placeholder='eg. alice@example.com'
-          ref={register({ required: true, pattern: EMAIL_REGEXP })}
-          styleName='field-input'
-        />
-        {errors.email && <small styleName='field-error'>
-          You need to provide a valid email address.
-        </small>}
-      </label>
-
-      <label styleName='field'>
-        <span styleName='field-name'>Password</span>
-        <Input
-          name='password'
-          type='password'
-          placeholder='type to reset password'
-          ref={register}
-          styleName='field-input'
-        />
-      </label>
-
       <Button variant='link' onClick={showTos}>
         View Terms of Service
       </Button>
