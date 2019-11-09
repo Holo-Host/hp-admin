@@ -23,7 +23,7 @@ const renderHeader = (
   ...render(
     <Router history={history}>
       <ApolloProvider client={apolloClient}>
-        <Header history={history} {...props} />
+        <Header {...props} />
       </ApolloProvider>
     </Router>
   ),
