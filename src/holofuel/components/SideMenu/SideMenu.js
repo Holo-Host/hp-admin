@@ -50,7 +50,7 @@ export function SideMenu ({
       <nav styleName='nav'>
         <ul styleName='nav-list'>
           <li>
-            <Link to='/inbox' styleName='nav-link' data-testid='inbox-link'>
+            <Link to={INBOX_PATH} styleName='nav-link' data-testid='inbox-link'>
               <div styleName='nav-icon' />
               Inbox
               {inboxCount > 0 && <span styleName='nav-badge'>{inboxCount}</span>}
@@ -69,7 +69,7 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to='/history' styleName='nav-link' data-testid='history-link'>
+            <Link to={HISTORY_PATH} styleName='nav-link' data-testid='history-link'>
               <div styleName='nav-icon' />
               History
             </Link>

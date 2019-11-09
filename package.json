@@ -12,7 +12,6 @@
     "hc:stop": "killall holochain",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
-<<<<<<< HEAD
     "test": "npm run test:lint && npm run test:unit",
     "test:ci": "CI=1 npm run test",
     "test:wait-for-conductor": "node scripts/wait-for-conductor.js",
@@ -20,11 +19,6 @@
     "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",  
     "test:preseed-data": "nix-shell --command 'npm run hc:start && npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data'",
     "test:integration": "nix-shell --run 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'"
-=======
-    "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
-    "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
-    "test:ci": "CI=1 npm run test"
->>>>>>> develop
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",
