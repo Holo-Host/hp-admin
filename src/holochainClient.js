@@ -1,7 +1,6 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
-import { findInstanceForAgent } from 'utils/integration-testing/conductorConfig'
 
 const developmentMockDnaConnection = false // this is the value MOCK_DNA_CONNECTION will have in the dev server
 // This can be written as a boolean expression then it's even less readable
@@ -22,16 +21,28 @@ export const MOCK_INDIVIDUAL_DNAS = {
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
 
-export function conductorInstanceId (instanceId, agentIndex) {
-  const realInstanceId = instanceId => findInstanceForAgent(instanceId, agentIndex).id
+const agentId = process.env.REACT_APP_AGENT_ID
 
-  // TODO: name holo-hosting-app hha in nix setup, then we can get rid of this dictionary lookup
-  return realInstanceId({
-    hylo: 'hylo',
-    'happ-store': 'happ-store',
-    hha: 'holo-hosting-app',
-    holofuel: 'holofuel'
-  }[instanceId])
+export function conductorInstanceId (instanceId) {
+// Discuss option for config file that lives in ui and informs happ-store or conductor of UI's DNA-Instance Handle for each DNA. rather than depending on reading the agentId, which is not known the first call.
+  // const realInstanceId = instanceId => findInstanceForAgent(instanceId, agentIndex).id
+  const formatInstanceId = instanceId => agentId + '::<happ_id>-' + instanceId
+
+  return {
+    hylo: formatInstanceId('hylo'),
+    'happ-store': formatInstanceId('happ-store'),
+    hha: formatInstanceId('holo-hosting-app'),
+    holofuel: formatInstanceId('holofuel')
+  }[instanceId]
+
+  // REMOVED THE FOLLOWING as the conductor.config is only needed for testing and is not modifiable after a static build
+  // // TODO: name holo-hosting-app hha in nix setup, then we can get rid of this dictionary lookup
+  // return realInstanceId({
+  //     hylo: 'hylo',
+  //     'happ-store': 'happ-store',
+  //     hha: 'holo-hosting-app',
+  //     holofuel: 'holofuel'
+  //   }[instanceId])
 }
 
 async function initAndGetHolochainClient () {
@@ -53,7 +64,7 @@ async function initAndGetHolochainClient () {
   }
 }
 
-export function createZomeCall (zomeCallPath, agentIndex = 0, callOpts = {}) {
+export function createZomeCall (zomeCallPath, callOpts = {}) {
   const DEFAULT_OPTS = {
     logging: HOLOCHAIN_LOGGING,
     resultParser: null
@@ -74,7 +85,7 @@ export function createZomeCall (zomeCallPath, agentIndex = 0, callOpts = {}) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()
-        const realInstanceId = conductorInstanceId(instanceId, agentIndex)
+        const realInstanceId = conductorInstanceId(instanceId)
         zomeCall = holochainClient.callZome(realInstanceId, zome, zomeFunc)
       }
 
@@ -127,12 +138,11 @@ export function createZomeCall (zomeCallPath, agentIndex = 0, callOpts = {}) {
   }
 }
 
-// NB: Review the need for the agentIndex here >> only was needed for testing, which was moved outside static build... correct?
-export function instanceCreateZomeCall (instanceId, agentIndex) {
+export function instanceCreateZomeCall (instanceId) {
   return (partialZomeCallPath, callOpts = {}) => {
     // regex removes leading slash
     const zomeCallPath = `${instanceId}/${partialZomeCallPath.replace(/^\/+/, '')}`
-    return createZomeCall(zomeCallPath, agentIndex, callOpts)
+    return createZomeCall(zomeCallPath, callOpts)
   }
 }
 
