@@ -2,6 +2,8 @@ import { render, act } from '@testing-library/react'
 import Modal from 'react-modal'
 import wait from 'waait'
 
+// *************************************************************************
+// Helper Functions :
 export async function renderAndWait (ui, ms = 0, options = {}) {
   let queries
   await act(async () => {
@@ -11,6 +13,8 @@ export async function renderAndWait (ui, ms = 0, options = {}) {
   return queries
 }
 
+// *************************************************************************
+// Shared Functions :
 export async function renderAndWaitWithModal (ui, ms = 0, options = {}) {
   let queries
   await act(async () => {

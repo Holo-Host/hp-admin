@@ -24,7 +24,7 @@ let holochainClient
 const agentId = process.env.REACT_APP_AGENT_ID
 
 export function conductorInstanceId (instanceId) {
-// Discuss option for config file that lives in ui and informs happ-store or conductor of UI's DNA-Instance Handle for each DNA. rather than depending on reading the agentId, which is not known the first call.
+// TODO: Discuss implementation  option for config file that lives in ui and informs happ-store or conductor of UI's DNA-Instance Handle for each DNA. rather than depending on reading the agentId, which is not known the first call.
   // const realInstanceId = instanceId => findInstanceForAgent(instanceId, agentIndex).id
   const formatInstanceId = instanceId => agentId + '::<happ_id>-' + instanceId
 
@@ -34,15 +34,6 @@ export function conductorInstanceId (instanceId) {
     hha: formatInstanceId('holo-hosting-app'),
     holofuel: formatInstanceId('holofuel')
   }[instanceId]
-
-  // REMOVED THE FOLLOWING as the conductor.config is only needed for testing and is not modifiable after a static build
-  // // TODO: name holo-hosting-app hha in nix setup, then we can get rid of this dictionary lookup
-  // return realInstanceId({
-  //     hylo: 'hylo',
-  //     'happ-store': 'happ-store',
-  //     hha: 'holo-hosting-app',
-  //     holofuel: 'holofuel'
-  //   }[instanceId])
 }
 
 async function initAndGetHolochainClient () {
