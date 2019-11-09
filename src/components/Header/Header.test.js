@@ -10,6 +10,7 @@ import apolloClient from 'apolloClient'
 import { Header } from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
 
+jest.mock('contexts/useAuthTokenContext')
 // TODO: switch to mock pattern for Router
 jest.unmock('react-router-dom')
 
@@ -49,23 +50,3 @@ it('should render the title and a menu icon', async () => {
 
   expect(props.history.push).toHaveBeenCalledWith('/dashboard')
 })
-
-// describe('with backTo defined', () => {
-//   it('should render the title and a back button', () => {
-//     const props = {
-//       title: 'the title',
-//       backTo: '/previous-page',
-//       history: { push: jest.fn() }
-//     }
-//     const { getByText, getByTestId } = render(
-//       <Header {...props} />)
-
-//     expect(getByText(props.title)).toBeInTheDocument()
-//     expect(getByText(backIconTitle)).toBeInTheDocument()
-//     expect(getByText('Back')).toBeInTheDocument()
-
-//     fireEvent.click(getByTestId('back-button'))
-
-//     expect(props.history.push).toHaveBeenCalledWith(props.backTo)
-//   })
-// })

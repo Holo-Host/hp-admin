@@ -1,5 +1,6 @@
 import React from 'react'
-import { Route, Link } from 'react-router-dom'
+import { Route } from 'react-router-dom'
+import AuthRoute from 'components/AuthRoute'
 import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
 import Settings from 'pages/Settings'
@@ -16,39 +17,17 @@ import FactoryResetInstructions from 'pages/FactoryResetInstructions'
 export default function HPAdminRouter () {
   return <>
     <Route path='/login' component={Login} />
-    <Route path='/(|dashboard)' exact component={Dashboard} />
-    <Route path='/menu' component={MainMenu} />
-    <Route path='/browse-happs' exact component={BrowseHapps} />
-    <Route path='/browse-happs/:appId' component={HappDetails} />
-    <Route path='/pricing' component={ManagePricing} />
-    <Route path='/settings' exact component={Settings} />
-    <Route path='/tos' exact component={Tos} />
-    <Route path='/earnings' component={HostingEarnings} />
-    <Route path='/my-profile' component={MyProfile} />
-    <Route path='/factory-reset' component={FactoryResetInstructions} />
 
-    <Route path='/style-demo' component={StyleDemo} />
-
-    // NB: This is a placeholder for the ticket to holofuel build compatible with hp admin
-    <Route path='/holofuel' render={() => <div style={{ marginTop: 50, textAlign: 'center' }}>
-      This page will redirect to the HoloFuel app
-      <br />
-      <br />
-      <br />
-      <Link to='/dashboard'
-        style={{
-          marginLeft: 'auto',
-          color: '#484848',
-          backgroundColor: '#CDCDCD',
-          fontWeight: 'bold',
-          fontSize: 14,
-          minWidth: 67,
-          padding: 10,
-          borderRadius: 5
-        }}>
-        Home
-      </Link>
-    </div>} />
-
+    <AuthRoute path='/(|dashboard)' exact component={Dashboard} />
+    <AuthRoute path='/menu' component={MainMenu} />
+    <AuthRoute path='/browse-happs' exact component={BrowseHapps} />
+    <AuthRoute path='/browse-happs/:appId' component={HappDetails} />
+    <AuthRoute path='/pricing' component={ManagePricing} />
+    <AuthRoute path='/settings' exact component={Settings} />
+    <AuthRoute path='/tos' exact component={Tos} />
+    <AuthRoute path='/earnings' component={HostingEarnings} />
+    <AuthRoute path='/my-profile' component={MyProfile} />
+    <AuthRoute path='/factory-reset' component={FactoryResetInstructions} />
+    <AuthRoute path='/style-demo' component={StyleDemo} />
   </>
 }

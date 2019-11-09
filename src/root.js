@@ -1,15 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
 import HFRouter from './holofuel/HFRouter'
-import RegisterUser from 'components/RegisterUser'
 import ScreenWidthContext from 'contexts/screenWidth'
+import { AuthTokenProvider } from 'contexts/useAuthTokenContext'
+import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
-import { FlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
+import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
@@ -20,16 +21,20 @@ export function App () {
   }
 }
 
-export function HoloFuelApp () {
+function HoloFuelAppCore () {
   const isWide = useMediaPredicate('(min-width: 550px)')
 
+  return <HFScreenWidthContext.Provider value={isWide}>
+    <HFFlashMessageProvider>
+      <HFRouter />
+    </HFFlashMessageProvider>
+  </HFScreenWidthContext.Provider>
+}
+
+export function HoloFuelApp () {
   return <ApolloProvider client={apolloClient}>
     <Router>
-      <HFScreenWidthContext.Provider value={isWide}>
-        <FlashMessageProvider>
-          <HFRouter />
-        </FlashMessageProvider>
-      </HFScreenWidthContext.Provider>
+      <HoloFuelAppCore />
     </Router>
   </ApolloProvider>
 }
@@ -39,11 +44,14 @@ export function HPAdminApp () {
 
   return <ApolloProvider client={apolloClient}>
     <Router>
-      <RegisterUser>
-        <ScreenWidthContext.Provider value={isWide}>
-          <HPAdminRouter />
-        </ScreenWidthContext.Provider>
-      </RegisterUser>
+      <ScreenWidthContext.Provider value={isWide}>
+        <AuthTokenProvider>
+          <FlashMessageProvider>
+            <HPAdminRouter />
+            <Route path='/holofuel' component={HoloFuelAppCore} />
+          </FlashMessageProvider>
+        </AuthTokenProvider>
+      </ScreenWidthContext.Provider>
     </Router>
   </ApolloProvider>
 }
