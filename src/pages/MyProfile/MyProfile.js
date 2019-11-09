@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
+import { useHPAuthQuery, useHPAuthMutation } from 'graphql/hpAuthHooks'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
@@ -12,14 +12,14 @@ import './MyProfile.module.css'
 
 // Data - Mutation hook
 function useUpdateDeviceName () {
-  const [hposUpdateSettings] = useMutation(HposUpdateSettingsMutation)
+  const [hposUpdateSettings] = useHPAuthMutation(HposUpdateSettingsMutation)
   return (hostName) => hposUpdateSettings({
     variables: { hostName }
   })
 }
 
 const MyProfile = ({ history: { push } }) => {
-  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
   const updateDeviceName = useUpdateDeviceName()
 
   const [isTosOpen, setTosOpen] = useState(false)

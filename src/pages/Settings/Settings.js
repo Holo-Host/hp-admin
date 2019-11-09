@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, get } from 'lodash/fp'
 import './Settings.module.css'
 import { sliceHash as presentHash } from 'utils'
@@ -10,6 +9,7 @@ import Button from 'components/Button'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
+import { useHPAuthQuery, useHPAuthMutation } from 'graphql/hpAuthHooks'
 
 // Dictionary of all relevant display ports
 export const getLabelFromPortName = portname => ({
@@ -21,15 +21,15 @@ const NOT_AVAILABLE = 'Not Available'
 
 // Data - Mutation hook
 function useUpdateVersion () {
-  const [hposUpdateVersion] = useMutation(HposUpdateVersionMutation)
+  const [hposUpdateVersion] = useHPAuthMutation(HposUpdateVersionMutation)
   return (availableVersion) => hposUpdateVersion({
     variables: { availableVersion }
   })
 }
 
 export function Settings ({ history: { push } }) {
-  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
-  const { data: { hposStatus: status = [] } = {} } = useQuery(HposStatusQuery)
+  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
+  const { data: { hposStatus: status = [] } = {} } = useHPAuthQuery(HposStatusQuery)
 
   const [toggleModal, setToggleModal] = useState()
   const showModal = () => setToggleModal(true)
