@@ -5,8 +5,8 @@ const moment = require('moment')
 const util = require('util')
 const ncp = util.promisify(require('ncp').ncp)
 const wait = require('waait')
-const { promiseMap, createAndRegister, happConfigKeys } = require('./RunHhaProviderFlow')
-const { providerShims, HAPP_STORE_DNA_INSTANCE, HHA_DNA_INSTANCE } = require('./RunHhaProviderFlow/provider-shims.js')
+const { promiseMap, createAndRegister, happConfigKeys } = require('./runHhaProviderFlow')
+const { providerShims, HAPP_STORE_DNA_INSTANCE, HHA_DNA_INSTANCE } = require('./runHhaProviderFlow/provider-shims.js')
 require('dotenv').config()
 
 const txParams = {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, wait, act } from '@testing-library/react'
+import { fireEvent, within, wait, act } from '@testing-library/react'
 import waait from 'waait'
 import { renderAndWait } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
@@ -100,7 +100,10 @@ describe('HP Admin : HostedEarnings', () => {
     // })
 
     // navigate back to home dashboard
-    fireEvent.click(getByTestId('menu-button'))
+    await act(async () => {
+      fireEvent.click(getByTestId('menu-button'))
+      await waait(0)
+    })
     await wait(() => getByText('Home'))
     await act(async () => {
       fireEvent.click(getByText('Home'))
@@ -109,7 +112,8 @@ describe('HP Admin : HostedEarnings', () => {
 
     // verify that dashboard reflects the Hosted Earnings (placeholder)
     await wait(() => getByText('My HoloPort'))
-    const hostedHapps = await wait(() => getByTestId('hosted-earnings'))
-    expect(hostedHapps).toEqual('You have no HoloFuel')
+    await wait(() => getByTestId('hosted-earnings'))
+    // TODO: Once earnings flag is in place, update below test expect accroding to the hosting earnings as reported from the hf dna :
+    expect(within(getByTestId('hosted-earnings')).getByText("You haven't earned any HoloFuel yet"))
   }), 150000)
 })

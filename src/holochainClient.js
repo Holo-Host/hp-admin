@@ -108,6 +108,7 @@ export function createZomeCall (zomeCallPath, agentIndex = 0, callOpts = {}) {
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
       if (repeatingError) return null
       else if (process.env.REACT_APP_INTEGRATION_TEST) {
+        console.log(error)
         prevErr.push({
           error: error.message,
           path: zomeCallPath
@@ -127,6 +128,7 @@ export function createZomeCall (zomeCallPath, agentIndex = 0, callOpts = {}) {
   }
 }
 
+// NB: Review the need for the agentIndex here >> only was needed for testing, which was moved outside static build... correct?
 export function instanceCreateZomeCall (instanceId, agentIndex) {
   return (partialZomeCallPath, callOpts = {}) => {
     // regex removes leading slash

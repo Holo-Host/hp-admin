@@ -72,7 +72,7 @@ const MyProfile = ({ history: { push } }) => {
           You need to set your name.
         </small>}
       </label>
-      <Button variant='link' onClick={showTos}>
+      <Button variant='link' onClick={showTos} dataTestId='tos-button'>
         View Terms of Service
       </Button>
 

@@ -23,7 +23,7 @@ export default function Dashboard () {
     <div styleName='greeting'>{greeting}</div>
     <Link styleName='card' to='/browse-happs'>
       <h2 styleName='card-title'>Hosting</h2>
-      {noInstalledHapps === 0 && <div>
+      {noInstalledHapps === 0 && <div data-testid='hosted-apps'>
         + Host your first app
       </div>}
       {noInstalledHapps > 0 && <div data-testid='hosted-apps'>
@@ -35,16 +35,16 @@ export default function Dashboard () {
       {balance === 0 && <div styleName='small-text' data-testid='hosted-earnings'>
         You haven't earned any HoloFuel yet
       </div>}
-      {balance > 0 && <div>
+      {balance > 0 && <div data-testid='hosted-earnings'>
         Today: {presentHolofuelAmount(balance)}
       </div>}
     </Link>
     <Link styleName='card' to='/holofuel'>
       <h2 styleName='card-title'>HoloFuel</h2>
-      {balance === 0 && <div styleName='small-text'>
+      {balance === 0 && <div styleName='small-text' data-testid='holofuel-balance'>
         You have no HoloFuel
       </div>}
-      {balance > 0 && <div>
+      {balance > 0 && <div data-testid='holofuel-balance'>
         <div styleName='small-text'>HoloFuel Balance</div>
         <div styleName='balance'>{presentHolofuelAmount(balance)}</div>
       </div>}
