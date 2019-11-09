@@ -19,7 +19,7 @@ describe('HOLOFUEL : Inbox', () => {
     // This is the test. If an element with text 'Pay' doesn't appear before timeout interval, the test will timeout.
     await wait(() => getByText('Pay'))
     expect(getByText('Pre-Seed Data')).toBeInTheDocument()
-    expect(getByText('(100)')).toBeInTheDocument()
+    expect(getByText('(200)')).toBeInTheDocument()
     // debug()
 
     // pay transaction
@@ -30,7 +30,7 @@ describe('HOLOFUEL : Inbox', () => {
 
     // accept transaction
     await wait(() => getByText('Accept'))
-    expect(getByText('100')).toBeInTheDocument()
+    expect(getByText('200')).toBeInTheDocument()
     await act(async () => {
       fireEvent.click(getByText('Accept'))
       await wait(0)
@@ -45,8 +45,7 @@ describe('HOLOFUEL : Inbox', () => {
     fireEvent.click(getByText('History'))
 
     await wait(() => getByText('History'))
-    expect(getByText('100')).toBeInTheDocument()
-    expect(getByText('(100)')).toBeInTheDocument()
+    expect(getByText('(200)')).toBeInTheDocument()
     expect(getByText('none')).toBeInTheDocument()
     // debug()
 

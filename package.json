@@ -20,8 +20,8 @@
     "test:ci": "CI=1 npm run test",
     "test:initialize-conductor-data": "NODE_ENV=test babel-node scripts/initialize-conductor-data",
     "test:integration-setup": "npm run hc:start && npm run test:wait-for-conductor && test:initialize-conductor-data",
-    "load-holofuel-dna": "node scripts/LoadHoloFuel/index.js",
-    "complete-provider-flow": "node scripts/RunHhaProviderFlow/index.js"
+    "load-holofuel-dna": "node scripts/loadHoloFuel/index.js",
+    "complete-provider-flow": "node scripts/runHhaProviderFlow/index.js"
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",

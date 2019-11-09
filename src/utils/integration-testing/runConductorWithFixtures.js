@@ -35,7 +35,7 @@ export default function runConductorWithFixtures (testFn) {
                 } else {
                   console.log('Deleted residual Default Storage dir.')
                   // eslint-disable-next-line no-unused-vars
-                  const { _, stderr } = await exec(`cp -r --remove-destination ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+                  const { _, stderr } = await exec(`cp -r --remove-destination ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`, { maxBuffer: 1024 * 3000 })
                   if (stderr) {
                     console.error(e)
                     throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')

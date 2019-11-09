@@ -17,7 +17,8 @@ describe('HOLOFUEL : Transaction History', () => {
 
     // This is the test. If an element with text 'Pending' doesn't appear before timeout interval, the test will timeout.
     await wait(() => getByText('Pending'))
-    await wait(() => getByText('Pre-Seed Data'))
+    expect(getByText('Pre-Seed Data')).toBeInTheDocument()
+    expect(getByText('100')).toBeInTheDocument()
     // debug()
   }), 150000)
 })
