@@ -6,6 +6,8 @@ import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+// this is importing from the mock.
+import { authToken } from 'contexts/useAuthTokenContext'
 
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
@@ -13,6 +15,7 @@ import { defaultHapp } from 'models/Happ'
 import Dashboard from './Dashboard'
 
 jest.mock('components/layout/PrimaryLayout')
+jest.mock('contexts/useAuthTokenContext')
 
 describe('Dashboard', () => {
   it('renders empty states', async () => {
@@ -58,7 +61,10 @@ describe('Dashboard', () => {
       },
       {
         request: {
-          query: HposSettingsQuery
+          query: HposSettingsQuery,
+          variables: {
+            authToken
+          }
         },
         result: {
           data: {
@@ -77,7 +83,7 @@ describe('Dashboard', () => {
 
     const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <Dashboard />
-    </MockedProvider>, 0)
+    </MockedProvider>)
 
     expect(getByText('Hi Holo Naut!')).toBeInTheDocument()
 
@@ -151,7 +157,10 @@ describe('Dashboard', () => {
       },
       {
         request: {
-          query: HposSettingsQuery
+          query: HposSettingsQuery,
+          variables: {
+            authToken
+          }
         },
         result: {
           data: {

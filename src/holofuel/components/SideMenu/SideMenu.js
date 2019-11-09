@@ -5,8 +5,14 @@ import Modal from 'components/Modal'
 import Button from 'components/Button'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
-import { presentHolofuelAmount } from 'utils' // presentAgentId
+import { presentHolofuelAmount } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import {
+  INBOX_PATH,
+  OFFER_PATH,
+  REQUEST_PATH,
+  HISTORY_PATH
+} from 'holofuel/utils/urls'
 
 import './SideMenu.module.css'
 
@@ -51,13 +57,13 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to='/offer' styleName='nav-link'>
+            <Link to={OFFER_PATH} styleName='nav-link'>
               <div styleName='nav-icon' />
               Offer
             </Link>
           </li>
           <li>
-            <Link to='/request' styleName='nav-link'>
+            <Link to={REQUEST_PATH} styleName='nav-link'>
               <div styleName='nav-icon' />
               Request
             </Link>

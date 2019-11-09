@@ -55,7 +55,7 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: HposInterface.os.settings,
+    hposSettings: (_, { authToken }) => HposInterface.os.settings(authToken),
 
     hposStatus: HposInterface.os.status
   },
@@ -88,9 +88,9 @@ export const resolvers = {
 
     updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit),
 
-    holofuelRequest: async (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
+    holofuelRequest: (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
 
-    holofuelOffer: async (_, { counterpartyId, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterpartyId, amount, notes, requestId),
+    holofuelOffer: (_, { counterpartyId, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterpartyId, amount, notes, requestId),
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
@@ -98,9 +98,22 @@ export const resolvers = {
 
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
+    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess, authToken),
 
-    hposUpdateVersion: HposInterface.os.updateVersion
+    hposUpdateVersion: (_, { authToken }) => HposInterface.os.updateVersion(authToken),
+
+    hposCheckAuth: async (_, { authToken }) => {
+      try {
+        await HposInterface.os.settings(authToken)
+      } catch (error) {
+        return {
+          isAuthed: false
+        }
+      }
+      return {
+        isAuthed: true
+      }
+    }
   }
 }
 

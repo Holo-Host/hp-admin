@@ -12,6 +12,7 @@
     "hc:stop": "killall holochain",
     "test:lint": "standard",
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
+<<<<<<< HEAD
     "test": "npm run test:lint && npm run test:unit",
     "test:ci": "CI=1 npm run test",
     "test:wait-for-conductor": "node scripts/wait-for-conductor.js",
@@ -19,6 +20,11 @@
     "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",  
     "test:preseed-data": "nix-shell --command 'npm run hc:start && npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data'",
     "test:integration": "nix-shell --run 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'"
+=======
+    "test:integration-with-setup": "nix-shell --run 'node scripts/wait-for-conductor.js && npm run test:integration'",
+    "test:integration": "REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js",
+    "test:ci": "CI=1 npm run test"
+>>>>>>> develop
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.0.1",
@@ -48,6 +54,7 @@
     "react-loader-spinner": "^3.1.4",
     "react-media-hook": "^0.4.4",
     "react-modal": "^3.9.1",
+    "react-router-dom": "^5.1.2",
     "react-test-renderer": "^16.9.0",
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",
@@ -112,8 +119,6 @@
     "postcss-safe-parser": "4.0.1",
     "react-app-polyfill": "^1.0.1",
     "react-dev-utils": "^9.0.1",
-    "react-router": "~5.0.1",
-    "react-router-dom": "~5.0.1",
     "resolve": "1.10.0",
     "sass-loader": "7.1.0",
     "semver": "6.0.0",

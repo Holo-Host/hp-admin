@@ -1,13 +1,43 @@
 import React from 'react'
+import { useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
+import { get } from 'lodash/fp'
 import './Login.module.css'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/Button'
 import Input from 'components/Input'
+import useAuthTokenContext from 'contexts/useAuthTokenContext'
+import useFlashMessageContext from 'contexts/useFlashMessageContext'
+import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
+
+// exported for testing
+export const authToken = 'EGeYSAmjxp1kNBzXAR2kv7m3BNxyREZnVwSfh3FX7Ew'
+
+const mockWebCryptoModule = (email, password) => {
+  if (email === 'a.b@c.com') return 'badauthkey'
+
+  return authToken
+}
 
 export default function Login ({ history: { push } }) {
+  const [checkAuth] = useMutation(HposCheckAuthMutation)
   const { register, handleSubmit, errors } = useForm()
-  const onSubmit = () => push('/')
+  const { setAuthToken, setIsAuthed } = useAuthTokenContext()
+  const { newMessage } = useFlashMessageContext()
+
+  const onSubmit = async ({ email, password }) => {
+    const authToken = mockWebCryptoModule(email, password)
+    setAuthToken(authToken)
+    const authResult = await checkAuth({ variables: { authToken } })
+    const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
+    setIsAuthed(isAuthed)
+
+    if (isAuthed) {
+      push('/')
+    } else {
+      newMessage('Incorrect email or password. Please check and try again.', 5000)
+    }
+  }
 
   return <PrimaryLayout
     headerProps={{
@@ -20,17 +50,19 @@ export default function Login ({ history: { push } }) {
         variant='big'
         type='email'
         name='email'
+        id='email'
         placeholder='Email address'
         ref={register({ required: true })} />
       {errors.email && <small styleName='field-error'>
         You need to provide a valid email address.
       </small>}
 
-      <label styleName='login-label' htmlFor='email'>Password</label>
+      <label styleName='login-label' htmlFor='password'>Password</label>
       <Input
         variant='big'
         type='password'
         name='password'
+        id='password'
         placeholder='Password'
         ref={register({ required: true, minLength: 6 })} />
       {errors.password && <small styleName='field-error'>

@@ -1,9 +1,9 @@
 import React from 'react'
-import { useQuery } from '@apollo/react-hooks'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import { sliceHash as presentHash } from 'utils'
 import './SideMenu.module.css'
 
@@ -12,7 +12,7 @@ export function SideMenu ({
   handleClose,
   avatarUrl = ''
 }) {
-  const { loading, data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const { loading, data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
 
   let loadingDisplay
   if (loading) loadingDisplay = '...Loading'

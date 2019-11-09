@@ -1,6 +1,6 @@
 import React from 'react'
-import { useQuery } from '@apollo/react-hooks'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import Button from 'components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
 export function Header ({ title, avatarUrl, backTo, history: { push }, hamburgerClick = () => push('/dashboard') }) {
-  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
 
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />
