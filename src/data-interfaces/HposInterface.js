@@ -1,7 +1,7 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
 
-const preLocalHposImageIntegration = true // This should be removed, and the value retunred to false, once HPOS Image is nixified and located within repo.
+const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value retunred to false, once HPOS Image is nixified and located within repo.
 const developmentMockHposConnection = true // boolean to toggle hpos mock data reference while in dev context...
 export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? preLocalHposImageIntegration
@@ -18,7 +18,6 @@ const axiosConfig = {
 
 export function hposCall (method = 'get', path, apiVersion = 'v1') {
   if (MOCK_HPOS_CONNECTION) {
-    console.log(' Accessing the HPOS MOCK DATA...')
     return mockCallHpos(method, apiVersion, path)
   } else {
     const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path

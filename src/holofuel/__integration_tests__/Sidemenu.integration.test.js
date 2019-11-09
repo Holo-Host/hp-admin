@@ -15,7 +15,7 @@ const agentNickname = getAgent().nickname
 describe('HOLOFUEL : Sidemenu', () => {
   it('Contains the agent public address', async () => {
     await waait(0)
-    const { getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
+    const { getByTestId } = await renderAndWait(<HoloFuelApp />)
     const menuButton = getByTestId('menu-button')
 
     await act(async () => {
@@ -27,8 +27,7 @@ describe('HOLOFUEL : Sidemenu', () => {
     await wait(() => title)
 
     expect(within(getByTestId('sidemenu-header')).getByText('HoloFuel')).toBeInTheDocument()
-
     // TODO: Determine why the call to whoami isn't completing (we only see loading instead...)
-    await wait(() => getByText(agentNickname))
+    expect(within(getByTestId('sidemenu-agentname')).getByText(agentNickname)).toBeInTheDocument()
   }, 150000)
 })
