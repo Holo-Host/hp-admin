@@ -1,5 +1,5 @@
 import React from 'react'
-import { fireEvent, wait, act } from '@testing-library/react'
+import { fireEvent, within, wait, act } from '@testing-library/react'
 import waait from 'waait'
 import { renderAndWait } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
@@ -110,6 +110,7 @@ describe('HP Admin : HostedEarnings', () => {
     // verify that dashboard reflects the Hosted Earnings (placeholder)
     await wait(() => getByText('My HoloPort'))
     const hostedHapps = await wait(() => getByTestId('hosted-earnings'))
-    expect(hostedHapps).toEqual('You have no HoloFuel')
+    console.log('hostedHapps : ', hostedHapps)
+    expect(within(hostedHapps).getByText('You have no HoloFuel'))
   }), 150000)
 })

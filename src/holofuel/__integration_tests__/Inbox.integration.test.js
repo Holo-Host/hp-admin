@@ -1,4 +1,5 @@
 import React from 'react'
+import waait from 'waait'
 import { fireEvent, within, act, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
@@ -25,7 +26,7 @@ describe('HOLOFUEL : Inbox', () => {
     // pay transaction
     await act(async () => {
       fireEvent.click(getByText('Pay'))
-      await wait(0)
+      await waait(0)
     })
 
     // accept transaction
@@ -33,7 +34,7 @@ describe('HOLOFUEL : Inbox', () => {
     expect(getByText('200')).toBeInTheDocument()
     await act(async () => {
       fireEvent.click(getByText('Accept'))
-      await wait(0)
+      await waait(0)
     })
     // debug()
 
