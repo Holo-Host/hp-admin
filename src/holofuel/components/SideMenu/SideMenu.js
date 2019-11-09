@@ -33,7 +33,7 @@ export function SideMenu ({
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
         </CopyAgentId>
 
-        <span styleName='header-account'>
+        <span styleName='header-account' data-testid='sidemenu-agentname'>
           <CopyAgentId agent={agent} isMe>
             {agent.nickname || agentLoading}
           </CopyAgentId>
