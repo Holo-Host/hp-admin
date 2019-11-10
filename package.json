@@ -16,7 +16,7 @@
     "test:ci": "CI=1 npm run test",
     "test:wait-for-conductor": "node scripts/wait-for-conductor.js",
     "preseed:holofuel": "node scripts/prepareHoloFuelData/index.js",
-    "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",  
+    "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",
     "test:preseed-data": "nix-shell --command 'npm run hc:start && npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data'",
     "test:integration": "nix-shell --run 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'"
   },
