@@ -109,7 +109,6 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
       if (repeatingError) return null
       else if (process.env.REACT_APP_INTEGRATION_TEST) {
-        console.log(error)
         prevErr.push({
           error: error.message,
           path: zomeCallPath
