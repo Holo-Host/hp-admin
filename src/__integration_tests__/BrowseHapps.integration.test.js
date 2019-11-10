@@ -3,6 +3,7 @@ import { fireEvent, within, act, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
+import { login } from './Login.integration.test'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
@@ -55,12 +56,20 @@ describe('HP Admin : BrowseHapps', () => {
   const apps = [happ1, happ2]
 
   it('User navigates to Hosting Page, adds a happ to host, & manages pricing', runConductor(async () => {
-    const { getByTestId, getAllByRole, getByText } = await renderAndWait(<HPAdminApp />) // debug,
+    const queries = await renderAndWait(<HPAdminApp />)
+    const { getByTestId, getAllByRole, getByText } = queries
+
+    // login and arrive at home page
+    await login(queries)
+    // verify home page header
+    // console.log('>>>>>> header TESTING >>>>>> : ', header)
+
     // navigate to hosting page
     fireEvent.click(getByTestId('menu-button'))
     await wait(() => getByTestId('hosting-link'))
     fireEvent.click(getByTestId('hosting-link'))
 
+    // verify new header
     const header = getAllByRole('region')[1]
     await wait(() => within(header).getByText('Hosting'))
 

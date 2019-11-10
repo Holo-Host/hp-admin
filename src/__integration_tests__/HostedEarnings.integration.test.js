@@ -4,6 +4,7 @@ import waait from 'waait'
 import { renderAndWait } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
+import { login } from './Login.integration.test'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
@@ -35,7 +36,12 @@ jest.unmock('react-router-dom')
 
 describe('HP Admin : HostedEarnings', () => {
   it('User navigates to Earnings Page, toggles between 1, 7, & 30 day views', runConductor(async () => {
-    const { getByTestId, getAllByTestId, getByText } = await renderAndWait(<HPAdminApp />)
+    const queries = await renderAndWait(<HPAdminApp />)
+    const { getByTestId, getAllByTestId, getByText } = queries
+
+    // login and arrive at home page
+    await login(queries)
+
     // navigate to earnings page
     await act(async () => {
       fireEvent.click(getByTestId('menu-button'))

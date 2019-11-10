@@ -4,6 +4,7 @@ import { renderAndWaitWithModal } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
 import runHposApi from 'utils/integration-testing/runHposApiWithSetup'
 import HposInterface from 'data-interfaces/HposInterface'
+import { login } from './Login.integration.test'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
@@ -14,7 +15,12 @@ describe('HP Admin : MyProfile', () => {
     const hposSettings = await HposInterface.os.settings()
     const newHostName = 'Host-Name-Test-123'
 
-    const { getByTestId, getByLabelText, getByText, getAllByRole } = await renderAndWaitWithModal(<HPAdminApp />)
+    const queries = await renderAndWaitWithModal(<HPAdminApp />)
+    const { getByTestId, getByLabelText, getByText, getAllByRole } = queries
+
+    // login and arrive at home page
+    await login(queries)
+
     // check starting hostname displayed on home screen
     await wait(() => getByText(hposSettings.hostName))
 
