@@ -15,44 +15,53 @@ export default function runConductorWithFixtures (testFn) {
 
     await wait(5000)
 
-    const manageStorageFiles = () => {
-      console.log('Searching for Data Storage Files...')
-      return fs.access(process.env.REACT_APP_DEFAULT_STORAGE, fs.constants.F_OK, async (e) => {
-        if (e) {
-          console.error('Error locating Default Storage dir')
-          console.log('Defaulting to auto generated Storage dir. \n')
-        } else {
-          rimraf(process.env.REACT_APP_DEFAULT_STORAGE, async (e) => {
-            if (e) {
-              console.error(e)
-              throw new Error('Error deleting residual Default Storage dir: ')
-            } else {
-              fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, async (e) => {
-                if (e) {
-                  if (e.code === 'ENOENT') console.error('Error locating Storage Snapshot dir : ENOENT: no such file or directory')
-                  else console.error('Error locating Storage Snapshot dir : ', e)
-                  console.log('\nDefaulting to auto generated Storage dir. \n')
-                } else {
-                  console.log('Deleted residual Default Storage dir.')
-                  // eslint-disable-next-line no-unused-vars
-                  const { _, stderr } = await exec(`cp -r --remove-destination ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`, { maxBuffer: 1024 * 3000 })
-                  if (stderr) {
-                    console.error(e)
-                    throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
+    const manageStorageFiles = async () => {
+      return new Promise(resolve => {
+        console.log('Searching for Data Storage Files...')
+        let storageDir
+        fs.access(process.env.REACT_APP_DEFAULT_STORAGE, fs.constants.F_OK, async (e) => {
+          if (e) {
+            console.error('Error locating Default Storage dir')
+            console.log('Defaulting to auto generated Storage dir. \n')
+            storageDir = 'Nix Auto-Generated Storage Directory'
+            resolve(storageDir)
+          } else {
+            rimraf(process.env.REACT_APP_DEFAULT_STORAGE, async (e) => {
+              if (e) {
+                console.error(e)
+                throw new Error('Error deleting residual Default Storage dir: ')
+              } else {
+                fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, async (e) => {
+                  if (e) {
+                    if (e.code === 'ENOENT') console.error('Error locating Storage Snapshot dir : ENOENT: no such file or directory')
+                    else console.error('Error locating Storage Snapshot dir : ', e)
+                    console.log('\nDefaulting to a new auto generated Storage dir. \n')
+                    storageDir = 'New Nix Auto-Generated Storage Directory'
+                    resolve(storageDir)
                   } else {
-                    console.log('Copied Snapshot Storage into Default Storage!')
+                    console.log('Deleted residual Default Storage dir.')
+                    // eslint-disable-next-line no-unused-vars
+                    const { _, stderr } = await exec(`cp -r --remove-destination ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`, { maxBuffer: 1024 * 3000 })
+                    if (stderr) {
+                      console.error(e)
+                      throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
+                    } else {
+                      console.log('Copied Snapshot Storage into Default Storage!')
+                      storageDir = 'Snapshot Storage Direcotry'
+                      resolve(storageDir)
+                    }
                   }
-                }
-              })
-            }
-          })
-        }
+                })
+              }
+            })
+          }
+        })
       })
     }
-    manageStorageFiles()
+    await manageStorageFiles()
 
     const hcStart = async () => exec('holochain -c ./conductor-config.toml &> conductor.log &')
-    hcStart()
+    await hcStart()
 
     const waitConductor = async () => {
       // eslint-disable-next-line no-unused-vars
