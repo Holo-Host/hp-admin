@@ -34,11 +34,12 @@ async function waitForConductor (interval = 10000) {
       const result = await axios.post('http://localhost:3300/admin/agent/list', {})
       if (result.status !== 200 && result.data.error) throw new Error(result.data.error.message)
       else if (result.status === 200) isUp = true
+      else return result.status
     } catch (error) {
-      console.log('>>>>>> CALL TO CONDUCTOR DID NOT PASS :: error code : ', error.code)
       if (error.code === 'ECONNREFUSED') {
         await printWaitingFeedback(interval)
       } else {
+        console.log('>>>>>> CALL TO CONDUCTOR DID NOT PASS :: error code : ', error.code)
         await reattemptConnection(error)
       }
     }
