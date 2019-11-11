@@ -10,6 +10,7 @@ import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
+import HashAvatar from 'components/HashAvatar'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { OFFER_PATH, REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
@@ -52,14 +53,19 @@ export default function Home () {
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
+    <div styleName='avatar'>
+      <CopyAgentId agent={holofuelUser} isMe>
+        <HashAvatar seed={holofuelUser.id} size={48} />
+      </CopyAgentId>
+    </div>
     <div styleName='greeting'>{greeting}</div>
     <div styleName='button-row'>
-      <Button onClick={goToOffer}>Send</Button>
-      <Button onClick={goToRequest}>Request</Button>
+      <Button onClick={goToOffer} styleName='send-button'>Send</Button>
+      <Button onClick={goToRequest} styleName='request-button'>Request</Button>
     </div>
 
     <div styleName='balance-and-transactions'>
-      <Link to={HISTORY_PATH}>
+      <Link to={HISTORY_PATH} styleName='balance-link'>
         <div styleName='balance'>
           <div styleName='balance-header'>
             <div styleName='balance-label'>

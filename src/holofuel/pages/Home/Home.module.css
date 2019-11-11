@@ -1,62 +1,109 @@
-.greeting {
+.avatar {
+  text-align: center;  
+  margin-bottom: 5px;
+}
 
+.greeting {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 15px;
 }
 
 .button-row {
   display: flex;
+  margin-bottom: 20px;
+}
+
+.link-button {
+  padding: 10px 30px;
+  font-size: 18px;
+  border-radius: 0;
+}
+
+.send-button {
+  composes: link-button;
+  background-color: lightblue;
+  margin-left: auto;
+}
+
+.request-button {
+  composes: link-button;
+  background-color: lightgray;
+  margin-right: auto;
 }
 
 .balance-and-transactions {
+  border: 1px solid black;
+  border-radius: 4px;
+}
 
+.balance-link {
+  color: black;
+  text-decoration: none;
 }
 
 .balance {
-
+  background-color: lightgray;
+  padding: 20px;
+  border-bottom: 1px solid black;
+  border-radius: 4px;
 }
 
 .balance-header {
   display: flex;
+  align-items: center;
 }
 
 .balance-label {
-
+  margin-left: auto;
+  font-size: 12px;
 }
 
 .balance-arrow {
-
+  margin-left: auto;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .balance-amount {
-
+  text-align: center;
+  font-size: 36px;
+  font-weight: bold;
 }
 
 .transactions {
-
+  padding: 15px;
 }
 
 .transactions-label {
-  
+  font-size: 16px;  
+  margin-bottom: 15px;
 }
 
 .transactions-empty {
-  
+  border: 1px solid black;
+  border-radius: 4px;
+  background-color: lightgray;
+  height: 120px;
+  padding-top: 80px;
+  text-align: center;
+  font-size: 12px;
 }
 
 .transaction-list {
-  margin: 10px -20px 0;
+
 }
 
 /* TransactionRow */
 
 .transaction-row {
-  display: flex;
-  border-bottom: 1px solid black;
-  font-size: 14px;
-  padding: 10px 20px 15px;
+  margin-bottom: 10px;
 }
 
 .counterparty-amount-row {
+  display: flex;
   font-weight: bold;
+  font-size: 14px;
 }
 
 .counterparty {
@@ -64,10 +111,11 @@
 }
 
 .amount {
-
+  margin-left: auto;
 }
 
 .notes {
   font-style: italic;
+  font-size: 14px;
   color: var(--color-gray);
 }
