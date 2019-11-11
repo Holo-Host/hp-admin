@@ -3,6 +3,7 @@ const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const rimraf = require('rimraf')
 const wait = require('waait')
+const ncp = util.promisify(require('ncp').ncp)
 
 export default function runConductorWithFixtures (testFn) {
   return async function () {
@@ -41,15 +42,21 @@ export default function runConductorWithFixtures (testFn) {
                   } else {
                     console.log('Deleted residual Default Storage dir.')
                     // eslint-disable-next-line no-unused-vars
-                    const { _, stderr } = await exec(`cp -r --remove-destination ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`, { maxBuffer: 1024 * 3000 })
-                    if (stderr) {
-                      console.error(e)
-                      throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
-                    } else {
-                      console.log('Copied Snapshot Storage into Default Storage!')
-                      storageDir = 'Snapshot Storage Direcotry'
-                      resolve(storageDir)
-                    }
+                    // const { _, stderr } = await exec(`cp -r --remove-destination ${process.env.REACT_APP_STORAGE_SNAPSHOT} ${process.env.REACT_APP_DEFAULT_STORAGE}`, { maxBuffer: 1024 * 3000 })
+                    // if (stderr) {
+                    //   console.error(e)
+                    //   throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ')
+                    // } else {
+                    //   console.log('Copied Snapshot Storage into Default Storage!')
+                    //   storageDir = 'Snapshot Storage Direcotry'
+                    //   resolve(storageDir)
+                    // }
+                    await exec(`rm -rf ${process.env.REACT_APP_DEFAULT_STORAGE} && mkdir ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+                    await ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT, (e)=>{
+                      console.log('Coping:: ',e);
+                    })
+                    storageDir = 'Snapshot Storage Direcotry'
+                    resolve(storageDir)
                   }
                 })
               }
@@ -60,8 +67,8 @@ export default function runConductorWithFixtures (testFn) {
     }
     await manageStorageFiles()
 
-    const hcStart = async () => exec('holochain -c ./conductor-config.toml &> conductor.log &')
-    await hcStart()
+    const hcStart = () => exec('holochain -c ./conductor-config.toml &> conductor.log &')
+    hcStart()
 
     const waitConductor = async () => {
       // eslint-disable-next-line no-unused-vars
