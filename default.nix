@@ -93,7 +93,7 @@ in
 
     preConfigure = ''
       rm -rf node_modules
-      && npm install --build-from-source
+      npm install --build-from-source
     '';
 
     buildPhase = ''
@@ -137,7 +137,7 @@ in
 
     preConfigure = ''
       rm -rf node_modules
-      && npm install --build-from-source
+      npm install --build-from-source
     '';
 
     buildPhase = ''
