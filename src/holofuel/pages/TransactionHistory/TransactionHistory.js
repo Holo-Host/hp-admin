@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, flatten, capitalize } from 'lodash/fp'
-import './TransactionHistory.module.css'
+import { useLocation } from 'react-router-dom'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
@@ -14,6 +14,7 @@ import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 import { DIRECTION } from 'models/Transaction'
+import './TransactionHistory.module.css'
 
 // Data - Mutation hook with refetch:
 function useCancel () {
@@ -74,15 +75,9 @@ export default function TransactionsHistory () {
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
-  const columnHeadings = [
-    null,
-    null,
-    'Fees',
-    'Amount',
-    null
-  ]
+  const queryFilter = (new URLSearchParams(useLocation().search)).get('filter')
 
-  const [filter, setFilter] = useState(FILTER_TYPES[0])
+  const [filter, setFilter] = useState(queryFilter || FILTER_TYPES[0])
 
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []
@@ -114,6 +109,14 @@ export default function TransactionsHistory () {
   }
 
   const noVisibleTransactions = isEmpty(filteredPendingTransactions) && isEmpty(filteredCompletedTransactions)
+
+  const columnHeadings = [
+    null,
+    null,
+    'Fees',
+    'Amount',
+    null
+  ]
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='balance'>
