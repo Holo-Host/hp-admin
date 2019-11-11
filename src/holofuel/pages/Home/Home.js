@@ -1,21 +1,21 @@
 import React from 'react'
-import cx from 'classnames'
-import { isEmpty, flatten } from 'lodash/fp'
-import { useQuery, useMutation } from '@apollo/react-hooks'
-import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
+import { useQuery } from '@apollo/react-hooks'
+import { useHistory, Link } from 'react-router-dom'
+import { isEmpty, flatten, get } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
-import { TYPE } from 'models/Transaction'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
-import Modal from 'holofuel/components/Modal'
 import './Home.module.css'
-import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { OFFER_PATH, REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
 function useFetchCounterparties () {
   const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
-  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
   const { data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
 
   if (holofuelHistoryCounterparties) {
@@ -33,69 +33,84 @@ function useFetchCounterparties () {
         holofuelCompletedTransactions: newCompletedTxList
       }
     })
-
-    // Cache Write/Update for HolofuelWaitingTransactionsQuery
-    const newWaitingTxList = flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
-    client.writeQuery({
-      query: HolofuelWaitingTransactionsQuery,
-      data: {
-        holofuelWaitingTransactions: newWaitingTxList
-      }
-    })
   }
 }
 
 export default function Home () {
+  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
+  const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
+
   const { data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   useFetchCounterparties()
-
   const isTransactionsEmpty = isEmpty(transactions)
+  const firstSixTransactions = transactions.slice(0, 6)
 
-  const pageTitle = `Home${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
+  const history = useHistory()
+  const goToRequest = () => history.push(REQUEST_PATH)
+  const goToOffer = () => history.push(OFFER_PATH)
 
-  return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
+  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
-    {!isTransactionsEmpty && <div styleName='transaction-list'>
-      {transactions.map(transaction => <TransactionRow
-        transaction={transaction}
-        role='list'
-        key={transaction.id} />)}
-    </div>}
+  return <PrimaryLayout headerProps={{ title: 'Home' }}>
+    <div styleName='greeting'>{greeting}</div>
+    <div styleName='button-row'>
+      <Button onClick={goToOffer}>Send</Button>
+      <Button onClick={goToRequest}>Request</Button>
+    </div>
+
+    <div styleName='balance-and-transactions'>
+      <Link to={HISTORY_PATH}>
+        <div styleName='balance'>
+          <div styleName='balance-header'>
+            <div styleName='balance-label'>
+              Available Balance
+            </div>
+            <div styleName='balance-arrow'>
+              >
+            </div>
+          </div>
+          <div styleName='balance-amount'>
+            {presentHolofuelAmount(holofuelBalance)} HF
+          </div>
+        </div>
+      </Link>
+
+      <div styleName='transactions'>
+        <div styleName='transactions-label'>Recent Transactions</div>
+
+        {isTransactionsEmpty && <div styleName='transactions-empty'>
+          You have no recent transactions
+        </div>}
+
+        {!isTransactionsEmpty && <div styleName='transaction-list'>
+          {firstSixTransactions.map(transaction => <TransactionRow
+            transaction={transaction}
+            key={transaction.id} />)}
+        </div>}
+      </div>
+
+    </div>
   </PrimaryLayout>
 }
 
 export function TransactionRow ({ transaction }) {
-  const { counterparty, amount, type, timestamp, notes } = transaction
+  const { counterparty, amount, notes, direction } = transaction
 
-  const isOffer = type === TYPE.offer
-  const isRequest = !isOffer
-
-  const { date, time } = presentDateAndTime(timestamp)
-
-  const story = isOffer ? ' is offering' : ' is requesting'
+  const presentedAmount = direction === DIRECTION.incoming
+    ? `+ ${presentHolofuelAmount(amount)}`
+    : `- ${presentHolofuelAmount(amount)}`
 
   return <div styleName='transaction-row' role='listitem'>
-    <div styleName='date-time'>
-      <div styleName='date'>
-        {date}
-      </div>
-      <div styleName='time'>
-        {time}
-      </div>
-    </div>
-    <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'>
+    <div styleName='counterparty-amount-row'>
+      <div styleName='counterparty'>
         <CopyAgentId agent={counterparty}>
           {counterparty.nickname || presentAgentId(counterparty.id)}
         </CopyAgentId>
-      </span>{story}</div>
-      <div styleName='notes'>{notes}</div>
+      </div>
+      <div styleName='amount'>
+        {presentedAmount}
+      </div>
     </div>
-    <AmountCell amount={amount} isRequest={isRequest} />
+    <div styleName='notes'>{notes}</div>
   </div>
-}
-
-function AmountCell ({ amount, isRequest }) {
-  const amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
-  return <div styleName={cx('amount', { debit: isRequest })}>{amountDisplay}</div>
 }

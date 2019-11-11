@@ -1,7 +1,7 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
 
-export const MOCK_HPOS_CONNECTION = false || process.env.NODE_ENV === 'test'
+export const MOCK_HPOS_CONNECTION = true || process.env.NODE_ENV === 'test'
 
 const axiosConfig = {
   headers: {
