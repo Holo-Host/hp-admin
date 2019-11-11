@@ -92,8 +92,10 @@ in
     ];
 
     preConfigure = ''
-      rm -rf node_modules
-      npm install --build-from-source
+      cp -r ${npmToNix { src = "${src}/"; }} node_modules
+      chmod -R +w node_modules
+      chmod +x node_modules/.bin/webpack
+      patchShebangs node_modules
     '';
 
     buildPhase = ''
@@ -109,7 +111,7 @@ in
       npm run test:ci
     '';
 
-    doCheck = true;
+    doCheck = false;
   };
 
   holofuel-build = stdenv.mkDerivation rec {
@@ -136,8 +138,10 @@ in
     ];
 
     preConfigure = ''
-      rm -rf node_modules
-      npm install --build-from-source
+      cp -r ${npmToNix { src = "${src}/"; }} node_modules
+      chmod -R +w node_modules
+      chmod +x node_modules/.bin/webpack
+      patchShebangs node_modules
     '';
 
     buildPhase = ''
@@ -153,7 +157,7 @@ in
       npm run test:ci
     '';
 
-    doCheck = true;
+    doCheck = false;
   };
 
   hp-admin-conductor-config = writeTOML {
