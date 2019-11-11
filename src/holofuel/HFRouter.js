@@ -16,7 +16,7 @@ export default function HFRouter () {
 
   return <>
     <Route path={makePath('')} exact render={() => <Redirect to={makePath('/')} />} />
-    <Route path={makePath('/(|inbox)')} exact component={Inbox} />
+    <Route path={makePath('/(|inbox)')} exact component={TransactionHistory} />
     <Route path={makePath('/offer')} exact component={CreateOffer} />
     <Route path={makePath('/request')} exact component={CreateRequest} />
     <Route path={makePath('/history')} component={TransactionHistory} />

@@ -10,8 +10,10 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
+import { DIRECTION } from 'models/Transaction'
 
 // Data - Mutation hook with refetch:
 function useCancel () {
@@ -58,17 +60,21 @@ function useFetchCounterparties () {
   }
 }
 
+const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
+
 // Display - Functional Components with Hooks :
 export default function TransactionsHistory () {
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
   useFetchCounterparties()
+
   const cancelTransaction = useCancel()
+
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
-  // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.
-  const headings = [
+  const columnHeadings = [
     null,
     null,
     'Fees',
@@ -76,23 +82,62 @@ export default function TransactionsHistory () {
     null
   ]
 
+  const [filter, setFilter] = useState(FILTER_TYPES[0])
+
+  let filteredPendingTransactions = []
+  let filteredCompletedTransactions = []
+  let transactionTypeName = ''
+
+  switch (filter) {
+    case 'all':
+      filteredPendingTransactions = pendingTransactions
+      filteredCompletedTransactions = completedTransactions
+      transactionTypeName = 'transactions'
+      break
+    case 'withdrawals':
+      filteredPendingTransactions = []
+      filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.outgoing)
+      transactionTypeName = 'withdrawals'
+      break
+    case 'deposits':
+      filteredPendingTransactions = []
+      filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.incoming)
+      transactionTypeName = 'deposits'
+      break
+    case 'pending':
+      filteredPendingTransactions = pendingTransactions
+      filteredCompletedTransactions = []
+      transactionTypeName = 'pending transactions'
+      break
+    default:
+      throw new Error(`unrecognized filter type: "${filter}"`)
+  }
+
+  const noVisibleTransactions = isEmpty(filteredPendingTransactions) && isEmpty(filteredCompletedTransactions)
+
   return <PrimaryLayout headerProps={{ title: 'History' }}>
+    <div styleName='balance'>
+      <div styleName='balance-label'>Available Balance</div>
+      <div styleName='balance-amount'>{presentHolofuelAmount(balance)} HF</div>
+    </div>
+    <FilterButtons filter={filter} setFilter={setFilter} />
+
+    {noVisibleTransactions && <div styleName='transactions-empty'>
+      You have no {transactionTypeName}.
+    </div>}
+
     <section styleName='account-ledger-table'>
-      <table styleName='completed-transactions-table'>
+      {!noVisibleTransactions && <table styleName='completed-transactions-table'>
         <thead>
           <tr key='heading'>
-            {headings && headings.map((header, contentIndex) => {
-              return (
-                <TransactionTableHeading
-                  key={`heading-${contentIndex}`}
-                  content={header}
-                />
-              )
-            })}
+            {columnHeadings.map((header, contentIndex) => <TransactionTableHeading
+              key={`heading-${contentIndex}`}
+              content={header}
+            />)}
           </tr>
         </thead>
         <tbody>
-          {!isEmpty(pendingTransactions) && pendingTransactions.map(pendingTx => {
+          {!isEmpty(filteredPendingTransactions) && filteredPendingTransactions.map(pendingTx => {
             return <TransactionRow
               transaction={pendingTx}
               key={pendingTx.id}
@@ -100,7 +145,7 @@ export default function TransactionsHistory () {
             />
           })}
 
-          {!isEmpty(completedTransactions) && completedTransactions.map(completeTx => {
+          {!isEmpty(filteredCompletedTransactions) && filteredCompletedTransactions.map(completeTx => {
             return <TransactionRow
               transaction={completeTx}
               key={completeTx.id}
@@ -108,7 +153,7 @@ export default function TransactionsHistory () {
               completed />
           })}
         </tbody>
-      </table>
+      </table>}
     </section>
 
     <ConfirmCancellationModal
@@ -118,7 +163,20 @@ export default function TransactionsHistory () {
   </PrimaryLayout>
 }
 
-const TransactionTableHeading = ({ content }) => {
+function FilterButtons ({ filter, setFilter }) {
+  const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
+
+  return <div styleName='filter-buttons'>
+    {FILTER_TYPES.map(type => <div
+      styleName={cx('filter-button', { selected: type === filter })}
+      onClick={() => setFilter(type)}
+      key={type}>
+      {capitalizeFirstLetter(type)}
+    </div>)}
+  </div>
+}
+
+function TransactionTableHeading ({ content }) {
   return <th id={content ? content.toLowerCase() : null} styleName='completed-tx-col table-headers'>
     {content}
   </th>
