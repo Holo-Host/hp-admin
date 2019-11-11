@@ -9,7 +9,7 @@ import { presentAgentId } from 'utils'
 
 export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard') }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
-    <MenuIcon styleName='menu-icon' color='#FFF' />
+    <MenuIcon styleName='menu-icon' color='#000000' />
   </Button>
 
   if (agentLoading) agentLoading = <h4>Loading...</h4>
@@ -18,7 +18,13 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
     <section styleName='header'>
       <div styleName='left-nav'>
         {leftNav}
-        <span styleName='title header-font'>HoloFuel</span>
+      </div>
+      <div styleName='middle-nav'>
+        <span styleName='title header-font'>
+          {title && <section styleName='page-header'>
+            <div styleName='page-title'>{title}</div>
+          </section>}
+        </span>
       </div>
       <div styleName='right-nav account-number header-font'>
         <CopyAgentId agent={agent} isMe>
@@ -29,9 +35,6 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
         <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} data-testid='hash-icon' />
       </CopyAgentId>
     </section>
-    {title && <section styleName='sub-header'>
-      <div styleName='sub-title'>{title}</div>
-    </section>}
   </header>
 }
 

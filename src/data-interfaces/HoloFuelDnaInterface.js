@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
-import { promiseMap } from 'utils'
+import { promiseMap, presentDateAndTime } from 'utils'
 
 export const currentDataTimeIso = () => new Date().toISOString()
 
@@ -20,6 +20,7 @@ export async function getTxCounterparties (transactionList) {
 }
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
+  const { date } = presentDateAndTime(eventTimestamp)
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -30,12 +31,14 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     status: STATUS.pending,
     type: TYPE.request,
     timestamp: eventTimestamp,
+    dateLabel: date,
     notes: notes || event.Request.notes,
     fees
   }
 }
 
 const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
+  const { date } = presentDateAndTime(eventTimestamp)
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -46,6 +49,7 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     status: STATUS.pending,
     type: TYPE.offer,
     timestamp: eventTimestamp,
+    dateLabel: date,
     notes: notes || event.Promise.tx.notes,
     fees
   }
@@ -69,6 +73,7 @@ const presentAcceptedPayment = async (acceptedPayment) => {
 
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterpartyId = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
+  const { date } = presentDateAndTime(eventTimestamp)
   return {
     id: origin,
     amount: event.Receipt.cheque.invoice.promise.tx.amount,
@@ -79,6 +84,7 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     status: STATUS.completed,
     type: event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
+    dateLabel: date,
     fees,
     presentBalance,
     notes: event.Receipt.cheque.invoice.promise.tx.notes
@@ -88,6 +94,7 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
 // TODO: Review whether we should be showing this in addition to the receipt
 const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterpartyId = stateDirection === DIRECTION.incoming ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
+  const { date } = presentDateAndTime(eventTimestamp)
   return {
     id: origin,
     amount: event.Cheque.invoice.promise.tx.amount,
@@ -98,6 +105,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
     status: STATUS.completed,
     type: event.Cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
+    dateLabel: date,
     fees,
     presentBalance,
     notes: event.Cheque.invoice.promise.tx.notes
@@ -137,8 +145,12 @@ function presentTransaction (transaction) {
       throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     case 'rejected': {
-      // We have decided not to return the reject case into the Ledger
-      break
+      // We have decided to show this **only** in the inbox page via the recent transactions filter
+      console.log(' >>>>>>>> INSIDE THE REJECTED presentTransaction Case <<<<<< EVENT : ', event)
+
+      if (event.Request) return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
+      if (event.Promise) return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
+      throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     // NOTE:
     // The below two cases are 'waitingTransaction' cases.
@@ -223,6 +235,12 @@ const HoloFuelDnaInterface = {
       // NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+    },
+    allRecent: async () => {
+      const { transactions } = await createZomeCall('transactions/list_transactions')()
+      const listOfNonActionableTransactions = transactions.map(presentTransaction)
+      const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
+      return noDuplicateIds.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })

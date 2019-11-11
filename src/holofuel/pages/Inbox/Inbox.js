@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, flatten } from 'lodash/fp'
+import { isEmpty, flatten, groupBy } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
+import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
+// import HolofuelRecentTransactionsQuery from 'graphql/HolofuelRecentTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
@@ -12,6 +15,10 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
+import Jumbotron from 'holofuel/components/Jumbotron'
+import PageDivider from 'holofuel/components/PageDivider'
+import HashAvatar from 'components/HashAvatar'
+import AddIcon from 'components/icons/AddIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 
@@ -37,7 +44,6 @@ function useDecline () {
 
 function useFetchCounterparties () {
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
-
   const { data: { holofuelInboxCounterparties } = {}, client } = useQuery(HolofuelInboxCounterpartiesQuery)
 
   if (holofuelInboxCounterparties) {
@@ -59,25 +65,76 @@ function useFetchCounterparties () {
 }
 
 export default function Inbox () {
-  const { data: { holofuelActionableTransactions: transactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
+  const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+
+  // const { data: { holofuelRecentTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelRecentTransactionsQuery)
+  const { data: { holofuelCompletedTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+
+  const VIEW = {
+    pending: 'pending',
+    recent: 'recent'
+  }
+  const toggleButtons = [{ view: 'pending', label: 'Pending' }, { view: 'recent', label: 'Recent' }]
+  const [inboxView, setInboxView] = useState(VIEW.pending)
+  let displayTransactions = []
+  switch (inboxView) {
+    case VIEW.pending:
+      displayTransactions = actionableTransactions
+      break
+    case VIEW.recent:
+      displayTransactions = recentTransactions
+      break
+    default:
+      displayTransactions = actionableTransactions
+      break
+  }
 
   useFetchCounterparties()
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [modalTransaction, setModalTransaction] = useState()
-  const isTransactionsEmpty = isEmpty(transactions)
+  const isPendingTransactionsEmpty = isEmpty(actionableTransactions)
+  const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
 
-  const pageTitle = `Inbox${isTransactionsEmpty ? '' : ` (${transactions.length})`}`
+  const pageTitle = `Inbox${isPendingTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
 
   const showConfirmationModal = (transaction, action) => {
     const modalTransaction = { ...transaction, action }
     setModalTransaction(modalTransaction)
   }
 
-  return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
+  const transactionsByDate = groupBy('dateLabel', displayTransactions)
+  console.log('transactionsByDate : ', transactionsByDate)
 
-    {!isTransactionsEmpty && <div styleName='transaction-list'>
-      {transactions.map(transaction => <TransactionRow
+  return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={actionableTransactions.length}>
+    <Jumbotron
+      className='inbox-header'
+      title={`${presentHolofuelAmount(holofuelBalance)} HF`}
+      titleSuperscript='Balance'isTransactionsEmpty
+    >
+      <Button
+        styleName='new-transaction-button'
+      >
+        <AddIcon styleName='add-icon' color='#0DC39F' />
+        <h3 styleName='button-text'>New Transaction</h3>
+      </Button>
+
+      <div>
+        {toggleButtons.map(button =>
+          <Button
+            variant={button.view === inboxView ? 'toggle-selected' : 'toggle'}
+            onClick={() => setInboxView(VIEW[button.view])}
+            className={cx(`${button.view}-button`)} /* eslint-disable-line quote-props */
+            key={button.days}>
+            {button.label}
+          </Button>)}
+      </div>
+    </Jumbotron>
+    <PageDivider title='Today' />
+
+    {!isDisplayTransactionsEmpty && <div styleName='transaction-list'>
+      {displayTransactions.map(transaction => <TransactionRow
         transaction={transaction}
         showConfirmationModal={showConfirmationModal}
         role='list'
@@ -93,23 +150,26 @@ export default function Inbox () {
 }
 
 export function TransactionRow ({ transaction, showConfirmationModal }) {
-  const { counterparty, amount, type, timestamp, notes } = transaction
+  const { counterparty, amount, type, notes } = transaction // timestamp
 
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
-  const { date, time } = presentDateAndTime(timestamp)
+  // const { date, time } = presentDateAndTime(timestamp)
 
   const story = isOffer ? ' is offering' : ' is requesting'
 
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='date-time'>
-      <div styleName='date'>
+      {/* <div styleName='date'>
         {date}
       </div>
       <div styleName='time'>
         {time}
-      </div>
+      </div> */}
+      <CopyAgentId agent={counterparty}>
+        <HashAvatar seed={counterparty.id} size={32} data-testid='hash-icon' />
+      </CopyAgentId>
     </div>
     <div styleName='description-cell'>
       <div styleName='story'><span styleName='counterparty'>

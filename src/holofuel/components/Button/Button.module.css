@@ -33,3 +33,31 @@
 .mini {
   padding: 0;
 }
+
+.toggle {
+  border: none;
+  background-color: transparent;
+  margin: 5px;
+  color: rgba(44, 64, 90, 0.5);
+  font-family: 'CircularStd', sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -0.4px;
+  border-radius: 3px;
+}
+
+.toggle-selected {
+  /* composes: toggle; */
+  border: none;
+  background-color: transparent;
+  margin: 5px;
+  color: rgba(44, 64, 90, 0.5);
+  font-family: 'CircularStd', sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -0.4px;
+  border-radius: 3px;
+
+  color: #2C405A;
+  text-decoration: underline 2px solid #0DC39F
+}

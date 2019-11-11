@@ -164,7 +164,7 @@ const DAYS = {
 export default function HostingEarnings () {
   const [days, setDays] = useState(DAYS.one)
 
-  var transactions = []
+  let transactions = []
   switch (days) {
     case DAYS.one:
       transactions = oneDayTransactions
