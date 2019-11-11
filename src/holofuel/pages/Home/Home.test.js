@@ -1,203 +1,172 @@
 import React from 'react'
-import { fireEvent, act, within } from '@testing-library/react'
-import wait from 'waait'
-import moment from 'moment'
-import { ApolloProvider } from '@apollo/react-hooks'
+import { fireEvent, within } from '@testing-library/react'
 import { MockedProvider } from '@apollo/react-testing'
-import apolloClient from 'apolloClient'
-import Inbox, { TransactionRow } from './Inbox'
-import { pendingList } from 'mock-dnas/holofuel'
-import { TYPE } from 'models/Transaction'
+import Home from './Home'
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
-import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
-import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
-import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
+import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import { DIRECTION } from 'models/Transaction'
+import { OFFER_PATH, REQUEST_PATH } from 'holofuel/utils/urls'
 
-import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
-
-const actionableTransactions = pendingList.requests.concat(pendingList.promises).reverse().map(item => {
-  if (item.event[2].Request) {
-    return {
-      type: 'request',
-      ...item.event[2].Request,
-      counterparty: item.event[2].Request.from
-    }
-  } else if (item.event[2].Promise) {
-    return {
-      type: 'offer',
-      ...item.event[2].Promise.tx,
-      counterparty: item.event[2].Promise.tx.from
-    }
-  } else {
-    throw new Error('unrecognized transaction type', item.toString())
-  }
-})
+// this is importing from the mocked version of this module
+import { history } from 'react-router-dom'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
-describe('Inbox Connected (with Agent Nicknames)', () => {
-  it('renders', async () => {
-    const { getAllByRole } = await renderAndWait(<ApolloProvider client={apolloClient}>
-      <Inbox />
-    </ApolloProvider>, 15)
+describe('Home', () => {
+  describe('with no transactions', () => {
+    const nickname = 'Julio'
+    const balance = '1234.56'
 
-    const listItems = getAllByRole('listitem')
-    expect(listItems).toHaveLength(2)
-
-    listItems.forEach(async (item, index) => {
-      const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
-
-      const { getByText } = within(item)
-      const transaction = actionableTransactions[index]
-      expect(getByText(transaction.notes)).toBeInTheDocument()
-      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
-      expect(getByText(amountToMatch)).toBeInTheDocument()
-      expect(getByText(whois.nickname)).toBeInTheDocument()
-    })
-  })
-})
-
-describe('TransactionRow', () => {
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
-  const request = {
-    id: '123',
-    counterparty: { id: 'last 6' },
-    amount: 100,
-    type: TYPE.request,
-    timestamp: moment().subtract(14, 'days'),
-    notes: 'Pay me'
-  }
-
-  const offer = {
-    ...request,
-    type: TYPE.offer
-  }
-
-  it('renders a request', async () => {
-    const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} />
-    </MockedProvider>, 0)
-
-    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
-    expect(getByText('last 6')).toBeInTheDocument()
-    expect(getByText('is requesting')).toBeInTheDocument()
-    expect(getByText(request.notes)).toBeInTheDocument()
-    expect(getByText('Pay')).toBeInTheDocument()
-    expect(getByText('Reject')).toBeInTheDocument()
-  })
-
-  it('renders an offer', async () => {
-    const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} />
-    </MockedProvider>, 0)
-
-    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
-    expect(getByText('last 6')).toBeInTheDocument()
-    expect(getByText('is offering')).toBeInTheDocument()
-    expect(getByText(offer.notes)).toBeInTheDocument()
-    expect(getByText('Accept')).toBeInTheDocument()
-    expect(getByText('Reject')).toBeInTheDocument()
-  })
-
-  const mockTransaction = {
-    ...request,
-    direction: '',
-    status: ''
-  }
-
-  const offerMock = {
-    request: {
-      query: HolofuelOfferMutation,
-      variables: { amount: request.amount, counterpartyId: request.counterparty.id, requestId: request.id }
-    },
-    result: {
-      data: { holofuelOffer: mockTransaction }
-    },
-    newData: jest.fn()
-  }
-
-  const acceptOfferMock = {
-    request: {
-      query: HolofuelAcceptOfferMutation,
-      variables: { transactionId: offer.id }
-    },
-    result: {
-      data: { holofuelAcceptOffer: mockTransaction }
-    },
-    newData: jest.fn()
-  }
-
-  const declineMock = {
-    request: {
-      query: HolofuelDeclineMutation,
-      variables: { transactionId: request.id }
-    },
-    result: {
-      data: { holofuelDecline: mockTransaction }
-    },
-    newData: jest.fn()
-  }
-
-  const mocks = [
-    offerMock,
-    acceptOfferMock,
-    declineMock,
-    {
-      request: {
-        query: HolofuelActionableTransactionsQuery
+    const mocks = [
+      {
+        request: {
+          query: HolofuelUserQuery
+        },
+        result: {
+          data: {
+            holofuelUser: {
+              id: '1',
+              nickname
+            }
+          }
+        }
       },
-      result: {
-        data: {
-          holofuelActionableTransactions: []
+      {
+        request: {
+          query: HolofuelLedgerQuery
+        },
+        result: {
+          data: {
+            holofuelLedger: {
+              balance,
+              credit: 0,
+              payable: 0,
+              receivable: 0,
+              fees: 0
+            }
+          }
         }
       }
-    }
-  ]
+    ]
 
-  describe('Pay and reject buttons', () => {
-    it('respond properly', async () => {
-      const props = {
-        transaction: request,
-        showConfirmationModal: jest.fn()
-      }
+    it('renders', async () => {
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow {...props} />
-      </MockedProvider>, 0)
+        <Home />
+      </MockedProvider>)
 
-      await act(async () => {
-        fireEvent.click(getByText('Pay'))
-        await wait(0)
-      })
+      expect(getByText(`Hi ${nickname}!`)).toBeInTheDocument()
 
-      expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'pay')
+      history.push.mockReset()
+      fireEvent.click(getByText('Send'))
+      expect(history.push).toHaveBeenCalledWith(OFFER_PATH)
 
-      fireEvent.click(getByText('Reject'))
+      history.push.mockReset()
+      fireEvent.click(getByText('Request'))
+      expect(history.push).toHaveBeenCalledWith(REQUEST_PATH)
 
-      expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'decline')
+      expect(getByText(`${presentHolofuelAmount(balance)} HF`)).toBeInTheDocument()
+
+      expect(getByText('You have no recent transactions')).toBeInTheDocument()
     })
   })
 
-  describe('Accept button', () => {
-    it('responds properly', async () => {
-      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} />
-      </MockedProvider>, 0)
+  describe('with a list of transactions', () => {
+    const transactionDefaults = {
+      status: '',
+      type: '',
+      timestamp: '',
+      fees: '',
+      presentBalance: ''
+    }
 
-      await act(async () => {
-        fireEvent.click(getByText('Accept'))
-        await wait(0)
+    const transactions = [{
+      ...transactionDefaults,
+      id: 1,
+      counterparty: {
+        id: '1',
+        nickname: 'Joe'
+      },
+      amount: '212',
+      notes: 'hey chief',
+      direction: DIRECTION.incoming
+    },
+    {
+      ...transactionDefaults,
+      id: 2,
+      counterparty: {
+        id: '2',
+        nickname: 'Sue'
+      },
+      amount: '543.4098',
+      notes: 'monies',
+      direction: DIRECTION.outgoing
+    }]
+
+    const mocks = [
+      {
+        request: {
+          query: HolofuelCompletedTransactionsQuery
+        },
+        result: {
+          data: {
+            holofuelCompletedTransactions: [
+              {
+                ...transactions[0],
+                counterparty: {
+                  id: transactions[0].counterparty.id
+                }
+              },
+              {
+                ...transactions[1],
+                counterparty: {
+                  id: transactions[1].counterparty.id
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        request: {
+          query: HolofuelHistoryCounterpartiesQuery
+        },
+        result: {
+          data: {
+            holofuelHistoryCounterparties: transactions.map(transaction => transaction.counterparty)
+          }
+        }
+      }
+    ]
+
+    it('renders the transactions', async () => {
+      const { getAllByRole, queryByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <Home />
+      </MockedProvider>)
+
+      expect(queryByText('You have no recent transactions')).not.toBeInTheDocument()
+
+      const listItems = getAllByRole('listitem')
+      expect(listItems).toHaveLength(2)
+
+      listItems.forEach((item, index) => {
+        const { getByText } = within(item)
+        const { notes, direction, amount, counterparty } = transactions[index]
+
+        expect(getByText(notes)).toBeInTheDocument()
+
+        const presentedAmount = direction === DIRECTION.incoming
+          ? `+ ${presentHolofuelAmount(amount)}`
+          : `- ${presentHolofuelAmount(amount)}`
+
+        expect(getByText(presentedAmount)).toBeInTheDocument()
+        expect(getByText(counterparty.nickname)).toBeInTheDocument()
       })
-
-      expect(acceptOfferMock.newData).toHaveBeenCalled()
     })
   })
 })
