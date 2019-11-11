@@ -93,17 +93,19 @@ in
     ];
 
     preConfigure = ''
-    rm -rf node_modules
-    && npm install --build-from-source
+      rm -rf node_modules
+      && npm install --build-from-source
     '';
 
     buildPhase = ''
       npm run build
+      cp -r build/ target/hp-admin/
+      npm run build:holofuel
+      cp -r build/ target/holofuel/
     '';
 
     installPhase = ''
-      mkdir $out
-      mv * $out
+      mv target $out
     '';
 
     checkPhase = ''
