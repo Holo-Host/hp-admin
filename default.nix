@@ -68,8 +68,8 @@ in
 
 {
 
-  hp-admin = stdenv.mkDerivation rec {
-    name = "hp-admin";
+  hp-admin-build = stdenv.mkDerivation rec {
+    name = "hp-admin-build";
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
@@ -89,7 +89,6 @@ in
     buildInputs = [
       run-unit-test
       build-hp-admin
-      build-holofuel
     ];
 
     preConfigure = ''
@@ -99,17 +98,59 @@ in
 
     buildPhase = ''
       npm run build
-      cp -r build/ target/hp-admin/
-      npm run build:holofuel
-      cp -r build/ target/holofuel/
+      cp -r build/ hp-admin/
     '';
 
     installPhase = ''
-      mv target $out
+      mv hp-admin $out
     '';
 
     checkPhase = ''
-      npm run test:all
+      npm run test:ci
+    '';
+
+    doCheck = true;
+  };
+
+  holofuel-build = stdenv.mkDerivation rec {
+    name = "holofuel-build";
+    src = gitignoreSource ./.;
+
+    nativeBuildInputs = [
+      holochain-cli
+      holochain-conductor
+      nodejs-12_x
+      pkgconfig
+      cairo
+      giflib
+      libjpeg
+      libpng
+      libuuid
+      pango
+      pixman
+    ];
+
+    buildInputs = [
+      run-unit-test
+      build-holofuel
+    ];
+
+    preConfigure = ''
+      rm -rf node_modules
+      && npm install --build-from-source
+    '';
+
+    buildPhase = ''
+      npm run build:holofuel
+      cp -r build/ holofuel/
+    '';
+
+    installPhase = ''
+      mv holofuel $out
+    '';
+
+    checkPhase = ''
+      npm run test:ci
     '';
 
     doCheck = true;
