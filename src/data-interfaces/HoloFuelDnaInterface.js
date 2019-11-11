@@ -20,21 +20,6 @@ export async function getTxCounterparties (transactionList) {
   return noDuplicatesAgentList
 }
 
-// // PLACEHOLDER for presenting filtered host earnings :
-// const presentHostEarningsTransaction = (presentableTransaction) => {
-//   const { notes } = presentableTransaction
-//
-//   // PLACEHOLDER for FILTERING/SORTING logic to remove these datasets from the returned tx notes.
-//   const { pricePerUnit, unitType, happName } = notes
-//
-//   return {
-//     ...presentableTransaction,
-//     pricePerUnit,
-//     units: unitType, // UNITS Enum : bandwidth, storage, cpu, ram
-//     happName // String; (ie: 'Holo/chain Community')
-//   }
-// }
-
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
   return {
     id: origin,
@@ -223,21 +208,9 @@ const HoloFuelDnaInterface = {
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
     allReceivedHostEarnings: async () => {
-      // BELOW IS A PLACEHOLDER for filtering through & returning all host earnings :
-      // ********************************************************************************
-      // const allCompletedTransactions = await HoloFuelDnaInterface.transactions.allCompleted()
-      // const hostingEarnings = allWaitingTransactions.map('**** REGEX FILTER FOR EARNINGS****')
-      // return hostingEarnings.map(presentHostEarningsTransaction)
-
       return 'TODO: STILL NEED TO FILTER THROUGH COMPLETED TX FOR RECEIVED EARNINGS!!!'
     },
     allInvoicedHostEarnings: async () => {
-      // BELOW IS A PLACEHOLDER for filtering through & returning all host earnings :
-      // ********************************************************************************
-      // const allWaitingTransactions = await HoloFuelDnaInterface.transactions.allWaiting()
-      // const hostingEarnings = allWaitingTransactions.map('**** REGEX FILTER FOR EARNINGS****')
-      // return hostingEarnings.map(presentHostEarningsTransaction)
-
       return 'TODO: STILL NEED TO FILTER THROUGH WAITING TX FOR INVOICED EARNINGS!!!'
     },
     getPending: async (transactionId) => {
