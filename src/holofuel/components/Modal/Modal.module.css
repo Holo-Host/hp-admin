@@ -5,9 +5,12 @@
   background-color: #fff;
   border: 1px solid #000;
   border-radius: 1px;
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, .5);
+  /* box-shadow: 4px 4px 8px rgba(0, 0, 0, .5); */
   padding: 50px;
   position: relative;
+
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(27.1828px);
 }
 
 /* TODO: Handle focus properly */

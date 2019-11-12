@@ -175,8 +175,6 @@ export default function Inbox () {
 export function TransactionRow ({ transaction, actionsClick, actionsVisible, showConfirmationModal, inboxView, whoami }) {
   const { counterparty, presentBalance, amount, type, notes } = transaction // timestamp
 
-  console.log('actionsVisible inside TransactionRow : ', actionsVisible)
-
   let agent
   if (counterparty.id === whoami.id) agent = whoami
   else agent = counterparty
@@ -215,7 +213,7 @@ export function TransactionRow ({ transaction, actionsClick, actionsVisible, sho
     </div>
 
     {inboxView === VIEW.pending && <RevealActionsButton actionsClick={actionsClick} />}
-    {inboxView === VIEW.pending && actionsVisible && <ActionOptions
+    {inboxView === VIEW.pending && <ActionOptions
       isOpen={actionsVisible}
       isOffer={isOffer}
       isRequest={isRequest}
@@ -312,7 +310,6 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
 
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   if (!transaction) return null
-  console.log('transaction in ConfirmationModal : ', transaction)
   const { id, counterparty, amount, type, action } = transaction
 
   let message, actionHook, actionParams, contentLabel

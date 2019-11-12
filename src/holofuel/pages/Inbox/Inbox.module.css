@@ -33,14 +33,16 @@
 .button-divide {
   border: 1px solid rgba(44, 64, 90, 0.5);
   transform: rotate(90deg);
-  width: 55px;
+  width: 45px;
   position: relative;
   top: 19px;
+  margin: -3px;
 }
 
 .button-link {
   flex: 1;
   text-decoration: none;
+  margin: -3px;
 }
 
 .green-classic-btn {
@@ -74,6 +76,7 @@
   padding: 10px 20px 15px;
   background-color: #FFFFFF;
   justify-content: space-between;
+  /* width: 80px; */
   transition: transform 1s ease-in-out;
 }
 
@@ -251,7 +254,7 @@
   flex-flow: row nowrap;
   margin: 0 auto;
   width: 300px;
-  height: auto;
+  height: 50px;
   color: #FFFFFF;
   justify-content: space-evenly;
   align-self: flex-start;
