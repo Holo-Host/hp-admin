@@ -1,28 +1,4 @@
-.transaction-list {
-  margin: 0px -20px;
-}
-
-.transaction-row {
-  display: flex;
-  border-bottom: 1px solid rgba(44, 64, 90, 0.1);
-  font-size: 14px;
-  padding: 10px 20px 15px;
-  background-color: #FFFFFF;
-}
-
-.avatar {
-  width: 50px;
-  margin: 0px 10px;
-  font-size: 12px;
-}
-
-.date {
-  margin-bottom: 5px;
-}
-
-.time {
-/*  */
-}
+/* Buttons & Icons */
 
 .add-icon {
   display: inline-flex;
@@ -39,9 +15,71 @@
   margin: 0px;
 }
 
+.button {
+  flex: 1;
+  flex-basis: content;
+  font-weight: normal;
+  padding: 10px 5px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.selected {
+  color: #2C405A;
+  text-decoration: underline 2px solid #0DC39F
+}
+
+.new-transaction-button {
+  color: white;
+  background-color: #0DC39F;
+  font-size: 13px;
+  line-height: 15px;
+  width: 175px;
+  padding: 8px;
+  margin: 12px 0px;
+  margin-left: auto;
+  border-radius: 100px;
+  box-shadow: 0px 2.5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Transaction Row */
+
+.transaction-list {
+  margin: 0px;
+}
+
+.transaction-row {
+  display: flex;
+  border-bottom: 1px solid rgba(44, 64, 90, 0.1);
+  font-size: 14px;
+  padding: 10px 20px 15px;
+  background-color: #FFFFFF;
+  justify-content: space-between;
+}
+
+/* Avatar and Description Cells */
+
+.avatar {
+  width: 50px;
+  flex: .75;
+  margin: 0px 10px;
+  font-size: 12px;
+  align-self: center;
+}
+
 .description-cell {
   display: flex;
+  flex: 3;
   flex-direction: column;
+}
+
+.counterparty {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 19px;
+  margin-bottom: 1px !important;
+  color: rgba(44, 64, 90, 0.8);
 }
 
 .story {
@@ -53,14 +91,6 @@
   text-transform: lowercase;
 }
 
-.counterparty {
-  font-weight: bold;
-  font-size: 14px;
-  line-height: 19px;
-  margin-bottom: 1px !important;
-  color: rgba(44, 64, 90, 0.8);
-}
-
 .notes {
   font-style: italic;
   color: var(--color-gray);
@@ -70,27 +100,11 @@
   text-transform: uppercase;
 }
 
-.actions {
-  display: flex;
-  flex-direction: column;
-}
-
-.button {
-  font-weight: normal;
-  border: 1px solid black;
-  padding: 5px;
-  width: 75px;
-  margin-bottom: 10px;
-}
-
-.selected {
-  color: #2C405A;
-  text-decoration: underline 2px solid #0DC39F
-}
-
 /* AmountCell */
 
 .amount {
+  flex: 1.5;
+  text-align: right;
   margin-left: auto;
   margin-right: 10px;
   font-size: 14px;
@@ -105,17 +119,14 @@
   color: #EE4266;
 }
 
-.drawer {
-  position: fixed;
-  top: 0;
-  left: -280px;
-  bottom: 0;
-  z-index: 98;
-}
 
-.drawer--open .wrapper {
-  transform: translateX(100%);
-  pointer-events: initial;
+/* ActionsCell */
+
+.reveal-actions-button  {
+  flex: 0;
+  border: none;
+  padding: 5px;
+  background-color: #FFFFFF;
 }
 
 .forward-icon {
@@ -124,10 +135,22 @@
   background-color: transparent;
 }
 
-.reveal-actions-button  {
-  border: none;
-  padding: 5px;
-  background-color: #FFFFFF;
+.actions {
+  display: flex;
+  flex-direction: row nowrap;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  bottom: 0;
+  z-index: 98;
+}
+
+.drawer--open .actions {
+  transform: translateX(100%);
+  pointer-events: initial;
 }
 
 .accept-button {
@@ -149,18 +172,7 @@
   font-weight: normal;
 }
 
-.new-transaction-button {
-  color: white;
-  background-color: #0DC39F;
-  font-size: 13px;
-  line-height: 15px;
-  width: 175px;
-  padding: 8px;
-  margin: 12px 0px;
-  margin-left: auto;
-  border-radius: 100px;
-  box-shadow: 0px 2.5px 10px rgba(0, 0, 0, 0.1);
-}
+/* Modal */
 
 .modal {
   display: flex;

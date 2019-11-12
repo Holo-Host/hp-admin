@@ -22,6 +22,8 @@ import AddIcon from 'components/icons/AddIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { Link } from 'react-router-dom'
+import { REQUEST_PATH } from 'holofuel/utils/urls'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -77,7 +79,12 @@ export default function Inbox () {
   const [modalTransaction, setModalTransaction] = useState()
 
   const [actionsVisible, setActionsVisible] = useState(false)
-  const actionsClick = () => setActionsVisible(!actionsVisible)
+  const actionsClick = () => {
+    console.log('YOU CLICKED THE REVEAL ACTIONS...')
+    console.log('actionsVisible BEFORE update : ', actionsVisible)
+    setActionsVisible(!actionsVisible)
+  }
+  console.log('actionsVisible AFTER update : ', actionsVisible)
 
   const VIEW = {
     pending: 'pending',
@@ -108,6 +115,7 @@ export default function Inbox () {
   }
 
   //* ********* */
+  // SORT THE TRANSACTIONS BY DATE
   const transactionsByDate = groupBy('dateLabel', displayTransactions)
   console.log('transactionsByDate : ', transactionsByDate)
   //* ********* */
@@ -118,12 +126,12 @@ export default function Inbox () {
       title={`${presentHolofuelAmount(holofuelBalance)} HF`}
       titleSuperscript='Balance'isTransactionsEmpty
     >
-      <Button
-        styleName='new-transaction-button'
-      >
-        <AddIcon styleName='add-icon' color='#0DC39F' />
-        <h3 styleName='button-text'>New Transaction</h3>
-      </Button>
+      <Link to={REQUEST_PATH}>
+        <Button styleName='new-transaction-button'>
+          <AddIcon styleName='add-icon' color='#0DC39F' />
+          <h3 styleName='button-text'>New Transaction</h3>
+        </Button>
+      </Link>
 
       <div>
         {toggleButtons.map(button =>
@@ -158,8 +166,10 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsVisible, showConfirmationModal, inboxView, actionsClick, whoami }) {
+export function TransactionRow ({ transaction, actionsClick, actionsVisible, showConfirmationModal, inboxView, whoami }) {
   const { counterparty, amount, type, notes } = transaction // timestamp
+
+  console.log('actionsVisible inside TransactionRow : ', actionsVisible)
 
   let agent
   if (counterparty.id === whoami.id) agent = whoami
@@ -180,13 +190,11 @@ export function TransactionRow ({ transaction, actionsVisible, showConfirmationM
     </div>
 
     <div styleName='description-cell'>
-      <div>
-        <span styleName='counterparty'>
-          <CopyAgentId agent={agent}>
-            {agent.nickname || presentAgentId(agent.id)}
-          </CopyAgentId>
-        </span>
-        <p styleName='story'>{story}</p>
+      <div><span styleName='counterparty'>
+        <CopyAgentId agent={agent}>
+          {agent.nickname || presentAgentId(agent.id)}
+        </CopyAgentId>
+      </span><p styleName='story'>{story}</p>
       </div>
       <div styleName='notes'>{notes}</div>
     </div>
@@ -199,7 +207,7 @@ export function TransactionRow ({ transaction, actionsVisible, showConfirmationM
 
     <RevealActionsButton actionsClick={actionsClick} />
     {actionsVisible && <ActionOptions
-      isOpen={!!actionsVisible}
+      isOpen={actionsVisible}
       isOffer={isOffer}
       isRequest={isRequest}
       transaction={transaction}
@@ -217,7 +225,7 @@ function RevealActionsButton ({ actionsClick }) {
 
 function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, isOpen }) {
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
-    <div styleName='actions wrapper'>
+    <div styleName='actions'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
