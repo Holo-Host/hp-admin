@@ -8,6 +8,7 @@ import HashAvatar from 'components/HashAvatar'
 import { presentHolofuelAmount } from 'utils' // presentAgentId
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import {
+  HOME_PATH,
   INBOX_PATH,
   OFFER_PATH,
   REQUEST_PATH,
@@ -49,6 +50,12 @@ export function SideMenu ({
 
       <nav styleName='nav'>
         <ul styleName='nav-list'>
+          <li>
+            <Link to={HOME_PATH} styleName='nav-link'>
+              <div styleName='nav-icon' />
+              Home
+            </Link>
+          </li>
           <li>
             <Link to={INBOX_PATH} styleName='nav-link'>
               <div styleName='nav-icon' />
