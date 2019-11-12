@@ -27,20 +27,38 @@
 
 .selected {
   color: #2C405A;
-  text-decoration: underline 2px solid #0DC39F
+  text-decoration: underline 2px solid #0DC39F;
 }
 
-.new-transaction-button {
+.button-divide {
+  border: 1px solid rgba(44, 64, 90, 0.5);
+  transform: rotate(90deg);
+  width: 55px;
+  position: relative;
+  top: 19px;
+}
+
+.button-link {
+  flex: 1;
+  text-decoration: none;
+}
+
+.green-classic-btn {
   color: white;
   background-color: #0DC39F;
-  font-size: 13px;
-  line-height: 15px;
-  width: 175px;
   padding: 8px;
   margin: 12px 0px;
   margin-left: auto;
   border-radius: 100px;
   box-shadow: 0px 2.5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.new-transaction-button {
+  composes: green-classic-btn;
+  font-size: 13px;
+  line-height: 15px;
+  width: 175px;
+  padding: 8px;
 }
 
 /* Transaction Row */
@@ -56,6 +74,7 @@
   padding: 10px 20px 15px;
   background-color: #FFFFFF;
   justify-content: space-between;
+  transition: transform 1s ease-in-out;
 }
 
 /* Avatar and Description Cells */
@@ -102,13 +121,30 @@
 
 /* AmountCell */
 
+.amount-cell {
+  display: flex;
+  flex: 1.8;
+  flex-direction: column;
+}
+
 .amount {
-  flex: 1.5;
+  flex: 1;
   text-align: right;
   margin-left: auto;
   margin-right: 10px;
   font-size: 14px;
   line-height: 19px;
+}
+
+.balance {
+  text-align: right;
+  margin-left: auto;
+  margin-right: 10px;
+  color: var(--color-gray);
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
 }
 
 .credit {
@@ -133,6 +169,12 @@
   width: 22px;
   height: 22px;
   background-color: transparent;
+  opacity: 0.5;
+  transition: opacity 300ms ease-out;
+}
+
+.forward-icon:hover {
+  opacity: 1;
 }
 
 .actions {
@@ -181,7 +223,11 @@
 }
 
 .modal-title {
-  margin-bottom: 10px;
+  margin-bottom: 30px;
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+  color: rgba(44, 64, 90, 0.6);
 }
 
 .modal-text {
@@ -198,15 +244,36 @@
 }
 
 .modal-buttons {
+  composes: green-classic-btn;
   margin-top: auto;
   margin-left: auto;
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 0 auto;
+  width: 300px;
+  height: auto;
+  color: #FFFFFF;
+  justify-content: space-evenly;
+  align-self: flex-start;
 }
 
 .modal-button {
+  flex: 1;
+  color: #FFFFFF;
+  font-size: 20px;
+  line-height: 19px;
+  padding: 11px 8px;
+  text-decoration: none;
   border: none;
-  text-decoration: underline;
-  color: #0000EE;
   font-weight: normal;
+}
+
+.modal-offer-link {
+  composes: modal-button;
+}
+
+.modal-request-link {
+  composes: modal-button;
 }
 
 .modal-button-no {
@@ -217,3 +284,7 @@
   composes: modal-button;
   font-weight: bold;
 }
+
+/* .ReactModal__Overlay .ReactModal__Overlay--after-open {
+  background-color: rgba(44, 64, 90, 0.3);
+} */

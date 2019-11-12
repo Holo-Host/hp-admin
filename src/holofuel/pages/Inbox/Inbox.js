@@ -23,7 +23,7 @@ import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { Link } from 'react-router-dom'
-import { REQUEST_PATH } from 'holofuel/utils/urls'
+import { REQUEST_PATH, OFFER_PATH } from 'holofuel/utils/urls'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -67,6 +67,11 @@ function useFetchCounterparties () {
   }
 }
 
+const VIEW = {
+  pending: 'pending',
+  recent: 'recent'
+}
+
 export default function Inbox () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
@@ -76,7 +81,14 @@ export default function Inbox () {
   useFetchCounterparties()
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
-  const [modalTransaction, setModalTransaction] = useState()
+  const [toggleModal, setToggleModal] = useState(null)
+  const [modalTransaction, setModalTransaction] = useState(null)
+
+  const showConfirmationModal = (transaction = {}, action = '') => {
+    const modalTransaction = { ...transaction, action }
+    if (!isEmpty(transaction) && action !== '') return setModalTransaction(modalTransaction)
+    else return setToggleModal(true)
+  }
 
   const [actionsVisible, setActionsVisible] = useState(false)
   const actionsClick = () => {
@@ -86,10 +98,6 @@ export default function Inbox () {
   }
   console.log('actionsVisible AFTER update : ', actionsVisible)
 
-  const VIEW = {
-    pending: 'pending',
-    recent: 'recent'
-  }
   const toggleButtons = [{ view: 'pending', label: 'Pending' }, { view: 'recent', label: 'Recent' }]
   const [inboxView, setInboxView] = useState(VIEW.pending)
   let displayTransactions = []
@@ -109,11 +117,6 @@ export default function Inbox () {
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const pageTitle = `Inbox${isPendingTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
 
-  const showConfirmationModal = (transaction, action) => {
-    const modalTransaction = { ...transaction, action }
-    setModalTransaction(modalTransaction)
-  }
-
   //* ********* */
   // SORT THE TRANSACTIONS BY DATE
   const transactionsByDate = groupBy('dateLabel', displayTransactions)
@@ -126,12 +129,10 @@ export default function Inbox () {
       title={`${presentHolofuelAmount(holofuelBalance)} HF`}
       titleSuperscript='Balance'isTransactionsEmpty
     >
-      <Link to={REQUEST_PATH}>
-        <Button styleName='new-transaction-button'>
-          <AddIcon styleName='add-icon' color='#0DC39F' />
-          <h3 styleName='button-text'>New Transaction</h3>
-        </Button>
-      </Link>
+      <Button styleName='new-transaction-button' onClick={() => showConfirmationModal()}>
+        <AddIcon styleName='add-icon' color='#0DC39F' />
+        <h3 styleName='button-text'>New Transaction</h3>
+      </Button>
 
       <div>
         {toggleButtons.map(button =>
@@ -159,6 +160,10 @@ export default function Inbox () {
         key={transaction.id} />)}
     </div>}
 
+    <NewTransactionModal
+      handleClose={() => setToggleModal(null)}
+      toggleModal={toggleModal} />
+
     <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
@@ -167,8 +172,8 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClick, actionsVisible, showConfirmationModal, inboxView, whoami, view }) {
-  const { counterparty, amount, type, notes } = transaction // timestamp
+export function TransactionRow ({ transaction, actionsClick, actionsVisible, showConfirmationModal, inboxView, whoami }) {
+  const { counterparty, presentBalance, amount, type, notes } = transaction // timestamp
 
   console.log('actionsVisible inside TransactionRow : ', actionsVisible)
 
@@ -180,8 +185,7 @@ export function TransactionRow ({ transaction, actionsClick, actionsVisible, sho
   const isRequest = !isOffer
 
   let story
-  if (inboxView === view.pending) story = isOffer ? ' is offering' : ' is requesting'
-  else story = isOffer ? 'offered' : 'requested'
+  if (inboxView === VIEW.pending) story = isOffer ? ' is offering' : ' is requesting'
 
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='avatar'>
@@ -200,14 +204,18 @@ export function TransactionRow ({ transaction, actionsClick, actionsVisible, sho
       <div styleName='notes'>{notes}</div>
     </div>
 
-    <AmountCell
-      amount={amount}
-      isRequest={isRequest}
-      isOffer={isOffer}
-    />
+    <div styleName='amount-cell'>
+      <AmountCell
+        amount={amount}
+        isRequest={isRequest}
+        isOffer={isOffer}
+        inboxView={inboxView}
+      />
+      {inboxView === VIEW.recent && <div styleName='balance'>{presentBalance}</div>}
+    </div>
 
-    <RevealActionsButton actionsClick={actionsClick} />
-    {actionsVisible && <ActionOptions
+    {inboxView === VIEW.pending && <RevealActionsButton actionsClick={actionsClick} />}
+    {inboxView === VIEW.pending && actionsVisible && <ActionOptions
       isOpen={actionsVisible}
       isOffer={isOffer}
       isRequest={isRequest}
@@ -234,9 +242,11 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer }) {
+function AmountCell ({ amount, isRequest, isOffer, inboxView }) {
   const amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
-  return <div styleName={cx('amount', { debit: isRequest }, { credit: isOffer })}>{amountDisplay} HF</div>
+  return <div styleName={cx('amount', { debit: isRequest && inboxView === VIEW.pending }, { credit: isOffer && inboxView === VIEW.pending })}>
+    {amountDisplay} HF
+  </div>
 }
 
 // these are pulled out into custom hooks ready for if we need to move them to their own file for re-use elsewhere
@@ -277,8 +287,32 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
+function NewTransactionModal ({ handleClose, toggleModal }) {
+  return <Modal
+    contentLabel={'Create a new transaction.'}
+    isOpen={!!toggleModal}
+    handleClose={handleClose}
+    styleName='modal'>
+    <div styleName='modal-title'>Create a new transaction.</div>
+    <Button styleName='modal-buttons' onClick={handleClose}>
+      <Link to={REQUEST_PATH} styleName='button-link'>
+        <div styleName='modal-offer-link'>
+          Send
+        </div>
+      </Link>
+      <div styleName='button-divide' />
+      <Link to={OFFER_PATH} styleName='button-link'>
+        <div styleName='modal-request-link'>
+          Request
+        </div>
+      </Link>
+    </Button>
+  </Modal>
+}
+
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   if (!transaction) return null
+  console.log('transaction in ConfirmationModal : ', transaction)
   const { id, counterparty, amount, type, action } = transaction
 
   let message, actionHook, actionParams, contentLabel
