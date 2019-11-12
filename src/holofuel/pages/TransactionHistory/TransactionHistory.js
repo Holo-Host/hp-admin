@@ -12,8 +12,8 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
-import { DIRECTION } from 'models/Transaction'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
 
@@ -65,8 +65,8 @@ function useFetchCounterparties () {
 // returns an array of objects of the form { label, transactions }, sorted chronologicaly
 function partitionByDate (transactions) {
   const now = moment()
-  const today = now.clone().startOf('day');
-  const yesterday = now.clone().subtract(1, 'days').startOf('day');
+  const today = now.clone().startOf('day')
+  const yesterday = now.clone().subtract(1, 'days').startOf('day')
 
   const isToday = momentDate => momentDate.isSame(today, 'd')
   const isYesterday = momentDate => momentDate.isSame(yesterday, 'd')
@@ -144,8 +144,7 @@ export default function TransactionsHistory () {
 
   const partitionedTransactions = ([{
     label: 'Pending',
-    transactions: filteredPendingTransactions,
-    pending: true
+    transactions: filteredPendingTransactions
   }].concat(partitionByDate(filteredCompletedTransactions)))
     .filter(({ transactions }) => !isEmpty(transactions))
 
@@ -161,13 +160,12 @@ export default function TransactionsHistory () {
     </div>}
 
     {!noVisibleTransactions && <div styleName='transactions'>
-      {partitionedTransactions.map(({ label, transactions, pending }) => <React.Fragment key={label}>
+      {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
         <div styleName='partition-label'>{label}</div>
         {transactions.map((transaction, index) => <TransactionRow
           transaction={transaction}
           key={transaction.id}
           showCancellationModal={showCancellationModal}
-          pending={pending}
           isFirst={index === 0} />)}
       </React.Fragment>)}
     </div>}
@@ -182,7 +180,7 @@ export default function TransactionsHistory () {
 function FilterButtons ({ filter, setFilter }) {
   const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 
-  return <div styleName='filter-buttons'>
+  return <div styleName='filter-buttons' data-testid='filter-buttons'>
     {FILTER_TYPES.map(type => <div
       styleName={cx('filter-button', { selected: type === filter })}
       onClick={() => setFilter(type)}
@@ -192,14 +190,15 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, pending, isFirst }) {
-  const { amount, counterparty, direction, presentBalance, notes } = transaction
+export function TransactionRow ({ transaction, showCancellationModal, isFirst }) {
+  const { amount, counterparty, direction, presentBalance, notes, status } = transaction
+  const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
     ? `+ ${presentHolofuelAmount(amount)}`
     : `- ${presentHolofuelAmount(amount)}`
 
-  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })}>
+  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
         <HashAvatar seed={counterparty.id} size={32} />
@@ -220,7 +219,7 @@ export function TransactionRow ({ transaction, showCancellationModal, pending, i
         {presentedAmount}
       </div>
       {presentBalance && <div styleName='transaction-balance'>
-        {presentBalance}
+        {presentHolofuelAmount(presentBalance)}
       </div>}
     </div>
     {pending && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
@@ -230,7 +229,8 @@ export function TransactionRow ({ transaction, showCancellationModal, pending, i
 function CancelButton ({ showCancellationModal, transaction }) {
   return <div
     onClick={() => showCancellationModal(transaction)}
-    styleName='cancel-button'>
+    styleName='cancel-button'
+    data-testid='cancel-button'>
     -
   </div>
 }
