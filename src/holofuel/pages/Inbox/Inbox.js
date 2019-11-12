@@ -3,10 +3,10 @@ import cx from 'classnames'
 import { isEmpty, flatten, groupBy } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-// import HolofuelRecentTransactionsQuery from 'graphql/HolofuelRecentTransactionsQuery.gql'
+import HolofuelRecentTransactionsQuery from 'graphql/HolofuelRecentTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
@@ -19,8 +19,9 @@ import Jumbotron from 'holofuel/components/Jumbotron'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
 import AddIcon from 'components/icons/AddIcon'
+import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -65,11 +66,18 @@ function useFetchCounterparties () {
 }
 
 export default function Inbox () {
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+  const { data: { holofuelRecentTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelRecentTransactionsQuery)
 
-  // const { data: { holofuelRecentTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelRecentTransactionsQuery)
-  const { data: { holofuelCompletedTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  useFetchCounterparties()
+  const payTransaction = useOffer()
+  const declineTransaction = useDecline()
+  const [modalTransaction, setModalTransaction] = useState()
+
+  const [actionsVisible, setActionsVisible] = useState(false)
+  const actionsClick = () => setActionsVisible(!actionsVisible)
 
   const VIEW = {
     pending: 'pending',
@@ -90,13 +98,8 @@ export default function Inbox () {
       break
   }
 
-  useFetchCounterparties()
-  const payTransaction = useOffer()
-  const declineTransaction = useDecline()
-  const [modalTransaction, setModalTransaction] = useState()
   const isPendingTransactionsEmpty = isEmpty(actionableTransactions)
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
-
   const pageTitle = `Inbox${isPendingTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
 
   const showConfirmationModal = (transaction, action) => {
@@ -104,8 +107,10 @@ export default function Inbox () {
     setModalTransaction(modalTransaction)
   }
 
+  //* ********* */
   const transactionsByDate = groupBy('dateLabel', displayTransactions)
   console.log('transactionsByDate : ', transactionsByDate)
+  //* ********* */
 
   return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={actionableTransactions.length}>
     <Jumbotron
@@ -136,8 +141,12 @@ export default function Inbox () {
     {!isDisplayTransactionsEmpty && <div styleName='transaction-list'>
       {displayTransactions.map(transaction => <TransactionRow
         transaction={transaction}
-        showConfirmationModal={showConfirmationModal}
+        actionsVisible={actionsVisible}
+        actionsClick={actionsClick}
         role='list'
+        whoami={whoami}
+        inboxView={inboxView}
+        showConfirmationModal={showConfirmationModal}
         key={transaction.id} />)}
     </div>}
 
@@ -149,49 +158,76 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, showConfirmationModal }) {
+export function TransactionRow ({ transaction, actionsVisible, showConfirmationModal, inboxView, actionsClick, whoami }) {
   const { counterparty, amount, type, notes } = transaction // timestamp
+
+  let agent
+  if (counterparty.id === whoami.id) agent = whoami
+  else agent = counterparty
 
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
-  // const { date, time } = presentDateAndTime(timestamp)
-
-  const story = isOffer ? ' is offering' : ' is requesting'
+  let story
+  if (inboxView) story = isOffer ? ' is offering' : ' is requesting'
+  else story = isOffer ? 'offered' : 'requested'
 
   return <div styleName='transaction-row' role='listitem'>
-    <div styleName='date-time'>
-      {/* <div styleName='date'>
-        {date}
-      </div>
-      <div styleName='time'>
-        {time}
-      </div> */}
-      <CopyAgentId agent={counterparty}>
-        <HashAvatar seed={counterparty.id} size={32} data-testid='hash-icon' />
+    <div styleName='avatar'>
+      <CopyAgentId agent={agent}>
+        <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
       </CopyAgentId>
     </div>
+
     <div styleName='description-cell'>
-      <div styleName='story'><span styleName='counterparty'>
-        <CopyAgentId agent={counterparty}>
-          {counterparty.nickname || presentAgentId(counterparty.id)}
-        </CopyAgentId>
-      </span>{story}</div>
+      <div>
+        <span styleName='counterparty'>
+          <CopyAgentId agent={agent}>
+            {agent.nickname || presentAgentId(agent.id)}
+          </CopyAgentId>
+        </span>
+        <p styleName='story'>{story}</p>
+      </div>
       <div styleName='notes'>{notes}</div>
     </div>
-    <AmountCell amount={amount} isRequest={isRequest} />
 
-    <div styleName='actions'>
+    <AmountCell
+      amount={amount}
+      isRequest={isRequest}
+      isOffer={isOffer}
+    />
+
+    <RevealActionsButton actionsClick={actionsClick} />
+    {actionsVisible && <ActionOptions
+      isOpen={!!actionsVisible}
+      isOffer={isOffer}
+      isRequest={isRequest}
+      transaction={transaction}
+      showConfirmationModal={showConfirmationModal}
+    />}
+
+  </div>
+}
+
+function RevealActionsButton ({ actionsClick }) {
+  return <Button onClick={actionsClick} styleName='reveal-actions-button' dataTestId='reveal-actions-button'>
+    <ForwardIcon styleName='forward-icon' color='#2c405a4d' />
+  </Button>
+}
+
+function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, isOpen }) {
+  return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
+    <div styleName='actions wrapper'>
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
     </div>
-  </div>
+  </aside>
 }
 
-function AmountCell ({ amount, isRequest }) {
+function AmountCell ({ amount, isRequest, isOffer }) {
   const amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
-  return <div styleName={cx('amount', { debit: isRequest })}>{amountDisplay}</div>
+  return <div styleName={cx('amount', { debit: isRequest }, { credit: isOffer })}>{amountDisplay} HF</div>
 }
 
 // these are pulled out into custom hooks ready for if we need to move them to their own file for re-use elsewhere

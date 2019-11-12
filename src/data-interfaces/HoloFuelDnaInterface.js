@@ -19,7 +19,7 @@ export async function getTxCounterparties (transactionList) {
   return noDuplicatesAgentList
 }
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
   const { date } = presentDateAndTime(eventTimestamp)
   return {
     id: origin,
@@ -28,7 +28,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
       id: counterpartyId || event.Request.from
     },
     direction: stateDirection,
-    status: STATUS.pending,
+    status: status || STATUS.pending,
     type: TYPE.request,
     timestamp: eventTimestamp,
     dateLabel: date,
@@ -37,7 +37,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
   const { date } = presentDateAndTime(eventTimestamp)
   return {
     id: origin,
@@ -46,7 +46,7 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
       id: counterpartyId || event.Promise.tx.to
     },
     direction: stateDirection,
-    status: STATUS.pending,
+    status: status || STATUS.pending,
     type: TYPE.offer,
     timestamp: eventTimestamp,
     dateLabel: date,
@@ -148,8 +148,8 @@ function presentTransaction (transaction) {
       // We have decided to show this **only** in the inbox page via the recent transactions filter
       console.log(' >>>>>>>> INSIDE THE REJECTED presentTransaction Case <<<<<< EVENT : ', event)
 
-      if (event.Request) return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
-      if (event.Promise) return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
+      if (event.Request) return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.rejected })
+      if (event.Promise) return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.rejected })
       throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     // NOTE:
