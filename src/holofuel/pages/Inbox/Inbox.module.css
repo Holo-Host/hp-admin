@@ -188,7 +188,7 @@
 .drawer {
   position: fixed;
   top: 0;
-  left: -280px;
+  right: -80px;
   bottom: 0;
   z-index: 98;
 }
@@ -196,25 +196,25 @@
 .drawer--open .actions {
   transform: translateX(100%);
   pointer-events: initial;
+  flex:1 1 400px;
 }
 
 .accept-button {
   composes: button;
+  color: white;
   background-color: lightgreen;
 }
 
 .pay-button {
   composes: button;
   color: white;
-  background-color: lightcoral;
+  background-color: lightgreen;
 }
 
 .reject-button {
-  border: none;
-  text-decoration: underline;
-  color: #0000EE;
-  background-color: var(--color-alabaster);
-  font-weight: normal;
+  composes: button;
+  color: white;
+  background-color: lightcoral;
 }
 
 /* Modal */
@@ -281,11 +281,16 @@
 
 .modal-button-no {
   composes: modal-button;
+  background-color: #0DC39F;
 }
 
 .modal-button-yes {
   composes: modal-button;
-  font-weight: bold;
+  background-color: #0DC39F;
+}
+
+.modal-muted-btn {
+  background-color: #05a484;
 }
 
 /* .ReactModal__Overlay .ReactModal__Overlay--after-open {
