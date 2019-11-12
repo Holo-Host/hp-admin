@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, flatten, capitalize } from 'lodash/fp'
-import { useLocation } from 'react-router-dom'
+import moment from 'moment'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
@@ -15,6 +15,7 @@ import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
 import { DIRECTION } from 'models/Transaction'
 import './TransactionHistory.module.css'
+import HashAvatar from '../../../components/HashAvatar/HashAvatar'
 
 // Data - Mutation hook with refetch:
 function useCancel () {
@@ -61,9 +62,42 @@ function useFetchCounterparties () {
   }
 }
 
+// returns an array of objects of the form { label, transactions }, sorted chronologicaly
+function partitionByDate (transactions) {
+  const now = moment()
+  const today = now.clone().startOf('day');
+  const yesterday = now.clone().subtract(1, 'days').startOf('day');
+
+  const isToday = momentDate => momentDate.isSame(today, 'd')
+  const isYesterday = momentDate => momentDate.isSame(yesterday, 'd')
+
+  const getLabel = ({ timestamp }) => {
+    const momentDate = moment(timestamp)
+    if (isToday(momentDate)) return 'Today'
+    if (isYesterday(momentDate)) return 'Yesterday'
+    return momentDate.format('MMMM Do')
+  }
+
+  return transactions.reduce((partitions, transaction) => {
+    const label = getLabel(transaction)
+    const partition = partitions.find(p => p.label === label)
+    if (partition) {
+      return partitions.filter(p => p.label !== label).concat([{
+        ...partition,
+        transactions: partition.transactions.concat([transaction])
+      }])
+    } else {
+      return partitions.concat([{
+        label,
+        transactions: [transaction]
+      }])
+    }
+  }, [])
+    .sort((a, b) => a.transactions[0].timestamp < b.transactions[0].timestamp ? -1 : 1)
+}
+
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
-// Display - Functional Components with Hooks :
 export default function TransactionsHistory () {
   const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
@@ -75,9 +109,7 @@ export default function TransactionsHistory () {
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
-  const queryFilter = (new URLSearchParams(useLocation().search)).get('filter')
-
-  const [filter, setFilter] = useState(queryFilter || FILTER_TYPES[0])
+  const [filter, setFilter] = useState(FILTER_TYPES[0])
 
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []
@@ -110,13 +142,14 @@ export default function TransactionsHistory () {
 
   const noVisibleTransactions = isEmpty(filteredPendingTransactions) && isEmpty(filteredCompletedTransactions)
 
-  const columnHeadings = [
-    null,
-    null,
-    'Fees',
-    'Amount',
-    null
-  ]
+  const partitionedTransactions = ([{
+    label: 'Pending',
+    transactions: filteredPendingTransactions,
+    pending: true
+  }].concat(partitionByDate(filteredCompletedTransactions)))
+    .filter(({ transactions }) => !isEmpty(transactions))
+
+  console.log('partitionedTransactions', partitionedTransactions)
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='balance'>
@@ -129,35 +162,16 @@ export default function TransactionsHistory () {
       You have no {transactionTypeName}.
     </div>}
 
-    <section styleName='account-ledger-table'>
-      {!noVisibleTransactions && <table styleName='completed-transactions-table'>
-        <thead>
-          <tr key='heading'>
-            {columnHeadings.map((header, contentIndex) => <TransactionTableHeading
-              key={`heading-${contentIndex}`}
-              content={header}
-            />)}
-          </tr>
-        </thead>
-        <tbody>
-          {!isEmpty(filteredPendingTransactions) && filteredPendingTransactions.map(pendingTx => {
-            return <TransactionRow
-              transaction={pendingTx}
-              key={pendingTx.id}
-              showCancellationModal={showCancellationModal}
-            />
-          })}
-
-          {!isEmpty(filteredCompletedTransactions) && filteredCompletedTransactions.map(completeTx => {
-            return <TransactionRow
-              transaction={completeTx}
-              key={completeTx.id}
-              showCancellationModal={showCancellationModal}
-              completed />
-          })}
-        </tbody>
-      </table>}
-    </section>
+    {!noVisibleTransactions && <div>
+      {partitionedTransactions.map(({ label, transactions, pending }) => <React.Fragment key={label}>
+        <div styleName='partition-label'>{label}</div>
+        {transactions.map(transaction => <TransactionRow
+          transaction={transaction}
+          key={transaction.id}
+          showCancellationModal={showCancellationModal}
+          pending={pending} />)}
+      </React.Fragment>)}
+    </div>}
 
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
@@ -179,45 +193,44 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-function TransactionTableHeading ({ content }) {
-  return <th id={content ? content.toLowerCase() : null} styleName='completed-tx-col table-headers'>
-    {content}
-  </th>
-}
+export function TransactionRow ({ transaction, showCancellationModal, pending }) {
+  const { amount, counterparty, direction, presentBalance, notes } = transaction
 
-export function TransactionRow ({ transaction, showCancellationModal, completed }) {
-  const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
+  const presentedAmount = direction === DIRECTION.incoming
+    ? `+ ${presentHolofuelAmount(amount)}`
+    : `- ${presentHolofuelAmount(amount)}`
 
-  const { date, time } = presentDateAndTime(timestamp)
-  return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
-    <td styleName='completed-tx-col table-content'>
-      <p data-testid='cell-date'>{date}</p>
-      <p data-testid='cell-time'>{time}</p>
-    </td>
-    <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'>
+  return <div styleName='transaction-row'>
+    <div styleName='avatar'>
+      <CopyAgentId agent={counterparty}>
+        <HashAvatar seed={counterparty.id} size={32} />
+      </CopyAgentId>
+    </div>
+    <div styleName='name-and-notes'>
+      <div styleName='name'>
         <CopyAgentId agent={counterparty}>
           {counterparty.nickname || presentAgentId(counterparty.id)}
         </CopyAgentId>
-      </h4>
-      <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
-    </td>
-    <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
-    <AmountCell amount={amount} direction={direction} />
-    { completed
-      ? <td styleName='completed-tx-col table-content' data-testid='cell-present-balance'>{presentBalance}</td>
-      : <td styleName='completed-tx-col table-content' data-testid='cell-pending-item'>
-        <p styleName='italic'>Pending</p>
-        <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />
-      </td>
-    }
-  </tr>
+      </div>
+      <div styleName='notes'>
+        {notes}
+      </div>
+    </div>
+    <div styleName='amount-and-balance'>
+      <div styleName='amount'>
+        {presentedAmount}
+      </div>
+      <div styleName='balance'>
+        {presentBalance}
+      </div>
+    </div>
+  </div>
 }
 
 function AmountCell ({ amount, direction }) {
   const amountDisplay = direction === 'outgoing' ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
   return <td
-    styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })}
+    styleName={cx('table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })}
     data-testid='cell-amount'>
     {amountDisplay}
   </td>
