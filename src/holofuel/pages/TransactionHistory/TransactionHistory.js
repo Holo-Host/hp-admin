@@ -93,7 +93,7 @@ function partitionByDate (transactions) {
       }])
     }
   }, [])
-    .sort((a, b) => a.transactions[0].timestamp < b.transactions[0].timestamp ? -1 : 1)
+    .sort((a, b) => a.transactions[0].timestamp < b.transactions[0].timestamp ? 1 : -1)
 }
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
@@ -149,8 +149,6 @@ export default function TransactionsHistory () {
   }].concat(partitionByDate(filteredCompletedTransactions)))
     .filter(({ transactions }) => !isEmpty(transactions))
 
-  console.log('partitionedTransactions', partitionedTransactions)
-
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='balance'>
       <div styleName='balance-label'>Available Balance</div>
@@ -162,14 +160,15 @@ export default function TransactionsHistory () {
       You have no {transactionTypeName}.
     </div>}
 
-    {!noVisibleTransactions && <div>
+    {!noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(({ label, transactions, pending }) => <React.Fragment key={label}>
         <div styleName='partition-label'>{label}</div>
-        {transactions.map(transaction => <TransactionRow
+        {transactions.map((transaction, index) => <TransactionRow
           transaction={transaction}
           key={transaction.id}
           showCancellationModal={showCancellationModal}
-          pending={pending} />)}
+          pending={pending}
+          isFirst={index === 0} />)}
       </React.Fragment>)}
     </div>}
 
@@ -193,14 +192,14 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, pending }) {
+export function TransactionRow ({ transaction, showCancellationModal, pending, isFirst }) {
   const { amount, counterparty, direction, presentBalance, notes } = transaction
 
   const presentedAmount = direction === DIRECTION.incoming
     ? `+ ${presentHolofuelAmount(amount)}`
     : `- ${presentHolofuelAmount(amount)}`
 
-  return <div styleName='transaction-row'>
+  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })}>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
         <HashAvatar seed={counterparty.id} size={32} />
@@ -220,28 +219,20 @@ export function TransactionRow ({ transaction, showCancellationModal, pending })
       <div styleName='amount'>
         {presentedAmount}
       </div>
-      <div styleName='balance'>
+      {presentBalance && <div styleName='transaction-balance'>
         {presentBalance}
-      </div>
+      </div>}
     </div>
+    {pending && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
   </div>
 }
 
-function AmountCell ({ amount, direction }) {
-  const amountDisplay = direction === 'outgoing' ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
-  return <td
-    styleName={cx('table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })}
-    data-testid='cell-amount'>
-    {amountDisplay}
-  </td>
-}
-
 function CancelButton ({ showCancellationModal, transaction }) {
-  return <Button
+  return <div
     onClick={() => showCancellationModal(transaction)}
     styleName='cancel-button'>
-    Cancel
-  </Button>
+    -
+  </div>
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component

@@ -26,40 +26,31 @@
   font-size: 12px;
 }
 
+.transactions {
+  margin-top: 20px;
+}
+
 .partition-label {
-
-}
-
-
-
-.red-text {
-  color: red;
-}
-
-.green-text {
-  color: green;
-}
-
-.italic {
-  font-style: italic
-}
-
-.align-left {
-  text-align: left;
-}
-
-.align-right {
-  text-align: right;
+  font-size: 14px;
+  background-color: lightgray;
+  margin: 0px -20px;
+  padding-left: 30px;
 }
 
 /* TransactionRow */
-
 .transaction-row {
   display: flex;
+  margin: 0px -20px;
+  padding: 10px 20px;
+  align-items: center;  
+}
+
+.not-first-row {
+  border-top: 2px solid #DDD;
 }
 
 .avatar {
-  
+  margin-right: 20px;
 }
 
 .name-and-notes {
@@ -67,32 +58,46 @@
 }
 
 .name {
-
+  font-weight: bold;
+  color: #555;
+  font-size: 16px;
 }
 
 .notes {
-
+  font-style: italic;
+  color: #888;
+  font-size: 14px;
 }
 
 .amount-and-balance {
-
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .amount {
-
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
 }
 
-.balance {
-
+.transaction-balance {
+  font-style: italic;
+  color: #AAA;
+  font-size: 14px;
 }
 
-/* Buttons */
+/* CancelButton */
 .cancel-button {
-  border: none !important;
-  text-decoration: underline;
-  color: #0000EE !important;
-  background-color: transparent !important;
-  font-weight: normal !important;
+  color: white;
+  border-radius: 50%;
+  background-color: red;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  margin-left: 10px;
 }
 
 /* Modal */
