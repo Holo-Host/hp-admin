@@ -153,6 +153,7 @@ export default function Inbox () {
         actionsClick={actionsClick}
         role='list'
         whoami={whoami}
+        view={VIEW}
         inboxView={inboxView}
         showConfirmationModal={showConfirmationModal}
         key={transaction.id} />)}
@@ -166,7 +167,7 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClick, actionsVisible, showConfirmationModal, inboxView, whoami }) {
+export function TransactionRow ({ transaction, actionsClick, actionsVisible, showConfirmationModal, inboxView, whoami, view }) {
   const { counterparty, amount, type, notes } = transaction // timestamp
 
   console.log('actionsVisible inside TransactionRow : ', actionsVisible)
@@ -179,7 +180,7 @@ export function TransactionRow ({ transaction, actionsClick, actionsVisible, sho
   const isRequest = !isOffer
 
   let story
-  if (inboxView) story = isOffer ? ' is offering' : ' is requesting'
+  if (inboxView === view.pending) story = isOffer ? ' is offering' : ' is requesting'
   else story = isOffer ? 'offered' : 'requested'
 
   return <div styleName='transaction-row' role='listitem'>
