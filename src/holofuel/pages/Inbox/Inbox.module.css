@@ -63,6 +63,23 @@
   padding: 8px;
 }
 
+
+.new-transaction-button-mini {
+  font-size: 13px;
+  line-height: 15px;
+  width: 175px;
+  padding: 8px;
+}
+
+/* Null State */
+
+.null-state-message {
+  background: #FFFFFF;
+  border-radius: 4px;
+  padding: 2em;
+}
+
+
 /* Transaction Row */
 
 .transaction-list {
@@ -186,35 +203,35 @@
 }
 
 .drawer {
-  position: fixed;
+  position: absolute;
   top: 0;
-  right: -80px;
+  right: 0px;
+  /* right: -80px; */
   bottom: 0;
   z-index: 98;
-}
+}reveal-actions-button
 
 .drawer--open .actions {
   transform: translateX(100%);
-  pointer-events: initial;
-  flex:1 1 400px;
+  flex:1 1 400px;  
 }
 
 .accept-button {
   composes: button;
   color: white;
-  background-color: lightgreen;
+  background-color: #23CC80;
 }
 
 .pay-button {
   composes: button;
   color: white;
-  background-color: lightgreen;
+  background-color: #23CC80;
 }
 
 .reject-button {
   composes: button;
   color: white;
-  background-color: lightcoral;
+  background-color: #EE4266;
 }
 
 /* Modal */

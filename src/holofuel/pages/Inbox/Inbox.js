@@ -16,6 +16,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
+import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
 import AddIcon from 'components/icons/AddIcon'
@@ -147,6 +148,17 @@ export default function Inbox () {
     </Jumbotron>
     <PageDivider title='Today' />
 
+    {isEmpty(displayTransactions) && <NullStateMessage
+      styleName='null-state-message'
+      message={inboxView === VIEW.pending
+        ? 'You have no pending offers or requests'
+        : 'You have no recent activity'}
+    >
+      <Button styleName='new-transaction-button-mini' onClick={() => showConfirmationModal()}>
+        <AddIcon styleName='add-icon' color='#0DC39F' />
+      </Button>
+    </NullStateMessage>}
+
     {!isDisplayTransactionsEmpty && <div styleName='transaction-list'>
       {displayTransactions.map(transaction => <TransactionRow
         transaction={transaction}
@@ -217,6 +229,7 @@ export function TransactionRow ({ transaction, actionsClick, actionsVisible, sho
       isOpen={actionsVisible}
       isOffer={isOffer}
       isRequest={isRequest}
+      actionsClick={actionsClick}
       transaction={transaction}
       showConfirmationModal={showConfirmationModal}
     />}
@@ -224,8 +237,8 @@ export function TransactionRow ({ transaction, actionsClick, actionsVisible, sho
   </div>
 }
 
-function RevealActionsButton ({ actionsClick }) {
-  return <Button onClick={actionsClick} styleName='reveal-actions-button' dataTestId='reveal-actions-button'>
+function RevealActionsButton ({ actionsClick, actionsVisible }) {
+  return <Button onClick={actionsClick} styleName={cx('reveal-actions-button', { 'drawer--open': actionsVisible })} dataTestId='reveal-actions-button'>
     <ForwardIcon styleName='forward-icon' color='#2c405a4d' />
   </Button>
 }
@@ -233,9 +246,9 @@ function RevealActionsButton ({ actionsClick }) {
 function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, isOpen }) {
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='actions'>
+      <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
       {isOffer && <AcceptButton transaction={transaction} />}
       {isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
-      <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
     </div>
   </aside>
 }
@@ -281,7 +294,7 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   return <Button
     onClick={() => showConfirmationModal(transaction, action)}
     styleName='reject-button'>
-    Reject
+    Decline
   </Button>
 }
 
@@ -325,7 +338,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = `Reject ${type}?`
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Reject <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Decline <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
     }
     default:
