@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, flatten, capitalize } from 'lodash/fp'
-import './TransactionHistory.module.css'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
@@ -10,8 +9,12 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import { presentAgentId, presentHolofuelAmount, presentDateAndTime } from 'utils'
+import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
+import { DIRECTION, STATUS } from 'models/Transaction'
+import './TransactionHistory.module.css'
+import HashAvatar from '../../../components/HashAvatar/HashAvatar'
 
 // Data - Mutation hook with refetch:
 function useCancel () {
@@ -58,58 +61,79 @@ function useFetchCounterparties () {
   }
 }
 
-// Display - Functional Components with Hooks :
+const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
+
 export default function TransactionsHistory () {
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
   useFetchCounterparties()
+
   const cancelTransaction = useCancel()
+
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
-  // NOTE: Column Header Titles (or null) => This provides a space fore easy updating of headers, should we decide to rename or substitute a null header with a title.
-  const headings = [
-    null,
-    null,
-    'Fees',
-    'Amount',
-    null
-  ]
+  const [filter, setFilter] = useState(FILTER_TYPES[0])
+
+  let filteredPendingTransactions = []
+  let filteredCompletedTransactions = []
+  let transactionTypeName = ''
+
+  switch (filter) {
+    case 'all':
+      filteredPendingTransactions = pendingTransactions
+      filteredCompletedTransactions = completedTransactions
+      transactionTypeName = 'transactions'
+      break
+    case 'withdrawals':
+      filteredPendingTransactions = []
+      filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.outgoing)
+      transactionTypeName = 'withdrawals'
+      break
+    case 'deposits':
+      filteredPendingTransactions = []
+      filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.incoming)
+      transactionTypeName = 'deposits'
+      break
+    case 'pending':
+      filteredPendingTransactions = pendingTransactions
+      filteredCompletedTransactions = []
+      transactionTypeName = 'pending transactions'
+      break
+    default:
+      throw new Error(`unrecognized filter type: "${filter}"`)
+  }
+
+  const noVisibleTransactions = isEmpty(filteredPendingTransactions) && isEmpty(filteredCompletedTransactions)
+
+  const partitionedTransactions = ([{
+    label: 'Pending',
+    transactions: filteredPendingTransactions
+  }].concat(partitionByDate(filteredCompletedTransactions)))
+    .filter(({ transactions }) => !isEmpty(transactions))
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
-    <section styleName='account-ledger-table'>
-      <table styleName='completed-transactions-table'>
-        <thead>
-          <tr key='heading'>
-            {headings && headings.map((header, contentIndex) => {
-              return (
-                <TransactionTableHeading
-                  key={`heading-${contentIndex}`}
-                  content={header}
-                />
-              )
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {!isEmpty(pendingTransactions) && pendingTransactions.map(pendingTx => {
-            return <TransactionRow
-              transaction={pendingTx}
-              key={pendingTx.id}
-              showCancellationModal={showCancellationModal}
-            />
-          })}
+    <div styleName='balance'>
+      <div styleName='balance-label'>Available Balance</div>
+      <div styleName='balance-amount'>{presentHolofuelAmount(balance)} HF</div>
+    </div>
+    <FilterButtons filter={filter} setFilter={setFilter} />
 
-          {!isEmpty(completedTransactions) && completedTransactions.map(completeTx => {
-            return <TransactionRow
-              transaction={completeTx}
-              key={completeTx.id}
-              showCancellationModal={showCancellationModal}
-              completed />
-          })}
-        </tbody>
-      </table>
-    </section>
+    {noVisibleTransactions && <div styleName='transactions-empty'>
+      You have no {transactionTypeName}.
+    </div>}
+
+    {!noVisibleTransactions && <div styleName='transactions'>
+      {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
+        <div styleName='partition-label'>{label}</div>
+        {transactions.map((transaction, index) => <TransactionRow
+          transaction={transaction}
+          key={transaction.id}
+          showCancellationModal={showCancellationModal}
+          isFirst={index === 0} />)}
+      </React.Fragment>)}
+    </div>}
 
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
@@ -118,56 +142,62 @@ export default function TransactionsHistory () {
   </PrimaryLayout>
 }
 
-const TransactionTableHeading = ({ content }) => {
-  return <th id={content ? content.toLowerCase() : null} styleName='completed-tx-col table-headers'>
-    {content}
-  </th>
+function FilterButtons ({ filter, setFilter }) {
+  const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
+
+  return <div styleName='filter-buttons' data-testid='filter-buttons'>
+    {FILTER_TYPES.map(type => <div
+      styleName={cx('filter-button', { selected: type === filter })}
+      onClick={() => setFilter(type)}
+      key={type}>
+      {capitalizeFirstLetter(type)}
+    </div>)}
+  </div>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, completed }) {
-  const { id, timestamp, amount, counterparty, direction, fees, presentBalance, notes } = transaction
+export function TransactionRow ({ transaction, showCancellationModal, isFirst }) {
+  const { amount, counterparty, direction, presentBalance, notes, status } = transaction
+  const pending = status === STATUS.pending
 
-  const { date, time } = presentDateAndTime(timestamp)
-  return <tr key={id} styleName={cx('table-content-row', { 'pending-transaction': !completed })} data-testid='transactions-table-row'>
-    <td styleName='completed-tx-col table-content'>
-      <p data-testid='cell-date'>{date}</p>
-      <p data-testid='cell-time'>{time}</p>
-    </td>
-    <td styleName='completed-tx-col table-content align-left'>
-      <h4 data-testid='cell-counterparty'>
+  const presentedAmount = direction === DIRECTION.incoming
+    ? `+ ${presentHolofuelAmount(amount)}`
+    : `- ${presentHolofuelAmount(amount)}`
+
+  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })} data-testid='transaction-row'>
+    <div styleName='avatar'>
+      <CopyAgentId agent={counterparty}>
+        <HashAvatar seed={counterparty.id} size={32} />
+      </CopyAgentId>
+    </div>
+    <div styleName='name-and-notes'>
+      <div styleName='name'>
         <CopyAgentId agent={counterparty}>
           {counterparty.nickname || presentAgentId(counterparty.id)}
         </CopyAgentId>
-      </h4>
-      <p styleName='italic' data-testid='cell-notes'>{notes || 'none'}</p>
-    </td>
-    <td styleName={cx('completed-tx-col table-content', { 'red-text': fees !== 0 })} data-testid='cell-fees'>{fees}</td>
-    <AmountCell amount={amount} direction={direction} />
-    { completed
-      ? <td styleName='completed-tx-col table-content' data-testid='cell-present-balance'>{presentBalance}</td>
-      : <td styleName='completed-tx-col table-content' data-testid='cell-pending-item'>
-        <p styleName='italic'>Pending</p>
-        <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />
-      </td>
-    }
-  </tr>
-}
-
-function AmountCell ({ amount, direction }) {
-  const amountDisplay = direction === 'outgoing' ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
-  return <td
-    styleName={cx('completed-tx-col table-content', { 'red-text': direction === 'outgoing' }, { 'green-text': direction === 'incoming' })}
-    data-testid='cell-amount'>
-    {amountDisplay}
-  </td>
+      </div>
+      <div styleName='notes'>
+        {notes}
+      </div>
+    </div>
+    <div styleName='amount-and-balance'>
+      <div styleName='amount'>
+        {presentedAmount}
+      </div>
+      {presentBalance && <div styleName='transaction-balance'>
+        {presentHolofuelAmount(presentBalance)}
+      </div>}
+    </div>
+    {pending && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
+  </div>
 }
 
 function CancelButton ({ showCancellationModal, transaction }) {
-  return <Button
+  return <div
     onClick={() => showCancellationModal(transaction)}
-    styleName='cancel-button'>
-    Cancel
-  </Button>
+    styleName='cancel-button'
+    data-testid='cancel-button'>
+    -
+  </div>
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
