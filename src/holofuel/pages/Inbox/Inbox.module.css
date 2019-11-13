@@ -211,18 +211,24 @@
 } */
 
 .drawer {
-  transform: translateX(0%);
+  /* transform: translateX(0%); */
   flex: 1;
 }
 
-.drawer--open {
-  transform: translateX(100%);
-  flex:1 1 0;  
+.drawer-close {
+  display: flex;
+  /* transform: translateX(100%); */
+  flex: 0 0 0;
+  visibility: visible;
+}
+.drawer-close .forward-icon{
+  /* transform: translateX(0%); */
+  visibility: visible;
 }
 
-.drawer--open .actions {
-  transform: translateX(100%);
-  flex:1 1 0;
+.drawer-close .actions {
+  /* transform: translateX(100%); */
+  display: none;
 }
 
 .accept-button {
