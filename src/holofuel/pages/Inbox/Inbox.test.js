@@ -10,7 +10,6 @@ import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
 import { presentHolofuelAmount } from 'utils' // , formatDateTime
 import { renderAndWait } from 'utils/test-utils'
-// import PageDivider from 'holofuel/components/PageDivider'
 // import { title as forwardIconTitle } from 'components/icons/ForwardIcon'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -99,7 +98,7 @@ describe('TransactionRow', () => {
 
   it('renders a request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} whoami={mockWhoamiAgent} />
+      <TransactionRow transaction={request} whoami={mockWhoamiAgent} inboxView='pending' />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -109,7 +108,7 @@ describe('TransactionRow', () => {
 
   it('renders an offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} />
+      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} inboxView='pending' />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -178,7 +177,9 @@ describe('TransactionRow', () => {
       const props = {
         transaction: request,
         whoami: mockWhoamiAgent,
-        showConfirmationModal: jest.fn()
+        actionsClickWithTx: jest.fn(),
+        showConfirmationModal: jest.fn(),
+        inboxView: 'pending'
       }
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <TransactionRow {...props} />
@@ -202,7 +203,7 @@ describe('TransactionRow', () => {
 
       expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'pay')
 
-      fireEvent.click(getByText('Reject'))
+      fireEvent.click(getByText('Decline'))
 
       expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'decline')
     })
@@ -211,7 +212,7 @@ describe('TransactionRow', () => {
   describe('Accept button', () => {
     it('responds properly', async () => {
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockWhoamiAgent} />
+        <TransactionRow transaction={offer} whoami={mockWhoamiAgent} inboxView='pending' />
       </MockedProvider>, 0)
 
       await act(async () => {

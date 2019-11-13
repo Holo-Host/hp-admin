@@ -257,7 +257,7 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
 
 function RevealActionsButton ({ actionsClick, handleClose, actionsVisible, istransaction }) {
   return <div onClick={actionsVisible ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !(actionsVisible && istransaction) })} data-testid='reveal-actions-button'>
-    <ForwardIcon styleName='forward-icon' color='#2c405a4d' data-test='forward-icon' />
+    <ForwardIcon styleName='forward-icon' color='#2c405a4d' dataTestId='forward-icon' />
   </div>
 }
 
