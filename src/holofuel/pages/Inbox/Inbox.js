@@ -197,8 +197,9 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
 
   const actionsClick = () => actionsClickWithTx(transaction)
   const handleCloseReveal = () => {
-    if (!isEmpty(inboxView) && inboxView === transaction) return actionsClickWithTx(null)
-    else if (!isEmpty(inboxView) && inboxView !== transaction) return actionsClickWithTx(transaction)
+    if (!isEmpty(actionsVisible) && actionsVisible === transaction) return actionsClickWithTx(null)
+    else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction)
+    else return actionsClickWithTx(null)
   }
 
   let agent
