@@ -6,11 +6,11 @@ import styles from './NullStateMessage.module.css' // eslint-disable-line no-unu
 function NullStateMessage ({
   wide = false,
   className,
-  nessage,
+  message,
   children,
   dataTestId
 }) {
-  const classes = cx('NullStateMessage-body', { wide })
+  const classes = cx('null-state-body', { wide })
 
   return (
     <div
@@ -18,7 +18,7 @@ function NullStateMessage ({
       styleName={classes}
       data-testid={dataTestId}
     >
-      <h3>{}</h3>
+      {message}
       {children}
     </div>
   )

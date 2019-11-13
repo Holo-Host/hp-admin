@@ -203,10 +203,6 @@
 }
 
 .drawer {
-  position: absolute;
-  top: 0;
-  right: 0px;
-  /* right: -80px; */
   bottom: 0;
   z-index: 98;
 }reveal-actions-button

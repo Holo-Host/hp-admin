@@ -1,0 +1,14 @@
+.null-state-body {
+  font-family: CircularStd;
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+  color: rgba(44, 64, 90, 0.6);
+}
+
+.wide {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: left;
+}
