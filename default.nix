@@ -112,6 +112,7 @@ in
     '';
 
     doCheck = false;
+    meta.platforms = stdenv.lib.platforms.linux;
   };
 
   holofuel-ui = stdenv.mkDerivation rec {
