@@ -8,12 +8,13 @@ import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
-import { presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount, formatDateTime } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
+import { title as forwardIconTitle } from 'components/icons/ForwardIcon'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
@@ -66,6 +67,21 @@ describe('TransactionRow', () => {
     jest.clearAllMocks()
   })
 
+  const mockWhoamiAgent = {
+    id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+    nickname: 'Perry'
+  }
+
+  const whoamiMock = {
+    request: {
+      query: HolofuelUserQuery
+    },
+    result: {
+      data: { holofuelUser: mockWhoamiAgent }
+    },
+    newData: jest.fn()
+  }
+
   const request = {
     id: '123',
     counterparty: { id: 'last 6' },
@@ -82,7 +98,7 @@ describe('TransactionRow', () => {
 
   it('renders a request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} />
+      <TransactionRow transaction={request} whoami={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
     expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
@@ -95,7 +111,7 @@ describe('TransactionRow', () => {
 
   it('renders an offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} />
+      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
     expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
@@ -146,6 +162,7 @@ describe('TransactionRow', () => {
   }
 
   const mocks = [
+    whoamiMock,
     offerMock,
     acceptOfferMock,
     declineMock,
@@ -165,11 +182,23 @@ describe('TransactionRow', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
+        whoami: mockWhoamiAgent,
         showConfirmationModal: jest.fn()
       }
-      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <TransactionRow {...props} />
       </MockedProvider>, 0)
+
+      expect(getByTestId('forward-icon')).toBeInTheDocument()
+      await act(async () => {
+        fireEvent.click(getByTestId('forward-icon'))
+        await wait(0)
+      })
+      // expect(getByText(forwardIconTitle)).toBeInTheDocument()
+      // await act(async () => {
+      //   fireEvent.click(getByText(forwardIconTitle))
+      //   await wait(0)
+      // })
 
       await act(async () => {
         fireEvent.click(getByText('Pay'))
@@ -187,7 +216,7 @@ describe('TransactionRow', () => {
   describe('Accept button', () => {
     it('responds properly', async () => {
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} />
+        <TransactionRow transaction={offer} whoami={mockWhoamiAgent} />
       </MockedProvider>, 0)
 
       await act(async () => {
