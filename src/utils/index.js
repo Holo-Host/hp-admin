@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
 
 export function bgImageStyle (url) {
   if (!url) return {}
@@ -47,6 +48,19 @@ export function getDateLabel (timestamp) {
   if (isYesterday(momentDate)) return 'Yesterday'
   return momentDate.format('MMMM Do')
 }
+
+// returns an array of objects of the form { label, transactions }, sorted chronologicaly
+export const partitionByDate = flow(
+  groupBy(({ timestamp }) => getDateLabel(timestamp)),
+  groups => {
+    const labels = keys(groups)
+    return labels.map(label => ({
+      transactions: groups[label],
+      label
+    }))
+  },
+  sortBy(partition => partition.transactions[0].timestamp),
+  reverse)
 
 // parking this here. Not currently used.
 

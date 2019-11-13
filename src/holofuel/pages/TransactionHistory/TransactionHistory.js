@@ -11,7 +11,7 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import { presentAgentId, presentHolofuelAmount, getDateLabel } from 'utils'
+import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
@@ -59,26 +59,6 @@ function useFetchCounterparties () {
       }
     })
   }
-}
-
-// returns an array of objects of the form { label, transactions }, sorted chronologicaly
-function partitionByDate (transactions) {
-  return transactions.reduce((partitions, transaction) => {
-    const label = getDateLabel(transaction.timestamp)
-    const partition = partitions.find(p => p.label === label)
-    if (partition) {
-      return partitions.filter(p => p.label !== label).concat([{
-        ...partition,
-        transactions: partition.transactions.concat([transaction])
-      }])
-    } else {
-      return partitions.concat([{
-        label,
-        transactions: [transaction]
-      }])
-    }
-  }, [])
-    .sort((a, b) => a.transactions[0].timestamp < b.transactions[0].timestamp ? 1 : -1)
 }
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
