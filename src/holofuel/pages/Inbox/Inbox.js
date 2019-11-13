@@ -121,7 +121,7 @@ export default function Inbox () {
   //* ********* */
   // SORT THE TRANSACTIONS BY DATE
   const transactionsByDate = groupBy('dateLabel', displayTransactions)
-  console.log('transactionsByDate : ', transactionsByDate)
+  const transactionsByDateKeys = Object.keys(transactionsByDate)
   //* ********* */
 
   return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={actionableTransactions.length}>
@@ -146,7 +146,6 @@ export default function Inbox () {
           </Button>)}
       </div>
     </Jumbotron>
-    <PageDivider title='Today' />
 
     {isEmpty(displayTransactions) && <NullStateMessage
       styleName='null-state-message'
@@ -159,17 +158,22 @@ export default function Inbox () {
       </Button>
     </NullStateMessage>}
 
-    {!isDisplayTransactionsEmpty && <div styleName='transaction-list'>
-      {displayTransactions.map(transaction => <TransactionRow
-        transaction={transaction}
-        actionsVisible={actionsVisible}
-        actionsClickWithTx={actionsClickWithTx}
-        role='list'
-        whoami={whoami}
-        view={VIEW}
-        inboxView={inboxView}
-        showConfirmationModal={showConfirmationModal}
-        key={transaction.id} />)}
+    {!isDisplayTransactionsEmpty && !isEmpty(transactionsByDateKeys) && <div className='transaction-by-date-list'>
+      {transactionsByDateKeys.map(transactionDate => <div key={transactionDate}>
+        <PageDivider title={transactionDate} />
+        <div styleName='transaction-list'>
+          {transactionsByDate[transactionDate].map(transaction => <TransactionRow
+            transaction={transaction}
+            actionsVisible={actionsVisible}
+            actionsClickWithTx={actionsClickWithTx}
+            role='list'
+            whoami={whoami}
+            view={VIEW}
+            inboxView={inboxView}
+            showConfirmationModal={showConfirmationModal}
+            key={transaction.id} />)}
+        </div>
+      </div>)}
     </div>}
 
     <NewTransactionModal
