@@ -247,8 +247,6 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
       transaction={transaction}
       showConfirmationModal={showConfirmationModal}
     />}
-
-
   </div>
 }
 
