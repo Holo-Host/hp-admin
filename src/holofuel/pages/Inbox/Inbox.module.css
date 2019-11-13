@@ -90,7 +90,7 @@
   display: flex;
   border-bottom: 1px solid rgba(44, 64, 90, 0.1);
   font-size: 14px;
-  padding: 10px 5px 0;
+  padding: 10px 5px 10px;
   background-color: #FFFFFF;
   justify-content: space-between;
   /* width: 80px; */
@@ -227,6 +227,7 @@
 
 .accept-button {
   composes: button;
+  margin: 0;
   min-width: 70px;
   color: white;
   background-color: #23CC80;
@@ -234,6 +235,7 @@
 
 .pay-button {
   composes: button;
+  margin: 0;
   min-width: 70px;
   color: white;
   background-color: #23CC80;
@@ -241,6 +243,7 @@
 
 .reject-button {
   composes: button;
+  margin: 0;
   min-width: 70px;
   color: white;
   background-color: #EE4266;
