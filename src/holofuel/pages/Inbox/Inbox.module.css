@@ -19,7 +19,7 @@
   flex: 1;
   flex-basis: content;
   font-weight: normal;
-  padding: 10px 5px;
+  padding: 10px;
   width: 100%;
   height: auto;
   margin-bottom: 10px;
@@ -90,7 +90,7 @@
   display: flex;
   border-bottom: 1px solid rgba(44, 64, 90, 0.1);
   font-size: 14px;
-  padding: 10px 20px 15px;
+  padding: 10px 5px 0;
   background-color: #FFFFFF;
   justify-content: space-between;
   /* width: 80px; */
@@ -154,6 +154,7 @@
   margin-right: 10px;
   font-size: 14px;
   line-height: 19px;
+  word-break: keep-all;
 }
 
 .balance {
@@ -180,9 +181,11 @@
 
 .reveal-actions-button  {
   flex: 0;
-  border: none;
+  font-size: 14px;
+  font-weight: 600;
   padding: 5px;
-  background-color: #FFFFFF;
+  cursor: pointer;
+  /* align-self: center; */
 }
 
 .forward-icon {
@@ -202,30 +205,43 @@
   flex-direction: row nowrap;
 }
 
-.drawer {
+/* .drawer {
   bottom: 0;
   z-index: 98;
-}reveal-actions-button
+} */
+
+.drawer {
+  transform: translateX(0%);
+  flex: 1;
+}
+
+.drawer--open {
+  transform: translateX(100%);
+  flex:1 1 0;  
+}
 
 .drawer--open .actions {
   transform: translateX(100%);
-  flex:1 1 400px;  
+  flex:1 1 0;
 }
 
 .accept-button {
   composes: button;
+  min-width: 70px;
   color: white;
   background-color: #23CC80;
 }
 
 .pay-button {
   composes: button;
+  min-width: 70px;
   color: white;
   background-color: #23CC80;
 }
 
 .reject-button {
   composes: button;
+  min-width: 70px;
   color: white;
   background-color: #EE4266;
 }

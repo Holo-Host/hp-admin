@@ -22,7 +22,7 @@ import HashAvatar from 'components/HashAvatar'
 import AddIcon from 'components/icons/AddIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount, sliceHash } from 'utils'
 import { Link } from 'react-router-dom'
 import { REQUEST_PATH, OFFER_PATH } from 'holofuel/utils/urls'
 
@@ -73,6 +73,11 @@ const VIEW = {
   recent: 'recent'
 }
 
+const presentTruncatedAmount = (string, number = 15) => {
+  if (string.length > number) return `${sliceHash(string, number)}...`
+  return sliceHash(string, number)
+}
+
 export default function Inbox () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
@@ -91,13 +96,8 @@ export default function Inbox () {
     else return setToggleModal(true)
   }
 
-  const [actionsVisible, setActionsVisible] = useState(false)
-  const actionsClick = () => {
-    console.log('YOU CLICKED THE REVEAL ACTIONS...')
-    console.log('actionsVisible BEFORE update : ', actionsVisible)
-    setActionsVisible(!actionsVisible)
-  }
-  console.log('actionsVisible AFTER update : ', actionsVisible)
+  const [actionsVisible, setActionsVisible] = useState(null)
+  const actionsClickWithTx = transaction => setActionsVisible(transaction)
 
   const toggleButtons = [{ view: 'pending', label: 'Pending' }, { view: 'recent', label: 'Recent' }]
   const [inboxView, setInboxView] = useState(VIEW.pending)
@@ -141,7 +141,7 @@ export default function Inbox () {
             variant={button.view === inboxView ? 'toggle-selected' : 'toggle'}
             onClick={() => setInboxView(VIEW[button.view])}
             className={cx(`${button.view}-button`)} /* eslint-disable-line quote-props */
-            key={button.days}>
+            key={button.view}>
             {button.label}
           </Button>)}
       </div>
@@ -163,7 +163,7 @@ export default function Inbox () {
       {displayTransactions.map(transaction => <TransactionRow
         transaction={transaction}
         actionsVisible={actionsVisible}
-        actionsClick={actionsClick}
+        actionsClickWithTx={actionsClickWithTx}
         role='list'
         whoami={whoami}
         view={VIEW}
@@ -184,8 +184,10 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClick, actionsVisible, showConfirmationModal, inboxView, whoami }) {
+export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, inboxView, whoami }) {
   const { counterparty, presentBalance, amount, type, notes } = transaction // timestamp
+
+  const actionsClick = () => actionsClickWithTx(transaction)
 
   let agent
   if (counterparty.id === whoami.id) agent = whoami
@@ -224,12 +226,16 @@ export function TransactionRow ({ transaction, actionsClick, actionsVisible, sho
       {inboxView === VIEW.recent && <div styleName='balance'>{presentBalance}</div>}
     </div>
 
-    {inboxView === VIEW.pending && <RevealActionsButton actionsClick={actionsClick} />}
+    {inboxView === VIEW.pending && <RevealActionsButton
+      actionsVisible={actionsVisible}
+      istransaction={transaction === actionsVisible}
+      actionsClick={actionsClick}
+      handleClose={() => actionsClickWithTx(null)}
+    />}
     {inboxView === VIEW.pending && <ActionOptions
-      isOpen={actionsVisible}
+      actionsVisible={actionsVisible}
       isOffer={isOffer}
       isRequest={isRequest}
-      actionsClick={actionsClick}
       transaction={transaction}
       showConfirmationModal={showConfirmationModal}
     />}
@@ -237,14 +243,14 @@ export function TransactionRow ({ transaction, actionsClick, actionsVisible, sho
   </div>
 }
 
-function RevealActionsButton ({ actionsClick, actionsVisible }) {
-  return <Button onClick={actionsClick} styleName={cx('reveal-actions-button', { 'drawer--open': actionsVisible })} dataTestId='reveal-actions-button'>
+function RevealActionsButton ({ actionsClick, handleClose, actionsVisible, istransaction }) {
+  return <div onClick={actionsVisible ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer--open': actionsVisible && istransaction })} data-testid='reveal-actions-button'>
     <ForwardIcon styleName='forward-icon' color='#2c405a4d' />
-  </Button>
+  </div>
 }
 
-function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, isOpen }) {
-  return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
+function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisible }) {
+  return <aside styleName={cx('drawer', { 'drawer--open': actionsVisible && transaction === actionsVisible })}>
     <div styleName='actions'>
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
       {isOffer && <AcceptButton transaction={transaction} />}
@@ -254,7 +260,7 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
 }
 
 function AmountCell ({ amount, isRequest, isOffer, inboxView }) {
-  const amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
+  const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
   return <div styleName={cx('amount', { debit: isRequest && inboxView === VIEW.pending }, { credit: isOffer && inboxView === VIEW.pending })}>
     {amountDisplay} HF
   </div>
@@ -276,7 +282,7 @@ function AcceptButton ({ transaction: { id } }) {
   return <Button
     onClick={acceptOffer}
     styleName='accept-button'>
-    Accept
+    <p>Accept</p>
   </Button>
 }
 
@@ -285,7 +291,7 @@ function PayButton ({ showConfirmationModal, transaction }) {
   return <Button
     onClick={() => showConfirmationModal(transaction, action)}
     styleName='pay-button'>
-    Pay
+    <p>Pay</p>
   </Button>
 }
 
@@ -294,7 +300,7 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   return <Button
     onClick={() => showConfirmationModal(transaction, action)}
     styleName='reject-button'>
-    Decline
+    <p>Decline</p>
   </Button>
 }
 
