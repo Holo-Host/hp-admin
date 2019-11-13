@@ -10,6 +10,7 @@ import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
 import { presentHolofuelAmount, formatDateTime } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
+import PageDivider from 'holofuel/components/PageDivider'
 import { title as forwardIconTitle } from 'components/icons/ForwardIcon'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -101,12 +102,9 @@ describe('TransactionRow', () => {
       <TransactionRow transaction={request} whoami={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
-    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is requesting')).toBeInTheDocument()
     expect(getByText(request.notes)).toBeInTheDocument()
-    expect(getByText('Pay')).toBeInTheDocument()
-    expect(getByText('Reject')).toBeInTheDocument()
   })
 
   it('renders an offer', async () => {
@@ -114,12 +112,9 @@ describe('TransactionRow', () => {
       <TransactionRow transaction={offer} whoami={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
-    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is offering')).toBeInTheDocument()
     expect(getByText(offer.notes)).toBeInTheDocument()
-    expect(getByText('Accept')).toBeInTheDocument()
-    expect(getByText('Reject')).toBeInTheDocument()
   })
 
   const mockTransaction = {
@@ -227,4 +222,20 @@ describe('TransactionRow', () => {
       expect(acceptOfferMock.newData).toHaveBeenCalled()
     })
   })
+
+  describe('Semantic Timestamp Label', () => {
+    it('responds properly', async () => {
+      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <PageDivider title={request.timestamp} />
+      </MockedProvider>, 0)
+
+      expect(getByText(formatDateTime(request.timestamp.format('MMM D YYYY')))).toBeInTheDocument()
+    })
+  })
 })
+
+// Add'l tests to add & review :
+// null state
+// semantic timedate label / divider ::check
+// jumbotron header with balance
+// action slider (buttons don't show until the slider/forward btn is clicked)
