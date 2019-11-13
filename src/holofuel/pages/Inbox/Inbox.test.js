@@ -8,12 +8,14 @@ import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
-import { presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount, formatDateTime } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
+import PageDivider from 'holofuel/components/PageDivider'
+import { title as forwardIconTitle } from 'components/icons/ForwardIcon'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
@@ -54,7 +56,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       const { getByText } = within(item)
       const transaction = actionableTransactions[index]
       expect(getByText(transaction.notes)).toBeInTheDocument()
-      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
+      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) HF` : `${presentHolofuelAmount(transaction.amount)} HF`
       expect(getByText(amountToMatch)).toBeInTheDocument()
       expect(getByText(whois.nickname)).toBeInTheDocument()
     })
@@ -65,6 +67,21 @@ describe('TransactionRow', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
+
+  const mockWhoamiAgent = {
+    id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+    nickname: 'Perry'
+  }
+
+  const whoamiMock = {
+    request: {
+      query: HolofuelUserQuery
+    },
+    result: {
+      data: { holofuelUser: mockWhoamiAgent }
+    },
+    newData: jest.fn()
+  }
 
   const request = {
     id: '123',
@@ -82,30 +99,22 @@ describe('TransactionRow', () => {
 
   it('renders a request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} />
+      <TransactionRow transaction={request} whoami={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
-    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is requesting')).toBeInTheDocument()
     expect(getByText(request.notes)).toBeInTheDocument()
-    expect(getByText('Pay')).toBeInTheDocument()
-    expect(getByText('Reject')).toBeInTheDocument()
   })
 
   it('renders an offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} />
+      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
-    expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is offering')).toBeInTheDocument()
     expect(getByText(offer.notes)).toBeInTheDocument()
-    expect(getByText('Accept')).toBeInTheDocument()
-    expect(getByText('Reject')).toBeInTheDocument()
   })
 
   const mockTransaction = {
@@ -148,6 +157,7 @@ describe('TransactionRow', () => {
   }
 
   const mocks = [
+    whoamiMock,
     offerMock,
     acceptOfferMock,
     declineMock,
@@ -167,11 +177,23 @@ describe('TransactionRow', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
+        whoami: mockWhoamiAgent,
         showConfirmationModal: jest.fn()
       }
-      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <TransactionRow {...props} />
       </MockedProvider>, 0)
+
+      expect(getByTestId('forward-icon')).toBeInTheDocument()
+      await act(async () => {
+        fireEvent.click(getByTestId('forward-icon'))
+        await wait(0)
+      })
+      // expect(getByText(forwardIconTitle)).toBeInTheDocument()
+      // await act(async () => {
+      //   fireEvent.click(getByText(forwardIconTitle))
+      //   await wait(0)
+      // })
 
       await act(async () => {
         fireEvent.click(getByText('Pay'))
@@ -189,7 +211,7 @@ describe('TransactionRow', () => {
   describe('Accept button', () => {
     it('responds properly', async () => {
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} />
+        <TransactionRow transaction={offer} whoami={mockWhoamiAgent} />
       </MockedProvider>, 0)
 
       await act(async () => {
@@ -200,4 +222,22 @@ describe('TransactionRow', () => {
       expect(acceptOfferMock.newData).toHaveBeenCalled()
     })
   })
+
+  describe('Semantic Timestamp Label', () => {
+    it('responds properly', async () => {
+      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <PageDivider title={request.timestamp} />
+      </MockedProvider>, 0)
+
+      expect(getByText(formatDateTime(request.timestamp.format('MMM D YYYY')))).toBeInTheDocument()
+    })
+  })
 })
+
+// Add'l tests to add & review :
+// null state (unit for that component.. ??)
+// action slider (buttons don't show until the slider/forward btn is clicked)
+//   ^^ >> (Issue locating the element in Jest debug. This is not experienced in manual testing.)
+
+// semantic timedate label / divider (unit for that component.. ??) ::check
+// jumbotron header with balance :: determine right approach

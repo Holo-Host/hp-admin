@@ -1,13 +1,16 @@
 .container {
-  max-width: 250px;
+  max-width: 90%;
   margin: 0 auto;
   top: 30%;
   background-color: #fff;
   border: 1px solid #000;
-  border-radius: 8px;
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, .5);
-  padding: 32px;
+  border-radius: 1px;
+  /* box-shadow: 4px 4px 8px rgba(0, 0, 0, .5); */
+  padding: 50px;
   position: relative;
+
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(27.1828px);
 }
 
 /* TODO: Handle focus properly */
@@ -25,6 +28,7 @@
   text-indent: -9999px;
   width: 36px;
   height: 36px;
+  color: rgba(44, 64, 90, 0.3);
 }
 
 .close-btn::after {
@@ -37,6 +41,6 @@
   right: 0;
   transform: translateY(-50%);
   text-indent: 0;
-  font-size: 18px;
+  font-size: 25px;
   line-height: 1;
 }

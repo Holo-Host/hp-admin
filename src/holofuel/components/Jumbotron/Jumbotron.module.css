@@ -1,0 +1,48 @@
+.jumbotron-body {
+  width: 100%;
+  height: auto;
+  display: block;
+  box-sizing: border-box;
+  text-align: left;
+  left: 0px;
+  padding: 0.5rem 2rem;
+  border-radius: .3rem;
+  background: #CFF3EC;
+  font-family: 'CircularStd', sans-serif;
+  color: #2C405A;
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -0.4px;
+}
+
+.wide {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: left;
+}
+
+.jumbotron-title {
+  width: 321px;
+  height: auto;
+  font-size: 36px;
+  line-height: 28px; 
+  text-align: left;
+}
+
+.jumbotron-superscript {
+  width: 58.15px;
+  height: 13px;
+  margin: 20px 2px 2px 2px;
+  color: rgba(44, 64, 90, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 13px;
+}
+
+.inbox-header {
+  padding: 0.25rem 2rem !important;
+}

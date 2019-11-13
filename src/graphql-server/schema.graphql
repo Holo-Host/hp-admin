@@ -62,6 +62,7 @@ type Transaction {
   status: TransactionStatus
   type: TransactionType
   timestamp: String
+  dateLabel: String
   fees: Float
   presentBalance: Float
   notes: String 
@@ -112,6 +113,7 @@ type Query {
   hostPricing: HostPricing
   holofuelCompletedTransactions: [Transaction]
   holofuelWaitingTransactions: [Transaction]
+  holofuelRecentTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
   holofuelUser: HolofuelUser

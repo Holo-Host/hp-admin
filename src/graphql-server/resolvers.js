@@ -45,6 +45,8 @@ export const resolvers = {
 
     holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
 
+    holofuelRecentTransactions: HoloFuelDnaInterface.transactions.allRecent,
+
     holofuelCompletedTransactions: HoloFuelDnaInterface.transactions.allCompleted,
 
     holofuelLedger: HoloFuelDnaInterface.ledger.get,

@@ -33,9 +33,8 @@ export function presentDateAndTime (dateTime) {
   return { date, time }
 }
 
-// parking this here. Not currently used.
-
-function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
+// Currently used for semantic data label dividers / headers
+export function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
   const dateDifference = moment(isoDate).fromNow()
   // If over a year ago, include the year in date
   if (dateDifference.split(' ')[1] === 'years' || dateDifference.split(' ')[1] === 'year') {
