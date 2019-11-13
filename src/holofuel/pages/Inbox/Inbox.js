@@ -320,13 +320,13 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
     styleName='modal'>
     <div styleName='modal-title'>Create a new transaction.</div>
     <Button styleName='modal-buttons' onClick={handleClose}>
-      <Link to={REQUEST_PATH} styleName='button-link'>
+      <Link to={OFFER_PATH} styleName='button-link'>
         <div styleName='modal-offer-link'>
           Send
         </div>
       </Link>
       <div styleName='button-divide' />
-      <Link to={OFFER_PATH} styleName='button-link'>
+      <Link to={REQUEST_PATH} styleName='button-link'>
         <div styleName='modal-request-link'>
           Request
         </div>
