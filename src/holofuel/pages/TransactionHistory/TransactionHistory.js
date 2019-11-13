@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, flatten, capitalize } from 'lodash/fp'
-import moment from 'moment'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
@@ -12,7 +11,7 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount, getDateLabel } from 'utils'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
@@ -64,22 +63,8 @@ function useFetchCounterparties () {
 
 // returns an array of objects of the form { label, transactions }, sorted chronologicaly
 function partitionByDate (transactions) {
-  const now = moment()
-  const today = now.clone().startOf('day')
-  const yesterday = now.clone().subtract(1, 'days').startOf('day')
-
-  const isToday = momentDate => momentDate.isSame(today, 'd')
-  const isYesterday = momentDate => momentDate.isSame(yesterday, 'd')
-
-  const getLabel = ({ timestamp }) => {
-    const momentDate = moment(timestamp)
-    if (isToday(momentDate)) return 'Today'
-    if (isYesterday(momentDate)) return 'Yesterday'
-    return momentDate.format('MMMM Do')
-  }
-
   return transactions.reduce((partitions, transaction) => {
-    const label = getLabel(transaction)
+    const label = getDateLabel(transaction.timestamp)
     const partition = partitions.find(p => p.label === label)
     if (partition) {
       return partitions.filter(p => p.label !== label).concat([{

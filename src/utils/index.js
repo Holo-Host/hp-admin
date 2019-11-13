@@ -33,6 +33,21 @@ export function presentDateAndTime (dateTime) {
   return { date, time }
 }
 
+export function getDateLabel (timestamp) {
+  const now = moment()
+  const today = now.clone().startOf('day')
+  const yesterday = now.clone().subtract(1, 'days').startOf('day')
+
+  const isToday = momentDate => momentDate.isSame(today, 'd')
+  const isYesterday = momentDate => momentDate.isSame(yesterday, 'd')
+
+  const momentDate = moment(timestamp)
+
+  if (isToday(momentDate)) return 'Today'
+  if (isYesterday(momentDate)) return 'Yesterday'
+  return momentDate.format('MMMM Do')
+}
+
 // parking this here. Not currently used.
 
 function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
