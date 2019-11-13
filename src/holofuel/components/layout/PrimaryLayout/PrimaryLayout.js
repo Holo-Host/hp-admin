@@ -29,7 +29,7 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} />
+    <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
