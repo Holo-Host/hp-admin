@@ -196,6 +196,11 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
   const { counterparty, presentBalance, amount, type, notes } = transaction
 
   const actionsClick = () => actionsClickWithTx(transaction)
+  const handleCloseReveal = () => {
+    if (!isEmpty(actionsVisible) && actionsVisible === transaction) return actionsClickWithTx(null)
+    else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction)
+    else return actionsClickWithTx(null)
+  }
 
   let agent
   if (counterparty.id === whoami.id) agent = whoami
@@ -238,7 +243,7 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
       actionsVisible={actionsVisible}
       istransaction={transaction === actionsVisible}
       actionsClick={actionsClick}
-      handleClose={() => actionsClickWithTx(null)}
+      handleClose={handleCloseReveal}
     />}
     {inboxView === VIEW.pending && <ActionOptions
       actionsVisible={actionsVisible}
@@ -252,7 +257,7 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
 
 function RevealActionsButton ({ actionsClick, handleClose, actionsVisible, istransaction }) {
   return <div onClick={actionsVisible ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !(actionsVisible && istransaction) })} data-testid='reveal-actions-button'>
-    <ForwardIcon styleName='forward-icon' color='#2c405a4d' data-test='forward-icon' />
+    <ForwardIcon styleName='forward-icon' color='#2c405a4d' dataTestId='forward-icon' />
   </div>
 }
 
@@ -319,13 +324,13 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
     styleName='modal'>
     <div styleName='modal-title'>Create a new transaction.</div>
     <Button styleName='modal-buttons' onClick={handleClose}>
-      <Link to={REQUEST_PATH} styleName='button-link'>
+      <Link to={OFFER_PATH} styleName='button-link'>
         <div styleName='modal-offer-link'>
           Send
         </div>
       </Link>
       <div styleName='button-divide' />
-      <Link to={OFFER_PATH} styleName='button-link'>
+      <Link to={REQUEST_PATH} styleName='button-link'>
         <div styleName='modal-request-link'>
           Request
         </div>
@@ -376,6 +381,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
         styleName='modal-button-no'>
         No
       </Button>
+      <div styleName='button-divide' />
       <Button
         onClick={onYes}
         styleName='modal-button-yes'>
