@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link, MemoryRouter } from 'react-router-dom'
 import { render, fireEvent } from '@testing-library/react'
+import Home from 'holofuel/pages/Home'
 import Inbox from 'holofuel/pages/Inbox'
 import CreateOffer from 'holofuel/pages/CreateOffer'
 import CreateRequest from 'holofuel/pages/CreateRequest'
@@ -24,6 +25,8 @@ const makeMockHFPage = title => () => <div>
   <Link to={HISTORY_PATH}>history</Link>
 </div>
 
+jest.mock('holofuel/pages/Home')
+Home.mockImplementation(makeMockHFPage('Home'))
 jest.mock('holofuel/pages/Inbox')
 Inbox.mockImplementation(makeMockHFPage('Inbox'))
 jest.mock('holofuel/pages/CreateOffer')
@@ -35,6 +38,9 @@ TransactionHistory.mockImplementation(makeMockHFPage('TransactionHistory'))
 
 const testLinks = ui => {
   const { getByText } = render(ui)
+  expect(getByText('Home')).toBeInTheDocument()
+
+  fireEvent.click(getByText('inbox'))
   expect(getByText('Inbox')).toBeInTheDocument()
 
   fireEvent.click(getByText('offer'))
