@@ -68,8 +68,8 @@ in
 
 {
 
-  hp-admin-build = stdenv.mkDerivation rec {
-    name = "hp-admin-build";
+  hp-admin = stdenv.mkDerivation rec {
+    name = "hp-admin";
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
@@ -114,8 +114,8 @@ in
     doCheck = false;
   };
 
-  holofuel-build = stdenv.mkDerivation rec {
-    name = "holofuel-build";
+  holofuel-ui = stdenv.mkDerivation rec {
+    name = "holofuel-ui";
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
