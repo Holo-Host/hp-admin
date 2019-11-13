@@ -196,6 +196,10 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
   const { counterparty, presentBalance, amount, type, notes } = transaction
 
   const actionsClick = () => actionsClickWithTx(transaction)
+  const handleCloseReveal = () => {
+    if (!isEmpty(inboxView) && inboxView === transaction) return actionsClickWithTx(null)
+    else if (!isEmpty(inboxView) && inboxView !== transaction) return actionsClickWithTx(transaction)
+  }
 
   let agent
   if (counterparty.id === whoami.id) agent = whoami
@@ -238,7 +242,7 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
       actionsVisible={actionsVisible}
       istransaction={transaction === actionsVisible}
       actionsClick={actionsClick}
-      handleClose={() => actionsClickWithTx(null)}
+      handleClose={handleCloseReveal}
     />}
     {inboxView === VIEW.pending && <ActionOptions
       actionsVisible={actionsVisible}
