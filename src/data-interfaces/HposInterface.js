@@ -10,17 +10,28 @@ const axiosConfig = {
   }
 }
 
-export function hposCall (method = 'get', path, apiVersion = 'v1') {
+export function hposCall (method = 'get', path, authToken, apiVersion = 'v1') {
   if (MOCK_HPOS_CONNECTION) {
     return mockCallHpos(method, apiVersion, path)
   } else {
     const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
 
+    const headers = {
+      ...axiosConfig.headers,
+      'X-Holo-Admin-Signature': authToken
+    }
+
     switch (method) {
       case 'get':
-        return params => axios.get(fullPath, params, axiosConfig)
+        return async params => {
+          const { data } = await axios.get(fullPath, { params, headers })
+          return data
+        }
       case 'post':
-        return params => axios.post(fullPath, params, axiosConfig)
+        return async params => {
+          const { data } = await axios.post(fullPath, { params, headers })
+          return data
+        }
       default:
         throw new Error(`No case in hposCall for ${method} method`)
     }
@@ -56,13 +67,13 @@ const presentHposSettings = (hposSettings) => {
 const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
-    settings: async () => {
-      const result = await hposCall('get', 'config')()
+    settings: async (authToken) => {
+      const result = await hposCall('get', 'config', authToken)()
       return presentHposSettings(result)
     },
 
     // TODO: Disucss options and implications for updating a Host's registration email.
-    updateSettings: async (hostPubKey, hostName, sshAccess) => {
+    updateSettings: async (hostPubKey, hostName, sshAccess, authToken) => {
       const settingsConfig = {
         admin: {
           name: hostName,
@@ -73,18 +84,18 @@ const HposInterface = {
         }
       }
 
-      const result = await hposCall('post', 'config')(settingsConfig)
+      const result = await hposCall('post', 'config', authToken)(settingsConfig)
       return presentHposSettings(result)
     },
 
     // HOLOPORT_OS STATUS
-    status: async () => {
-      const result = await hposCall('get', 'status')()
+    status: async (authToken) => {
+      const result = await hposCall('get', 'status', authToken)()
       return presentHposStatus(result)
     },
 
-    updateVersion: async () => {
-      const result = await hposCall('post', 'upgrade')()
+    updateVersion: async (authToken) => {
+      const result = await hposCall('post', 'upgrade', authToken)()
       return presentHposStatus(result)
     }
   }

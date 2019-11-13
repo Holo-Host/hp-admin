@@ -4,13 +4,14 @@ import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
 import './Dashboard.module.css'
 
 export default function Dashboard () {
-  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
 
   const { data: { happs = [] } = {} } = useQuery(HappsQuery)
   const noInstalledHapps = happs.reduce((total, happ) => happ.isEnabled ? total + 1 : total, 0)

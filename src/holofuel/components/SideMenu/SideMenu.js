@@ -7,6 +7,13 @@ import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import { presentHolofuelAmount } from 'utils' // presentAgentId
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import {
+  HOME_PATH,
+  INBOX_PATH,
+  OFFER_PATH,
+  REQUEST_PATH,
+  HISTORY_PATH
+} from 'holofuel/utils/urls'
 
 import './SideMenu.module.css'
 
@@ -44,26 +51,32 @@ export function SideMenu ({
       <nav styleName='nav'>
         <ul styleName='nav-list'>
           <li>
-            <Link to='/inbox' styleName='nav-link'>
+            <Link to={HOME_PATH} styleName='nav-link'>
+              <div styleName='nav-icon' />
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link to={INBOX_PATH} styleName='nav-link'>
               <div styleName='nav-icon' />
               Inbox
               {inboxCount > 0 && <span styleName='nav-badge'>{inboxCount}</span>}
             </Link>
           </li>
           <li>
-            <Link to='/offer' styleName='nav-link'>
+            <Link to={OFFER_PATH} styleName='nav-link'>
               <div styleName='nav-icon' />
               Offer
             </Link>
           </li>
           <li>
-            <Link to='/request' styleName='nav-link'>
+            <Link to={REQUEST_PATH} styleName='nav-link'>
               <div styleName='nav-icon' />
               Request
             </Link>
           </li>
           <li>
-            <Link to='/history' styleName='nav-link'>
+            <Link to={HISTORY_PATH} styleName='nav-link'>
               <div styleName='nav-icon' />
               History
             </Link>
