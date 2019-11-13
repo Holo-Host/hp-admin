@@ -54,7 +54,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       const { getByText } = within(item)
       const transaction = actionableTransactions[index]
       expect(getByText(transaction.notes)).toBeInTheDocument()
-      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)})` : presentHolofuelAmount(transaction.amount)
+      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) HF` : `${presentHolofuelAmount(transaction.amount)} HF`
       expect(getByText(amountToMatch)).toBeInTheDocument()
       expect(getByText(whois.nickname)).toBeInTheDocument()
     })
@@ -86,7 +86,6 @@ describe('TransactionRow', () => {
     </MockedProvider>, 0)
 
     expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is requesting')).toBeInTheDocument()
     expect(getByText(request.notes)).toBeInTheDocument()
@@ -100,7 +99,6 @@ describe('TransactionRow', () => {
     </MockedProvider>, 0)
 
     expect(getByText(request.timestamp.format('MMM D YYYY'))).toBeInTheDocument()
-    expect(getByText(request.timestamp.utc().format('kk:mm UTC'))).toBeInTheDocument()
     expect(getByText('last 6')).toBeInTheDocument()
     expect(getByText('is offering')).toBeInTheDocument()
     expect(getByText(offer.notes)).toBeInTheDocument()

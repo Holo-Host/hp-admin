@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
-import { promiseMap, presentDateAndTime } from 'utils'
+import { promiseMap, formatDateTime } from 'utils'
 
 export const currentDataTimeIso = () => new Date().toISOString()
 
@@ -20,7 +20,7 @@ export async function getTxCounterparties (transactionList) {
 }
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
-  const { date } = presentDateAndTime(eventTimestamp)
+  const { date } = formatDateTime(eventTimestamp)
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -38,7 +38,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
 }
 
 const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
-  const { date } = presentDateAndTime(eventTimestamp)
+  const { date } = formatDateTime(eventTimestamp)
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -73,7 +73,7 @@ const presentAcceptedPayment = async (acceptedPayment) => {
 
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterpartyId = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
-  const { date } = presentDateAndTime(eventTimestamp)
+  const { date } = formatDateTime(eventTimestamp)
   return {
     id: origin,
     amount: event.Receipt.cheque.invoice.promise.tx.amount,
@@ -94,7 +94,7 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
 // TODO: Review whether we should be showing this in addition to the receipt
 const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterpartyId = stateDirection === DIRECTION.incoming ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
-  const { date } = presentDateAndTime(eventTimestamp)
+  const { date } = formatDateTime(eventTimestamp)
   return {
     id: origin,
     amount: event.Cheque.invoice.promise.tx.amount,

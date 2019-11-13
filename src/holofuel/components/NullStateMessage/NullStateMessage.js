@@ -18,8 +18,10 @@ function NullStateMessage ({
       styleName={classes}
       data-testid={dataTestId}
     >
-      {message}
+      <h3 styleName='null-state-message'>{message}</h3>
+
       {children}
+
     </div>
   )
 }

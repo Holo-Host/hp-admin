@@ -4,6 +4,14 @@
   line-height: 24px;
   text-align: center;
   color: rgba(44, 64, 90, 0.6);
+  margin: 20px;
+  margin-top: 30px;
+}
+
+.null-state-message {
+  display: block;
+  width: 200px;
+  margin: 0 auto;
 }
 
 .wide {
