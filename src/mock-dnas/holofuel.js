@@ -93,7 +93,7 @@ export const transactionList = {
       },
       timestamp: {
         origin: '2019-08-30T11:16:12+00:00',
-        event: '2019-08-30T11:19:33+00:00'
+        event: '2019-08-30T07:19:33+00:00'
       },
       adjustment: {
         Ok: {
@@ -116,10 +116,10 @@ export const transactionList = {
               tx: {
                 from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
                 to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-                amount: '10.01',
+                amount: '207.45',
                 fee: '0',
                 deadline: '2020-02-02T00:00:00+00:00',
-                notes: 'Taco Tuesday!',
+                notes: 'Sushi Sunday!',
                 synchronous: null
               },
               request: 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
