@@ -215,23 +215,20 @@
   flex: 1;
 }
 
-.drawer--open {
+.drawer-close {
   display: flex;
   /* transform: translateX(100%); */
   flex: 0 0 0;
-  visibility: collapse;
+  visibility: visible;
 }
-.drawer--open .forward-icon{
+.drawer-close .forward-icon{
   /* transform: translateX(0%); */
-  flex:1 1 0;
   visibility: visible;
 }
 
-.drawer--open .actions {
+.drawer-close .actions {
   /* transform: translateX(100%); */
-  width: 0;
-  flex:0;
-  visibility: collapse;
+  display: none;
 }
 
 .accept-button {
