@@ -186,6 +186,7 @@ export default function Inbox () {
 
     <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
+      setInboxView={setInboxView}
       transaction={modalTransaction}
       payTransaction={payTransaction}
       declineTransaction={declineTransaction} />
@@ -334,7 +335,7 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
   </Modal>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, setInboxView }) {
   if (!transaction) return null
   const { id, counterparty, amount, type, action } = transaction
 
@@ -360,6 +361,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
 
   const onYes = () => {
     actionHook(actionParams)
+    if (actionHook === declineTransaction) setInboxView(VIEW['recent'])
     handleClose()
   }
 
