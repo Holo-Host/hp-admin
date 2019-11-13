@@ -376,6 +376,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
         styleName='modal-button-no'>
         No
       </Button>
+      <div styleName='button-divide' />
       <Button
         onClick={onYes}
         styleName='modal-button-yes'>

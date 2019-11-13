@@ -32,11 +32,7 @@
 
 .button-divide {
   border: 1px solid rgba(44, 64, 90, 0.5);
-  transform: rotate(90deg);
-  width: 45px;
-  position: relative;
   top: 19px;
-  margin: -3px;
 }
 
 .button-link {
@@ -233,24 +229,27 @@
 
 .accept-button {
   composes: button;
-  margin: 0;
+  margin: -10px 0px;
   min-width: 70px;
+  height: 70px;
   color: white;
   background-color: #23CC80;
 }
 
 .pay-button {
   composes: button;
-  margin: 0;
+  margin: -10px 0px;
   min-width: 70px;
+  height: 70px;
   color: white;
   background-color: #23CC80;
 }
 
 .reject-button {
   composes: button;
-  margin: 0;
+  margin: -10px 0px;
   min-width: 70px;
+  height: 70px;
   color: white;
   background-color: #EE4266;
 }
@@ -286,6 +285,7 @@
 
 .modal-buttons {
   composes: green-classic-btn;
+  padding: 0px;
   margin-top: auto;
   margin-left: auto;
   display: flex;
@@ -311,24 +311,29 @@
 
 .modal-offer-link {
   composes: modal-button;
+  border-radius: 100px;
 }
 
 .modal-request-link {
   composes: modal-button;
+  border-radius: 100px;
 }
 
 .modal-button-no {
   composes: modal-button;
   background-color: #0DC39F;
+  border-radius: 100px;
 }
 
 .modal-button-yes {
   composes: modal-button;
   background-color: #0DC39F;
+  border-radius: 100px;
 }
 
 .modal-muted-btn {
   background-color: #05a484;
+  border-radius: 100px;
 }
 
 /* .ReactModal__Overlay .ReactModal__Overlay--after-open {

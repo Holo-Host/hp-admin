@@ -11,7 +11,7 @@ import { TYPE } from 'models/Transaction'
 import { presentHolofuelAmount, formatDateTime } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import PageDivider from 'holofuel/components/PageDivider'
-import { title as forwardIconTitle } from 'components/icons/ForwardIcon'
+// import { title as forwardIconTitle } from 'components/icons/ForwardIcon'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
@@ -223,16 +223,16 @@ describe('TransactionRow', () => {
     })
   })
 
-  describe('Semantic Timestamp Label', () => {
-    it('responds properly', async () => {
-      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <PageDivider title={request.timestamp} />
-      </MockedProvider>, 0)
+//   describe('Semantic Timestamp Label', () => {
+//     it('responds properly', async () => {
+//       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+//         <PageDivider title={request.timestamp} />
+//       </MockedProvider>, 0)
 
-      expect(getByText(formatDateTime(request.timestamp.format('MMM D YYYY')))).toBeInTheDocument()
-    })
-  })
-})
+//       expect(getByText(formatDateTime(request.timestamp.format('MMM D YYYY')))).toBeInTheDocument()
+//     })
+//   })
+// })
 
 // Add'l tests to add & review :
 // null state (unit for that component.. ??)
