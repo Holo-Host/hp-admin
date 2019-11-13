@@ -244,16 +244,19 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
       showConfirmationModal={showConfirmationModal}
     />}
 
+
   </div>
 }
 
 function RevealActionsButton ({ actionsClick, handleClose, actionsVisible, istransaction }) {
+  console.log('REtrive: ',actionsVisible && istransaction );
   return <div onClick={actionsVisible ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer--open': actionsVisible && istransaction })} data-testid='reveal-actions-button'>
     <ForwardIcon styleName='forward-icon' color='#2c405a4d' />
   </div>
 }
 
 function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisible }) {
+  console.log("action> ",actionsVisible && transaction === actionsVisible);
   return <aside styleName={cx('drawer', { 'drawer--open': actionsVisible && transaction === actionsVisible })}>
     <div styleName='actions'>
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
