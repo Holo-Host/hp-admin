@@ -6,9 +6,11 @@ import * as yup from 'yup'
 import Loader from 'react-loader-spinner'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'holofuel/components/Button'
+import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import './CreateRequest.module.css'
@@ -33,15 +35,22 @@ function useRequestMutation () {
 }
 
 export default function CreateRequest ({ history: { push } }) {
+  const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const createRequest = useRequestMutation()
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
+
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
   }, [counterpartyId])
 
-  const { register, handleSubmit, errors } = useForm({ validationSchema: FormValidationSchema })
+  const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
+
+  const selectAgent = id => {
+    setCounterpartyId(id)
+    setFormValue('counterpartyId', id)
+  }
 
   const { newMessage } = useFlashMessageContext()
 
@@ -88,6 +97,11 @@ export default function CreateRequest ({ history: { push } }) {
         name='notes'
         placeholder='Notes'
         ref={register} />
+      <RecentCounterparties
+        styleName='recent-counterparties'
+        agents={agents}
+        selectedAgentId={counterpartyId}
+        selectAgent={selectAgent} />
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
     </form>
   </PrimaryLayout>
