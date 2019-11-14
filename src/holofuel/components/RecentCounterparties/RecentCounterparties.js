@@ -22,7 +22,7 @@ export default function RecentCounterparties ({ agents, selectedAgentId, selectA
 function AgentRow ({ agent, selectThisAgent, selected }) {
   const agentName = agent.nickname || presentAgentId(agent.id)
 
-  return <div styleName={cx('agent-row', { selected })} onClick={selectThisAgent}>
+  return <div styleName={cx('agent-row', { selected })} onClick={selectThisAgent} data-testid='agent-row'>
     <HashIcon hash={agent.id} size={24} styleName='avatar' />
     <div styleName='name-and-id'>
       <div styleName='name'>{agentName}</div>
