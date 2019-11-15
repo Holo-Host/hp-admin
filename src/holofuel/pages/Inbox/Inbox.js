@@ -69,7 +69,7 @@ function useFetchCounterparties () {
 }
 
 const VIEW = {
-  pending: 'pending',
+  actionable: 'pending',
   recent: 'recent'
 }
 
@@ -97,13 +97,13 @@ export default function Inbox () {
   }
 
   const [actionsVisible, setActionsVisible] = useState(null)
-  const actionsClickWithTx = transaction => setActionsVisible(transaction)
+  const actionsClickWithTx = transactionId => setActionsVisible(transactionId)
 
-  const toggleButtons = [{ view: VIEW.pending, label: 'Pending' }, { view: VIEW.recent, label: 'Recent' }]
-  const [inboxView, setInboxView] = useState(VIEW.pending)
+  const toggleButtons = [{ view: VIEW.actionable, label: 'Pending' }, { view: VIEW.recent, label: 'Recent' }]
+  const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   switch (inboxView) {
-    case VIEW.pending:
+    case VIEW.actionable:
       displayTransactions = actionableTransactions
       break
     case VIEW.recent:
@@ -115,9 +115,9 @@ export default function Inbox () {
       break
   }
 
-  const isPendingTransactionsEmpty = isEmpty(actionableTransactions)
+  const isActionableTransactionsEmpty = isEmpty(actionableTransactions)
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
-  const pageTitle = `Inbox${isPendingTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
+  const pageTitle = `Inbox${isActionableTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
 
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
@@ -149,7 +149,7 @@ export default function Inbox () {
       <PageDivider title='Today' />
       <NullStateMessage
         styleName='null-state-message'
-        message={inboxView === VIEW.pending
+        message={inboxView === VIEW.actionable
           ? 'You have no pending offers or requests'
           : 'You have no recent activity'}>
         <div onClick={() => showConfirmationModal()}>
@@ -172,7 +172,7 @@ export default function Inbox () {
             role='list'
             whoami={whoami}
             view={VIEW}
-            inboxView={inboxView}
+            isActionable={inboxView === VIEW.actionable}
             showConfirmationModal={showConfirmationModal}
             key={transaction.id} />)}
         </div>
@@ -191,12 +191,12 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, inboxView, whoami }) {
+export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, isActionable, whoami }) {
   const { counterparty, presentBalance, amount, type, notes } = transaction
 
   const handleCloseReveal = () => {
     if (!isEmpty(actionsVisible) && actionsVisible === transaction) return actionsClickWithTx(null)
-    else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction)
+    else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction.id)
     else return actionsClickWithTx(null)
   }
 
@@ -210,7 +210,7 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
   const isRequest = !isOffer
 
   let story
-  if (inboxView === VIEW.pending) story = isOffer ? ' is offering' : ' is requesting'
+  if (isActionable) story = isOffer ? ' is offering' : ' is requesting'
 
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='avatar'>
@@ -234,16 +234,16 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
         amount={amount}
         isRequest={isRequest}
         isOffer={isOffer}
-        inboxView={inboxView}
+        isActionable={isActionable}
       />
-      {inboxView === VIEW.recent && <div styleName='balance'>{presentBalance}</div>}
+      {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
     </div>
 
-    {inboxView === VIEW.pending && <>
+    {isActionable && <>
       <RevealActionsButton
         actionsVisible={actionsVisible}
-        istransaction={transaction === actionsVisible}
-        actionsClick={() => actionsClickWithTx(transaction)}
+        istransaction={transaction.id === actionsVisible}
+        actionsClick={() => actionsClickWithTx(transaction.id)}
         handleClose={handleCloseReveal}
       />
       <ActionOptions
@@ -264,7 +264,7 @@ function RevealActionsButton ({ actionsClick, handleClose, actionsVisible, istra
 }
 
 function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisible }) {
-  return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisible && transaction === actionsVisible) })}>
+  return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisible && transaction.id === actionsVisible) })}>
     <div styleName='actions'>
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
       {isOffer && <AcceptButton transaction={transaction} />}
@@ -273,9 +273,9 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, inboxView }) {
+function AmountCell ({ amount, isRequest, isOffer, isActionable }) {
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
-  return <div styleName={cx('amount', { debit: isRequest && inboxView === VIEW.pending }, { credit: isOffer && inboxView === VIEW.pending })}>
+  return <div styleName={cx('amount', { debit: isRequest && isActionable }, { credit: isOffer && isActionable })}>
     {amountDisplay} HF
   </div>
 }
