@@ -15,7 +15,7 @@ export function PrimaryLayout ({
   headerProps = {}
 }) {
   const isWide = useContext(ScreenWidthContext)
-  const [isMenuOpen, setMenuOpen] = useState(false)
+  const [isMenuOpen, setMenuOpen] = useState(true)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
 
