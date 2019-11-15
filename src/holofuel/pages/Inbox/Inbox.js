@@ -204,6 +204,8 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
   if (counterparty.id === whoami.id) agent = whoami
   else agent = counterparty
 
+  console.log('agent (check for nickname - in pending...) : ', agent)
+
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
@@ -237,19 +239,21 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
       {inboxView === VIEW.recent && <div styleName='balance'>{presentBalance}</div>}
     </div>
 
-    {inboxView === VIEW.pending && <RevealActionsButton
-      actionsVisible={actionsVisible}
-      istransaction={transaction === actionsVisible}
-      actionsClick={actionsClick}
-      handleClose={handleCloseReveal}
-    />}
-    {inboxView === VIEW.pending && <ActionOptions
-      actionsVisible={actionsVisible}
-      isOffer={isOffer}
-      isRequest={isRequest}
-      transaction={transaction}
-      showConfirmationModal={showConfirmationModal}
-    />}
+    {inboxView === VIEW.pending && <>
+      <RevealActionsButton
+        actionsVisible={actionsVisible}
+        istransaction={transaction === actionsVisible}
+        actionsClick={actionsClick}
+        handleClose={handleCloseReveal}
+      />
+      <ActionOptions
+        actionsVisible={actionsVisible}
+        isOffer={isOffer}
+        isRequest={isRequest}
+        transaction={transaction}
+        showConfirmationModal={showConfirmationModal}
+      />
+    </>}
   </div>
 }
 
