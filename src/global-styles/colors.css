@@ -1,4 +1,5 @@
 /* color names come from http://chir.ag/projects/name-that-color/ */
+/* this is useful for translating from rgba to hex https://www.hexcolortool.com/ */
 
 :root {
   --color-tundora: #484848;
@@ -10,6 +11,9 @@
   --color-loblolly: #BFC5CD;
   --color-outerspace: #314843;
   --color-caribbean-green: #0DC39F;
+  --color-limed-spruce: #39474A;  
+  --color-rhino-35: rgba(44, 63, 89, 0.35);  
+  --color-rhino-80: rgba(44, 63, 89, 0.80);      
   /* color-shocking used in StyleDemo only */
   --color-shocking: #E292C0;
 }

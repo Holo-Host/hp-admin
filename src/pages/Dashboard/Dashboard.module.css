@@ -1,22 +1,39 @@
+.avatar {
+  align-self: center;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
 .greeting {
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 20px
+  color: var(--color-limed-spruce);
 }
 
 .card {
   display: block;
   text-decoration: none;
   color: black;
-  background-color: var(--color-gallery);
-  border: 1px solid var(--color-gray);
+  background-color: white;
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.1);
   border-radius: 4px;
-  padding: 15px 20px;
-  margin-bottom: 15px;
+  padding: 16px 24px;
+  margin-bottom: 20px;
 }
 
-.card-title {
-  display: block;
+.laptop-icon {
+  width: 26px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.application-count {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+  font-family: "Circular";
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--color-rhino-80);
 }
 
 .small-text {
@@ -27,4 +44,14 @@
   margin-top: 10px;
   font-weight: bold;
   font-size: 18px;
+}
+
+/* Card */
+
+.card-title {
+  color: var(--color-limed-spruce);
+}
+
+.card-subtitle {
+  color: var(--color-rhino-35);
 }
