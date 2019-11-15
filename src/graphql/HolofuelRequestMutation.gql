@@ -7,6 +7,5 @@ mutation HolofuelRequest ($counterpartyId: String, $amount: Float, $notes: Strin
     status
     type
     timestamp
-    dateLabel
   }
 }

@@ -7,7 +7,6 @@ query HolofuelActionableTransactionsQuery {
     status
     type
     timestamp
-    dateLabel
     notes
     fees
   }
