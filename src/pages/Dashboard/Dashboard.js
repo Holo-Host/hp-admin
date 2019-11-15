@@ -20,7 +20,7 @@ export default function Dashboard () {
 
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
 
-  return <PrimaryLayout>
+  return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='greeting'>{greeting}</div>
     <Link styleName='card' to='/browse-happs'>
       <h2 styleName='card-title'>Hosting</h2>

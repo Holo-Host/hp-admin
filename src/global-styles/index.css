@@ -5,12 +5,12 @@
 
 @font-face {
   font-family: 'Circular';
-  src: local('Roboto'), url(../assets/fonts/lineto-circular-book.ttf) format('truetype');
+  src: local('Circular'), url(../assets/fonts/lineto-circular-book.ttf) format('truetype');
 }
 
 body {
   margin: 0;
-  font-family: "Roboto";
+  font-family: "Circular";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: rgb(250,250,250);
