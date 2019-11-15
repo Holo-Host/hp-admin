@@ -104,6 +104,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         console.groupEnd()
         console.groupEnd()
       }
+      console.log('Result: ',result);
       return result
     } catch (error) {
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
