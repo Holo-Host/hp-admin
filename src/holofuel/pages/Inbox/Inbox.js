@@ -6,7 +6,7 @@ import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import HolofuelRecentTransactionsQuery from 'graphql/HolofuelRecentTransactionsQuery.gql'
+import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
@@ -82,7 +82,7 @@ export default function Inbox () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
-  const { data: { holofuelRecentTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelRecentTransactionsQuery)
+  const { data: { holofuelNonPendingTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery)
 
   useFetchCounterparties()
   const payTransaction = useOffer()
@@ -99,7 +99,7 @@ export default function Inbox () {
   const [actionsVisible, setActionsVisible] = useState(null)
   const actionsClickWithTx = transaction => setActionsVisible(transaction)
 
-  const toggleButtons = [{ view: 'pending', label: 'Pending' }, { view: 'recent', label: 'Recent' }]
+  const toggleButtons = [{ view: VIEW.pending, label: 'Pending' }, { view: VIEW.recent, label: 'Recent' }]
   const [inboxView, setInboxView] = useState(VIEW.pending)
   let displayTransactions = []
   switch (inboxView) {
@@ -111,6 +111,7 @@ export default function Inbox () {
       break
     default:
       displayTransactions = actionableTransactions
+      console.error('Error: inboxView is not set to valid display option (eg: recent or pending).')
       break
   }
 
@@ -193,7 +194,6 @@ export default function Inbox () {
 export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, inboxView, whoami }) {
   const { counterparty, presentBalance, amount, type, notes } = transaction
 
-  const actionsClick = () => actionsClickWithTx(transaction)
   const handleCloseReveal = () => {
     if (!isEmpty(actionsVisible) && actionsVisible === transaction) return actionsClickWithTx(null)
     else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction)
@@ -201,11 +201,11 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
   }
 
   let agent
-  if (counterparty.id === whoami.id) agent = whoami
-  else agent = counterparty
+  if (counterparty.id === whoami.id) {
+    agent = whoami
+  } else { agent = counterparty }
 
-  console.log('agent (check for nickname - in pending...) : ', agent)
-
+  // console.log('agent (check for nickname - in pending...) : ', agent)
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
@@ -243,7 +243,7 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
       <RevealActionsButton
         actionsVisible={actionsVisible}
         istransaction={transaction === actionsVisible}
-        actionsClick={actionsClick}
+        actionsClick={() => actionsClickWithTx(transaction)}
         handleClose={handleCloseReveal}
       />
       <ActionOptions

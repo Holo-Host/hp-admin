@@ -61,11 +61,11 @@ describe('resolvers', () => {
       })
     })
 
-    describe('.holofuelRecentTransactions', () => {
-      it('calls HoloFuelInterface.transactions.allRecent', async () => {
-        resolvers.Query.holofuelRecentTransactions()
+    describe('.holofuelNonPendingTransactions', () => {
+      it('calls HoloFuelInterface.transactions.allNonPending', async () => {
+        resolvers.Query.holofuelNonPendingTransactions()
         await wait(0)
-        expect(mockHoloFuelInterface.transactions.allRecent).toHaveBeenCalled()
+        expect(mockHoloFuelInterface.transactions.allNonPending).toHaveBeenCalled()
       })
     })
 

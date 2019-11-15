@@ -3,7 +3,7 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
 // This can be written as a boolean expression then it's even less readable
-const developmentMockDnaConnection = false // this is the value MOCK_DNA_CONNECTION will have in the dev server
+const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
   : process.env.NODE_ENV === 'test'
