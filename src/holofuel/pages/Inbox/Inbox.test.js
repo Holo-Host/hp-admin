@@ -2,13 +2,14 @@ import React from 'react'
 import { fireEvent, act, within } from '@testing-library/react'
 import wait from 'waait'
 import moment from 'moment'
+import { reverse } from 'lodash/fp'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
-import { presentHolofuelAmount } from 'utils' // , formatDateTime
+import { presentHolofuelAmount } from 'utils' // , partitionByDate
 import { renderAndWait } from 'utils/test-utils'
 // import { title as forwardIconTitle } from 'components/icons/ForwardIcon'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
@@ -49,7 +50,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)
 
-    listItems.forEach(async (item, index) => {
+    reverse(listItems).forEach(async (item, index) => {
       const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
 
       const { getByText } = within(item)
