@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
-import { promiseMap, formatDateTime } from 'utils'
+import { promiseMap } from 'utils'
 
 export const currentDataTimeIso = () => new Date().toISOString()
 
@@ -20,7 +20,6 @@ export async function getTxCounterparties (transactionList) {
 }
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
-  const { date } = formatDateTime(eventTimestamp)
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -31,14 +30,12 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     status: status || STATUS.pending,
     type: TYPE.request,
     timestamp: eventTimestamp,
-    dateLabel: date,
     notes: notes || event.Request.notes,
     fees
   }
 }
 
 const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
-  const { date } = formatDateTime(eventTimestamp)
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -49,7 +46,6 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     status: status || STATUS.pending,
     type: TYPE.offer,
     timestamp: eventTimestamp,
-    dateLabel: date,
     notes: notes || event.Promise.tx.notes,
     fees
   }
@@ -73,7 +69,6 @@ const presentAcceptedPayment = async (acceptedPayment) => {
 
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterpartyId = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
-  const { date } = formatDateTime(eventTimestamp)
   return {
     id: origin,
     amount: event.Receipt.cheque.invoice.promise.tx.amount,
@@ -84,7 +79,6 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     status: STATUS.completed,
     type: event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
-    dateLabel: date,
     fees,
     presentBalance,
     notes: event.Receipt.cheque.invoice.promise.tx.notes
@@ -94,7 +88,6 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
 // TODO: Review whether we should be showing this in addition to the receipt
 const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterpartyId = stateDirection === DIRECTION.incoming ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
-  const { date } = formatDateTime(eventTimestamp)
   return {
     id: origin,
     amount: event.Cheque.invoice.promise.tx.amount,
@@ -105,7 +98,6 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
     status: STATUS.completed,
     type: event.Cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
-    dateLabel: date,
     fees,
     presentBalance,
     notes: event.Cheque.invoice.promise.tx.notes

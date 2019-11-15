@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
 
 export function bgImageStyle (url) {
   if (!url) return {}
@@ -33,8 +34,36 @@ export function presentDateAndTime (dateTime) {
   return { date, time }
 }
 
-// Currently used for semantic data label dividers / headers
-export function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
+export function getDateLabel (timestamp) {
+  const now = moment()
+  const today = now.clone().startOf('day')
+  const yesterday = now.clone().subtract(1, 'days').startOf('day')
+
+  const isToday = momentDate => momentDate.isSame(today, 'd')
+  const isYesterday = momentDate => momentDate.isSame(yesterday, 'd')
+
+  const momentDate = moment(timestamp)
+
+  if (isToday(momentDate)) return 'Today'
+  if (isYesterday(momentDate)) return 'Yesterday'
+  return momentDate.format('MMMM Do')
+}
+
+// returns an array of objects of the form { label, transactions }, sorted chronologicaly
+export const partitionByDate = flow(
+  groupBy(({ timestamp }) => getDateLabel(timestamp)),
+  groups => {
+    const labels = keys(groups)
+    return labels.map(label => ({
+      transactions: groups[label],
+      label
+    }))
+  },
+  sortBy(partition => partition.transactions[0].timestamp),
+  reverse)
+
+// parking this here. Not currently used.
+function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
   const dateDifference = moment(isoDate).fromNow()
   // If over a year ago, include the year in date
   if (dateDifference.split(' ')[1] === 'years' || dateDifference.split(' ')[1] === 'year') {

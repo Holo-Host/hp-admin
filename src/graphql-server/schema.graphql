@@ -62,7 +62,6 @@ type Transaction {
   status: TransactionStatus
   type: TransactionType
   timestamp: String
-  dateLabel: String
   fees: Float
   presentBalance: Float
   notes: String 

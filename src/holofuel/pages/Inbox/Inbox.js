@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, flatten, groupBy } from 'lodash/fp'
+import { isEmpty, flatten } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -22,7 +22,7 @@ import HashAvatar from 'components/HashAvatar'
 import AddIcon from 'components/icons/AddIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount, sliceHash } from 'utils'
+import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } from 'utils'
 import { Link } from 'react-router-dom'
 import { REQUEST_PATH, OFFER_PATH } from 'holofuel/utils/urls'
 
@@ -118,9 +118,7 @@ export default function Inbox () {
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const pageTitle = `Inbox${isPendingTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
 
-  // Sort the transactions by (semantic) date
-  const transactionsByDate = groupBy('dateLabel', displayTransactions)
-  const transactionsByDateKeys = Object.keys(transactionsByDate)
+  const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
   return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={actionableTransactions.length}>
     <Jumbotron
@@ -162,11 +160,11 @@ export default function Inbox () {
       </NullStateMessage>
     </>}
 
-    {!isDisplayTransactionsEmpty && !isEmpty(transactionsByDateKeys) && <div className='transaction-by-date-list'>
-      {transactionsByDateKeys.map(transactionDate => <div key={transactionDate}>
-        <PageDivider title={transactionDate} />
+    {!isDisplayTransactionsEmpty && <div className='transaction-by-date-list'>
+      {partitionedTransactions.map(({ label: dateLabel, transactions }) => <React.Fragment key={dateLabel}>
+        <PageDivider title={dateLabel} />
         <div styleName='transaction-list'>
-          {transactionsByDate[transactionDate].map(transaction => <TransactionRow
+          {transactions.map(transaction => <TransactionRow
             transaction={transaction}
             actionsVisible={actionsVisible}
             actionsClickWithTx={actionsClickWithTx}
@@ -177,7 +175,7 @@ export default function Inbox () {
             showConfirmationModal={showConfirmationModal}
             key={transaction.id} />)}
         </div>
-      </div>)}
+      </React.Fragment>)}
     </div>}
 
     <NewTransactionModal

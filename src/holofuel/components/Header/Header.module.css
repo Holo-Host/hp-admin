@@ -3,7 +3,7 @@
   display: flex;
 }
 
-.middle-nav {
+.center-nav {
   flex: 1;
 }
 
@@ -71,8 +71,26 @@
 }
 
 .title {
-  text-align: left;
-  margin: 10px;
+  text-align: center;
+}
+
+/* We should turn this into a design-system component */
+.nav-badge {
+  box-sizing: border-box;
+  position: absolute;
+  top: -5px;
+  right: -15px;
+  color: #FFF;
+  background-color: #cf2a27;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .2) inset,
+    0 0 0 1px rgba(0, 0, 0, .25);
+  font-size: .7em;
+  min-width: 30px;
+  line-height: 14px;
+  text-align: center;
+  border-radius: 9999px;
+  font-weight: 700;
+  padding: 8px;
 }
 
 .account-number {
