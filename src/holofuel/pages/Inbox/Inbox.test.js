@@ -202,6 +202,8 @@ describe('TransactionRow', () => {
 
       fireEvent.click(getByText('Decline'))
 
+
+      console.log('isActionable ? : ', isActionable)
       expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'decline')
     })
   })
@@ -223,9 +225,9 @@ describe('TransactionRow', () => {
 })
 
 // Add'l tests to add & review :
-// null state (unit for that component.. ??)
+// null state (test unit for that component.. ??)
 // action slider (buttons don't show until the slider/forward btn is clicked)
 //   ^^ >> (Issue locating the element in Jest debug. This is not experienced in manual testing.)
 
-// semantic timedate label / divider (unit for that component.. ??) ::check
-// jumbotron header with balance :: determine right approach
+// semantic timedate label / divider (test unit for that component.. ??)
+// jumbotron header with balance >> determine right approach
