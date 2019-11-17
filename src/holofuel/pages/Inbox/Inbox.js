@@ -69,7 +69,7 @@ function useFetchCounterparties () {
 }
 
 const VIEW = {
-  actionable: 'pending',
+  actionable: 'actionable',
   recent: 'recent'
 }
 
@@ -193,8 +193,7 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
   const { counterparty, presentBalance, amount, type, notes } = transaction
 
   const handleCloseReveal = () => {
-    if (!isEmpty(actionsVisible) && actionsVisible === transaction) return actionsClickWithTx(null)
-    else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction.id)
+    if (!isEmpty(actionsVisible) && actionsVisible !== transaction.id) return actionsClickWithTx(transaction.id)
     else return actionsClickWithTx(null)
   }
 
