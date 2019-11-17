@@ -56,7 +56,9 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       const transaction = actionableTransactions[index]
       expect(getByText(transaction.notes)).toBeInTheDocument()
       const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) HF` : `${presentHolofuelAmount(transaction.amount)} HF`
+      const story = transaction.type === 'request' ? 'is requesting' : 'is offering'
       expect(getByText(amountToMatch)).toBeInTheDocument()
+      expect(getByText(story)).toBeInTheDocument()
       expect(getByText(whois.nickname)).toBeInTheDocument()
     })
   })
@@ -98,7 +100,7 @@ describe('TransactionRow', () => {
 
   it('renders a request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} whoami={mockWhoamiAgent} inboxView='pending' />
+      <TransactionRow transaction={request} whoami={mockWhoamiAgent} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -108,7 +110,7 @@ describe('TransactionRow', () => {
 
   it('renders an offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} inboxView='pending' />
+      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -176,10 +178,10 @@ describe('TransactionRow', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
-        whoami: mockWhoamiAgent,
         actionsClickWithTx: jest.fn(),
         showConfirmationModal: jest.fn(),
-        inboxView: 'pending'
+        actionsVisible: jest.fn(),
+        isActionable: true
       }
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <TransactionRow {...props} />
@@ -207,7 +209,7 @@ describe('TransactionRow', () => {
   describe('Accept button', () => {
     it('responds properly', async () => {
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockWhoamiAgent} inboxView='pending' />
+        <TransactionRow transaction={offer} whoami={mockWhoamiAgent} isActionable />
       </MockedProvider>, 0)
 
       await act(async () => {
