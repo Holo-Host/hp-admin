@@ -147,6 +147,7 @@ export default function Inbox () {
             variant={button.view === inboxView ? 'toggle-selected' : 'toggle'}
             onClick={() => setInboxView(VIEW[button.view])}
             className={cx(`${button.view}-button`)} /* eslint-disable-line quote-props */
+            dataTestId={`${button.view}-transactions`}
             key={button.view}>
             {button.label}
           </Button>)}
