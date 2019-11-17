@@ -47,7 +47,9 @@ function useDecline () {
 }
 
 function useFetchCounterparties () {
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
+  const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery)
   const { data: { holofuelInboxCounterparties } = {}, client } = useQuery(HolofuelInboxCounterpartiesQuery)
 
   if (holofuelInboxCounterparties) {
@@ -57,19 +59,30 @@ function useFetchCounterparties () {
       return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
     })
 
-    const result = flatten(updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties))
-
+    // Cache Write/Update for holofuelActionableTransactions
+    const reflexiveActionableTxList = updateTxListCounterparties(holofuelActionableTransactions, [whoami])
+    const newActionableTxList = flatten((updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties)).concat(reflexiveActionableTxList))
     client.writeQuery({
       query: HolofuelActionableTransactionsQuery,
       data: {
-        holofuelActionableTransactions: result
+        holofuelActionableTransactions: newActionableTxList
+      }
+    })
+
+    // Cache Write/Update for holofuelNonPendingTransactions
+    const reflexiveNonPendingTxList = updateTxListCounterparties(holofuelNonPendingTransactions, [whoami])
+    const newNonPendingTxList = flatten((updateTxListCounterparties(holofuelNonPendingTransactions, holofuelInboxCounterparties)).concat(reflexiveNonPendingTxList))
+    client.writeQuery({
+      query: HolofuelNonPendingTransactionsQuery,
+      data: {
+        holofuelNonPendingTransactions: newNonPendingTxList
       }
     })
   }
 }
 
 const VIEW = {
-  actionable: 'pending',
+  actionable: 'actionable',
   recent: 'recent'
 }
 
@@ -79,7 +92,6 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox () {
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
   const { data: { holofuelNonPendingTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery)
@@ -115,17 +127,14 @@ export default function Inbox () {
       break
   }
 
-  const isActionableTransactionsEmpty = isEmpty(actionableTransactions)
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
-  const pageTitle = `Inbox${isActionableTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
-
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
-  return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={actionableTransactions.length}>
+  return <PrimaryLayout headerProps={{ title: 'Inbox' }} inboxCount={actionableTransactions.length}>
     <Jumbotron
       className='inbox-header'
       title={`${presentHolofuelAmount(holofuelBalance)} HF`}
-      titleSuperscript='Balance'isTransactionsEmpty
+      titleSuperscript='Balance'
     >
       <Button styleName='new-transaction-button' onClick={() => showConfirmationModal()}>
         <AddIcon styleName='add-icon' color='#0DC39F' />
@@ -168,7 +177,6 @@ export default function Inbox () {
             actionsVisible={actionsVisible}
             actionsClickWithTx={actionsClickWithTx}
             role='list'
-            whoami={whoami}
             view={VIEW}
             isActionable={inboxView === VIEW.actionable}
             showConfirmationModal={showConfirmationModal}
@@ -190,21 +198,15 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, isActionable, whoami }) {
+export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, isActionable }) {
   const { counterparty, presentBalance, amount, type, notes } = transaction
+  const agent = counterparty
 
   const handleCloseReveal = () => {
-    if (!isEmpty(actionsVisible) && actionsVisible === transaction) return actionsClickWithTx(null)
-    else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction.id)
+    if (!isEmpty(actionsVisible) && actionsVisible !== transaction.id) return actionsClickWithTx(transaction.id)
     else return actionsClickWithTx(null)
   }
 
-  let agent
-  if (counterparty.id === whoami.id) {
-    agent = whoami
-  } else { agent = counterparty }
-
-  // console.log('agent (check for nickname - in pending...) : ', agent)
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
