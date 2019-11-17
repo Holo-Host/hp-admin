@@ -1,7 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
-// not importing styles here breaks tests. This is a hack.
-import styles from './NullStateMessage.module.css' // eslint-disable-line no-unused-vars
+import './NullStateMessage.module.css'
 
 function NullStateMessage ({
   wide = false,

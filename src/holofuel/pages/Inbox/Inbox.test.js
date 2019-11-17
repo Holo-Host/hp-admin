@@ -9,9 +9,8 @@ import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow } from './Inbox'
 import { pendingList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
-import { presentHolofuelAmount } from 'utils' // , partitionByDate
+import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
-// import { title as forwardIconTitle } from 'components/icons/ForwardIcon'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
@@ -191,11 +190,6 @@ describe('TransactionRow', () => {
         fireEvent.click(getByTestId('forward-icon'))
         await wait(0)
       })
-      // expect(getByText(forwardIconTitle)).toBeInTheDocument()
-      // await act(async () => {
-      //   fireEvent.click(getByText(forwardIconTitle))
-      //   await wait(0)
-      // })
 
       await act(async () => {
         fireEvent.click(getByText('Pay'))
@@ -224,16 +218,6 @@ describe('TransactionRow', () => {
       expect(acceptOfferMock.newData).toHaveBeenCalled()
     })
   })
-
-  // describe('Semantic Timestamp Label', () => {
-  //   it('responds properly', async () => {
-  //     const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-  //       <PageDivider title={request.timestamp} />
-  //     </MockedProvider>, 0)
-
-  //     expect(getByText(formatDateTime(request.timestamp.format('MMM D YYYY')))).toBeInTheDocument()
-  //   })
-  // })
 })
 
 // Add'l tests to add & review :

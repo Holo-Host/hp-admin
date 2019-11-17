@@ -112,7 +112,7 @@ type Query {
   hostPricing: HostPricing
   holofuelCompletedTransactions: [Transaction]
   holofuelWaitingTransactions: [Transaction]
-  holofuelRecentTransactions: [Transaction]
+  holofuelNonPendingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
   holofuelLedger: Ledger
   holofuelUser: HolofuelUser

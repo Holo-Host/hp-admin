@@ -138,8 +138,6 @@ function presentTransaction (transaction) {
     }
     case 'rejected': {
       // We have decided to show this **only** in the inbox page via the recent transactions filter
-      console.log(' >>>>>>>> INSIDE THE REJECTED presentTransaction Case <<<<<< EVENT : ', event)
-
       if (event.Request) return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.rejected })
       if (event.Promise) return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.rejected })
       throw new Error('Completed event did not have a Receipt or Cheque event')
@@ -228,7 +226,7 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
-    allRecent: async () => {
+    allNonPending: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')

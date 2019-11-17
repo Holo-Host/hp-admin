@@ -1,5 +1,5 @@
-query HolofuelRecentTransactionsQuery {
-  holofuelRecentTransactions {
+query HolofuelNonPendingTransactionsQuery {
+  holofuelNonPendingTransactions {
     id
     amount
     counterparty { id }

@@ -45,7 +45,8 @@ export const resolvers = {
 
     holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
 
-    holofuelRecentTransactions: HoloFuelDnaInterface.transactions.allRecent,
+    // NOTE: NonPending includes both completed and rejected/declined transactions.
+    holofuelNonPendingTransactions: HoloFuelDnaInterface.transactions.allNonPending,
 
     holofuelCompletedTransactions: HoloFuelDnaInterface.transactions.allCompleted,
 

@@ -6,7 +6,7 @@ import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import HolofuelRecentTransactionsQuery from 'graphql/HolofuelRecentTransactionsQuery.gql'
+import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
@@ -69,7 +69,7 @@ function useFetchCounterparties () {
 }
 
 const VIEW = {
-  pending: 'pending',
+  actionable: 'pending',
   recent: 'recent'
 }
 
@@ -82,7 +82,7 @@ export default function Inbox () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
-  const { data: { holofuelRecentTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelRecentTransactionsQuery)
+  const { data: { holofuelNonPendingTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery)
 
   useFetchCounterparties()
   const payTransaction = useOffer()
@@ -97,13 +97,13 @@ export default function Inbox () {
   }
 
   const [actionsVisible, setActionsVisible] = useState(null)
-  const actionsClickWithTx = transaction => setActionsVisible(transaction)
+  const actionsClickWithTx = transactionId => setActionsVisible(transactionId)
 
-  const toggleButtons = [{ view: 'pending', label: 'Pending' }, { view: 'recent', label: 'Recent' }]
-  const [inboxView, setInboxView] = useState(VIEW.pending)
+  const toggleButtons = [{ view: VIEW.actionable, label: 'Pending' }, { view: VIEW.recent, label: 'Recent' }]
+  const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   switch (inboxView) {
-    case VIEW.pending:
+    case VIEW.actionable:
       displayTransactions = actionableTransactions
       break
     case VIEW.recent:
@@ -111,12 +111,13 @@ export default function Inbox () {
       break
     default:
       displayTransactions = actionableTransactions
+      console.error('Error: inboxView is not set to valid display option (eg: recent or pending).')
       break
   }
 
-  const isPendingTransactionsEmpty = isEmpty(actionableTransactions)
+  const isActionableTransactionsEmpty = isEmpty(actionableTransactions)
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
-  const pageTitle = `Inbox${isPendingTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
+  const pageTitle = `Inbox${isActionableTransactionsEmpty ? '' : ` (${actionableTransactions.length})`}`
 
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
@@ -127,7 +128,6 @@ export default function Inbox () {
       titleSuperscript='Balance'isTransactionsEmpty
     >
       <Button styleName='new-transaction-button' onClick={() => showConfirmationModal()}>
-        {/* TODO: Resolve issue with path for the ADD icon >> not displayed properly */}
         <AddIcon styleName='add-icon' color='#0DC39F' />
         <h3 styleName='button-text'>New Transaction</h3>
       </Button>
@@ -148,11 +148,10 @@ export default function Inbox () {
       <PageDivider title='Today' />
       <NullStateMessage
         styleName='null-state-message'
-        message={inboxView === VIEW.pending
+        message={inboxView === VIEW.actionable
           ? 'You have no pending offers or requests'
           : 'You have no recent activity'}>
         <div onClick={() => showConfirmationModal()}>
-          {/* TODO: Resolve issue with path for the ADD icon >> not displayed properly */}
           <AddIcon styleName='add-icon' color='#0DC39F' />
           {/* TODO: Remove once the above ADD Icon works... */}
           <p style={{ fontSize: 30 }}>+</p>
@@ -171,7 +170,7 @@ export default function Inbox () {
             role='list'
             whoami={whoami}
             view={VIEW}
-            inboxView={inboxView}
+            isActionable={inboxView === VIEW.actionable}
             showConfirmationModal={showConfirmationModal}
             key={transaction.id} />)}
         </div>
@@ -191,25 +190,26 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, inboxView, whoami }) {
+export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, isActionable, whoami }) {
   const { counterparty, presentBalance, amount, type, notes } = transaction
 
-  const actionsClick = () => actionsClickWithTx(transaction)
   const handleCloseReveal = () => {
     if (!isEmpty(actionsVisible) && actionsVisible === transaction) return actionsClickWithTx(null)
-    else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction)
+    else if (!isEmpty(actionsVisible) && actionsVisible !== transaction) return actionsClickWithTx(transaction.id)
     else return actionsClickWithTx(null)
   }
 
   let agent
-  if (counterparty.id === whoami.id) agent = whoami
-  else agent = counterparty
+  if (counterparty.id === whoami.id) {
+    agent = whoami
+  } else { agent = counterparty }
 
+  // console.log('agent (check for nickname - in pending...) : ', agent)
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
 
   let story
-  if (inboxView === VIEW.pending) story = isOffer ? ' is offering' : ' is requesting'
+  if (isActionable) story = isOffer ? ' is offering' : ' is requesting'
 
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='avatar'>
@@ -233,24 +233,26 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
         amount={amount}
         isRequest={isRequest}
         isOffer={isOffer}
-        inboxView={inboxView}
+        isActionable={isActionable}
       />
-      {inboxView === VIEW.recent && <div styleName='balance'>{presentBalance}</div>}
+      {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
     </div>
 
-    {inboxView === VIEW.pending && <RevealActionsButton
-      actionsVisible={actionsVisible}
-      istransaction={transaction === actionsVisible}
-      actionsClick={actionsClick}
-      handleClose={handleCloseReveal}
-    />}
-    {inboxView === VIEW.pending && <ActionOptions
-      actionsVisible={actionsVisible}
-      isOffer={isOffer}
-      isRequest={isRequest}
-      transaction={transaction}
-      showConfirmationModal={showConfirmationModal}
-    />}
+    {isActionable && <>
+      <RevealActionsButton
+        actionsVisible={actionsVisible}
+        istransaction={transaction.id === actionsVisible}
+        actionsClick={() => actionsClickWithTx(transaction.id)}
+        handleClose={handleCloseReveal}
+      />
+      <ActionOptions
+        actionsVisible={actionsVisible}
+        isOffer={isOffer}
+        isRequest={isRequest}
+        transaction={transaction}
+        showConfirmationModal={showConfirmationModal}
+      />
+    </>}
   </div>
 }
 
@@ -261,7 +263,7 @@ function RevealActionsButton ({ actionsClick, handleClose, actionsVisible, istra
 }
 
 function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisible }) {
-  return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisible && transaction === actionsVisible) })}>
+  return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisible && transaction.id === actionsVisible) })}>
     <div styleName='actions'>
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
       {isOffer && <AcceptButton transaction={transaction} />}
@@ -270,9 +272,9 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, inboxView }) {
+function AmountCell ({ amount, isRequest, isOffer, isActionable }) {
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
-  return <div styleName={cx('amount', { debit: isRequest && inboxView === VIEW.pending }, { credit: isOffer && inboxView === VIEW.pending })}>
+  return <div styleName={cx('amount', { debit: isRequest && isActionable }, { credit: isOffer && isActionable })}>
     {amountDisplay} HF
   </div>
 }

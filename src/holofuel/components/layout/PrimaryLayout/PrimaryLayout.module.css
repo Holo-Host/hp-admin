@@ -4,7 +4,7 @@
   word-break: break-word;
   height: 100%;
   box-sizing: border-box;
-  background-color: #ECECEC;
+  background-color: var(--color-white-smoke)
 }
 
 .wide {
