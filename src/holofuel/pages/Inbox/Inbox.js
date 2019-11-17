@@ -128,7 +128,6 @@ export default function Inbox () {
       titleSuperscript='Balance'isTransactionsEmpty
     >
       <Button styleName='new-transaction-button' onClick={() => showConfirmationModal()}>
-        {/* TODO: Resolve issue with path for the ADD icon >> not displayed properly */}
         <AddIcon styleName='add-icon' color='#0DC39F' />
         <h3 styleName='button-text'>New Transaction</h3>
       </Button>
@@ -153,7 +152,6 @@ export default function Inbox () {
           ? 'You have no pending offers or requests'
           : 'You have no recent activity'}>
         <div onClick={() => showConfirmationModal()}>
-          {/* TODO: Resolve issue with path for the ADD icon >> not displayed properly */}
           <AddIcon styleName='add-icon' color='#0DC39F' />
           {/* TODO: Remove once the above ADD Icon works... */}
           <p style={{ fontSize: 30 }}>+</p>
