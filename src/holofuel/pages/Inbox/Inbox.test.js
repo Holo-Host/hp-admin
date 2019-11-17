@@ -202,8 +202,6 @@ describe('TransactionRow', () => {
 
       fireEvent.click(getByText('Decline'))
 
-
-      console.log('isActionable ? : ', isActionable)
       expect(props.showConfirmationModal).toHaveBeenCalledWith(request, 'decline')
     })
   })
