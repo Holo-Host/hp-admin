@@ -16,7 +16,7 @@ describe('HP Admin : MyProfile', () => {
     const newHostName = 'Host-Name-Test-123'
 
     const queries = await setupModal(renderAndWait(<HPAdminApp />))
-    const { getByTestId, getByLabelText, getByText, getAllByRole } = queries
+    const { getByTestId, getByLabelText, getByText, getAllByText, getAllByRole } = queries
 
     // login and arrive at home page
     await login(queries)
@@ -31,8 +31,10 @@ describe('HP Admin : MyProfile', () => {
     await wait(() => within(header).getByText('Edit Profile'))
 
     // navigate to TOS info
-    await wait(() => getByTestId('tos-button'))
-    fireEvent.click(getByTestId('tos-button'))
+    // NB: First instance of TOS appears in the side nav-bar.
+    const profileTOS = getAllByText('View Terms of Service')[1]
+    await wait(() => profileTOS)
+    fireEvent.click(profileTOS)
     // exit TOS modal
     await wait(() => getByText('Close'))
     fireEvent.click(getByText('Close'))
