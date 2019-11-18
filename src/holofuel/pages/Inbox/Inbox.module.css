@@ -89,7 +89,7 @@
   padding: 10px 5px 10px;
   background-color: #FFFFFF;
   justify-content: space-between;
-  /* width: 80px; */
+  min-height: 50px;
   transition: transform 1s ease-in-out;
 }
 
