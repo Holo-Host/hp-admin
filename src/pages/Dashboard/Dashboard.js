@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
+import PlusIcon from 'components/icons/PlusIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import HappsQuery from 'graphql/HappsQuery.gql'
@@ -28,28 +29,27 @@ export default function Dashboard () {
     </div>
     <h2 styleName='greeting'>{greeting}</h2>
 
-    <Card title='Hosting' subtitle='Set, track, and manage your hosted applications and users.'>
-      {noInstalledHapps === 0 && <div>
-        + Host your first app
-      </div>}
-      {noInstalledHapps > 0 && <div styleName='application-count'>
-        <LaptopIcon styleName='laptop-icon' color='rgba(44, 63, 89, 0.80)' /> {noInstalledHapps} hApp{noInstalledHapps > 1 && 's'}
-      </div>}
+    <Card title='Hosting' linkTo='/hosting' subtitle='Set, track, and manage your hosted applications and users.'>
+      <div styleName='hosting-content'>
+        {noInstalledHapps === 0 && <>
+          <PlusInDiscIcon />Host your first hApp!
+        </>}
+        {noInstalledHapps > 0 && <>
+          <LaptopIcon styleName='laptop-icon' color='rgba(44, 63, 89, 0.80)' /> {noInstalledHapps} hApp{noInstalledHapps > 1 && 's'}
+        </>}
+      </div>
     </Card>
 
-    <Link styleName='card' to='/browse-happs'>
-      <h2 styleName='card-title'>Hosting</h2>
-    </Link>
-
-    <Link styleName='card' to='/earnings'>
-      <h2 styleName='card-title'>Earnings</h2>
-      {balance === 0 && <div styleName='small-text'>
-        You haven't earned any HoloFuel yet
+    <Card title='Earnings' linkTo='/earnings' subtitle='Save, send, and receive Holofuel'>
+      {balance === 0 && <div styleName='no-balance'>
+        <div styleName='no-balance-header'>
+          You haven't earned any HoloFuel yet
+        </div>
       </div>}
-      {balance > 0 && <div>
+      {balance > 0 && <div styleName='no-balance'>
         Today: {presentHolofuelAmount(balance)}
       </div>}
-    </Link>
+    </Card>
 
     <Link styleName='card' to='/holofuel'>
       <h2 styleName='card-title'>HoloFuel</h2>
@@ -71,4 +71,10 @@ function Card ({ title, subtitle, linkTo, children }) {
     <h3 styleName='card-subtitle'>{subtitle}</h3>
     {children}
   </Link>
+}
+
+function PlusInDiscIcon () {
+  return <div styleName='disc-icon'>
+    <PlusIcon styleName='plus-icon' color='#06C470' />
+  </div>
 }

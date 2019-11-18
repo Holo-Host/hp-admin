@@ -20,13 +20,7 @@
   margin-bottom: 20px;
 }
 
-.laptop-icon {
-  width: 26px;
-  height: 16px;
-  margin-right: 4px;
-}
-
-.application-count {
+.hosting-content {
   display: flex;
   align-items: center;
   margin-top: 16px;
@@ -34,6 +28,12 @@
   font-size: 18px;
   line-height: 24px;
   color: var(--color-rhino-80);
+}
+
+.laptop-icon {
+  width: 26px;
+  height: 16px;
+  margin-right: 4px;
 }
 
 .small-text {
@@ -54,4 +54,21 @@
 
 .card-subtitle {
   color: var(--color-rhino-35);
+}
+
+/* PlusInDiscIcon */
+
+.disc-icon {
+  background-color: #D3F5E6;
+  border-radius: 50%;
+  margin-right: 8px;
+  width: 21px;
+  height: 21px;
+}
+
+.plus-icon {
+  width: 26px;
+  height: 16px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
