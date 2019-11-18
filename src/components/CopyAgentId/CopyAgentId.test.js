@@ -2,11 +2,11 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import CopyAgentId from './CopyAgentId.js'
 import { presentAgentId } from 'utils'
-import CopyToClipboard from 'holofuel/components/CopyToClipboard'
+import CopyToClipboard from 'components/CopyToClipboard'
 
-jest.mock('holofuel/components/CopyToClipboard')
-jest.mock('holofuel/components/layout/PrimaryLayout')
-jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('components/CopyToClipboard')
+jest.mock('components/layout/PrimaryLayout')
+jest.mock('contexts/useFlashMessageContext')
 
 it('render CopyToClipboard with "Your" in message when isMe', () => {
   const agent = {

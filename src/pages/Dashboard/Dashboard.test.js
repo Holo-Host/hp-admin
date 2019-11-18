@@ -16,6 +16,7 @@ import Dashboard from './Dashboard'
 
 jest.mock('components/layout/PrimaryLayout')
 jest.mock('contexts/useAuthTokenContext')
+jest.mock('contexts/useFlashMessageContext')
 
 describe('Dashboard', () => {
   it('renders empty states', async () => {

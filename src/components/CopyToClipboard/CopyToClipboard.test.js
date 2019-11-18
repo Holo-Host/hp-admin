@@ -2,11 +2,11 @@ import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import CopyToClipboard from './CopyToClipboard.js'
-import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
+import { newMessage as mockNewMessage } from 'contexts/useFlashMessageContext'
 import mockCopy from 'copy-to-clipboard'
 
-jest.mock('holofuel/components/layout/PrimaryLayout')
-jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('components/layout/PrimaryLayout')
+jest.mock('contexts/useFlashMessageContext')
 jest.mock('copy-to-clipboard')
 
 it('should copy the copyContent to clipboard and display flash message feedback', async () => {
