@@ -13,7 +13,8 @@ import 'global-styles/index.css'
 
 export function PrimaryLayout ({
   children,
-  headerProps = {}
+  headerProps = {},
+  contentClassName
 }) {
   const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
 
@@ -31,7 +32,7 @@ export function PrimaryLayout ({
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
       settings={settings} />
-    <div styleName='styles.content'>
+    <div styleName='styles.content' className={contentClassName}>
       <FlashMessage />
       {children}
     </div>

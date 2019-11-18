@@ -1,11 +1,11 @@
 import React from 'react'
 import { isEmpty } from 'lodash/fp'
-import HappThumbnail from 'components/HappThumbnail'
-import HostButton from 'components/HostButton'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import './BrowseHapps.module.css'
+import cx from 'classnames'
+import styles from  './BrowseHapps.module.css'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
-import Button from 'components/Button'
+import Button from 'components/UIButton'
+import GearIcon from 'components/icons/GearIcon'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import EnableHappMutation from 'graphql/EnableHappMutation.gql'
 import DisableHappMutation from 'graphql/DisableHappMutation.gql'
@@ -19,7 +19,14 @@ export default function BrowseHapps ({ history: { push } }) {
 
   const goToPricing = () => push('/pricing')
 
-  return <PrimaryLayout headerProps={{ title: 'Hosting' }}>
+  return <PrimaryLayout headerProps={{ title: 'Hosting' }} contentClassName={styles.content}>
+    <div styleName='header-row'>
+      <h1 styleName='header'>Available hApps</h1>
+      <div styleName='pricing-link' onClick={goToPricing}>
+        <GearIcon styleName='gear-icon' color='#80858C' /> Manage Pricing
+      </div>
+    </div>
+
     {!isEmpty(happs) && <div styleName='happ-list' role='list'>
       {happs.map(happ =>
         <HappRow
@@ -28,8 +35,6 @@ export default function BrowseHapps ({ history: { push } }) {
           disableHapp={disableHapp}
           key={happ.id} />)}
     </div>}
-
-    <Button variant='primary' wide onClick={goToPricing} styleName='pricing-button'>Manage Pricing</Button>
   </PrimaryLayout>
 }
 
@@ -38,14 +43,27 @@ export function HappRow ({ happ, enableHapp, disableHapp }) {
   return <div styleName='happ-row' role='listitem'>
     <HappThumbnail url={thumbnailUrl} title={title} />
     <div styleName='details'>
-      <div styleName='title-row'>
-        <span styleName='title'>{title}</span>
-        <HostButton
-          isEnabled={isEnabled}
-          enableHapp={() => enableHapp(id)}
-          disableHapp={() => disableHapp(id)} />
-      </div>
+      <h2 styleName='title'>{title}</h2>
       <div styleName='description'>{description}</div>
+      <HostButton
+        isEnabled={isEnabled}
+        enableHapp={() => enableHapp(id)}
+        disableHapp={() => disableHapp(id)} />
     </div>
   </div>
+}
+
+function HappThumbnail ({ title, url, className }) {
+  return <img src={url} styleName='thumbnail' className={className} alt={`${title} icon`} />
+}
+
+function HostButton ({ isEnabled, enableHapp, disableHapp }) {
+  const action = isEnabled ? disableHapp : enableHapp
+  const onClick = (e) => {
+    e.preventDefault()
+    action()
+  }
+  return <UIButton onClick={onClick} variant={isEnabled ? 'green' : 'host' } styleName={cx('host-button', { unhost: isEnabled })}>
+    {isEnabled ? 'Un-Host' : 'Host' }
+  </UIButton>
 }
