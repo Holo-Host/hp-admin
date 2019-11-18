@@ -1,6 +1,4 @@
 import React from 'react'
-import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
-import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import Button from 'components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
@@ -8,9 +6,7 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
-export function Header ({ title, history: { push }, hamburgerClick }) {
-  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
-
+export function Header ({ title, history: { push }, hamburgerClick, settings }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' />
   </Button>

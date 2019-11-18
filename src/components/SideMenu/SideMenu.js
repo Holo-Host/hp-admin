@@ -3,18 +3,15 @@ import cx from 'classnames'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import GearIcon from 'components/icons/GearIcon'
-import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
-import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import { sliceHash as presentHash } from 'utils'
 import './SideMenu.module.css'
 
 export function SideMenu ({
   isOpen,
   handleClose,
-  avatarUrl = ''
+  avatarUrl = '',
+  settings
 }) {
-  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
-
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>

@@ -11,9 +11,12 @@
   --color-loblolly: #BFC5CD;
   --color-outerspace: #314843;
   --color-caribbean-green: #0DC39F;
-  --color-limed-spruce: #39474A;  
+  --color-limed-spruce: #39474A;
+  --color-granny-apple-50: rgba(211, 245, 230, 0.5);  
+  --color-rhino-10: rgba(44, 63, 89, 0.10);      
   --color-rhino-35: rgba(44, 63, 89, 0.35);  
-  --color-rhino-80: rgba(44, 63, 89, 0.80);      
+  --color-rhino-50: rgba(44, 63, 89, 0.50);    
+  --color-rhino-80: rgba(44, 63, 89, 0.80);
   /* color-shocking used in StyleDemo only */
   --color-shocking: #E292C0;
 }

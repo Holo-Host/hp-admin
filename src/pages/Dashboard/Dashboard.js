@@ -11,7 +11,11 @@ import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
+import cx from 'classnames'
 import './Dashboard.module.css'
+
+// Mock value to be replaced by graphql query
+const earnings = 8937
 
 export default function Dashboard () {
   const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
@@ -21,11 +25,14 @@ export default function Dashboard () {
 
   const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
+  const isEarningsZero = Number(earnings) === 0
+  const isBalanceZero = Number(balance) === 0
+
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='avatar'>
-      <HashIcon seed={settings.hostPubKey} size={42} />
+      <HashIcon hash={settings.hostPubKey} size={42} />
     </div>
     <h2 styleName='greeting'>{greeting}</h2>
 
@@ -41,27 +48,26 @@ export default function Dashboard () {
     </Card>
 
     <Card title='Earnings' linkTo='/earnings' subtitle='Save, send, and receive Holofuel'>
-      {balance === 0 && <div styleName='no-balance'>
-        <div styleName='no-balance-header'>
-          You haven't earned any HoloFuel yet
+      <div styleName={cx('balance', { 'empty-balance': isEarningsZero })}>
+        <h4 styleName='balance-header'>
+          {isEarningsZero ? 'Balance' : "Today's earnings"}
+        </h4>
+        <div styleName='balance-body'>
+          {isEarningsZero ? "You haven't earned HoloFuel" : `${presentHolofuelAmount(earnings)} HF`}
         </div>
-      </div>}
-      {balance > 0 && <div styleName='no-balance'>
-        Today: {presentHolofuelAmount(balance)}
-      </div>}
+      </div>
     </Card>
 
-    <Link styleName='card' to='/holofuel'>
-      <h2 styleName='card-title'>HoloFuel</h2>
-      {balance === 0 && <div styleName='small-text'>
-        You have no HoloFuel
-      </div>}
-      {balance > 0 && <div>
-        <div styleName='small-text'>HoloFuel Balance</div>
-        <div styleName='balance'>{presentHolofuelAmount(balance)}</div>
-      </div>}
-    </Link>
-
+    <Card title='Earnings' linkTo='/holofuel' subtitle='Save, send, and receive Holofuel'>
+      <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
+        <h4 styleName='balance-header'>
+          Balance
+        </h4>
+        <div styleName='balance-body'>
+          {isBalanceZero ? 'You have no HoloFuel' : `${presentHolofuelAmount(balance)} HF`}
+        </div>
+      </div>
+    </Card>
   </PrimaryLayout>
 }
 
