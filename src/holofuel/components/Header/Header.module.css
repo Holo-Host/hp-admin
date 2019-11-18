@@ -1,5 +1,5 @@
 .left-nav {
-  flex: 2 1 0;
+  flex: 1.33 1;
   display: flex;
 }
 
@@ -15,8 +15,8 @@
   border: none;
   display: flex;
   align-content: center;
-  background-color: rgb(200,200,200);
-  color: var(--color-gray);
+  background-color: white;
+  color: black;
 }
 
 .back-icon {
@@ -36,20 +36,23 @@
   z-index: 99;
   border: none;
   padding: 5px;
-  background-color: var(--color-tundora);
+  background-color: white;
 }
 
 .menu-icon {
   width: 22px;
   height: 22px;
-  background-color: var(--color-tundora);
+  background-color: white;
 }
 
 .header {
-  display: flex;
-  background-color: var(--color-tundora);
+  height: 50px;
   padding: 5px 10px;
   align-items: center;
+  display: flex;
+  background-color: white;
+  box-shadow: 0px 2.5px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(27.1828px);
 }
 
 .header-font {
@@ -58,7 +61,7 @@
   flex-grow: 1;
   line-height: 28px;
   font-size: 16px;
-  color: rgb(200,200,200);
+  color: black
 }
 
 .title {
@@ -95,17 +98,16 @@
   height: 32px;
 }
 
-.sub-header {
-  background-color: rgb(140,140,140);
-  /* background-image: linear-gradient(rgb(100,100,100), rgb(255,255,255)); */
+.page-header {
   text-align: center;
-  color: white;
+  color: black;
   padding: 10px;
   border: none;
+  background-color: white;
 }
 
-.sub-title {
-  font-size: 20px;
+.page-title {
+  /* */
 }
 
 .empty-spacer {
