@@ -63,7 +63,7 @@ function HostButton ({ isEnabled, enableHapp, disableHapp }) {
     e.preventDefault()
     action()
   }
-  return <UIButton onClick={onClick} variant={isEnabled ? 'green' : 'host' } styleName={cx('host-button', { unhost: isEnabled })}>
-    {isEnabled ? 'Un-Host' : 'Host' }
-  </UIButton>
+  return <Button onClick={onClick} variant={isEnabled ? 'green' : 'white'} styleName='host-button'>
+    {isEnabled ? 'Unhost' : 'Host' }
+  </Button>
 }

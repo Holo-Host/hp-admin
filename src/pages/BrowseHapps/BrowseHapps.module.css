@@ -60,6 +60,7 @@
   font-size: 14px;
   line-height: 19px;
   color: var(--color-rhino-50);
+  margin-bottom: 4px;
 }
 
 /* HappThumbnail */
@@ -70,4 +71,10 @@
   height: 100px;
   box-shadow: 2px 4px 10px rgba(44, 64, 90, 0.1);
   border-radius: 4px;
+}
+
+
+/* HostButton */
+.host-button {
+  width: 100px;
 }
