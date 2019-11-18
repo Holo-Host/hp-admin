@@ -1,9 +1,8 @@
 import React from 'react'
 import waait from 'waait'
-// import { mockNavigateTo } from 'react-router-dom'
 import { fireEvent, within, act, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
-// import { presentHolofuelAmount, presentAgentId } from 'utils'
+import { presentHolofuelAmount, presentAgentId } from 'utils'
 import { HoloFuelApp } from 'root'
 import { getAgent } from 'utils/integration-testing/conductorConfig'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
@@ -40,7 +39,7 @@ describe('HOLOFUEL : CreateRequest', () => {
     // **************************************************************
     // TODO: Determine why this doens't appear until after refresh...
     // **************************************************************
-    // expect(getByText(presentAgentId(agentId))).toBeInTheDocument()
-    // expect(getByText(presentHolofuelAmount(amount))).toBeInTheDocument()
+    expect(getByText(presentAgentId(agentId))).toBeInTheDocument()
+    expect(getByText(presentHolofuelAmount(amount))).toBeInTheDocument()
   }), 150000)
 })
