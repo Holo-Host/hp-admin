@@ -114,64 +114,52 @@ const ledgerMock = {
 }
 
 describe('Ledger Jumbotron', () => {
-  describe('renders the correct null state text whenever no actionable transactions exist', () => {
-    it('renders the balance and the empty state', async () => {
-      const { getByText, getAllByText } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
-        <Inbox />
-      </MockedProvider>)
+  it('renders the balance and the empty state', async () => {
+    const { getByText, getAllByText } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
+      <Inbox />
+    </MockedProvider>)
 
-      const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} HF`
+    const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} HF`
 
-      expect(getAllByText('Balance')[0]).toBeInTheDocument()
-      expect(getByText(presentedBalance)).toBeInTheDocument()
-      expect(getAllByText('New Transaction')[0]).toBeInTheDocument()
-    })
+    expect(getAllByText('Balance')[0]).toBeInTheDocument()
+    expect(getByText(presentedBalance)).toBeInTheDocument()
+    expect(getAllByText('New Transaction')[0]).toBeInTheDocument()
   })
 })
 
 describe('Inbox Null States', () => {
-  describe('renders the correct null state text whenever no actionable transactions exist', () => {
-    const mocks = [
-      actionableTransactionsMock,
-      nonPendingTransactionsMock,
-      ledgerMock
-    ]
+  const mocks = [
+    actionableTransactionsMock,
+    nonPendingTransactionsMock,
+    ledgerMock
+  ]
 
-    it('renders the balance and the empty state', async () => {
-      const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <Inbox />
-      </MockedProvider>)
+  it('renders the correct null state text whenever no actionable transactions exist', async () => {
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <Inbox />
+    </MockedProvider>)
 
-      expect(getByTestId('recent-transactions')).toBeInTheDocument()
-      await act(async () => {
-        fireEvent.click(getByTestId('recent-transactions'))
-        await wait(0)
-      })
-
-      expect(getByText('You have no recent activity')).toBeInTheDocument()
+    expect(getByTestId('recent-transactions')).toBeInTheDocument()
+    await act(async () => {
+      fireEvent.click(getByTestId('recent-transactions'))
+      await wait(0)
     })
+
+    expect(getByText('You have no recent activity')).toBeInTheDocument()
   })
 
-  describe('renders the correct null state text whenever no recent transactions exist', () => {
-    const mocks = [
-      actionableTransactionsMock,
-      nonPendingTransactionsMock,
-      ledgerMock
-    ]
+  it('renders the correct null state text whenever no recent transactions exist', async () => {
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <Inbox />
+    </MockedProvider>)
 
-    it('renders the balance and the empty state', async () => {
-      const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <Inbox />
-      </MockedProvider>)
-
-      expect(getByTestId('actionable-transactions')).toBeInTheDocument()
-      await act(async () => {
-        fireEvent.click(getByTestId('actionable-transactions'))
-        await wait(0)
-      })
-
-      expect(getByText('You have no pending offers or requests')).toBeInTheDocument()
+    expect(getByTestId('actionable-transactions')).toBeInTheDocument()
+    await act(async () => {
+      fireEvent.click(getByTestId('actionable-transactions'))
+      await wait(0)
     })
+
+    expect(getByText('You have no pending offers or requests')).toBeInTheDocument()
   })
 })
 
@@ -299,7 +287,7 @@ describe('TransactionRow', () => {
   describe('Reveal actionable-buttons slider', () => {
     it('shows whenever actionable transactions are shown ', async () => {
       const { getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} actionsClickWithTx={jest.fn()} isActionable />
+        <TransactionRow transaction={offer} actionsClickWithTxId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -307,7 +295,7 @@ describe('TransactionRow', () => {
 
     it('does not show whenever actionable transactions are shown ', async () => {
       const { queryByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} actionsClickWithTx={jest.fn()} />
+        <TransactionRow transaction={offer} actionsClickWithTxId={jest.fn()} />
       </MockedProvider>, 0)
 
       expect(queryByTestId('forward-icon')).not.toBeInTheDocument()
@@ -315,7 +303,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for requests ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={request} actionsClickWithTx={jest.fn()} isActionable />
+        <TransactionRow transaction={request} actionsClickWithTxId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -330,7 +318,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for offers ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} actionsClickWithTx={jest.fn()} isActionable />
+        <TransactionRow transaction={offer} actionsClickWithTxId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -348,7 +336,7 @@ describe('TransactionRow', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
-        actionsClickWithTx: jest.fn(),
+        actionsClickWithTxId: jest.fn(),
         showConfirmationModal: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true

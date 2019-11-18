@@ -108,8 +108,8 @@ export default function Inbox () {
     else return setToggleModal(true)
   }
 
-  const [actionsVisible, setActionsVisible] = useState(null)
-  const actionsClickWithTx = transactionId => setActionsVisible(transactionId)
+  const [actionsVisibleId, setActionsVisibleId] = useState(null)
+  const actionsClickWithTxId = transactionId => setActionsVisibleId(transactionId)
 
   const toggleButtons = [{ view: VIEW.actionable, label: 'Pending' }, { view: VIEW.recent, label: 'Recent' }]
   const [inboxView, setInboxView] = useState(VIEW.actionable)
@@ -175,8 +175,8 @@ export default function Inbox () {
         <div styleName='transaction-list'>
           {transactions.map(transaction => <TransactionRow
             transaction={transaction}
-            actionsVisible={actionsVisible}
-            actionsClickWithTx={actionsClickWithTx}
+            actionsVisibleId={actionsVisibleId}
+            actionsClickWithTxId={actionsClickWithTxId}
             role='list'
             view={VIEW}
             isActionable={inboxView === VIEW.actionable}
@@ -199,13 +199,13 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisible, showConfirmationModal, isActionable }) {
+export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisibleId, showConfirmationModal, isActionable }) {
   const { counterparty, presentBalance, amount, type, notes } = transaction
   const agent = counterparty
 
   const handleCloseReveal = () => {
-    if (!isEmpty(actionsVisible) && actionsVisible !== transaction.id) return actionsClickWithTx(transaction.id)
-    else return actionsClickWithTx(null)
+    if (!isEmpty(actionsVisibleId) && actionsVisibleId !== transaction.id) return actionsClickWithTxId(transaction.id)
+    else return actionsClickWithTxId(null)
   }
 
   const isOffer = type === TYPE.offer
@@ -243,13 +243,13 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
 
     {isActionable && <>
       <RevealActionsButton
-        actionsVisible={actionsVisible}
-        istransaction={transaction.id === actionsVisible}
-        actionsClick={() => actionsClickWithTx(transaction.id)}
+        actionsVisibleId={actionsVisibleId}
+        istransaction={transaction.id === actionsVisibleId}
+        actionsClick={() => actionsClickWithTxId(transaction.id)}
         handleClose={handleCloseReveal}
       />
       <ActionOptions
-        actionsVisible={actionsVisible}
+        actionsVisibleId={actionsVisibleId}
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}
@@ -259,14 +259,14 @@ export function TransactionRow ({ transaction, actionsClickWithTx, actionsVisibl
   </div>
 }
 
-function RevealActionsButton ({ actionsClick, handleClose, actionsVisible, istransaction }) {
-  return <div onClick={actionsVisible ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !(actionsVisible && istransaction) })} data-testid='reveal-actions-button'>
+function RevealActionsButton ({ actionsClick, handleClose, actionsVisibleId, istransaction }) {
+  return <div onClick={actionsVisibleId ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !(actionsVisibleId && istransaction) })} data-testid='reveal-actions-button'>
     <ForwardIcon styleName='forward-icon' color='#2c405a4d' dataTestId='forward-icon' />
   </div>
 }
 
-function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisible }) {
-  return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisible && transaction.id === actionsVisible) })}>
+function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisibleId }) {
+  return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisibleId && transaction.id === actionsVisibleId) })}>
     <div styleName='actions'>
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
       {isOffer && <AcceptButton transaction={transaction} />}
