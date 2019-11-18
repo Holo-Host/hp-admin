@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
-// import { UNITS } from 'models/HostPricing'
 import { promiseMap } from 'utils'
 
 export const currentDataTimeIso = () => new Date().toISOString()
@@ -206,12 +205,6 @@ const HoloFuelDnaInterface = {
       // NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
-    },
-    allReceivedHostEarnings: async () => {
-      return 'TODO: STILL NEED TO FILTER THROUGH COMPLETED TX FOR RECEIVED EARNINGS!!!'
-    },
-    allInvoicedHostEarnings: async () => {
-      return 'TODO: STILL NEED TO FILTER THROUGH WAITING TX FOR INVOICED EARNINGS!!!'
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })

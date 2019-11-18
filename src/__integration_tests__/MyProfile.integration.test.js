@@ -1,6 +1,6 @@
 import React from 'react'
 import { fireEvent, within, wait } from '@testing-library/react'
-import { renderAndWaitWithModal } from 'utils/test-utils'
+import { renderAndWait, setupModal } from 'utils/test-utils'
 import { HPAdminApp } from 'root'
 import runHposApi from 'utils/integration-testing/runHposApiWithSetup'
 import HposInterface from 'data-interfaces/HposInterface'
@@ -15,7 +15,7 @@ describe('HP Admin : MyProfile', () => {
     const hposSettings = await HposInterface.os.settings()
     const newHostName = 'Host-Name-Test-123'
 
-    const queries = await renderAndWaitWithModal(<HPAdminApp />)
+    const queries = await setupModal(renderAndWait(<HPAdminApp />))
     const { getByTestId, getByLabelText, getByText, getAllByRole } = queries
 
     // login and arrive at home page

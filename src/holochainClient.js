@@ -2,7 +2,7 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-const developmentMockDnaConnection = false // this is the value MOCK_DNA_CONNECTION will have in the dev server
+const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
@@ -24,8 +24,6 @@ let holochainClient
 const agentId = process.env.REACT_APP_AGENT_ID
 
 export function conductorInstanceId (instanceId) {
-// TODO: Discuss implementation  option for config file that lives in ui and informs happ-store or conductor of UI's DNA-Instance Handle for each DNA. rather than depending on reading the agentId, which is not known the first call.
-  // const realInstanceId = instanceId => findInstanceForAgent(instanceId, agentIndex).id
   const formatInstanceId = instanceId => agentId + '::<happ_id>-' + instanceId
 
   return {
@@ -104,7 +102,6 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         console.groupEnd()
         console.groupEnd()
       }
-      console.log('Result: ',result);
       return result
     } catch (error) {
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)

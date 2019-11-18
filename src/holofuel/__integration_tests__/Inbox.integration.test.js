@@ -21,7 +21,6 @@ describe('HOLOFUEL : Inbox', () => {
     await wait(() => getByText('Pay'))
     expect(getByText('Pre-Seed Data')).toBeInTheDocument()
     expect(getByText('(200)')).toBeInTheDocument()
-    // debug()
 
     // pay transaction
     await act(async () => {
@@ -36,7 +35,6 @@ describe('HOLOFUEL : Inbox', () => {
       fireEvent.click(getByText('Accept'))
       await waait(0)
     })
-    // debug()
 
     expect(getByText('Accept')).not.toBeInTheDocument()
 
@@ -48,7 +46,6 @@ describe('HOLOFUEL : Inbox', () => {
     await wait(() => getByText('History'))
     expect(getByText('(200)')).toBeInTheDocument()
     expect(getByText('none')).toBeInTheDocument()
-    // debug()
 
     console.log('found "Pay", all is good')
   }), 150000)

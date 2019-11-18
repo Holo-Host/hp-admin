@@ -15,12 +15,17 @@ export async function renderAndWait (ui, ms = 0, options = {}) {
 
 // *************************************************************************
 // Shared Functions :
-export async function renderAndWaitWithModal (ui, ms = 0, options = {}) {
-  let queries
-  await act(async () => {
-    queries = render(ui, options)
-    await wait(ms)
-    Modal.setAppElement(queries.container)
-  })
-  return queries
+export function setupModal (renderQueries) {
+  Modal.setAppElement(renderQueries.container)
+  return renderQueries
 }
+
+// export async function renderAndWaitWithModal (ui, ms = 0, options = {}) {
+//   let queries
+//   await act(async () => {
+//     queries = render(ui, options)
+//     await wait(ms)
+//     Modal.setAppElement(queries.container)
+//   })
+//   return queries
+// }

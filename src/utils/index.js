@@ -1,8 +1,5 @@
 import moment from 'moment'
 
-// eslint-disable-next-line no-useless-escape
-export const FORMAT_EMAIL_REGEXP = (str) => str.replace(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
-
 export function bgImageStyle (url) {
   if (!url) return {}
   const escaped = url.replace(/([\(\)])/g, (match, $1) => '\\' + $1) // eslint-disable-line

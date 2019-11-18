@@ -27,7 +27,6 @@ describe('HOLOFUEL : Sidemenu', () => {
     await wait(() => title)
 
     expect(within(getByTestId('sidemenu-header')).getByText('HoloFuel')).toBeInTheDocument()
-    // TODO: Determine why the call to whoami isn't completing (we only see loading instead...)
     expect(within(getByTestId('sidemenu-agentname')).getByText(agentNickname)).toBeInTheDocument()
   }, 150000)
 })

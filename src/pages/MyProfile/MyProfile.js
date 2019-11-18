@@ -32,7 +32,6 @@ const MyProfile = ({ history: { push } }) => {
     }
     push('/dashboard')
   }
-  // const email = watch('email')
   const avatarUrl = watch('avatar')
   const showTos = e => {
     e.preventDefault()

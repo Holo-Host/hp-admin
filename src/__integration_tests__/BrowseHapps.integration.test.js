@@ -9,8 +9,6 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-// TODO: Setup seed data in such that two happs are available for hosting...
-
 describe('HP Admin : BrowseHapps', () => {
   // TODO : Update to pull data straight from pre-seed happ-data source. (NB: The app list below is a copy...)
   const happ1 = {
@@ -61,8 +59,6 @@ describe('HP Admin : BrowseHapps', () => {
 
     // login and arrive at home page
     await login(queries)
-    // verify home page header
-    // console.log('>>>>>> header TESTING >>>>>> : ', header)
 
     // navigate to hosting page
     fireEvent.click(getByTestId('menu-button'))
