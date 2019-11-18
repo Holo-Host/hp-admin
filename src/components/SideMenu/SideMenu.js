@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
+import CopyAgentId from 'components/CopyAgentId'
 import GearIcon from 'components/icons/GearIcon'
 import { sliceHash as presentHash } from 'utils'
 import './SideMenu.module.css'
@@ -15,8 +16,9 @@ export function SideMenu ({
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} size={48} styleName='avatar' />
-
+        <CopyAgentId agent={{ id: settings.hostPubKey }} isMe>
+          <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} size={48} styleName='avatar' />
+        </CopyAgentId>
         <h2 styleName='host-name'>
           {settings.hostName || presentHash(settings.hostPubKey)}
         </h2>

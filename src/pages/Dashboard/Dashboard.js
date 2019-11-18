@@ -6,6 +6,7 @@ import PrimaryLayout from 'components/layout/PrimaryLayout'
 import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
 import PlusIcon from 'components/icons/PlusIcon'
+import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import HappsQuery from 'graphql/HappsQuery.gql'
@@ -15,7 +16,7 @@ import cx from 'classnames'
 import './Dashboard.module.css'
 
 // Mock value to be replaced by graphql query
-export const mockEarnings = 8937
+export const mockEarnings = 4984
 
 export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
@@ -32,7 +33,9 @@ export default function Dashboard ({ earnings = mockEarnings }) {
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='avatar'>
-      <HashIcon hash={settings.hostPubKey} size={42} />
+      <CopyAgentId agent={{ id: settings.hostPubKey }} isMe>
+        <HashIcon hash={settings.hostPubKey} size={42} />
+      </CopyAgentId>
     </div>
     <h2 styleName='greeting'>{greeting}</h2>
 
@@ -58,7 +61,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>
 
-    <Card title='Earnings' linkTo='/holofuel' subtitle='Save, send, and receive Holofuel'>
+    <Card title='HoloFuel' linkTo='/holofuel' subtitle='Save, send, and receive Holofuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Balance
