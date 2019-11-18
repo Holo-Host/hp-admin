@@ -59,6 +59,7 @@ describe('HP Admin : BrowseHapps', () => {
 
     // login and arrive at home page
     await login(queries)
+      .then(result => result())
 
     // navigate to hosting page
     fireEvent.click(getByTestId('menu-button'))

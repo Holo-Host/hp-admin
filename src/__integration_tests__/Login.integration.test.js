@@ -12,13 +12,14 @@ jest.unmock('react-router-dom')
 
 export const login = async (queries, email = 'test@123.com', password = 'MyHostpw123') => {
   return new Promise(resolve => {
-    return act(async () => {
+    const loginResult = async () => await act(async () => { // eslint-disable-line no-return-await
       fireEvent.change(queries.getByLabelText('Email'), { target: { value: email } })
       fireEvent.change(queries.getByLabelText('Password'), { target: { value: password } })
       fireEvent.click(queries.getByText('Login'))
       await waait(0)
-      resolve(await wait(() => queries.getByText('My HoloPort')))
+      return wait(() => queries.getByText('My HoloPort'))
     })
+    resolve(loginResult)
   })
 }
 
@@ -33,6 +34,7 @@ describe('HP Admin : Login', () => {
     const { queryByLabelText, getByText } = queries
 
     await login(queries, email, password)
+      .then(result => result())
 
     expect(getByText(`Hi ${hposSettings.hostName}!`)).toBeInTheDocument()
     expect(queryByLabelText('Email')).not.toBeInTheDocument()

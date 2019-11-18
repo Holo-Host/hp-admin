@@ -20,6 +20,7 @@ describe('HP Admin : MyProfile', () => {
 
     // login and arrive at home page
     await login(queries)
+      .then(result => result())
 
     // check starting hostname displayed on home screen
     await wait(() => getByText(hposSettings.hostName))

@@ -25,6 +25,7 @@ describe('HP Admin : Settings', () => {
 
     // login and arrive at home page
     await login(queries)
+      .then(result => result())
 
     // navigate to earnings page
     fireEvent.click(getByTestId('menu-button'))

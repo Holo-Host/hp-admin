@@ -41,6 +41,7 @@ describe('HP Admin : HostedEarnings', () => {
 
     // login and arrive at home page
     await login(queries)
+      .then(result => result())
 
     // navigate to earnings page
     await act(async () => {

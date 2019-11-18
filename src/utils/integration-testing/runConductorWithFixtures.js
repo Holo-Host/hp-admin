@@ -10,7 +10,8 @@ export default function runConductorWithFixtures (testFn) {
     console.log('Creating Testing Environment...')
     await exec('npm run hc:stop')
       .catch(e => {
-        if (e.code === 1) console.error('Cannot close holochain process : No holochain process currently running. Code:', e.code)
+        // If e.code === 1, error results from no holochain processes being found
+        if (e.code === 1) return null
         else console.error('hc:stop error: ', e.stderr)
       })
 
@@ -23,7 +24,7 @@ export default function runConductorWithFixtures (testFn) {
         fs.access(process.env.REACT_APP_DEFAULT_STORAGE, fs.constants.F_OK, async (e) => {
           if (e) {
             console.error('Error locating Default Storage dir')
-            console.log('Defaulting to auto generated Storage dir. \n')
+            console.log('Defaulting to Nix Auto-Generated Storage Directory. \n')
             storageDir = 'Nix Auto-Generated Storage Directory'
             resolve(storageDir)
           } else {
@@ -36,15 +37,15 @@ export default function runConductorWithFixtures (testFn) {
                   if (e) {
                     if (e.code === 'ENOENT') console.error('Error locating Storage Snapshot dir : ENOENT: no such file or directory')
                     else console.error('Error locating Storage Snapshot dir : ', e)
-                    console.log('\nDefaulting to a new auto generated Storage dir. \n')
+                    console.log('\nDefaulting to a New Nix Auto-Generated Storage Directory. \n')
                     storageDir = 'New Nix Auto-Generated Storage Directory'
                     resolve(storageDir)
                   } else {
                     console.log('Deleted residual Default Storage dir.')
-                    await exec(`rm -rf ${process.env.REACT_APP_DEFAULT_STORAGE} && mkdir ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+                    await exec(`rm -rf ${process.env.REACT_APP_DEFAULT_STORAGE} && mkdir ${process.env.REACT_APP_DEFAULT_STORAGE}`, { maxBuffer: 1024 * 3000 })
                     await ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT, e => { throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ') })
                     console.log('Copied Snapshot Storage into Default Storage!')
-                    storageDir = 'Snapshot Storage Direcotry'
+                    storageDir = 'Snapshot Storage Directory'
                     resolve(storageDir)
                   }
                 })
