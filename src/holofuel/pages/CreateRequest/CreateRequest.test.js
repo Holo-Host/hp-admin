@@ -243,15 +243,6 @@ describe('CreateRequest', () => {
     const mocks = [
       {
         request: {
-          query: HolofuelCounterpartyQuery,
-          variables: { agentId: agent1.id }
-        },
-        result: {
-          data: { holofuelCounterparty: agent1 }
-        }
-      },
-      {
-        request: {
           query: HolofuelHistoryCounterpartiesQuery
         },
         result: {
