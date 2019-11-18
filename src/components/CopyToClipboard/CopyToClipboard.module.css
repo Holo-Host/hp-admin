@@ -1,0 +1,8 @@
+.copy-item {
+  cursor: copy;
+  display: inline;
+}
+
+.modal-counterparty {
+  white-space: nowrap;
+}
