@@ -56,8 +56,8 @@ export default function runConductorWithFixtures (testFn) {
     }
     await manageStorageFiles()
 
-    const hcStart = () => exec('holochain -c ./conductor-config.toml &> conductor.log &')
-    hcStart()
+    // hc:start
+    exec('holochain -c ./conductor-config.toml &> conductor.log &')
 
     const waitConductor = async () => {
       // eslint-disable-next-line no-unused-vars
