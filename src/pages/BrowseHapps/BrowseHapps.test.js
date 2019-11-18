@@ -51,7 +51,7 @@ describe('BrowseHapps Connected', () => {
       expect(getByText(apps[index].appEntry.title)).toBeInTheDocument()
       expect(getByText(apps[index].appEntry.description)).toBeInTheDocument()
       if (index === 0) {
-        expect(getByText('Un-Host')).toBeInTheDocument()
+        expect(getByText('Unhost')).toBeInTheDocument()
       }
       if (index === 1) {
         expect(getByText('Host')).toBeInTheDocument()
@@ -71,11 +71,11 @@ describe('BrowseHapps Connected', () => {
       })
 
       const listItems = getAllByRole('listitem')
-      expect(queryAllByText('Un-Host')).toHaveLength(1)
+      expect(queryAllByText('Unhost')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)
 
       const { getByText: getByTextFromListItem } = within(listItems[0])
-      fireEvent.click(getByTextFromListItem('Un-Host'))
+      fireEvent.click(getByTextFromListItem('Unhost'))
 
       await act(() => wait(0))
 
@@ -86,7 +86,7 @@ describe('BrowseHapps Connected', () => {
 
       await act(() => wait(0))
 
-      expect(queryAllByText('Un-Host')).toHaveLength(1)
+      expect(queryAllByText('Unhost')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)
       expect(hhaInterface.happs.enable).toHaveBeenCalledWith(hhaHapps[0].id)
       expect(mockEnvoyInterface.happs.install).toHaveBeenCalledWith(hhaHapps[0].id)
@@ -116,22 +116,6 @@ describe('BrowseHapps Connected', () => {
       </MockedProvider>)
       fireEvent.click(getByText('Manage Pricing'))
       expect(mockHistory.push).toHaveBeenCalledWith('/pricing')
-    })
-  })
-
-  describe('hApp entry', () => {
-    // we don't currently link to happ description.
-    it.skip("navigates to '/browse-happs/APP_HASH' on click", async () => {
-      let getByText, history
-      await act(async () => {
-        ({ getByText, history } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <BrowseHapps history={{}} />
-        </ApolloProvider>))
-        await wait(0)
-      })
-
-      fireEvent.click(getByText('HoloFuel'))
-      expect(history.location.pathname).toBe('/browse-happs/QmHHAHappEntryAddressHash1')
     })
   })
 })
