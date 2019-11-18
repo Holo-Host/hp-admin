@@ -8,10 +8,12 @@ import { createMemoryHistory } from 'history'
 import moment from 'moment'
 import CreateOffer, { FEE_PERCENTAGE } from './CreateOffer'
 import { TYPE } from 'models/Transaction'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { renderAndWait } from 'utils/test-utils'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
@@ -233,6 +235,48 @@ describe('CreateOffer', () => {
 
     expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
     expect(within(getByTestId('counterparty-nickname')).getByText('Loading')).toBeInTheDocument()
+  })
+
+  it('renders a clickable list of recent counterparties', async () => {
+    const agent1 = {
+      id: 'fkljd',
+      nickname: 'Jo'
+    }
+
+    const agent2 = {
+      id: 'dskajln',
+      nickname: 'Bob'
+    }
+
+    const mocks = [
+      {
+        request: {
+          query: HolofuelHistoryCounterpartiesQuery
+        },
+        result: {
+          data: { holofuelHistoryCounterparties: [agent1, agent2] }
+        }
+      }
+    ]
+
+    const { getAllByTestId, getByLabelText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <CreateOffer history={{}} />
+    </MockedProvider>)
+
+    const agentRows = getAllByTestId('agent-row')
+
+    const agent1Row = agentRows.find(agentRow => {
+      const { queryByText } = within(agentRow)
+      return !!queryByText(agent1.nickname)
+    })
+
+    expect(agent1Row).toBeInTheDocument()
+    fireEvent.click(agent1Row)
+
+    expect(getByLabelText('To').value).toEqual(agent1.id)
+
+    const { getByText: getByTextInAgent1Row } = within(agent1Row)
+    expect(getByTextInAgent1Row('Selected')).toBeInTheDocument()
   })
 
   it.skip('responds appropriately to bad input', () => {
