@@ -93,7 +93,7 @@ export const transactionList = {
       },
       timestamp: {
         origin: '2019-08-30T11:16:12+00:00',
-        event: '2019-08-30T11:19:33+00:00'
+        event: '2019-08-30T07:19:33+00:00'
       },
       adjustment: {
         Ok: {
@@ -103,7 +103,7 @@ export const transactionList = {
           fees: '0'
         }
       },
-      available: '10.01'
+      available: '4010.01'
     },
     {
       index: 3,
@@ -114,12 +114,12 @@ export const transactionList = {
           invoice: {
             promise: {
               tx: {
-                from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+                from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
                 to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-                amount: '10.01',
+                amount: '207.45',
                 fee: '0',
                 deadline: '2020-02-02T00:00:00+00:00',
-                notes: 'Taco Tuesday!',
+                notes: 'Sushi Sunday!',
                 synchronous: null
               },
               request: 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
@@ -133,8 +133,8 @@ export const transactionList = {
         }
       },
       timestamp: {
-        origin: '2019-08-30T11:17:16+00:00',
-        event: '2019-08-30T11:19:32+00:00'
+        origin: '2019-08-28T11:17:16+00:00',
+        event: '2019-11-12T11:19:32+00:00'
       },
       adjustment: {
         Ok: {
@@ -144,7 +144,48 @@ export const transactionList = {
           fees: '0'
         }
       },
-      available: '0'
+      available: '295.11'
+    },
+    {
+      index: 31,
+      state: 'outgoing/completed',
+      origin: 'QmXTCCEMeobd97tFHL6MWiMTyqZsGGVyStxnePSc6MCGes',
+      event: {
+        Cheque: {
+          invoice: {
+            promise: {
+              tx: {
+                to: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+                from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+                amount: '3507.45',
+                fee: '0',
+                deadline: '2020-02-02T00:00:00+00:00',
+                notes: 'Sandwich Saturday!',
+                synchronous: null
+              },
+              request: 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
+            },
+            promise_sig: 'gcAT6bIvN5wd11OS3gxd1mmimtf/5c9niLhL7eWruG1Kd3kg+CfclsbI/dG69NSXBQbvhwj1u4DLhdSMHutRAQ==',
+            promise_commit: 'QmXTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6MCGes'
+          },
+          invoice_sig: 'S6PuR1MnOB9GuOniJ018oWC6DLTB0oiyu4NjR2a0CkiKtmdMIyeePIwgBbpx6uiDlN2CQTznwzdo7Ee9/yygAQ==',
+          invoice_commit: 'QmRCS3aPbfJb7GTyrGFsP8JMvFmvaD43BcXGpA9mhmtpYC',
+          invoice_proof: 'QmVEQhMp7w4BEzXfCnTWGfritiWAgfWamMxmLQ2n3SdACt'
+        }
+      },
+      timestamp: {
+        origin: '2019-08-28T11:17:16+00:00',
+        event: '2019-11-12T11:19:32+00:00'
+      },
+      adjustment: {
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
+        }
+      },
+      available: '502.56'
     },
     {
       index: 1,
@@ -153,8 +194,8 @@ export const transactionList = {
       event: {
         Promise: {
           tx: {
+            to: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
             from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-            to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
             amount: '200.01',
             fee: '2.0001',
             deadline: '2020-12-01T00:00:00+00:00',
@@ -184,9 +225,9 @@ export const transactionList = {
       origin: 'QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz',
       event: {
         Request: {
-          from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+          from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
           to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-          amount: '200.01',
+          amount: '1200.034',
           fee: '2',
           deadline: '2020-12-02T00:00:00+00:00',
           notes: null,
