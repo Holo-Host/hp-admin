@@ -4,19 +4,18 @@ import cx from 'classnames'
 import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
 import SideMenu from 'components/SideMenu'
+import Header from 'components/Header'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
 
-import Header from 'components/Header'
-
 export function PrimaryLayout ({
   children,
   headerProps = {}
 }) {
-  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

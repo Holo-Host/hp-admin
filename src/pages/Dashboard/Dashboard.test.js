@@ -82,19 +82,19 @@ describe('Dashboard', () => {
     ]
 
     const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-      <Dashboard />
+      <Dashboard earnings={0} />
     </MockedProvider>)
 
     expect(getByText('Hi Holo Naut!')).toBeInTheDocument()
 
-    const hosting = getByText('+ Host your first app')
+    const hosting = getByText('Host your first hApp!')
     expect(hosting).toBeInTheDocument()
     fireEvent.click(hosting)
     expect(mockNavigateTo).toHaveBeenCalledWith('/browse-happs')
 
-    const earnings = getByText("You haven't earned any HoloFuel yet")
-    expect(earnings).toBeInTheDocument()
-    fireEvent.click(earnings)
+    const earningsCard = getByText("You haven't earned HoloFuel")
+    expect(earningsCard).toBeInTheDocument()
+    fireEvent.click(earningsCard)
     expect(mockNavigateTo).toHaveBeenCalledWith('/earnings')
 
     const holofuel = getByText('You have no HoloFuel')
@@ -177,16 +177,18 @@ describe('Dashboard', () => {
       }
     ]
 
+    const earnings = 40948
+
     const { getByText } = await renderAndWait(<MockedProvider mocks={macks} addTypename={false}>
-      <Dashboard />
+      <Dashboard earnings={earnings} />
     </MockedProvider>, 0)
 
     expect(getByText('Hi Holo Naut!')).toBeInTheDocument()
 
-    expect(getByText('1 Application')).toBeInTheDocument()
+    expect(getByText('1 hApp')).toBeInTheDocument()
 
-    expect(getByText(`Today: ${presentHolofuelAmount(balance)}`)).toBeInTheDocument()
+    expect(getByText(`${presentHolofuelAmount(earnings)} HF`)).toBeInTheDocument()
 
-    expect(getByText('HoloFuel Balance')).toBeInTheDocument()
+    expect(getByText(`${presentHolofuelAmount(balance)} HF`)).toBeInTheDocument()
   })
 })

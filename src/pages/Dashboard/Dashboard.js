@@ -15,9 +15,9 @@ import cx from 'classnames'
 import './Dashboard.module.css'
 
 // Mock value to be replaced by graphql query
-const earnings = 8937
+export const mockEarnings = 8937
 
-export default function Dashboard () {
+export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
 
   const { data: { happs = [] } = {} } = useQuery(HappsQuery)
@@ -36,7 +36,7 @@ export default function Dashboard () {
     </div>
     <h2 styleName='greeting'>{greeting}</h2>
 
-    <Card title='Hosting' linkTo='/hosting' subtitle='Set, track, and manage your hosted applications and users.'>
+    <Card title='Hosting' linkTo='/browse-happs' subtitle='Set, track, and manage your hosted applications and users.'>
       <div styleName='hosting-content'>
         {noInstalledHapps === 0 && <>
           <PlusInDiscIcon />Host your first hApp!

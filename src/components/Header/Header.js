@@ -2,11 +2,11 @@ import React from 'react'
 import Button from 'components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
-import { withRouter } from 'react-router'
+// import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
-export function Header ({ title, history: { push }, hamburgerClick, settings }) {
+export function Header ({ title, hamburgerClick, settings }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' />
   </Button>
@@ -22,4 +22,4 @@ export function Header ({ title, history: { push }, hamburgerClick, settings }) 
   </header>
 }
 
-export default withRouter(Header)
+export default Header
