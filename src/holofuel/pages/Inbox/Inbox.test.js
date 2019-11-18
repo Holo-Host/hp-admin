@@ -367,7 +367,7 @@ describe('TransactionRow', () => {
   describe('Accept button', () => {
     it('responds properly', async () => {
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} isActionable />
+        <TransactionRow transaction={offer} actionsClickWithTxId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       await act(async () => {
