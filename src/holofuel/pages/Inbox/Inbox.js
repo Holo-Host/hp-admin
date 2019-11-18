@@ -74,13 +74,12 @@ export default function Inbox () {
     setModalTransaction(modalTransaction)
   }
 
-  return <PrimaryLayout headerProps={{ title: pageTitle }} inboxCount={transactions.length}>
+  return <PrimaryLayout headerProps={{ title: pageTitle }}>
 
     {!isTransactionsEmpty && <div styleName='transaction-list'>
       {transactions.map(transaction => <TransactionRow
         transaction={transaction}
         showConfirmationModal={showConfirmationModal}
-        role='list'
         key={transaction.id} />)}
     </div>}
 

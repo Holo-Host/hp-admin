@@ -43,6 +43,38 @@ it('should render the title and a menu icon', () => {
   expect(props.history.push).toHaveBeenCalledWith('/dashboard')
 })
 
+it('should render the title and a menu icon with update badge when inbox updates exist', () => {
+  const props = {
+    history: { push: jest.fn() },
+    agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' },
+    inboxCount: 2
+  }
+  const { getByText, getByTestId } = renderWithRouter(<Header {...props} />)
+
+  expect(getByText(menuIconTitle)).toBeInTheDocument()
+  expect(getByTestId('inboxCount-badge')).toBeInTheDocument()
+
+  fireEvent.click(getByTestId('menu-button'))
+
+  expect(props.history.push).toHaveBeenCalledWith('/dashboard')
+})
+
+it('should render the menu icon without update badge when no inbox updates exist', () => {
+  const props = {
+    history: { push: jest.fn() },
+    agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' },
+    inboxCount: 0
+  }
+  const { getByText, getByTestId } = renderWithRouter(<Header {...props} />)
+
+  expect(getByText(menuIconTitle)).toBeInTheDocument()
+  expect(document.querySelector('[data-testid="inboxCount-badge"]')).not.toBeInTheDocument()
+
+  fireEvent.click(getByTestId('menu-button'))
+
+  expect(props.history.push).toHaveBeenCalledWith('/dashboard')
+})
+
 it('should render the agent nickname', () => {
   const props = {
     title: 'the title',
