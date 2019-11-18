@@ -70,10 +70,10 @@ export default function runConductorWithFixtures (testFn) {
         console.log('Conductor is up...')
         return testFn()
           .catch(async (e) => {
+            console.log('Jest Test Error: ', e)
             await exec('npm run hc:stop')
               .then(() => console.log('Conductor Shut Down...'))
-              .catch()
-            console.error('Jest Test Error: ', e)
+              .catch(e => null)
             throw new Error('End of Test: Scenario Test Failed')
           })
       })
@@ -81,7 +81,7 @@ export default function runConductorWithFixtures (testFn) {
         console.log('End of Test: Scenario Test Successful')
         await exec('npm run hc:stop')
           .then(() => console.log('Conductor Successfully Closed.'))
-          .catch()
+          .catch(e => null)
       })
   }
 }
