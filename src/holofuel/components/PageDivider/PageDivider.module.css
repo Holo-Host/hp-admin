@@ -1,0 +1,18 @@
+.divider {
+  width: 100%;
+  height: 25px;
+  background: rgba(44, 64, 90, 0.1);
+}
+
+.divider-title {
+  color: rgba(44, 64, 90, 0.5);
+  font-family: Circular Std;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  margin: 40px;
+  display: inline;
+  text-transform: uppercase;
+}

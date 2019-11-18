@@ -4,6 +4,7 @@
   word-break: break-word;
   height: 100%;
   box-sizing: border-box;
+  background-color: var(--color-white-smoke)
 }
 
 .wide {
@@ -15,7 +16,7 @@
 }
 
 .content {
-  padding: 20px;
+  padding: 3px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;

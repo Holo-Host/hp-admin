@@ -15,7 +15,7 @@ export const MOCK_INDIVIDUAL_DNAS = {
   hylo: true,
   'happ-store': true,
   hha: true,
-  holofuel: false
+  holofuel: true
 }
 
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
