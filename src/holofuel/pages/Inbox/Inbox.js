@@ -195,6 +195,7 @@ export default function Inbox () {
       setInboxView={setInboxView}
       transaction={modalTransaction}
       payTransaction={payTransaction}
+      actionsClickWithTxId={actionsClickWithTxId}
       declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
@@ -254,6 +255,7 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
         isRequest={isRequest}
         transaction={transaction}
         showConfirmationModal={showConfirmationModal}
+        actionsClickWithTxId={actionsClickWithTxId}
       />
     </>}
   </div>
@@ -265,11 +267,11 @@ function RevealActionsButton ({ actionsClick, handleClose, actionsVisibleId, ist
   </div>
 }
 
-function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisibleId }) {
+function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisibleId, actionsClickWithTxId }) {
   return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisibleId && transaction.id === actionsVisibleId) })}>
     <div styleName='actions'>
       <RejectButton transaction={transaction} showConfirmationModal={showConfirmationModal} />
-      {isOffer && <AcceptButton transaction={transaction} />}
+      {isOffer && <AcceptButton transaction={transaction} actionsClickWithTxId={actionsClickWithTxId} />}
       {isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
     </div>
   </aside>
@@ -293,10 +295,14 @@ function useAcceptOffer (id) {
   })
 }
 
-function AcceptButton ({ transaction: { id } }) {
+function AcceptButton ({ transaction: { id }, actionsClickWithTxId }) {
   const acceptOffer = useAcceptOffer(id)
+  const handleAcceptClick = id => {
+    acceptOffer(id)
+    actionsClickWithTxId(null)
+  }
   return <Button
-    onClick={acceptOffer}
+    onClick={handleAcceptClick}
     styleName='accept-button'>
     <p>Accept</p>
   </Button>
@@ -343,7 +349,7 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
   </Modal>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, setInboxView }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, actionsClickWithTxId, setInboxView }) {
   if (!transaction) return null
   const { id, counterparty, amount, type, action } = transaction
 
@@ -369,7 +375,8 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
 
   const onYes = () => {
     actionHook(actionParams)
-    if (actionHook === declineTransaction) setInboxView(VIEW['recent'])
+    if (action === 'decline') setInboxView(VIEW['recent'])
+    actionsClickWithTxId(null)
     handleClose()
   }
 
