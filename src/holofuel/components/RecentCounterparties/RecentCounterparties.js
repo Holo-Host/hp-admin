@@ -8,9 +8,11 @@ import './RecentCounterparties.module.css'
 export default function RecentCounterparties ({ agents, selectedAgentId, selectAgent, className }) {
   if (isEmpty(agents)) return null
 
+  const recentAgents = agents.slice(0, 6)
+
   return <div styleName='recent-counterparties' className={className}>
     <div styleName='header'>Recent Friends</div>
-    {agents.map(agent => <AgentRow
+    {recentAgents.map(agent => <AgentRow
       agent={agent}
       selected={agent.id === selectedAgentId}
       selectThisAgent={() => selectAgent(agent.id)}

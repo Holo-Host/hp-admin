@@ -36,7 +36,6 @@ function useRequestMutation () {
 
 export default function CreateRequest ({ history: { push } }) {
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-  const recentAgents = agents ? agents.slice(0, 6) : []
 
   const createRequest = useRequestMutation()
 
@@ -101,7 +100,7 @@ export default function CreateRequest ({ history: { push } }) {
         ref={register} />
       <RecentCounterparties
         styleName='recent-counterparties'
-        agents={recentAgents}
+        agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
       <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
