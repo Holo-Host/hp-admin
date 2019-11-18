@@ -4,7 +4,7 @@ import { fireEvent, within, act, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 // import { mockNavigateTo } from 'react-router-dom'
 import { HoloFuelApp } from 'root'
-// import { presentHolofuelAmount, presentAgentId } from 'utils'
+import { presentHolofuelAmount, presentAgentId } from 'utils'
 import { getAgent } from 'utils/integration-testing/conductorConfig'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
 
@@ -42,8 +42,8 @@ describe('HOLOFUEL : CreateOffer', () => {
     // **************************************************************
     // TODO: Determine why this doens't appear until after refresh...
     // **************************************************************
-    // expect(getByText(presentAgentId(agentId))).toBeInTheDocument()
-    // expect(getByText(presentHolofuelAmount(amount))).toBeInTheDocument()
+    expect(getByText(presentAgentId(agentId))).toBeInTheDocument()
+    expect(getByText(presentHolofuelAmount(amount))).toBeInTheDocument()
 
     console.log('found "History", rerouted to TX Hitory Page, all is good')
   }), 150000)

@@ -14,6 +14,14 @@ jest.unmock('react-router-dom')
 describe('HOLOFUEL : Inbox', () => {
   it('A request is displayed', runConductor(async () => {
     const { getByTestId, getByText, getAllByRole } = await renderAndWait(<HoloFuelApp />) // debug,
+    fireEvent.click(getByTestId('menu-button'))
+    await wait(() => getByText('Inbox'))
+
+    await act(async () => {
+      fireEvent.click(getByText('Inbox'))
+      await waait(0)
+    })
+
     const header = getAllByRole('region')[1]
     await wait(() => within(header).getByText('Inbox'))
 

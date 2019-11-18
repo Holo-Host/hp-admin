@@ -17,11 +17,14 @@ describe('HOLOFUEL : CreateRequest', () => {
   const notes = 'Testing 123'
 
   it('user can create a request and then view it in the transaction history', runConductor(async () => {
-    const { getByTestId, getByText, getByLabelText, getByPlaceholderText, getAllByRole } = await renderAndWait(<HoloFuelApp />)
+    const { getByTestId, getByText, getAllByText, getByLabelText, getByPlaceholderText, getAllByRole } = await renderAndWait(<HoloFuelApp />)
     fireEvent.click(getByTestId('menu-button'))
-    await wait(() => getByText('Request'))
+    await wait(() => getAllByText('Request')[0])
 
-    fireEvent.click(getByText('Request'))
+    await act(async () => {
+      fireEvent.click(getAllByText('Request')[0])
+      await waait(0)
+    })
 
     await wait(() => getByLabelText('From'))
     // request from ourself
