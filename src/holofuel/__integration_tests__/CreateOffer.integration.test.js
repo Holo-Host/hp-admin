@@ -2,8 +2,9 @@ import React from 'react'
 import waait from 'waait'
 import { fireEvent, within, act, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
-import { presentHolofuelAmount, presentAgentId } from 'utils'
+// import { mockNavigateTo } from 'react-router-dom'
 import { HoloFuelApp } from 'root'
+import { presentHolofuelAmount, presentAgentId } from 'utils'
 import { getAgent } from 'utils/integration-testing/conductorConfig'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
 
@@ -11,24 +12,23 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-describe('HOLOFUEL : CreateRequest', () => {
+describe('HOLOFUEL : CreateOffer', () => {
   const agentId = getAgent().id
   const amount = 123
   const notes = 'Testing 123'
 
-  it('user can create a request and then view it in the transaction history', runConductor(async () => {
-    const { getByTestId, getByText, getAllByText, getByLabelText, getByPlaceholderText, getAllByRole } = await renderAndWait(<HoloFuelApp />)
+  it('user can create an offer and then view it in the transaction history', runConductor(async () => {
+    const { getByTestId, getByText, getByLabelText, getByPlaceholderText, getAllByRole } = await renderAndWait(<HoloFuelApp />)
     fireEvent.click(getByTestId('menu-button'))
-    await wait(() => getAllByText('Request')[0])
-
+    await wait(() => getByText('Offer'))
     await act(async () => {
-      fireEvent.click(getAllByText('Request')[0])
+      fireEvent.click(getByText('Offer'))
       await waait(0)
     })
 
-    await wait(() => getByLabelText('From'))
-    // request from ourself
-    fireEvent.change(getByLabelText('From'), { target: { value: agentId } })
+    await wait(() => getByLabelText('To'))
+    // offer to ourself
+    fireEvent.change(getByLabelText('To'), { target: { value: agentId } })
     fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
     fireEvent.change(getByPlaceholderText(/notes/i), { target: { value: notes } })
 
@@ -44,5 +44,7 @@ describe('HOLOFUEL : CreateRequest', () => {
     // **************************************************************
     expect(getByText(presentAgentId(agentId))).toBeInTheDocument()
     expect(getByText(presentHolofuelAmount(amount))).toBeInTheDocument()
+
+    console.log('found "History", rerouted to TX Hitory Page, all is good')
   }), 150000)
 })

@@ -2,8 +2,8 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-// This can be written as a boolean expression then it's even less readable
 const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
+// This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
   : process.env.NODE_ENV === 'test'
@@ -44,6 +44,7 @@ async function initAndGetHolochainClient () {
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
+    return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
@@ -61,6 +62,9 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
     ...DEFAULT_OPTS,
     ...callOpts
   }
+
+  const prevErr = []
+
   return async function (args = {}) {
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
@@ -100,14 +104,24 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       }
       return result
     } catch (error) {
-      console.log(
-        `👎 %c${zomeCallPath}%c zome call ERROR using args: `,
-        'font-weight: bold; color: rgb(220, 208, 120); color: red',
-        'font-weight: normal; color: rgb(160, 160, 160)',
-        args,
-        ' -- ',
-        error
-      )
+      const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
+      if (repeatingError) return null
+      else if (process.env.REACT_APP_INTEGRATION_TEST) {
+        prevErr.push({
+          error: error.message,
+          path: zomeCallPath
+        })
+        console.log(prevErr)
+      } else {
+        console.log(
+          `👎 %c${zomeCallPath}%c zome call ERROR using args: `,
+          'font-weight: bold; color: rgb(220, 208, 120); color: red',
+          'font-weight: normal; color: rgb(160, 160, 160)',
+          args,
+          ' -- ',
+          error
+        )
+      }
     }
   }
 }

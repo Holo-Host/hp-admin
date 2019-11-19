@@ -47,6 +47,5 @@ it('should render the title and a menu icon', async () => {
   expect(getByText(menuIconTitle)).toBeInTheDocument()
 
   fireEvent.click(getByTestId('menu-button'))
-
   expect(props.history.push).toHaveBeenCalledWith('/dashboard')
 })

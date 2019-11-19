@@ -8,23 +8,23 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
-export function Header ({ title, avatarUrl, email, backTo, history: { push }, hamburgerClick = () => push('/dashboard') }) {
+export function Header ({ title, avatarUrl, backTo, history: { push }, hamburgerClick = () => push('/dashboard') }) {
   const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
 
-  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
+  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />
   </Button>
 
   return <header>
     <section styleName='header'>
-      <div styleName='left-nav'>{leftNav}</div>
+      <div styleName='left-nav' data-testid='menu-button'>{leftNav}</div>
       <div styleName='title'>My HoloPort</div>
-      <Link to='/my-profile' styleName='avatar-link'>
+      <Link to='/my-profile' styleName='avatar-link' data-testid='profile-link'>
         <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} size={32} />
       </Link>
     </section>
     {title && <section styleName='sub-header'>
-      <div id='sub=title' styleName='sub-title'>{title}</div>
+      <div id='sub=title' styleName='sub-title' data-testid='header-subtitle'>{title}</div>
     </section>}
   </header>
 }
