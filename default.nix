@@ -68,8 +68,8 @@ in
 
 {
 
-  hp-admin = stdenv.mkDerivation rec {
-    name = "hp-admin";
+  hp-admin-ui = stdenv.mkDerivation rec {
+    name = "hp-admin-ui";
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
@@ -89,28 +89,77 @@ in
     buildInputs = [
       run-unit-test
       build-hp-admin
-      build-holofuel
     ];
 
     preConfigure = ''
-    rm -rf node_modules
-    && npm install --build-from-source
+      cp -r ${npmToNix { src = "${src}/"; }} node_modules
+      chmod -R +w node_modules
+      chmod +x node_modules/.bin/webpack
+      patchShebangs node_modules
     '';
 
     buildPhase = ''
       npm run build
+      cp -r build/ hp-admin/
     '';
 
     installPhase = ''
-      mkdir $out
-      mv * $out
+      mv hp-admin $out
     '';
 
     checkPhase = ''
-      npm run test:all
+      npm run test:ci
     '';
 
-    doCheck = true;
+    doCheck = false;
+    meta.platforms = stdenv.lib.platforms.linux;
+  };
+
+  holofuel-ui = stdenv.mkDerivation rec {
+    name = "holofuel-ui";
+    src = gitignoreSource ./.;
+
+    nativeBuildInputs = [
+      holochain-cli
+      holochain-conductor
+      nodejs-12_x
+      pkgconfig
+      cairo
+      giflib
+      libjpeg
+      libpng
+      libuuid
+      pango
+      pixman
+    ];
+
+    buildInputs = [
+      run-unit-test
+      build-holofuel
+    ];
+
+    preConfigure = ''
+      cp -r ${npmToNix { src = "${src}/"; }} node_modules
+      chmod -R +w node_modules
+      chmod +x node_modules/.bin/webpack
+      patchShebangs node_modules
+    '';
+
+    buildPhase = ''
+      npm run build:holofuel
+      cp -r build/ holofuel/
+    '';
+
+    installPhase = ''
+      mv holofuel $out
+    '';
+
+    checkPhase = ''
+      npm run test:ci
+    '';
+
+    doCheck = false;
+    meta.platforms = stdenv.lib.platforms.linux;
   };
 
   hp-admin-conductor-config = writeTOML {
