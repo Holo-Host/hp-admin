@@ -47,6 +47,8 @@ export const resolvers = {
 
     holofuelCompletedTransactions: HoloFuelDnaInterface.transactions.allCompleted,
 
+    holofuelEarningsTransactions: HoloFuelDnaInterface.transactions.allEarnings,
+
     holofuelLedger: HoloFuelDnaInterface.ledger.get,
 
     happ: (_, { id }) => {
