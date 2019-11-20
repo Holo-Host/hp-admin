@@ -19,7 +19,7 @@ export async function getTxCounterparties (transactionList) {
   return noDuplicatesAgentList
 }
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -27,7 +27,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
       id: counterpartyId || event.Request.from
     },
     direction: stateDirection,
-    status: STATUS.pending,
+    status: status || STATUS.pending,
     type: TYPE.request,
     timestamp: eventTimestamp,
     notes: notes || event.Request.notes,
@@ -35,7 +35,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -43,7 +43,7 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
       id: counterpartyId || event.Promise.tx.to
     },
     direction: stateDirection,
-    status: STATUS.pending,
+    status: status || STATUS.pending,
     type: TYPE.offer,
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
@@ -137,8 +137,10 @@ function presentTransaction (transaction) {
       throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     case 'rejected': {
-      // We have decided not to return the reject case into the Ledger
-      break
+      // We have decided to show this **only** in the inbox page via the recent transactions filter
+      if (event.Request) return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.rejected })
+      if (event.Promise) return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.rejected })
+      throw new Error('Completed event did not have a Receipt or Cheque event')
     }
     // NOTE:
     // The below two cases are 'waitingTransaction' cases.
@@ -173,24 +175,6 @@ const HoloFuelDnaInterface = {
         id: result[0].Ok.agent_id.pub_sign_key,
         nickname: result[0].Ok.agent_id.nick
       }
-    },
-    getCounterparties: async (agentIdArray) => {
-      const result = await createZomeCall('transactions/whois')({ agents: agentIdArray })
-      if (result.error) throw new Error('There was an error fetching the agent nicknames for the referenced counterparties. ERROR: ', result.error)
-
-      // Returning the Agent ID detials for more than 1 agent:
-      const agentList = []
-      result.forEach((agent, index) => {
-        if (agent[index].Ok) {
-          agentList.push({
-            id: agent[index].Ok.agent_id.pub_sign_key,
-            nickname: agent[index].Ok.agent_id.nick
-          })
-        } else {
-          throw new Error('There was an error locating one of the holofuel agent nicknames. ERROR: ', agent[index].Err)
-        }
-      })
-      return agentList
     }
   },
   ledger: {
@@ -223,6 +207,12 @@ const HoloFuelDnaInterface = {
       // NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+    },
+    allNonPending: async () => {
+      const { transactions } = await createZomeCall('transactions/list_transactions')()
+      const listOfNonActionableTransactions = transactions.map(presentTransaction)
+      const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
+      return noDuplicateIds.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })

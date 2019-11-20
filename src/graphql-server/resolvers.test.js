@@ -61,6 +61,14 @@ describe('resolvers', () => {
       })
     })
 
+    describe('.holofuelNonPendingTransactions', () => {
+      it('calls HoloFuelInterface.transactions.allNonPending', async () => {
+        resolvers.Query.holofuelNonPendingTransactions()
+        await wait(0)
+        expect(mockHoloFuelInterface.transactions.allNonPending).toHaveBeenCalled()
+      })
+    })
+
     describe('.holofuelLedger', () => {
       it('calls HoloFuelInterface.transactions.ledger.get', async () => {
         resolvers.Query.holofuelLedger()
