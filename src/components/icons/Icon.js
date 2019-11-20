@@ -7,10 +7,11 @@ export default function Icon ({
   color = '#000000',
   viewBox,
   title = 'Icon',
-  style
+  style,
+  dataTestId
 }) {
   const styleName = className ? null : 'icon'
-  return <svg viewBox={viewBox} version='1' xmlns='http://www.w3.org/2000/svg' className={className} styleName={styleName} style={style}>
+  return <svg viewBox={viewBox} version='1' xmlns='http://www.w3.org/2000/svg' className={className} styleName={styleName} style={style} data-testid={dataTestId}>
     <title>{title}</title>
     <g fill={color}>
       {children}

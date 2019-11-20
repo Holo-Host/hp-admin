@@ -34,7 +34,6 @@ export default function HostingEarnings () {
   const buttons = [{ days: 'one', label: '1 Day' }, { days: 'seven', label: '7 Days' }, { days: 'thirty', label: '30 Days' }]
 
   return <PrimaryLayout headerProps={{ title: 'Earnings' }}>
-
     <div styleName='day-buttons'>
       {buttons.map(button =>
         <Button
@@ -61,7 +60,6 @@ export default function HostingEarnings () {
             key={transaction.id} />)}
       </tbody>
     </table>}
-
   </PrimaryLayout>
 }
 
@@ -69,7 +67,7 @@ export function TransactionRow ({ transaction }) {
   const { timestamp, amount, happName } = transaction
   const prettyDate = moment(timestamp).format('D MMM YYYY')
   const prettyTime = moment(timestamp).format('kk:mm')
-  return <tr data-testid='transaction-row'>
+  return <tr data-testid='earnings-row'>
     <td>{prettyDate}<br />{prettyTime}</td>
     <td>{amount} HF</td>
     <td>5 HF/CPU</td>

@@ -2,8 +2,7 @@ import React from 'react'
 import { fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import { renderAndWait } from 'utils/test-utils'
-// testing the named export Header rather than the default export which is wrapped in withRouter
-import { Header } from './Header'
+import Header from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
 
 jest.mock('contexts/useAuthTokenContext')

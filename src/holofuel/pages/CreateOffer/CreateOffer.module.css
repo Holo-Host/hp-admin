@@ -73,6 +73,10 @@
   margin-top: 50px;
 }
 
+.recent-counterparties {
+  margin-top: 40px;
+}
+
 .send-button {
   justify-self: flex-end;
   margin-top: auto;
