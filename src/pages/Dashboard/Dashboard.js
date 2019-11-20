@@ -40,7 +40,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
     <h2 styleName='greeting'>{greeting}</h2>
 
     <Card title='Hosting' linkTo='/browse-happs' subtitle='Set, track, and manage your hosted applications and users.'>
-      <div styleName='hosting-content'>
+      <div styleName='hosting-content' data-testid='hosted-apps'>
         {noInstalledHapps === 0 && <>
           <PlusInDiscIcon />Host your first hApp!
         </>}
@@ -55,7 +55,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
         <h4 styleName='balance-header'>
           {isEarningsZero ? 'Balance' : "Today's earnings"}
         </h4>
-        <div styleName='balance-body'>
+        <div styleName='balance-body' data-testid='hosted-earnings'>
           {isEarningsZero ? "You haven't earned HoloFuel" : `${presentHolofuelAmount(earnings)} HF`}
         </div>
       </div>
@@ -66,7 +66,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
         <h4 styleName='balance-header'>
           Balance
         </h4>
-        <div styleName='balance-body'>
+        <div styleName='balance-body' data-testid='holofuel-balance'>
           {isBalanceZero ? 'You have no HoloFuel' : `${presentHolofuelAmount(balance)} HF`}
         </div>
       </div>

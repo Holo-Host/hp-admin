@@ -45,6 +45,9 @@ export const resolvers = {
 
     holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
 
+    // NOTE: NonPending includes both completed and rejected/declined transactions.
+    holofuelNonPendingTransactions: HoloFuelDnaInterface.transactions.allNonPending,
+
     holofuelCompletedTransactions: HoloFuelDnaInterface.transactions.allCompleted,
 
     holofuelLedger: HoloFuelDnaInterface.ledger.get,
@@ -98,7 +101,7 @@ export const resolvers = {
 
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    hposUpdateSettings: (_, { hostPubKey, hostName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, sshAccess, authToken),
+    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess, authToken),
 
     hposUpdateVersion: (_, { authToken }) => HposInterface.os.updateVersion(authToken),
 

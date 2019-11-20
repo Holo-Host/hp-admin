@@ -1,0 +1,14 @@
+query HolofuelNonPendingTransactionsQuery {
+  holofuelNonPendingTransactions {
+    id
+    amount
+    counterparty { id }
+    direction
+    status
+    type
+    timestamp
+    fees
+    presentBalance
+    notes
+  }
+}

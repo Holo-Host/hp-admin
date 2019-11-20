@@ -26,7 +26,7 @@ export default function BrowseHapps ({ history: { push } }) {
       </div>
     </div>
 
-    {!isEmpty(happs) && <div styleName='happ-list' role='list'>
+    {!isEmpty(happs) && <div styleName='happ-list' role='list' data-testid='happ-row'>
       {happs.map(happ =>
         <HappRow
           happ={happ}

@@ -5,7 +5,7 @@ import Modal from 'components/Modal'
 import Button from 'components/Button'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
-import { presentHolofuelAmount } from 'utils' // presentAgentId
+import { presentHolofuelAmount } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import {
   HOME_PATH,
@@ -35,12 +35,12 @@ export function SideMenu ({
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <h1 styleName='appName'>HoloFuel</h1>
+        <h1 styleName='appName' data-testid='sidemenu-header'>HoloFuel</h1>
         <CopyAgentId agent={agent} isMe>
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
         </CopyAgentId>
 
-        <span styleName='header-account'>
+        <span styleName='header-account' data-testid='sidemenu-agentname'>
           <CopyAgentId agent={agent} isMe>
             {agent.nickname || agentLoading}
           </CopyAgentId>
@@ -57,7 +57,7 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to={INBOX_PATH} styleName='nav-link'>
+            <Link to={INBOX_PATH} styleName='nav-link' data-testid='inbox-link'>
               <div styleName='nav-icon' />
               Inbox
               {inboxCount > 0 && <span styleName='nav-badge'>{inboxCount}</span>}
@@ -76,7 +76,7 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to={HISTORY_PATH} styleName='nav-link'>
+            <Link to={HISTORY_PATH} styleName='nav-link' data-testid='history-link'>
               <div styleName='nav-icon' />
               History
             </Link>

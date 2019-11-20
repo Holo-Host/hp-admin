@@ -19,6 +19,8 @@ function Button ({
     secondary: (variant === 'secondary'),
     plain: (variant === 'plain'),
     mini: (variant === 'mini'),
+    toggle: (variant === 'toggle'),
+    'toggle-selected': (variant === 'toggle-selected'),
     disabled
   })
 

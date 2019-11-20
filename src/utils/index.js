@@ -63,7 +63,6 @@ export const partitionByDate = flow(
   reverse)
 
 // parking this here. Not currently used.
-
 function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
   const dateDifference = moment(isoDate).fromNow()
   // If over a year ago, include the year in date
