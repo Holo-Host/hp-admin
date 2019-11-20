@@ -8,7 +8,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import { presentAgentId } from 'utils'
 
 export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount }) {
-  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button'>
+  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' color='#FFF' />
     {inboxCount > 0 && <span styleName='nav-badge' data-testid='inboxCount-badge'>{inboxCount}</span>}
   </Button>
@@ -17,7 +17,7 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
 
   return <header>
     <section styleName='header'>
-      <div styleName='left-nav' data-testid='menu-button'>
+      <div styleName='left-nav'>
         {leftNav}
       </div>
       <div styleName='center-nav'>

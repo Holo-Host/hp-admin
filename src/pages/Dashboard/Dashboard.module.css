@@ -1,22 +1,29 @@
+.avatar {
+  align-self: center;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
 .greeting {
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 20px
+  color: var(--color-limed-spruce);
+  margin-bottom: 36px;
 }
 
-.card {
-  display: block;
-  text-decoration: none;
-  color: black;
-  background-color: var(--color-gallery);
-  border: 1px solid var(--color-gray);
-  border-radius: 4px;
-  padding: 15px 20px;
-  margin-bottom: 15px;
+.hosting-content {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+  font-family: "Circular";
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--color-rhino-80);
 }
 
-.card-title {
-  display: block;
+.laptop-icon {
+  width: 26px;
+  height: 16px;
+  margin-right: 4px;
 }
 
 .small-text {
@@ -24,7 +31,61 @@
 }
 
 .balance {
+  background-color: var(--color-granny-apple-50);
+  padding: 5px 8px;
   margin-top: 10px;
-  font-weight: bold;
+}
+
+.empty-balance {
+  background-color: var(--color-rhino-10);
+}
+
+.balance-header {
+  color: var(--color-rhino-50);
+}
+
+.balance-body {
   font-size: 18px;
+  line-height: 24px;
+  color: var(--color-rhino-50);
+}
+
+
+/* Card */
+
+.card {
+  display: block;
+  text-decoration: none;
+  color: black;
+  background-color: white;
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.1);
+  border-radius: 4px;
+  padding: 16px 24px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  color: var(--color-limed-spruce);
+  margin-bottom: 0px;
+}
+
+.card-subtitle {
+  color: var(--color-rhino-35);
+}
+
+/* PlusInDiscIcon */
+
+.disc-icon {
+  background-color: #D3F5E6;
+  border-radius: 50%;
+  margin-right: 8px;
+  width: 21px;
+  height: 21px;
+}
+
+.plus-icon {
+  width: 26px;
+  height: 16px;
+  margin-top: 5px;
+  margin-left: 5px;
 }

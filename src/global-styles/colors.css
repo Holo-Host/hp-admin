@@ -1,9 +1,22 @@
 /* color names come from http://chir.ag/projects/name-that-color/ */
+/* this is useful for translating from rgba to hex https://www.hexcolortool.com/ */
 
 :root {
   --color-tundora: #484848;
   --color-gray: #939393;
   --color-gallery: #EFEFEF;
+  --color-alabaster: #F9F9F9;
+  --color-alabaster-light: #FCFCFC;
+  --color-cape-cod: #363D3C;
+  --color-loblolly: #BFC5CD;
+  --color-outerspace: #314843;
+  --color-caribbean-green: #0DC39F;
+  --color-limed-spruce: #39474A;
+  --color-granny-apple-50: rgba(211, 245, 230, 0.5);  
+  --color-rhino-10: rgba(44, 63, 89, 0.10);      
+  --color-rhino-35: rgba(44, 63, 89, 0.35);  
+  --color-rhino-50: rgba(44, 63, 89, 0.50);    
+  --color-rhino-80: rgba(44, 63, 89, 0.80);
   /* color-shocking used in StyleDemo only */
   --color-shocking: #E292C0;
 }

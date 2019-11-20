@@ -2,14 +2,13 @@ import React from 'react'
 import Icon from './Icon'
 
 export const title = 'Menu Icon'
-const path = 'M491 235H21a21 21 0 1 0 0 42h470a21 21 0 1 0 0-42zM491 78H21a21 21 0 0 0 0 42h470a21 21 0 1 0 0-42zM491 392H21a21 21 0 1 0 0 42h470a21 21 0 1 0 0-42z'
-const viewBox = '0 0 512 512'
 
 export default function MenuIcon ({ className, color = '#000000' }) {
-  return <Icon viewBox={viewBox}
+  return <Icon
     color={color}
     title={title}
-    className={className} >
-    <path d={path} />
+    className={className}
+    style={{ paddingTop: '10px' }}>
+    <path fillRule='evenodd' clipRule='evenodd' d='M0 0h21v2H0V0zm0 6h21v2H0V6zm21 6H0v2h21v-2z' />
   </Icon>
 }
