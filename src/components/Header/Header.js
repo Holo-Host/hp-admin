@@ -5,7 +5,7 @@ import './Header.module.css'
 import { Link } from 'react-router-dom'
 import MenuIcon from 'components/icons/MenuIcon'
 
-export function Header ({ title, hamburgerClick, settings }) {
+export default function Header ({ title, hamburgerClick, settings }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' />
 
@@ -21,5 +21,3 @@ export function Header ({ title, hamburgerClick, settings }) {
     </section>
   </header>
 }
-
-export default Header
