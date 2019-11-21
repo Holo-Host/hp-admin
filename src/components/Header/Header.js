@@ -11,13 +11,11 @@ export default function Header ({ title, hamburgerClick, settings }) {
 
   </Button>
 
-  return <header>
-    <section styleName='header'>
+  return <div styleName='header'>
       <div styleName='left-nav'>{leftNav}</div>
       <h2 styleName='title'>{title}</h2>
       <Link to='/my-profile' styleName='avatar-link'>
         <HashAvatar seed={settings.hostPubKey} size={32} />
       </Link>
-    </section>
-  </header>
+    </div>
 }
