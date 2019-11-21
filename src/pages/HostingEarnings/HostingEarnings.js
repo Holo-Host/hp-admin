@@ -61,7 +61,7 @@ export default function HostingEarnings () {
     </div>
 
     <Graph transactions={scopedTransactions} />
-    
+
     {!isEmpty(transactions) && <table styleName='transaction-list' role='list'>
       <thead>
         <tr styleName='transaction-headers'>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import styles from './BrowseHapps.module.css'
+import './BrowseHapps.module.css'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import GearIcon from 'components/icons/GearIcon'
@@ -18,7 +18,7 @@ export default function BrowseHapps ({ history: { push } }) {
 
   const goToPricing = () => push('/pricing')
 
-  return <PrimaryLayout headerProps={{ title: 'Hosting' }} contentClassName={styles.content}>
+  return <PrimaryLayout headerProps={{ title: 'Hosting' }}>
     <div styleName='header-row'>
       <h1 styleName='header'>Available hApps</h1>
       <div styleName='pricing-link' onClick={goToPricing}>

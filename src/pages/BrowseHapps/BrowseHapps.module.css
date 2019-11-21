@@ -1,15 +1,11 @@
-.content {
-  padding: 6px;
-}
-
 .header-row {
   display: flex;
   align-items: center;
-  margin-top: 6px;
 }
 
 .header {
   color: var(--color-rhino);
+  margin: 0px;
 }
 
 .pricing-link {
