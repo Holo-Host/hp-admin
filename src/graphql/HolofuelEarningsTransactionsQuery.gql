@@ -2,14 +2,8 @@ query HolofuelEarningsTransactionsQuery {
   holofuelEarningsTransactions {
     id
     amount
-    counterparty { id }
-    direction
-    status
-    type
     timestamp
-    fees
-    presentBalance
-    notes
     happName
+    counterparty { id }
   }
 }

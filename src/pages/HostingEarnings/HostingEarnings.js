@@ -19,6 +19,8 @@ export default function HostingEarnings () {
   const { data: { holofuelEarningsTransactions: transactions = [] } = {} } = useQuery(HolofuelEarningsTransactionsQuery)
   const [days, setDays] = useState(DAYS.one)
 
+  console.log('transactions', transactions)
+
   const buttons = ['one', 'seven', 'thirty']
 
   // This is annoying
