@@ -7,8 +7,9 @@ import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import './HostingEarnings.module.css'
 import { presentHolofuelAmount } from 'utils'
+import Graph from './Graph'
 
-const DAYS = {
+export const DAYS = {
   one: 'one',
   seven: 'seven',
   thirty: 'thirty'
@@ -60,7 +61,7 @@ export default function HostingEarnings () {
         </Button>)}
     </div>
 
-    <Graph transactions={scopedTransactions} />
+    <Graph transactions={scopedTransactions} days={days} />
 
     {!isEmpty(transactions) && <table styleName='transaction-list' role='list'>
       <thead>
@@ -78,12 +79,6 @@ export default function HostingEarnings () {
       </tbody>
     </table>}
   </PrimaryLayout>
-}
-
-export function Graph ({ transactions }) {
-  return <div styleName='graph'>
-    Big sexy graph
-  </div>
 }
 
 export function TransactionRow ({ transaction }) {
