@@ -14,6 +14,7 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
+import { HISTORY_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
@@ -97,7 +98,7 @@ describe('CreateOffer', () => {
     })
 
     expect(offerMock.newData).toHaveBeenCalled()
-    expect(push).toHaveBeenCalledWith('/history')
+    expect(push).toHaveBeenCalledWith(HISTORY_PATH)
     expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} HF sent to ${presentAgentId(counterparty.id)}.`, 5000)
   })
 

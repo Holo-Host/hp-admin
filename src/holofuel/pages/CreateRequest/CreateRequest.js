@@ -13,6 +13,7 @@ import Button from 'holofuel/components/Button'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateRequest.module.css'
 
 // TODO: this constants should come from somewhere more scientific
@@ -57,7 +58,7 @@ export default function CreateRequest ({ history: { push } }) {
 
   const onSubmit = ({ amount, counterpartyId, notes }) => {
     createRequest(amount, counterpartyId, notes)
-    push('/history')
+    push(HISTORY_PATH)
     newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
   }
 
