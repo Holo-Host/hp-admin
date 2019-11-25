@@ -1,5 +1,7 @@
 # HoloPort Admin
+
 > The entry point into the world of Holo as a Host.
+
 ## HoloPort Admin Setup Instructions
 
 1. Clone local instance of repo with `git clone https://github.com/Holo-Host/hp-admin.git`
