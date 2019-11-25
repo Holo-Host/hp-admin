@@ -68,8 +68,8 @@ in
 
 {
 
-  hp-admin-ui = stdenv.mkDerivation rec {
-    name = "hp-admin-ui";
+  hp-admin = stdenv.mkDerivation rec {
+    name = "hp-admin";
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
