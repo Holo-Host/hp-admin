@@ -17,7 +17,7 @@ let
   };
 
   branchJobset = ref: sharedJobset // {
-    inputs.holo-envoy = {
+    inputs.hp-admin = {
       emailresponsible = false;
       type = "git";
       value = "https://github.com/Holo-Host/hp-admin.git ${ref}";
@@ -26,7 +26,7 @@ let
   };
 
   pullRequestToJobset = n: pr: sharedJobset // {
-    inputs.holo-envoy = {
+    inputs.hp-admin = {
       emailresponsible = false;
       type = "git";
       value = "https://github.com/${pr.base.repo.owner.login}/${pr.base.repo.name} pull/${n}/head";
