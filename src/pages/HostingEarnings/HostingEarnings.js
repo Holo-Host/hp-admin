@@ -19,8 +19,6 @@ export default function HostingEarnings () {
   const { data: { holofuelEarningsTransactions: transactions = [] } = {} } = useQuery(HolofuelEarningsTransactionsQuery)
   const [days, setDays] = useState(DAYS.one)
 
-  console.log('transactions', transactions)
-
   const buttons = ['one', 'seven', 'thirty']
 
   // This is annoying
@@ -70,7 +68,7 @@ export default function HostingEarnings () {
         <tr styleName='transaction-headers'>
           <th>hApp</th>
           <th>Price/Unit</th>
-          <th>Total (HF)</th>
+          <th>Total</th>
         </tr>
       </thead>
       <tbody>

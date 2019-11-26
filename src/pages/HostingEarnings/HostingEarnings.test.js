@@ -14,19 +14,28 @@ const transactions = [{
   id: 1,
   timestamp: moment(),
   amount: 150,
-  happName: 'HoloFuel'
+  happName: 'HoloFuel',
+  counterparty: {
+    id: 1
+  }
 },
 {
   id: 2,
   timestamp: moment().subtract(3, 'days'),
-  amount: 150,
-  happName: 'HoloFuel'
+  amount: 250,
+  happName: 'HoloFuel',
+  counterparty: {
+    id: 1
+  }
 },
 {
   id: 3,
   timestamp: moment().subtract(10, 'days'),
-  amount: 150,
-  happName: 'HoloFuel'
+  amount: 350,
+  happName: 'HoloFuel',
+  counterparty: {
+    id: 1
+  }
 }]
 
 const mocks = [
@@ -43,33 +52,32 @@ const mocks = [
 describe('HostingEarnings', () => {
   it('renders', async () => {
     const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}><HostingEarnings /></MockedProvider>)
-    expect(getByText('Total')).toBeInTheDocument()
-    expect(getByText('Price/Unit')).toBeInTheDocument()
     expect(getByText('hApp')).toBeInTheDocument()
+    expect(getByText('Price/Unit')).toBeInTheDocument()
+    expect(getByText('Total')).toBeInTheDocument()
   })
 
   describe('Day Buttons', () => {
     it('switches between different transaction lists', async () => {
-      const { getByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}><HostingEarnings /></MockedProvider>)
-      expect(getAllByTestId('transaction-row')).toHaveLength(1)
+      const { getByText, getAllByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}><HostingEarnings /></MockedProvider>)
+      expect(getAllByTestId('transaction-row')).toHaveLength(3)
+
       const oneDayTotal = transactions.slice(0, 1).reduce((sum, transaction) => sum + transaction.amount, 0)
-      expect(getByText(`${presentHolofuelAmount(oneDayTotal)} HF`)).toBeInTheDocument()
+      expect(getAllByText(`${presentHolofuelAmount(oneDayTotal)} HF`)).toHaveLength(2)
 
       fireEvent.click(getByText('7 Days'))
 
-      expect(getAllByTestId('transaction-row')).toHaveLength(2)
       const sevenDayTotal = transactions.slice(0, 2).reduce((sum, transaction) => sum + transaction.amount, 0)
       expect(getByText(`${presentHolofuelAmount(sevenDayTotal)} HF`)).toBeInTheDocument()
 
       fireEvent.click(getByText('30 Days'))
 
-      expect(getAllByTestId('transaction-row')).toHaveLength(3)
       const thirtyDayTotal = transactions.slice(0, 3).reduce((sum, transaction) => sum + transaction.amount, 0)
       expect(getByText(`${presentHolofuelAmount(thirtyDayTotal)} HF`)).toBeInTheDocument()
 
-      fireEvent.click(getByText('1 Day'))
+      fireEvent.click(getByText('Today'))
 
-      expect(getAllByTestId('transaction-row')).toHaveLength(1)
+      expect(getAllByText(`${presentHolofuelAmount(oneDayTotal)} HF`)).toHaveLength(2)
     })
   })
 })
