@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, flatten, capitalize } from 'lodash/fp'
+import { isEmpty, flatten, capitalize, uniqBy } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
@@ -9,6 +9,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
@@ -32,7 +33,7 @@ function useCancel () {
 function useFetchCounterparties () {
   const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
   const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-  const { data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { data: { holofuelHistoryCounterparties = [] } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
 
   if (holofuelHistoryCounterparties) {
     const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
@@ -61,13 +62,33 @@ function useFetchCounterparties () {
   }
 }
 
+function useTransactionsWithCounterparties () {
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
+
+  const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
+    ...transaction,
+    counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
+  }))
+
+  const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
+
+  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
+  const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
+
+  return {
+    completedTransactions: updatedCompletedTransactions,
+    pendingTransactions: updatedWaitingTransactions
+  }
+}
+
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
 export default function TransactionsHistory () {
   const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
-  const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
-  const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-  useFetchCounterparties()
+  const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
 
   const cancelTransaction = useCancel()
 

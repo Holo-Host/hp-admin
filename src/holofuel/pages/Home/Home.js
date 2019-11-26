@@ -1,7 +1,7 @@
 import React from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
-import { isEmpty, flatten, get } from 'lodash/fp'
+import { isEmpty, get, uniqBy } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -15,25 +15,22 @@ import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { OFFER_PATH, REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
-function useFetchCounterparties () {
+function useTransactionsWithCounterparties () {
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
-  const { data: { holofuelHistoryCounterparties } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
 
-  if (holofuelHistoryCounterparties) {
-    const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
-    const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
-      const matchingTx = filterTransactionsByAgentId(agent, txListType)
-      return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
-    })
+  const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
+    ...transaction,
+    counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
+  }))
 
-    // Cache Write/Update for HolofuelCompletedTransactionsQuery
-    const newCompletedTxList = flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
-    client.writeQuery({
-      query: HolofuelCompletedTransactionsQuery,
-      data: {
-        holofuelCompletedTransactions: newCompletedTxList
-      }
-    })
+  const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
+
+  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
+
+  return {
+    transactions: updatedCompletedTransactions
   }
 }
 
@@ -41,8 +38,7 @@ export default function Home () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
-  const { data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
-  useFetchCounterparties()
+  const { transactions } = useTransactionsWithCounterparties()
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
 
