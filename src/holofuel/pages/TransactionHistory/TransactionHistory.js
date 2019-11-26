@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, flatten, capitalize, uniqBy } from 'lodash/fp'
+import { isEmpty, capitalize, uniqBy } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
@@ -28,38 +28,6 @@ function useCancel () {
       query: HolofuelWaitingTransactionsQuery
     }]
   })
-}
-
-function useFetchCounterparties () {
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
-  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery)
-  const { data: { holofuelHistoryCounterparties = [] } = {}, client } = useQuery(HolofuelHistoryCounterpartiesQuery)
-
-  if (holofuelHistoryCounterparties) {
-    const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
-    const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
-      const matchingTx = filterTransactionsByAgentId(agent, txListType)
-      return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
-    })
-
-    // Cache Write/Update for HolofuelCompletedTransactionsQuery
-    const newCompletedTxList = flatten(updateTxListCounterparties(holofuelCompletedTransactions, holofuelHistoryCounterparties))
-    client.writeQuery({
-      query: HolofuelCompletedTransactionsQuery,
-      data: {
-        holofuelCompletedTransactions: newCompletedTxList
-      }
-    })
-
-    // Cache Write/Update for HolofuelWaitingTransactionsQuery
-    const newWaitingTxList = flatten(updateTxListCounterparties(holofuelWaitingTransactions, holofuelHistoryCounterparties))
-    client.writeQuery({
-      query: HolofuelWaitingTransactionsQuery,
-      data: {
-        holofuelWaitingTransactions: newWaitingTxList
-      }
-    })
-  }
 }
 
 function useTransactionsWithCounterparties () {
