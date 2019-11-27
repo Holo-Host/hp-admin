@@ -1,23 +1,24 @@
 import React, { useState } from 'react'
-import { isEmpty, get } from 'lodash/fp'
+import { isEmpty, get, keys, omit } from 'lodash/fp'
 import './Settings.module.css'
-import { sliceHash as presentHash } from 'utils'
-import HashAvatar from 'components/HashAvatar'
+import { sliceHash as presentHash, presentAgentId } from 'utils'
+import HashIcon from 'components/HashIcon'
+import CopyAgentId from 'components/CopyAgentId'
 import Modal from 'components/Modal'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
-import Button from 'components/Button'
+import Button from 'components/UIButton'
+import ToggleButton from 'components/ToggleButton'
+import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 import { useHPAuthQuery, useHPAuthMutation } from 'graphql/hpAuthHooks'
+import { rhino } from 'utils/colors'
 
 // Dictionary of all relevant display ports
 export const getLabelFromPortName = portname => ({
   primaryPort: 'Primary Port'
 }[portname])
-
-const DEFAULT_PORT_NAMES = ['Device Admin', 'HC Network', 'Hosting']
-const NOT_AVAILABLE = 'Not Available'
 
 // Data - Mutation hook
 function useUpdateVersion () {
@@ -28,11 +29,14 @@ function useUpdateVersion () {
 }
 
 export function Settings ({ history: { push } }) {
-  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
-  const { data: { hposStatus: status = [] } = {} } = useHPAuthQuery(HposStatusQuery)
+  const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
 
-  const [toggleModal, setToggleModal] = useState()
-  const showModal = () => setToggleModal(true)
+  const { data: { hposStatus: status = {} } = {} } = useHPAuthQuery(HposStatusQuery)
+
+  const [modalVisible, setModalVisible] = useState()
+  const showModal = () => setModalVisible(true)
+
+  const [sshAccess, setSshAccess] = useState()
 
   const updateVersion = useUpdateVersion()
 
@@ -40,127 +44,90 @@ export function Settings ({ history: { push } }) {
   const currentVersion = get('versionInfo.currentVersion', status)
   const updateAvailable = (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion))
 
+  const title = (settings.hostName ? `${settings.hostName}'s` : 'Your') + ' HoloPort'
+
+  const ports = (() => {
+    const portsObject = (omit('__typename', get('ports', status)) || {})
+    const allKeys = keys(portsObject)
+    return allKeys.map(key => ({
+      label: getLabelFromPortName(key),
+      value: portsObject[key]
+    }))
+  })()
+
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
-    <header styleName='jumbotron-header' data-testid='settings-header'>
-      {!isEmpty(settings) && <>
-        <HashAvatar seed={settings.hostPubKey} styleName='avatar-image' />
-        <h2> {settings.hostName ? `${settings.hostName}'s` : 'Your'} HoloPort </h2>
-      </> }
-      {/* TODO: Find out what the below number should link to... */}
-      <Button styleName='header-button'>{presentHash(settings.hostPubKey)}</Button>
-    </header>
+    <div styleName='avatar'>
+      <CopyAgentId agent={{ id: settings.hostPubKey }} isMe>
+        <HashIcon hash={settings.hostPubKey} size={42} />
+      </CopyAgentId>
+    </div>
+    <div styleName='title'>{title}</div>
 
     <section styleName='settings-section'>
-      <SettingsTable header='Software Version' updateAvailable={updateAvailable}>
-        {!isEmpty(status) && !isEmpty(status.versionInfo)
-          ? <SoftwareUpdateRow
-            label={presentHash(currentVersion)}
-            content={availableVersion}
-            showModal={showModal}
-            updateAvailable={updateAvailable} />
-          : <SoftwareUpdateRow
-            label='Version Number'
-            content={NOT_AVAILABLE} />
-        }
-      </SettingsTable>
-
-      <SettingsTable header='About this HoloPort' >
-        <SettingsRow
-          label='Device Name'
-          dataTestId='device-name'
-          content={!isEmpty(settings) && settings.deviceName ? settings.deviceName : NOT_AVAILABLE} />
-        <SettingsRow
-          label='Network ID'// change to 'Network'
-          // TODO : Change content (below) to `settings.networkStatus`
-          dataTestId='network-type'
-          content={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : NOT_AVAILABLE} />
-      </SettingsTable>
-
-      <SettingsTable header='Access Port Numbers'>
-        {!isEmpty(status) && !isEmpty(status.ports)
-          ? Object.entries(status.ports).map(port => {
-            if (port[0] === '__typename') return null
-            return <SettingsRow
-              key={port[0] + port[1]}
-              label={getLabelFromPortName(port[0])}
-              content={port[1]} />
-          })
-          : DEFAULT_PORT_NAMES.map(port => <SettingsRow
-            key={port}
-            label={port}
-            content={NOT_AVAILABLE} />)
-        }
-      </SettingsTable>
+      <div styleName='version-header-row'>
+        <div styleName='settings-header'>Software Version</div>
+        {updateAvailable && <div styleName='update-available'>Update Available</div>}        
+      </div>
+      <SettingsRow
+        label={presentAgentId(currentVersion)}
+        value={updateAvailable ? <VersionUpdateButton showModal={showModal} /> : 'Your software is up to date.'}
+        bottomStyle />
+      <div styleName='settings-header'>About this HoloPort</div>
+      <SettingsRow
+        label='Device Name'
+        dataTestId='device-name'
+        value={!isEmpty(settings) && settings.deviceName ? settings.deviceName : 'Not Available'} />
+      <SettingsRow
+        label='Network ID'
+        bottomStyle
+        dataTestId='network-type'
+        value={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : 'Not Available'} />
+      <div styleName='settings-header'>Access Port Numbers</div>
+      {ports.map(({ label, value }, i) => <SettingsRow
+        key={label}
+        label={label}
+        value={value}
+        bottomStyle={i === ports.length - 1} />)}
+      <div styleName='settings-header'>&nbsp;</div>
+      <SettingsRow
+        label='SSH'
+        value={<ToggleButton checked={sshAccess} onChange={e => setSshAccess(e.target.checked)} />} />
+      <SettingsRow
+        label={<Button name='factory-reset' variant='danger' wide styleName='factory-reset-button' onClick={() => push('/factory-reset')}>Factory Reset</Button>}
+        value={<div onClick={() => push('/factory-reset')} styleName='arrow-wrapper'><ArrowRightIcon color={rhino} opacity={0.8} /></div>}
+        bottomStyle />
     </section>
 
-    <UpdateSoftwareModal
+    <VersionUpdateModal
       settings={settings}
-      handleClose={() => setToggleModal(null)}
-      toggleModal={toggleModal}
+      handleClose={() => setModalVisible(null)}
+      modalVisible={modalVisible}
       availableVersion={availableVersion}
       updateVersion={updateVersion} />
-
-    <hr />
-    <hr />
-
-    <Button name='factory-reset' variant='danger' wide styleName='factory-reset-button' onClick={() => push('/factory-reset')}>Factory Reset</Button>
   </PrimaryLayout>
 }
 
-export function SettingsTable ({ updateAvailable, header, children }) {
-  return <table styleName='settings-table' data-testid='settings-table'>
-    <thead>
-      <tr key='heading'>
-        <th id={header.toLowerCase().trim()} styleName='settings-row-header'>
-          <h5 styleName='row-header-title'>{header}
-            { updateAvailable
-              ? <span styleName='second-header'> Update Available</span>
-              : null
-            }
-          </h5>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      {children}
-    </tbody>
-  </table>
+export function SettingsRow ({ label, value, dataTestId, bottomStyle }) {    
+  return <div styleName={bottomStyle ? 'settings-row-bottom' : 'settings-row'} data-testid={dataTestId}>
+    {typeof label === 'string'
+      ? <span styleName='settings-label'>{label}</span>
+      : label}
+    {typeof value === 'string'
+      ? <span styleName='settings-value'>{value}</span>
+      : value}
+  </div>
 }
 
-export function SettingsRow ({ label, content, dataTestId }) {
-  return <tr styleName='settings-row' data-testid='settings-row'>
-    <td styleName='settings-col align-left'>
-      <h3 styleName='row-label' data-testid='settings-label'>{label}</h3>
-    </td>
-    <td styleName='settings-col align-right'>
-      <h3 styleName='row-content' data-testid={dataTestId}>{content}</h3>
-    </td>
-  </tr>
-}
-
-export function SoftwareUpdateRow ({ label, showModal, updateAvailable }) {
-  return <tr styleName='settings-row' data-testid='settings-row'>
-    <td styleName='settings-col align-left'>
-      <h3 styleName='row-label' data-testid='settings-label'>{label}</h3>
-    </td>
-    <td styleName='settings-col align-right'>
-      { updateAvailable
-        ? <SoftwareUpdateButton showModal={showModal} />
-        : <h3 styleName='row-content'>Your Software is up-to-date</h3>
-      }
-    </td>
-  </tr>
-}
-
-function SoftwareUpdateButton ({ showModal }) {
+function VersionUpdateButton ({ showModal }) {
   return <Button
+    variant='white'
     onClick={showModal}
-    styleName='update-version-button'>
+    styleName='version-update-button'>
     Update Software
   </Button>
 }
 
-export function UpdateSoftwareModal ({ settings, handleClose, toggleModal, availableVersion, updateVersion }) {
+export function VersionUpdateModal ({ settings, handleClose, modalVisible, availableVersion, updateVersion }) {
   if (!availableVersion) return null
   const onYes = () => {
     updateVersion()
@@ -168,7 +135,7 @@ export function UpdateSoftwareModal ({ settings, handleClose, toggleModal, avail
   }
   return <Modal
     contentLabel={`Update ${settings.deviceName}?`}
-    isOpen={!!toggleModal}
+    isOpen={!!modalVisible}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>

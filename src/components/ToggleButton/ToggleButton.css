@@ -1,0 +1,12 @@
+.react-toggle--checked .react-toggle-thumb {
+  left: 27px;
+  border-color: var(--color-caribbean-green);
+}
+
+.react-toggle--checked .react-toggle-track {
+  background-color: var(--color-caribbean-green);
+}
+
+.react-toggle--checked:hover:not(.react-toggle--disabled) .react-toggle-track {
+  background-color: var(--color-caribbean-green);
+}

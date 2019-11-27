@@ -4,3 +4,4 @@
 export const gray = '#939393'
 export const caribbeanGreen = '#0DC39F'
 export const silverChalice = '#A3A3A3'
+export const rhino = '#2C405A'
