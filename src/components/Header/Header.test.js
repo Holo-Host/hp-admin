@@ -1,6 +1,7 @@
 import React from 'react'
 import { fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
+import { mockNavigateTo } from 'react-router-dom'
 import { renderAndWait } from 'utils/test-utils'
 import Header from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
@@ -26,6 +27,8 @@ it('should render the title and a menu icon', async () => {
   expect(getByText(menuIconTitle)).toBeInTheDocument()
 
   fireEvent.click(getByTestId('menu-button'))
-
   expect(hamburgerClick).toHaveBeenCalled()
+
+  fireEvent.click(getByTestId('avatar-link'))
+  expect(mockNavigateTo).toHaveBeenCalledWith('/settings')
 })

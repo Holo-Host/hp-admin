@@ -5,6 +5,7 @@ export default function Icon ({
   className,
   children,
   color = '#000000',
+  opacity = '1',
   viewBox,
   title = 'Icon',
   style,
@@ -13,7 +14,7 @@ export default function Icon ({
   const styleName = className ? null : 'icon'
   return <svg viewBox={viewBox} version='1' xmlns='http://www.w3.org/2000/svg' className={className} styleName={styleName} style={style} data-testid={dataTestId}>
     <title>{title}</title>
-    <g fill={color}>
+    <g fill={color} fillOpacity={opacity}>
       {children}
     </g>
   </svg>

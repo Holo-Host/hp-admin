@@ -107,7 +107,7 @@ describe('BrowseHapps Connected', () => {
   ]
 
   describe('pricing button', () => {
-    it("calls history.push with '/pricing'", async () => {
+    it.skip("calls history.push with '/pricing'", async () => {
       const mockHistory = {
         push: jest.fn()
       }

@@ -13,7 +13,8 @@ import 'global-styles/index.css'
 
 export function PrimaryLayout ({
   children,
-  headerProps = {}
+  headerProps = {},
+  showSideMenu = true
 }) {
   const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
 
@@ -25,7 +26,7 @@ export function PrimaryLayout ({
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header
       {...headerProps}
-      hamburgerClick={hamburgerClick}
+      hamburgerClick={showSideMenu && hamburgerClick}
       settings={settings} />
     <SideMenu
       isOpen={isMenuOpen}

@@ -51,6 +51,7 @@
     "react-modal": "^3.9.1",
     "react-router-dom": "^5.1.2",
     "react-test-renderer": "^16.9.0",
+    "react-toggle": "^4.1.1",
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",
     "rpc-websockets": "^4.5.1",
