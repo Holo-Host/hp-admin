@@ -36,7 +36,7 @@ export function Settings ({ history: { push } }) {
   const [modalVisible, setModalVisible] = useState()
   const showModal = () => setModalVisible(true)
 
-  const [sshAccess, setSshAccess] = useState()
+  const [sshAccess, setSshAccess] = useState(true)
 
   const updateVersion = useUpdateVersion()
 
@@ -78,7 +78,7 @@ export function Settings ({ history: { push } }) {
         dataTestId='device-name'
         value={!isEmpty(settings) && settings.deviceName ? settings.deviceName : 'Not Available'} />
       <SettingsRow
-        label='Network ID'
+        label='Network'
         bottomStyle
         dataTestId='network-type'
         value={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : 'Not Available'} />
