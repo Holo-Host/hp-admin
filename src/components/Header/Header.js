@@ -13,7 +13,7 @@ export default function Header ({ title, hamburgerClick, settings }) {
   return <div styleName='header'>
     <div styleName='left-nav'>{leftNav}</div>
     <h2 styleName='title'>{title}</h2>
-    <Link to='/settings' styleName='avatar-link'>
+    <Link to='/settings' styleName='avatar-link' data-testid='avatar-link'>
       <HashAvatar seed={settings.hostPubKey} size={32} />
     </Link>
   </div>

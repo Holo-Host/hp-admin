@@ -10,11 +10,12 @@ jest.mock('contexts/useFlashMessageContext')
 
 describe('Login', () => {
   it('renders', async () => {
-    const { getByPlaceholderText, getByText } = render(<MockedProvider><Login history={{}} /></MockedProvider>)
+    const { getByPlaceholderText, getByText, queryByTestId } = render(<MockedProvider><Login history={{}} /></MockedProvider>)
 
     expect(getByPlaceholderText('Email address')).toBeInTheDocument()
     expect(getByPlaceholderText('Password')).toBeInTheDocument()
     expect(getByText('Login')).toBeInTheDocument()
+    expect(queryByTestId('menu-button')).not.toBeInTheDocument()
   })
 
   describe('Validation', () => {

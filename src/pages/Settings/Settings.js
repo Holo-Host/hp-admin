@@ -66,7 +66,7 @@ export function Settings ({ history: { push } }) {
     <section styleName='settings-section'>
       <div styleName='version-header-row'>
         <div styleName='settings-header'>Software Version</div>
-        {updateAvailable && <div styleName='update-available'>Update Available</div>}        
+        {updateAvailable && <div styleName='update-available'>Update Available</div>}
       </div>
       <SettingsRow
         label={presentAgentId(currentVersion)}
@@ -107,7 +107,7 @@ export function Settings ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function SettingsRow ({ label, value, dataTestId, bottomStyle }) {    
+export function SettingsRow ({ label, value, dataTestId, bottomStyle }) {
   return <div styleName={bottomStyle ? 'settings-row-bottom' : 'settings-row'} data-testid={dataTestId}>
     {typeof label === 'string'
       ? <span styleName='settings-label'>{label}</span>
