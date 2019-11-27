@@ -4,7 +4,7 @@ export const AuthTokenContext = createContext()
 
 export function AuthTokenProvider ({ children }) {
   const [authToken, setAuthToken] = useState('')
-  const [isAuthed, setIsAuthed] = useState(process.env.NODE_ENV !== 'test')
+  const [isAuthed, setIsAuthed] = useState(false)
 
   return <AuthTokenContext.Provider value={{ authToken, setAuthToken, isAuthed, setIsAuthed }}>
     {children}
