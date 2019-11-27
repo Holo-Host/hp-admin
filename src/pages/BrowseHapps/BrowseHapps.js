@@ -18,12 +18,14 @@ export default function BrowseHapps ({ history: { push } }) {
 
   const goToPricing = () => push('/pricing')
 
+  const showPricingLink = false
+
   return <PrimaryLayout headerProps={{ title: 'Hosting' }}>
     <div styleName='header-row'>
       <h1 styleName='header'>Available hApps</h1>
-      <div styleName='pricing-link' onClick={goToPricing}>
+      {showPricingLink && <div styleName='pricing-link' onClick={goToPricing}>
         <GearIcon styleName='gear-icon' color='#80858C' /> Manage Pricing
-      </div>
+      </div>}
     </div>
 
     {!isEmpty(happs) && <div styleName='happ-list' role='list' data-testid='happ-row'>
