@@ -64,7 +64,8 @@ type Transaction {
   timestamp: String
   fees: Float
   presentBalance: Float
-  notes: String 
+  notes: String
+  happName: String
 }
 
 type Ledger {
@@ -114,6 +115,7 @@ type Query {
   holofuelWaitingTransactions: [Transaction]
   holofuelNonPendingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
+  holofuelEarningsTransactions: [Transaction]
   holofuelLedger: Ledger
   holofuelUser: HolofuelUser
   holofuelCounterparty(agentId: String!): HolofuelUser

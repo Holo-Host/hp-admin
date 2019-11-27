@@ -6,7 +6,6 @@ import MainMenu from 'pages/MainMenu'
 import Settings from 'pages/Settings'
 import Tos from 'pages/Tos'
 import BrowseHapps from 'pages/BrowseHapps'
-import HappDetails from 'pages/HappDetails'
 import ManagePricing from 'pages/ManagePricing'
 import HostingEarnings from 'pages/HostingEarnings'
 import MyProfile from 'pages/MyProfile'
@@ -20,7 +19,6 @@ export default function HPAdminRouter () {
     <AuthRoute path='/(|dashboard)' exact component={Dashboard} />
     <AuthRoute path='/menu' component={MainMenu} />
     <AuthRoute path='/browse-happs' exact component={BrowseHapps} />
-    <AuthRoute path='/browse-happs/:appId' component={HappDetails} />
     <AuthRoute path='/pricing' component={ManagePricing} />
     <AuthRoute path='/settings' exact component={Settings} />
     <AuthRoute path='/tos' exact component={Tos} />

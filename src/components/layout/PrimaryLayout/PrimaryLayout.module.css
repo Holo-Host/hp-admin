@@ -11,7 +11,7 @@
 }
 
 .narrow {
-  padding: 25px 16px;
+  padding: 0px 24px;
 }
 
 .content {
@@ -19,6 +19,7 @@
   flex-direction: column;
   flex-grow: 1;
   flex-shrink: 1;
+  padding-top: 40px;
 }
 
 .menu-link {

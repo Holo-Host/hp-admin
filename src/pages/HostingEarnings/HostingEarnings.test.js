@@ -1,34 +1,83 @@
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
+import { MockedProvider } from '@apollo/react-testing'
+import moment from 'moment'
+import HolofuelEarningsTransactionsQuery from 'graphql/HolofuelEarningsTransactionsQuery.gql'
+import { presentHolofuelAmount } from 'utils'
+import { renderAndWait } from 'utils/test-utils'
 import HostingEarnings from './HostingEarnings'
 
 jest.mock('components/layout/PrimaryLayout')
+jest.mock('./Graph', () => () => <div>Graph</div>)
+
+const transactions = [{
+  id: 1,
+  timestamp: moment(),
+  amount: 150,
+  happName: 'HoloFuel',
+  counterparty: {
+    id: 1
+  }
+},
+{
+  id: 2,
+  timestamp: moment().subtract(3, 'days'),
+  amount: 250,
+  happName: 'HoloFuel',
+  counterparty: {
+    id: 1
+  }
+},
+{
+  id: 3,
+  timestamp: moment().subtract(10, 'days'),
+  amount: 350,
+  happName: 'HoloFuel',
+  counterparty: {
+    id: 1
+  }
+}]
+
+const mocks = [
+  {
+    request: {
+      query: HolofuelEarningsTransactionsQuery
+    },
+    result: {
+      data: { holofuelEarningsTransactions: transactions }
+    }
+  }
+]
 
 describe('HostingEarnings', () => {
-  it('renders', () => {
-    const { getByText } = render(<HostingEarnings />)
-    expect(getByText('Time')).toBeInTheDocument()
-    expect(getByText('Total (HF)')).toBeInTheDocument()
-    expect(getByText('Price/Unit')).toBeInTheDocument()
+  it('renders', async () => {
+    const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}><HostingEarnings /></MockedProvider>)
     expect(getByText('hApp')).toBeInTheDocument()
+    expect(getByText('Price/Unit')).toBeInTheDocument()
+    expect(getByText('Total')).toBeInTheDocument()
   })
 
   describe('Day Buttons', () => {
-    it('switches between different transaction lists', () => {
-      const { getByText, getAllByTestId } = render(<HostingEarnings />)
-      expect(getAllByTestId('earnings-row')).toHaveLength(3)
+    it('switches between different transaction lists', async () => {
+      const { getByText, getAllByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}><HostingEarnings /></MockedProvider>)
+      expect(getAllByTestId('transaction-row')).toHaveLength(3)
+
+      const oneDayTotal = transactions.slice(0, 1).reduce((sum, transaction) => sum + transaction.amount, 0)
+      expect(getAllByText(`${presentHolofuelAmount(oneDayTotal)} HF`)).toHaveLength(2)
 
       fireEvent.click(getByText('7 Days'))
 
-      expect(getAllByTestId('earnings-row')).toHaveLength(10)
+      const sevenDayTotal = transactions.slice(0, 2).reduce((sum, transaction) => sum + transaction.amount, 0)
+      expect(getByText(`${presentHolofuelAmount(sevenDayTotal)} HF`)).toBeInTheDocument()
 
       fireEvent.click(getByText('30 Days'))
 
-      expect(getAllByTestId('earnings-row')).toHaveLength(17)
+      const thirtyDayTotal = transactions.slice(0, 3).reduce((sum, transaction) => sum + transaction.amount, 0)
+      expect(getByText(`${presentHolofuelAmount(thirtyDayTotal)} HF`)).toBeInTheDocument()
 
-      fireEvent.click(getByText('1 Day'))
+      fireEvent.click(getByText('Today'))
 
-      expect(getAllByTestId('earnings-row')).toHaveLength(3)
+      expect(getAllByText(`${presentHolofuelAmount(oneDayTotal)} HF`)).toHaveLength(2)
     })
   })
 })
