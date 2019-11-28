@@ -49,7 +49,7 @@ it('should render a message which closes itself after the given time', async () 
 
   expect(queryByText(message)).toBeInTheDocument()
 
-  await act(async => wait(time * 2))
+  await act(() => wait(time * 2))
 
   expect(queryByText(message)).not.toBeInTheDocument()
 })

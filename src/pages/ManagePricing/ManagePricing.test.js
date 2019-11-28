@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, fireEvent, act } from '@testing-library/react'
+import { fireEvent, act } from '@testing-library/react'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
@@ -9,6 +9,7 @@ import HostPricingQuery from 'graphql/HostPricingQuery.gql'
 import UpdateHostPricingMutation from 'graphql/UpdateHostPricingMutation.gql'
 import { UNITS } from 'models/HostPricing'
 import mockHha from 'mock-dnas/hha'
+import { renderAndWait } from 'utils/test-utils'
 
 jest.mock('components/layout/PrimaryLayout')
 
@@ -59,13 +60,9 @@ describe('ManagePricing', () => {
       history: {}
     }
 
-    let getByText, getByTestId
-    await act(async () => {
-      ({ getByText, getByTestId } = render(<ApolloProvider client={apolloClient}>
-        <ManagePricing {...props} />
-      </ApolloProvider>))
-      await wait(0)
-    })
+    const { getByText, getByTestId } = await renderAndWait(<ApolloProvider client={apolloClient}>
+      <ManagePricing {...props} />
+    </ApolloProvider>)
 
     expect(getByText('HoloFuel per')).toBeInTheDocument()
     expect(getByText('CPU (MS)')).toBeInTheDocument()
@@ -76,14 +73,10 @@ describe('ManagePricing', () => {
     const props = {
       history: {}
     }
-    let getByText, getByTestId
 
-    await act(async () => {
-      ({ getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <ManagePricing {...props} />
-      </MockedProvider>))
-      await wait(0)
-    })
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <ManagePricing {...props} />
+    </MockedProvider>)
 
     fireEvent.change(getByTestId('units-dropdown'), { target: { value: UNITS.storage } })
 
@@ -99,13 +92,9 @@ describe('ManagePricing', () => {
       history: {}
     }
 
-    let getByText, getByTestId
-    await act(async () => {
-      ({ getByText, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <ManagePricing {...props} />
-      </MockedProvider>))
-      await wait(0)
-    })
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <ManagePricing {...props} />
+    </MockedProvider>)
 
     expect(getByText('Save')).toHaveAttribute('disabled')
 
