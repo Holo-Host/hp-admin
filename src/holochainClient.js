@@ -21,17 +21,14 @@ export const MOCK_INDIVIDUAL_DNAS = {
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 let holochainClient
 
-// const agentId = process.env.REACT_APP_AGENT_ID
-// export function conductorInstanceId (instanceId) {
-//   const formatInstanceId = instanceId => agentId + '::<happ_id>-' + instanceId
-
-//   return {
-//     hylo: formatInstanceId('hylo'),
-//     'happ-store': formatInstanceId('happ-store'),
-//     hha: formatInstanceId('holo-hosting-app'),
-//     holofuel: formatInstanceId('holofuel')
-//   }[instanceId]
-// }
+export function conductorInstanceIdbyDnaAlias (instanceId) {
+  return {
+    hylo: 'hylo',
+    'happ-store': 'happ-store',
+    hha: 'holo-hosting-app',
+    holofuel: 'holofuel'
+  }[instanceId]
+}
 
 async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
@@ -73,8 +70,8 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()
-        // const realInstanceId = conductorInstanceId(instanceId)
-        zomeCall = holochainClient.callZome(instanceId, zome, zomeFunc)
+        const dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
+        zomeCall = holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
       }
 
       const rawResult = await zomeCall(args)
