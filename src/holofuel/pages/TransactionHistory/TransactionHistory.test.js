@@ -1,9 +1,8 @@
 import React from 'react'
 import Modal from 'react-modal'
 import _ from 'lodash'
-import { render, within, act, fireEvent } from '@testing-library/react'
+import { within, fireEvent } from '@testing-library/react'
 import { MockedProvider } from '@apollo/react-testing'
-import wait from 'waait'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
@@ -18,8 +17,6 @@ import { renderAndWait } from 'utils/test-utils'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
-// TODO: switch to mock pattern for Router
-jest.unmock('react-router-dom')
 
 const agent1 = {
   id: '1',
@@ -361,10 +358,9 @@ describe('TransactionsHistory', () => {
         pending: true
       }
 
-      const { container, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <TransactionRow {...props} />
       </MockedProvider>)
-      Modal.setAppElement(container)
 
       fireEvent.click(getByTestId('cancel-button'))
       expect(props.showCancellationModal).toHaveBeenCalledWith(pendingOffer)
@@ -384,15 +380,10 @@ describe('TransactionsHistory', () => {
         counterpartyQueryMock
       ]
 
-      let container, getByRole
-      await act(async () => {
-        ({ container, getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <ConfirmCancellationModal
-            transaction={pendingRequest} />
-        </MockedProvider>))
-        await wait(0)
-        Modal.setAppElement(container)
-      })
+      const { getByRole } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <ConfirmCancellationModal
+          transaction={pendingRequest} />
+      </MockedProvider>)
 
       const capitalizedType = _.capitalize(pendingRequest.type)
 
@@ -412,22 +403,15 @@ describe('TransactionsHistory', () => {
         counterpartyQueryMock
       ]
 
-      let getByRole
-      await act(async () => {
-        let container
-        ({ container, getByRole } = render(<MockedProvider mocks={mocks} addTypename={false}>
-          <ConfirmCancellationModal
-            transaction={pendingOffer} />
-        </MockedProvider>))
-        await wait(0)
-        Modal.setAppElement(container)
-      })
+      const { getByRole } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <ConfirmCancellationModal
+          transaction={pendingOffer} />
+      </MockedProvider>)
 
       const capitalizedType = _.capitalize(pendingOffer.type)
 
       const heading = getByRole('heading')
-      const { container, getAllByText, getByText } = within(heading)
-      await Modal.setAppElement(container)
+      const { getAllByText, getByText } = within(heading)
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('of', { exact: false })).toBeInTheDocument()
       expect(getAllByText('to', { exact: false })[0]).toBeInTheDocument() // NB: 2 instances of the word two exist, due to the tooltip.

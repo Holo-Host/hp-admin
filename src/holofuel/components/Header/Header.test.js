@@ -1,8 +1,6 @@
 import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory } from 'history'
 import { presentAgentId } from 'utils'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 
@@ -11,21 +9,6 @@ import { Header } from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
 
 jest.mock('holofuel/contexts/useFlashMessageContext')
-// TODO: switch to mock pattern for Router
-jest.unmock('react-router-dom')
-
-function renderWithRouter (
-  ui,
-  {
-    route = '/',
-    history = createMemoryHistory({ initialEntries: [route] })
-  } = {}
-) {
-  return {
-    ...render(<Router history={history}>{ui}</Router>),
-    history
-  }
-}
 
 it('should render the title and a menu icon', () => {
   const props = {
@@ -33,7 +16,7 @@ it('should render the title and a menu icon', () => {
     history: { push: jest.fn() },
     agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
   }
-  const { getByText, getByTestId } = renderWithRouter(<Header {...props} />)
+  const { getByText, getByTestId } = render(<Header {...props} />)
 
   expect(getByText(props.title)).toBeInTheDocument()
   expect(getByText(menuIconTitle)).toBeInTheDocument()
@@ -49,7 +32,7 @@ it('should render the title and a menu icon with update badge when inbox updates
     agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' },
     inboxCount: 2
   }
-  const { getByText, getByTestId } = renderWithRouter(<Header {...props} />)
+  const { getByText, getByTestId } = render(<Header {...props} />)
 
   expect(getByText(menuIconTitle)).toBeInTheDocument()
   expect(getByTestId('inboxCount-badge')).toBeInTheDocument()
@@ -65,7 +48,7 @@ it('should render the menu icon without update badge when no inbox updates exist
     agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' },
     inboxCount: 0
   }
-  const { getByText, getByTestId } = renderWithRouter(<Header {...props} />)
+  const { getByText, getByTestId } = render(<Header {...props} />)
 
   expect(getByText(menuIconTitle)).toBeInTheDocument()
   expect(document.querySelector('[data-testid="inboxCount-badge"]')).not.toBeInTheDocument()
@@ -81,7 +64,7 @@ it('should render the agent nickname', () => {
     history: { push: jest.fn() },
     agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
   }
-  const { getByText } = renderWithRouter(<Header {...props} />)
+  const { getByText } = render(<Header {...props} />)
   expect(getByText(props.agent.nickname)).toBeInTheDocument()
 })
 
@@ -92,7 +75,7 @@ it('should render last 6 of agent id when agent is loading', () => {
     agent: { id: 'QmAGENTHASH', nickname: undefined },
     agentLoading: true
   }
-  const { getByText } = renderWithRouter(<Header {...props} />)
+  const { getByText } = render(<Header {...props} />)
   expect(getByText(presentAgentId(props.agent.id))).toBeInTheDocument()
 })
 
