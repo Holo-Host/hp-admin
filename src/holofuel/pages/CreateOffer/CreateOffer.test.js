@@ -1,10 +1,7 @@
 import React from 'react'
-import Modal from 'react-modal'
-import { render, fireEvent, within, act } from '@testing-library/react'
+import { fireEvent, within, act } from '@testing-library/react'
 import wait from 'waait'
 import { MockedProvider } from '@apollo/react-testing'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory } from 'history'
 import moment from 'moment'
 import CreateOffer, { FEE_PERCENTAGE } from './CreateOffer'
 import { TYPE } from 'models/Transaction'
@@ -18,8 +15,6 @@ import { HISTORY_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
-// TODO: switch to mock pattern for Router
-jest.unmock('react-router-dom')
 
 const counterparty = { id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi' }
 const amount = 35674
@@ -51,32 +46,13 @@ const mocks = [
   offerMock
 ]
 
-const renderWithRouter = (
-  ui,
-  {
-    route = '/',
-    history = createMemoryHistory({ initialEntries: [route] })
-  } = {}
-) => ({
-  ...render(
-    <Router history={history}>
-      <MockedProvider mocks={mocks} addTypename={false}>
-        {ui}
-      </MockedProvider>
-    </Router>
-  ),
-  history
-})
-
 describe('CreateOffer', () => {
   it('renders a form that can be filled out and submitted', async () => {
     const push = jest.fn()
 
-    let getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText
-    await act(async () => {
-      ({ getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText } = renderWithRouter(<CreateOffer history={{ push }} />))
-      await wait(0)
-    })
+    const { getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <CreateOffer history={{ push }} />
+    </MockedProvider>)
 
     expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
@@ -133,14 +109,9 @@ describe('CreateOffer', () => {
 
     const push = jest.fn()
 
-    let container, getByLabelText, queryByTestId, getByTestId
-    await act(async () => {
-      ({ container, getByLabelText, queryByTestId, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <CreateOffer history={{ push }} />
-      </MockedProvider>))
-      await wait(0)
-      Modal.setAppElement(container)
-    })
+    const { getByLabelText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <CreateOffer history={{ push }} />
+    </MockedProvider>)
 
     expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
@@ -177,14 +148,9 @@ describe('CreateOffer', () => {
 
     const push = jest.fn()
 
-    let container, getByLabelText, queryByTestId, getByTestId
-    await act(async () => {
-      ({ container, getByLabelText, queryByTestId, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <CreateOffer history={{ push }} />
-      </MockedProvider>))
-      await wait(0)
-      Modal.setAppElement(container)
-    })
+    const { getByLabelText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <CreateOffer history={{ push }} />
+    </MockedProvider>)
 
     expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
@@ -221,14 +187,9 @@ describe('CreateOffer', () => {
 
     const push = jest.fn()
 
-    let container, getByLabelText, queryByTestId, getByTestId
-    await act(async () => {
-      ({ container, getByLabelText, queryByTestId, getByTestId } = render(<MockedProvider mocks={mocks} addTypename={false}>
-        <CreateOffer history={{ push }} />
-      </MockedProvider>))
-      await wait(0)
-      Modal.setAppElement(container)
-    })
+    const { getByLabelText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <CreateOffer history={{ push }} />
+    </MockedProvider>)
 
     expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 

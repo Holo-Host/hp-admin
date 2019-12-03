@@ -43,6 +43,7 @@ export default function Login ({ history: { push } }) {
     headerProps={{
       title: 'HoloPort'
     }}
+    showSideMenu={false}
   >
     <form styleName='login-form' onSubmit={handleSubmit(onSubmit)}>
       <label styleName='login-label' htmlFor='email'>Email</label>

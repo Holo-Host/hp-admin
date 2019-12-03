@@ -1,0 +1,9 @@
+query HolofuelEarningsTransactionsQuery {
+  holofuelEarningsTransactions {
+    id
+    amount
+    timestamp
+    happName
+    counterparty { id }
+  }
+}

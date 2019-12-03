@@ -1,8 +1,6 @@
 import React from 'react'
 import { render, fireEvent, within, act } from '@testing-library/react'
 import wait from 'waait'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory } from 'history'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
@@ -12,34 +10,16 @@ import hhaInterface from 'data-interfaces/HhaDnaInterface'
 import { happs as hhaHapps } from 'mock-dnas/hha'
 import { appOne as appHoloFuel, appTwo as appHylo } from 'mock-dnas/happStore'
 import BrowseHapps from './BrowseHapps'
+import { renderAndWait } from 'utils/test-utils'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('components/layout/PrimaryLayout')
-// TODO: switch to mock pattern for Router
-jest.unmock('react-router-dom')
-
-function renderWithRouter (
-  ui,
-  {
-    route = '/',
-    history = createMemoryHistory({ initialEntries: [route] })
-  } = {}
-) {
-  return {
-    ...render(<Router history={history}>{ui}</Router>),
-    history
-  }
-}
 
 describe('BrowseHapps Connected', () => {
   it('renders', async () => {
-    let getAllByRole
-    await act(async () => {
-      ({ getAllByRole } = renderWithRouter(<ApolloProvider client={apolloClient}>
-        <BrowseHapps history={{}} />
-      </ApolloProvider>))
-      await wait(15)
-    })
+    const { getAllByRole } = await renderAndWait(<ApolloProvider client={apolloClient}>
+      <BrowseHapps history={{}} />
+    </ApolloProvider>)
 
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)
@@ -51,7 +31,7 @@ describe('BrowseHapps Connected', () => {
       expect(getByText(apps[index].appEntry.title)).toBeInTheDocument()
       expect(getByText(apps[index].appEntry.description)).toBeInTheDocument()
       if (index === 0) {
-        expect(getByText('Un-Host')).toBeInTheDocument()
+        expect(getByText('Unhost')).toBeInTheDocument()
       }
       if (index === 1) {
         expect(getByText('Host')).toBeInTheDocument()
@@ -62,20 +42,17 @@ describe('BrowseHapps Connected', () => {
   describe('HostButton', () => {
     it('enables and disables happs', async () => {
       hhaInterface.happs.enable = jest.fn()
-      let getAllByRole, queryAllByText
-      await act(async () => {
-        ({ getAllByRole, queryAllByText } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <BrowseHapps history={{}} />
-        </ApolloProvider>))
-        await wait(15)
-      })
+
+      const { getAllByRole, queryAllByText } = await renderAndWait(<ApolloProvider client={apolloClient}>
+        <BrowseHapps history={{}} />
+      </ApolloProvider>)
 
       const listItems = getAllByRole('listitem')
-      expect(queryAllByText('Un-Host')).toHaveLength(1)
+      expect(queryAllByText('Unhost')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)
 
       const { getByText: getByTextFromListItem } = within(listItems[0])
-      fireEvent.click(getByTextFromListItem('Un-Host'))
+      fireEvent.click(getByTextFromListItem('Unhost'))
 
       await act(() => wait(0))
 
@@ -86,7 +63,7 @@ describe('BrowseHapps Connected', () => {
 
       await act(() => wait(0))
 
-      expect(queryAllByText('Un-Host')).toHaveLength(1)
+      expect(queryAllByText('Unhost')).toHaveLength(1)
       expect(queryAllByText('Host')).toHaveLength(1)
       expect(hhaInterface.happs.enable).toHaveBeenCalledWith(hhaHapps[0].id)
       expect(mockEnvoyInterface.happs.install).toHaveBeenCalledWith(hhaHapps[0].id)
@@ -107,31 +84,15 @@ describe('BrowseHapps Connected', () => {
   ]
 
   describe('pricing button', () => {
-    it("calls history.push with '/pricing'", async () => {
+    it.skip("calls history.push with '/pricing'", async () => {
       const mockHistory = {
         push: jest.fn()
       }
-      const { getByText } = renderWithRouter(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByText } = render(<MockedProvider mocks={mocks} addTypename={false}>
         <BrowseHapps history={mockHistory} />
       </MockedProvider>)
       fireEvent.click(getByText('Manage Pricing'))
       expect(mockHistory.push).toHaveBeenCalledWith('/pricing')
-    })
-  })
-
-  describe('hApp entry', () => {
-    // we don't currently link to happ description.
-    it.skip("navigates to '/browse-happs/APP_HASH' on click", async () => {
-      let getByText, history
-      await act(async () => {
-        ({ getByText, history } = renderWithRouter(<ApolloProvider client={apolloClient}>
-          <BrowseHapps history={{}} />
-        </ApolloProvider>))
-        await wait(0)
-      })
-
-      fireEvent.click(getByText('HoloFuel'))
-      expect(history.location.pathname).toBe('/browse-happs/QmHHAHappEntryAddressHash1')
     })
   })
 })

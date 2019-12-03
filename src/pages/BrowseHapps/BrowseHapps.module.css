@@ -1,3 +1,27 @@
+.header-row {
+  display: flex;
+  align-items: center;
+}
+
+.header {
+  color: var(--color-rhino);
+  margin: 0px;
+}
+
+.pricing-link {
+  display: flex;
+  margin-left: auto;
+  color: var(--color-cape-cod);
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.gear-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 2px;
+}
+
 .happ-list {
   padding-top: 20px;
 }
@@ -6,6 +30,8 @@
   /* this margin-bottom value is to stop the button being pushed off the screen. there's a better way to do this */
   margin-top: auto;
 }
+
+/* HappRow */
 
 .happ-row {
   display: flex;
@@ -19,21 +45,32 @@
   padding-left: 16px;
 }
 
-.title-row {
-  display: flex;
-  margin-bottom: 5px;
-  align-items: center;
-}
-
 .title {
   font-size: 20px;
-  color: var(--color-tundora);
+  color: var(--color-rhino);
+  margin-top: -2px;
 }
 
 .description {
-  padding-top: 5px;
   font-weight: normal;
   font-size: 14px;
   line-height: 19px;
-  color: #939393;
+  color: var(--color-rhino-50);
+  margin-bottom: 4px;
+}
+
+/* HappThumbnail */
+
+.thumbnail {
+  display: block;
+  flex: 0 0 100px;
+  height: 100px;
+  box-shadow: 2px 4px 10px rgba(44, 64, 90, 0.1);
+  border-radius: 4px;
+}
+
+
+/* HostButton */
+.host-button {
+  width: 100px;
 }

@@ -55,7 +55,7 @@ describe('HP Admin : HostedEarnings', () => {
     })
 
     await wait(() => getByText('1 Day'))
-    const rows = getAllByTestId('earnings-row')
+    const rows = getAllByTestId('transaction-row')
 
     // Confirm earnings content for 1 DAY (placeholder)
     await act(async () => {
