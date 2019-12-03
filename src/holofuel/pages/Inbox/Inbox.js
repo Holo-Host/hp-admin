@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, flatten } from 'lodash/fp'
+import { isEmpty, uniqBy } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -46,38 +46,25 @@ function useDecline () {
   })
 }
 
-function useFetchCounterparties () {
+function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery)
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
   const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery)
-  const { data: { holofuelInboxCounterparties } = {}, client } = useQuery(HolofuelInboxCounterpartiesQuery)
 
-  if (holofuelInboxCounterparties) {
-    const filterTransactionsByAgentId = (agent, txListType) => txListType.filter(transaction => transaction.counterparty.id === agent.id)
-    const updateTxListCounterparties = (txListType, counterpartyList) => counterpartyList.map(agent => {
-      const matchingTx = filterTransactionsByAgentId(agent, txListType)
-      return matchingTx.map(transaction => { Object.assign(transaction.counterparty, agent); return transaction })
-    })
+  const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
+    ...transaction,
+    counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
+  }))
 
-    // Cache Write/Update for holofuelActionableTransactions
-    const reflexiveActionableTxList = updateTxListCounterparties(holofuelActionableTransactions, [whoami])
-    const newActionableTxList = flatten((updateTxListCounterparties(holofuelActionableTransactions, holofuelInboxCounterparties)).concat(reflexiveActionableTxList))
-    client.writeQuery({
-      query: HolofuelActionableTransactionsQuery,
-      data: {
-        holofuelActionableTransactions: newActionableTxList
-      }
-    })
+  const allCounterparties = uniqBy('id', holofuelInboxCounterparties.concat([whoami]))
 
-    // Cache Write/Update for holofuelNonPendingTransactions
-    const reflexiveNonPendingTxList = updateTxListCounterparties(holofuelNonPendingTransactions, [whoami])
-    const newNonPendingTxList = flatten((updateTxListCounterparties(holofuelNonPendingTransactions, holofuelInboxCounterparties)).concat(reflexiveNonPendingTxList))
-    client.writeQuery({
-      query: HolofuelNonPendingTransactionsQuery,
-      data: {
-        holofuelNonPendingTransactions: newNonPendingTxList
-      }
-    })
+  const updatedActionableTransactions = updateCounterparties(holofuelActionableTransactions, allCounterparties)
+  const updatedNonPendingTransactions = updateCounterparties(holofuelNonPendingTransactions, allCounterparties)
+
+  return {
+    actionableTransactions: updatedActionableTransactions,
+    recentTransactions: updatedNonPendingTransactions
   }
 }
 
@@ -93,10 +80,8 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox () {
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
-  const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery)
-  const { data: { holofuelNonPendingTransactions: recentTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery)
 
-  useFetchCounterparties()
+  const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [toggleModal, setToggleModal] = useState(null)
@@ -122,9 +107,7 @@ export default function Inbox () {
       displayTransactions = recentTransactions
       break
     default:
-      displayTransactions = actionableTransactions
-      console.error('Error: inboxView is not set to valid display option (eg: recent or pending).')
-      break
+      throw new Error('bad inboxView: ' + inboxView)
   }
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
