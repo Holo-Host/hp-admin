@@ -106,10 +106,10 @@ export function SideMenu ({
       <footer styleName='footer'>
         <ul styleName='footer-list'>
           <li>
-            <Link to='/tos' styleName='footer-link'>View Disclaimer</Link>
+            <Link to='#/' styleName='footer-link'>View Disclaimer</Link>
           </li>
           <li>
-            <Link to='/tos' styleName='footer-link'>View Terms of Service</Link>
+            <Link to='#/' styleName='footer-link'>View Terms of Service</Link>
           </li>
         </ul>
       </footer>

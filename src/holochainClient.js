@@ -34,6 +34,7 @@ async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
   try {
     holochainClient = await hcWebClientConnect({
+      url: 'ws://localhost:3400/',
       wsClient: { max_reconnects: 0 }
     })
     if (HOLOCHAIN_LOGGING) {

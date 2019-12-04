@@ -1,6 +1,6 @@
 query HolofuelActionableTransactionsQuery {
   holofuelActionableTransactions {
-    id @client(always: true)
+    id
     amount
     counterparty { id }
     direction
