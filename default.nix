@@ -27,7 +27,7 @@ let
   '';
 
   dnaConfig = dna: {
-    id = dna.name;
+    id = dna.name+"-dna";
     file = "${dna}/${dna.name}.dna.json";
     hash = dnaHash dna;
   };
@@ -41,17 +41,17 @@ let
 
   multiInstanceConfig = dna: map (agent: {
     agent = agent.id;
-    dna = dna.name;
-    id = agent.public_address+"::<happ_id>-"+dna.name;
+    dna = dna.name+"-dna";
+    id = dna.name;
     storage = {
-      path = ".holochain/holo/storage/${agent.public_address+"::<happ_id>-"+dna.name}";
+      path = ".holochain/holo/storage/${dna.name}";
       type = "file";
     };
   }) config.agents;
 
 
   multiInterfaceInstanceConfig = dna: map (agent: {
-    id = agent.public_address+"::<happ_id>-"+dna.name;
+    id = dna.name;
   }) config.agents;
 
   flatten = x:

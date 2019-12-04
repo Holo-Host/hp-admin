@@ -9,7 +9,7 @@ import { presentAgentId } from 'utils'
 
 export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
-    <MenuIcon styleName='menu-icon' color='#FFF' />
+    <MenuIcon styleName='menu-icon' color='#000000' />
     {inboxCount > 0 && <span styleName='nav-badge' data-testid='inboxCount-badge'>{inboxCount}</span>}
   </Button>
 
