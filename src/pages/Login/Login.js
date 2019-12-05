@@ -39,12 +39,7 @@ export default function Login ({ history: { push } }) {
     }
   }
 
-  return <PrimaryLayout
-    headerProps={{
-      title: 'HoloPort'
-    }}
-    showSideMenu={false}
-  >
+  return <PrimaryLayout showHeader={false}>
     <div styleName='container'>
       <div styleName='backdrop' />
       <form styleName='form' onSubmit={handleSubmit(onSubmit)}>
