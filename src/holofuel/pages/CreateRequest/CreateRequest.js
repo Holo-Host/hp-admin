@@ -37,11 +37,19 @@ function useRequestMutation () {
 
 export default function CreateRequest ({ history: { push } }) {
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-
   const createRequest = useRequestMutation()
+
+  const { newMessage } = useFlashMessageContext()
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [disabled, setDisabled] = useState('')
+
+  if (errorMessage) {
+    newMessage(errorMessage)
+    setErrorMessage('')
+  }
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
@@ -53,8 +61,6 @@ export default function CreateRequest ({ history: { push } }) {
     setCounterpartyId(id)
     setFormValue('counterpartyId', id)
   }
-
-  const { newMessage } = useFlashMessageContext()
 
   const onSubmit = ({ amount, counterpartyId, notes }) => {
     createRequest(amount, counterpartyId, notes)
@@ -78,9 +84,13 @@ export default function CreateRequest ({ history: { push } }) {
           ref={register}
           onChange={({ target: { value } }) => setCounterpartyId(value)} />
         <div styleName='hash-and-nick'>
-          {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
-          {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
-            <RenderNickname agentId={counterpartyId} setCounterpartyNick={setCounterpartyNick} />
+          {counterpartyId.length === AGENT_ID_LENGTH && !errorMessage && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
+          {counterpartyId.length === AGENT_ID_LENGTH && !errorMessage && <h4 data-testid='counterparty-nickname'>
+            <RenderNickname
+              agentId={counterpartyId}
+              setCounterpartyNick={setCounterpartyNick}
+              setDisabled={setDisabled}
+              setErrorMessage={setErrorMessage} />
           </h4>}
         </div>
       </div>
@@ -104,12 +114,12 @@ export default function CreateRequest ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
+      <Button type='submit' wide variant='secondary' styleName='send-button' disabled={disabled}>Send</Button>
     </form>
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage, setDisabled }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
@@ -117,6 +127,21 @@ export function RenderNickname ({ agentId, setCounterpartyNick }) {
   useEffect(() => {
     setCounterpartyNick(nickname)
   }, [setCounterpartyNick, nickname])
+
+  let errorMessage = ''
+  let disabled = false
+  if (!nickname && !loading) {
+    errorMessage = 'This HoloFuel Peer with whom you would to transact is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
+    disabled = true
+  }
+
+  useEffect(() => {
+    setErrorMessage(errorMessage)
+  }, [setErrorMessage, errorMessage])
+
+  useEffect(() => {
+    setDisabled(disabled)
+  }, [setDisabled, disabled])
 
   if (loading) {
     return <>

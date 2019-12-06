@@ -161,7 +161,7 @@ const HoloFuelDnaInterface = {
   user: {
     get: async () => {
       const result = await createZomeCall('transactions/whoami')()
-      if (result.error) throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.error)
+      if (result.Err) return console.error('There was an error locating the current holofuel agent nickname. ERROR: ', result.Err)
 
       return {
         id: result.agent_id.pub_sign_key,
@@ -170,7 +170,13 @@ const HoloFuelDnaInterface = {
     },
     getCounterparty: async ({ agentId }) => {
       const result = await createZomeCall('transactions/whois')({ agents: agentId })
-      if (result.error || !result[0].Ok) throw new Error('There was an error locating the counterparty agent nickname. ERROR: ', result.error)
+      if (result.Err || !result[0].Ok) {
+        console.error('There was an error locating the current holofuel agent nickname. ERROR: ', result.Err || result[0].Err)
+        return {
+          id: agentId,
+          error: true
+        }
+      }
 
       return {
         id: result[0].Ok.agent_id.pub_sign_key,
