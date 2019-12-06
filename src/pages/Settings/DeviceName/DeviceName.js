@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { isEmpty, get, keys, omit } from 'lodash/fp'
-import './Settings.module.css'
+import './DeviceName.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
 import HashIcon from 'components/HashIcon'
 import CopyAgentId from 'components/CopyAgentId'
@@ -32,25 +32,6 @@ export function Settings ({ history: { push } }) {
   const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
 
   const { data: { hposStatus: status = {} } = {} } = useHPAuthQuery(HposStatusQuery)
-
-  const [sshAccess, setSshAccess] = useState(true)
-  const [editedDeviceName, setEditedDeviceName] = useState('')
-  const [isEditingDeviceName, setIsEditingDeviceName] = useState(false)
-  const editDeviceName = () => {
-    setEditedDeviceName(settings.deviceName)
-    setIsEditingDeviceName(true)
-  }
-
-  const saveDeviceName = () => {
-    console.log('saving device name', editedDeviceName)
-    setEditedDeviceName('')
-    setIsEditingDeviceName(false)
-  }
-
-  const cancelDeviceName = () => {
-    setEditedDeviceName('')
-    setIsEditingDeviceName(false)
-  }
 
   const updateVersion = useUpdateVersion()
   const { newMessage } = useFlashMessageContext()
@@ -92,10 +73,10 @@ export function Settings ({ history: { push } }) {
         value={updateAvailable ? <VersionUpdateButton updateVersion={updateVersionWithMessage} /> : 'Your software is up to date.'}
         bottomStyle />
       <div styleName='settings-header'>About this HoloPort</div>
-      {!isEditingDeviceName && <SettingsRow
+      <SettingsRow
         label='Device Name'
         dataTestId='device-name'
-        onClick={() => setEditedDeviceName('')}
+        onClick={() => push('/settings/device-name')}
         value={!isEmpty(settings) && settings.deviceName
           ? <div styleName='device-name-button'>
             <span styleName='settings-value'>{settings.deviceName}</span>
@@ -103,13 +84,7 @@ export function Settings ({ history: { push } }) {
               <ArrowRightIcon color={rhino} opacity={0.8} />
             </div>
           </div>
-          : 'Not Available'} />}
-      {!isEditing && <div>
-        <SettingsRow
-        label='Device Name'
-        dataTestId='device-name'
-        value={<input value={editedDeviceName} onChange={e => setEditedDeviceName(e.target)}>}
-        >}
+          : 'Not Available'} />
       <SettingsRow
         label='Network'
         bottomStyle

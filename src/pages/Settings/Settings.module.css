@@ -72,6 +72,11 @@
   flex: 1
 }
 
+.device-name-button {
+  display: flex;
+  flex: 1
+}
+
 .factory-reset-button {
   color: var(--color-amaranth);
   background-color: transparent;
@@ -94,46 +99,4 @@
   padding: 5px 1px !important;
   text-transform: uppercase;
   flex: 1
-}
-
-/* VersionUpdateModal */
-.modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.modal-title {
-  margin-bottom: 10px;
-}
-
-.modal-text {
-  font-size: 14px;
-  margin-bottom: 30px;
-}
-
-.modal-counterparty {
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-.modal-amount {
-  font-weight: bold;
-}
-
-.modal-buttons {
-  margin-top: auto;
-  margin-left: auto;
-}
-
-.modal-button, .modal-button-no, .modal-button-yes {
-  border: none !important;
-  text-decoration: underline;
-  color: #0000EE !important;
-  font-weight: normal !important;
-  margin: 2px 10px;
-}
-
-.modal-button-yes {
-  font-weight: bold;
 }
