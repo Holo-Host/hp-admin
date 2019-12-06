@@ -34,7 +34,7 @@ async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
   try {
     holochainClient = await hcWebClientConnect({
-      url: 'ws://localhost:3400/',
+      url: process.env.NODE_ENV === 'production' ? undefined : process.env.REACT_APP_DNA_INTERFACE_URL,
       wsClient: { max_reconnects: 0 }
     })
     if (HOLOCHAIN_LOGGING) {

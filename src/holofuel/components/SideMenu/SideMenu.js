@@ -12,7 +12,8 @@ import {
   INBOX_PATH,
   OFFER_PATH,
   REQUEST_PATH,
-  HISTORY_PATH
+  HISTORY_PATH,
+  TOS_PATH
 } from 'holofuel/utils/urls'
 
 import './SideMenu.module.css'
@@ -106,10 +107,10 @@ export function SideMenu ({
       <footer styleName='footer'>
         <ul styleName='footer-list'>
           <li>
-            <Link to='#/' styleName='footer-link'>View Disclaimer</Link>
+            <Link to='#/' styleName='footer-link'>Help</Link>
           </li>
           <li>
-            <Link to='#/' styleName='footer-link'>View Terms of Service</Link>
+            <Link to={TOS_PATH} styleName='footer-link'>View Terms of Service</Link>
           </li>
         </ul>
       </footer>
