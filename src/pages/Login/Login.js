@@ -73,8 +73,8 @@ export default function Login ({ history: { push } }) {
         </div>
         <Button type='submit' variant='green' wide styleName='login-button'>Login</Button>
       </form>
-      <div styleName='reminder-text-block'>*Remember, Holo doesn’t store your password so we can’t recover it for you. So save your password securely!</div>
-      <div styleName='reminder-text-block'><a styleName='reminder-text' href='www.wheredoesthisgo.com'>Learn more</a> about controlling your own data.</div>
+      <div styleName='reminder-text-block'>*Remember, Holo doesn’t store your password so we can’t recover it for you. Please save your password securely!</div>
+      <div styleName='reminder-text-block'><a styleName='reminder-text' href='https://www.wheredoesthisgo.com'>Learn more</a> about controlling your own data.</div>
     </div>
   </PrimaryLayout>
 }
