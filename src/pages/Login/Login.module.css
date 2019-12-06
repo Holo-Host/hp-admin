@@ -1,16 +1,84 @@
-.login-form {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding-top: 25px;
+.container {
+  height: 100%;
+  width: 100%;  
 }
 
-.login-label {
-  margin: 15px 0 6px;
+.backdrop {
+  background-color: var(--color-iceberg);
+  height: 354px;
+  right: 0;
+  top: 0;
+  left: 0;
+  z-index: -10;
+  position: absolute;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-box {
+  background: #FFFFFF;
+  box-shadow: 0px 2.5px 10px rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 60px;
+  margin-bottom: 40px;
+  padding: 0 24px 32px 24px;
+}
+
+.holofuel-icon-disc {
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  background-color: var(--color-blue-lagoon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  position: relative;
+  top: -27px;
+}
+
+.holofuel-icon {
+  width: 35px;
+  height: 25px;
+}
+
+.title {
+  color: var(--color-rhino-80);
+  align-self: center;
+  margin-bottom: 29px;
+}
+
+.label {
+  font-family: 'Circular';
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 13px;  
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--color-rhino-60);
+}
+
+.input {
+  border: none;
+  border-bottom: 1px solid var(--color-rhino-50);
+  font-size: 18px;
+  padding: 5px 5px;
+  margin-bottom: 20px;
+  font-family: 'Circular';
+  color: var(--color-rhino);
 }
 
 .login-button {
-  margin-top: auto;
+  align-self: center;
+  font-size: 16px;
+  height: 43px;
+  width: 192px;
+  margin-bottom: 32px;
 }
 
 .field-error {
@@ -18,4 +86,18 @@
   font-weight: 500;
   color: #a00;
   margin: .3em 0 .0;
+}
+
+.reminder-text {
+  font-family: 'Circular';
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  color: var(--color-rhino-50);
+}
+
+.reminder-text-block {
+  composes: reminder-text;
+  margin-bottom: 13px;
+  padding: 0 22px;
 }

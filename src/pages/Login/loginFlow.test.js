@@ -45,13 +45,13 @@ describe('login flow', () => {
       <HPAdminApp />
     </MockedProvider>)
     await act(async () => {
-      fireEvent.change(getByLabelText('Email'), { target: { value: email } })
-      fireEvent.change(getByLabelText('Password'), { target: { value: password } })
+      fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
+      fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       fireEvent.click(getByText('Login'))
       await wait(0)
     })
     expect(getByText('Hi!')).toBeInTheDocument()
-    expect(queryByLabelText('Email')).not.toBeInTheDocument()
+    expect(queryByLabelText('Email:')).not.toBeInTheDocument()
   })
 
   it('shows flash message on unsuccesful auth', async () => {
@@ -75,12 +75,12 @@ describe('login flow', () => {
       <HPAdminApp />
     </MockedProvider>)
     await act(async () => {
-      fireEvent.change(getByLabelText('Email'), { target: { value: email } })
-      fireEvent.change(getByLabelText('Password'), { target: { value: password } })
+      fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
+      fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       fireEvent.click(getByText('Login'))
       await wait(0)
     })
     expect(getByText('Incorrect email or password. Please check and try again.')).toBeInTheDocument()
-    expect(getByLabelText('Email')).toBeInTheDocument()
+    expect(getByLabelText('Email:')).toBeInTheDocument()
   })
 })
