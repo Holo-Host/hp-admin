@@ -131,7 +131,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
   let errorMessage = ''
   let disabled = false
   if (!nickname && !loading) {
-    errorMessage = 'This HoloFuel Peer with whom you would to transact is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
+    errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
     disabled = true
   }
 
