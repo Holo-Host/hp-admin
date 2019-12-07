@@ -292,8 +292,8 @@ const HoloFuelDnaInterface = {
     // cancel WAITING TRANSACTION that current agent authored /OR ACTIONABLE TRANSACTION that agent received.
     cancel: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      console.log('TRANSACTION TO CANCEL : ', transaction);
-      
+      console.log('TRANSACTION TO CANCEL : ', transaction)
+
       const reason = annulTransactionReaason
       await createZomeCall('transactions/cancel_transactions')({ origins: transactionId, reason })
       return {
