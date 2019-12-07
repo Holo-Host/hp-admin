@@ -4,12 +4,14 @@ import { isEmpty, uniqBy } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { TYPE } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
@@ -44,6 +46,21 @@ function useDecline () {
       query: HolofuelActionableTransactionsQuery
     }]
   })
+}
+
+function useCounterparty (agentId) {
+  const { newMessage } = useFlashMessageContext()
+  const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
+    variables: { agentId }
+  })
+
+  const confirmingAgentIsOnlineMessage = 'Confirming your Holofuel Peer is online.'
+  const errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.'
+
+  if (loading) return newMessage(confirmingAgentIsOnlineMessage)
+  if (!holofuelCounterparty.nickname) return newMessage(errorMessage)
+
+  return holofuelCounterparty
 }
 
 function useTransactionsWithCounterparties () {
@@ -84,6 +101,7 @@ export default function Inbox () {
   const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
+  const [disabled, setDisabled] = useState(true)
   const [toggleModal, setToggleModal] = useState(null)
   const [modalTransaction, setModalTransaction] = useState(null)
 
@@ -173,11 +191,14 @@ export default function Inbox () {
       handleClose={() => setToggleModal(null)}
       toggleModal={toggleModal} />
 
-    <ConfirmationModal
+    {modalTransaction && <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       payTransaction={payTransaction}
-      declineTransaction={declineTransaction} />
+      declineTransaction={declineTransaction}
+      setDisabled={setDisabled}
+      disabled={disabled} />
+    }
   </PrimaryLayout>
 }
 
@@ -325,9 +346,11 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
   </Modal>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
-  if (!transaction) return null
+export async function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, setDisabled, disabled }) {
   const { id, counterparty, amount, type, action } = transaction
+
+  const counterpartyConfirmed = await useCounterparty(counterparty.id)
+  if (counterpartyConfirmed) setDisabled(false)
 
   let message, actionHook, actionParams, contentLabel
   switch (action) {
@@ -370,7 +393,8 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       <div styleName='button-divide' />
       <Button
         onClick={onYes}
-        styleName='modal-button-yes'>
+        styleName='modal-button-yes'
+        disabled={disabled}>
         Yes
       </Button>
     </div>
