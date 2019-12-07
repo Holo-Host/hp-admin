@@ -44,18 +44,19 @@ export default function CreateRequest ({ history: { push } }) {
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const [disabled, setDisabled] = useState('')
-
-  if (errorMessage) {
-    newMessage(errorMessage)
-    setErrorMessage('')
-  }
+  const [disabled, setDisabled] = useState(true)
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
   }, [counterpartyId])
 
-  const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
+  const { register, handleSubmit, errors, setValue: setFormValue, getValues } = useForm({ validationSchema: FormValidationSchema })
+  const formValues = getValues()
+
+  if (errorMessage) {
+    newMessage(errorMessage)
+    setErrorMessage('')
+  }
 
   const selectAgent = id => {
     setCounterpartyId(id)
@@ -84,13 +85,15 @@ export default function CreateRequest ({ history: { push } }) {
           ref={register}
           onChange={({ target: { value } }) => setCounterpartyId(value)} />
         <div styleName='hash-and-nick'>
-          {counterpartyId.length === AGENT_ID_LENGTH && !errorMessage && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
-          {counterpartyId.length === AGENT_ID_LENGTH && !errorMessage && <h4 data-testid='counterparty-nickname'>
+          {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
+          {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
             <RenderNickname
               agentId={counterpartyId}
               setCounterpartyNick={setCounterpartyNick}
+              setErrorMessage={setErrorMessage}
               setDisabled={setDisabled}
-              setErrorMessage={setErrorMessage} />
+              disabled={disabled}
+              formValues={formValues} />
           </h4>}
         </div>
       </div>
@@ -114,12 +117,12 @@ export default function CreateRequest ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' wide variant='secondary' styleName='send-button' disabled={disabled}>Send</Button>
+      <Button type='submit' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? disabled : true}>Send</Button>
     </form>
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage, setDisabled }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage, setDisabled, disabled, formValues }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
@@ -128,8 +131,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
     setCounterpartyNick(nickname)
   }, [setCounterpartyNick, nickname])
 
-  let errorMessage = ''
-  let disabled = false
+  let errorMessage = null
   if (!nickname && !loading) {
     errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
     disabled = true
@@ -138,6 +140,10 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
   useEffect(() => {
     setErrorMessage(errorMessage)
   }, [setErrorMessage, errorMessage])
+
+  if (formValues.counterpartyId && formValues.counterpartyId.length === AGENT_ID_LENGTH && !errorMessage) {
+    disabled = false
+  }
 
   useEffect(() => {
     setDisabled(disabled)
