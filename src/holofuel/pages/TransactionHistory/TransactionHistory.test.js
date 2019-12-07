@@ -225,7 +225,7 @@ describe('TransactionsHistory', () => {
       notes: 'Thanks for the Lyft! :)'
     }
 
-    const mockCancelledTransaction = {
+    const mockCanceledTransaction = {
       ...pendingRequest,
       direction: '',
       status: ''
@@ -282,7 +282,7 @@ describe('TransactionsHistory', () => {
         }]
       },
       result: {
-        data: { holofuelCancel: mockCancelledTransaction }
+        data: { holofuelCancel: mockCanceledTransaction }
       },
       newData: jest.fn()
     }
@@ -298,7 +298,7 @@ describe('TransactionsHistory', () => {
         }]
       },
       result: {
-        data: { holofuelCancel: mockCancelledTransaction }
+        data: { holofuelCancel: mockCanceledTransaction }
       },
       newData: jest.fn()
     }

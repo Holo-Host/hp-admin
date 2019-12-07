@@ -47,7 +47,8 @@ enum TransactionStatus {
   pending
   completed
   rejected
-  cancelled
+  canceled
+  declined
 }
 
 enum TransactionDirection {
@@ -67,6 +68,8 @@ type Transaction {
   presentBalance: Float
   notes: String
   happName: String
+  declinedReference: String
+  canceledReference: String
 }
 
 type Ledger {

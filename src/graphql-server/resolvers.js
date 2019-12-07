@@ -99,9 +99,15 @@ export const resolvers = {
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
-    holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId),
+    holofuelDecline: (_, { transactionId }) => {
+      console.log('!! INSIDE DECLINE ENDPOINT IN RESOLVERS !!')
+      return HoloFuelDnaInterface.transactions.decline(transactionId)
+    },
 
-    holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
+    holofuelCancel: (_, { transactionId }) => {
+      console.log('!! INSIDE CANCEL ENDPOINT IN RESOLVERS !!')
+      return HoloFuelDnaInterface.transactions.cancel(transactionId)
+    },
 
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess, authToken),
 
