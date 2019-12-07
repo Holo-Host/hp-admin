@@ -49,17 +49,10 @@ function useDecline () {
 }
 
 function useCounterparty (agentId) {
-  const { newMessage } = useFlashMessageContext()
   const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-
-  const confirmingAgentIsOnlineMessage = 'Confirming your Holofuel Peer is online.'
-  const errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.'
-
-  if (loading) return newMessage(confirmingAgentIsOnlineMessage)
-  if (!holofuelCounterparty.nickname) return newMessage(errorMessage)
-
+  if (loading) return null
   return holofuelCounterparty
 }
 
@@ -101,7 +94,7 @@ export default function Inbox () {
   const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
-  const [disabled, setDisabled] = useState(true)
+  // const [disabled, setDisabled] = useState(true)
   const [toggleModal, setToggleModal] = useState(null)
   const [modalTransaction, setModalTransaction] = useState(null)
 
@@ -191,14 +184,11 @@ export default function Inbox () {
       handleClose={() => setToggleModal(null)}
       toggleModal={toggleModal} />
 
-    {modalTransaction && <ConfirmationModal
+    <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       payTransaction={payTransaction}
-      declineTransaction={declineTransaction}
-      setDisabled={setDisabled}
-      disabled={disabled} />
-    }
+      declineTransaction={declineTransaction} />
   </PrimaryLayout>
 }
 
@@ -346,11 +336,24 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
   </Modal>
 }
 
-export async function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, setDisabled, disabled }) {
-  const { id, counterparty, amount, type, action } = transaction
+export async function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
+  const { newMessage } = useFlashMessageContext()
+  if (!transaction) return null
 
-  const counterpartyConfirmed = await useCounterparty(counterparty.id)
-  if (counterpartyConfirmed) setDisabled(false)
+  const { id, counterparty, amount, type, action } = transaction
+  console.log('inside confirmation MODAL !!')
+
+  // const counterpartyConfirmed = await useCounterparty(counterparty.id)
+  // console.log(' #1 counterpartyConfirmed!!', counterpartyConfirmed)
+  // if (counterpartyConfirmed) {
+  //   // setDisabled(false)
+
+  //   const errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.'
+
+  //   console.log('>>>>>>>>> #2 counterpartyConfirmed!!', counterpartyConfirmed)
+
+  //   if (counterpartyConfirmed.nickname !== counterparty.nickname) newMessage(errorMessage)
+  // }
 
   let message, actionHook, actionParams, contentLabel
   switch (action) {
@@ -393,8 +396,7 @@ export async function ConfirmationModal ({ transaction, handleClose, declineTran
       <div styleName='button-divide' />
       <Button
         onClick={onYes}
-        styleName='modal-button-yes'
-        disabled={disabled}>
+        styleName='modal-button-yes'>
         Yes
       </Button>
     </div>
