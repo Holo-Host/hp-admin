@@ -40,12 +40,15 @@ function useOffer () {
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
-  return ({ id }) => decline({
-    variables: { transactionId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    }]
-  })
+  return ({ id }) => {
+    console.log('THE TRANSATION - id in useDecline', id)
+    decline({
+      variables: { transactionId: id },
+      refetchQueries: [{
+        query: HolofuelActionableTransactionsQuery
+      }]
+    })
+  }
 }
 
 function useCounterparty (agentId) {
@@ -364,7 +367,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
     case 'decline': {
       contentLabel = `Reject ${type}?`
-      actionParams = id
+      actionParams = { id }
       actionHook = declineTransaction
       message = <div styleName='modal-text' data-testid='modal-message'>Decline <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break

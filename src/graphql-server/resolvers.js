@@ -100,7 +100,7 @@ export const resolvers = {
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
     holofuelDecline: (_, { transactionId }) => {
-      console.log('!! INSIDE DECLINE ENDPOINT IN RESOLVERS !!')
+      console.log('!! INSIDE DECLINE ENDPOINT IN RESOLVERS !!', transactionId)
       return HoloFuelDnaInterface.transactions.decline(transactionId)
     },
 
