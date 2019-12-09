@@ -78,8 +78,7 @@ const HposInterface = {
       return presentHposSettings(result)
     },
 
-    // TODO: Disucss options and implications for updating a Host's registration email.
-    updateSettings: async (hostPubKey, hostName, sshAccess, authToken) => {
+    updateSettings: async (hostPubKey, hostName, deviceName, sshAccess, authToken) => {
       const settingsConfig = {
         admin: {
           name: hostName,
@@ -87,7 +86,8 @@ const HposInterface = {
         },
         holoportos: {
           sshAccess: sshAccess
-        }
+        },
+        name: deviceName
       }
 
       const result = await hposCall('post', 'config', authToken)(settingsConfig)

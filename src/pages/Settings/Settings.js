@@ -6,11 +6,11 @@ import HashIcon from 'components/HashIcon'
 import CopyAgentId from 'components/CopyAgentId'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
-import ToggleButton from 'components/ToggleButton'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
+import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
 import { useHPAuthQuery, useHPAuthMutation } from 'graphql/hpAuthHooks'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import { rhino } from 'utils/colors'
@@ -33,16 +33,22 @@ export function Settings ({ history: { push } }) {
 
   const { data: { hposStatus: status = {} } = {} } = useHPAuthQuery(HposStatusQuery)
 
-  const [sshAccess, setSshAccess] = useState(true)
+  const [updateSettings] = useHPAuthMutation(HposUpdateSettingsMutation)
+
   const [editedDeviceName, setEditedDeviceName] = useState('')
   const [isEditingDeviceName, setIsEditingDeviceName] = useState(false)
+
   const editDeviceName = () => {
     setEditedDeviceName(settings.deviceName)
     setIsEditingDeviceName(true)
   }
 
   const saveDeviceName = () => {
-    console.log('saving device name', editedDeviceName)
+    updateSettings({
+      variables: {
+        deviceName: editedDeviceName
+      }
+    })
     setEditedDeviceName('')
     setIsEditingDeviceName(false)
   }
@@ -95,7 +101,7 @@ export function Settings ({ history: { push } }) {
       {!isEditingDeviceName && <SettingsRow
         label='Device Name'
         dataTestId='device-name'
-        onClick={() => setEditedDeviceName('')}
+        onClick={editDeviceName}
         value={!isEmpty(settings) && settings.deviceName
           ? <div styleName='device-name-button'>
             <span styleName='settings-value'>{settings.deviceName}</span>
@@ -104,12 +110,20 @@ export function Settings ({ history: { push } }) {
             </div>
           </div>
           : 'Not Available'} />}
-      {!isEditing && <div>
+      {isEditingDeviceName && <div>
         <SettingsRow
-        label='Device Name'
-        dataTestId='device-name'
-        value={<input value={editedDeviceName} onChange={e => setEditedDeviceName(e.target)}>}
-        >}
+          label='Device Name'
+          dataTestId='device-name'
+          bottomStyle
+          value={<input
+            styleName='device-name-input'
+            value={editedDeviceName}
+            onChange={e => setEditedDeviceName(e.target.value)} />} />
+        <div styleName='device-edit-buttons'>
+          <Button onClick={cancelDeviceName} variant='red-on-white' styleName='device-edit-button'>Cancel</Button>
+          <Button onClick={saveDeviceName} variant='white' styleName='device-edit-button'>Save</Button>
+        </div>
+      </div>}
       <SettingsRow
         label='Network'
         bottomStyle
@@ -122,9 +136,6 @@ export function Settings ({ history: { push } }) {
         value={value}
         bottomStyle={i === ports.length - 1} />)}
       <div styleName='settings-header'>&nbsp;</div>
-      <SettingsRow
-        label='SSH'
-        value={<ToggleButton checked={sshAccess} onChange={e => setSshAccess(e.target.checked)} />} />
       <SettingsRow
         label={<Button name='factory-reset' variant='danger' wide styleName='factory-reset-button' onClick={() => push('/factory-reset')}>Factory Reset</Button>}
         value={<div onClick={() => push('/factory-reset')} styleName='arrow-wrapper'><ArrowRightIcon color={rhino} opacity={0.8} /></div>}

@@ -77,6 +77,29 @@
   flex: 1
 }
 
+.device-name-input {
+  color: var(--color-rhino);
+  font-family: 'Circular';
+  font-size: 14px;
+  flex: 1;
+}
+
+.device-edit-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 48px;
+}
+
+.device-edit-button {
+  font-size: 10px !important;
+  line-height: 13px !important;
+  padding: 5px 15px !important;
+  text-transform: uppercase;
+  height: 22px;  
+  margin-left: 10px;
+}
+
 .factory-reset-button {
   color: var(--color-amaranth);
   background-color: transparent;

@@ -60,10 +60,10 @@ export function SideMenu ({
             <a href='https://holo.freshdesk.com/support/home' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
           </li>
           <li styleName='footer-list-item'>
-            <Link to='/tos' styleName='footer-link'>View Disclaimer</Link>
+            <Link to='https://thiswilllinktoholotos.com' styleName='footer-link'>View Disclaimer</Link>
           </li>
           <li styleName='footer-list-item'>
-            <Link to='/tos' styleName='footer-link'>View Terms of Service</Link>
+            <Link to='https://thiswilllinktoholotos.com' styleName='footer-link'>View Terms of Service</Link>
           </li>
         </ul>
       </footer>
