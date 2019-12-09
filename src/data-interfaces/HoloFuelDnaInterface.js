@@ -70,6 +70,9 @@ const presentAcceptedPayment = async (acceptedPayment) => {
 }
 
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
+  console.log(' event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer : ', event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer)
+  console.log('event.Receipt.cheque.invoice.promise : ', event.Receipt.cheque.invoice.promise)
+
   const counterpartyId = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
   return {
     id: origin,
@@ -79,7 +82,7 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     },
     direction: stateDirection,
     status: STATUS.completed,
-    type: event.Receipt.cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
+    type: stateDirection === DIRECTION.outgoing ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
     fees,
     presentBalance,
@@ -211,13 +214,16 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
-      return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+
+      console.log('ALL COMPLETED TRANSACTIONS : ', noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1).reverse())
+
+      return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1).reverse()
     },
     allActionable: async () => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')()
       const actionableTransactions = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
 
-      console.log('ALL ACTIONABLE TRANSACTIONS : ', actionableTransactions.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1))
+      console.log('ALL ACTIONABLE TRANSACTIONS : ', actionableTransactions.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)).reverse()
 
       return actionableTransactions.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
     },
@@ -226,7 +232,7 @@ const HoloFuelDnaInterface = {
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
-      return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+      return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1).reverse()
     },
     allEarnings: () => mockEarningsData,
     /* NOTE: allNonPending will include Declined and Canceled Transactions:  */
@@ -237,7 +243,7 @@ const HoloFuelDnaInterface = {
 
       console.log('ALL NOT_PENDING TRANSACTIONS : ', noDuplicateIds.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1))
 
-      return noDuplicateIds.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+      return noDuplicateIds.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1).reverse()
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
@@ -272,16 +278,11 @@ const HoloFuelDnaInterface = {
         return transactionArray[0]
       }
     },
-    /* NOTE: decline ACTIONABLE TRANSACTION (NB: pending transaction proposed by another agent) >> ONLY for asynchronous transactions. */
+    /* NOTE: decline ACTIONABLE TRANSACTION (NB: pending transaction proposed by another agent) >> ONLY for on asynchronous transactions. */
     decline: async (transactionId) => {
-      console.log('transactionId of TRANSACTION TO DECLINE : ', transactionId)
-
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-
       const reason = annulTransactionReaason
       const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId, reason })
-
-      console.log('declinedProof : ', declinedProof)
 
       return {
         ...transaction,
@@ -356,6 +357,7 @@ const HoloFuelDnaInterface = {
       console.log('ACCEPT transactionId : ', transactionId)
 
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
+      console.log('ACCEPT transaction : ', transaction)
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
@@ -373,13 +375,13 @@ const HoloFuelDnaInterface = {
     acceptMany: async (transactionIdArray) => {
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionIdArray })
       const transactionArray = Object.entries(result).map(presentAcceptedPayment)
-      return transactionArray.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+      return transactionArray.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1).reverse()
     },
 
     acceptAll: async () => {
       const result = await createZomeCall('transactions/receive_payments_pending')({})
       const transactionArray = Object.entries(result).map(presentAcceptedPayment)
-      return transactionArray.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1)
+      return transactionArray.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1).reverse()
     }
   }
 }

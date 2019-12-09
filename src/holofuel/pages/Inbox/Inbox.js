@@ -151,7 +151,7 @@ export default function Inbox () {
       </div>
     </Jumbotron>
 
-    {isEmpty(displayTransactions) && <>
+    {isDisplayTransactionsEmpty && <>
       <PageDivider title='Today' />
       <NullStateMessage
         styleName='null-state-message'
@@ -200,6 +200,8 @@ export default function Inbox () {
 export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisibleId, showConfirmationModal, isActionable }) {
   const { counterparty, presentBalance, amount, type, notes } = transaction
   const agent = counterparty
+
+  console.log('Transaction in TransactionRow : ', transaction)
 
   const handleCloseReveal = () => {
     if (!isEmpty(actionsVisibleId) && actionsVisibleId !== transaction.id) return actionsClickWithTxId(transaction.id)
@@ -274,6 +276,9 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
 }
 
 function AmountCell ({ amount, isRequest, isOffer, isActionable }) {
+  console.log('amount cell, isRequest? : ', isRequest)
+  console.log('amount cell, isOffer? : ', isOffer)
+  
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
   return <div styleName={cx('amount', { debit: isRequest && isActionable }, { credit: isOffer && isActionable })}>
     {amountDisplay} HF
