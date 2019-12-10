@@ -108,24 +108,43 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
   }
 }
 
-function presentPendingRequest (transaction) {
-  const { event, provenance } = transaction
+const presentDeclinedTransaction = async (declinedTx) => {
+  const transaction = declinedTx[2].Request ? presentPendingRequest(declinedTx, true) : presentPendingOffer(declinedTx, true)
+  return {
+    ...transaction,
+    status: STATUS.declined
+  }
+}
+
+const presentCanceledTransaction = async (canceledTx) => {
+  const transaction = canceledTx[2].Request ? presentPendingRequest(canceledTx, true) : presentPendingOffer(canceledTx, true)
+  return {
+    ...transaction,
+    status: STATUS.canceled
+  }
+}
+
+function presentPendingRequest (transaction, annuled = false) {
+  let { event, provenance } = transaction
+  if (annuled) event = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.outgoing // this indicates the recipient of funds. (Note: This is an actionable Tx.)
   const eventTimestamp = event[1]
-  const counterpartyId = provenance[0]
+  const counterpartyId = annuled ? 'none' : provenance[0]
   const { amount, notes, fee } = event[2].Request
   return presentRequest({ origin, event: event[2], stateDirection, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
-function presentPendingOffer (transaction) {
+function presentPendingOffer (transaction, annuled = false) {
   console.log('PRESENT PENDING OFFER : ', transaction)
 
-  const { event, provenance } = transaction
+  let { event, provenance } = transaction
+  if (annuled) event = transaction
+
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)
   const eventTimestamp = event[1]
-  const counterpartyId = provenance[0]
+  const counterpartyId = annuled ? 'none' : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
   return presentOffer({ origin, event: event[2], stateDirection, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
@@ -218,8 +237,8 @@ const HoloFuelDnaInterface = {
       return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
-      const { requests, promises } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
+      const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
+      const actionableTransactions = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer)).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentCanceledTransaction))
 
       console.log('ALL ACTIONABLE TRANSACTIONS : ', actionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1))
 
@@ -300,8 +319,6 @@ const HoloFuelDnaInterface = {
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored (or ACTIONABLE ACCEPT that agent received... ???). */
     cancel: async (transactionId) => {
-      console.log('TRANSACTION TO CANCEL (by ID) : ', transactionId)
-
       const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/request'])
 
       console.log(' AUTHORED TRANSACTIONS : ', authoredRequests)

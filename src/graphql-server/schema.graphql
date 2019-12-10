@@ -145,6 +145,7 @@ type Mutation {
   holofuelAcceptOffer(transactionId: ID): Transaction 
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
+  holofuelRecoverFunds(transaction: ID): Transaction
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean, authToken: String): HposSettings
   hposUpdateVersion(authToken: String): HposStatus
   hposCheckAuth(authToken: String): HposAuth

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, uniqBy } from 'lodash/fp'
@@ -6,6 +6,8 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
@@ -14,6 +16,8 @@ import HashAvatar from 'components/HashAvatar'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { OFFER_PATH, REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
+
+const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction history to cancel your pending transaction.'
 
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
@@ -35,6 +39,8 @@ function useTransactionsWithCounterparties () {
 }
 
 export default function Home () {
+  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
@@ -46,7 +52,16 @@ export default function Home () {
   const goToRequest = () => history.push(REQUEST_PATH)
   const goToOffer = () => history.push(OFFER_PATH)
 
-  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+  const { newMessage } = useFlashMessageContext()
+  const [errorMessage, setErrorMessage] = useState(null)
+
+  if (errorMessage) {
+    newMessage(errorMessage)
+    setErrorMessage('')
+  }
+
+  const filterActionableTransactionsByStatus = status => holofuelActionableTransactions.filter(actionableTx => actionableTx.status === status)
+  if (!isEmpty(filterActionableTransactionsByStatus('declined')) && errorMessage === null) setErrorMessage(declinedTransactionNotice)
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='avatar'>

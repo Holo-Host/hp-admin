@@ -1,5 +1,5 @@
-mutation HolofuelCancelMutation ($transactionId: ID) {
-  holofuelCancel(transactionId: $transactionId) {
+mutation HolofuelRecoverFunds ($transactionId: ID) {
+  holofuelRecoverFunds (transactionId: $transactionId) {
     id
     amount
     counterparty { id }

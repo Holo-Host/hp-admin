@@ -109,6 +109,11 @@ export const resolvers = {
       return HoloFuelDnaInterface.transactions.cancel(transactionId)
     },
 
+    holofuelRecoverFunds: (_, { transactionId }) => {
+      console.log('!! INSIDE RECOVR FUNDS ENDPOINT IN RESOLVERS !!')
+      return HoloFuelDnaInterface.transactions.recoverFunds(transactionId)
+    },
+
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess, authToken),
 
     hposUpdateVersion: (_, { authToken }) => HposInterface.os.updateVersion(authToken),
