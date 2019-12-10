@@ -9,13 +9,6 @@
     keystore_file = "agent.key";
     public_address = "HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi";
   }
-  # Currently we can only run one agent on a conductor
-  #{
-  #  id = "hp-admin-agent-2";
-  #  name = "HP Admin 2";
-  #  keystore_file = "agent-2.key";
-  #  public_address = "HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi";
-  #}
   ];
 
 }
