@@ -38,6 +38,11 @@ type HolofuelUser {
   error: Boolean
 }
 
+type ListOrigins {
+  Origin: String
+  OriginList: [String]
+}
+
 enum TransactionType {
   offer
   request
@@ -129,14 +134,14 @@ type Query {
   hposStatus(authToken: String): HposStatus
 }
 
-type Mutation {
+type Mutation { 
   registerUser(name: String, avatarUrl: String): Me
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
-  holofuelRequest(counterpartyId: String, amount: Float): Transaction
-  holofuelOffer(counterpartyId: String, amount: Float, requestId:ID): Transaction
+  holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
+  holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction 
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
