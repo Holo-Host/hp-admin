@@ -4,7 +4,9 @@ import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import Loader from 'react-loader-spinner'
+import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
+import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -43,11 +45,20 @@ function useRequestMutation () {
   })
 }
 
-
 const OFFER_MODE = 'offer'
 const REQUEST_MODE = 'request'
 
-export default function CreateOffer ({ history: { push } }) {
+const modeVerbs = {
+  [OFFER_MODE]: 'Send',
+  [REQUEST_MODE]: 'Request'
+}
+
+const modePrepositions = {
+  [OFFER_MODE]: 'To',
+  [REQUEST_MODE]: 'From'
+}
+
+export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
@@ -103,9 +114,17 @@ export default function CreateOffer ({ history: { push } }) {
     <div styleName='help-text'>
       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     </div>
+    <div styleName='mode-toggle'>
+      {[OFFER_MODE, REQUEST_MODE].map(buttonMode =>
+        <Button styleName={cx('mode-toggle-button', { selected: buttonMode === mode })}
+          onClick={() => setMode(buttonMode)}
+          key={buttonMode}>
+          {modeVerbs[buttonMode]}
+        </Button>)}
+    </div>
     <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
       <div styleName='form-row'>
-        <label htmlFor='counterpartyId' styleName='form-label'>To</label>
+        <label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}</label>
         <input
           name='counterpartyId'
           id='counterpartyId'
@@ -130,7 +149,7 @@ export default function CreateOffer ({ history: { push } }) {
           onChange={({ target: { value } }) => onAmountChange(value)} />
         <span styleName='hf'>HF</span>
       </div>
-      <div styleName='form-row'>
+      {mode === OFFER_MODE && <div styleName='form-row'>
         <label htmlFor='fee' styleName='form-label'>Fee (1%)</label>
         <input
           name='fee'
@@ -139,7 +158,7 @@ export default function CreateOffer ({ history: { push } }) {
           readOnly
           styleName='readonly-input' />
         <span styleName='hf'>HF</span>
-      </div>
+      </div>}
       <div styleName='form-row'>
         <label htmlFor='total' styleName='form-label'>Total</label>
         <input
@@ -160,7 +179,9 @@ export default function CreateOffer ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' wide variant='secondary' styleName='send-button'>Send</Button>
+      <Button type='submit' wide variant='secondary' styleName='send-button' dataTestId='submit-button'>
+        {modeVerbs[mode]}
+      </Button>
     </form>
   </PrimaryLayout>
 }

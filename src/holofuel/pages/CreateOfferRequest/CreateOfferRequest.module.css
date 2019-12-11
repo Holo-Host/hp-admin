@@ -4,6 +4,19 @@
   color: var(--color-gray);
 }
 
+.mode-toggle {
+  display: flex;
+  justify-content: center;
+}
+
+.mode-toggle-button {
+  margin: 0 5px;
+}
+
+.selected {
+  background-color: var(--color-caribbean-green);
+}
+
 .offer-form {
   display: flex;
   flex-direction: column;
