@@ -24,7 +24,7 @@ import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } from 'utils'
 import { Link } from 'react-router-dom'
-import { REQUEST_PATH, OFFER_PATH } from 'holofuel/utils/urls'
+import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -310,15 +310,9 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
     styleName='modal'>
     <div styleName='modal-title'>Create a new transaction.</div>
     <Button styleName='modal-buttons' onClick={handleClose}>
-      <Link to={OFFER_PATH} styleName='button-link'>
+      <Link to={OFFER_REQUEST_PATH} styleName='button-link'>
         <div styleName='modal-offer-link'>
-          Send
-        </div>
-      </Link>
-      <div styleName='button-divide' />
-      <Link to={REQUEST_PATH} styleName='button-link'>
-        <div styleName='modal-request-link'>
-          Request
+          Send / Request
         </div>
       </Link>
     </Button>
