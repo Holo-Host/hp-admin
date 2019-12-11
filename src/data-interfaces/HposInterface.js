@@ -1,6 +1,15 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
 
+// these two functions are stubs until we have the crypto library
+function payloadSignature (authKey, method, request, body) {
+  return 'signature'
+}
+
+function hashResponseBody (body) {
+  return 'hash of body'
+}
+
 const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value retunred to false, once HPOS Image is nixified and located within repo.
 const developmentMockHposConnection = true // boolean to toggle hpos mock data reference while in dev context...
 export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -16,30 +25,36 @@ const axiosConfig = {
   }
 }
 
-export function hposCall (method = 'get', path, authToken, apiVersion = 'v1') {
+export function hposCall ({ method = 'get', path, authToken, apiVersion = 'v1', headers: userHeaders = {} }) {
   if (MOCK_HPOS_CONNECTION) {
     return mockCallHpos(method, apiVersion, path)
   } else {
-    const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
+    return async params => {
+      const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
 
-    const headers = {
-      ...axiosConfig.headers,
-      'X-Holo-Admin-Signature': authToken
-    }
+      const signature = payloadSignature(authToken, method, fullPath, params)
 
-    switch (method) {
-      case 'get':
-        return async params => {
-          const { data } = await axios.get(fullPath, { params, headers })
+      const headers = {
+        ...axiosConfig.headers,
+        ...userHeaders,
+        'X-Holo-Admin-Signature': signature
+      }
+
+      let data
+
+      switch (method) {
+        case 'get':
+          ({ data } = await axios.get(fullPath, { params, headers }))
           return data
-        }
-      case 'post':
-        return async params => {
-          const { data } = await axios.post(fullPath, { params, headers })
+        case 'post':
+          ({ data } = await axios.post(fullPath, { params, headers }))
           return data
-        }
-      default:
-        throw new Error(`No case in hposCall for ${method} method`)
+        case 'put':
+          ({ data } = await axios.put(fullPath, { params, headers }))
+          return data
+        default:
+          throw new Error(`No case in hposCall for ${method} method`)
+      }
     }
   }
 }
@@ -74,11 +89,18 @@ const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
     settings: async (authToken) => {
-      const result = await hposCall('get', 'config', authToken)()
+      const result = await hposCall({ method: 'get', path: 'config', authToken })()
       return presentHposSettings(result)
     },
 
     updateSettings: async (hostPubKey, hostName, deviceName, sshAccess, authToken) => {
+      const settingsResponse = await hposCall({ method: 'get', path: 'config', authToken })()
+
+      // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
+      const headers = {
+        'x-hp-admin-cas': hashResponseBody(settingsResponse)
+      }
+
       const settingsConfig = {
         admin: {
           name: hostName,
@@ -90,18 +112,18 @@ const HposInterface = {
         name: deviceName
       }
 
-      const result = await hposCall('post', 'config', authToken)(settingsConfig)
+      const result = await hposCall({ method: 'put', path: 'config', headers, authToken })(settingsConfig)
       return presentHposSettings(result)
     },
 
     // HOLOPORT_OS STATUS
     status: async (authToken) => {
-      const result = await hposCall('get', 'status', authToken)()
+      const result = await hposCall({ method: 'get', path: 'status', authToken })()
       return presentHposStatus(result)
     },
 
     updateVersion: async (authToken) => {
-      const result = await hposCall('post', 'upgrade', authToken)()
+      const result = await hposCall({ method: 'post', path: 'upgrade', authToken })()
       return presentHposStatus(result)
     }
   }
