@@ -17,7 +17,7 @@ import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { OFFER_PATH, REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
-const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction history to cancel your pending transaction.'
+const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction history to view and/or cancel your pending transaction.'
 
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)

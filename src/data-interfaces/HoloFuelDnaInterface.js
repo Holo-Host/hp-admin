@@ -6,7 +6,7 @@ import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
 
 export const currentDataTimeIso = () => new Date().toISOString()
-export const annulTransactionReaason = 'I need to revert the transaction.'
+export const annulTransactionReason = 'I need to revert the transaction.'
 
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
@@ -252,9 +252,12 @@ const HoloFuelDnaInterface = {
       return noDuplicateIds.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allEarnings: () => mockEarningsData,
-    allNonActionableByState: async (transactionId, stateFilter = []) => {
-      const filteredList = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
-      const cleanedList = _.uniqBy(filteredList, 'id').filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+    allNonActionableByState: async (transactionId, stateFilter = [], status = 'completed') => {
+      const { transactions } = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
+      const listOfNonActionableTransactions = transactions.map(presentTransaction)
+      const cleanedList = _.uniqBy(listOfNonActionableTransactions, 'origin')
+      console.log('cleanedList : ', cleanedList)
+
       if (cleanedList.length === 0) {
         console.error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -307,7 +310,7 @@ const HoloFuelDnaInterface = {
     /* NOTE: decline ACTIONABLE TRANSACTION (NB: pending transaction proposed by another agent) >> ONLY for on asynchronous transactions. */
     decline: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      const reason = annulTransactionReaason
+      const reason = annulTransactionReason
       const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId, reason })
 
       return {
@@ -319,24 +322,23 @@ const HoloFuelDnaInterface = {
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored (or ACTIONABLE ACCEPT that agent received... ???). */
     cancel: async (transactionId) => {
-      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/request'])
-
-      console.log(' AUTHORED TRANSACTIONS : ', authoredRequests)
-      const transaction = authoredRequests.find(authoredRequest => authoredRequest.id === transactionId)
+      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested'], 'canceled')
+      const transaction = authoredRequests.find(authoredRequest => authoredRequest.origin === transactionId)
 
       console.log(' CANCEL TRANSACTION DETAILS : ', transaction)
-      const reason = annulTransactionReaason
-      await createZomeCall('transactions/cancel_transactions')({ origins: transactionId, reason })
+      const reason = annulTransactionReason
+      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: transactionId, reason })
       return {
         ...transaction,
         id: transactionId,
-        status: STATUS['pending-cancelation']
+        status: STATUS.canceled,
+        canceledReference: canceledProof
       }
     }
   },
   /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */
   recoverFunds: async (transactionId) => {
-    const reason = annulTransactionReaason
+    const reason = annulTransactionReason
     const transaction = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId)
 
     console.log('confirm - TRANSACTION TO CANCEL : ', transaction)

@@ -10,5 +10,6 @@ mutation HolofuelRecoverFunds ($transactionId: ID) {
     fees
     presentBalance
     notes
+    canceledProof
   }
 }
