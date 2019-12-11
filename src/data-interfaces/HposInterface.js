@@ -93,7 +93,7 @@ const HposInterface = {
       return presentHposSettings(result)
     },
 
-    updateSettings: async (hostPubKey, hostName, sshAccess, authToken) => {
+    updateSettings: async (hostPubKey, hostName, deviceName, sshAccess, authToken) => {
       const settingsResponse = await hposCall({ method: 'get', path: 'config', authToken })()
 
       // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
@@ -108,7 +108,8 @@ const HposInterface = {
         },
         holoportos: {
           sshAccess: sshAccess
-        }
+        },
+        name: deviceName
       }
 
       const result = await hposCall({ method: 'put', path: 'config', headers, authToken })(settingsConfig)
