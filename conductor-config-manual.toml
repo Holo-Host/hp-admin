@@ -1,0 +1,103 @@
+bridges = []
+persistence_dir = ".holochain/holo"
+ui_bundles = []
+ui_interfaces = []
+
+[[agents]]
+id = "hp-admin-agent"
+keystore_file = "agent.key"
+name = "HP Admin"
+public_address = "HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi"
+
+[[dnas]]
+file = "/nix/store/nl88n7735i15yi855l9v9jh8msrvmm7f-happ-store/happ-store.dna.json"
+hash = "QmUtX3p8MnSQzFN5EqyhYkmmuwGtmetcTXPKgM8pvzbhKu"
+id = "happ-store-dna"
+
+[[dnas]]
+file = "/nix/store/260cqx6wwc29nzglfjpi745fbh2d9rlg-holo-hosting-app/holo-hosting-app.dna.json"
+hash = "QmVN1NnsjXndiMmdXyrRcJdvgyCsksPEuPvbRZJ3vsw2KP"
+id = "holo-hosting-app-dna"
+
+[[dnas]]
+file = "/nix/store/63lvpbia4g2vhf7q9a5pl89gdfmdbjvh-holofuel/holofuel.dna.json"
+hash = "Qmd73iyYZEnWhDRbNVroGgkMzRiMXFcVxPPHJjJSeR6ZRa"
+id = "holofuel-dna"
+
+[[instances]]
+agent = "hp-admin-agent"
+dna = "happ-store-dna"
+id = "happ-store"
+
+[instances.storage]
+path = ".holochain/holo/storage/happ-store"
+type = "file"
+
+[[instances]]
+agent = "hp-admin-agent"
+dna = "holo-hosting-app-dna"
+id = "holo-hosting-app"
+
+[instances.storage]
+path = ".holochain/holo/storage/holo-hosting-app"
+type = "file"
+
+[[instances]]
+agent = "hp-admin-agent"
+dna = "holofuel-dna"
+id = "holofuel"
+
+[instances.storage]
+path = ".holochain/holo/storage/holofuel"
+type = "file"
+
+[[interfaces]]
+id = "websocket-interface"
+
+[interfaces.driver]
+port = 3400
+type = "websocket"
+
+[[interfaces.instances]]
+alias = "happ-store"
+id = "happ-store"
+
+[[interfaces.instances]]
+alias = "holo-hosting-app"
+id = "holo-hosting-app"
+
+[[interfaces.instances]]
+alias = "holofuel"
+id = "holofuel"
+
+[[interfaces]]
+admin = true
+id = "http-interface"
+
+[interfaces.driver]
+port = 3300
+type = "http"
+
+[[interfaces.instances]]
+id = "happ-store"
+
+[[interfaces.instances]]
+id = "holo-hosting-app"
+
+[[interfaces.instances]]
+id = "holofuel"
+
+[logger]
+type = "debug"
+
+[logger.rules]
+
+[[logger.rules.rules]]
+color = "red"
+exclude = false
+pattern = "^err/"
+
+[[logger.rules.rules]]
+color = "white"
+exclude = false
+pattern = "^debug/dna"

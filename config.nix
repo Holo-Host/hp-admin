@@ -8,7 +8,5 @@
     name = "HP Admin";
     keystore_file = "agent.key";
     public_address = "HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi";
-  }
-  ];
-
+  }];
 }

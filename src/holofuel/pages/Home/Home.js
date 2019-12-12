@@ -45,7 +45,7 @@ export default function Home () {
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
-  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
+  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='avatar'>
