@@ -9,7 +9,7 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
-import { OFFER_PATH, REQUEST_PATH } from 'holofuel/utils/urls'
+import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 // this is importing from the mocked version of this module
 import { history } from 'react-router-dom'
@@ -63,12 +63,8 @@ describe('Home', () => {
       expect(getByText(`Hi ${nickname}!`)).toBeInTheDocument()
 
       history.push.mockReset()
-      fireEvent.click(getByText('Send'))
-      expect(history.push).toHaveBeenCalledWith(OFFER_PATH)
-
-      history.push.mockReset()
-      fireEvent.click(getByText('Request'))
-      expect(history.push).toHaveBeenCalledWith(REQUEST_PATH)
+      fireEvent.click(getByText('Send / Request'))
+      expect(history.push).toHaveBeenCalledWith(OFFER_REQUEST_PATH)
 
       expect(getByText(`${presentHolofuelAmount(balance)} HF`)).toBeInTheDocument()
 

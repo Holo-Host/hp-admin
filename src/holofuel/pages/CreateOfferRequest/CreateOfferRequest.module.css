@@ -4,7 +4,20 @@
   color: var(--color-gray);
 }
 
-.request-form {
+.mode-toggle {
+  display: flex;
+  justify-content: center;
+}
+
+.mode-toggle-button {
+  margin: 0 5px;
+}
+
+.selected {
+  background-color: var(--color-caribbean-green);
+}
+
+.offer-form {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -15,7 +28,7 @@
 .form-row {
   display: flex;
   justify-content: center;
-  align-items: center;  
+  align-items: center;
   margin-bottom: 20px;
   height: 32px;
 }
@@ -52,7 +65,7 @@
   text-align: right;
 }
 
-.fee-input {
+.readonly-input {
   composes: number-input;
   border: none;
   background-color: var(--color-alto);
@@ -78,6 +91,7 @@
 }
 
 .send-button {
+  justify-self: flex-end;
   margin-top: auto;
   height: 54px;
   font-size: 24px;

@@ -10,8 +10,6 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import {
   HOME_PATH,
   INBOX_PATH,
-  OFFER_PATH,
-  REQUEST_PATH,
   HISTORY_PATH,
   TOS_PATH
 } from 'holofuel/utils/urls'
@@ -62,18 +60,6 @@ export function SideMenu ({
               <div styleName='nav-icon' />
               Inbox
               {inboxCount > 0 && <span styleName='nav-badge'>{inboxCount}</span>}
-            </Link>
-          </li>
-          <li>
-            <Link to={OFFER_PATH} styleName='nav-link'>
-              <div styleName='nav-icon' />
-              Offer
-            </Link>
-          </li>
-          <li>
-            <Link to={REQUEST_PATH} styleName='nav-link'>
-              <div styleName='nav-icon' />
-              Request
             </Link>
           </li>
           <li>

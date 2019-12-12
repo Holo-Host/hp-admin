@@ -13,7 +13,7 @@ import Button from 'holofuel/components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
-import { OFFER_PATH, REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
+import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
@@ -43,8 +43,7 @@ export default function Home () {
   const firstSixTransactions = transactions.slice(0, 6)
 
   const history = useHistory()
-  const goToRequest = () => history.push(REQUEST_PATH)
-  const goToOffer = () => history.push(OFFER_PATH)
+  const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
 
@@ -56,8 +55,7 @@ export default function Home () {
     </div>
     <div styleName='greeting'>{greeting}</div>
     <div styleName='button-row'>
-      <Button onClick={goToOffer} styleName='send-button'>Send</Button>
-      <Button onClick={goToRequest} styleName='request-button'>Request</Button>
+      <Button onClick={goToOfferRequest} styleName='send-button'>Send / Request</Button>
     </div>
 
     <div styleName='balance-and-transactions'>

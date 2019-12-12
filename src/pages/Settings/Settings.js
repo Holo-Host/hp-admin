@@ -4,15 +4,15 @@ import './Settings.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
 import HashIcon from 'components/HashIcon'
 import CopyAgentId from 'components/CopyAgentId'
-import Modal from 'components/Modal'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
-import ToggleButton from 'components/ToggleButton'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
+import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
 import { useHPAuthQuery, useHPAuthMutation } from 'graphql/hpAuthHooks'
+import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import { rhino } from 'utils/colors'
 
 // Dictionary of all relevant display ports
@@ -33,12 +33,37 @@ export function Settings ({ history: { push } }) {
 
   const { data: { hposStatus: status = {} } = {} } = useHPAuthQuery(HposStatusQuery)
 
-  const [modalVisible, setModalVisible] = useState()
-  const showModal = () => setModalVisible(true)
+  const [updateSettings] = useHPAuthMutation(HposUpdateSettingsMutation)
 
-  const [sshAccess, setSshAccess] = useState(true)
+  const [editedDeviceName, setEditedDeviceName] = useState('')
+  const [isEditingDeviceName, setIsEditingDeviceName] = useState(false)
+
+  const editDeviceName = () => {
+    setEditedDeviceName(settings.deviceName)
+    setIsEditingDeviceName(true)
+  }
+
+  const saveDeviceName = () => {
+    updateSettings({
+      variables: {
+        deviceName: editedDeviceName
+      }
+    })
+    setEditedDeviceName('')
+    setIsEditingDeviceName(false)
+  }
+
+  const cancelDeviceName = () => {
+    setEditedDeviceName('')
+    setIsEditingDeviceName(false)
+  }
 
   const updateVersion = useUpdateVersion()
+  const { newMessage } = useFlashMessageContext()
+  const updateVersionWithMessage = () => {
+    updateVersion()
+    newMessage('Your software version has been updated.', 5000)
+  }
 
   const availableVersion = get('versionInfo.availableVersion', status)
   const currentVersion = get('versionInfo.currentVersion', status)
@@ -70,13 +95,35 @@ export function Settings ({ history: { push } }) {
       </div>
       <SettingsRow
         label={presentAgentId(currentVersion)}
-        value={updateAvailable ? <VersionUpdateButton showModal={showModal} /> : 'Your software is up to date.'}
+        value={updateAvailable ? <VersionUpdateButton updateVersion={updateVersionWithMessage} /> : 'Your software is up to date.'}
         bottomStyle />
       <div styleName='settings-header'>About this HoloPort</div>
-      <SettingsRow
+      {!isEditingDeviceName && <SettingsRow
         label='Device Name'
         dataTestId='device-name'
-        value={!isEmpty(settings) && settings.deviceName ? settings.deviceName : 'Not Available'} />
+        onClick={editDeviceName}
+        value={!isEmpty(settings) && settings.deviceName
+          ? <div styleName='device-name-button'>
+            <span styleName='settings-value'>{settings.deviceName}</span>
+            <div styleName='arrow-wrapper'>
+              <ArrowRightIcon color={rhino} opacity={0.8} />
+            </div>
+          </div>
+          : 'Not Available'} />}
+      {isEditingDeviceName && <div>
+        <SettingsRow
+          label='Device Name'
+          dataTestId='device-name'
+          bottomStyle
+          value={<input
+            styleName='device-name-input'
+            value={editedDeviceName}
+            onChange={e => setEditedDeviceName(e.target.value)} />} />
+        <div styleName='device-edit-buttons'>
+          <Button onClick={cancelDeviceName} variant='red-on-white' styleName='device-edit-button'>Cancel</Button>
+          <Button onClick={saveDeviceName} variant='white' styleName='device-edit-button'>Save</Button>
+        </div>
+      </div>}
       <SettingsRow
         label='Network'
         bottomStyle
@@ -90,25 +137,15 @@ export function Settings ({ history: { push } }) {
         bottomStyle={i === ports.length - 1} />)}
       <div styleName='settings-header'>&nbsp;</div>
       <SettingsRow
-        label='SSH'
-        value={<ToggleButton checked={sshAccess} onChange={e => setSshAccess(e.target.checked)} />} />
-      <SettingsRow
         label={<Button name='factory-reset' variant='danger' wide styleName='factory-reset-button' onClick={() => push('/factory-reset')}>Factory Reset</Button>}
         value={<div onClick={() => push('/factory-reset')} styleName='arrow-wrapper'><ArrowRightIcon color={rhino} opacity={0.8} /></div>}
         bottomStyle />
     </section>
-
-    <VersionUpdateModal
-      settings={settings}
-      handleClose={() => setModalVisible(null)}
-      modalVisible={modalVisible}
-      availableVersion={availableVersion}
-      updateVersion={updateVersion} />
   </PrimaryLayout>
 }
 
-export function SettingsRow ({ label, value, dataTestId, bottomStyle }) {
-  return <div styleName={bottomStyle ? 'settings-row-bottom' : 'settings-row'} data-testid={dataTestId}>
+export function SettingsRow ({ label, value, dataTestId, bottomStyle, onClick }) {
+  return <div onClick={onClick} styleName={bottomStyle ? 'settings-row-bottom' : 'settings-row'} data-testid={dataTestId}>
     {typeof label === 'string'
       ? <span styleName='settings-label'>{label}</span>
       : label}
@@ -118,43 +155,13 @@ export function SettingsRow ({ label, value, dataTestId, bottomStyle }) {
   </div>
 }
 
-function VersionUpdateButton ({ showModal }) {
+function VersionUpdateButton ({ updateVersion }) {
   return <Button
     variant='white'
-    onClick={showModal}
+    onClick={updateVersion}
     styleName='version-update-button'>
     Update Software
   </Button>
-}
-
-export function VersionUpdateModal ({ settings, handleClose, modalVisible, availableVersion, updateVersion }) {
-  if (!availableVersion) return null
-  const onYes = () => {
-    updateVersion()
-    handleClose()
-  }
-  return <Modal
-    contentLabel={`Update ${settings.deviceName}?`}
-    isOpen={!!modalVisible}
-    handleClose={handleClose}
-    styleName='modal'>
-    <div styleName='modal-title'>Are you sure?</div>
-    <div styleName='modal-text' role='heading' data-testid='modal-message'>
-      Would you like to update the HoloPort, "{settings.deviceName}", to version {presentHash(availableVersion)}?
-    </div>
-    <div styleName='modal-buttons'>
-      <Button
-        onClick={handleClose}
-        styleName='modal-button-no'>
-        No
-      </Button>
-      <Button
-        onClick={onYes}
-        styleName='modal-button-yes'>
-        Yes
-      </Button>
-    </div>
-  </Modal>
 }
 
 export default props => <Settings {...props} />
