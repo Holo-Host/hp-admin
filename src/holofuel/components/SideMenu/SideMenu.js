@@ -91,6 +91,18 @@ export function SideMenu ({
       </nav>
 
       <footer styleName='footer'>
+        <div styleName='alpha-info'>
+          <p>
+            HoloFuel is in Alpha testing.
+          </p>
+          <p>
+            Learn more about out our&nbsp;
+            <a href='https://wheredoesthisgo.com' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
+              Alpha Testnet.
+            </a>
+          </p>
+        </div>
+
         <ul styleName='footer-list'>
           <li>
             <Link to='#/' styleName='footer-link'>Help</Link>

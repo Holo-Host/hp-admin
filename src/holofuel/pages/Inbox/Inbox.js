@@ -11,6 +11,7 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import { TYPE } from 'models/Transaction'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
@@ -96,7 +97,7 @@ export default function Inbox () {
   const [actionsVisibleId, setActionsVisibleId] = useState(null)
   const actionsClickWithTxId = transactionId => setActionsVisibleId(transactionId)
 
-  const toggleButtons = [{ view: VIEW.actionable, label: 'Pending' }, { view: VIEW.recent, label: 'Recent' }]
+  const toggleButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   switch (inboxView) {
@@ -116,7 +117,7 @@ export default function Inbox () {
   return <PrimaryLayout headerProps={{ title: 'Inbox' }} inboxCount={actionableTransactions.length}>
     <Jumbotron
       className='inbox-header'
-      title={`${presentHolofuelAmount(holofuelBalance)} HF`}
+      title={`${presentHolofuelAmount(holofuelBalance)} TF`}
       titleSuperscript='Balance'
     >
       <Button styleName='new-transaction-button' onClick={() => showConfirmationModal()}>
@@ -260,7 +261,7 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
 function AmountCell ({ amount, isRequest, isOffer, isActionable }) {
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
   return <div styleName={cx('amount', { debit: isRequest && isActionable }, { credit: isOffer && isActionable })}>
-    {amountDisplay} HF
+    {amountDisplay} TF
   </div>
 }
 
@@ -276,9 +277,14 @@ function useAcceptOffer (id) {
 }
 
 function AcceptButton ({ transaction: { id } }) {
+  const { newMessage } = useFlashMessageContext()
   const acceptOffer = useAcceptOffer(id)
+  const accept = () => {
+    acceptOffer()
+    newMessage('Offer successfully accepted')
+  }
   return <Button
-    onClick={acceptOffer}
+    onClick={accept}
     styleName='accept-button'>
     <p>Accept</p>
   </Button>
@@ -289,7 +295,7 @@ function PayButton ({ showConfirmationModal, transaction }) {
   return <Button
     onClick={() => showConfirmationModal(transaction, action)}
     styleName='pay-button'>
-    <p>Pay</p>
+    <p>Accept</p>
   </Button>
 }
 
@@ -320,23 +326,37 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
 }
 
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
+  const { newMessage } = useFlashMessageContext()
   if (!transaction) return null
-  const { id, counterparty, amount, type, action } = transaction
+  const { id, counterparty, amount, type, action } = transaction  
 
-  let message, actionHook, actionParams, contentLabel
+  let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
     case 'pay': {
       contentLabel = 'Pay request'
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Pay <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      message = <div styleName='modal-text' data-testid='modal-message'>
+        Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+      </div>
+      flashMessage = 'Payment sent succesfully'
       break
     }
     case 'decline': {
       contentLabel = `Reject ${type}?`
       actionParams = id
       actionHook = declineTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Decline <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
+      if (type === 'offer') {
+        message = <div styleName='modal-text' data-testid='modal-message'>
+          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        </div>
+      } else {
+        message = <div styleName='modal-text' data-testid='modal-message'>
+          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        </div>
+      }
+      flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`
+
       break
     }
     default:
@@ -346,6 +366,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   const onYes = () => {
     actionHook(actionParams)
     handleClose()
+    newMessage(flashMessage)
   }
 
   return <Modal
