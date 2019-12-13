@@ -5,6 +5,7 @@ import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
 import SideMenu from 'components/SideMenu'
 import Header from 'components/Header'
+import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
@@ -33,6 +34,7 @@ export function PrimaryLayout ({
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
       settings={settings} />
+    <AlphaFlag styleName='styles.alpha-flag' />
     <div styleName='styles.content'>
       <FlashMessage />
       {children}

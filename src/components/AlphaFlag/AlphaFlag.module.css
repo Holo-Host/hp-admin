@@ -1,0 +1,46 @@
+.wrapper {
+  display: flex;
+}
+
+.flag {
+  background-color: var(--color-havelock-blue);
+  font-family: 'Circular';
+  font-style: normal;
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  height: 32px;
+  width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.left {
+
+}
+
+.right {
+  
+}
+
+.left-arrow {
+  width: 0; 
+  height: 0; 
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  
+  border-right: 16px solid var(--color-havelock-blue);
+}
+
+.right-arrow {
+  width: 0; 
+  height: 0; 
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  
+  border-left: 16px solid var(--color-havelock-blue);
+}

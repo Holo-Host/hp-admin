@@ -4,6 +4,7 @@
   word-break: break-word;
   height: 100%;
   box-sizing: border-box;
+  position: relative;
 }
 
 .wide {
@@ -12,6 +13,11 @@
 
 .narrow {
   padding: 0px 24px;
+}
+
+.alpha-flag {
+  position: absolute;
+  right: 0px;
 }
 
 .content {
