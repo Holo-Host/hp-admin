@@ -93,12 +93,12 @@ describe('Dashboard', () => {
     fireEvent.click(hosting)
     expect(mockNavigateTo).toHaveBeenCalledWith('/browse-happs')
 
-    const earningsCard = getByText("You haven't earned HoloFuel")
+    const earningsCard = getByText("You haven't earned TestFuel")
     expect(earningsCard).toBeInTheDocument()
     fireEvent.click(earningsCard)
     expect(mockNavigateTo).toHaveBeenCalledWith('/earnings')
 
-    const holofuel = getByText('You have no HoloFuel')
+    const holofuel = getByText('You have no TestFuel')
     expect(holofuel).toBeInTheDocument()
     fireEvent.click(holofuel)
     expect(mockNavigateTo).toHaveBeenCalledWith('/holofuel')
@@ -188,8 +188,8 @@ describe('Dashboard', () => {
 
     expect(getByText('1 hApp')).toBeInTheDocument()
 
-    expect(getByText(`${presentHolofuelAmount(earnings)} HF`)).toBeInTheDocument()
+    expect(getByText(`${presentHolofuelAmount(earnings)} TF`)).toBeInTheDocument()
 
-    expect(getByText(`${presentHolofuelAmount(balance)} HF`)).toBeInTheDocument()
+    expect(getByText(`${presentHolofuelAmount(balance)} TF`)).toBeInTheDocument()
   })
 })
