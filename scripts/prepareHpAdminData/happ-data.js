@@ -3,7 +3,7 @@
 const happConfig = {
   happ1: {
     title: 'HoloFuel',
-    description: 'Send and receive Test Fuel',
+    description: 'Send and receive TestFuel',
     thumbnail_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cMFvYqaw7TtcTkPFcwE8pupKWqLFMCFu2opap9jqUoqIcAKB',
     homepage_url: 'about-holofuel.com',
     ui: {

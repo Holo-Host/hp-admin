@@ -3,7 +3,7 @@ export const appOne = {
   appEntry: {
     title: 'HoloFuel',
     author: 'Holo ltd',
-    description: 'Send and receive Test Fuel',
+    description: 'Send and receive TestFuel',
     thumbnailUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cMFvYqaw7TtcTkPFcwE8pupKWqLFMCFu2opap9jqUoqIcAKB',
     homepageUrl: 'https://holo.host/faq/what-is-holo-fuel/',
     dnas: [

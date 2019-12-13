@@ -47,7 +47,7 @@ export default function HostingEarnings () {
   return <PrimaryLayout headerProps={{ title: 'Earnings' }}>
     <div styleName='earnings-banner'>
       <h4 styleName='earnings-label'>{labels[days].earnings}</h4>
-      <h1 styleName='earnings-amount'>{presentHolofuelAmount(earnings)} HF</h1>
+      <h1 styleName='earnings-amount'>{presentHolofuelAmount(earnings)} TF</h1>
     </div>
 
     <div styleName='day-buttons'>
@@ -85,7 +85,7 @@ export function TransactionRow ({ transaction }) {
   const { amount, happName } = transaction
   return <tr styleName='transaction-row' data-testid='transaction-row'>
     <td>{happName}</td>
-    <td>5 HF/CPU</td>
-    <td>{amount} HF</td>
+    <td>5 TF/CPU</td>
+    <td>{amount} TF</td>
   </tr>
 }

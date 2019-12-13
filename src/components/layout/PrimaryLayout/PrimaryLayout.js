@@ -16,7 +16,8 @@ export function PrimaryLayout ({
   children,
   headerProps = {},
   showHeader = true,
-  showSideMenu = true
+  showSideMenu = true,
+  showAlphaFlag = true
 }) {
   const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
 
@@ -34,7 +35,7 @@ export function PrimaryLayout ({
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
       settings={settings} />
-    <AlphaFlag styleName='styles.alpha-flag' />
+    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />
       {children}

@@ -281,7 +281,7 @@ function AcceptButton ({ transaction: { id } }) {
   const acceptOffer = useAcceptOffer(id)
   const accept = () => {
     acceptOffer()
-    newMessage('Offer successfully accepted')
+    newMessage('Offer successfully accepted', 5000)
   }
   return <Button
     onClick={accept}
@@ -328,7 +328,7 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
   const { newMessage } = useFlashMessageContext()
   if (!transaction) return null
-  const { id, counterparty, amount, type, action } = transaction  
+  const { id, counterparty, amount, type, action } = transaction
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
@@ -366,7 +366,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   const onYes = () => {
     actionHook(actionParams)
     handleClose()
-    newMessage(flashMessage)
+    newMessage(flashMessage, 5000)
   }
 
   return <Modal

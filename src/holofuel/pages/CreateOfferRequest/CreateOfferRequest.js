@@ -96,11 +96,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
     switch (mode) {
       case OFFER_MODE:
         createOffer(amount, counterpartyId, notes)
-        newMessage(`Offer of ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
+        newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
         break
       case REQUEST_MODE:
         createRequest(amount, counterpartyId, notes)
-        newMessage(`Request for ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
+        newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
         break
       default:
         throw new Error(`Unknown mode: '${mode}' in CreateOfferRequest`)
@@ -110,10 +110,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)
 
-  return <PrimaryLayout headerProps={{ title: 'Offer' }}>
-    <div styleName='help-text'>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    </div>
+  const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
+
+  return <PrimaryLayout headerProps={{ title }}>
     <div styleName='mode-toggle'>
       {[OFFER_MODE, REQUEST_MODE].map(buttonMode =>
         <Button styleName={cx('mode-toggle-button', { selected: buttonMode === mode })}
@@ -129,6 +128,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           name='counterpartyId'
           id='counterpartyId'
           styleName='form-input'
+          placeholder='Who is this for?'
           ref={register}
           onChange={({ target: { value } }) => setCounterpartyId(value)} />
         <div styleName='hash-and-nick'>
@@ -147,7 +147,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           styleName='number-input'
           ref={register}
           onChange={({ target: { value } }) => onAmountChange(value)} />
-        <span styleName='hf'>HF</span>
+        <span styleName='hf'>TF</span>
       </div>
       {mode === OFFER_MODE && <div styleName='form-row'>
         <label htmlFor='fee' styleName='form-label'>Fee (1%)</label>
@@ -157,7 +157,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           value={fee.toFixed(2)}
           readOnly
           styleName='readonly-input' />
-        <span styleName='hf'>HF</span>
+        <span styleName='hf'>TF</span>
       </div>}
       <div styleName='form-row'>
         <label htmlFor='total' styleName='form-label'>Total</label>
@@ -167,12 +167,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
           value={total.toFixed(2)}
           readOnly
           styleName='readonly-input' />
-        <span styleName='hf'>HF</span>
+        <span styleName='hf'>TF</span>
       </div>
       <textarea
         styleName='notes-input'
         name='notes'
-        placeholder='Notes'
+        placeholder='What is this for?'
         ref={register} />
       <RecentCounterparties
         styleName='recent-counterparties'

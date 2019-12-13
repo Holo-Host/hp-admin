@@ -10,8 +10,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import {
   HOME_PATH,
   INBOX_PATH,
-  HISTORY_PATH,
-  TOS_PATH
+  HISTORY_PATH
 } from 'holofuel/utils/urls'
 
 import './SideMenu.module.css'
@@ -105,10 +104,10 @@ export function SideMenu ({
 
         <ul styleName='footer-list'>
           <li>
-            <Link to='#/' styleName='footer-link'>Help</Link>
+            <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
           </li>
           <li>
-            <Link to={TOS_PATH} styleName='footer-link'>View Terms of Service</Link>
+            <a href='https://thiswilllinktoholotos.com' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</a>
           </li>
         </ul>
       </footer>

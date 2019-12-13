@@ -6,7 +6,7 @@ export default function AlphaFlag ({ variant = 'left', className }) {
   const left = variant === 'left'
   const right = variant === 'right'
   const flagStyleNames = cx('flag', {
-    left, 
+    left,
     right
   })
   return <div styleName='wrapper' className={className}>

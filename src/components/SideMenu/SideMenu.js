@@ -71,10 +71,7 @@ export function SideMenu ({
 
         <ul styleName='footer-list'>
           <li styleName='footer-list-item'>
-            <a href='https://holo.freshdesk.com/support/home' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
-          </li>
-          <li styleName='footer-list-item'>
-            <Link to='https://thiswilllinktoholotos.com' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Disclaimer</Link>
+            <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
           </li>
           <li styleName='footer-list-item'>
             <Link to='https://thiswilllinktoholotos.com' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</Link>
