@@ -238,7 +238,7 @@ const HoloFuelDnaInterface = {
     },
     allActionable: async () => {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer)).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentCanceledTransaction))
+      const actionableTransactions = requests.map(r=>presentPendingRequest(r)).concat(promises.map(p=>presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentCanceledTransaction))
 
       console.log('ALL ACTIONABLE TRANSACTIONS : ', actionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1))
 
@@ -276,7 +276,7 @@ const HoloFuelDnaInterface = {
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
-      const transactionArray = requests.map(presentPendingRequest).concat(promises.map(presentPendingOffer))
+      const transactionArray = requests.map(r=>presentPendingRequest(r)).concat(promises.map(p=>presentPendingOffer(p)))
       if (transactionArray.length === 0) {
         throw new Error(`no pending transaction with id ${transactionId} found.`)
       } else {
