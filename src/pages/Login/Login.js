@@ -39,7 +39,7 @@ export default function Login ({ history: { push } }) {
     }
   }
 
-  return <PrimaryLayout showHeader={false}>
+  return <PrimaryLayout showHeader={false} showAlphaFlag={false}>
     <div styleName='container'>
       <div styleName='backdrop' />
       <form styleName='form' onSubmit={handleSubmit(onSubmit)}>

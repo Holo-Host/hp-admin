@@ -70,7 +70,7 @@ export default function Home () {
             </div>
           </div>
           <div styleName='balance-amount'>
-            {presentHolofuelAmount(holofuelBalance)} HF
+            {presentHolofuelAmount(holofuelBalance)} TF
           </div>
         </div>
       </Link>
@@ -79,7 +79,7 @@ export default function Home () {
         <div styleName='transactions-label'>Recent Transactions</div>
 
         {isTransactionsEmpty && <div styleName='transactions-empty'>
-          You have no recent transactions
+          You have no offers or requests
         </div>}
 
         {!isTransactionsEmpty && <div styleName='transaction-list'>

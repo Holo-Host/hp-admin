@@ -7,7 +7,6 @@ import TransactionHistory from 'holofuel/pages/TransactionHistory'
 import Tos from 'holofuel/pages/Tos'
 import CreateOfferRequest from 'holofuel/pages/CreateOfferRequest'
 
-
 export default function HFRouter () {
   const match = useRouteMatch()
 

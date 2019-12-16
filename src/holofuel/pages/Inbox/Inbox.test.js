@@ -51,7 +51,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       <Inbox />
     </ApolloProvider>, 15)
 
-    expect(getByText(`${presentHolofuelAmount(ledger.balance)} HF`)).toBeInTheDocument()
+    expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
 
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)
@@ -64,7 +64,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       const { getByText } = within(item)
       const transaction = actionableTransactions[index]
       expect(getByText(transaction.notes)).toBeInTheDocument()
-      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) HF` : `${presentHolofuelAmount(transaction.amount)} HF`
+      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) TF` : `${presentHolofuelAmount(transaction.amount)} TF`
       const story = transaction.type === 'request' ? 'is requesting' : 'is offering'
       expect(getByText(amountToMatch)).toBeInTheDocument()
       expect(getByText(story)).toBeInTheDocument()
@@ -119,7 +119,7 @@ describe('Ledger Jumbotron', () => {
       <Inbox />
     </MockedProvider>)
 
-    const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} HF`
+    const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} TF`
 
     expect(getAllByText('Balance')[0]).toBeInTheDocument()
     expect(getByText(presentedBalance)).toBeInTheDocument()
@@ -312,7 +312,7 @@ describe('TransactionRow', () => {
         await wait(0)
       })
 
-      expect(getByText('Pay')).toBeVisible()
+      expect(getByText('Accept')).toBeVisible()
       expect(getByText('Decline')).toBeVisible()
     })
 
@@ -352,7 +352,7 @@ describe('TransactionRow', () => {
       })
 
       await act(async () => {
-        fireEvent.click(getByText('Pay'))
+        fireEvent.click(getByText('Accept'))
         await wait(0)
       })
 

@@ -5,13 +5,12 @@ import HashIcon from 'holofuel/components/HashIcon'
 import { presentAgentId } from 'utils'
 import './RecentCounterparties.module.css'
 
-export default function RecentCounterparties ({ agents, selectedAgentId, selectAgent, className }) {
-  if (isEmpty(agents)) return null
-
+export default function RecentCounterparties ({ agents = [], selectedAgentId, selectAgent, className }) {
   const recentAgents = agents.slice(0, 6)
 
   return <div styleName='recent-counterparties' className={className}>
-    <div styleName='header'>Recent Friends</div>
+    <div styleName='header'>Recent Peers</div>
+    {isEmpty(agents) && <div>You have no recent peers.</div>}
     {recentAgents.map(agent => <AgentRow
       agent={agent}
       selected={agent.id === selectedAgentId}

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import CopyAgentId from 'components/CopyAgentId'
 import GearIcon from 'components/icons/GearIcon'
+import AlphaFlag from 'components/AlphaFlag'
 import { sliceHash as presentHash } from 'utils'
 import './SideMenu.module.css'
 
@@ -55,15 +56,25 @@ export function SideMenu ({
       </nav>
 
       <footer styleName='footer'>
+        <div styleName='alpha-info'>
+          <AlphaFlag variant='right' styleName='alpha-flag' />
+          <p>
+            HP Admin is in Alpha testing.
+          </p>
+          <p>
+            Learn more about out our&nbsp;
+            <a href='https://wheredoesthisgo.com' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
+              Alpha Testnet.
+            </a>
+          </p>
+        </div>
+
         <ul styleName='footer-list'>
           <li styleName='footer-list-item'>
-            <a href='https://holo.freshdesk.com/support/home' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
+            <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
           </li>
           <li styleName='footer-list-item'>
-            <Link to='https://thiswilllinktoholotos.com' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Disclaimer</Link>
-          </li>
-          <li styleName='footer-list-item'>
-            <Link to='https://thiswilllinktoholotos.com' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</Link>
+            <Link to='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</Link>
           </li>
         </ul>
       </footer>
