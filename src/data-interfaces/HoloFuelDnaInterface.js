@@ -308,9 +308,7 @@ const HoloFuelDnaInterface = {
     /* NOTE: decline ACTIONABLE TRANSACTION (NB: pending transaction proposed by another agent) >> ONLY for on asynchronous transactions. */
     decline: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      const reason = annulTransactionReason
-      const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId, reason })
-
+      const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId })
       return {
         ...transaction,
         id: transactionId,
