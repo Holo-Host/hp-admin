@@ -51,7 +51,12 @@ function useTransactionsWithCounterparties () {
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
-    counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
+    counterparty: counterparties.find(counterparty => {
+      if (transactions.counterparty != null) {
+        return counterparty.id === transaction.counterparty.id}
+      else return false
+    }
+  ) || transaction.counterparty
   }))
 
   const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
@@ -130,7 +135,9 @@ export default function TransactionsHistory () {
     {!noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
         <div styleName='partition-label'>{label}</div>
-        {transactions.map((transaction, index) => <TransactionRow
+        { // Filtered to remove all the cancled transactions
+          // TODO: Display the Cancled transactions.
+          (transactions.filter(t => t.counterparty)).map((transaction, index) => <TransactionRow
           transaction={transaction}
           key={transaction.id}
           showCancellationModal={showCancellationModal}
@@ -209,8 +216,8 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
   if (!transaction) return null
   const { id, counterparty, amount, type, direction } = transaction
   const onYes = () => {
-    if (TYPE.request) cancelTransaction(id)
-    else if (TYPE.offer) refundTransaction(id)
+    if (TYPE.request) {console.log("REQUEST CANCLE: ");cancelTransaction(id)}
+    else if (TYPE.offer) {console.log("REFUND CANCLE: ");refundTransaction(id)}
     else console.error('Detected invalid Transaction Type; could not progress with cancel.')
     handleClose()
   }

@@ -256,8 +256,6 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const cleanedList = _.uniqBy(listOfNonActionableTransactions, 'origin')
-      console.log('cleanedList : ', cleanedList)
-
       if (cleanedList.length === 0) {
         console.error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -322,7 +320,7 @@ const HoloFuelDnaInterface = {
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored (or ACTIONABLE ACCEPT that agent received... ???). */
     cancel: async (transactionId) => {
-      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested'], 'canceled')
+      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested','outgoing/approved'], 'canceled')
       const transaction = authoredRequests.find(authoredRequest => authoredRequest.origin === transactionId)
 
       console.log(' CANCEL TRANSACTION DETAILS : ', transaction)
