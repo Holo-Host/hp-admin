@@ -65,6 +65,20 @@
   margin-top: auto;
 }
 
+.alpha-info {
+  position: relative;
+  margin: 0 -32px 20px -32px;
+  padding: 30px 24px;
+  font-family: 'Circular';
+  font-size: 14px;
+  line-height: 16px;
+  color: #fff;
+}
+
+.alpha-link {
+  color: #fff;
+}
+
 /* Header */
 
 .appName {

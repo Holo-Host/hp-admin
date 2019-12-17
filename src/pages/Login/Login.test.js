@@ -10,10 +10,10 @@ jest.mock('contexts/useFlashMessageContext')
 
 describe('Login', () => {
   it('renders', async () => {
-    const { getByPlaceholderText, getByText, queryByTestId } = render(<MockedProvider><Login history={{}} /></MockedProvider>)
+    const { getByLabelText, getByText, queryByTestId } = render(<MockedProvider><Login history={{}} /></MockedProvider>)
 
-    expect(getByPlaceholderText('Email address')).toBeInTheDocument()
-    expect(getByPlaceholderText('Password')).toBeInTheDocument()
+    expect(getByLabelText('Email:')).toBeInTheDocument()
+    expect(getByLabelText('Password:')).toBeInTheDocument()
     expect(getByText('Login')).toBeInTheDocument()
     expect(queryByTestId('menu-button')).not.toBeInTheDocument()
   })
@@ -23,10 +23,10 @@ describe('Login', () => {
       const push = jest.fn()
       const email = 'a@example.com'
       const password = 'fkldsjf'
-      const { getByPlaceholderText, getByText } = render(<Login history={{ push }} />)
+      const { getByLabelText, getByText } = render(<Login history={{ push }} />)
       act(() => {
-        fireEvent.change(getByPlaceholderText('Email address'), { target: { value: email } })
-        fireEvent.change(getByPlaceholderText('Password'), { target: { value: password } })
+        fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
+        fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       })
 
       fireEvent.click(getByText('Login'))
@@ -38,10 +38,10 @@ describe('Login', () => {
     it('shows email error when no email is provided', async () => {
       const push = jest.fn()
       const password = 'fkldsjf'
-      const { getByPlaceholderText, getByText } = render(<MockedProvider><Login history={{ push }} /></MockedProvider>)
+      const { getByLabelText, getByText } = render(<MockedProvider><Login history={{ push }} /></MockedProvider>)
       act(() => {
-        fireEvent.change(getByPlaceholderText('Email address'), { target: { value: '' } })
-        fireEvent.change(getByPlaceholderText('Password'), { target: { value: password } })
+        fireEvent.change(getByLabelText('Email:'), { target: { value: '' } })
+        fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       })
 
       fireEvent.click(getByText('Login'))
@@ -54,10 +54,10 @@ describe('Login', () => {
     it('shows password required error when no password is provided', async () => {
       const push = jest.fn()
       const email = 'a@example.com'
-      const { getByPlaceholderText, getByText } = render(<MockedProvider><Login history={{ push }} /></MockedProvider>)
+      const { getByLabelText, getByText } = render(<MockedProvider><Login history={{ push }} /></MockedProvider>)
       act(() => {
-        fireEvent.change(getByPlaceholderText('Email address'), { target: { value: email } })
-        fireEvent.change(getByPlaceholderText('Password'), { target: { value: '' } })
+        fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
+        fireEvent.change(getByLabelText('Password:'), { target: { value: '' } })
       })
 
       fireEvent.click(getByText('Login'))
@@ -71,10 +71,10 @@ describe('Login', () => {
       const push = jest.fn()
       const email = 'a@example.com'
       const password = 'short'
-      const { getByPlaceholderText, getByText } = render(<MockedProvider><Login history={{ push }} /></MockedProvider>)
+      const { getByLabelText, getByText } = render(<MockedProvider><Login history={{ push }} /></MockedProvider>)
       act(() => {
-        fireEvent.change(getByPlaceholderText('Email address'), { target: { value: email } })
-        fireEvent.change(getByPlaceholderText('Password'), { target: { value: password } })
+        fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
+        fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       })
 
       fireEvent.click(getByText('Login'))

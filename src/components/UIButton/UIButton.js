@@ -15,6 +15,7 @@ function UIButton ({
   const classes = cx('button', {
     white: variant === 'white',
     green: variant === 'green',
+    'red-on-white': variant === 'red-on-white',
     disabled
   })
 

@@ -3,7 +3,7 @@
 const happConfig = {
   happ1: {
     title: 'HoloFuel',
-    description: 'Manage and redeem payments for hosting',
+    description: 'Send and receive TestFuel',
     thumbnail_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2cMFvYqaw7TtcTkPFcwE8pupKWqLFMCFu2opap9jqUoqIcAKB',
     homepage_url: 'about-holofuel.com',
     ui: {
@@ -22,7 +22,7 @@ const happConfig = {
   },
   happ2: {
     title: 'Holo Community',
-    description: 'Connect with other hosts in the Holo network',
+    description: 'Connect with your peers',
     thumbnail_url: 'https://d3ngex8q79bk55.cloudfront.net/misc/default_community_avatar.png',
     homepage_url: 'about-holo-community.com',
     ui: {

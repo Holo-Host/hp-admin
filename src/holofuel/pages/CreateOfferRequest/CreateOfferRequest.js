@@ -4,7 +4,9 @@ import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
 import Loader from 'react-loader-spinner'
+import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
+import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -14,7 +16,7 @@ import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
-import './CreateOffer.module.css'
+import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
 export const FEE_PERCENTAGE = 0.01
@@ -39,9 +41,32 @@ function useOfferMutation () {
   })
 }
 
-export default function CreateOffer ({ history: { push } }) {
+function useRequestMutation () {
+  const [offer] = useMutation(HolofuelRequestMutation)
+  return (amount, counterpartyId, notes) => offer({
+    variables: { amount, counterpartyId, notes }
+  })
+}
+
+const OFFER_MODE = 'offer'
+const REQUEST_MODE = 'request'
+
+const modeVerbs = {
+  [OFFER_MODE]: 'Send',
+  [REQUEST_MODE]: 'Request'
+}
+
+const modePrepositions = {
+  [OFFER_MODE]: 'To',
+  [REQUEST_MODE]: 'From'
+}
+
+export default function CreateOfferRequest ({ history: { push } }) {
+  const [mode, setMode] = useState(OFFER_MODE)
+
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const createOffer = useOfferMutation()
+  const createRequest = useRequestMutation()
 
   const { newMessage } = useFlashMessageContext()
 
@@ -80,24 +105,42 @@ export default function CreateOffer ({ history: { push } }) {
   }
 
   const onSubmit = ({ amount, counterpartyId, notes }) => {
-    createOffer(amount, counterpartyId, notes)
+    switch (mode) {
+      case OFFER_MODE:
+        createOffer(amount, counterpartyId, notes)
+        newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        break
+      case REQUEST_MODE:
+        createRequest(amount, counterpartyId, notes)
+        newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        break
+      default:
+        throw new Error(`Unknown mode: '${mode}' in CreateOfferRequest`)
+    }
     push(HISTORY_PATH)
-    newMessage(`Offer of ${presentHolofuelAmount(amount)} HF sent to ${counterpartyNick}.`, 5000)
   }
 
-  !isEmpty(errors) && console.log('Offer form errors (leave here until proper error handling is implemented):', errors)
+  !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)
 
-  return <PrimaryLayout headerProps={{ title: 'Offer' }}>
-    <div styleName='help-text'>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
+
+  return <PrimaryLayout headerProps={{ title }}>
+    <div styleName='mode-toggle'>
+      {[OFFER_MODE, REQUEST_MODE].map(buttonMode =>
+        <Button styleName={cx('mode-toggle-button', { selected: buttonMode === mode })}
+          onClick={() => setMode(buttonMode)}
+          key={buttonMode}>
+          {modeVerbs[buttonMode]}
+        </Button>)}
     </div>
     <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
       <div styleName='form-row'>
-        <label htmlFor='counterpartyId' styleName='form-label'>To</label>
+        <label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}</label>
         <input
           name='counterpartyId'
           id='counterpartyId'
           styleName='form-input'
+          placeholder='Who is this for?'
           ref={register}
           onChange={({ target: { value } }) => setCounterpartyId(value)} />
         <div styleName='hash-and-nick'>
@@ -124,9 +167,9 @@ export default function CreateOffer ({ history: { push } }) {
           styleName='number-input'
           ref={register}
           onChange={({ target: { value } }) => onAmountChange(value)} />
-        <span styleName='hf'>HF</span>
+        <span styleName='hf'>TF</span>
       </div>
-      <div styleName='form-row'>
+      {mode === OFFER_MODE && <div styleName='form-row'>
         <label htmlFor='fee' styleName='form-label'>Fee (1%)</label>
         <input
           name='fee'
@@ -134,8 +177,8 @@ export default function CreateOffer ({ history: { push } }) {
           value={fee.toFixed(2)}
           readOnly
           styleName='readonly-input' />
-        <span styleName='hf'>HF</span>
-      </div>
+        <span styleName='hf'>TF</span>
+      </div>}
       <div styleName='form-row'>
         <label htmlFor='total' styleName='form-label'>Total</label>
         <input
@@ -144,12 +187,12 @@ export default function CreateOffer ({ history: { push } }) {
           value={total.toFixed(2)}
           readOnly
           styleName='readonly-input' />
-        <span styleName='hf'>HF</span>
+        <span styleName='hf'>TF</span>
       </div>
       <textarea
         styleName='notes-input'
         name='notes'
-        placeholder='Notes'
+        placeholder='What is this for?'
         ref={register} />
 
       <RecentCounterparties

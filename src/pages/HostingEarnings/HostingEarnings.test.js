@@ -63,21 +63,21 @@ describe('HostingEarnings', () => {
       expect(getAllByTestId('transaction-row')).toHaveLength(3)
 
       const oneDayTotal = transactions.slice(0, 1).reduce((sum, transaction) => sum + transaction.amount, 0)
-      expect(getAllByText(`${presentHolofuelAmount(oneDayTotal)} HF`)).toHaveLength(2)
+      expect(getAllByText(`${presentHolofuelAmount(oneDayTotal)} TF`)).toHaveLength(2)
 
       fireEvent.click(getByText('7 Days'))
 
       const sevenDayTotal = transactions.slice(0, 2).reduce((sum, transaction) => sum + transaction.amount, 0)
-      expect(getByText(`${presentHolofuelAmount(sevenDayTotal)} HF`)).toBeInTheDocument()
+      expect(getByText(`${presentHolofuelAmount(sevenDayTotal)} TF`)).toBeInTheDocument()
 
       fireEvent.click(getByText('30 Days'))
 
       const thirtyDayTotal = transactions.slice(0, 3).reduce((sum, transaction) => sum + transaction.amount, 0)
-      expect(getByText(`${presentHolofuelAmount(thirtyDayTotal)} HF`)).toBeInTheDocument()
+      expect(getByText(`${presentHolofuelAmount(thirtyDayTotal)} TF`)).toBeInTheDocument()
 
       fireEvent.click(getByText('Today'))
 
-      expect(getAllByText(`${presentHolofuelAmount(oneDayTotal)} HF`)).toHaveLength(2)
+      expect(getAllByText(`${presentHolofuelAmount(oneDayTotal)} TF`)).toHaveLength(2)
     })
   })
 })
