@@ -51,7 +51,11 @@ function useTransactionsWithCounterparties () {
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
-    counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
+    counterparty: counterparties.find(counterparty => {
+      if (transactions.counterparty != null) {
+        return counterparty.id === transaction.counterparty.id
+      } else return false
+    }) || transaction.counterparty
   }))
 
   const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
@@ -130,11 +134,13 @@ export default function TransactionsHistory () {
     {!noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
         <div styleName='partition-label'>{label}</div>
-        {transactions.map((transaction, index) => <TransactionRow
-          transaction={transaction}
-          key={transaction.id}
-          showCancellationModal={showCancellationModal}
-          isFirst={index === 0} />)}
+        { // Transactions filtered by counterparty to filter out all canceled transactions (which currenlty do not have a counterparty in the object...)
+          // TODO: Display the Canceled transactions.
+          (transactions.filter(t => t.counterparty)).map((transaction, index) => <TransactionRow
+            transaction={transaction}
+            key={transaction.id}
+            showCancellationModal={showCancellationModal}
+            isFirst={index === 0} />)}
       </React.Fragment>)}
     </div>}
 

@@ -256,8 +256,6 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const cleanedList = _.uniqBy(listOfNonActionableTransactions, 'origin')
-      console.log('cleanedList : ', cleanedList)
-
       if (cleanedList.length === 0) {
         console.error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -310,9 +308,9 @@ const HoloFuelDnaInterface = {
     /* NOTE: decline ACTIONABLE TRANSACTION (NB: pending transaction proposed by another agent) >> ONLY for on asynchronous transactions. */
     decline: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      const reason = annulTransactionReason
-      const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId, reason })
-
+      // NOTE: POTENTIAL DNA BUG >> Passing in a reason to the `decline_pending` endpoint generates API error.
+      // const reason = annulTransactionReason
+      const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId }) // ({ origins: transactionId, reason })
       return {
         ...transaction,
         id: transactionId,
@@ -322,7 +320,7 @@ const HoloFuelDnaInterface = {
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored (or ACTIONABLE ACCEPT that agent received... ???). */
     cancel: async (transactionId) => {
-      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested'], 'canceled')
+      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'], 'canceled')
       const transaction = authoredRequests.find(authoredRequest => authoredRequest.origin === transactionId)
 
       console.log(' CANCEL TRANSACTION DETAILS : ', transaction)
