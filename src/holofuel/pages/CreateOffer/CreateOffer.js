@@ -15,7 +15,6 @@ import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOffer.module.css'
-import Login from '../../../pages/Login/Login'
 
 // TODO: these constants should come from somewhere more scientific
 export const FEE_PERCENTAGE = 0.01
@@ -56,12 +55,9 @@ export default function CreateOffer ({ history: { push } }) {
   const formValues = getValues()
 
   useEffect(() => {
-    console.log(' ========================================= ')
-    console.log(' !!!!!!!!!!!!!!! inside use effect ...')
-    console.log('1. page counterpartyNotFound : ', counterpartyNotFound)
-    console.log('1. page errorMessage : ', errorMessage)
     if (errorMessage) {
       newMessage(errorMessage)
+      setErrorMessage(null)
     }
   }, [errorMessage, setErrorMessage])
 
@@ -166,43 +162,35 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-
-  console.log('2 loading inside modal useEffect : ', loading)
-  console.log('2 counterpartyNotFound : ', counterpartyNotFound)
-  console.log('2 errorMessage : ', errorMessage)
-
   const { nickname } = holofuelCounterparty
   useEffect(() => {
-    if (!loading) {
-      if (!errorMessage && !nickname) {
-        console.log('NO NICKNAME FOUND')
-        errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
-        setCounterpartyNotFound(true)
-        console.log('3 - ERROR >> counterpartyNotFound : ', counterpartyNotFound)
-        console.log('3 - ERROR >> errorMessage : ', errorMessage)
-      } else if (currentCounterpartyValue && currentCounterpartyValue.length === AGENT_ID_LENGTH) {
-        console.log('ALL (SHOULD  BE) GOOD')
-        setCounterpartyNick(nickname || '')
-        errorMessage = null
-        setCounterpartyNotFound(false)
-        console.log('3 - SUCCESS >> counterpartyNotFound : ', counterpartyNotFound)
-        console.log('3 - SUCCESS >> errorMessage : ', errorMessage)
-      }
-    }
-  })
+    setCounterpartyNick(nickname)
+  }, [setCounterpartyNick, nickname])
+
+  if (!loading && !nickname) {
+    errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
+    counterpartyNotFound = true
+  } else if (!loading && !errorMessage && currentCounterpartyValue && currentCounterpartyValue.length === AGENT_ID_LENGTH) {
+    counterpartyNotFound = false
+  }
 
   useEffect(() => {
     setErrorMessage(errorMessage)
   }, [setErrorMessage, errorMessage])
 
+  useEffect(() => {
+    setCounterpartyNotFound(counterpartyNotFound)
+  }, [setCounterpartyNotFound, counterpartyNotFound])
+
   if (loading) {
+    // TODO: Unsubscribe from Loader to avoid any potential mem leak.
     return <>
       <Loader
         type='ThreeDots'
         color='#00BFFF'
         height={30}
         width={30}
-        timeout={5000}
+        timeout={3000}
       />
        Loading
     </>

@@ -122,7 +122,7 @@ export default function CreateRequest ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage, setDisabled, disabled, formValues }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage, errorMessage, setDisabled, disabled, formValues }) {
   const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
@@ -131,7 +131,6 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
     setCounterpartyNick(nickname)
   }, [setCounterpartyNick, nickname])
 
-  let errorMessage = null
   if (!nickname && !loading) {
     errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
     disabled = true
@@ -150,6 +149,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
   }, [setDisabled, disabled])
 
   if (loading) {
+    // TODO: Unsubscribe from Loader to avoid any potential mem leak.
     return <>
       <Loader
         type='ThreeDots'
