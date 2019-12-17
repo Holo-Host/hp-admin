@@ -75,6 +75,9 @@ function useTransactionsWithCounterparties () {
   const updatedActionableTransactions = updateCounterparties(holofuelActionableTransactions, allCounterparties)
   const updatedNonPendingTransactions = updateCounterparties(holofuelNonPendingTransactions, allCounterparties)
 
+  console.log('updatedActionableTransactions : ', updatedActionableTransactions)
+  console.log('updatedNonPendingTransactions : ', updatedNonPendingTransactions)
+
   return {
     actionableTransactions: updatedActionableTransactions,
     recentTransactions: updatedNonPendingTransactions

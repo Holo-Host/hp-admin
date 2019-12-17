@@ -11,6 +11,7 @@
     "build:holofuel": "REACT_APP_HOLOFUEL_APP=true node scripts/build.js",
     "hc:start-manual": "holochain -c conductor-config-manual.toml",
     "hc:start-manual-2": "holochain -c conductor-config-manual-2.toml",
+    "hc:clean-storage": "rm -rf ./.holochain/holo/storage",
     "hc:start": "holochain -c ./conductor-config.toml &> conductor.log &",
     "hc:start-and-wait": "npm run hc:start && npm run test:wait-for-conductor",
     "hc:stop": "killall holochain",
