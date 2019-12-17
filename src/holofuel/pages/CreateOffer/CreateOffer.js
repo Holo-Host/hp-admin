@@ -59,7 +59,7 @@ export default function CreateOffer ({ history: { push } }) {
       newMessage(errorMessage)
       setErrorMessage(null)
     }
-  }, [errorMessage, setErrorMessage])
+  }, [errorMessage, setErrorMessage, newMessage])
 
   const selectAgent = id => {
     setCounterpartyId(id)
@@ -103,6 +103,7 @@ export default function CreateOffer ({ history: { push } }) {
             <RenderNickname
               agentId={counterpartyId}
               setCounterpartyNick={setCounterpartyNick}
+              counterpartyNick={counterpartyNick}
               setErrorMessage={setErrorMessage}
               errorMessage={errorMessage}
               setCounterpartyNotFound={setCounterpartyNotFound}
