@@ -13,7 +13,6 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { TYPE } from 'models/Transaction'
-import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
@@ -114,11 +113,7 @@ export default function Inbox () {
   const [actionsVisibleId, setActionsVisibleId] = useState(null)
   const actionsClickWithTxId = transactionId => setActionsVisibleId(transactionId)
 
-<<<<<<< HEAD
-  const toggleButtons = [{ view: VIEW.actionable, label: 'To-do' }, { view: VIEW.recent, label: 'Activity' }]
-=======
   const toggleButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
->>>>>>> develop
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   switch (inboxView) {
@@ -291,13 +286,8 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
 
 function AmountCell ({ amount, isRequest, isOffer, isActionable, notValid }) {
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
-<<<<<<< HEAD
   return <div styleName={cx('amount', { debit: isRequest && isActionable }, { credit: isOffer && isActionable }, { removed: notValid })}>
     {amountDisplay} HF
-=======
-  return <div styleName={cx('amount', { debit: isRequest && isActionable }, { credit: isOffer && isActionable })}>
-    {amountDisplay} TF
->>>>>>> develop
   </div>
 }
 
@@ -361,7 +351,6 @@ function NewTransactionModal ({ handleClose, toggleNewTransactionModal }) {
   </Modal>
 }
 
-<<<<<<< HEAD
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, setCounterpartyNotFound, counterpartyNotFound }) {
   const { newMessage } = useFlashMessageContext()
   const { id, amount, type, action } = transaction
@@ -378,12 +367,6 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       } else setCounterpartyNotFound(false)
     }
   })
-=======
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction }) {
-  const { newMessage } = useFlashMessageContext()
-  if (!transaction) return null
-  const { id, counterparty, amount, type, action } = transaction
->>>>>>> develop
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
