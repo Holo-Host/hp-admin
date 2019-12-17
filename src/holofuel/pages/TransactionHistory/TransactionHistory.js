@@ -134,8 +134,8 @@ export default function TransactionsHistory () {
     {!noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
         <div styleName='partition-label'>{label}</div>
-        { // Filtered to remove all the cancled transactions
-          // TODO: Display the Cancled transactions.
+        { // Transactions filtered by counterparty to filter out all canceled transactions (which currenlty do not have a counterparty in the object...)
+          // TODO: Display the Canceled transactions.
           (transactions.filter(t => t.counterparty)).map((transaction, index) => <TransactionRow
             transaction={transaction}
             key={transaction.id}
