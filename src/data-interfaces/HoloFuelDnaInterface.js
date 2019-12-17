@@ -255,17 +255,17 @@ const HoloFuelDnaInterface = {
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
-      const noDuplicateIdsWaitingList = _.uniqBy(listOfNonActionableTransactions, 'id')
-
       const listOfDeclinedTransactions = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
-      const filteredWaitingTransactions = noDuplicateIdsWaitingList.map(waitingTx => listOfDeclinedTransactions.filter(declinedTransaction => declinedTransaction[0] !== waitingTx))
 
+      const fullList = listOfDeclinedTransactions.concat(listOfNonActionableTransactions)
+      /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
+      const noDuplicateIdsWaitingList = _.uniqBy(fullList, 'id')
+
+      const filteredWaitingTransactions = noDuplicateIdsWaitingList.filter(tx => tx.status === STATUS.declined)
       console.log('FILTERED WAITING : ', filteredWaitingTransactions)
+      console.log('ALL WAITING TRANSACTIONS : ', filteredWaitingTransactions.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1))
 
-      console.log('ALL WAITING TRANSACTIONS : ', noDuplicateIdsWaitingList.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1))
-
-      return noDuplicateIdsWaitingList.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return filteredWaitingTransactions.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')()
