@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, uniqBy } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -52,7 +52,8 @@ function useCounterparty (agentId) {
   const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-  return { holofuelCounterparty, loading }
+  if (loading) return null
+  return holofuelCounterparty
 }
 
 function useTransactionsWithCounterparties () {
@@ -93,14 +94,14 @@ export default function Inbox () {
   const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
-  const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
-  const [toggleNewTransactionModal, setToggleNewTransactionModal] = useState(null)
+  const [disabled, setDisabled] = useState(true)
+  const [toggleModal, setToggleModal] = useState(null)
   const [modalTransaction, setModalTransaction] = useState(null)
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
     if (!isEmpty(transaction) && action !== '') return setModalTransaction(modalTransaction)
-    else return setToggleNewTransactionModal(true)
+    else return setToggleModal(true)
   }
 
   const [actionsVisibleId, setActionsVisibleId] = useState(null)
@@ -117,7 +118,7 @@ export default function Inbox () {
       displayTransactions = recentTransactions
       break
     default:
-      throw new Error('Invalid inboxView: ' + inboxView)
+      throw new Error('bad inboxView: ' + inboxView)
   }
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
@@ -180,16 +181,16 @@ export default function Inbox () {
     </div>}
 
     <NewTransactionModal
-      handleClose={() => setToggleNewTransactionModal(null)}
-      toggleNewTransactionModal={toggleNewTransactionModal} />
+      handleClose={() => setToggleModal(null)}
+      toggleModal={toggleModal} />
 
-    <ConfirmationModal
+    {!!modalTransaction && <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
-      transaction={modalTransaction || {}}
+      transaction={modalTransaction}
       payTransaction={payTransaction}
       declineTransaction={declineTransaction}
-      setCounterpartyNotFound={setCounterpartyNotFound}
-      counterpartyNotFound={counterpartyNotFound} />
+      setDisabled={setDisabled}
+      disabled={disabled} />}
   </PrimaryLayout>
 }
 
@@ -314,10 +315,10 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
-function NewTransactionModal ({ handleClose, toggleNewTransactionModal }) {
+function NewTransactionModal ({ handleClose, toggleModal }) {
   return <Modal
     contentLabel={'Create a new transaction.'}
-    isOpen={!!toggleNewTransactionModal}
+    isOpen={!!toggleModal}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Create a new transaction.</div>
@@ -337,22 +338,20 @@ function NewTransactionModal ({ handleClose, toggleNewTransactionModal }) {
   </Modal>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, setCounterpartyNotFound, counterpartyNotFound }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, setDisabled, disabled }) {
   const { newMessage } = useFlashMessageContext()
-  const { id, amount, type, action } = transaction
-  let counterparty
-  if (!counterparty) counterparty = {}
-  const { holofuelCounterparty, loading } = useCounterparty(counterparty.id)
+  const { id, counterparty, amount, type, action } = transaction
 
-  useEffect(() => {
-    if (!transaction) return null
-    else if (holofuelCounterparty || loading) {
-      if (holofuelCounterparty.notFound) {
-        setCounterpartyNotFound(true)
-        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.')
-      } else setCounterpartyNotFound(false)
+  const counterpartyConfirmed = useCounterparty(counterparty.id)
+  if (counterpartyConfirmed) {
+    setDisabled(false)
+    const errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.'
+    console.log(' should show error message? =>>> counterpartyConfirmed.nickname !== counterparty.nickname : ', counterpartyConfirmed.nickname !== counterparty.nickname)
+    if (counterpartyConfirmed.nickname !== counterparty.nickname) {
+      setDisabled(true)
+      newMessage(errorMessage)
     }
-  })
+  }
 
   let message, actionHook, actionParams, contentLabel
   switch (action) {
@@ -371,9 +370,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       break
     }
     default:
-      // NB: action === undefined when first loading page && no transaction is yet passed in
-      if (action === undefined) break
-      else throw new Error('Error: Transaction action was not matched with a valid modal action. Current transaction action : ', action)
+      throw new Error('Error: Transaction action was not matched with a modal action. Current transaction action : ', action)
   }
 
   const onYes = () => {
@@ -383,7 +380,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
 
   return <Modal
     contentLabel={contentLabel}
-    isOpen={!isEmpty(transaction)}
+    isOpen={!!transaction}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
@@ -398,7 +395,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
-        disabled={counterpartyNotFound}>
+        disabled={disabled}>
         Yes
       </Button>
     </div>
