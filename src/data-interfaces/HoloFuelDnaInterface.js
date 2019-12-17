@@ -318,7 +318,7 @@ const HoloFuelDnaInterface = {
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored (or ACTIONABLE ACCEPT that agent received... ???). */
     cancel: async (transactionId) => {
-      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested','outgoing/approved'], 'canceled')
+      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'], 'canceled')
       const transaction = authoredRequests.find(authoredRequest => authoredRequest.origin === transactionId)
 
       console.log(' CANCEL TRANSACTION DETAILS : ', transaction)
