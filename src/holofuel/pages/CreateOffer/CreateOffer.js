@@ -15,6 +15,7 @@ import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOffer.module.css'
+import Login from '../../../pages/Login/Login'
 
 // TODO: these constants should come from somewhere more scientific
 export const FEE_PERCENTAGE = 0.01
@@ -44,8 +45,8 @@ export default function CreateOffer ({ history: { push } }) {
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
-  const [disabled, setDisabled] = useState(true)
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
@@ -54,10 +55,14 @@ export default function CreateOffer ({ history: { push } }) {
   const { register, handleSubmit, errors, setValue: setFormValue, getValues } = useForm({ validationSchema: FormValidationSchema })
   const formValues = getValues()
 
-  if (errorMessage) {
-    newMessage(errorMessage)
-    setErrorMessage('')
-  }
+  useEffect(() => {
+    console.log(' !!!!!!!!!!!!!!! inside use effect ...')
+    console.log('1. page counterpartyNotFound : ', counterpartyNotFound)
+    console.log('1. page errorMessage : ', errorMessage)
+    if (errorMessage) {
+      newMessage(errorMessage)
+    }
+  }, [errorMessage, setErrorMessage])
 
   const selectAgent = id => {
     setCounterpartyId(id)
@@ -102,9 +107,10 @@ export default function CreateOffer ({ history: { push } }) {
               agentId={counterpartyId}
               setCounterpartyNick={setCounterpartyNick}
               setErrorMessage={setErrorMessage}
-              setDisabled={setDisabled}
-              disabled={disabled}
-              formValues={formValues} />
+              errorMessage={errorMessage}
+              setCounterpartyNotFound={setCounterpartyNotFound}
+              counterpartyNotFound={counterpartyNotFound}
+              currentCounterpartyValue={formValues.counterpartyId} />
           </h4>}
         </div>
       </div>
@@ -150,37 +156,43 @@ export default function CreateOffer ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? disabled : true}>Send</Button>
+      <Button type='submit' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? counterpartyNotFound : true}>Send</Button>
     </form>
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage, setDisabled, disabled, formValues }) {
-  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
+export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage, errorMessage, setCounterpartyNotFound, counterpartyNotFound, currentCounterpartyValue }) {
+  const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
+
+  console.log('2 counterpartyNotFound : ', counterpartyNotFound)
+  console.log('2 errorMessage : ', errorMessage)
+
   const { nickname } = holofuelCounterparty
   useEffect(() => {
-    setCounterpartyNick(nickname)
-  }, [setCounterpartyNick, nickname])
-
-  let errorMessage = null
-  if (!nickname && !loading) {
-    errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
-    disabled = true
-  }
+    console.log('inside modal useEffect : ', errorMessage, loading)
+    if (!loading) {
+      if (!errorMessage && !nickname) {
+        console.log('NO NICKNAME FOUND')
+        errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
+        setCounterpartyNotFound(true)
+        console.log('3 - ERROR >> counterpartyNotFound : ', counterpartyNotFound)
+        console.log('3 - ERROR >> errorMessage : ', errorMessage)
+      } else if (currentCounterpartyValue && currentCounterpartyValue.length === AGENT_ID_LENGTH) {
+        console.log('ALL (SHOULD  BE) GOOD')
+        setCounterpartyNick(nickname || '')
+        errorMessage = null
+        setCounterpartyNotFound(false)
+        console.log('3 - SUCCESS >> counterpartyNotFound : ', counterpartyNotFound)
+        console.log('3 - SUCCESS >> errorMessage : ', errorMessage)
+      }
+    }
+  })
 
   useEffect(() => {
     setErrorMessage(errorMessage)
   }, [setErrorMessage, errorMessage])
-
-  if (formValues.counterpartyId && formValues.counterpartyId.length === AGENT_ID_LENGTH && !errorMessage) {
-    disabled = false
-  }
-
-  useEffect(() => {
-    setDisabled(disabled)
-  }, [setDisabled, disabled])
 
   if (loading) {
     return <>
@@ -195,8 +207,6 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
     </>
   }
 
-  if (error || !nickname) {
-    return <>No nickname available.</>
-  }
+  if (queryError || !nickname) return <>No nickname available.</>
   return <>{nickname}</>
 }

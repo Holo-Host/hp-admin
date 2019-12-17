@@ -35,7 +35,7 @@ type HostPricing {
 type HolofuelUser {
   id: ID
   nickname: String
-  error: Boolean
+  notFound: Boolean
 }
 
 enum TransactionType {

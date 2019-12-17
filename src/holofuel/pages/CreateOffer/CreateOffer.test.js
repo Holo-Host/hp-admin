@@ -42,8 +42,19 @@ const offerMock = {
   newData: jest.fn()
 }
 
+const counterpartyQueryMock = {
+  request: {
+    query: HolofuelCounterpartyQuery,
+    variables: { agentId: counterparty.id }
+  },
+  result: {
+    data: { holofuelCounterparty: { id: counterparty.id, nickname: 'Perry' } }
+  }
+}
+
 const mocks = [
-  offerMock
+  offerMock,
+  counterpartyQueryMock
 ]
 
 describe('CreateOffer', () => {
@@ -69,6 +80,9 @@ describe('CreateOffer', () => {
     fireEvent.change(getByPlaceholderText('Notes'), { target: { value: notes } })
 
     await act(async () => {
+      const sendButton = getByText('Send')
+      console.log('=>>>>>>>>>> check pendingProps in sendButton to the see state of diabled: ', sendButton)
+
       fireEvent.click(getByText('Send'))
       await wait(0)
     })

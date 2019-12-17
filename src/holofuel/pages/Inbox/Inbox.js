@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { isEmpty, uniqBy } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -52,8 +52,7 @@ function useCounterparty (agentId) {
   const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-  if (loading) return null
-  return holofuelCounterparty
+  return { holofuelCounterparty, loading }
 }
 
 function useTransactionsWithCounterparties () {
@@ -95,13 +94,13 @@ export default function Inbox () {
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
   const [disabled, setDisabled] = useState(true)
-  const [toggleModal, setToggleModal] = useState(null)
+  const [toggleNewTransactionModal, setToggleNewTransactionModal] = useState(null)
   const [modalTransaction, setModalTransaction] = useState(null)
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
     if (!isEmpty(transaction) && action !== '') return setModalTransaction(modalTransaction)
-    else return setToggleModal(true)
+    else return setToggleNewTransactionModal(true)
   }
 
   const [actionsVisibleId, setActionsVisibleId] = useState(null)
@@ -118,7 +117,7 @@ export default function Inbox () {
       displayTransactions = recentTransactions
       break
     default:
-      throw new Error('bad inboxView: ' + inboxView)
+      throw new Error('Invalid inboxView: ' + inboxView)
   }
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
@@ -181,16 +180,16 @@ export default function Inbox () {
     </div>}
 
     <NewTransactionModal
-      handleClose={() => setToggleModal(null)}
-      toggleModal={toggleModal} />
+      handleClose={() => setToggleNewTransactionModal(null)}
+      toggleNewTransactionModal={toggleNewTransactionModal} />
 
-    {!!modalTransaction && <ConfirmationModal
+    <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       payTransaction={payTransaction}
       declineTransaction={declineTransaction}
       setDisabled={setDisabled}
-      disabled={disabled} />}
+      disabled={disabled} />
   </PrimaryLayout>
 }
 
@@ -315,10 +314,10 @@ function RejectButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
-function NewTransactionModal ({ handleClose, toggleModal }) {
+function NewTransactionModal ({ handleClose, toggleNewTransactionModal }) {
   return <Modal
     contentLabel={'Create a new transaction.'}
-    isOpen={!!toggleModal}
+    isOpen={!!toggleNewTransactionModal}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Create a new transaction.</div>
@@ -339,19 +338,20 @@ function NewTransactionModal ({ handleClose, toggleModal }) {
 }
 
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, payTransaction, setDisabled, disabled }) {
+  transaction = {}
   const { newMessage } = useFlashMessageContext()
-  const { id, counterparty, amount, type, action } = transaction
+  const { id, counterparty = {}, amount, type, action } = transaction
+  const { holofuelCounterparty: counterpartyConfirmed, loading: counterpartyCheckLoading } = useCounterparty(counterparty.id)
 
-  const counterpartyConfirmed = useCounterparty(counterparty.id)
-  if (counterpartyConfirmed) {
-    setDisabled(false)
-    const errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.'
-    console.log(' should show error message? =>>> counterpartyConfirmed.nickname !== counterparty.nickname : ', counterpartyConfirmed.nickname !== counterparty.nickname)
-    if (counterpartyConfirmed.nickname !== counterparty.nickname) {
-      setDisabled(true)
-      newMessage(errorMessage)
+  useEffect(() => {
+    if (!transaction) return null
+    else if (counterpartyConfirmed || !counterpartyCheckLoading) {
+      if (counterpartyConfirmed.notFound) {
+        setDisabled(true)
+        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.')
+      } else setDisabled(false)
     }
-  }
+  })
 
   let message, actionHook, actionParams, contentLabel
   switch (action) {
@@ -370,7 +370,9 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       break
     }
     default:
-      throw new Error('Error: Transaction action was not matched with a modal action. Current transaction action : ', action)
+      // NB: action === undefined when first loading page && no transaction is yet passed in
+      if (action === undefined) break
+      else throw new Error('Error: Transaction action was not matched with a valid modal action. Current transaction action : ', action)
   }
 
   const onYes = () => {
@@ -380,7 +382,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
 
   return <Modal
     contentLabel={contentLabel}
-    isOpen={!!transaction}
+    isOpen={!isEmpty(transaction)}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>

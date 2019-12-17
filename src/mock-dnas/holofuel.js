@@ -325,7 +325,7 @@ const agentArray = [{
   }
 }]
 
-const whois = (agentId) => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
+const whois = agentId => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
 
 function listPending ({ origins }) {
   if (!origins) return pendingList
