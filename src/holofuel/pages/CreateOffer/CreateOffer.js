@@ -56,6 +56,7 @@ export default function CreateOffer ({ history: { push } }) {
   const formValues = getValues()
 
   useEffect(() => {
+    console.log(' ========================================= ')
     console.log(' !!!!!!!!!!!!!!! inside use effect ...')
     console.log('1. page counterpartyNotFound : ', counterpartyNotFound)
     console.log('1. page errorMessage : ', errorMessage)
@@ -166,12 +167,12 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
     variables: { agentId }
   })
 
+  console.log('2 loading inside modal useEffect : ', loading)
   console.log('2 counterpartyNotFound : ', counterpartyNotFound)
   console.log('2 errorMessage : ', errorMessage)
 
   const { nickname } = holofuelCounterparty
   useEffect(() => {
-    console.log('inside modal useEffect : ', errorMessage, loading)
     if (!loading) {
       if (!errorMessage && !nickname) {
         console.log('NO NICKNAME FOUND')
