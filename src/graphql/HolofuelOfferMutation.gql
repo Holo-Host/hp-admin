@@ -2,7 +2,8 @@ mutation HolofuelOffer ($counterpartyId: String, $amount: Float, $notes: String,
   holofuelOffer(counterpartyId: $counterpartyId, amount: $amount, notes: $notes, requestId: $requestId) {
     id
     amount
-    counterparty
+    counterparty { id }
+    notes
     direction
     status
     type

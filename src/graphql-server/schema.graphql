@@ -38,6 +38,11 @@ type HolofuelUser {
   notFound: Boolean
 }
 
+type ListOrigins {
+  Origin: String
+  OriginList: [String]
+}
+
 enum TransactionType {
   offer
   request
@@ -47,7 +52,8 @@ enum TransactionStatus {
   pending
   completed
   rejected
-  cancelled
+  canceled
+  declined
 }
 
 enum TransactionDirection {
@@ -67,6 +73,8 @@ type Transaction {
   presentBalance: Float
   notes: String
   happName: String
+  declinedReference: String
+  canceledReference: String
 }
 
 type Ledger {
@@ -126,17 +134,18 @@ type Query {
   hposStatus(authToken: String): HposStatus
 }
 
-type Mutation {
+type Mutation { 
   registerUser(name: String, avatarUrl: String): Me
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
-  holofuelRequest(counterpartyId: String, amount: Float): Transaction
-  holofuelOffer(counterpartyId: String, amount: Float, requestId:ID): Transaction
+  holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
+  holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction 
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
+  holofuelRecoverFunds(transaction: ID): Transaction
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean, authToken: String): HposSettings
   hposUpdateVersion(authToken: String): HposStatus
   hposCheckAuth(authToken: String): HposAuth

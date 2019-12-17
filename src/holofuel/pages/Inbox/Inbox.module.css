@@ -151,6 +151,7 @@
   font-size: 14px;
   line-height: 19px;
   word-break: keep-all;
+  color: rgba(44, 64, 90, 0.8)
 }
 
 .balance {
@@ -170,6 +171,11 @@
 
 .debit {
   color: #EE4266;
+}
+
+.removed {
+  text-decoration: line-through;
+  opacity: 0.8;
 }
 
 

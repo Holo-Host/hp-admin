@@ -12,12 +12,13 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
+import HolofuelRecoverFundsMutation from 'graphql/HolofuelRecoverFundsMutation.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
-import { DIRECTION, STATUS } from 'models/Transaction'
+import { DIRECTION, STATUS, TYPE } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
 
-// Data - Mutation hook with refetch:
+// Data - Mutation hooks with refetch:
 function useCancel () {
   const [cancel] = useMutation(HolofuelCancelMutation)
   return (id) => cancel({
@@ -30,15 +31,31 @@ function useCancel () {
   })
 }
 
+function useRecoverFunds () {
+  const [recoverFunds] = useMutation(HolofuelRecoverFundsMutation)
+  return (id) => recoverFunds({
+    variables: { transactionId: id },
+    refetchQueries: [{
+      query: HolofuelCompletedTransactionsQuery
+    }, {
+      query: HolofuelWaitingTransactionsQuery
+    }]
+  })
+}
+
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'network-only' })
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
-    counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
+    counterparty: counterparties.find(counterparty => {
+      if (transactions.counterparty != null) {
+        return counterparty.id === transaction.counterparty.id
+      } else return false
+    }) || transaction.counterparty
   }))
 
   const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
@@ -59,6 +76,7 @@ export default function TransactionsHistory () {
   const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
 
   const cancelTransaction = useCancel()
+  const refundTransaction = useRecoverFunds()
 
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
@@ -116,18 +134,21 @@ export default function TransactionsHistory () {
     {!noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
         <div styleName='partition-label'>{label}</div>
-        {transactions.map((transaction, index) => <TransactionRow
-          transaction={transaction}
-          key={transaction.id}
-          showCancellationModal={showCancellationModal}
-          isFirst={index === 0} />)}
+        { // Transactions filtered by counterparty to filter out all canceled transactions (which currenlty do not have a counterparty in the object...)
+          // TODO: Display the Canceled transactions.
+          (transactions.filter(t => t.counterparty)).map((transaction, index) => <TransactionRow
+            transaction={transaction}
+            key={transaction.id}
+            showCancellationModal={showCancellationModal}
+            isFirst={index === 0} />)}
       </React.Fragment>)}
     </div>}
 
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
-      cancelTransaction={cancelTransaction} />
+      cancelTransaction={cancelTransaction}
+      refundTransaction={refundTransaction} />
   </PrimaryLayout>
 }
 
@@ -190,11 +211,13 @@ function CancelButton ({ showCancellationModal, transaction }) {
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
-export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, refundTransaction }) {
   if (!transaction) return null
   const { id, counterparty, amount, type, direction } = transaction
   const onYes = () => {
-    cancelTransaction(id)
+    if (TYPE.request) cancelTransaction(id)
+    else if (TYPE.offer) refundTransaction(id)
+    else console.error('Detected invalid Transaction Type; could not progress with cancel.')
     handleClose()
   }
   return <Modal

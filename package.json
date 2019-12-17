@@ -4,10 +4,13 @@
   "private": true,
   "scripts": {
     "start": "rm -rf ./node_modules/.cache/babel-loader && node scripts/start.js",
+    "start:holofuel-agent-1": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_HOLOFUEL_APP=true PORT=3001 REACT_APP_DNA_INTERFACE_URL=ws://localhost:3400 node scripts/start.js",
+    "start:holofuel-agent-2": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_HOLOFUEL_APP=true PORT=3002 REACT_APP_DNA_INTERFACE_URL=ws://localhost:3500 REACT_APP_HPOS_URL=3200 node scripts/start.js",
     "start:holofuel": "REACT_APP_HOLOFUEL_APP=true npm start",
     "build": "node scripts/build.js",
     "build:holofuel": "REACT_APP_HOLOFUEL_APP=true node scripts/build.js",
     "hc:start-manual": "holochain -c conductor-config-manual.toml",
+    "hc:start-manual-2": "holochain -c conductor-config-manual-2.toml",
     "hc:start": "holochain -c ./conductor-config.toml &> conductor.log &",
     "hc:start-and-wait": "npm run hc:start && npm run test:wait-for-conductor",
     "hc:stop": "killall holochain",

@@ -27,6 +27,7 @@ import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } from 'utils'
 import { Link } from 'react-router-dom'
 import { REQUEST_PATH, OFFER_PATH } from 'holofuel/utils/urls'
+import { STATUS } from '../../../models/Transaction'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -40,12 +41,15 @@ function useOffer () {
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
-  return ({ id }) => decline({
-    variables: { transactionId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    }]
-  })
+  return ({ id }) => {
+    console.log('THE TRANSATION - id in useDecline', id)
+    decline({
+      variables: { transactionId: id },
+      refetchQueries: [{
+        query: HolofuelActionableTransactionsQuery
+      }]
+    })
+  }
 }
 
 function useCounterparty (agentId) {
@@ -106,7 +110,7 @@ export default function Inbox () {
   const [actionsVisibleId, setActionsVisibleId] = useState(null)
   const actionsClickWithTxId = transactionId => setActionsVisibleId(transactionId)
 
-  const toggleButtons = [{ view: VIEW.actionable, label: 'Pending' }, { view: VIEW.recent, label: 'Recent' }]
+  const toggleButtons = [{ view: VIEW.actionable, label: 'To-do' }, { view: VIEW.recent, label: 'Activity' }]
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   switch (inboxView) {
@@ -194,7 +198,7 @@ export default function Inbox () {
 }
 
 export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisibleId, showConfirmationModal, isActionable }) {
-  const { counterparty, presentBalance, amount, type, notes } = transaction
+  const { counterparty, presentBalance, amount, type, status, notes } = transaction
   const agent = counterparty
 
   const handleCloseReveal = () => {
@@ -204,9 +208,16 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
 
   const isOffer = type === TYPE.offer
   const isRequest = !isOffer
+  const isCanceled = status === STATUS.canceled
+  const isDeclined = status === STATUS.declined
 
   let story
   if (isActionable) story = isOffer ? ' is offering' : ' is requesting'
+
+  let fullNotes
+  if (isCanceled) fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
+  else if (isDeclined) fullNotes = isOffer ? ` Declined Offer: ${notes}` : ` Declined Request: ${notes}`
+  else fullNotes = notes
 
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='avatar'>
@@ -222,7 +233,7 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
-      <div styleName='notes'>{notes}</div>
+      <div styleName='notes'>{fullNotes}</div>
     </div>
 
     <div styleName='amount-cell'>
@@ -231,6 +242,7 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
         isRequest={isRequest}
         isOffer={isOffer}
         isActionable={isActionable}
+        notValid={isCanceled || isDeclined}
       />
       {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
     </div>
@@ -269,9 +281,9 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, isActionable }) {
+function AmountCell ({ amount, isRequest, isOffer, isActionable, notValid }) {
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
-  return <div styleName={cx('amount', { debit: isRequest && isActionable }, { credit: isOffer && isActionable })}>
+  return <div styleName={cx('amount', { debit: isRequest && isActionable }, { credit: isOffer && isActionable }, { removed: notValid })}>
     {amountDisplay} HF
   </div>
 }
@@ -365,7 +377,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
     case 'decline': {
       contentLabel = `Reject ${type}?`
-      actionParams = id
+      actionParams = { id }
       actionHook = declineTransaction
       message = <div styleName='modal-text' data-testid='modal-message'>Decline <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>'s {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span>?</div>
       break
