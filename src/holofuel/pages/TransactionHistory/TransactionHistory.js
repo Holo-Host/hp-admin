@@ -12,30 +12,15 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import HolofuelRecoverFundsMutation from 'graphql/HolofuelRecoverFundsMutation.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
-import { DIRECTION, STATUS, TYPE } from 'models/Transaction'
+import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
 
 // Data - Mutation hooks with refetch:
 function useCancel () {
-  console.log('CANCELING TX !!')
   const [cancel] = useMutation(HolofuelCancelMutation)
   return (id) => cancel({
-    variables: { transactionId: id },
-    refetchQueries: [{
-      query: HolofuelCompletedTransactionsQuery
-    }, {
-      query: HolofuelWaitingTransactionsQuery
-    }]
-  })
-}
-
-function useRecoverFunds () {
-  console.log('RECOVERING FUNDS...')
-  const [recoverFunds] = useMutation(HolofuelRecoverFundsMutation)
-  return (id) => recoverFunds({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelCompletedTransactionsQuery
@@ -78,8 +63,6 @@ export default function TransactionsHistory () {
   const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
 
   const cancelTransaction = useCancel()
-  const refundTransaction = useRecoverFunds()
-
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
@@ -147,8 +130,7 @@ export default function TransactionsHistory () {
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
-      cancelTransaction={cancelTransaction}
-      refundTransaction={refundTransaction} />
+      cancelTransaction={cancelTransaction} />
   </PrimaryLayout>
 }
 
@@ -211,13 +193,11 @@ function CancelButton ({ showCancellationModal, transaction }) {
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
-export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, refundTransaction }) {
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
   if (!transaction) return null
   const { id, counterparty, amount, type, direction } = transaction
   const onYes = () => {
-    if (TYPE.request) cancelTransaction(id)
-    else if (TYPE.offer) refundTransaction(id)
-    else console.error('Detected invalid Transaction Type; could not progress with cancel.')
+    cancelTransaction(id)
     handleClose()
   }
   return <Modal

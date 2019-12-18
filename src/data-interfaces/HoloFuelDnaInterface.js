@@ -108,17 +108,16 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
   }
 }
 
-const presentDeclinedTransaction = async (declinedTx) => {
+const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) return console.log('declinedTx[2] is UNDEFINED : ', declinedTx)
   const transaction = declinedTx[2].Request ? presentPendingRequest(declinedTx, true) : presentPendingOffer(declinedTx, true)
   return {
     ...transaction,
-    counterparty: { id: declinedTx[0] },
     status: STATUS.declined
   }
 }
 
-const presentCanceledTransaction = async (canceledTx) => {
+const presentCanceledTransaction = canceledTx => {
   if (!canceledTx.event[2].Cancel.entry) return console.log('!canceledTx.event[2].Cancel.entry is UNDEFINED : ', canceledTx)
   let { event } = canceledTx
   event = [event[0], event[1], event[2].Cancel.entry]
@@ -126,7 +125,6 @@ const presentCanceledTransaction = async (canceledTx) => {
   const transaction = !canceledTx.event[2].Cancel.entry.Request ? presentPendingRequest(canceledTx, false) : presentPendingOffer(canceledTx, false)
   return {
     ...transaction,
-    counterparty: { id: canceledTx[0] },
     status: STATUS.canceled
   }
 }
@@ -139,22 +137,22 @@ function presentPendingRequest (transaction, declined = false) {
   const status = STATUS.pending
   const type = TYPE.request
   const eventTimestamp = event[1]
-  const counterparty = { id: declined ? event[0] : provenance[0] }
+  const counterpartyId = declined ? event[2].Request.from : provenance[0]
   const { amount, notes, fee } = event[2].Request
-  return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterparty, amount, notes, fees: fee })
+  return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
-function presentPendingOffer (transaction, annuled = false) {
+function presentPendingOffer (transaction, declined = false) {
   let { event, provenance } = transaction
-  if (annuled) event = transaction
+  if (declined) event = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)
   const status = STATUS.pending
   const type = TYPE.offer
-  const eventTimestamp = annuled ? null : event[1]
-  const counterparty = { id: annuled ? 'none' : provenance[0] }
+  const eventTimestamp = event[1]
+  const counterpartyId = declined ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterparty, amount, notes, fees: fee })
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
 function presentTransaction (transaction) {
@@ -240,8 +238,6 @@ const HoloFuelDnaInterface = {
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
 
-      console.log('ALL COMPLETED TRANSACTIONS : ', noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp < b.timestamp ? -1 : 1).reverse())
-
       return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
@@ -255,28 +251,28 @@ const HoloFuelDnaInterface = {
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      const listOfDeclinedTransactions = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
-
-      const fullList = listOfDeclinedTransactions.concat(listOfNonActionableTransactions)
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
-      const noDuplicateIdsWaitingList = _.uniqBy(fullList, 'id')
+      const noDuplicateIdsWaitingList = _.uniqBy(listOfNonActionableTransactions, 'id')
+      const listOfDeclinedTransactions = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
+      // Filter out transactions that share a TX ID with a Declined Transaction (FYI: pending declined txs (on the counterparty side?) will also result from a canceled tx..)
+      const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(noDuplicateIdsWaitingList, listOfDeclinedTransactions, 'id')
+      console.log('noDuplicateIdsWaitingList : ', noDuplicateIdsWaitingList)
+      console.log('ALL WAITING TRANSACTIONS Without Declined or Canceled: ', uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1))
 
-      const filteredWaitingTransactions = noDuplicateIdsWaitingList.filter(tx => tx.status === STATUS.declined)
-      console.log('FILTERED WAITING : ', filteredWaitingTransactions)
-      console.log('ALL WAITING TRANSACTIONS : ', filteredWaitingTransactions.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1))
-
-      return filteredWaitingTransactions.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')()
-      console.log(' >>>>>>>>>> ALL Declined transactions RESULT : ', declinedResult)
-      return declinedResult
+      const listOfDeclinedTransactions = declinedResult.map(presentDeclinedTransaction)
+
+      return listOfDeclinedTransactions
     },
     allEarnings: () => mockEarningsData,
-    allNonActionableByState: async (transactionId, stateFilter = [], status = 'completed') => {
+    allNonActionableByState: async (transactionId, stateFilter = []) => {
       const { transactions } = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      const cleanedList = _.uniqBy(listOfNonActionableTransactions, 'origin')
+      const cleanedList = _.uniqBy(listOfNonActionableTransactions, 'id')
+
       if (cleanedList.length === 0) {
         console.error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -302,24 +298,15 @@ const HoloFuelDnaInterface = {
         return transactionArray[0]
       }
     },
-    /* NOTE: This is to allow handling of the other side of the transaction that was canceled... ( ?? - verify - ).  */
-    getPendingCanceled: async (transactionId) => {
-      const canceledResult = await createZomeCall('transactions/list_pending_canceled')({ origins: transactionId })
-      console.log(' >>>>>>>>>> Pending Canceled transactions : ', canceledResult)
-
-      const transactionArray = canceledResult.map(canceledTx => canceledTx.entry)
-      if (transactionArray.length === 0) {
-        throw new Error(`no pending transaction with id ${transactionId} found.`)
-      } else {
-        return transactionArray[0]
-      }
-    },
     /* NOTE: This is to allow handling of the other side of the transaction that was declined.  */
     getPendingDeclined: async (transactionId) => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')({ origins: transactionId })
+
       console.log(' >>>>>>>>>> Pendng Declined transactions RESULT : ', declinedResult)
 
-      const transactionArray = declinedResult.map(declinedTx => declinedTx.entry)
+      const transactionArray = declinedResult.map(presentDeclinedTransaction)
+      console.log('transactionArray :', transactionArray)
+
       if (transactionArray.length === 0) {
         throw new Error(`no pending transaction with id ${transactionId} found.`)
       } else {
@@ -329,9 +316,7 @@ const HoloFuelDnaInterface = {
     /* NOTE: decline ACTIONABLE TRANSACTION (NB: pending transaction proposed by another agent) >> ONLY for on asynchronous transactions. */
     decline: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      // NOTE: POTENTIAL DNA BUG >> Passing in a reason to the `decline_pending` endpoint generates API error.
-      // const reason = annulTransactionReason
-      const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId }) // ({ origins: transactionId, reason })
+      const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId })
       return {
         ...transaction,
         id: transactionId,
@@ -339,10 +324,12 @@ const HoloFuelDnaInterface = {
         declinedReference: declinedProof
       }
     },
-    /* NOTE: cancel WAITING TRANSACTION that current agent authored (or ACTIONABLE ACCEPT that agent received... ???). */
+    /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
     cancel: async (transactionId) => {
-      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'], 'canceled')
-      const transaction = authoredRequests.find(authoredRequest => authoredRequest.origin === transactionId)
+      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'])
+      console.log('authoredRequests : ', authoredRequests)
+
+      const transaction = authoredRequests.find(authoredRequest => authoredRequest.id === transactionId)
 
       console.log(' CANCEL TRANSACTION DETAILS : ', transaction)
       const reason = annulTransactionReason
