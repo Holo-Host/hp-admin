@@ -5,6 +5,7 @@ import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
 import SideMenu from 'components/SideMenu'
 import Header from 'components/Header'
+import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
@@ -14,7 +15,9 @@ import 'global-styles/index.css'
 export function PrimaryLayout ({
   children,
   headerProps = {},
-  showSideMenu = true
+  showHeader = true,
+  showSideMenu = true,
+  showAlphaFlag = true
 }) {
   const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
 
@@ -24,14 +27,15 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header
+    {showHeader && <Header
       {...headerProps}
       hamburgerClick={showSideMenu && hamburgerClick}
-      settings={settings} />
+      settings={settings} />}
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
       settings={settings} />
+    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />
       {children}

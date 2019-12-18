@@ -1,12 +1,8 @@
 import React from 'react'
-import { fireEvent, act } from '@testing-library/react'
-import wait from 'waait'
+import { render, fireEvent } from '@testing-library/react'
 import { mockNavigateTo } from 'react-router-dom'
-import { renderAndWait } from 'utils/test-utils'
 import Header from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
-
-jest.mock('contexts/useAuthTokenContext')
 
 it('should render the title and a menu icon', async () => {
   const hamburgerClick = jest.fn()
@@ -17,11 +13,7 @@ it('should render the title and a menu icon', async () => {
     hamburgerClick
   }
 
-  let getByText, getByTestId
-  await act(async () => {
-    ({ getByText, getByTestId } = await renderAndWait(<Header {...props} />))
-    await wait(0)
-  })
+  const { getByText, getByTestId } = render(<Header {...props} />)
 
   expect(getByText(props.title)).toBeInTheDocument()
   expect(getByText(menuIconTitle)).toBeInTheDocument()

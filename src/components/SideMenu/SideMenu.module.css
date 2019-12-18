@@ -127,6 +127,27 @@
   font-weight: 500;
 }
 
+.alpha-info {
+  position: relative;
+  margin: 0 -32px 60px -32px;
+  padding: 30px 12px;
+  font-family: 'Circular';
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--color-rhino);
+  background-color: var(--color-iceberg);
+}
+
+.alpha-flag {
+  position: absolute;
+  top: -16px;
+  left: 0px;
+}
+
+.alpha-link {
+  color: var(--color-rhino);
+}
+
 /* Footer */
 
 .footer {

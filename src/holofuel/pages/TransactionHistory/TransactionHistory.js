@@ -108,7 +108,7 @@ export default function TransactionsHistory () {
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='balance'>
       <div styleName='balance-label'>Available Balance</div>
-      <div styleName='balance-amount'>{presentHolofuelAmount(balance)} HF</div>
+      <div styleName='balance-amount'>{presentHolofuelAmount(balance)} TF</div>
     </div>
     <FilterButtons filter={filter} setFilter={setFilter} />
 
@@ -207,7 +207,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     styleName='modal'>
     <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel your {capitalize(type)} {direction === 'incoming' ? 'for' : 'of'} <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
+      Cancel {capitalize(type)} of <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} TF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
     </div>
     <div styleName='modal-buttons'>
       <Button

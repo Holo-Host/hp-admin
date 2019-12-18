@@ -14,8 +14,6 @@ mkShell {
     rm -f src/utils/integration-testing/conductor-config.toml
     ln -s ${project.hp-admin-conductor-config} conductor-config.toml
     ln -s ${project.hp-admin-conductor-config} src/utils/integration-testing/conductor-config.toml
-    cleanup() {
-    }
     trap cleanup EXIT
   '';
 }

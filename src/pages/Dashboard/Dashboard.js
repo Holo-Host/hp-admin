@@ -39,7 +39,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
     </div>
     <h2 styleName='greeting'>{greeting}</h2>
 
-    <Card title='Hosting' linkTo='/browse-happs' subtitle='Set, track, and manage your hosted applications and users.'>
+    <Card title='Hosting' linkTo='/browse-happs' subtitle='Manage your Holo applications'>
       <div styleName='hosting-content' data-testid='hosted-apps'>
         {noInstalledHapps === 0 && <>
           <PlusInDiscIcon />Host your first hApp!
@@ -50,24 +50,24 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>
 
-    <Card title='Earnings' linkTo='/earnings' subtitle='Save, send, and receive Holofuel'>
+    <Card title='Earnings' linkTo='/earnings' subtitle='Track your TestFuel earnings'>
       <div styleName={cx('balance', { 'empty-balance': isEarningsZero })}>
         <h4 styleName='balance-header'>
           {isEarningsZero ? 'Balance' : "Today's earnings"}
         </h4>
         <div styleName='balance-body' data-testid='hosted-earnings'>
-          {isEarningsZero ? "You haven't earned HoloFuel" : `${presentHolofuelAmount(earnings)} HF`}
+          {isEarningsZero ? "You haven't earned TestFuel" : `${presentHolofuelAmount(earnings)} TF`}
         </div>
       </div>
     </Card>
 
-    <Card title='HoloFuel' linkTo='/holofuel' subtitle='Save, send, and receive Holofuel'>
+    <Card title='HoloFuel' linkTo='/holofuel' subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Balance
         </h4>
         <div styleName='balance-body' data-testid='holofuel-balance'>
-          {isBalanceZero ? 'You have no HoloFuel' : `${presentHolofuelAmount(balance)} HF`}
+          {isBalanceZero ? 'You have no TestFuel' : `${presentHolofuelAmount(balance)} TF`}
         </div>
       </div>
     </Card>

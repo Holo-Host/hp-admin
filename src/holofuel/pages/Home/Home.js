@@ -15,7 +15,7 @@ import Button from 'holofuel/components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
-import { OFFER_PATH, REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
+import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
 const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction Inbox to view and/or cancel your pending transaction.'
 
@@ -49,8 +49,7 @@ export default function Home () {
   const firstSixTransactions = transactions.slice(0, 6)
 
   const history = useHistory()
-  const goToRequest = () => history.push(REQUEST_PATH)
-  const goToOffer = () => history.push(OFFER_PATH)
+  const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
   const { newMessage } = useFlashMessageContext()
   const [errorMessage, setErrorMessage] = useState(null)
@@ -71,8 +70,7 @@ export default function Home () {
     </div>
     <div styleName='greeting'>{greeting}</div>
     <div styleName='button-row'>
-      <Button onClick={goToOffer} styleName='send-button'>Send</Button>
-      <Button onClick={goToRequest} styleName='request-button'>Request</Button>
+      <Button onClick={goToOfferRequest} styleName='send-button'>Send / Request</Button>
     </div>
 
     <div styleName='balance-and-transactions'>
@@ -87,7 +85,7 @@ export default function Home () {
             </div>
           </div>
           <div styleName='balance-amount'>
-            {presentHolofuelAmount(holofuelBalance)} HF
+            {presentHolofuelAmount(holofuelBalance)} TF
           </div>
         </div>
       </Link>
@@ -96,7 +94,7 @@ export default function Home () {
         <div styleName='transactions-label'>Recent Transactions</div>
 
         {isTransactionsEmpty && <div styleName='transactions-empty'>
-          You have no recent transactions
+          You have no offers or requests
         </div>}
 
         {!isTransactionsEmpty && <div styleName='transaction-list'>

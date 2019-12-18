@@ -52,18 +52,18 @@ const data = {
       }
     }
   },
-  post: {
+  put: {
     '/v1/config': params => {
       data.get['/v1/config'] = { ...data.get['/v1/config'], ...params }
       return {
         ...data.get['/v1/config']
       }
-    },
-
+    }
+  },
+  post: {
     // Forces HoloPortOS upgrade. - Returns Status Code ONLY (200 if OK/Successful, 400 if Bad Request, or 401 if Unauthorized).
     // TODO: Talk to HCen to see if hydra/hpos will return new Status Obj upon successful update.
     '/v1/upgrade': () => {
-      console.log('Code 200: You have now updated your HPOS Version.')
       return {
         ...data.get['/v1/status']
       }

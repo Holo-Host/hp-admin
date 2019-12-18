@@ -10,10 +10,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import {
   HOME_PATH,
   INBOX_PATH,
-  OFFER_PATH,
-  REQUEST_PATH,
-  HISTORY_PATH,
-  TOS_PATH
+  HISTORY_PATH
 } from 'holofuel/utils/urls'
 
 import './SideMenu.module.css'
@@ -65,18 +62,6 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to={OFFER_PATH} styleName='nav-link'>
-              <div styleName='nav-icon' />
-              Offer
-            </Link>
-          </li>
-          <li>
-            <Link to={REQUEST_PATH} styleName='nav-link'>
-              <div styleName='nav-icon' />
-              Request
-            </Link>
-          </li>
-          <li>
             <Link to={HISTORY_PATH} styleName='nav-link' data-testid='history-link'>
               <div styleName='nav-icon' />
               History
@@ -105,12 +90,24 @@ export function SideMenu ({
       </nav>
 
       <footer styleName='footer'>
+        <div styleName='alpha-info'>
+          <p>
+            HoloFuel is in Alpha testing.
+          </p>
+          <p>
+            Learn more about out our&nbsp;
+            <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
+              Alpha Testnet.
+            </a>
+          </p>
+        </div>
+
         <ul styleName='footer-list'>
           <li>
-            <Link to='#/' styleName='footer-link'>Help</Link>
+            <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
           </li>
           <li>
-            <Link to={TOS_PATH} styleName='footer-link'>View Terms of Service</Link>
+            <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</a>
           </li>
         </ul>
       </footer>

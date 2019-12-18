@@ -13,6 +13,12 @@
   color: var(--color-caribbean-green);
 }
 
+.red-on-white {
+  background: white;
+  border: 1px solid var(--color-amaranth);
+  color: var(--color-amaranth);
+}
+
 .green {
   color: white;
   border: 1px solid var(--color-caribbean-green);

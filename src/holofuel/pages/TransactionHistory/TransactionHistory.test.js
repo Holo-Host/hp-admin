@@ -63,7 +63,7 @@ describe('TransactionsHistory', () => {
         <TransactionsHistory />
       </MockedProvider>)
 
-      const presentedBalance = `${presentHolofuelAmount(balance)} HF`
+      const presentedBalance = `${presentHolofuelAmount(balance)} TF`
 
       expect(getByText(presentedBalance)).toBeInTheDocument()
 
@@ -390,7 +390,7 @@ describe('TransactionsHistory', () => {
       const heading = getByRole('heading')
       const { getByText } = within(heading)
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
-      expect(getByText('for', { exact: false })).toBeInTheDocument()
+      expect(getByText('of', { exact: false })).toBeInTheDocument()
       expect(getByText('from', { exact: false })).toBeInTheDocument()
     })
 
