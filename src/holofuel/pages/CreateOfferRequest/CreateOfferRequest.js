@@ -217,7 +217,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage,
     counterpartyNotFound = true
   } else if (!loading && !errorMessage && currentCounterpartyValue && currentCounterpartyValue.length === AGENT_ID_LENGTH) {
     counterpartyNotFound = false
-  }
+  } else if (loading) counterpartyNotFound = true
 
   useEffect(() => {
     setErrorMessage(errorMessage)

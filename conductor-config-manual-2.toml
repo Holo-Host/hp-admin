@@ -104,4 +104,5 @@ pattern = "^debug/dna"
 
 [network]
 sim2h_url = "wss://sim2h.holochain.org:9000"
+# sim2h_url = "wss://localhost:9000"
 type = "sim2h"
