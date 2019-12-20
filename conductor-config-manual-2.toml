@@ -55,7 +55,7 @@ type = "file"
 id = "websocket-interface"
 
 [interfaces.driver]
-port = 3500
+port = 3401
 type = "websocket"
 
 [[interfaces.instances]]
