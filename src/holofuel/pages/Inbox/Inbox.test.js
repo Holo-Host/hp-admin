@@ -129,6 +129,10 @@ describe('Ledger Jumbotron', () => {
 })
 
 describe('Inbox Null States', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   const mocks = [
     actionableTransactionsMock,
     nonPendingTransactionsMock,
