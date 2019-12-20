@@ -374,9 +374,7 @@ function NewTransactionModal ({ handleClose, isNewTransactionModalVisible }) {
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, setCounterpartyNotFound, counterpartyNotFound }) {
   const { newMessage } = useFlashMessageContext()
   const { id, amount, type, action } = transaction
-  // const { counterparty = {} } = transaction
-  let { counterparty } = transaction
-  if (!counterparty) counterparty = {}
+  const { counterparty = {} } = transaction
   const { holofuelCounterparty, loading } = useCounterparty(counterparty.id)
 
   useEffect(() => {
