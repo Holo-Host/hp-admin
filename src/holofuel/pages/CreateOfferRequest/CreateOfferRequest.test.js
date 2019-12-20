@@ -53,7 +53,8 @@ const mockAgent1 = {
 
 const mockWhoIsAgent1 = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry'
+  nickname: 'Perry',
+  notFound: false
 }
 
 const counterpartyQueryMock = {
@@ -104,7 +105,7 @@ describe('CreateOfferRequest', () => {
 
       expect(offerMock.newData).toHaveBeenCalled()
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
-      expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${presentAgentId(counterparty.id)}.`, 5000)
+      expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
 
     it('renders the counterparty nickname upon *successful* fetch', async () => {
@@ -140,7 +141,8 @@ describe('CreateOfferRequest', () => {
 
       const mockAgent1 = {
         pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nick: 'Perry'
+        nick: 'Perry',
+        notFound: false
       }
 
       const counterpartyQueryMockError = {
@@ -280,7 +282,8 @@ describe('CreateOfferRequest', () => {
       }
 
       const mocks = [
-        requestMock
+        requestMock,
+        counterpartyQueryMock
       ]
 
       const push = jest.fn()
@@ -297,7 +300,10 @@ describe('CreateOfferRequest', () => {
       expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
       expect(queryByLabelText('Fee (1%)')).not.toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('From'), { target: { value: counterparty.id } })
+      await act(async () => {
+        fireEvent.change(getByLabelText('From'), { target: { value: counterparty.id } })
+        await wait(0)
+      })
 
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
@@ -312,7 +318,7 @@ describe('CreateOfferRequest', () => {
 
       expect(requestMock.newData).toHaveBeenCalled()
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
-      expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${presentAgentId(counterparty.id)}.`, 5000)
+      expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
   })
 })

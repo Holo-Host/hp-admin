@@ -54,7 +54,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
 
     const listItems = getAllByRole('listitem')
-    expect(listItems).toHaveLength(2)
+    expect(listItems).toHaveLength(1)
 
     const getByTextParent = getByText
 
@@ -66,7 +66,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       expect(getByText(transaction.notes)).toBeInTheDocument()
       const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) TF` : `${presentHolofuelAmount(transaction.amount)} TF`
       const story = transaction.type === 'request' ? 'is requesting' : 'is offering'
-      expect(getByText(amountToMatch)).toBeInTheDocument()
+      expect(getByTextParent(amountToMatch)).toBeInTheDocument()
       expect(getByText(story)).toBeInTheDocument()
       expect(getByText(whois.nickname)).toBeInTheDocument()
       expect(getByTextParent(getDateLabel(transaction.timestamp))).toBeInTheDocument()

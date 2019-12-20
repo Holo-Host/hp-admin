@@ -421,7 +421,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = `Cancel ${type}?`
       actionParams = { id }
       actionHook = refundTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Cancel your declined {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {type === TYPE.offer ? 'to' : 'from'} <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>?<br /><br /><div styleName='modal-note-text'>Note: Canceling will refund your balance by the outstanding amount.</div></div>
+      message = <div styleName='modal-text' data-testid='modal-message'>Cancel your declined {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {type === TYPE.offer ? 'to' : 'from'} <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>?<br /><br /><div styleName='modal-note-text'>Note: Canceling will credit your balance by the outstanding amount.</div></div>
       break
     }
     default:
