@@ -196,7 +196,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? counterpartyNotFound : true}>Send</Button>
+      <Button type='submit' data-testid='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? counterpartyNotFound : true}>Send</Button>
     </form>
   </PrimaryLayout>
 }

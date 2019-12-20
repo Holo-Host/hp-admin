@@ -17,7 +17,10 @@ import { HISTORY_PATH } from 'holofuel/utils/urls'
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
-const counterparty = { id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi' }
+const counterparty = {
+  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nickname: 'Perry'
+}
 const amount = 35674
 const notes = 'Hi there'
 
@@ -43,8 +46,29 @@ const offerMock = {
   newData: jest.fn()
 }
 
+const mockAgent1 = {
+  pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nick: 'Perry'
+}
+
+const mockWhoIsAgent1 = {
+  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nickname: 'Perry'
+}
+
+const counterpartyQueryMock = {
+  request: {
+    query: HolofuelCounterpartyQuery,
+    variables: { agentId: mockAgent1.pub_sign_key }
+  },
+  result: {
+    data: { holofuelCounterparty: mockWhoIsAgent1 }
+  }
+}
+
 const mocks = [
-  offerMock
+  offerMock,
+  counterpartyQueryMock
 ]
 
 describe('CreateOfferRequest', () => {
@@ -58,7 +82,10 @@ describe('CreateOfferRequest', () => {
 
       expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('To'), { target: { value: counterparty.id } })
+      await act(async () => {
+        fireEvent.change(getByLabelText('To'), { target: { value: counterparty.id } })
+        await wait(0)
+      })
 
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
@@ -84,26 +111,6 @@ describe('CreateOfferRequest', () => {
       afterEach(() => {
         jest.clearAllMocks()
       })
-
-      const mockAgent1 = {
-        pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nick: 'Perry'
-      }
-
-      const mockWhoIsAgent1 = {
-        id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nickname: 'Perry'
-      }
-
-      const counterpartyQueryMock = {
-        request: {
-          query: HolofuelCounterpartyQuery,
-          variables: { agentId: mockAgent1.pub_sign_key }
-        },
-        result: {
-          data: { holofuelCounterparty: mockWhoIsAgent1 }
-        }
-      }
 
       const mocks = [
         counterpartyQueryMock
