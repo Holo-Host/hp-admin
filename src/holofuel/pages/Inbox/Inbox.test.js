@@ -62,11 +62,12 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
 
       const { getByText } = within(item)
+
       const transaction = actionableTransactions[index]
       expect(getByText(transaction.notes)).toBeInTheDocument()
       const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) TF` : `${presentHolofuelAmount(transaction.amount)} TF`
       const story = transaction.type === 'request' ? 'is requesting' : 'is offering'
-      expect(getByTextParent(amountToMatch)).toBeInTheDocument()
+      expect(getByText(amountToMatch)).toBeInTheDocument()
       expect(getByText(story)).toBeInTheDocument()
       expect(getByText(whois.nickname)).toBeInTheDocument()
       expect(getByTextParent(getDateLabel(transaction.timestamp))).toBeInTheDocument()

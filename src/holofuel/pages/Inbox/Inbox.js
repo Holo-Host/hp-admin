@@ -307,7 +307,7 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
 function AmountCell ({ amount, isRequest, isOffer, isActionable, isCanceled, isDeclined }) {
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
   return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && isDeclined) }, { credit: (isOffer && isActionable) || (isRequest && isDeclined) }, { removed: isDeclined || isCanceled })}>
-    {amountDisplay} HF
+    {amountDisplay} TF
   </div>
 }
 
