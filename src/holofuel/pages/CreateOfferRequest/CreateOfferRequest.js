@@ -80,10 +80,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const { register, handleSubmit, errors, setValue: setFormValue, getValues } = useForm({ validationSchema: FormValidationSchema })
   const formValues = getValues()
 
-  if (errorMessage) {
-    newMessage(errorMessage)
-    setErrorMessage('')
-  }
+  useEffect(() => {
+    if (errorMessage) {
+      newMessage(errorMessage)
+      setErrorMessage(null)
+    }
+  }, [errorMessage, setErrorMessage, newMessage])
 
   const selectAgent = id => {
     setCounterpartyId(id)
