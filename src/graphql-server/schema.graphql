@@ -73,8 +73,6 @@ type Transaction {
   presentBalance: Float
   notes: String
   happName: String
-  declinedReference: String
-  canceledReference: String
 }
 
 type Ledger {

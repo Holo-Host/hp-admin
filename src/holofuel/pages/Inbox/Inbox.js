@@ -35,14 +35,13 @@ function useOffer () {
     variables: { amount, counterpartyId: counterparty.id, requestId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
-    }]
+    }]s
   })
 }
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
   return ({ id }) => {
-    console.log('THE TRANSATION - id in useDecline', id)
     decline({
       variables: { transactionId: id },
       refetchQueries: [{
@@ -52,7 +51,7 @@ function useDecline () {
   }
 }
 
-function useRecoverFunds () {
+function useRefund () {
   const [recoverFunds] = useMutation(HolofuelRecoverFundsMutation)
   return (id) => recoverFunds({
     variables: { transactionId: id },
@@ -83,17 +82,11 @@ function useTransactionsWithCounterparties () {
   const allCounterparties = uniqBy('id', holofuelInboxCounterparties.concat([whoami]))
 
   const updatedActionableTransactions = updateCounterparties(holofuelActionableTransactions, allCounterparties)
-  console.log('updatedActionableTransactions', updatedActionableTransactions)
 
   const updatedActionableWOCanceledOffers = updatedActionableTransactions.filter(actionableTx => (actionableTx.status !== STATUS.canceled) && (actionableTx.type !== TYPE.request))
-  console.log('updatedActionableWOCanceledOffers', updatedActionableWOCanceledOffers)
-
   const updatedCanceledTransactions = updatedActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   const updatedDeclinedTransactions = updatedActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = updateCounterparties(holofuelNonPendingTransactions, allCounterparties).concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
-
-  // console.log('updatedActionableWithoutCanceled : ', updatedActionableWOCanceledOffers)
-  // console.log('updatedNonPendingTransactions : ', updatedNonPendingTransactions)
 
   return {
     actionableTransactions: updatedActionableWOCanceledOffers,
@@ -117,16 +110,18 @@ export default function Inbox () {
   const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
   const declineTransaction = useDecline()
-  const refundTransaction = useRecoverFunds()
+  const refundTransaction = useRefund()
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
-  const [toggleNewTransactionModal, setToggleNewTransactionModal] = useState(null)
+  const [isNewTransactionModalVisible, setIsNewTransactionModalVisible] = useState(null)
   const [modalTransaction, setModalTransaction] = useState(null)
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
     if (!isEmpty(transaction) && action !== '') return setModalTransaction(modalTransaction)
-    else return setToggleNewTransactionModal(true)
+    return null
   }
+
+  const showNewTransactionModal = () => setIsNewTransactionModalVisible(true)
 
   const [actionsVisibleId, setActionsVisibleId] = useState(null)
   const actionsClickWithTxId = transactionId => setActionsVisibleId(transactionId)
@@ -154,7 +149,7 @@ export default function Inbox () {
       title={`${presentHolofuelAmount(holofuelBalance)} TF`}
       titleSuperscript='Balance'
     >
-      <Button styleName='new-transaction-button' onClick={() => showConfirmationModal()}>
+      <Button styleName='new-transaction-button' onClick={() => showNewTransactionModal()}>
         <AddIcon styleName='add-icon' color='#0DC39F' />
         <h3 styleName='button-text'>New Transaction</h3>
       </Button>
@@ -179,7 +174,7 @@ export default function Inbox () {
         message={inboxView === VIEW.actionable
           ? 'You have no pending offers or requests'
           : 'You have no recent activity'}>
-        <div onClick={() => showConfirmationModal()}>
+        <div onClick={() => showNewTransactionModal()}>
           <AddIcon styleName='add-icon' color='#0DC39F' />
           {/* TODO: Remove once the above ADD Icon works... */}
           <p style={{ fontSize: 30 }}>+</p>
@@ -205,8 +200,8 @@ export default function Inbox () {
     </div>}
 
     <NewTransactionModal
-      handleClose={() => setToggleNewTransactionModal(null)}
-      toggleNewTransactionModal={toggleNewTransactionModal} />
+      handleClose={() => setIsNewTransactionModalVisible(null)}
+      isNewTransactionModalVisible={isNewTransactionModalVisible} />
 
     <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
@@ -238,9 +233,11 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
   else if (isDeclined && isOffer) story = 'has declined'
 
   let fullNotes
-  if (isCanceled) fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
-  else if (isDeclined) fullNotes = isOffer ? notes : ` Declined Request: ${notes}`
-  else fullNotes = notes
+  if (isCanceled) {
+    fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
+  } else if (isDeclined) {
+    fullNotes = isOffer ? notes : ` Declined Request: ${notes}`
+  } else fullNotes = notes
 
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='avatar'>
@@ -265,7 +262,8 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
         isRequest={isRequest}
         isOffer={isOffer}
         isActionable={isActionable}
-        notValid={isCanceled || isDeclined}
+        isDeclined={isDeclined}
+        isCanceled={isCanceled}
       />
       {!isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
     </div>
@@ -283,7 +281,8 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
         isRequest={isRequest}
         transaction={transaction}
         showConfirmationModal={showConfirmationModal}
-        notValid={isCanceled || isDeclined}
+        isDeclined={isDeclined}
+        isCanceled={isCanceled}
       />
     </>}
   </div>
@@ -295,19 +294,19 @@ function RevealActionsButton ({ actionsClick, handleClose, actionsVisibleId, ist
   </div>
 }
 
-function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisibleId, notValid }) {
+function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal, actionsVisibleId, isCanceled, isDeclined }) {
   return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisibleId && transaction.id === actionsVisibleId) })}>
     <div styleName='actions'>
-      <RejectButton transaction={transaction} notValid={notValid} showConfirmationModal={showConfirmationModal} />
-      {!notValid && isOffer && <AcceptButton transaction={transaction} />}
-      {!notValid && isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
+      <DeclineOrCancelButton transaction={transaction} isDeclined={isDeclined} showConfirmationModal={showConfirmationModal} />
+      {!isDeclined && !isCanceled && isOffer && <AcceptButton transaction={transaction} />}
+      {!isDeclined && !isCanceled && isRequest && <PayButton transaction={transaction} showConfirmationModal={showConfirmationModal} />}
     </div>
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, isActionable, notValid }) {
+function AmountCell ({ amount, isRequest, isOffer, isActionable, isCanceled, isDeclined }) {
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
-  return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && notValid) }, { credit: (isOffer && isActionable) || (isOffer && notValid) }, { removed: notValid })}>
+  return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && isDeclined) }, { credit: (isOffer && isActionable) || (isRequest && isDeclined) }, { removed: isDeclined || isCanceled })}>
     {amountDisplay} HF
   </div>
 }
@@ -346,19 +345,19 @@ function PayButton ({ showConfirmationModal, transaction }) {
   </Button>
 }
 
-function RejectButton ({ showConfirmationModal, transaction, notValid }) {
-  const action = notValid ? 'cancel' : 'decline'
+function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined }) {
+  const action = isDeclined ? 'cancel' : 'decline'
   return <Button
     onClick={() => showConfirmationModal(transaction, action)}
     styleName='reject-button'>
-    <p>{notValid ? 'Cancel' : 'Decline'}</p>
+    <p>{isDeclined ? 'Cancel' : 'Decline'}</p>
   </Button>
 }
 
-function NewTransactionModal ({ handleClose, toggleNewTransactionModal }) {
+function NewTransactionModal ({ handleClose, isNewTransactionModalVisible }) {
   return <Modal
     contentLabel={'Create a new transaction.'}
-    isOpen={!!toggleNewTransactionModal}
+    isOpen={!!isNewTransactionModalVisible}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Create a new transaction.</div>

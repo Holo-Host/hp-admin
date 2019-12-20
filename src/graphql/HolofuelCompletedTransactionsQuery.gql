@@ -1,5 +1,5 @@
-query HolofuelCompletedTransactionsQuery ($transactionId: String)  {
-  holofuelCompletedTransactions(filters: $transactionId)  {
+query HolofuelCompletedTransactionsQuery ()  {
+  holofuelCompletedTransactions()  {
     id
     amount
     counterparty { id }

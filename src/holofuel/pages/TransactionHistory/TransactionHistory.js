@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, uniqBy } from 'lodash/fp'
+import { isEmpty, capitalize, uniqBy, get } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
@@ -38,11 +38,7 @@ function useTransactionsWithCounterparties () {
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
-    counterparty: counterparties.find(counterparty => {
-      if (transactions.counterparty != null) {
-        return counterparty.id === transaction.counterparty.id
-      } else return false
-    }) || transaction.counterparty
+    counterparty: counterparties.find(counterparty => counterparty.id === get('counterparty.id', transaction)) || transaction.counterparty
   }))
 
   const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))

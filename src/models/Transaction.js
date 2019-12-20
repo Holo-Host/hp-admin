@@ -6,7 +6,6 @@ export const TYPE = {
 export const STATUS = {
   pending: 'pending',
   completed: 'completed',
-  rejected: 'rejected',
   canceled: 'canceled',
   declined: 'declined'
 }

@@ -25,8 +25,6 @@ const AGENT_ID_LENGTH = 63
 const FormValidationSchema = yup.object().shape({
   counterpartyId: yup.string()
     .required()
-    // the first four chars === 'HcSc' (ie: the hc prefix)
-    // .substring(0, 5).matches(/(HcSc)/)
     .length(AGENT_ID_LENGTH)
     .trim(),
   amount: yup.number()
