@@ -52,7 +52,6 @@ If referencing **Live** Data :
 **What nix-shell does in the background?**
 - Set `holochain` and `hc` binaries that are required to run the DNAs
 - Auto generates the conductor-config.toml
-- Run the `holochain -c conductor-config.toml` in the background i.e. it run the holochain conductor in the background.
 
 **Setup:**
 
