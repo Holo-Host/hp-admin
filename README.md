@@ -7,7 +7,7 @@
 
 3. Decide which Root you'd like to run and follow the respective steps below.
     > Roots:
-    >- HP Admin [calls HHA (host's side), HAS, and Hylo DNA endpoints]
+    >- HP Admin [calls HHA (host's side), HAS, and Holo Community DNA endpoints]
     >- HoloFuel (solely calls holofuel DNA endpoints)
 
 ### HP Admin:
