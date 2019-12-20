@@ -19,6 +19,8 @@ If referencing **Mock** Data :
 - If running HP Admin, run `npm run start` & proceed to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
 
 If referencing **Live** Data :
+**NOTE: Please reference version v0.12.2 of the holofuel dna to test with the UI.**
+
 - Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **false**. *(Tip: If running HoloFuel root, you can leave the hylo, happ-store, and hha DNA vars as true.)*
 - Create a *.env* file at root and set contents to : `REACT_APP_DNA_INTERFACE_URL=ws://localhost:3400`
 - Create the *./conductor-config.toml* file at root
