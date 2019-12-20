@@ -21,9 +21,9 @@ If referencing **Live** Data :
 - Open 2 terminals.
 ##### Start the Conductors:
 - In one of the termainals, open nix-shell by typing `nix-shell` (after this happens your terminal line should become neon green)
-- In the nix-shell terminal, start the conductor for HP Admin, by typing in the command: `npm run hc:start-manual-1`
+- Inside this nix-shell terminal, start the conductor for HP Admin, by typing in the command: `npm run hc:start-manual-1`
 ##### Open the UI
-- In one of the remaining terminals, open the UI for HP Admin, by typing in the command: `npm run start:live`
+- In the remaining terminals, open the UI for HP Admin, by typing in the command: `npm run start:live`
 - Visit `http://localhost:3001/` to view the HoloFuel UI as **HP Admin**.  
 *(NB: This should automatically load and open up the correct url in your default browser.)*
 
@@ -40,9 +40,9 @@ If referencing **Live** Data :
 - Open 2 terminals.
 ##### Start the Conductors:
 - In one of the termainals, open nix-shell by typing `nix-shell` (after this happens your terminal line should become neon green)
-- In the nix-shell terminal, start the conductor for HoloFuel, by typing in the command: `npm run hc:start-manual`
+- Inside this nix-shell terminal, start the conductor for HoloFuel, by typing in the command: `npm run hc:start-manual`
 ##### Open the UI
-- In one of the remaining terminals, open the UI for HoloFuel, by typing in the command: `npm run start:holofuel-agent-1`
+- In the remaining terminals, open the UI for HoloFuel, by typing in the command: `npm run start:holofuel-agent-1`
 - Visit `http://localhost:3001/` to view the HoloFuel UI as **HP Admin**.  
 *(NB: This should automatically load and open up the correct url in your default browser.)*
 
