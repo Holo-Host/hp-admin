@@ -3,14 +3,14 @@ import waait from 'waait'
 import { fireEvent, within, act, wait } from '@testing-library/react'
 import { renderAndWait } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
-import { getAgent } from 'utils/integration-testing/conductorConfig'
+import { agent1 } from 'utils/const'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
 // TODO: See below - Determine why the call to whoami isn't completing.
-const agentNickname = getAgent().nickname
+const agentNickname = agent1.nickname
 
 describe('HOLOFUEL : Sidemenu', () => {
   it('Contains the agent public address', async () => {

@@ -31,5 +31,7 @@ yarn-error.log*
 yarn.lock
 .holochain
 conductor.log
+conductor-1.log
+conductor-2.log
 conductor.pid
 conductor-config.toml
