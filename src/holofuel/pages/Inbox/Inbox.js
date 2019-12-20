@@ -35,7 +35,7 @@ function useOffer () {
     variables: { amount, counterpartyId: counterparty.id, requestId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
-    }]s
+    }]
   })
 }
 
