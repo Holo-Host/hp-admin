@@ -27,6 +27,7 @@
     "@apollo/react-hooks": "^3.0.1",
     "@apollo/react-testing": "^3.0.1",
     "@babel/node": "^7.6.3",
+    "@holo-host/hp-admin-keypair": "^0.1.2",
     "@holochain/hc-web-client": "^0.5.0",
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-client": "^2.6.4",
@@ -125,8 +126,8 @@
     "terser-webpack-plugin": "1.2.3",
     "ts-pnp": "1.1.2",
     "url-loader": "1.1.2",
-    "webpack": "4.29.6",
-    "webpack-dev-server": "3.2.1",
+    "webpack": "4.41.0",
+    "webpack-dev-server": "3.9.0",
     "webpack-manifest-plugin": "2.0.4",
     "workbox-webpack-plugin": "4.2.0"
   },

@@ -10,14 +10,17 @@ import useAuthTokenContext from 'contexts/useAuthTokenContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
 
+// This import has to be async because of the way that dumb webpack interacts with wasm
+// It took me more than 2 days to make it work so DO NOT even try to touch this code!
+const getHpAdminKeypair = async () => {
+    const wasm = await import("@holo-host/hp-admin-keypair")
+    return wasm.HpAdminKeypair
+}
+
 // exported for testing
 export const authToken = 'EGeYSAmjxp1kNBzXAR2kv7m3BNxyREZnVwSfh3FX7Ew'
 
-const mockWebCryptoModule = (email, password) => {
-  if (email === 'a.b@c.com') return 'badauthkey'
-
-  return authToken
-}
+const getHcPubkey = () => window.location.hostname.split('.')[0]
 
 export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
@@ -26,9 +29,11 @@ export default function Login ({ history: { push } }) {
   const { newMessage } = useFlashMessageContext()
 
   const onSubmit = async ({ email, password }) => {
-    const authToken = mockWebCryptoModule(email, password)
-    setAuthToken(authToken)
-    const authResult = await checkAuth({ variables: { authToken } })
+    const HpAdminKeypair = await getHpAdminKeypair();
+    const hckey = '3llrdmlase6xwo9drzs6qpze40hgaucyf7g8xpjze6dz32s957'
+    let keypair = new HpAdminKeypair(hckey, email, password)
+    setAuthToken(keypair)
+    const authResult = await checkAuth({ variables: { keypair } })
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
     setIsAuthed(isAuthed)
 
