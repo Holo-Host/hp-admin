@@ -72,8 +72,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [counterpartyNick, setCounterpartyNick] = useState('')
   const [isCounterpartyFound, setCounterpartyFound] = useState(null)
 
-  console.log('counterpartyFound : ', isCounterpartyFound)
-
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
   }, [counterpartyId])
@@ -208,8 +206,6 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
 
   useEffect(() => {
     if (!loading) {
-      console.log('loading, notFound, isCounterpartyFound : ', loading, notFound, isCounterpartyFound)
-
       if (notFound) {
         setCounterpartyFound(false)
         if (!hasDisplayedNotFoundMessage) {
