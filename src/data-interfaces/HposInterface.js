@@ -1,16 +1,6 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
-import { getHpAdminKeypair } from 'holochainClient'
-
-// Return empty string if HpAdminKeypair is still not initialized
-async function payloadSignature (method, request, body = "") {
-  const keypair = await getHpAdminKeypair()
-
-  if (keypair !== null)
-    return keypair.sign({method, request, body})
-  else
-    return ""
-}
+import { signPayload } from 'holochainClient'
 
 function hashResponseBody (body) {
   return 'hash of body'
@@ -38,7 +28,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
     return async params => {
       const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
 
-      const signature = await payloadSignature(method, fullPath, params)
+      const signature = await signPayload(method, fullPath, params)
 
       const headers = {
         ...axiosConfig.headers,

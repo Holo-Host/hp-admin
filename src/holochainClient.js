@@ -2,31 +2,6 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
-// Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
-const getHcPubkey = () => {
-    return ((process.env.NODE_ENV === 'development')?'3llrdmlase6xwo9drzs6qpze40hgaucyf7g8xpjze6dz32s957':window.location.hostname.split('.')[0])
-}
-
-// This import has to be async because of the way that dumb webpack interacts with wasm
-// It took me more than 2 days to make it work so DO NOT even try to touch this code!
-const importHpAdminKeypairClass = async () => {
-    const wasm = await import("@holo-host/hp-admin-keypair")
-    return wasm.HpAdminKeypair
-}
-
-// Create keypair using wasm-based HpAdminKeypair Class
-// Use singleton pattern
-// Return null when no params provided
-let HpAdminKeypairInstance
-export const getHpAdminKeypair = async (email = undefined, password = undefined) => {
-    if (HpAdminKeypairInstance) return HpAdminKeypairInstance;
-    const hckey = getHcPubkey();
-    if (!hckey || !email || !password) return null;
-    const HpAdminKeypair = await importHpAdminKeypairClass();
-    HpAdminKeypairInstance = new HpAdminKeypair(hckey, email, password)
-    return HpAdminKeypairInstance
-}
-
 const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -41,6 +16,41 @@ export const MOCK_INDIVIDUAL_DNAS = {
   'happ-store': true,
   hha: true,
   holofuel: false
+}
+
+// Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
+const getHcPubkey = () => {
+  return ((process.env.NODE_ENV === 'development')?'3llrdmlase6xwo9drzs6qpze40hgaucyf7g8xpjze6dz32s957':window.location.hostname.split('.')[0])
+}
+
+// This import has to be async because of the way that dumb webpack interacts with wasm
+// It took me more than 2 days to make it work so DO NOT even try to touch this code!
+const importHpAdminKeypairClass = async () => {
+  const wasm = await import("@holo-host/hp-admin-keypair")
+  return wasm.HpAdminKeypair
+}
+
+// Create keypair using wasm-based HpAdminKeypair Class
+// Use singleton pattern
+// Return null when no params provided
+let HpAdminKeypairInstance
+export const getHpAdminKeypair = async (email = undefined, password = undefined) => {
+  if (HpAdminKeypairInstance) return HpAdminKeypairInstance;
+  const hcKey = getHcPubkey();
+  if (!hcKey || !email || !password) return null;
+  const HpAdminKeypair = await importHpAdminKeypairClass();
+  HpAdminKeypairInstance = new HpAdminKeypair(hcKey, email, password)
+  return HpAdminKeypairInstance
+}
+
+// Return empty string if HpAdminKeypair is still not initialized
+export const signPayload = async (method, request, body = "") => {
+const keypair = await getHpAdminKeypair()
+
+if (keypair !== null)
+  return keypair.sign({method, request, body})
+else
+  return ""
 }
 
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
@@ -58,8 +68,17 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
   try {
+    let url = process.env.NODE_ENV === 'production' ? undefined : process.env.REACT_APP_DNA_INTERFACE_URL
+    // Construct url with query param X-Holo-Admin-Signature = signature
+    let urlObj = new URL(url)
+    const params = new URLSearchParams(urlObj.search.slice(1))
+    params.append('X-Holo-Admin-Signature', signPayload("get", urlObj.pathname, ""))
+	  params.sort()
+    urlObj.search = params.toString()
+    url = urlObj.toString()
+
     holochainClient = await hcWebClientConnect({
-      url: process.env.NODE_ENV === 'production' ? undefined : process.env.REACT_APP_DNA_INTERFACE_URL,
+      url: url,
       wsClient: { max_reconnects: 0 }
     })
     if (HOLOCHAIN_LOGGING) {
