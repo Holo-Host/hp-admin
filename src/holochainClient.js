@@ -2,6 +2,30 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 
+// Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
+const getHcPubkey = () => {
+    return ((process.env.NODE_ENV === 'development')?'3llrdmlase6xwo9drzs6qpze40hgaucyf7g8xpjze6dz32s957':window.location.hostname.split('.')[0])
+}
+
+// This import has to be async because of the way that dumb webpack interacts with wasm
+// It took me more than 2 days to make it work so DO NOT even try to touch this code!
+const importHpAdminKeypairClass = async () => {
+    const wasm = await import("@holo-host/hp-admin-keypair")
+    return wasm.HpAdminKeypair
+}
+
+// Create keypair using wasm-based HpAdminKeypair Class
+// Use singleton pattern
+let HpAdminKeypairInstance
+export const getHpAdminKeypair = async (email = undefined, password = undefined) => {
+    if (HpAdminKeypairInstance) return HpAdminKeypairInstance;
+    const HpAdminKeypair = await importHpAdminKeypairClass();
+    const hckey = getHcPubkey();
+    HpAdminKeypairInstance = new HpAdminKeypair(hckey, email, password)
+    console.log(HpAdminKeypairInstance.sign({method:"get", request: "/endpoint", body: ""}))
+    return HpAdminKeypairInstance
+}
+
 const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
