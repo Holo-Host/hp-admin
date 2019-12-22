@@ -18,6 +18,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
+import Loader from 'react-loader-spinner'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
@@ -326,8 +327,22 @@ function AcceptButton ({ transaction: { id } }) {
   const { newMessage } = useFlashMessageContext()
   const acceptOffer = useAcceptOffer(id)
   const accept = () => {
-    acceptOffer()
-    newMessage('Offer successfully accepted', 5000)
+
+    newMessage(<>
+      <Loader
+        type='Circles'
+        color='#FFF'
+        height={30}
+        width={30}
+        timeout={5000}
+      /> Sending...
+    </>, 5000)
+
+    acceptOffer().then(() => {
+      newMessage('Offer successfully accepted', 5000)
+    }).catch(() => {
+      newMessage('Offer acceptance unsuccessfully', 5000)
+    })
   }
   return <Button
     onClick={accept}
@@ -353,6 +368,8 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
     <p>{isDeclined ? 'Cancel' : 'Decline'}</p>
   </Button>
 }
+
+
 
 function NewTransactionModal ({ handleClose, isNewTransactionModalVisible }) {
   return <Modal
