@@ -4,12 +4,12 @@ import { getHpAdminKeypair } from 'holochainClient'
 
 // Return empty string if HpAdminKeypair is still not initialized
 async function payloadSignature (method, request, body = "") {
-    const keypair = await getHpAdminKeypair()
+  const keypair = await getHpAdminKeypair()
 
-    if (keypair !== null)
-        return keypair.sign({method, request, body})
-    else
-        return ""
+  if (keypair !== null)
+    return keypair.sign({method, request, body})
+  else
+    return ""
 }
 
 function hashResponseBody (body) {
