@@ -60,7 +60,7 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: (_, { authToken }) => HposInterface.os.settings(authToken),
+    hposSettings: (_) => HposInterface.os.settings(),
 
     hposStatus: HposInterface.os.status
   },
@@ -103,14 +103,16 @@ export const resolvers = {
 
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess, authToken),
+    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 
-    hposUpdateVersion: (_, { authToken }) => HposInterface.os.updateVersion(authToken),
+    hposUpdateVersion: () => HposInterface.os.updateVersion(),
 
     hposCheckAuth: async (_, { authToken }) => {
       try {
-        await HposInterface.os.settings(authToken)
+        await HposInterface.os.settings()
       } catch (error) {
+          // For Robbie: it might be good here to distinguish between (error.response.status === 401) and other kinds of 
+          // error (e.g. HPOS is unreachable) and report to the user...
         return {
           isAuthed: false
         }

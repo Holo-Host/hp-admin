@@ -2,9 +2,14 @@ import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
 import { getHpAdminKeypair } from 'holochainClient'
 
-// these two functions are stubs until we have the crypto library
-function payloadSignature (method, request, body) {
-    return getHpAdminKeypair.sign({method, request, body})
+// Return empty string if HpAdminKeypair is still not initialized
+async function payloadSignature (method, request, body = "") {
+    const keypair = await getHpAdminKeypair()
+
+    if (keypair !== null)
+        return keypair.sign({method, request, body})
+    else
+        return ""
 }
 
 function hashResponseBody (body) {
@@ -12,7 +17,7 @@ function hashResponseBody (body) {
 }
 
 const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value retunred to false, once HPOS Image is nixified and located within repo.
-const developmentMockHposConnection = true // boolean to toggle hpos mock data reference while in dev context...
+const developmentMockHposConnection = false // boolean to toggle hpos mock data reference while in dev context...
 export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? preLocalHposImageIntegration
   : process.env.NODE_ENV === 'test'
@@ -33,7 +38,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
     return async params => {
       const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
 
-      const signature = payloadSignature(method, fullPath, params)
+      const signature = await payloadSignature(method, fullPath, params)
 
       const headers = {
         ...axiosConfig.headers,
@@ -89,7 +94,7 @@ const presentHposSettings = (hposSettings) => {
 const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
-    settings: async () => {
+    settings: async (authToken) => {
       const result = await hposCall({ method: 'get', path: 'config' })()
       return presentHposSettings(result)
     },
@@ -118,12 +123,12 @@ const HposInterface = {
     },
 
     // HOLOPORT_OS STATUS
-    status: async () => {
+    status: async (authToken) => {
       const result = await hposCall({ method: 'get', path: 'status' })()
       return presentHposStatus(result)
     },
 
-    updateVersion: async () => {
+    updateVersion: async (authToken) => {
       const result = await hposCall({ method: 'post', path: 'upgrade' })()
       return presentHposStatus(result)
     }

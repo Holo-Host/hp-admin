@@ -28,7 +28,7 @@ describe('login flow', () => {
     const mocks = [{
       request: {
         query: HposCheckAuthMutation,
-        variables: { authToken }
+        variables: { }
       },
       result: {
         data: {
@@ -58,7 +58,7 @@ describe('login flow', () => {
     const mocks = [{
       request: {
         query: HposCheckAuthMutation,
-        variables: { authToken }
+        variables: { }
       },
       result: {
         data: {

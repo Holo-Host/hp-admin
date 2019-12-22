@@ -16,13 +16,14 @@ const importHpAdminKeypairClass = async () => {
 
 // Create keypair using wasm-based HpAdminKeypair Class
 // Use singleton pattern
+// Return null when no params provided
 let HpAdminKeypairInstance
 export const getHpAdminKeypair = async (email = undefined, password = undefined) => {
     if (HpAdminKeypairInstance) return HpAdminKeypairInstance;
-    const HpAdminKeypair = await importHpAdminKeypairClass();
     const hckey = getHcPubkey();
+    if (!hckey || !email || !password) return null;
+    const HpAdminKeypair = await importHpAdminKeypairClass();
     HpAdminKeypairInstance = new HpAdminKeypair(hckey, email, password)
-    console.log(HpAdminKeypairInstance.sign({method:"get", request: "/endpoint", body: ""}))
     return HpAdminKeypairInstance
 }
 
