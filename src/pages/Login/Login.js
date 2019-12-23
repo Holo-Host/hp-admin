@@ -6,7 +6,7 @@ import './Login.module.css'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import HoloFuelIcon from 'components/icons/HoloFuelIcon'
-import useAuthTokenContext from 'contexts/useAuthTokenContext'
+import useAuthContext from 'contexts/useAuthContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
 import { getHpAdminKeypair } from 'holochainClient'
@@ -14,11 +14,11 @@ import { getHpAdminKeypair } from 'holochainClient'
 export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
   const { register, handleSubmit, errors } = useForm()
-  const { setIsAuthed } = useAuthTokenContext()
+  const { setIsAuthed } = useAuthContext()
   const { newMessage } = useFlashMessageContext()
 
   const onSubmit = async ({ email, password }) => {
-    let keypair = await getHpAdminKeypair(email, password)
+    const keypair = await getHpAdminKeypair(email, password)
     const authResult = await checkAuth({ variables: { keypair } })
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
     setIsAuthed(isAuthed)

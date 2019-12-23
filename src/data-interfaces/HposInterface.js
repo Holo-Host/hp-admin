@@ -83,7 +83,7 @@ const presentHposSettings = (hposSettings) => {
 const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
-    settings: async (authToken) => {
+    settings: async () => {
       const result = await hposCall({ method: 'get', path: 'config' })()
       return presentHposSettings(result)
     },
@@ -112,12 +112,12 @@ const HposInterface = {
     },
 
     // HOLOPORT_OS STATUS
-    status: async (authToken) => {
+    status: async () => {
       const result = await hposCall({ method: 'get', path: 'status' })()
       return presentHposStatus(result)
     },
 
-    updateVersion: async (authToken) => {
+    updateVersion: async () => {
       const result = await hposCall({ method: 'post', path: 'upgrade' })()
       return presentHposStatus(result)
     }

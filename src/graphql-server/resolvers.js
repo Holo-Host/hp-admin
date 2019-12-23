@@ -107,12 +107,10 @@ export const resolvers = {
 
     hposUpdateVersion: () => HposInterface.os.updateVersion(),
 
-    hposCheckAuth: async (_, { authToken }) => {
+    hposCheckAuth: async () => {
       try {
         await HposInterface.os.settings()
       } catch (error) {
-          // For Robbie: it might be good here to distinguish between (error.response.status === 401) and other kinds of 
-          // error (e.g. HPOS is unreachable) and report to the user...
         return {
           isAuthed: false
         }

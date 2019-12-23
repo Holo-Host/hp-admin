@@ -121,8 +121,8 @@ type Query {
   holofuelCounterparty(agentId: String!): HolofuelUser
   holofuelHistoryCounterparties: [HolofuelUser]
   holofuelInboxCounterparties: [HolofuelUser]
-  hposSettings(authToken: String): HposSettings
-  hposStatus(authToken: String): HposStatus
+  hposSettings: HposSettings
+  hposStatus: HposStatus
 }
 
 type Mutation {
@@ -136,7 +136,7 @@ type Mutation {
   holofuelAcceptOffer(transactionId: ID): Transaction 
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
-  hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean, authToken: String): HposSettings
-  hposUpdateVersion(authToken: String): HposStatus
-  hposCheckAuth(authToken: String): HposAuth
+  hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings
+  hposUpdateVersion: HposStatus
+  hposCheckAuth: HposAuth
 }

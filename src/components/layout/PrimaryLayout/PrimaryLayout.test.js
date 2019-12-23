@@ -4,7 +4,7 @@ import { renderAndWait } from 'utils/test-utils'
 import PrimaryLayout from './PrimaryLayout'
 
 jest.mock('contexts/useFlashMessageContext')
-jest.mock('contexts/useAuthTokenContext')
+jest.mock('contexts/useAuthContext')
 jest.mock('components/Header')
 
 it('should render the header and children', async () => {

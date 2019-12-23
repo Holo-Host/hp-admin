@@ -4,11 +4,10 @@ import { renderAndWait } from 'utils/test-utils'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
-import { AuthTokenProvider } from 'contexts/useAuthTokenContext'
+import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HPAdminRouter from 'HPAdminRouter'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
-import { authToken } from 'pages/Login/Login'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
@@ -16,11 +15,11 @@ jest.unmock('react-router-dom')
 
 const HPAdminApp = () =>
   <Router>
-    <AuthTokenProvider>
+    <AuthProvider>
       <FlashMessageProvider>
         <HPAdminRouter />
       </FlashMessageProvider>
-    </AuthTokenProvider>
+    </AuthProvider>
   </Router>
 
 describe('login flow', () => {
