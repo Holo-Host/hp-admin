@@ -319,7 +319,11 @@ function useAcceptOffer (id) {
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
-    }]
+    },
+    {
+      query: HolofuelLedgerQuery
+    }
+  ]
   })
 }
 
