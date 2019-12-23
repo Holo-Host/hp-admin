@@ -42,14 +42,12 @@ function useOffer () {
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
-  return ({ id }) => {
-    decline({
+  return ({ id }) => decline({
       variables: { transactionId: id },
       refetchQueries: [{
         query: HolofuelActionableTransactionsQuery
       }]
     })
-  }
 }
 
 function useRefund () {
@@ -451,9 +449,16 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   }
 
   const onYes = () => {
-    actionHook(actionParams)
+    newMessage(<>
+      <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000} />
+    </>, 5000)
+
+    actionHook(actionParams).then(() => {
+      newMessage(flashMessage, 5000)
+    }).catch(() => {
+      newMessage('Sorry Something went wrong', 5000)
+    })
     handleClose()
-    newMessage(flashMessage, 5000)
   }
 
   return <Modal
