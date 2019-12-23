@@ -43,11 +43,11 @@ function useOffer () {
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
   return ({ id }) => decline({
-      variables: { transactionId: id },
-      refetchQueries: [{
-        query: HolofuelActionableTransactionsQuery
-      }]
-    })
+    variables: { transactionId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
 }
 
 function useRefund () {
@@ -320,8 +320,7 @@ function useAcceptOffer (id) {
     },
     {
       query: HolofuelLedgerQuery
-    }
-  ]
+    }]
   })
 }
 
@@ -329,7 +328,6 @@ function AcceptButton ({ transaction: { id } }) {
   const { newMessage } = useFlashMessageContext()
   const acceptOffer = useAcceptOffer(id)
   const accept = () => {
-
     newMessage(<>
       <Loader
         type='Circles'
@@ -370,8 +368,6 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
     <p>{isDeclined ? 'Cancel' : 'Decline'}</p>
   </Button>
 }
-
-
 
 function NewTransactionModal ({ handleClose, isNewTransactionModalVisible }) {
   return <Modal
