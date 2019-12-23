@@ -38,11 +38,6 @@ type HolofuelUser {
   notFound: Boolean
 }
 
-type ListOrigins {
-  Origin: String
-  OriginList: [String]
-}
-
 enum TransactionType {
   offer
   request

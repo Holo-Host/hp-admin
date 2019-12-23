@@ -112,13 +112,12 @@ export default function Inbox () {
   const declineTransaction = useDecline()
   const refundTransaction = useRefund()
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
-  const [isNewTransactionModalVisible, setIsNewTransactionModalVisible] = useState(null)
+  const [isNewTransactionModalVisible, setIsNewTransactionModalVisible] = useState(false)
   const [modalTransaction, setModalTransaction] = useState(null)
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
-    if (!isEmpty(transaction) && action !== '') return setModalTransaction(modalTransaction)
-    return null
+    if (!isEmpty(transaction) && action !== '') setModalTransaction(modalTransaction)
   }
 
   const showNewTransactionModal = () => setIsNewTransactionModalVisible(true)
@@ -357,7 +356,7 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
 function NewTransactionModal ({ handleClose, isNewTransactionModalVisible }) {
   return <Modal
     contentLabel={'Create a new transaction.'}
-    isOpen={!!isNewTransactionModalVisible}
+    isOpen={isNewTransactionModalVisible}
     handleClose={handleClose}
     styleName='modal'>
     <div styleName='modal-title'>Create a new transaction.</div>
@@ -374,13 +373,13 @@ function NewTransactionModal ({ handleClose, isNewTransactionModalVisible }) {
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, setCounterpartyNotFound, counterpartyNotFound }) {
   const { newMessage } = useFlashMessageContext()
   const { id, amount, type, action } = transaction
-  const { counterparty = {} } = transaction
-  const { holofuelCounterparty, loading } = useCounterparty(counterparty.id)
+  const { counterparty = {}, notFound } = transaction
+  const { holofuelCounterparty } = useCounterparty(counterparty.id)
 
   useEffect(() => {
     if (!transaction) return null
-    else if (holofuelCounterparty || loading) {
-      if (holofuelCounterparty.notFound) {
+    else if (holofuelCounterparty) {
+      if (notFound) {
         setCounterpartyNotFound(true)
         newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.')
       } else setCounterpartyNotFound(false)
