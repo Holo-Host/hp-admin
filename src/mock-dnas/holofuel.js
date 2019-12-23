@@ -27,6 +27,63 @@ export const transactionList = {
     total: 5
   },
   transactions: [
+    // Agent Perry cancelled own/initated transaction, Perry sees cancelled outgoing transaction
+    {
+      index: 9,
+      state: 'outgoing/canceled',
+      origin: 'QmRccTDUM1UcJWuxW3aMjfYkSBFmhBnGtgB7iKZAEe5bKz',
+      event: {
+        Cancel: {
+          entry: {
+            Request: {
+              from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+              to: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+              amount: '13383',
+              fee: '13.383',
+              deadline: '2025-01-02T03:04:05.678901234+00:00',
+              notes: 'testing...',
+              synchronous: null
+            }
+          },
+          reason: 'No longer need to buy book.'
+        }
+      }
+    },
+    // Agent Sam cancelled transaction, Perry sees cancelled incoming transaction
+    {
+      index: 9,
+      state: 'incoming/canceled',
+      origin: 'QmRccTDUM1UcJWuxW3aMjfYkSBFmhBnGtgB7iKZAEe5bKz',
+      event: {
+        Cancel: {
+          entry: {
+            Request: {
+              from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+              to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+              amount: '234560000',
+              fee: '234560.00',
+              deadline: '2025-01-02T03:04:05.678901234+00:00',
+              notes: 'testing...',
+              synchronous: null
+            }
+          },
+          reason: 'Sorry, concert rained out! :('
+        }
+      },
+      timestamp: {
+        origin: '2019-12-06T11:27:49+00:00',
+        event: '2019-12-06T11:29:00+00:00'
+      },
+      adjustment: {
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
+        }
+      },
+      available: '0'
+    },
     {
       index: 4,
       state: 'outgoing/approved',
@@ -300,7 +357,11 @@ export const pendingList = {
         '3+BrqUuu3sC4bZmub4qGvkmfeKnkJfkm5qZGOM88uompxM0/gE2KNpvTyxpGg44MCbNMB8i8vHBmhTIDMjFwAQ=='
       ]
     }
-  ]
+  ],
+  // TODO: >> RESOLVE QUESTION: Is this an Anti-Faud measure (?? => determine use case of actionable decline event) >> Spender must accept Spender's proposed decline of a offered HF ??
+  declined: [],
+  // NOTE: This is to allow Spender Refunds >> Recipient must accept proposed cancelation of a completed Transfer, in order for the Spender to be refunded.
+  canceled: []
 }
 
 const agentArray = [{
@@ -325,7 +386,7 @@ const agentArray = [{
   }
 }]
 
-const whois = (agentId) => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { error: 'No agent was found by this id.' }
+const whois = agentId => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
 
 function listPending ({ origins }) {
   if (!origins) return pendingList
@@ -365,7 +426,7 @@ const holofuel = {
     receive_payment: ({ promise, promise_sig: sig, promise_commit: commit }) => bcrypt.hashSync((promise + sig + commit + 'accepted'), NUM_SALT_ROUNDS),
     receive_payments_pending: ({ promises }) => typeof promises === 'string' ? receivedPaymentsHashMap([promises]) : receivedPaymentsHashMap(promises),
     decline: ({ origin }) => bcrypt.hashSync((origin + 'declined'), NUM_SALT_ROUNDS),
-    cancel: ({ origin }) => bcrypt.hashSync((origin + 'cancelled'), NUM_SALT_ROUNDS)
+    cancel: ({ origin }) => bcrypt.hashSync((origin + 'canceled'), NUM_SALT_ROUNDS)
   }
 }
 
