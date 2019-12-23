@@ -22,7 +22,9 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
     return mockCallHpos(method, apiVersion, path)
   } else {
     return async params => {
-      const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
+      // For Robbie: this url should be probably constructed from window.location, right?
+      // const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
+      const fullPath = 'https://' + window.location.hostname + '/' + apiVersion + '/' + path
       const urlObj = new URL(fullPath)
 
       const signature = await signPayload(method, urlObj.pathname, params)

@@ -19,6 +19,8 @@ export const MOCK_INDIVIDUAL_DNAS = {
   holofuel: false
 }
 
+export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
+
 // Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
 const getHcPubkey = () => {
   return ((process.env.NODE_ENV === 'development')?'3llrdmlase6xwo9drzs6qpze40hgaucyf7g8xpjze6dz32s957':window.location.hostname.split('.')[0])
@@ -37,20 +39,48 @@ const importHpAdminKeypairClass = async () => {
 let HpAdminKeypairInstance
 export const getHpAdminKeypair = async (email = undefined, password = undefined) => {
   if (HpAdminKeypairInstance) return HpAdminKeypairInstance;
-  const hcKey = getHcPubkey();
-  if (!hcKey || !email || !password) return null;
-  const HpAdminKeypair = await importHpAdminKeypairClass();
-  HpAdminKeypairInstance = new HpAdminKeypair(hcKey, email, password)
-  return HpAdminKeypairInstance
+  try {
+    const hcKey = getHcPubkey();
+    if (!hcKey || !email || !password) return null;
+    const HpAdminKeypair = await importHpAdminKeypairClass();
+    HpAdminKeypairInstance = new HpAdminKeypair(hcKey, email, password)
+
+    if (HOLOCHAIN_LOGGING)
+      console.log('🎉 Successfully created HP Admin KeyPair!')
+
+    return HpAdminKeypairInstance
+  } catch (error) {
+    if (HOLOCHAIN_LOGGING) {
+      console.log('😞 Failed to create HP Admin KeyPair! -- ', error.toString())
+    }
+    throw (error)
+  }
 }
 
 // Return empty string if HpAdminKeypair is still not initialized
 export const signPayload = async (method, request, body) => {
-const keypair = await getHpAdminKeypair()
-if (keypair !== null)
-  return keypair.sign({method: method.toLowerCase(), request, body: stringify(body)})
-else
-  return ""
+  const keypair = await getHpAdminKeypair()
+
+  if (keypair === null) return ""
+
+  let payload = {method: method.toLowerCase(), request, body: stringify(body)}
+
+  try {
+    if (HOLOCHAIN_LOGGING)
+        console.log('🎉 Signing payload: ', payload)
+
+    const signature = keypair.sign(payload)
+
+    if (HOLOCHAIN_LOGGING)
+        console.log('🎉 Successfully signed payload with signature ', signature)
+
+    return signature
+  } catch (error) {
+    if (HOLOCHAIN_LOGGING) {
+      console.log('😞 Failed to sign payload -- ', error.toString())
+    }
+    throw (error)
+  }
 }
 
 export const hashResponseBody = async (data) => {
@@ -60,9 +90,6 @@ export const hashResponseBody = async (data) => {
   return Buffer.from(hashBytes).toString('base64')
 }
 
-export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
-let holochainClient
-
 export function conductorInstanceIdbyDnaAlias (instanceId) {
   return {
     hylo: 'hylo',
@@ -71,6 +98,8 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
     holofuel: 'holofuel'
   }[instanceId]
 }
+
+let holochainClient
 
 async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
