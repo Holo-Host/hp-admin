@@ -414,7 +414,7 @@ describe('TransactionsHistory', () => {
       const { getAllByText, getByText } = within(heading)
       expect(getByText(capitalizedType, { exact: false })).toBeInTheDocument()
       expect(getByText('of', { exact: false })).toBeInTheDocument()
-      expect(getAllByText('to', { exact: false })[0]).toBeInTheDocument() // NB: 2 instances of the word two exist, due to the tooltip.
+      expect(getAllByText('to', { exact: false })[0]).toBeInTheDocument() // NB: 2 instances of the word 'to' exist, due to the tooltip.
     })
   })
 
