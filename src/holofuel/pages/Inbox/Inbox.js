@@ -82,7 +82,7 @@ function useTransactionsWithCounterparties () {
 
   const updatedActionableTransactions = updateCounterparties(holofuelActionableTransactions, allCounterparties)
 
-  const updatedActionableWOCanceledOffers = updatedActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled || !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
+  const updatedActionableWOCanceledOffers = updatedActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
   const updatedCanceledTransactions = updatedActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   const updatedDeclinedTransactions = updatedActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = updateCounterparties(holofuelNonPendingTransactions, allCounterparties).concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
