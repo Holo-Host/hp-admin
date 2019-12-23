@@ -1,6 +1,7 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
+import stringify from 'json-stable-stringify'
 
 const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
 // This can be written as a boolean expression then it's even less readable
@@ -47,9 +48,16 @@ export const getHpAdminKeypair = async (email = undefined, password = undefined)
 export const signPayload = async (method, request, body) => {
 const keypair = await getHpAdminKeypair()
 if (keypair !== null)
-  return keypair.sign({method: method.toLowerCase(), request, body: JSON.stringify(body)})
+  return keypair.sign({method: method.toLowerCase(), request, body: stringify(body)})
 else
   return ""
+}
+
+export const hashResponseBody = async (data) => {
+  const dataBytes = Buffer.from(stringify(data))
+  const hashBytes = await crypto.subtle.digest('SHA-512', dataBytes)
+
+  return Buffer.from(hashBytes).toString('base64')
 }
 
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'

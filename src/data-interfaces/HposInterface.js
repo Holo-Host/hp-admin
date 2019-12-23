@@ -1,10 +1,6 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
-import { signPayload } from 'holochainClient'
-
-function hashResponseBody (body) {
-  return 'hash of body'
-}
+import { signPayload, hashResponseBody } from 'holochainClient'
 
 const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value retunred to false, once HPOS Image is nixified and located within repo.
 const developmentMockHposConnection = false // boolean to toggle hpos mock data reference while in dev context...
@@ -95,7 +91,7 @@ const HposInterface = {
 
       // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
       const headers = {
-        'x-hp-admin-cas': hashResponseBody(settingsResponse)
+        'x-hp-admin-cas': await hashResponseBody(settingsResponse)
       }
 
       const settingsConfig = {
