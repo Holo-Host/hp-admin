@@ -140,7 +140,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
               setCounterpartyNick={setCounterpartyNick}
               counterpartyNick={counterpartyNick}
               setCounterpartyFound={setCounterpartyFound}
-              isCounterpartyFound={isCounterpartyFound}
               newMessage={newMessage} />
           </h4>}
         </div>
@@ -192,12 +191,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, isCounterpartyFound, newMessage }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(null)
+  const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
 
   const { nickname, notFound } = holofuelCounterparty
   useEffect(() => {
