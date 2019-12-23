@@ -23,8 +23,8 @@ const mockHoloFuelDnaInterface = {
     allCompleted: jest.fn(() => ['mockCompleteTransactionOne', 'mockCompleteTransactionTwo']),
     allActionable: jest.fn(() => ['mockActionableTransactionOne', 'mockActionableTransactionTwo']),
     allWaiting: jest.fn(() => ['mockWaitingTransactionOne', 'mockWaitingTransactionTwo']),
-    decline: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.declined, type: TYPE.offer })), // type is hard-coded, but could be either
-    cancel: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.cancelled, type: TYPE.outgoing })) // type is hard-coded, but could be either
+    decline: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.declined, type: TYPE.request })),
+    cancel: jest.fn(transactionId => successfulTransactionResponse({ transactionId, status: STATUS.canceled, type: TYPE.offer }))
   },
   requests: {
     create: jest.fn((counterparty, amount) => successfulTransactionResponse({ transactionId: 'requestHashId', counterparty, amount, status: STATUS.pending, type: TYPE.request }))

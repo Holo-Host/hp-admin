@@ -20,8 +20,8 @@ hash = "QmVN1NnsjXndiMmdXyrRcJdvgyCsksPEuPvbRZJ3vsw2KP"
 id = "holo-hosting-app-dna"
 
 [[dnas]]
-file = "/nix/store/63lvpbia4g2vhf7q9a5pl89gdfmdbjvh-holofuel/holofuel.dna.json"
-hash = "Qmd73iyYZEnWhDRbNVroGgkMzRiMXFcVxPPHJjJSeR6ZRa"
+file = "./dna/holofuel.dna.json"
+hash = "QmU7j8botL3W2aWSPXKBCetyaaUj2rPHHRkN5kb8HrxA9e"
 id = "holofuel-dna"
 
 [[instances]]
@@ -30,7 +30,7 @@ dna = "happ-store-dna"
 id = "happ-store"
 
 [instances.storage]
-path = ".holochain/holo/storage/happ-store"
+path = ".holochain/holo/storage/agent-1/happ-store"
 type = "file"
 
 [[instances]]
@@ -39,7 +39,7 @@ dna = "holo-hosting-app-dna"
 id = "holo-hosting-app"
 
 [instances.storage]
-path = ".holochain/holo/storage/holo-hosting-app"
+path = ".holochain/holo/storage/agent-1/holo-hosting-app"
 type = "file"
 
 [[instances]]
@@ -48,7 +48,7 @@ dna = "holofuel-dna"
 id = "holofuel"
 
 [instances.storage]
-path = ".holochain/holo/storage/holofuel"
+path = ".holochain/holo/storage/agent-1/holofuel"
 type = "file"
 
 [[interfaces]]
@@ -101,3 +101,8 @@ pattern = "^err/"
 color = "white"
 exclude = false
 pattern = "^debug/dna"
+
+[network]
+sim2h_url = "wss://sim2h.holochain.org:9000"
+# sim2h_url = "wss://localhost:9000"
+type = "sim2h"

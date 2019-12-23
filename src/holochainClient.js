@@ -3,20 +3,19 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import stringify from 'json-stable-stringify'
 
-const developmentMockDnaConnection = true // this is the value MOCK_DNA_CONNECTION will have in the dev server
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
   : process.env.NODE_ENV === 'test'
     ? true
-    : developmentMockDnaConnection
+    : process.env.REACT_APP_MOCK_DNA_CONNECTION === 'true' || false
 
 // These are overwritten when MOCK_DNA_CONNECTION is true, so they only take effect when that is false
 export const MOCK_INDIVIDUAL_DNAS = {
   hylo: true,
   'happ-store': true,
   hha: true,
-  holofuel: false
+  holofuel: true
 }
 
 export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
@@ -150,8 +149,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
       let zomeCall
-
-      if (MOCK_DNA_CONNECTION || MOCK_INDIVIDUAL_DNAS[instanceId]) {
+      if (MOCK_DNA_CONNECTION && MOCK_INDIVIDUAL_DNAS[instanceId]) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()

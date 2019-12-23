@@ -151,6 +151,7 @@
   font-size: 14px;
   line-height: 19px;
   word-break: keep-all;
+  color: rgba(44, 64, 90, 0.8)
 }
 
 .balance {
@@ -172,6 +173,16 @@
   color: #EE4266;
 }
 
+.removed {
+  text-decoration: line-through;
+  color: rgba(44, 64, 90, 0.8);
+  opacity: 0.8;
+}
+
+.modal-note-text {
+  composes: notes;
+  text-transform: none;
+}
 
 /* ActionsCell */
 
@@ -271,6 +282,7 @@
 }
 
 .modal-text {
+  text-align: center;
   font-size: 14px;
   margin-bottom: 30px;
 }

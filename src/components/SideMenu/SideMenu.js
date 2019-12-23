@@ -38,16 +38,6 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to='/browse-happs' styleName='nav-link' data-testid='hosting-link'>
-              Hosting
-            </Link>
-          </li>
-          <li>
-            <Link to='/earnings' styleName='nav-link' data-testid='earnings-link'>
-              Earnings
-            </Link>
-          </li>
-          <li>
             <Link to='/holofuel' styleName='nav-link'>
               HoloFuel
             </Link>

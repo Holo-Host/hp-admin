@@ -25,7 +25,8 @@ const AGENT_ID_LENGTH = 63
 const FormValidationSchema = yup.object().shape({
   counterpartyId: yup.string()
     .required()
-    .length(AGENT_ID_LENGTH),
+    .length(AGENT_ID_LENGTH)
+    .trim(),
   amount: yup.number()
     .required()
     .positive()
@@ -62,12 +63,14 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
 
+  const { newMessage } = useFlashMessageContext()
+
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
+  const [isCounterpartyFound, setCounterpartyFound] = useState(false)
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
@@ -82,8 +85,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const [fee, setFee] = useState(0)
   const [total, setTotal] = useState(0)
-
-  const { newMessage } = useFlashMessageContext()
 
   const onAmountChange = amount => {
     if (isNaN(amount)) return
@@ -134,7 +135,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
         <div styleName='hash-and-nick'>
           {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
           {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
-            <RenderNickname agentId={counterpartyId} setCounterpartyNick={setCounterpartyNick} />
+            <RenderNickname
+              agentId={counterpartyId}
+              setCounterpartyNick={setCounterpartyNick}
+              counterpartyNick={counterpartyNick}
+              setCounterpartyFound={setCounterpartyFound}
+              newMessage={newMessage} />
           </h4>}
         </div>
       </div>
@@ -174,40 +180,61 @@ export default function CreateOfferRequest ({ history: { push } }) {
         name='notes'
         placeholder='What is this for?'
         ref={register} />
+
       <RecentCounterparties
         styleName='recent-counterparties'
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' wide variant='secondary' styleName='send-button' dataTestId='submit-button'>
-        {modeVerbs[mode]}
-      </Button>
+      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true}>Send</Button>
     </form>
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick }) {
-  const { loading, error, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
+  const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-  const { nickname } = holofuelCounterparty
+
+  const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
+
+  const { nickname, notFound } = holofuelCounterparty
   useEffect(() => {
     setCounterpartyNick(nickname)
   }, [setCounterpartyNick, nickname])
 
+  useEffect(() => {
+    if (!loading) {
+      if (notFound) {
+        setCounterpartyFound(false)
+        if (!hasDisplayedNotFoundMessage) {
+          newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
+          setHasDisplayedNotFoundMessage(true)
+        }
+      } else {
+        setCounterpartyFound(true)
+        setHasDisplayedNotFoundMessage(false)
+      }
+    } else {
+      setCounterpartyFound(false)
+      setHasDisplayedNotFoundMessage(false)
+    }
+  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage])
+
   if (loading) {
+    // TODO: Unsubscribe from Loader to avoid any potential mem leak.
     return <>
       <Loader
         type='ThreeDots'
         color='#00BFFF'
         height={30}
         width={30}
-        timeout={5000}
+        timeout={3000}
       />
        Loading
     </>
   }
 
-  if (error || !nickname) return <>No nickname available.</>
+  if (queryError || !nickname) return <>No nickname available.</>
   return <>{nickname}</>
 }
