@@ -27,8 +27,9 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
   } else {
     return async params => {
       const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
+      const urlObj = new URL(fullPath)
 
-      const signature = await signPayload(method, fullPath, params)
+      const signature = await signPayload(method, urlObj.pathname, params)
 
       const headers = {
         ...axiosConfig.headers,

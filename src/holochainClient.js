@@ -44,11 +44,10 @@ export const getHpAdminKeypair = async (email = undefined, password = undefined)
 }
 
 // Return empty string if HpAdminKeypair is still not initialized
-export const signPayload = async (method, request, body = "") => {
+export const signPayload = async (method, request, body) => {
 const keypair = await getHpAdminKeypair()
-
 if (keypair !== null)
-  return keypair.sign({method, request, body})
+  return keypair.sign({method: method.toLowerCase(), request, body: JSON.stringify(body)})
 else
   return ""
 }
