@@ -2,7 +2,7 @@ import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
 import { signPayload, hashResponseBody } from 'holochainClient'
 
-const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value retunred to false, once HPOS Image is nixified and located within repo.
+const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
 const developmentMockHposConnection = false // boolean to toggle hpos mock data reference while in dev context...
 export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? preLocalHposImageIntegration
@@ -22,9 +22,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
     return mockCallHpos(method, apiVersion, path)
   } else {
     return async params => {
-      // For Robbie: this url should be probably constructed from window.location, right?
-      // const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
-      const fullPath = 'https://' + window.location.hostname + '/' + apiVersion + '/' + path
+      const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
       const urlObj = new URL(fullPath)
 
       const signature = await signPayload(method, urlObj.pathname, params)

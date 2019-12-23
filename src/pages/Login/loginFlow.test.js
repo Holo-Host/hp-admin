@@ -43,12 +43,14 @@ describe('login flow', () => {
     const { getByLabelText, queryByLabelText, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <HPAdminApp />
     </MockedProvider>)
+
     await act(async () => {
       fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
       fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       fireEvent.click(getByText('Login'))
-      await wait(0)
+      await wait(50)
     })
+
     expect(getByText('Hi!')).toBeInTheDocument()
     expect(queryByLabelText('Email:')).not.toBeInTheDocument()
   })
@@ -73,12 +75,14 @@ describe('login flow', () => {
     const { getByLabelText, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <HPAdminApp />
     </MockedProvider>)
+
     await act(async () => {
       fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
       fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       fireEvent.click(getByText('Login'))
-      await wait(0)
+      await wait(50)
     })
+
     expect(getByText('Incorrect email or password. Please check and try again.')).toBeInTheDocument()
     expect(getByLabelText('Email:')).toBeInTheDocument()
   })

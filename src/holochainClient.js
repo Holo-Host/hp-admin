@@ -23,7 +23,7 @@ export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 
 // Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
 const getHcPubkey = () => {
-  return ((process.env.NODE_ENV === 'development')
+  return ((process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
     ? '3llrdmlase6xwo9drzs6qpze40hgaucyf7g8xpjze6dz32s957'
     : window.location.hostname.split('.')[0])
 }
@@ -89,11 +89,10 @@ export const signPayload = async (method, request, body) => {
 }
 
 export const hashResponseBody = async (data) => {
-  // const dataBytes = Buffer.from(stringify(data))
-  // const hashBytes = await crypto.subtle.digest('SHA-512', dataBytes)
+  const dataBytes = Buffer.from(stringify(data))
+  const hashBytes = await crypto.subtle.digest('SHA-512', dataBytes)
 
-  // return Buffer.from(hashBytes).toString('base64')
-  return 'hashed response'
+  return Buffer.from(hashBytes).toString('base64')
 }
 
 export function conductorInstanceIdbyDnaAlias (instanceId) {
