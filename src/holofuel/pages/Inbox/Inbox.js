@@ -380,7 +380,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
 
   useEffect(() => {
     if (!transaction) return null
-    else if (holofuelCounterparty) {
+    else if (!isEmpty(holofuelCounterparty)) {
       if (notFound) {
         setCounterpartyNotFound(true)
         if (!hasDisplayedNotFoundMessage) {
@@ -389,7 +389,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
         }
       } else setCounterpartyNotFound(false)
     }
-  }, [setCounterpartyNotFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, notFound, newMessage])
+  }, [setCounterpartyNotFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, notFound, holofuelCounterparty, transaction, newMessage])
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
