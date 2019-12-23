@@ -18,6 +18,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'holofuel/components/Button'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
+import Loader from 'react-loader-spinner'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
@@ -41,14 +42,12 @@ function useOffer () {
 
 function useDecline () {
   const [decline] = useMutation(HolofuelDeclineMutation)
-  return ({ id }) => {
-    decline({
-      variables: { transactionId: id },
-      refetchQueries: [{
-        query: HolofuelActionableTransactionsQuery
-      }]
-    })
-  }
+  return ({ id }) => decline({
+    variables: { transactionId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    }]
+  })
 }
 
 function useRefund () {
@@ -317,6 +316,9 @@ function useAcceptOffer (id) {
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
+    },
+    {
+      query: HolofuelLedgerQuery
     }]
   })
 }
@@ -325,8 +327,21 @@ function AcceptButton ({ transaction: { id } }) {
   const { newMessage } = useFlashMessageContext()
   const acceptOffer = useAcceptOffer(id)
   const accept = () => {
-    acceptOffer()
-    newMessage('Offer successfully accepted', 5000)
+    newMessage(<>
+      <Loader
+        type='Circles'
+        color='#FFF'
+        height={30}
+        width={30}
+        timeout={5000}
+      /> Sending...
+    </>, 5000)
+
+    acceptOffer().then(() => {
+      newMessage('Offer successfully accepted', 5000)
+    }).catch(() => {
+      newMessage('Offer acceptance unsuccessfully', 5000)
+    })
   }
   return <Button
     onClick={accept}
@@ -429,9 +444,16 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   }
 
   const onYes = () => {
-    actionHook(actionParams)
+    newMessage(<>
+      <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000} />
+    </>, 5000)
+
+    actionHook(actionParams).then(() => {
+      newMessage(flashMessage, 5000)
+    }).catch(() => {
+      newMessage('Sorry Something went wrong', 5000)
+    })
     handleClose()
-    newMessage(flashMessage, 5000)
   }
 
   return <Modal

@@ -286,7 +286,8 @@ describe('TransactionRow', () => {
     offerMock,
     acceptOfferMock,
     declineMock,
-    actionableTransactionsMock
+    actionableTransactionsMock,
+    ledgerMock
   ]
 
   describe('Reveal actionable-buttons slider', () => {
