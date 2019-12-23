@@ -305,16 +305,6 @@ describe('TransactionRow', () => {
     }
   }
 
-  const counterpartyQueryErrorMock = {
-    request: {
-      query: HolofuelCounterpartyQuery,
-      variables: { agentId: mockAgent1.pub_sign_key }
-    },
-    result: {
-      data: { holofuelCounterparty: { ...mockWhoIsAgent1, nickname: undefined, nonFound: true } }
-    }
-  }
-
   const mocks = [
     whoamiMock,
     offerMock,
@@ -373,7 +363,7 @@ describe('TransactionRow', () => {
     })
   })
 
-  describe('Pay and DeclineOrCancel buttons', () => {
+  describe('Accept Payment and DeclineOrCancel buttons', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
@@ -402,15 +392,6 @@ describe('TransactionRow', () => {
   })
 
   describe('Accept Payment Modal', () => {
-    const mocks = [
-      whoamiMock,
-      offerMock,
-      declineMock,
-      actionableTransactionsMock,
-      counterpartyQueryErrorMock,
-      ledgerMock
-    ]
-
     it('respond properly', async () => {
       const props = {
         transaction: { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' }, action: 'pay' },
@@ -422,13 +403,33 @@ describe('TransactionRow', () => {
         counterpartyNotFound: false
       }
 
+      const counterpartyQueryErrorMock = {
+        request: {
+          query: HolofuelCounterpartyQuery,
+          variables: { agentId: mockAgent1.pub_sign_key }
+        },
+        result: () => {
+          props.counterpartyNotFound = true
+          return { data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, notFound: true } } }
+        }
+      }
+
+      const mocks = [
+        whoamiMock,
+        offerMock,
+        declineMock,
+        actionableTransactionsMock,
+        counterpartyQueryErrorMock,
+        ledgerMock
+      ]
+
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <ConfirmationModal {...props} />
       </MockedProvider>, 0)
 
       expect(getByText(presentAgentId('HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'), { exact: false })).toBeInTheDocument()
       expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()
-      expect(counterpartyQueryErrorMock.nonFound).toBe(true)
+      expect(props.counterpartyNotFound).toBe(true)
 
       fireEvent.click(getByText('Close Modal'))
       expect(props.handleClose).toHaveBeenCalled()
