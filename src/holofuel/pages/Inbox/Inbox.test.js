@@ -186,8 +186,7 @@ describe('TransactionRow', () => {
     },
     result: {
       data: { holofuelUser: mockWhoamiAgent }
-    },
-    newData: jest.fn()
+    }
   }
 
   const request = {
@@ -258,8 +257,7 @@ describe('TransactionRow', () => {
     },
     result: {
       data: { holofuelOffer: mockTransaction }
-    },
-    newData: jest.fn()
+    }
   }
 
   const acceptOfferMock = {
@@ -269,8 +267,7 @@ describe('TransactionRow', () => {
     },
     result: {
       data: { holofuelAcceptOffer: mockTransaction }
-    },
-    newData: jest.fn()
+    }
   }
 
   const declineMock = {
@@ -280,8 +277,7 @@ describe('TransactionRow', () => {
     },
     result: {
       data: { holofuelDecline: mockTransaction }
-    },
-    newData: jest.fn()
+    }
   }
 
   const mockAgent1 = {

@@ -1,5 +1,5 @@
-mutation HposCheckAuth ($authToken: String) {
-  hposCheckAuth(authToken: $authToken) {
+mutation HposCheckAuth {
+  hposCheckAuth {
     isAuthed
   }
 }

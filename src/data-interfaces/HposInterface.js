@@ -1,17 +1,9 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
+import { signPayload, hashResponseBody } from 'holochainClient'
 
-// these two functions are stubs until we have the crypto library
-function payloadSignature (authKey, method, request, body) {
-  return 'signature'
-}
-
-function hashResponseBody (body) {
-  return 'hash of body'
-}
-
-const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value retunred to false, once HPOS Image is nixified and located within repo.
-const developmentMockHposConnection = true // boolean to toggle hpos mock data reference while in dev context...
+const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
+const developmentMockHposConnection = false // boolean to toggle hpos mock data reference while in dev context...
 export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? preLocalHposImageIntegration
   : process.env.NODE_ENV === 'test'
@@ -25,14 +17,15 @@ const axiosConfig = {
   }
 }
 
-export function hposCall ({ method = 'get', path, authToken, apiVersion = 'v1', headers: userHeaders = {} }) {
+export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: userHeaders = {} }) {
   if (MOCK_HPOS_CONNECTION) {
     return mockCallHpos(method, apiVersion, path)
   } else {
     return async params => {
       const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
+      const urlObj = new URL(fullPath)
 
-      const signature = payloadSignature(authToken, method, fullPath, params)
+      const signature = await signPayload(method, urlObj.pathname, params)
 
       const headers = {
         ...axiosConfig.headers,
@@ -88,17 +81,17 @@ const presentHposSettings = (hposSettings) => {
 const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
-    settings: async (authToken) => {
-      const result = await hposCall({ method: 'get', path: 'config', authToken })()
+    settings: async () => {
+      const result = await hposCall({ method: 'get', path: 'config' })()
       return presentHposSettings(result)
     },
 
-    updateSettings: async (hostPubKey, hostName, deviceName, sshAccess, authToken) => {
-      const settingsResponse = await hposCall({ method: 'get', path: 'config', authToken })()
+    updateSettings: async (hostPubKey, hostName, deviceName, sshAccess) => {
+      const settingsResponse = await hposCall({ method: 'get', path: 'config' })()
 
       // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
       const headers = {
-        'x-hp-admin-cas': hashResponseBody(settingsResponse)
+        'x-hp-admin-cas': await hashResponseBody(settingsResponse)
       }
 
       const settingsConfig = {
@@ -112,18 +105,18 @@ const HposInterface = {
         name: deviceName
       }
 
-      const result = await hposCall({ method: 'put', path: 'config', headers, authToken })(settingsConfig)
+      const result = await hposCall({ method: 'put', path: 'config', headers })(settingsConfig)
       return presentHposSettings(result)
     },
 
     // HOLOPORT_OS STATUS
-    status: async (authToken) => {
-      const result = await hposCall({ method: 'get', path: 'status', authToken })()
+    status: async () => {
+      const result = await hposCall({ method: 'get', path: 'status' })()
       return presentHposStatus(result)
     },
 
-    updateVersion: async (authToken) => {
-      const result = await hposCall({ method: 'post', path: 'upgrade', authToken })()
+    updateVersion: async () => {
+      const result = await hposCall({ method: 'post', path: 'upgrade' })()
       return presentHposStatus(result)
     }
   }

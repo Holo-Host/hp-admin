@@ -6,8 +6,6 @@ import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
-// this is importing from the mock.
-import { authToken } from 'contexts/useAuthTokenContext'
 
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
@@ -15,7 +13,7 @@ import { defaultHapp } from 'models/Happ'
 import Dashboard from './Dashboard'
 
 jest.mock('components/layout/PrimaryLayout')
-jest.mock('contexts/useAuthTokenContext')
+jest.mock('contexts/useAuthContext')
 jest.mock('contexts/useFlashMessageContext')
 
 describe('Dashboard', () => {
@@ -62,10 +60,7 @@ describe('Dashboard', () => {
       },
       {
         request: {
-          query: HposSettingsQuery,
-          variables: {
-            authToken
-          }
+          query: HposSettingsQuery
         },
         result: {
           data: {
@@ -137,10 +132,7 @@ describe('Dashboard', () => {
       },
       {
         request: {
-          query: HposSettingsQuery,
-          variables: {
-            authToken
-          }
+          query: HposSettingsQuery
         },
         result: {
           data: {
@@ -233,10 +225,7 @@ describe('Dashboard', () => {
       },
       {
         request: {
-          query: HposSettingsQuery,
-          variables: {
-            authToken
-          }
+          query: HposSettingsQuery
         },
         result: {
           data: {
@@ -318,10 +307,7 @@ describe('Dashboard', () => {
       },
       {
         request: {
-          query: HposSettingsQuery,
-          variables: {
-            authToken
-          }
+          query: HposSettingsQuery
         },
         result: {
           data: {

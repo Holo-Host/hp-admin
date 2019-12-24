@@ -42,8 +42,7 @@ const offerMock = {
         status: ''
       }
     }
-  },
-  newData: jest.fn()
+  }
 }
 
 const mockAgent1 = {
@@ -85,25 +84,28 @@ describe('CreateOfferRequest', () => {
 
       await act(async () => {
         fireEvent.change(getByLabelText('To'), { target: { value: counterparty.id } })
-        await wait(0)
+        await wait(50)
       })
 
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
+      act(() => {
+        fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
+      })
 
       expect(getByLabelText('Fee (1%)').value).toEqual((amount * FEE_PERCENTAGE).toFixed(2))
 
       expect(getByLabelText('Total').value).toEqual((amount + (amount * FEE_PERCENTAGE)).toFixed(2))
 
-      fireEvent.change(getByPlaceholderText('What is this for?'), { target: { value: notes } })
+      act(() => {
+        fireEvent.change(getByPlaceholderText('What is this for?'), { target: { value: notes } })
+      })
 
       await act(async () => {
         fireEvent.click(getByTestId('submit-button'))
         await wait(0)
       })
 
-      expect(offerMock.newData).toHaveBeenCalled()
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
@@ -204,7 +206,9 @@ describe('CreateOfferRequest', () => {
 
       expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+      act(() => {
+        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+      })
 
       expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
       expect(within(getByTestId('counterparty-nickname')).getByText('Loading')).toBeInTheDocument()
@@ -277,8 +281,7 @@ describe('CreateOfferRequest', () => {
               status: ''
             }
           }
-        },
-        newData: jest.fn()
+        }
       }
 
       const mocks = [
@@ -316,7 +319,6 @@ describe('CreateOfferRequest', () => {
         await wait(0)
       })
 
-      expect(requestMock.newData).toHaveBeenCalled()
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })

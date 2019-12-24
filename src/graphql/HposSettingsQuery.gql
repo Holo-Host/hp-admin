@@ -1,5 +1,5 @@
-query HposSettings ($authToken: String)  {
-  hposSettings(authToken: $authToken) {
+query HposSettings  {
+  hposSettings {
     hostPubKey
     hostName
     registrationEmail

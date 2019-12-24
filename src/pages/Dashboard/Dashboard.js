@@ -8,7 +8,6 @@ import LaptopIcon from 'components/icons/LaptopIcon'
 import PlusIcon from 'components/icons/PlusIcon'
 import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
-import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
@@ -19,7 +18,7 @@ import './Dashboard.module.css'
 export const mockEarnings = 4984
 
 export default function Dashboard ({ earnings = mockEarnings }) {
-  const { data: { hposSettings: settings = [] } = {} } = useHPAuthQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
 
   const { data: { happs = [] } = {} } = useQuery(HappsQuery)
   const noInstalledHapps = happs.reduce((total, happ) => happ.isEnabled ? total + 1 : total, 0)

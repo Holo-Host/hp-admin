@@ -96,8 +96,7 @@ describe('resolvers', () => {
 
     describe('.hposSettings', () => {
       it('calls HposInterface.os.settings', async () => {
-        const authToken = 'fldsjfdlskj'
-        resolvers.Query.hposSettings(null, { authToken })
+        resolvers.Query.hposSettings(null)
         await wait(0)
         expect(mockHposInterface.os.settings).toHaveBeenCalled()
       })

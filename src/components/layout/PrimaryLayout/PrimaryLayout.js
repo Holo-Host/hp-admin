@@ -1,13 +1,13 @@
 import React, { useContext, useState } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
+import { useQuery } from '@apollo/react-hooks'
 import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
 import SideMenu from 'components/SideMenu'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
-import { useHPAuthQuery } from 'graphql/hpAuthHooks'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -19,7 +19,7 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
-  const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

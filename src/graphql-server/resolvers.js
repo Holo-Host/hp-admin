@@ -60,7 +60,7 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: (_, { authToken }) => HposInterface.os.settings(authToken),
+    hposSettings: (_) => HposInterface.os.settings(),
 
     hposStatus: HposInterface.os.status
   },
@@ -105,13 +105,13 @@ export const resolvers = {
 
     holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
 
-    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess, authToken),
+    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 
-    hposUpdateVersion: (_, { authToken }) => HposInterface.os.updateVersion(authToken),
+    hposUpdateVersion: () => HposInterface.os.updateVersion(),
 
-    hposCheckAuth: async (_, { authToken }) => {
+    hposCheckAuth: async () => {
       try {
-        await HposInterface.os.settings(authToken)
+        await HposInterface.os.settings()
       } catch (error) {
         return {
           isAuthed: false
