@@ -34,3 +34,4 @@ yarn.lock
 conductor.log
 conductor.pid
 conductor-config.toml
+conductor-config-extra.toml

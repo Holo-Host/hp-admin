@@ -47,12 +47,25 @@ let
       path = ".holochain/holo/storage/${dna.name}";
       type = "file";
     };
-  }) config.agents;
-
+  }) config.agent1;
 
   multiInterfaceInstanceConfig = dna: map (agent: {
     id = dna.name;
-  }) config.agents;
+  }) config.agent1;
+
+  multiInterfaceInstanceConfig2 = dna: map (agent: {
+    id = dna.name;
+  }) config.agent2;
+
+  multiInstanceConfig2 = dna: map (agent: {
+    agent = agent.id;
+    dna = dna.name+"-dna";
+    id = dna.name;
+    storage = {
+      path = ".holochain/holo/storage/${dna.name}";
+      type = "file";
+    };
+  }) config.agent2;
 
   flatten = x:
     if builtins.isList x
@@ -165,7 +178,7 @@ in
   hp-admin-conductor-config = writeTOML {
     bridges = [];
     persistence_dir = ".holochain/holo";
-    agents = map agentConfig config.agents;
+    agents = map agentConfig config.agent1;
     dnas = map dnaConfig dnas;
     instances = flatten(map multiInstanceConfig dnas);
     interfaces = [
@@ -187,6 +200,57 @@ in
         instances = flatten(map multiInterfaceInstanceConfig dnas);
       }
     ];
+    network = {
+      sim2h_url = "wss://sim2h.holochain.org:9000";
+      type = "sim2h";
+    };
+    logger = {
+      type = "debug";
+      rules.rules = [
+        {
+          color = "red";
+          exclude = false;
+          pattern = "^err/";
+        }
+        {
+          color = "white";
+          exclude = false;
+          pattern = "^debug/dna";
+        }
+      ];
+    };
+  };
+
+
+  hp-admin-extra-conductor-config = writeTOML {
+    bridges = [];
+    persistence_dir = ".holochain/holo";
+    agents = map agentConfig config.agent2;
+    dnas = map dnaConfig dnas;
+    instances = flatten(map multiInstanceConfig2 dnas);
+    interfaces = [
+      {
+        id = "websocket-interface";
+        driver = {
+          port = 3400;
+          type = "websocket";
+        };
+        instances = flatten(map multiInterfaceInstanceConfig2 dnas);
+      }
+      {
+        id = "http-interface";
+        admin = true;
+        driver = {
+          port = 3300;
+          type = "http";
+        };
+        instances = flatten(map multiInterfaceInstanceConfig2 dnas);
+      }
+    ];
+    network = {
+      sim2h_url = "wss://sim2h.holochain.org:9000";
+      type = "sim2h";
+    };
     logger = {
       type = "debug";
       rules.rules = [
