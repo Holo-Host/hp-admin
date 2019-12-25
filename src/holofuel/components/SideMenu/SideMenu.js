@@ -1,8 +1,6 @@
-import React, { useState } from 'react'
-import ReactTooltip from 'react-tooltip'
+import React from 'react'
 import cx from 'classnames'
-import Modal from 'components/Modal'
-import Button from 'components/Button'
+import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import { presentHolofuelAmount } from 'utils'
@@ -15,130 +13,87 @@ import {
 
 import './SideMenu.module.css'
 
-export function SideMenu ({
+export default function SideMenu ({
   isOpen,
   handleClose,
   avatarUrl = '',
   agent,
   agentLoading,
   inboxCount,
-  holofuelBalance,
-  isWide
+  holofuelBalance
 }) {
-  if (agentLoading) agentLoading = <h4>Loading...</h4>
-
-  const [toggleModal, setToggleModal] = useState()
-  const showModal = () => setToggleModal(true)
-
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <h1 styleName='appName' data-testid='sidemenu-header'>HoloFuel</h1>
-        <CopyAgentId agent={agent} isMe>
-          <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={100} styleName='avatar' />
+        <CopyAgentId agent={{ id: agent.id }} isMe>
+          <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={48} styleName='avatar' />
         </CopyAgentId>
+        <h3 styleName='nickname'>
+          {agent.nickname || (agentLoading && <>Loading...</>)}
+        </h3>
 
-        <span styleName='header-account' data-testid='sidemenu-agentname'>
-          <CopyAgentId agent={agent} isMe>
-            {agent.nickname || agentLoading}
-          </CopyAgentId>
-        </span>
-        <strong styleName='header-balance'>{presentHolofuelAmount(holofuelBalance)}</strong>
+        <h1 styleName='balance'>{presentHolofuelAmount(holofuelBalance)} TF</h1>
+
       </header>
 
       <nav styleName='nav'>
         <ul styleName='nav-list'>
           <li>
             <Link to={HOME_PATH} styleName='nav-link'>
-              <div styleName='nav-icon' />
               Home
             </Link>
           </li>
           <li>
-            <Link to={INBOX_PATH} styleName='nav-link' data-testid='inbox-link'>
-              <div styleName='nav-icon' />
-              Inbox
-              {inboxCount > 0 && <span styleName='nav-badge'>{inboxCount}</span>}
+            <Link to={INBOX_PATH} styleName='nav-link'>
+              Inbox <InboxBadge count={inboxCount} />
             </Link>
           </li>
           <li>
-            <Link to={HISTORY_PATH} styleName='nav-link' data-testid='history-link'>
-              <div styleName='nav-icon' />
+            <Link to={HISTORY_PATH} styleName='nav-link'>
               History
             </Link>
           </li>
           <li>
-            {isWide
-              ? <Link to='#/' data-tip='' data-for='hf-redemption' styleName='nav-link disabled-link'>
-                <div styleName='nav-icon disabled' />
-                Redeem
-                <ReactTooltip
-                  id='hf-redemption'
-                  delayShow={250}
-                  getContent={() => <>'Feature is to come... '</>}
-                />
-              </Link>
-              : <>
-                <Link to='#/' styleName='nav-link disabled-link' onClick={() => showModal()}>
-                  <div styleName='nav-icon disabled' />
-                  Redeem
-                </Link>
-              </>
-            }
+            <Link to='/makemework' styleName='nav-link'>
+              HP Admin
+            </Link>
           </li>
         </ul>
       </nav>
 
       <footer styleName='footer'>
         <div styleName='alpha-info'>
+          <AlphaFlag variant='right' styleName='alpha-flag' />
           <p>
             HoloFuel is in Alpha testing.
           </p>
           <p>
             Learn more about out our&nbsp;
-            <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
+            <a href='https://wheredoesthisgo.com' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
               Alpha Testnet.
             </a>
           </p>
         </div>
 
         <ul styleName='footer-list'>
-          <li>
+          <li styleName='footer-list-item'>
             <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
           </li>
-          <li>
-            <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</a>
+          <li styleName='footer-list-item'>
+            <Link to='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</Link>
           </li>
         </ul>
       </footer>
+
     </div>
-
     <div styleName='drawer-overlay' onClick={handleClose} />
-
-    <HfRedemptionDescriptionModal
-      handleClose={() => setToggleModal(null)}
-      toggleModal={toggleModal} />
   </aside>
 }
 
-function HfRedemptionDescriptionModal ({ toggleModal, handleClose }) {
-  return <Modal
-    contentLabel='HoloFuel Redemption'
-    isOpen={!!toggleModal}
-    handleClose={handleClose}
-    styleName='modal topmost'>
-    <div styleName='modal-title'>How to Redeem HoloFuel</div>
-    <div styleName='modal-text' role='heading'>
-      Feature is to come...
-    </div>
-    <div styleName='modal-buttons'>
-      <Button
-        onClick={handleClose}
-        styleName='modal-button-no'>
-        Ok
-      </Button>
-    </div>
-  </Modal>
-}
+function InboxBadge ({ count = 0 }) {
+  if (count === 0) return null
 
-export default SideMenu
+  return <div styleName='inbox-badge'>
+    {count}
+  </div>
+}

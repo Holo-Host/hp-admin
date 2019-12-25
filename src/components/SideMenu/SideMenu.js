@@ -5,7 +5,7 @@ import HashAvatar from 'components/HashAvatar'
 import CopyAgentId from 'components/CopyAgentId'
 import GearIcon from 'components/icons/GearIcon'
 import AlphaFlag from 'components/AlphaFlag'
-import { sliceHash as presentHash } from 'utils'
+import { presentAgentId } from 'utils'
 import './SideMenu.module.css'
 
 export function SideMenu ({
@@ -21,7 +21,7 @@ export function SideMenu ({
           <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} size={48} styleName='avatar' />
         </CopyAgentId>
         <h2 styleName='host-name'>
-          {settings.hostName || presentHash(settings.hostPubKey)}
+          {settings.hostName || presentAgentId(settings.hostPubKey)}
         </h2>
 
         <Link to='/settings' styleName='settings-link'>
