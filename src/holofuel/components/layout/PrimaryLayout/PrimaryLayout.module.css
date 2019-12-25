@@ -4,7 +4,6 @@
   word-break: break-word;
   height: 100%;
   box-sizing: border-box;
-  background-color: var(--color-white-smoke)
 }
 
 .wide {
@@ -15,8 +14,13 @@
   padding: 0;
 }
 
+.alpha-flag {
+  position: absolute;
+  right: 0px;
+  top: 80px;
+}
+
 .content {
-  padding: 3px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;

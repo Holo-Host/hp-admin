@@ -9,6 +9,7 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
+import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { TYPE, STATUS } from 'models/Transaction'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
@@ -40,6 +41,7 @@ export function PrimaryLayout ({
       holofuelBalance={holofuelBalance}
       isWide={isWide}
     />
+    <AlphaFlag styleName='styles.alpha-flag' />
     <div styleName='styles.content'>
       <FlashMessage />
       {children}
