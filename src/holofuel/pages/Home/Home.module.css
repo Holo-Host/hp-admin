@@ -3,8 +3,6 @@
   flex-direction: column;
   height: 100%;
   width: 100%;  
-  background-color: var(--color-alabaster);
-  z-index: -12;
   position: relative;
 }
 
