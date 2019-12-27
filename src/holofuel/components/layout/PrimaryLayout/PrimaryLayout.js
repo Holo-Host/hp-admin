@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
+import { isEmpty } from 'lodash/fp'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -20,9 +21,14 @@ export function PrimaryLayout ({
 }) {
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
   const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
 
   const inboxCount = actionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request))).length
+
+  let ledgerNullState
+  if (ledgerLoading || !holofuelBalance || isEmpty(holofuelBalance)) {
+    ledgerNullState = NaN
+  }
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -37,7 +43,7 @@ export function PrimaryLayout ({
       agent={holofuelUser}
       agentLoading={holofuelUserLoading}
       inboxCount={inboxCount}
-      holofuelBalance={holofuelBalance}
+      holofuelBalance={ledgerNullState || holofuelBalance}
       isWide={isWide}
     />
     <div styleName='styles.content'>
