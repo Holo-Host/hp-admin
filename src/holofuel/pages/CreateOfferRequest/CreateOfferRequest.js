@@ -7,6 +7,7 @@ import Loader from 'react-loader-spinner'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -62,6 +63,7 @@ const modePrepositions = {
 export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
@@ -140,7 +142,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
               setCounterpartyNick={setCounterpartyNick}
               counterpartyNick={counterpartyNick}
               setCounterpartyFound={setCounterpartyFound}
-              newMessage={newMessage} />
+              newMessage={newMessage}
+              whoami={whoami} />
           </h4>}
         </div>
       </div>
@@ -191,7 +194,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage, whoami }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
@@ -211,6 +214,12 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
           newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
           setHasDisplayedNotFoundMessage(true)
         }
+      } else if (holofuelCounterparty.id === whoami.id) {
+        setCounterpartyFound(false)
+        if (!hasDisplayedNotFoundMessage) {
+          newMessage('You cannot send yourself TestFuel')
+          setHasDisplayedNotFoundMessage(true)
+        }
       } else {
         setCounterpartyFound(true)
         setHasDisplayedNotFoundMessage(false)
@@ -219,7 +228,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
       setCounterpartyFound(false)
       setHasDisplayedNotFoundMessage(false)
     }
-  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage])
+  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage, whoami])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.
