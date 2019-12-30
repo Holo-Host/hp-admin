@@ -8,6 +8,7 @@ import { TYPE } from 'models/Transaction'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { presentHolofuelAmount } from 'utils'
@@ -134,6 +135,46 @@ describe('CreateOfferRequest', () => {
 
       expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
       expect(within(getByTestId('counterparty-nickname')).getByText(mockWhoIsAgent1.nickname)).toBeInTheDocument()
+    })
+
+    it('renders error message upon attempt to transact with self', async () => {
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
+      const mockWhoamiAgent = {
+        id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+        nickname: 'Perry'
+      }
+
+      const whoamiMock = {
+        request: {
+          query: HolofuelUserQuery
+        },
+        result: {
+          data: { holofuelUser: mockWhoamiAgent }
+        }
+      }
+
+      const mocks = [
+        counterpartyQueryMock,
+        whoamiMock
+      ]
+
+      const push = jest.fn()
+
+      const { getByLabelText, queryByText, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <CreateOfferRequest history={{ push }} />
+      </MockedProvider>)
+
+      expect(queryByText('You cannot send yourself TestFuel')).not.toBeInTheDocument()
+
+      await act(async () => {
+        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+        await wait(0)
+      })
+
+      expect(getByText('You cannot send yourself TestFuel')).toBeInTheDocument()
     })
 
     it('renders the counterparty error message upon *unsuccessful* fetch', async () => {
