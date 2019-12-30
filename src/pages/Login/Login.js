@@ -18,6 +18,8 @@ export default function Login ({ history: { push } }) {
   const { newMessage } = useFlashMessageContext()
 
   const onSubmit = async ({ email, password }) => {
+    // we call this to SET the singleton value of HpAdminKeypair
+    await getHpAdminKeypair(email, password)
     const authResult = await checkAuth()
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
 
@@ -25,7 +27,7 @@ export default function Login ({ history: { push } }) {
     await getHpAdminKeypair(email, password)
 
     setIsAuthed(isAuthed)
-    console.log('isAuthed', isAuthed)
+    
     if (isAuthed) {
       push('/admin')
     } else {

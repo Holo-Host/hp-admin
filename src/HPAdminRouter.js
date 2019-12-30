@@ -14,7 +14,7 @@ import FactoryResetInstructions from 'pages/FactoryResetInstructions'
 
 export default function HPAdminRouter () {
   return <>
-    <Route path='(|/|/admin/login)' component={Login} />
+    <Route path='(|/|/admin/login)' component={Login} exact />
     <AuthRoute path='(/admin|/admin/|/admin/dashboard)' exact component={Dashboard} />
     <AuthRoute path='/admin/menu' component={MainMenu} />
     <AuthRoute path='/admin/browse-happs' exact component={BrowseHapps} />
