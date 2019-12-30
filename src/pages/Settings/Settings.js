@@ -137,8 +137,15 @@ export function Settings ({ history: { push } }) {
         bottomStyle={i === ports.length - 1} />)}
       <div styleName='settings-header'>&nbsp;</div>
       <SettingsRow
-        label={<Button name='factory-reset' variant='danger' wide styleName='factory-reset-button' onClick={() => push('/factory-reset')}>Factory Reset</Button>}
-        value={<div onClick={() => push('/factory-reset')} styleName='arrow-wrapper'><ArrowRightIcon color={rhino} opacity={0.8} /></div>}
+        label={<a href='https://holo.host/holoport-reset' target='_blank' rel='noopener noreferrer' styleName='reset-link'>
+          <Button name='factory-reset' variant='danger' wide styleName='factory-reset-button'>Factory Reset</Button>
+        </a>}
+        value={
+          <div styleName='arrow-wrapper'>
+            <a href='https://holo.host/holoport-reset' target='_blank' rel='noopener noreferrer' styleName='reset-link'>
+              <ArrowRightIcon color={rhino} opacity={0.8} />
+            </a>
+          </div>}
         bottomStyle />
     </section>
   </PrimaryLayout>

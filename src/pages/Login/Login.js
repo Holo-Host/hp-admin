@@ -25,7 +25,7 @@ export default function Login ({ history: { push } }) {
     if (isAuthed) {
       // we call this to SET the singleton value of HpAdminKeypair
       await getHpAdminKeypair(email, password)
-      push('/')
+      push('/admin')
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     }
