@@ -32,7 +32,7 @@ async function populateHoloFuelData () {
 
   // 2.) Scenario: A request from agent2 to agent1
   console.log('\nTEST SCENARIO #2 : Agent 2 Requests hf from Agent 1')
-  const agent2InitiateRequest = await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, to: agent2.id, from: agent1.id, amount: '200' })
+  const agent2InitiateRequest = await createZomeCall('holofuel', 'transactions', 'request', agent2Index)({ ...txParams, to: agent2.id, from: agent1.id, amount: '200' })
   console.log(' >> Agent 2 Initiate Request Success Hash', agent2InitiateRequest)
 
   // 3.) Scenario: An offer from agent2 to agent1
@@ -42,25 +42,26 @@ async function populateHoloFuelData () {
 
   // 4.) Scenario: A request from agent1 to agent2, which agent 2 has paid :
   // Part 1) : Agent 1 request HF from Agent 2
-  console.log('\nTEST SCENARIO #4 : Agent 2 receives Request from Agent 1 and Offers payment')
-  await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, to: agent1.id, from: agent2.id, amount: '400' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log(' Transaction `originId` : ', originId)
-      console.log('Waiting to allow for data propagation...')
-      await wait(6000)
-      console.log(' Part 1, Step 2 : searching to find pending transaction....')
-      const response = await createZomeCall('holofuel', 'transactions', 'list_pending', agent2Index)({ origins: originId })
-      const jsonResult = JSON.parse(response)
-      const transaction = _.get('Ok.requests[0].event[2].Request', jsonResult)
-      console.log(' Matching Transaction : ', transaction)
-      const { amount } = transaction
-      console.log(' Part 2 :')
-      // // Part 2) : Agent 2 Offers HF in response to Agent 1's Request
-      const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent1Index)({ ...txParams, to: agent1.id, from: agent2.id, amount })
-      console.log(' >> Pay Request Success Hash', payRequest)
-      return payRequest
-    })
+  // console.log('\nTEST SCENARIO #4 : Agent 2 receives Request from Agent 1 and Offers payment')
+  // await createZomeCall('holofuel', 'transactions', 'request', agent2Index)({ ...txParams, to: agent1.id, from: agent2.id, amount: '400' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log("LOGG: ", r);
+  //     console.log(' Transaction `originId` : ', originId)
+  //     console.log('Waiting to allow for data propagation...')
+  //     await wait(10000)
+  //     console.log(' Part 1, Step 2 : searching to find pending transaction....')
+  //     const response = await createZomeCall('holofuel', 'transactions', 'list_pending', agent2Index)({ origins: originId })
+  //     const jsonResult = JSON.parse(response)
+  //     const transaction = _.get('Ok.requests[0].event[2].Request', jsonResult)
+  //     console.log(' Matching Transaction : ', transaction)
+  //     const { amount } = transaction
+  //     console.log(' Part 2 :')
+  //     // // Part 2) : Agent 2 Offers HF in response to Agent 1's Request
+  //     const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, from: agent2.id, amount })
+  //     console.log(' >> Pay Request Success Hash', payRequest)
+  //     return payRequest
+  //   })
 
   // 5.) Scenario: An offer from agent1 to agent2 which agent 2 has accepted
   // Part 1) : Agent 1 Offers HF from Agent 2
