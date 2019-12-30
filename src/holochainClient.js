@@ -108,7 +108,7 @@ let holochainClient
 async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
   try {
-    let url = process.env.NODE_ENV === 'production' ? undefined : process.env.REACT_APP_DNA_INTERFACE_URL
+    let url = process.env.NODE_ENV === 'production' ? '/api/v1/ws/' : process.env.REACT_APP_DNA_INTERFACE_URL
     // Construct url with query param X-Holo-Admin-Signature = signature
     const urlObj = new URL(url)
     const params = new URLSearchParams(urlObj.search.slice(1))
