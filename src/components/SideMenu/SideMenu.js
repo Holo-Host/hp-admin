@@ -14,9 +14,6 @@ export function SideMenu ({
   avatarUrl = '',
   settings
 }) {
-
-  return null
-
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>

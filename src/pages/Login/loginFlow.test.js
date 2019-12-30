@@ -40,7 +40,7 @@ describe('login flow', () => {
 
     const email = 'a@example.com'
     const password = 'fkldsjf'
-    const { getByLabelText, queryByLabelText, getByText, debug } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+    const { getByLabelText, queryByLabelText, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <HPAdminApp />
     </MockedProvider>)
 

@@ -27,7 +27,7 @@ export default function Login ({ history: { push } }) {
     await getHpAdminKeypair(email, password)
 
     setIsAuthed(isAuthed)
-    
+
     if (isAuthed) {
       push('/admin')
     } else {
