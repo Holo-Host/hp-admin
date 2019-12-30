@@ -30,7 +30,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
       const headers = {
         ...axiosConfig.headers,
         ...userHeaders,
-        'X-Holo-Admin-Signature': signature
+        'X-Hpos-Admin-Signature': signature
       }
 
       let data
