@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { pickBy } from 'lodash/fp'
+import { pickBy, omitBy, isNil } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -233,11 +233,27 @@ const HoloFuelDnaInterface = {
 
       return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
-    allActionable: async () => {
-      const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentCanceledTransaction))
+    allActionable: async ({ limit, until }) => {
+      const args = omitBy(isNil, { limit, until })
+      const result = await createZomeCall('transactions/list_pending')(args)
+      const { requests, promises, declined, canceled } = result
+      const actionableTransactions = await requests
+        .map(r => presentPendingRequest(r))
+        .concat(promises.map(p => presentPendingOffer(p)))
+        .concat(declined.map(presentDeclinedTransaction))
+        .concat(canceled.map(presentCanceledTransaction))
+        .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
 
-      return actionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      const returning = {
+        transactions: actionableTransactions,
+        hasMore: true,
+        earliestTimestamp: actionableTransactions[actionableTransactions.length - 1].timestamp // this works because the list is sorted by timestamp
+      }
+      console.log('limit', limit)
+      console.log('until', until)
+      console.log('returning', returning)
+
+      return returning
     },
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()

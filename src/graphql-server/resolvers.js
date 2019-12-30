@@ -43,7 +43,11 @@ export const resolvers = {
 
     holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
 
-    holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
+    holofuelActionableTransactions: async (_, { limit }) => {
+      const resolversResult = await HoloFuelDnaInterface.transactions.allActionable({ limit })
+      console.log('resolversResult', resolversResult)
+      return resolversResult
+    },
 
     // NOTE: NonPending includes both completed and rejected/declined transactions.
     holofuelNonPendingTransactions: HoloFuelDnaInterface.transactions.allNonPending,
