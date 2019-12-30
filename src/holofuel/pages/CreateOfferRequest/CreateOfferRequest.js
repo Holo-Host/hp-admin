@@ -89,6 +89,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [total, setTotal] = useState(0)
 
   const onAmountChange = amount => {
+    if (amount < 0) return newMessage(`You cannot ${mode === OFFER_MODE ? 'send' : 'request'} negative amounts.`)
     if (isNaN(amount)) return
     const newFee = Number(amount) * FEE_PERCENTAGE
     setFee(newFee)
@@ -153,6 +154,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           name='amount'
           id='amount'
           type='number'
+          min='0'
           styleName='number-input'
           ref={register}
           onChange={({ target: { value } }) => onAmountChange(value)} />
@@ -189,7 +191,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true}>Send</Button>
+      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length !== AGENT_ID_LENGTH || !isCounterpartyFound}>Send</Button>
     </form>
   </PrimaryLayout>
 }

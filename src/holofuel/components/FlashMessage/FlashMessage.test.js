@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
+import { renderAndWait } from 'utils/test-utils'
 import wait from 'waait'
 import FlashMessage from './FlashMessage.js'
 import useFlashMessageContext, { FlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
@@ -36,7 +37,7 @@ it('should render a closable message', () => {
 it('should render a message which closes itself after the given time', async () => {
   const message = 'this is the message'
   const time = 10
-  const { queryByText, getByText } = render(
+  const { queryByText, getByText } = await renderAndWait(
     <FlashMessageProvider>
       <FlashMessage />
       <MockFlashMessageConsumer message={message} time={time} />
