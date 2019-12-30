@@ -20,11 +20,13 @@ export default function Login ({ history: { push } }) {
   const onSubmit = async ({ email, password }) => {
     const authResult = await checkAuth()
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
-    setIsAuthed(isAuthed)
 
+    // we call this to SET the singleton value of HpAdminKeypair
+    await getHpAdminKeypair(email, password)
+
+    setIsAuthed(isAuthed)
+    console.log('isAuthed', isAuthed)
     if (isAuthed) {
-      // we call this to SET the singleton value of HpAdminKeypair
-      await getHpAdminKeypair(email, password)
       push('/admin')
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
