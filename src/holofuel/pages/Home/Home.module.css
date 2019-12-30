@@ -12,7 +12,6 @@
   right: 0;
   top: 0;
   left: 0;
-  z-index: -10;
   position: absolute;
 }
 
@@ -20,12 +19,14 @@
   text-align: center;
   margin-top: 40px;
   margin-bottom: 12px;
+  z-index: 1
 }
 
 .greeting {
   text-align: center;
   color: var(--color-rhino-80);
   margin-bottom: 24px;
+  z-index: 1
 }
 
 .balance-and-transactions {

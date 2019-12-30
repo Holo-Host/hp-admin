@@ -42,8 +42,9 @@ function useTransactionsWithCounterparties () {
 
 const transactions = [
   {
+    id: 1,
     counterparty: {
-      id: 1,
+      id: '1',
       nickname: 'Jackson.the.human'
     },
     notes: 'you know...',
@@ -51,8 +52,9 @@ const transactions = [
     direction: DIRECTION.incoming
   },
   {
+    id: 2,
     counterparty: {
-      id: 1,
+      id: '1',
       nickname: 'Jackson.the.human'
     },
     notes: 'you know...',
