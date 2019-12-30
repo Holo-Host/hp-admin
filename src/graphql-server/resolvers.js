@@ -60,7 +60,7 @@ export const resolvers = {
       return happmapped
     },
 
-    hposSettings: (_, { authToken }) => HposInterface.os.settings(authToken),
+    hposSettings: (_) => HposInterface.os.settings(),
 
     hposStatus: HposInterface.os.status
   },
@@ -99,28 +99,19 @@ export const resolvers = {
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
-    holofuelDecline: (_, { transactionId }) => {
-      console.log('!! INSIDE DECLINE ENDPOINT IN RESOLVERS !!', transactionId)
-      return HoloFuelDnaInterface.transactions.decline(transactionId)
-    },
+    holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId),
 
-    holofuelCancel: (_, { transactionId }) => {
-      console.log('!! INSIDE CANCEL ENDPOINT IN RESOLVERS !!')
-      return HoloFuelDnaInterface.transactions.cancel(transactionId)
-    },
+    holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
-    holofuelRecoverFunds: (_, { transactionId }) => {
-      console.log('!! INSIDE RECOVR FUNDS ENDPOINT IN RESOLVERS !!')
-      return HoloFuelDnaInterface.transactions.recoverFunds(transactionId)
-    },
+    holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
 
-    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess, authToken }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess, authToken),
+    hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 
-    hposUpdateVersion: (_, { authToken }) => HposInterface.os.updateVersion(authToken),
+    hposUpdateVersion: () => HposInterface.os.updateVersion(),
 
-    hposCheckAuth: async (_, { authToken }) => {
+    hposCheckAuth: async () => {
       try {
-        await HposInterface.os.settings(authToken)
+        await HposInterface.os.settings()
       } catch (error) {
         return {
           isAuthed: false

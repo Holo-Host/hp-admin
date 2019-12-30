@@ -5,7 +5,7 @@ import { MockedProvider } from '@apollo/react-testing'
 import Login from './Login'
 
 jest.mock('components/layout/PrimaryLayout')
-jest.mock('contexts/useAuthTokenContext')
+jest.mock('contexts/useAuthContext')
 jest.mock('contexts/useFlashMessageContext')
 
 describe('Login', () => {

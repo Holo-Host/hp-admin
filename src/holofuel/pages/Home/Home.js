@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useCallback } from 'react' // useState,
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, uniqBy } from 'lodash/fp'
@@ -52,15 +52,14 @@ export default function Home () {
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
   const { newMessage } = useFlashMessageContext()
-  const [errorMessage, setErrorMessage] = useState(null)
 
-  if (errorMessage) {
-    newMessage(errorMessage)
-    setErrorMessage('')
-  }
+  const filterActionableTransactionsByStatus = useCallback(status => holofuelActionableTransactions.filter(actionableTx => actionableTx.status === status), [holofuelActionableTransactions])
 
-  const filterActionableTransactionsByStatus = status => holofuelActionableTransactions.filter(actionableTx => actionableTx.status === status)
-  if (!isEmpty(filterActionableTransactionsByStatus('declined')) && errorMessage === null) setErrorMessage(declinedTransactionNotice)
+  useEffect(() => {
+    if (!isEmpty(filterActionableTransactionsByStatus('declined'))) {
+      newMessage(declinedTransactionNotice)
+    }
+  }, [filterActionableTransactionsByStatus, newMessage])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='avatar'>

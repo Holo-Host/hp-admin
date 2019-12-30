@@ -24,6 +24,7 @@ holofuel-conductor-config.toml
 hpadmin-conductor-config.toml
 nix-conductor-config.toml
 keystores
+dna
 
 npm-debug.log*
 yarn-debug.log*
@@ -35,3 +36,4 @@ conductor-1.log
 conductor-2.log
 conductor.pid
 conductor-config.toml
+conductor-config-extra.toml

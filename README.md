@@ -7,7 +7,7 @@
 
 3. Decide which Root you'd like to run and follow the respective steps below.
     > Roots:
-    >- HP Admin [calls HHA (host's side), HAS, and Hylo DNA endpoints]
+    >- HP Admin [calls HHA (host's side), HAS, and Holo Community DNA endpoints]
     >- HoloFuel (solely calls holofuel DNA endpoints)
 
 ### HP Admin:
@@ -15,17 +15,17 @@
 **Decide if you'll be using Mock or Live data.**
 
 If referencing **Mock** Data :
- - Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **true**. *NB: This is the default behavior.
-- If running HP Admin, run `npm run start` & proceed to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
+- If running HP Admin, run `npm run start:mock` & proceed to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
 
 If referencing **Live** Data :
-- Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **false**. *(Tip: If running HoloFuel root, you can leave the hylo, happ-store, and hha DNA vars as true.)*
-- Create a *.env* file at root and set contents to : `REACT_APP_DNA_INTERFACE_URL=ws://localhost:3400`
-- Create the *./conductor-config.toml* file at root
-- If running HP Admin, copy contents from *./conductor-config.example.toml* into the new conductor file
-> NB: Make sure the ws driver port is the same number as the one listed in your *.env* file.
-- Load HAS & HHA(provider's side) DHTs; run `npm run provider:flow`
-- Start HP Admin by running`npm run start` & head over to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
+- Open 2 terminals.
+##### Start the Conductors:
+- In one of the termainals, open nix-shell by typing `nix-shell` (after this happens your terminal line should become neon green)
+- Inside this nix-shell terminal, start the conductor for HP Admin, by typing in the command: `npm run hc:start-manual-1`
+##### Open the UI
+- In the remaining terminals, open the UI for HP Admin, by typing in the command: `npm run start:live`
+- Visit `http://localhost:3001/` to view the HoloFuel UI as **HP Admin**.  
+*(NB: This should automatically load and open up the correct url in your default browser.)*
 
 ---
 ### HoloFuel:
@@ -33,17 +33,18 @@ If referencing **Live** Data :
 **Decide if you'll be using Mock or Live data.**
 
 If referencing **Mock** Data :
-- Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **true**. *NB: This is the default behavior.
-- If running Holofuel, run `npm run start:holofuel` & proceed to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
+- Run`npm run start:holofuel-mock` & proceed to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
     
 If referencing **Live** Data :
-- Verify that all global MOCK variables inside *./src/holochainClient.js (lines 5-13)* are set to **false**. *(Tip: If running HoloFuel root, you can leave the hylo, happ-store, and hha DNA vars as true.)*
-- Create a *.env* file at root and set contents to : `REACT_APP_DNA_INTERFACE_URL=ws://localhost:3400`
-- Create the *./conductor-config.toml* file at root
-- If running Holofuel, copy contents from *./holofuel-conductor-config.example.toml* into the new conductor file
-> NB: Make sure the ws driver port is the same number as the one listed in your *.env* file.
-- Load holofuel DHT; run `npm run load:holofuel`
-- Start Holofuel by running`npm run start:holofuel` & head over to `http://localhost:3100`. *(NB: This should open automatically with a hot reloader.)*
+**NOTE: Please reference version v0.12.2 of the holofuel dna to test with the UI.**
+- Open 2 terminals.
+##### Start the Conductors:
+- In one of the termainals, open nix-shell by typing `nix-shell` (after this happens your terminal line should become neon green)
+- Inside this nix-shell terminal, start the conductor for HoloFuel, by typing in the command: `npm run hc:start-manual`
+##### Open the UI
+- In the remaining terminals, open the UI for HoloFuel, by typing in the command: `npm run start:holofuel-agent-1`
+- Visit `http://localhost:3001/` to view the HoloFuel UI as **HP Admin**.  
+*(NB: This should automatically load and open up the correct url in your default browser.)*
 
 ---
 ## Use with `nix-shell`
@@ -51,7 +52,6 @@ If referencing **Live** Data :
 **What nix-shell does in the background?**
 - Set `holochain` and `hc` binaries that are required to run the DNAs
 - Auto generates the conductor-config.toml
-- Run the `holochain -c conductor-config.toml` in the background i.e. it run the holochain conductor in the background.
 
 **Setup:**
 

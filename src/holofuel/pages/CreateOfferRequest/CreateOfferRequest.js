@@ -25,8 +25,6 @@ const AGENT_ID_LENGTH = 63
 const FormValidationSchema = yup.object().shape({
   counterpartyId: yup.string()
     .required()
-    // the first four chars === 'HcSc' (ie: the hc prefix)
-    // .substring(0, 5).matches(/(HcSc)/)
     .length(AGENT_ID_LENGTH)
     .trim(),
   amount: yup.number()
@@ -72,20 +70,13 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
+  const [isCounterpartyFound, setCounterpartyFound] = useState(false)
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
   }, [counterpartyId])
 
-  const { register, handleSubmit, errors, setValue: setFormValue, getValues } = useForm({ validationSchema: FormValidationSchema })
-  const formValues = getValues()
-
-  if (errorMessage) {
-    newMessage(errorMessage)
-    setErrorMessage('')
-  }
+  const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
   const selectAgent = id => {
     setCounterpartyId(id)
@@ -148,11 +139,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
               agentId={counterpartyId}
               setCounterpartyNick={setCounterpartyNick}
               counterpartyNick={counterpartyNick}
-              setErrorMessage={setErrorMessage}
-              errorMessage={errorMessage}
-              setCounterpartyNotFound={setCounterpartyNotFound}
-              counterpartyNotFound={counterpartyNotFound}
-              currentCounterpartyValue={formValues.counterpartyId} />
+              setCounterpartyFound={setCounterpartyFound}
+              newMessage={newMessage} />
           </h4>}
         </div>
       </div>
@@ -198,34 +186,40 @@ export default function CreateOfferRequest ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? counterpartyNotFound : true}>Send</Button>
+      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true}>Send</Button>
     </form>
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setErrorMessage, errorMessage, setCounterpartyNotFound, counterpartyNotFound, currentCounterpartyValue }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-  const { nickname } = holofuelCounterparty
+
+  const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
+
+  const { nickname, notFound } = holofuelCounterparty
   useEffect(() => {
     setCounterpartyNick(nickname)
   }, [setCounterpartyNick, nickname])
 
-  if (!loading && holofuelCounterparty.notFound) {
-    errorMessage = 'This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.'
-    counterpartyNotFound = true
-  } else if (!loading && !errorMessage && currentCounterpartyValue && currentCounterpartyValue.length === AGENT_ID_LENGTH) {
-    counterpartyNotFound = false
-  } else if (loading) counterpartyNotFound = true
-
   useEffect(() => {
-    setErrorMessage(errorMessage)
-  }, [setErrorMessage, errorMessage])
-
-  useEffect(() => {
-    setCounterpartyNotFound(counterpartyNotFound)
-  }, [setCounterpartyNotFound, counterpartyNotFound])
+    if (!loading) {
+      if (notFound) {
+        setCounterpartyFound(false)
+        if (!hasDisplayedNotFoundMessage) {
+          newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
+          setHasDisplayedNotFoundMessage(true)
+        }
+      } else {
+        setCounterpartyFound(true)
+        setHasDisplayedNotFoundMessage(false)
+      }
+    } else {
+      setCounterpartyFound(false)
+      setHasDisplayedNotFoundMessage(false)
+    }
+  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.

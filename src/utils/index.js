@@ -15,7 +15,6 @@ export async function promiseMap (array, fn) {
 }
 
 export function sliceHash (hashString = '', desiredLength = 6) {
-  // console.log(parseInt(hashString) || hashString === '' ? '' : `hashString: ${hashString}`)
   if (typeof desiredLength !== 'number') throw new Error('Fn sliceHash requires a number input.')
   return (hashString).slice(-desiredLength)
 }

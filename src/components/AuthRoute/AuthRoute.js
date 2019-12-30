@@ -4,10 +4,10 @@ import {
   Redirect
 } from 'react-router-dom'
 import { omit } from 'lodash/fp'
-import useAuthTokenContext from 'contexts/useAuthTokenContext'
+import useAuthContext from 'contexts/useAuthContext'
 
 export default function AuthRoute (props) {
-  const { isAuthed } = useAuthTokenContext()
+  const { isAuthed } = useAuthContext()
 
   if (isAuthed) return <Route {...props} />
 

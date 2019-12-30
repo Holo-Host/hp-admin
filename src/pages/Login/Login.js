@@ -6,33 +6,25 @@ import './Login.module.css'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import HoloFuelIcon from 'components/icons/HoloFuelIcon'
-import useAuthTokenContext from 'contexts/useAuthTokenContext'
+import useAuthContext from 'contexts/useAuthContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
-
-// exported for testing
-export const authToken = 'EGeYSAmjxp1kNBzXAR2kv7m3BNxyREZnVwSfh3FX7Ew'
-
-const mockWebCryptoModule = (email, password) => {
-  if (email === 'a.b@c.com') return 'badauthkey'
-
-  return authToken
-}
+import { getHpAdminKeypair } from 'holochainClient'
 
 export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
   const { register, handleSubmit, errors } = useForm()
-  const { setAuthToken, setIsAuthed } = useAuthTokenContext()
+  const { setIsAuthed } = useAuthContext()
   const { newMessage } = useFlashMessageContext()
 
   const onSubmit = async ({ email, password }) => {
-    const authToken = mockWebCryptoModule(email, password)
-    setAuthToken(authToken)
-    const authResult = await checkAuth({ variables: { authToken } })
+    const authResult = await checkAuth()
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
     setIsAuthed(isAuthed)
 
     if (isAuthed) {
+      // we call this to SET the singleton value of HpAdminKeypair
+      await getHpAdminKeypair(email, password)
       push('/')
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)

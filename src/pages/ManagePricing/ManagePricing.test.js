@@ -54,7 +54,7 @@ const mocks = [
   }
 ]
 
-describe('ManagePricing', () => {
+describe.skip('ManagePricing', () => {
   it('renders', async () => {
     const props = {
       history: {}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { isEmpty, get, keys, omit } from 'lodash/fp'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import './Settings.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
 import HashIcon from 'components/HashIcon'
@@ -11,7 +12,6 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
-import { useHPAuthQuery, useHPAuthMutation } from 'graphql/hpAuthHooks'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import { rhino } from 'utils/colors'
 
@@ -22,18 +22,18 @@ export const getLabelFromPortName = portname => ({
 
 // Data - Mutation hook
 function useUpdateVersion () {
-  const [hposUpdateVersion] = useHPAuthMutation(HposUpdateVersionMutation)
+  const [hposUpdateVersion] = useMutation(HposUpdateVersionMutation)
   return (availableVersion) => hposUpdateVersion({
     variables: { availableVersion }
   })
 }
 
 export function Settings ({ history: { push } }) {
-  const { data: { hposSettings: settings = {} } = {} } = useHPAuthQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
 
-  const { data: { hposStatus: status = {} } = {} } = useHPAuthQuery(HposStatusQuery)
+  const { data: { hposStatus: status = {} } = {} } = useQuery(HposStatusQuery)
 
-  const [updateSettings] = useHPAuthMutation(HposUpdateSettingsMutation)
+  const [updateSettings] = useMutation(HposUpdateSettingsMutation)
 
   const [editedDeviceName, setEditedDeviceName] = useState('')
   const [isEditingDeviceName, setIsEditingDeviceName] = useState(false)

@@ -4,11 +4,10 @@ import { renderAndWait } from 'utils/test-utils'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { MockedProvider } from '@apollo/react-testing'
 import wait from 'waait'
-import { AuthTokenProvider } from 'contexts/useAuthTokenContext'
+import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HPAdminRouter from 'HPAdminRouter'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
-import { authToken } from 'pages/Login/Login'
 
 jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
@@ -16,11 +15,11 @@ jest.unmock('react-router-dom')
 
 const HPAdminApp = () =>
   <Router>
-    <AuthTokenProvider>
+    <AuthProvider>
       <FlashMessageProvider>
         <HPAdminRouter />
       </FlashMessageProvider>
-    </AuthTokenProvider>
+    </AuthProvider>
   </Router>
 
 describe('login flow', () => {
@@ -28,7 +27,7 @@ describe('login flow', () => {
     const mocks = [{
       request: {
         query: HposCheckAuthMutation,
-        variables: { authToken }
+        variables: { }
       },
       result: {
         data: {
@@ -44,12 +43,14 @@ describe('login flow', () => {
     const { getByLabelText, queryByLabelText, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <HPAdminApp />
     </MockedProvider>)
+
     await act(async () => {
       fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
       fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       fireEvent.click(getByText('Login'))
-      await wait(0)
+      await wait(50)
     })
+
     expect(getByText('Hi!')).toBeInTheDocument()
     expect(queryByLabelText('Email:')).not.toBeInTheDocument()
   })
@@ -58,7 +59,7 @@ describe('login flow', () => {
     const mocks = [{
       request: {
         query: HposCheckAuthMutation,
-        variables: { authToken }
+        variables: { }
       },
       result: {
         data: {
@@ -74,12 +75,14 @@ describe('login flow', () => {
     const { getByLabelText, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <HPAdminApp />
     </MockedProvider>)
+
     await act(async () => {
       fireEvent.change(getByLabelText('Email:'), { target: { value: email } })
       fireEvent.change(getByLabelText('Password:'), { target: { value: password } })
       fireEvent.click(getByText('Login'))
-      await wait(0)
+      await wait(50)
     })
+
     expect(getByText('Incorrect email or password. Please check and try again.')).toBeInTheDocument()
     expect(getByLabelText('Email:')).toBeInTheDocument()
   })

@@ -10,14 +10,17 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
-const counterparty = { id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi' }
+const counterparty = {
+  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nickname: 'Perry'
+}
 const amount = 35674
 const notes = 'Hi there'
 
@@ -39,12 +42,33 @@ const offerMock = {
         status: ''
       }
     }
+  }
+}
+
+const mockAgent1 = {
+  pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nick: 'Perry'
+}
+
+const mockWhoIsAgent1 = {
+  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nickname: 'Perry',
+  notFound: false
+}
+
+const counterpartyQueryMock = {
+  request: {
+    query: HolofuelCounterpartyQuery,
+    variables: { agentId: mockAgent1.pub_sign_key }
   },
-  newData: jest.fn()
+  result: {
+    data: { holofuelCounterparty: mockWhoIsAgent1 }
+  }
 }
 
 const mocks = [
-  offerMock
+  offerMock,
+  counterpartyQueryMock
 ]
 
 describe('CreateOfferRequest', () => {
@@ -58,52 +82,38 @@ describe('CreateOfferRequest', () => {
 
       expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('To'), { target: { value: counterparty.id } })
+      await act(async () => {
+        fireEvent.change(getByLabelText('To'), { target: { value: counterparty.id } })
+        await wait(50)
+      })
 
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
+      act(() => {
+        fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
+      })
 
       expect(getByLabelText('Fee (1%)').value).toEqual((amount * FEE_PERCENTAGE).toFixed(2))
 
       expect(getByLabelText('Total').value).toEqual((amount + (amount * FEE_PERCENTAGE)).toFixed(2))
 
-      fireEvent.change(getByPlaceholderText('What is this for?'), { target: { value: notes } })
+      act(() => {
+        fireEvent.change(getByPlaceholderText('What is this for?'), { target: { value: notes } })
+      })
 
       await act(async () => {
         fireEvent.click(getByTestId('submit-button'))
         await wait(0)
       })
 
-      expect(offerMock.newData).toHaveBeenCalled()
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
-      expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${presentAgentId(counterparty.id)}.`, 5000)
+      expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
 
     it('renders the counterparty nickname upon *successful* fetch', async () => {
       afterEach(() => {
         jest.clearAllMocks()
       })
-
-      const mockAgent1 = {
-        pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nick: 'Perry'
-      }
-
-      const mockWhoIsAgent1 = {
-        id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nickname: 'Perry'
-      }
-
-      const counterpartyQueryMock = {
-        request: {
-          query: HolofuelCounterpartyQuery,
-          variables: { agentId: mockAgent1.pub_sign_key }
-        },
-        result: {
-          data: { holofuelCounterparty: mockWhoIsAgent1 }
-        }
-      }
 
       const mocks = [
         counterpartyQueryMock
@@ -133,7 +143,8 @@ describe('CreateOfferRequest', () => {
 
       const mockAgent1 = {
         pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nick: 'Perry'
+        nick: 'Perry',
+        notFound: false
       }
 
       const counterpartyQueryMockError = {
@@ -195,7 +206,9 @@ describe('CreateOfferRequest', () => {
 
       expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+      act(() => {
+        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+      })
 
       expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
       expect(within(getByTestId('counterparty-nickname')).getByText('Loading')).toBeInTheDocument()
@@ -268,12 +281,12 @@ describe('CreateOfferRequest', () => {
               status: ''
             }
           }
-        },
-        newData: jest.fn()
+        }
       }
 
       const mocks = [
-        requestMock
+        requestMock,
+        counterpartyQueryMock
       ]
 
       const push = jest.fn()
@@ -290,7 +303,10 @@ describe('CreateOfferRequest', () => {
       expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
       expect(queryByLabelText('Fee (1%)')).not.toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('From'), { target: { value: counterparty.id } })
+      await act(async () => {
+        fireEvent.change(getByLabelText('From'), { target: { value: counterparty.id } })
+        await wait(0)
+      })
 
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
@@ -303,9 +319,8 @@ describe('CreateOfferRequest', () => {
         await wait(0)
       })
 
-      expect(requestMock.newData).toHaveBeenCalled()
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
-      expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${presentAgentId(counterparty.id)}.`, 5000)
+      expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
   })
 })

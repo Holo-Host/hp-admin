@@ -11,7 +11,9 @@ mkShell {
 
   shellHook = ''
     rm -f conductor-config.toml
+    rm -f conductor-config-extra.toml
     ln -s ${project.hp-admin-conductor-config} conductor-config.toml
+    ln -s ${project.hp-admin-extra-conductor-config} conductor-config-extra.toml
     trap cleanup EXIT
   '';
 }

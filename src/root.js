@@ -7,7 +7,7 @@ import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
 import HFRouter from './holofuel/HFRouter'
 import ScreenWidthContext from 'contexts/screenWidth'
-import { AuthTokenProvider } from 'contexts/useAuthTokenContext'
+import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
@@ -45,12 +45,12 @@ export function HPAdminApp () {
   return <ApolloProvider client={apolloClient}>
     <Router>
       <ScreenWidthContext.Provider value={isWide}>
-        <AuthTokenProvider>
+        <AuthProvider>
           <FlashMessageProvider>
             <HPAdminRouter />
             <Route path='/holofuel' component={HoloFuelAppCore} />
           </FlashMessageProvider>
-        </AuthTokenProvider>
+        </AuthProvider>
       </ScreenWidthContext.Provider>
     </Router>
   </ApolloProvider>
