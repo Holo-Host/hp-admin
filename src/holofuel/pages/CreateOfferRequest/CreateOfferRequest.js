@@ -219,7 +219,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
       } else if (id === whoami.id) {
         setCounterpartyFound(false)
         if (!hasDisplayedNotFoundMessage) {
-          newMessage('You cannot send yourself TestFuel')
+          newMessage('You cannot send yourself TestFuel.')
           setHasDisplayedNotFoundMessage(true)
         }
       } else {

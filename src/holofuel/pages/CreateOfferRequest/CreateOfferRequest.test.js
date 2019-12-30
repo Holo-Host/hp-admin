@@ -111,32 +111,6 @@ describe('CreateOfferRequest', () => {
       expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
 
-    it('renders the counterparty nickname upon *successful* fetch', async () => {
-      afterEach(() => {
-        jest.clearAllMocks()
-      })
-
-      const mocks = [
-        counterpartyQueryMock
-      ]
-
-      const push = jest.fn()
-
-      const { getByLabelText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <CreateOfferRequest history={{ push }} />
-      </MockedProvider>)
-
-      expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
-
-      await act(async () => {
-        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
-        await wait(0)
-      })
-
-      expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
-      expect(within(getByTestId('counterparty-nickname')).getByText(mockWhoIsAgent1.nickname)).toBeInTheDocument()
-    })
-
     it('renders error message upon attempt to transact with self', async () => {
       afterEach(() => {
         jest.clearAllMocks()
@@ -163,18 +137,59 @@ describe('CreateOfferRequest', () => {
 
       const push = jest.fn()
 
-      const { getByLabelText, queryByText, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
-
-      expect(queryByText('You cannot send yourself TestFuel')).not.toBeInTheDocument()
 
       await act(async () => {
         fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
         await wait(0)
       })
 
-      expect(getByText('You cannot send yourself TestFuel')).toBeInTheDocument()
+      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send yourself TestFuel.`)
+    })
+
+    it('renders error message upon attempt to transact with a negative number.', async () => {
+      const push = jest.fn()
+
+      const NEGATIVE_AMOUNT = -2
+
+      const { getByLabelText } = await renderAndWait(<MockedProvider mocks={[]} addTypename={false}>
+        <CreateOfferRequest history={{ push }} />
+      </MockedProvider>)
+
+      await act(async () => {
+        fireEvent.change(getByLabelText('Amount'), { target: { value: NEGATIVE_AMOUNT } })
+        await wait(0)
+      })
+
+      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send negative amounts.`)
+    })
+
+    it('renders the counterparty nickname upon *successful* fetch', async () => {
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
+      const mocks = [
+        counterpartyQueryMock
+      ]
+
+      const push = jest.fn()
+
+      const { getByLabelText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <CreateOfferRequest history={{ push }} />
+      </MockedProvider>)
+
+      expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
+
+      await act(async () => {
+        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+        await wait(0)
+      })
+
+      expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
+      expect(within(getByTestId('counterparty-nickname')).getByText(mockWhoIsAgent1.nickname)).toBeInTheDocument()
     })
 
     it('renders the counterparty error message upon *unsuccessful* fetch', async () => {
