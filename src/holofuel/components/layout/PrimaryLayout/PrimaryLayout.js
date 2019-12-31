@@ -17,7 +17,8 @@ import 'holofuel/global-styles/index.css'
 
 export function PrimaryLayout ({
   children,
-  headerProps = {}
+  headerProps = {},
+  showAlphaFlag = true
 }) {
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
   const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
@@ -41,7 +42,7 @@ export function PrimaryLayout ({
       holofuelBalance={holofuelBalance}
       isWide={isWide}
     />
-    <AlphaFlag styleName='styles.alpha-flag' />
+    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />
       {children}
