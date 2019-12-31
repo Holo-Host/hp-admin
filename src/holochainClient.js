@@ -23,7 +23,7 @@ export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 // Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
 const getHcPubkey = () => {
   return ((process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
-    ? '3llrdmlase6xwo9drzs6qpze40hgaucyf7g8xpjze6dz32s957'
+    ? '5m5srup6m3b2iilrsqmxu6ydp8p8cr0rdbh4wamupk3s4sxqr5'
     : window.location.hostname.split('.')[0])
 }
 
@@ -43,6 +43,7 @@ export const getHpAdminKeypair = async (email = undefined, password = undefined)
   try {
     const hcKey = getHcPubkey()
     if (!hcKey || !email || !password) return null
+
     const HpAdminKeypair = await importHpAdminKeypairClass()
     HpAdminKeypairInstance = new HpAdminKeypair(hcKey, email, password)
 
@@ -65,7 +66,7 @@ export const signPayload = async (method, request, body) => {
 
   if (keypair === null) return ''
 
-  const payload = { method: method.toLowerCase(), request, body: stringify(body) }
+  const payload = { method: method.toLowerCase(), request, body: stringify(body) || "" }
 
   try {
     if (HOLOCHAIN_LOGGING) {
