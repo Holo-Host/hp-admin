@@ -1,4 +1,5 @@
 const createZomeCall = require('./create-zome-call')
+const { Agent1, Agent2 } = require('./get-agent')
 const moment = require('moment')
 // const _ = require('lodash/fp')
 // const util = require('util')
@@ -21,8 +22,8 @@ const txParams = {
 async function populateHoloFuelData () {
   const agent1Index = 0
   const agent2Index = 1
-  const agent1 = { id: 'HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi' }
-  const agent2 = { id: 'HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi' }
+  const agent1 = Agent1
+  const agent2 = Agent2
 
   // Seed Data:
   // 1.) Scenario: A request from agent1 to agent2
