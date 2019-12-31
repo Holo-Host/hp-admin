@@ -25,7 +25,8 @@
 // >>>> Agent 1 Offers HF (initiated)
 
 // //////////////////////////////////////////////////////////////////////////////////// //
-
+const wait = require('waait')
+const createZomeCall = require('../create-zome-call')
 const Agent1TransactionLedger = require('./agent1-hf-ledger.js')
 const Agent2TransactionLedger = require('./agent2-hf-ledger.js')
 const { transactHoloFuel, REQUEST, OFFER, PAY, ACCEPT } = require('./transact-holofuel.js')
@@ -165,12 +166,30 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
     }
   }
 
+  // LEDGER CHECK :
+  const checkLedger = async () => {
+    console.log('Waiting to allow for data propagation...')
+    await wait(0)
+    console.log('\n\n*****************')
+    // Agent 1 Ledger Check :
+    console.log('\nAgent 1 Ledger Check')
+    const agent1LedgerState = await createZomeCall('holofuel', 'transactions', 'ledger_state', 0)()
+    console.log('>> Initiate Request Success Hash', agent1LedgerState)
+
+    // Agent 2 Ledger Check :
+    console.log('\nAgent 2 Ledger Check')
+    const agent2LedgerState = await createZomeCall('holofuel', 'transactions', 'ledger_state', 1)()
+    console.log('>> Initiate Request Success Hash', agent2LedgerState)
+    console.log('\n\n*****************')
+  }
+
   // Invoke Individual Transaction Cases for Agents
   await fullRequestCycle()
-  await twoPartsRequestCycle()
-  await onePartRequestCycle()
-  await fullOfferCycle()
-  await halfOfferCycle()
+  // await twoPartsRequestCycle()
+  // await onePartRequestCycle()
+  // await fullOfferCycle()
+  // await halfOfferCycle()
+  await checkLedger()
 }
 
 module.exports = agentScenarioFlow
