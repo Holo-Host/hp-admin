@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, useRouteMatch, Redirect } from 'react-router-dom'
+import { Route, useRouteMatch } from 'react-router-dom'
 
 import Home from 'holofuel/pages/Home'
 import Inbox from 'holofuel/pages/Inbox'
@@ -16,7 +16,6 @@ export default function HFRouter () {
   }
 
   return <>
-    <Route path={makePath('')} exact render={() => <Redirect to={makePath('/')} />} />
     <Route path={makePath('/(|home)')} exact component={Home} />
     <Route path={makePath('/inbox')} exact component={Inbox} />
     <Route path={makePath('/history')} component={TransactionHistory} />

@@ -18,7 +18,8 @@ export function PrimaryLayout ({
   children,
   headerProps = {}
 }) {
-  const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelActionableTransactions = { transactions: [] } } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
+  const { transactions: actionableTransactions } = holofuelActionableTransactions
   const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
 
