@@ -14,5 +14,5 @@ const Agent2 = {
 
 module.exports = {
   Agent1,
-  Agent2,
+  Agent2
 }
