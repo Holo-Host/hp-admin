@@ -60,7 +60,7 @@ const modePrepositions = {
 }
 
 export default function CreateOfferRequest ({ history: { push } }) {
-  const [numpadVisible, setNumpadVisible] = useState(true)
+  const [numpadVisible, setNumpadVisible] = useState(false)
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
@@ -124,8 +124,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
     return <AmountInput amount={amount} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
   }
 
-  return <PrimaryLayout headerProps={{ title }}>
-    <div styleName='mode-toggle'>
+  return <PrimaryLayout headerProps={{ title }} showAlphaFlag={false}>
+    <div styleName='amount-banner'>
+    </div>
+
+    {/* <div styleName='mode-toggle'>
       {[OFFER_MODE, REQUEST_MODE].map(buttonMode =>
         <Button styleName={cx('mode-toggle-button', { selected: buttonMode === mode })}
           onClick={() => setMode(buttonMode)}
@@ -199,7 +202,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
       <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true}>Send</Button>
-    </form>
+    </form> */}
   </PrimaryLayout>
 }
 
