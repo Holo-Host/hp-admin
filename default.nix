@@ -44,7 +44,7 @@ let
     dna = dna.name+"-dna";
     id = dna.name;
     storage = {
-      path = ".holochain/holo/storage/${dna.name}";
+      path = ".holochain/holo/storage/${agent.id}/${dna.name}";
       type = "file";
     };
   }) config.agent1;
@@ -62,7 +62,7 @@ let
     dna = dna.name+"-dna";
     id = dna.name;
     storage = {
-      path = ".holochain/holo/storage/${dna.name}";
+      path = ".holochain/holo/storage/${agent.id}/${dna.name}";
       type = "file";
     };
   }) config.agent2;
@@ -232,7 +232,7 @@ in
       {
         id = "websocket-interface";
         driver = {
-          port = 3400;
+          port = 3401;
           type = "websocket";
         };
         instances = flatten(map multiInterfaceInstanceConfig2 dnas);
@@ -241,7 +241,7 @@ in
         id = "http-interface";
         admin = true;
         driver = {
-          port = 3300;
+          port = 3301;
           type = "http";
         };
         instances = flatten(map multiInterfaceInstanceConfig2 dnas);
