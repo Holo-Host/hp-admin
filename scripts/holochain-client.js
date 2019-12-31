@@ -4,11 +4,17 @@ require('dotenv').config()
 const HOLOCHAIN_LOGGING = true
 let holochainClient
 
-async function initAndGetHolochainClient () {
+async function initAndGetHolochainClient (agentIndex = 0) {
   if (holochainClient) return holochainClient
+  let url
   try {
-    holochainClient = await hcWebClientConnect({
-      url: process.env.NODE_ENV === 'production' ? undefined : process.env.REACT_APP_DNA_INTERFACE_URL,
+    if (agentIndex === 0) {
+      url = 'ws://localhost:3400'
+    } else if (agentIndex === 1) {
+      url = 'ws://localhost:3401'
+    }
+    const holochainClient = await hcWebClientConnect({
+      url,
       wsClient: { max_reconnects: 0 }
     })
     if (HOLOCHAIN_LOGGING) {
