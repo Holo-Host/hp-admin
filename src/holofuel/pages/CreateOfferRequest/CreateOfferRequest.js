@@ -73,14 +73,17 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
   const [isCounterpartyFound, setCounterpartyFound] = useState(false)
+  const [isFormValid, setIsFormValid] = useState(false)
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
-
     if (counterpartyId.length === AGENT_ID_LENGTH && counterpartyId === whoami.id) {
       newMessage('You cannot send yourself TestFuel.')
+      setIsFormValid(false)
+    } else {
+      setIsFormValid(true)
     }
-  }, [counterpartyId])
+  }, [counterpartyId, whoami, setIsFormValid])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
@@ -93,11 +96,16 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [total, setTotal] = useState(0)
 
   const onAmountChange = amount => {
-    if (amount < 0) return newMessage(`You cannot ${mode === OFFER_MODE ? 'send' : 'request'} negative amounts.`)
-    if (isNaN(amount)) return
-    const newFee = Number(amount) * FEE_PERCENTAGE
-    setFee(newFee)
-    setTotal(Number(amount) + newFee)
+    if (isNaN(amount)) return null
+    else if (amount < 0) {
+      setIsFormValid(false)
+      return newMessage(`You cannot ${mode === OFFER_MODE ? 'send' : 'request'} negative amounts.`)
+    } else {
+      setIsFormValid(true)
+      const newFee = Number(amount) * FEE_PERCENTAGE
+      setFee(newFee)
+      setTotal(Number(amount) + newFee)
+    }
   }
 
   const onSubmit = ({ amount, counterpartyId, notes }) => {
@@ -195,7 +203,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length !== AGENT_ID_LENGTH || !isCounterpartyFound}>Send</Button>
+      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length !== AGENT_ID_LENGTH || !isCounterpartyFound || !isFormValid}>Send</Button>
     </form>
   </PrimaryLayout>
 }
