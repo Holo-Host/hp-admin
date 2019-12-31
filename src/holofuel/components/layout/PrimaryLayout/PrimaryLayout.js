@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
-import { isEmpty } from 'lodash/fp'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -25,11 +24,6 @@ export function PrimaryLayout ({
 
   const inboxCount = actionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request))).length
 
-  let ledgerNullState
-  if (ledgerLoading || !holofuelBalance || isEmpty(holofuelBalance)) {
-    ledgerNullState = NaN
-  }
-
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
@@ -43,7 +37,8 @@ export function PrimaryLayout ({
       agent={holofuelUser}
       agentLoading={holofuelUserLoading}
       inboxCount={inboxCount}
-      holofuelBalance={ledgerNullState || holofuelBalance}
+      holofuelBalance={holofuelBalance}
+      ledgerLoading={ledgerLoading}
       isWide={isWide}
     />
     <div styleName='styles.content'>

@@ -76,6 +76,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
+
+    if (counterpartyId.length === AGENT_ID_LENGTH && counterpartyId === whoami.id) {
+      newMessage('You cannot send yourself TestFuel.')
+    }
   }, [counterpartyId])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
@@ -214,12 +218,6 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
         setCounterpartyFound(false)
         if (!hasDisplayedNotFoundMessage) {
           newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
-          setHasDisplayedNotFoundMessage(true)
-        }
-      } else if (id === whoami.id) {
-        setCounterpartyFound(false)
-        if (!hasDisplayedNotFoundMessage) {
-          newMessage('You cannot send yourself TestFuel.')
           setHasDisplayedNotFoundMessage(true)
         }
       } else {

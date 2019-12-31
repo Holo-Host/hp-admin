@@ -15,8 +15,8 @@ import {
 
 import './SideMenu.module.css'
 
-const DisplayBalance = ({ holofuelBalance }) => {
-  if (isNaN(holofuelBalance)) return <>-- TF</>
+const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
+  if (ledgerLoading) return <>-- TF</>
   else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 
@@ -28,6 +28,7 @@ export function SideMenu ({
   agentLoading,
   inboxCount,
   holofuelBalance,
+  ledgerLoading,
   isWide
 }) {
   if (agentLoading) agentLoading = <h4>Loading...</h4>
@@ -49,7 +50,10 @@ export function SideMenu ({
           </CopyAgentId>
         </span>
         <strong styleName='header-balance'>
-          <DisplayBalance holofuelBalance={holofuelBalance} />
+          <DisplayBalance
+            holofuelBalance={holofuelBalance}
+            ledgerLoading={ledgerLoading}
+          />
         </strong>
       </header>
 
