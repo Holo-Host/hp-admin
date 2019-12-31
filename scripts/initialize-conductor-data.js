@@ -51,14 +51,15 @@ async function populateHoloFuelData () {
   //     console.log('Waiting to allow for data propagation...')
   //     await wait(10000)
   //     console.log(' Part 1, Step 2 : searching to find pending transaction....')
-  //     const response = await createZomeCall('holofuel', 'transactions', 'list_pending', agent2Index)({ origins: originId })
+  //     const response = await createZomeCall('holofuel', 'transactions', 'list_pending', agent1Index)({ origins: originId })
   //     const jsonResult = JSON.parse(response)
+  //     console.log("_------> ", jsonResult);
   //     const transaction = _.get('Ok.requests[0].event[2].Request', jsonResult)
   //     console.log(' Matching Transaction : ', transaction)
   //     const { amount } = transaction
   //     console.log(' Part 2 :')
   //     // // Part 2) : Agent 2 Offers HF in response to Agent 1's Request
-  //     const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, from: agent2.id, amount })
+  //     const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent1Index)({ ...txParams, to: agent2.id, from: agent2.id, amount })
   //     console.log(' >> Pay Request Success Hash', payRequest)
   //     return payRequest
   //   })
@@ -112,9 +113,9 @@ const populateHpAdminData = async () => {
 
 populateHoloFuelData()
   .then(() => console.log('Finished loading HoloFuel data...'))
-  .then(() => populateHpAdminData())
+  // .then(() => populateHpAdminData())
   .then(() => console.log('Finished loading HPAdmin data...'))
-  .then(() => snapshotStrorage())
+  // .then(() => snapshotStrorage())
   .then(() => console.log('Loaded Snapshot Storage'))
   .then(() => process.exit())
   .catch(e => {
