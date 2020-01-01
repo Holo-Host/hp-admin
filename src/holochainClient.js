@@ -23,7 +23,7 @@ export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
 // Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
 const getHcPubkey = () => {
   return ((process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')
-    ? '3llrdmlase6xwo9drzs6qpze40hgaucyf7g8xpjze6dz32s957'
+    ? '5m5srup6m3b2iilrsqmxu6ydp8p8cr0rdbh4wamupk3s4sxqr5'
     : window.location.hostname.split('.')[0])
 }
 
@@ -34,15 +34,22 @@ const importHpAdminKeypairClass = async () => {
   return wasm.HpAdminKeypair
 }
 
+let HpAdminKeypairInstance
+
+// Erase keypair
+export const eraseHpAdminKeypair = () => {
+  HpAdminKeypairInstance = undefined
+}
+
 // Create keypair using wasm-based HpAdminKeypair Class
 // Use singleton pattern
 // Return null when no params provided
-let HpAdminKeypairInstance
 export const getHpAdminKeypair = async (email = undefined, password = undefined) => {
   if (HpAdminKeypairInstance) return HpAdminKeypairInstance
   try {
     const hcKey = getHcPubkey()
     if (!hcKey || !email || !password) return null
+
     const HpAdminKeypair = await importHpAdminKeypairClass()
     HpAdminKeypairInstance = new HpAdminKeypair(hcKey, email, password)
 
@@ -65,7 +72,7 @@ export const signPayload = async (method, request, body) => {
 
   if (keypair === null) return ''
 
-  const payload = { method: method.toLowerCase(), request, body: stringify(body) }
+  const payload = { method: method.toLowerCase(), request, body: stringify(body) || '' }
 
   try {
     if (HOLOCHAIN_LOGGING) {
@@ -108,11 +115,11 @@ let holochainClient
 async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
   try {
-    let url = process.env.NODE_ENV === 'production' ? undefined : process.env.REACT_APP_DNA_INTERFACE_URL
-    // Construct url with query param X-Holo-Admin-Signature = signature
+    let url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
+    // Construct url with query param X-Hpos-Admin-Signature = signature
     const urlObj = new URL(url)
     const params = new URLSearchParams(urlObj.search.slice(1))
-    params.append('X-Holo-Admin-Signature', signPayload('get', urlObj.pathname, ''))
+    params.append('X-Hpos-Admin-Signature', await signPayload('get', urlObj.pathname))
     params.sort()
     urlObj.search = params.toString()
     url = urlObj.toString()
