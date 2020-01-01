@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { pickBy, omitBy, isNil } from 'lodash/fp'
+import { pickBy, omitBy, isNil, uniqBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -226,13 +226,30 @@ const HoloFuelDnaInterface = {
     }
   },
   transactions: {
-    allCompleted: async () => {
-      const { transactions } = await createZomeCall('transactions/list_transactions')()
-      const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
+    allCompleted: async ({ limit, until }) => {
+      const args = omitBy(isNil, { limit, until })
+      const { transactions } = await createZomeCall('transactions/list_transactions')(args)
+      console.log('transactions', transactions)
+      const nonActionableTransactions = transactions.map(presentTransaction)
+      console.log('nonActionableTransactions', nonActionableTransactions)
+      const completedTransactions = uniqBy('id', nonActionableTransactions)
+        .filter(tx => tx.status === 'completed')
+        .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      console.log('completedTransactions', completedTransactions)
 
-      return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      const earliestTimestamp = completedTransactions.length > 0 
+        ? completedTransactions[completedTransactions.length - 1].timestamp // this works because the list is sorted by timestamp
+        : ''
+
+      const returning = {
+        transactions: completedTransactions,
+        hasMore: true,
+        earliestTimestamp
+      }
+
+      return returning
     },
+
     allActionable: async ({ limit, until }) => {
       const args = omitBy(isNil, { limit, until })
       const result = await createZomeCall('transactions/list_pending')(args)
@@ -249,10 +266,6 @@ const HoloFuelDnaInterface = {
         hasMore: true,
         earliestTimestamp: actionableTransactions[actionableTransactions.length - 1].timestamp // this works because the list is sorted by timestamp
       }
-      console.log('limit', limit)
-      console.log('until', until)
-      console.log('returning', returning)
-
       return returning
     },
     allWaiting: async () => {

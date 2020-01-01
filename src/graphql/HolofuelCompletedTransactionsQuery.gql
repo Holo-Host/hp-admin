@@ -1,14 +1,18 @@
-query HolofuelCompletedTransactionsQuery {
-  holofuelCompletedTransactions {
-    id
-    amount
-    counterparty { id }
-    direction
-    status
-    type
-    timestamp
-    fees
-    presentBalance
-    notes
+query HolofuelCompletedTransactionsQuery($limit: Int, $until: String) {
+  holofuelCompletedTransactions(limit: $limit, until: $until) {
+    transactions {
+      id
+      amount
+      counterparty { id }
+      direction
+      status
+      type
+      timestamp
+      fees
+      presentBalance
+      notes
+    }
+    hasMore
+    earliestTimestamp
   }
 }

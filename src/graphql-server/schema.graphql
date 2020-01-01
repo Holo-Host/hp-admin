@@ -119,7 +119,7 @@ type Query {
   happs: [Happ]
   happ(id: String!): Happ
   hostPricing: HostPricing
-  holofuelCompletedTransactions: [Transaction]
+  holofuelCompletedTransactions(limit: Int, until: String): TransactionList
   holofuelWaitingTransactions: [Transaction]
   holofuelNonPendingTransactions: [Transaction]
   holofuelActionableTransactions(limit: Int, until: String): TransactionList

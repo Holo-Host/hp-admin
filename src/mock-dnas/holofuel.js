@@ -23,8 +23,8 @@ export const transactionList = {
   },
   cover: {
     first: 0,
-    count: 5,
-    total: 5
+    count: 8,
+    total: 8
   },
   transactions: [
     // Agent Perry cancelled own/initated transaction, Perry sees cancelled outgoing transaction
@@ -46,6 +46,18 @@ export const transactionList = {
             }
           },
           reason: 'No longer need to buy book.'
+        }
+      },
+      timestamp: {
+        origin: '2019-08-30T10:57:29+00:00',
+        event: '2019-08-30T10:57:29+00:00'
+      },
+      adjustment: {
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
       }
     },
@@ -442,6 +454,24 @@ function listPending ({ origins, limit, until }) {
   }
 }
 
+function listTransactions ({ limit, until }) {
+  if (limit) {
+    const untilFilter = until
+      ? transaction => new Date(transaction.timestamp.event) > new Date(until)
+      : _ => true
+    // this is a hack and not how the dna does it, but close enough for testing
+    return {
+      ...transactionList,
+      transactions: transactionList.transactions
+        .filter(untilFilter)
+        .sort((a, b) => a.timestamp.event > b.timestamp.event ? -1 : 1)
+        .slice(0, limit)
+    }
+  } else {
+    return transactionList
+  }
+}
+
 function receivedPaymentsHashMap (promiseArr) {
   return promiseArr.reduce((currentHashMap, promise) => {
     return {
@@ -461,7 +491,7 @@ const holofuel = {
     // whois is for discovering all other agents
     whois: ({ agents }) => typeof agents === 'string' ? Array.of(whois(agents)) : Array.of(agents.map(agent => whois(agent))),
     ledger_state: () => transactionList.ledger,
-    list_transactions: () => transactionList,
+    list_transactions: listTransactions,
     list_pending: listPending,
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),

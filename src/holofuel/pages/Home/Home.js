@@ -39,9 +39,9 @@ function useTransactionsWithCounterparties () {
 }
 
 export default function Home () {
-  const { data: { holofuelActionableTransactions: holofuelActionableTransactionLists } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelActionableTransactions: holofuelActionableTransactionLists = {} } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
 
-  const holofuelActionableTransactions = holofuelActionableTransactionLists.transactions || {}
+  const holofuelActionableTransactions = holofuelActionableTransactionLists.transactions || []
 
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
