@@ -23,10 +23,14 @@ export default function Login ({ history: { push } }) {
     await getHpAdminKeypair(email, password)
     const authResult = await checkAuth()
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
+
+    // we call this to SET the singleton value of HpAdminKeypair
+    await getHpAdminKeypair(email, password)
+
     setIsAuthed(isAuthed)
 
     if (isAuthed) {
-      push('/')
+      push('/admin')
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     }

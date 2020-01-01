@@ -96,7 +96,7 @@ export function SideMenu ({
           </p>
           <p>
             Learn more about out our&nbsp;
-            <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
+            <a href='https://medium.com/@H_O_L_O_/253c473381fd' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
               Alpha Testnet.
             </a>
           </p>
