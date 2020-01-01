@@ -23,7 +23,7 @@ function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const {
-    data: { holofuelCompletedTransactions: holofuelCompletedTransactionList = {} } = {},
+    data: { holofuelCompletedTransactions: holofuelCompletedTransactionList = {} } = {}
   } = useQuery(HolofuelCompletedTransactionsQuery, {
     variables: {
       limit: 10

@@ -320,34 +320,33 @@ export const transactionList = {
   ]
 }
 
-const now = (new Date()).getTime()
-const oneHour = 60 * 60 * 1000
+// const now = (new Date()).getTime()
+// const oneHour = 60 * 60 * 1000
 
-const someRequests = Array.from({ length: 5 }, (_, id) => ({
-  event: [
-    id,
-    new Date(now - Math.floor((id + 1) * oneHour)).toISOString(),
-    {
-      Request: {
-        from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-        to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        amount: Math.floor(Math.random() * 1000),
-        fee: '2',
-        deadline: '2020-12-02T00:00:00+00:00',
-        notes: `I want my $${id}!`,
-        synchronous: null
-      }
-    }
-  ],
-  provenance: [
-    'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-    'JSnAoopQg0fVHsA3dQIvJ3tRl5CRdtBbCAjzUZLMaWsD51G8nieRhoKK8JIKqkjscsprJe+j+ceun9oPpoc3AA=='
-  ]
-}))
+// const someRequests = Array.from({ length: 5 }, (_, id) => ({
+//   event: [
+//     id,
+//     new Date(now - Math.floor((id + 1) * oneHour)).toISOString(),
+//     {
+//       Request: {
+//         from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+//         to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+//         amount: Math.floor(Math.random() * 1000),
+//         fee: '2',
+//         deadline: '2020-12-02T00:00:00+00:00',
+//         notes: `I want my $${id}!`,
+//         synchronous: null
+//       }
+//     }
+//   ],
+//   provenance: [
+//     'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+//     'JSnAoopQg0fVHsA3dQIvJ3tRl5CRdtBbCAjzUZLMaWsD51G8nieRhoKK8JIKqkjscsprJe+j+ceun9oPpoc3AA=='
+//   ]
+// }))
 
 export const pendingList = {
   requests: [
-    ...someRequests,
     {
       event: [
         'QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz',

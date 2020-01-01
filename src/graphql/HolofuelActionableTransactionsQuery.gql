@@ -1,11 +1,13 @@
 query HolofuelActionableTransactionsQuery {
-  id
-  amount
-  counterparty { id }
-  direction
-  status
-  type
-  timestamp
-  notes
-  fees
+  zholofuelActionableTransactions {
+    id
+    amount
+    counterparty { id }
+    direction
+    status
+    type
+    timestamp
+    notes
+    fees
+  }
 }
