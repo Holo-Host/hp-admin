@@ -436,7 +436,7 @@ function listPending ({ origins }) {
         promises: pendingList.promises.filter(filter)
       }
     }
-    throw new Error('Array value for origins param of list_pending is not supported in the mock dna')  
+    throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
   } else {
     return pendingList
   }

@@ -229,15 +229,12 @@ const HoloFuelDnaInterface = {
     allCompleted: async ({ limit, until }) => {
       const args = omitBy(isNil, { limit, until })
       const { transactions } = await createZomeCall('transactions/list_transactions')(args)
-      console.log('transactions', transactions)
       const nonActionableTransactions = transactions.map(presentTransaction)
-      console.log('nonActionableTransactions', nonActionableTransactions)
       const completedTransactions = uniqBy('id', nonActionableTransactions)
         .filter(tx => tx.status === 'completed')
         .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
-      console.log('completedTransactions', completedTransactions)
 
-      const earliestTimestamp = completedTransactions.length > 0 
+      const earliestTimestamp = completedTransactions.length > 0
         ? completedTransactions[completedTransactions.length - 1].timestamp // this works because the list is sorted by timestamp
         : ''
 
@@ -274,7 +271,7 @@ const HoloFuelDnaInterface = {
 
       return uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
-    
+
     allDeclinedTransactions: async () => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')()
       const listOfDeclinedTransactions = declinedResult.map(presentDeclinedTransaction)
