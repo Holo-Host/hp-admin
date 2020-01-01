@@ -1,6 +1,56 @@
 import bcrypt from 'bcryptjs'
 import { isString } from 'lodash/fp'
 
+const now = (new Date()).getTime()
+const tenHours = 10 * 60 * 60 * 1000
+
+const someCompletedRequests = Array.from({ length: 25 }, (_, id) => ({
+  index: 100 + id,
+  state: 'incoming/completed',
+  origin: String(id),
+  event: {
+    Receipt: {
+      cheque: {
+        invoice: {
+          promise: {
+            tx: {
+              from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+              to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+              amount: Math.floor(Math.random() * 1000),
+              fee: '0',
+              deadline: '2020-02-02T00:00:00+00:00',
+              notes: `I want my $${id}!`,
+              synchronous: null
+            },
+            request: 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
+          },
+          promise_sig: 'gcAT6bIvN5wd11OS3gxd1mmimtf/5c9niLhL7eWruG1Kd3kg+CfclsbI/dG69NSXBQbvhwj1u4DLhdSMHutRAQ==',
+          promise_commit: 'QmXTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6MCGes'
+        },
+        invoice_sig: 'S6PuR1MnOB9GuOniJ018oWC6DLTB0oiyu4NjR2a0CkiKtmdMIyeePIwgBbpx6uiDlN2CQTznwzdo7Ee9/yygAQ==',
+        invoice_commit: 'QmRCS3aPbfJb7GTyrGFsP8JMvFmvaD43BcXGpA9mhmtpYC',
+        invoice_proof: 'QmVEQhMp7w4BEzXfCnTWGfritiWAgfWamMxmLQ2n3SdACt'
+      },
+      cheque_sig: 'HxhqdPgh+h1XwiNxsGf336l1PpZF+dUQ+J2wNQlKADGt0yZg7yNbKU5sujRTFR3saP5eBpnAA3hjuC7HkhVaBg==',
+      cheque_commit: 'QmSXG9G8hNnfZbXBUQ6cMSNn6Y33ywLG5m6czvTLNs2VQn',
+      cheque_proof: 'QmVEQhMp7w4BEzXfCnTWGfritiWAgfWamMxmLQ2n3SdACt'
+    }
+  },
+  timestamp: {
+    origin: '2019-08-30T11:16:12+00:00',
+    event: new Date(now - Math.floor((id + 1) * tenHours)).toISOString()
+  },
+  adjustment: {
+    Ok: {
+      balance: '0',
+      payable: '0',
+      receivable: '0',
+      fees: '0'
+    }
+  },
+  available: '4010.01'
+}))
+
 export const transactionList = {
   ledger: {
     balance: '1038900.01',
@@ -27,6 +77,7 @@ export const transactionList = {
     total: 5
   },
   transactions: [
+    ...someCompletedRequests,
     // Agent Perry cancelled own/initated transaction, Perry sees cancelled outgoing transaction
     {
       index: 9,
@@ -47,7 +98,20 @@ export const transactionList = {
           },
           reason: 'No longer need to buy book.'
         }
-      }
+      },
+      timestamp: {
+        origin: '2019-12-06T11:27:49+00:00',
+        event: '2019-12-06T11:29:00+00:00'
+      },
+      adjustment: {
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
+        }
+      },
+      available: '0'
     },
     // Agent Sam cancelled transaction, Perry sees cancelled incoming transaction
     {
@@ -305,7 +369,7 @@ export const transactionList = {
       },
       available: '0'
     }
-  ]
+  ].sort((a, b) => a.timestamp.event > b.timestamp.event ? -1 : 1)
 }
 
 export const pendingList = {
@@ -421,6 +485,7 @@ const holofuel = {
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: listPending,
+    list_pending_declined: [],
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
     receive_payment: ({ promise, promise_sig: sig, promise_commit: commit }) => bcrypt.hashSync((promise + sig + commit + 'accepted'), NUM_SALT_ROUNDS),
