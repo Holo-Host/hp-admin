@@ -39,7 +39,7 @@ function useTransactionsWithCounterparties () {
     fetchMore: fetchMoreCompleted
   } = useQuery(HolofuelCompletedTransactionsQuery, {
     variables: {
-      limit: 4
+      limit: 10
     },
     fetchPolicy: 'network-only'
   })
@@ -66,12 +66,10 @@ function useTransactionsWithCounterparties () {
     hasMoreCompleted,
     fetchMoreCompleted: () => fetchMoreCompleted({
       variables: {
-        limit: 4,
+        limit: 10,
         until: earliestCompletedTimestamp
       },
       updateQuery: (prev, { fetchMoreResult }) => {
-        console.log('prev', prev)
-        console.log('fetchMoreResult', fetchMoreResult)
         if (!fetchMoreResult) return prev
         return {
           holofuelCompletedTransactions: {
