@@ -83,20 +83,8 @@ function useCounterparty (agentId) {
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'network-only' })
-  const {
-    data: { holofuelActionableTransactions: holofuelActionableTransactionList = { transactions: [] } } = {},
-    fetchMore: fetchMoreActionable
-  } = useQuery(HolofuelActionableTransactionsQuery, {
-    fetchPolicy: 'network-only',
-    variables: {
-      limit: 10
-    }
-  })
+  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'network-only' })
-
-  console.log('holofuelActionableTransactionList', holofuelActionableTransactionList)
-
-  const holofuelActionableTransactions = holofuelActionableTransactionList.transactions
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
@@ -114,25 +102,6 @@ function useTransactionsWithCounterparties () {
 
   return {
     actionableTransactions: updatedActionableWOCanceledOffers,
-    hasMoreActionable: holofuelActionableTransactionList.hasMore,
-    fetchMoreActionable: () => fetchMoreActionable({
-      variables: {
-        limit: 10,
-        until: holofuelActionableTransactionList.earliestTimestamp
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        console.log('prev', prev)
-        console.log('fetchMoreResult', fetchMoreResult)
-        if (!fetchMoreResult) return prev
-        return {
-          holofuelActionableTransactions: {
-            ...fetchMoreResult.holofuelActionableTransactions,
-            transactions: prev.holofuelActionableTransactions.transactions.concat(fetchMoreResult.holofuelActionableTransactions.transactions)
-          }
-        }
-      }
-
-    }),
     recentTransactions: updatedNonPendingTransactions
   }
 }
@@ -152,8 +121,6 @@ export default function Inbox () {
 
   const {
     actionableTransactions,
-    fetchMoreActionable,
-    hasMoreActionable,
     recentTransactions
   } = useTransactionsWithCounterparties()
 
@@ -247,8 +214,6 @@ export default function Inbox () {
         </div>
       </React.Fragment>)}
     </div>}
-
-    {hasMoreActionable && <button onClick={fetchMoreActionable}>Load More</button>}
 
     <NewTransactionModal
       handleClose={() => setIsNewTransactionModalVisible(null)}

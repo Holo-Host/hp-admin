@@ -122,7 +122,7 @@ type Query {
   holofuelCompletedTransactions(limit: Int, until: String): TransactionList
   holofuelWaitingTransactions: [Transaction]
   holofuelNonPendingTransactions: [Transaction]
-  holofuelActionableTransactions(limit: Int, until: String): TransactionList
+  holofuelActionableTransactions: [Transaction]
   holofuelEarningsTransactions: [Transaction]
   holofuelLedger: Ledger
   holofuelUser: HolofuelUser

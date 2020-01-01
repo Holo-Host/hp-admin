@@ -250,9 +250,8 @@ const HoloFuelDnaInterface = {
       return returning
     },
 
-    allActionable: async ({ limit, until }) => {
-      const args = omitBy(isNil, { limit, until })
-      const result = await createZomeCall('transactions/list_pending')(args)
+    allActionable: async () => {
+      const result = await createZomeCall('transactions/list_pending')()
       const { requests, promises, declined, canceled } = result
       const actionableTransactions = await requests
         .map(r => presentPendingRequest(r))
@@ -261,13 +260,9 @@ const HoloFuelDnaInterface = {
         .concat(canceled.map(presentCanceledTransaction))
         .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
 
-      const returning = {
-        transactions: actionableTransactions,
-        hasMore: true,
-        earliestTimestamp: actionableTransactions[actionableTransactions.length - 1].timestamp // this works because the list is sorted by timestamp
-      }
-      return returning
+      return actionableTransactions
     },
+
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
@@ -279,6 +274,7 @@ const HoloFuelDnaInterface = {
 
       return uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
+    
     allDeclinedTransactions: async () => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')()
       const listOfDeclinedTransactions = declinedResult.map(presentDeclinedTransaction)

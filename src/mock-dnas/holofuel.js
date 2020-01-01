@@ -323,7 +323,7 @@ export const transactionList = {
 const now = (new Date()).getTime()
 const oneHour = 60 * 60 * 1000
 
-const aBunchOfRequests = Array.from({ length: 60 }, (_, id) => ({
+const someRequests = Array.from({ length: 5 }, (_, id) => ({
   event: [
     id,
     new Date(now - Math.floor((id + 1) * oneHour)).toISOString(),
@@ -347,7 +347,7 @@ const aBunchOfRequests = Array.from({ length: 60 }, (_, id) => ({
 
 export const pendingList = {
   requests: [
-    ...aBunchOfRequests,
+    ...someRequests,
     {
       event: [
         'QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz',
@@ -426,7 +426,7 @@ const agentArray = [{
 
 const whois = agentId => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
 
-function listPending ({ origins, limit, until }) {
+function listPending ({ origins }) {
   if (origins) {
     if (isString(origins)) {
       const filter = entry => entry.event[0] === origins
@@ -438,19 +438,7 @@ function listPending ({ origins, limit, until }) {
     }
     throw new Error('Array value for origins param of list_pending is not supported in the mock dna')  
   } else {
-    if (limit) {
-      const untilFilter = until
-        ? transaction => new Date(transaction.event[2]) < new Date(until)
-        : _ => true
-      // this is a hack and not how the dna does it, but close enough for testing
-      return {
-        ...pendingList,
-        requests: pendingList.requests.filter(untilFilter).slice(0, Math.ceil(limit / 2)),
-        promises: pendingList.promises.filter(untilFilter).slice(0, Math.ceil(limit / 2))
-      }
-    } else {
-      return pendingList
-    }
+    return pendingList
   }
 }
 
