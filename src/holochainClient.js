@@ -34,10 +34,16 @@ const importHpAdminKeypairClass = async () => {
   return wasm.HpAdminKeypair
 }
 
+let HpAdminKeypairInstance
+
+// Erase keypair
+export const eraseHpAdminKeypair = () => {
+  HpAdminKeypairInstance = undefined
+}
+
 // Create keypair using wasm-based HpAdminKeypair Class
 // Use singleton pattern
 // Return null when no params provided
-let HpAdminKeypairInstance
 export const getHpAdminKeypair = async (email = undefined, password = undefined) => {
   if (HpAdminKeypairInstance) return HpAdminKeypairInstance
   try {
