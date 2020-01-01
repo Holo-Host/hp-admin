@@ -257,6 +257,8 @@ const HoloFuelDnaInterface = {
         .concat(canceled.map(presentCanceledTransaction))
         .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
 
+      console.log('actionableTransactions', actionableTransactions)
+
       return actionableTransactions
     },
 
@@ -295,6 +297,8 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
+
+      // console.log('non pending', noDuplicateIds.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1))
 
       return noDuplicateIds.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },

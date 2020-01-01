@@ -22,7 +22,16 @@ const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of 
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
+  const {
+    data: { holofuelCompletedTransactions: holofuelCompletedTransactionList = {} } = {},
+  } = useQuery(HolofuelCompletedTransactionsQuery, {
+    variables: {
+      limit: 10
+    },
+    fetchPolicy: 'network-only'
+  })
+
+  const { transactions: holofuelCompletedTransactions = [] } = holofuelCompletedTransactionList
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
