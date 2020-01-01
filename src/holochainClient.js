@@ -72,7 +72,7 @@ export const signPayload = async (method, request, body) => {
 
   if (keypair === null) return ''
 
-  const payload = { method: method.toLowerCase(), request, body: stringify(body) || "" }
+  const payload = { method: method.toLowerCase(), request, body: stringify(body) || '' }
 
   try {
     if (HOLOCHAIN_LOGGING) {
