@@ -67,14 +67,14 @@ const presentHposStatus = (hposStatus) => {
 }
 
 const presentHposSettings = (hposSettings) => {
-  const { admin, holoportos, name } = hposSettings
+  const { admin, holoportos = {}, name } = hposSettings
   return {
     hostPubKey: admin.public_key,
     hostName: admin.name,
     registrationEmail: admin.email,
-    networkStatus: holoportos.network, // ie: 'live'
-    sshAccess: holoportos.sshAccess,
-    deviceName: name
+    networkStatus: holoportos.network || 'test', // ie: 'live'
+    sshAccess: holoportos.sshAccess || false,
+    deviceName: name || 'My HoloPort'
   }
 }
 
