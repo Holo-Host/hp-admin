@@ -13,10 +13,10 @@ const ACCEPT = 'offers.accepted'
 const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrace, originId }) => {
   let currentAgent, counterparty
   if (agentTransactionLedger === Agent1TransactionLedger) {
-    counterparty = Agent2.agentId
+    counterparty = Agent2.id
     currentAgent = 0
   } else {
-    counterparty = Agent1.agentId
+    counterparty = Agent1.id
     currentAgent = 1
   }
 

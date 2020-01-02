@@ -2,7 +2,6 @@ const axios = require('axios')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const wait = require('waait')
-// const { getAgent } = require('../src/utils/integration-testing/conductorConfig')
 
 const reattemptConnection = async (firstError = '') => {
   console.log('Stopping Conductor...')
