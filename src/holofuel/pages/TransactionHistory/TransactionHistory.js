@@ -167,7 +167,7 @@ export default function TransactionsHistory () {
       </React.Fragment>)}
     </div>}
 
-    {showLoadMoreButton && <Button onClick={fetchMoreCompleted}>Load More</Button>}
+    {!noVisibleTransactions && showLoadMoreButton && <Button onClick={fetchMoreCompleted}>Load More</Button>}
 
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}

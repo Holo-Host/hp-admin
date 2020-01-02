@@ -452,7 +452,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     actionHook(actionParams).then(() => {
       newMessage(flashMessage, 5000)
     }).catch(() => {
-      newMessage('Sorry Something went wrong', 5000)
+      newMessage('Hm..., looks like something went wrong.  Please try again.', 5000)
     })
     handleClose()
   }
