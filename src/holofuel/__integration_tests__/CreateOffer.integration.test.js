@@ -5,7 +5,7 @@ import { renderAndWait } from 'utils/test-utils'
 // import { mockNavigateTo } from 'react-router-dom'
 import { HoloFuelApp } from 'root'
 import { presentHolofuelAmount, presentAgentId } from 'utils'
-import { getAgent } from 'utils/integration-testing/conductorConfig'
+import { agent1 } from 'utils/const'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
 
 jest.mock('react-media-hook')
@@ -13,7 +13,7 @@ jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
 describe('HOLOFUEL : CreateOffer', () => {
-  const agentId = getAgent().id
+  const agentId = agent1.id
   const amount = 123
   const notes = 'Testing 123'
 
