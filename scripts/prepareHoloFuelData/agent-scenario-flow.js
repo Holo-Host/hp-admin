@@ -25,7 +25,8 @@
 // >>>> Agent 1 Offers HF (initiated)
 
 // //////////////////////////////////////////////////////////////////////////////////// //
-
+const wait = require('waait')
+const createZomeCall = require('../create-zome-call')
 const Agent1TransactionLedger = require('./agent1-hf-ledger.js')
 const Agent2TransactionLedger = require('./agent2-hf-ledger.js')
 const { transactHoloFuel, REQUEST, OFFER, PAY, ACCEPT } = require('./transact-holofuel.js')
@@ -65,7 +66,6 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
         console.log('\n Full Request Array Iteration Number (index) : ', i)
         let txOriginId
         // Agent 1 Requests HF
-        // AGENT_1_DNA_INSTANCE
         transactHoloFuel(CURRENT_AGENT_LEDGER, REQUEST, { index: i })
         // Agent 2 Offers HF in response to Agent 1's request
           .then(r => {
@@ -75,7 +75,6 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
             return transactHoloFuel(COUNTERPARTY_LEDGER, PAY, { transactionTrace: i, originId })
           })
           // Agent 1 Accepts HF offered by Agent 2 and completes originating Request
-          // AGENT_1_DNA_INSTANCE
           .then(res => {
             setTimeout(() => resolve(transactHoloFuel(CURRENT_AGENT_LEDGER, ACCEPT, { originId: txOriginId })), 5000)
           })
@@ -167,12 +166,30 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
     }
   }
 
+  // LEDGER CHECK :
+  const checkLedger = async () => {
+    console.log('Waiting to allow for data propagation...')
+    await wait(0)
+    console.log('\n\n*****************')
+    // Agent 1 Ledger Check :
+    console.log('\nAgent 1 Ledger Check')
+    const agent1LedgerState = await createZomeCall('holofuel', 'transactions', 'ledger_state', 0)()
+    console.log('>> Initiate Request Success Hash', agent1LedgerState)
+
+    // Agent 2 Ledger Check :
+    console.log('\nAgent 2 Ledger Check')
+    const agent2LedgerState = await createZomeCall('holofuel', 'transactions', 'ledger_state', 1)()
+    console.log('>> Initiate Request Success Hash', agent2LedgerState)
+    console.log('\n\n*****************')
+  }
+
   // Invoke Individual Transaction Cases for Agents
   await fullRequestCycle()
-  await twoPartsRequestCycle()
-  await onePartRequestCycle()
-  await fullOfferCycle()
-  await halfOfferCycle()
+  // await twoPartsRequestCycle()
+  // await onePartRequestCycle()
+  // await fullOfferCycle()
+  // await halfOfferCycle()
+  await checkLedger()
 }
 
 module.exports = agentScenarioFlow
