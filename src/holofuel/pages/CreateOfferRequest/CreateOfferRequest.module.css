@@ -1,7 +1,7 @@
 .amount-backdrop {
   background-color: var(--color-iceberg);
   width: 100%;
-  height: 138px;
+  height: 148px;
   position: absolute;
 }
 
@@ -18,13 +18,22 @@
 .amount {
   font-size: 36px;
   color: var(--color-rhino);
+  margin-bottom: 8px;
+}
+
+.fee-notice {
+  font-family: "Circular";
+  font-size: 10px;
+  line-height: 13px;
+  height: 13px;
+  color: var(--color-rhino-50);  
 }
 
 .mode-toggle {
   display: flex;
   justify-content: center;
   z-index: 1;
-  margin-top: 23px;
+  margin-top: 13px;
 }
 
 .mode-toggle-button {

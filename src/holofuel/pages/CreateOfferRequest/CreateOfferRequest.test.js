@@ -104,6 +104,7 @@ describe('CreateOfferRequest', () => {
 
       expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
       expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
+      expect(getByText(`A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).toBeInTheDocument()
 
       act(() => {
         fireEvent.change(getByLabelText('For:'), { target: { value: notes } })
@@ -307,7 +308,7 @@ describe('CreateOfferRequest', () => {
     it('renders a form that can be filled out and submitted', async () => {
       const push = jest.fn()
 
-      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText, queryByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
 
@@ -324,6 +325,7 @@ describe('CreateOfferRequest', () => {
 
       expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
       expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
+      expect(queryByText(`A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).not.toBeInTheDocument()
 
       act(() => {
         fireEvent.change(getByLabelText('For:'), { target: { value: notes } })

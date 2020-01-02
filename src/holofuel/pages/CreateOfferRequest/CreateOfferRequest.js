@@ -82,7 +82,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     setFormValue('counterpartyId', id)
   }
 
-  const [amount, setAmountRaw] = useState(30000)
+  const [amount, setAmountRaw] = useState(0)
   const setAmount = amount => setAmountRaw(Number(amount))
 
   const fee = (amount * FEE_PERCENTAGE) || 0
@@ -132,6 +132,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
       </h4>
       <div styleName='amount'>
         {presentHolofuelAmount(amount)} TF
+      </div>
+      <div styleName='fee-notice'>
+        {mode === OFFER_MODE
+          ? `A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`
+          : ' '}
       </div>
     </div>
 
