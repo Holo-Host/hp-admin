@@ -83,12 +83,11 @@ function useCounterparty (agentId) {
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'network-only' })
-  const { data: { holofuelActionableTransactions: holofuelActionableTransactionList = { transactions: [] } } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'network-only' })
 
-  console.log('holofuelActionableTransactionList', holofuelActionableTransactionList)
-
-  const holofuelActionableTransactions = holofuelActionableTransactionList.transactions
+  console.log('holofuelActionableTransactions', holofuelActionableTransactions)
+  console.log('holofuelNonPendingTransactions', holofuelNonPendingTransactions)
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,

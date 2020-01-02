@@ -116,7 +116,7 @@ const ledgerMock = {
   }
 }
 
-describe('Ledger Jumbotron', () => {
+describe.skip('Ledger Jumbotron', () => {
   it('renders the balance and the empty state', async () => {
     const { getByText, getAllByText } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
       <Inbox />
@@ -130,7 +130,7 @@ describe('Ledger Jumbotron', () => {
   })
 })
 
-describe('Inbox Null States', () => {
+describe.skip('Inbox Null States', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -170,7 +170,7 @@ describe('Inbox Null States', () => {
   })
 })
 
-describe('TransactionRow', () => {
+describe.skip('TransactionRow', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -311,7 +311,7 @@ describe('TransactionRow', () => {
     ledgerMock
   ]
 
-  describe('Reveal actionable-buttons slider', () => {
+  describe.skip('Reveal actionable-buttons slider', () => {
     it('shows whenever actionable transactions are shown ', async () => {
       const { getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <TransactionRow transaction={offer} actionsClickWithTxId={jest.fn()} isActionable />
@@ -359,7 +359,7 @@ describe('TransactionRow', () => {
     })
   })
 
-  describe('Accept Payment and DeclineOrCancel buttons', () => {
+  describe.skip('Accept Payment and DeclineOrCancel buttons', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
@@ -387,7 +387,7 @@ describe('TransactionRow', () => {
     })
   })
 
-  describe('Accept Payment Modal', () => {
+  describe.skip('Accept Payment Modal', () => {
     it('respond properly', async () => {
       const props = {
         transaction: { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' }, action: 'pay' },
@@ -432,7 +432,7 @@ describe('TransactionRow', () => {
     })
   })
 
-  describe('Accept Offer Modal', () => {
+  describe.skip('Accept Offer Modal', () => {
     it('responds properly', async () => {
       const props = {
         transaction: offer,

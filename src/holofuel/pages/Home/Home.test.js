@@ -107,24 +107,31 @@ describe('Home', () => {
     const mocks = [
       {
         request: {
-          query: HolofuelCompletedTransactionsQuery
+          query: HolofuelCompletedTransactionsQuery,
+          variables: {
+            limit: 10
+          }
         },
         result: {
           data: {
-            holofuelCompletedTransactions: [
-              {
-                ...transactions[0],
-                counterparty: {
-                  id: transactions[0].counterparty.id
+            holofuelCompletedTransactions: {
+              transactions: [
+                {
+                  ...transactions[0],
+                  counterparty: {
+                    id: transactions[0].counterparty.id
+                  }
+                },
+                {
+                  ...transactions[1],
+                  counterparty: {
+                    id: transactions[1].counterparty.id
+                  }
                 }
-              },
-              {
-                ...transactions[1],
-                counterparty: {
-                  id: transactions[1].counterparty.id
-                }
-              }
-            ]
+              ],
+              hasMore: false,
+              earliestTimestamp: ''
+            }
           }
         }
       },

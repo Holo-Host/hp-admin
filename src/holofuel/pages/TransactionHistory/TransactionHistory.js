@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, capitalize, uniqBy, get } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
-import Button from 'holofuel/components/Button'
+import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
@@ -33,8 +33,22 @@ function useCancel () {
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'network-only' })
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'network-only' })
+  const {
+    data: { holofuelCompletedTransactions: holofuelCompletedTransactionList = {} } = {},
+    fetchMore: fetchMoreCompleted
+  } = useQuery(HolofuelCompletedTransactionsQuery, {
+    variables: {
+      limit: 10
+    },
+    fetchPolicy: 'network-only'
+  })
+
+  const {
+    transactions: holofuelCompletedTransactions = [],
+    hasMore: hasMoreCompleted,
+    earliestTimestamp: earliestCompletedTimestamp
+  } = holofuelCompletedTransactionList
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
@@ -47,8 +61,24 @@ function useTransactionsWithCounterparties () {
   const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
 
   return {
+    pendingTransactions: updatedWaitingTransactions,
     completedTransactions: updatedCompletedTransactions,
-    pendingTransactions: updatedWaitingTransactions
+    hasMoreCompleted,
+    fetchMoreCompleted: () => fetchMoreCompleted({
+      variables: {
+        limit: 10,
+        until: earliestCompletedTimestamp
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev
+        return {
+          holofuelCompletedTransactions: {
+            ...fetchMoreResult.holofuelCompletedTransactions,
+            transactions: prev.holofuelCompletedTransactions.transactions.concat(fetchMoreResult.holofuelCompletedTransactions.transactions)
+          }
+        }
+      }
+    })
   }
 }
 
@@ -61,7 +91,7 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 
 export default function TransactionsHistory () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
-  const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
+  const { completedTransactions, pendingTransactions, hasMoreCompleted, fetchMoreCompleted } = useTransactionsWithCounterparties()
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -72,22 +102,26 @@ export default function TransactionsHistory () {
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []
   let transactionTypeName = ''
+  let showLoadMoreButton = false
 
   switch (filter) {
     case 'all':
       filteredPendingTransactions = pendingTransactions
       filteredCompletedTransactions = completedTransactions
       transactionTypeName = 'transactions'
+      showLoadMoreButton = hasMoreCompleted
       break
     case 'withdrawals':
       filteredPendingTransactions = []
       filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.outgoing)
       transactionTypeName = 'withdrawals'
+      showLoadMoreButton = hasMoreCompleted
       break
     case 'deposits':
       filteredPendingTransactions = []
       filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.incoming)
       transactionTypeName = 'deposits'
+      showLoadMoreButton = hasMoreCompleted
       break
     case 'pending':
       filteredPendingTransactions = pendingTransactions
@@ -132,6 +166,8 @@ export default function TransactionsHistory () {
           isFirst={index === 0} />)}
       </React.Fragment>)}
     </div>}
+
+    {showLoadMoreButton && <Button onClick={fetchMoreCompleted}>Load More</Button>}
 
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}

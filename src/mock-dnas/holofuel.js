@@ -23,8 +23,8 @@ export const transactionList = {
   },
   cover: {
     first: 0,
-    count: 5,
-    total: 5
+    count: 8,
+    total: 8
   },
   transactions: [
     // Agent Perry cancelled own/initated transaction, Perry sees cancelled outgoing transaction
@@ -46,6 +46,18 @@ export const transactionList = {
             }
           },
           reason: 'No longer need to buy book.'
+        }
+      },
+      timestamp: {
+        origin: '2019-08-30T10:57:29+00:00',
+        event: '2019-08-30T10:57:29+00:00'
+      },
+      adjustment: {
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
         }
       }
     },
@@ -308,34 +320,33 @@ export const transactionList = {
   ]
 }
 
-const now = (new Date()).getTime()
-const oneHour = 60 * 60 * 1000
+// const now = (new Date()).getTime()
+// const oneHour = 60 * 60 * 1000
 
-const aBunchOfRequests = Array.from({ length: 60 }, (_, id) => ({
-  event: [
-    id,
-    new Date(now - Math.floor((id + 1) * oneHour)).toISOString(),
-    {
-      Request: {
-        from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-        to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        amount: Math.floor(Math.random() * 1000),
-        fee: '2',
-        deadline: '2020-12-02T00:00:00+00:00',
-        notes: `I want my $${id}!`,
-        synchronous: null
-      }
-    }
-  ],
-  provenance: [
-    'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-    'JSnAoopQg0fVHsA3dQIvJ3tRl5CRdtBbCAjzUZLMaWsD51G8nieRhoKK8JIKqkjscsprJe+j+ceun9oPpoc3AA=='
-  ]
-}))
+// const someRequests = Array.from({ length: 5 }, (_, id) => ({
+//   event: [
+//     id,
+//     new Date(now - Math.floor((id + 1) * oneHour)).toISOString(),
+//     {
+//       Request: {
+//         from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+//         to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+//         amount: Math.floor(Math.random() * 1000),
+//         fee: '2',
+//         deadline: '2020-12-02T00:00:00+00:00',
+//         notes: `I want my $${id}!`,
+//         synchronous: null
+//       }
+//     }
+//   ],
+//   provenance: [
+//     'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+//     'JSnAoopQg0fVHsA3dQIvJ3tRl5CRdtBbCAjzUZLMaWsD51G8nieRhoKK8JIKqkjscsprJe+j+ceun9oPpoc3AA=='
+//   ]
+// }))
 
 export const pendingList = {
   requests: [
-    ...aBunchOfRequests,
     {
       event: [
         'QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz',
@@ -414,7 +425,7 @@ const agentArray = [{
 
 const whois = agentId => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
 
-function listPending ({ origins, limit, until }) {
+function listPending ({ origins }) {
   if (origins) {
     if (isString(origins)) {
       const filter = entry => entry.event[0] === origins
@@ -424,21 +435,27 @@ function listPending ({ origins, limit, until }) {
         promises: pendingList.promises.filter(filter)
       }
     }
-    throw new Error('Array value for origins param of list_pending is not supported in the mock dna')  
+    throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
   } else {
-    if (limit) {
-      const untilFilter = until
-        ? transaction => new Date(transaction.event[2]) < new Date(until)
-        : _ => true
-      // this is a hack and not how the dna does it, but close enough for testing
-      return {
-        ...pendingList,
-        requests: pendingList.requests.filter(untilFilter).slice(0, Math.ceil(limit / 2)),
-        promises: pendingList.promises.filter(untilFilter).slice(0, Math.ceil(limit / 2))
-      }
-    } else {
-      return pendingList
+    return pendingList
+  }
+}
+
+function listTransactions ({ limit, until }) {
+  if (limit) {
+    const untilFilter = until
+      ? transaction => new Date(transaction.timestamp.event) > new Date(until)
+      : _ => true
+    // this is a hack and not how the dna does it, but close enough for testing
+    return {
+      ...transactionList,
+      transactions: transactionList.transactions
+        .filter(untilFilter)
+        .sort((a, b) => a.timestamp.event > b.timestamp.event ? -1 : 1)
+        .slice(0, limit)
     }
+  } else {
+    return transactionList
   }
 }
 
@@ -461,7 +478,7 @@ const holofuel = {
     // whois is for discovering all other agents
     whois: ({ agents }) => typeof agents === 'string' ? Array.of(whois(agents)) : Array.of(agents.map(agent => whois(agent))),
     ledger_state: () => transactionList.ledger,
-    list_transactions: () => transactionList,
+    list_transactions: listTransactions,
     list_pending: listPending,
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),

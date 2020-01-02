@@ -39,7 +39,7 @@ describe('resolvers', () => {
 
     describe('.holofuelCompletedTransactions', () => {
       it('calls HoloFuelInterface.transactions.allCompleted', async () => {
-        resolvers.Query.holofuelCompletedTransactions()
+        resolvers.Query.holofuelCompletedTransactions(null, {})
         await wait(0)
         expect(mockHoloFuelInterface.transactions.allCompleted).toHaveBeenCalled()
       })

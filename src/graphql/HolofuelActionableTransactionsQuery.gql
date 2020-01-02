@@ -1,17 +1,13 @@
-query HolofuelActionableTransactionsQuery($limit: Int, $until: String) {
-  holofuelActionableTransactions(limit: $limit, until: $until) {
-    transactions {
-      id
-      amount
-      counterparty { id }
-      direction
-      status
-      type
-      timestamp
-      notes
-      fees
-    }
-    hasMore
-    earliestTimestamp
+query HolofuelActionableTransactionsQuery {
+  zholofuelActionableTransactions {
+    id
+    amount
+    counterparty { id }
+    direction
+    status
+    type
+    timestamp
+    notes
+    fees
   }
 }
