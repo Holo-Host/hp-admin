@@ -185,10 +185,10 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
 
   // Invoke Individual Transaction Cases for Agents
   await fullRequestCycle()
-  // await twoPartsRequestCycle()
-  // await onePartRequestCycle()
-  // await fullOfferCycle()
-  // await halfOfferCycle()
+  await twoPartsRequestCycle()
+  await onePartRequestCycle()
+  await fullOfferCycle()
+  await halfOfferCycle()
   await checkLedger()
 }
 
