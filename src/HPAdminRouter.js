@@ -14,15 +14,15 @@ import FactoryResetInstructions from 'pages/FactoryResetInstructions'
 
 export default function HPAdminRouter () {
   return <>
-    <Route path='/login' component={Login} />
-    <AuthRoute path='/(|dashboard)' exact component={Dashboard} />
-    <AuthRoute path='/menu' component={MainMenu} />
-    <AuthRoute path='/browse-happs' exact component={BrowseHapps} />
-    <AuthRoute path='/pricing' component={ManagePricing} />
-    <AuthRoute path='/settings' exact component={Settings} />
-    <AuthRoute path='/tos' exact component={Tos} />
-    <AuthRoute path='/earnings' component={HostingEarnings} />
-    <AuthRoute path='/factory-reset' component={FactoryResetInstructions} />
-    <AuthRoute path='/style-demo' component={StyleDemo} />
+    <Route path='(|/|/admin/login)' component={Login} exact />
+    <AuthRoute path='(/admin|/admin/|/admin/dashboard)' exact component={Dashboard} />
+    <AuthRoute path='/admin/menu' component={MainMenu} />
+    <AuthRoute path='/admin/browse-happs' exact component={BrowseHapps} />
+    <AuthRoute path='/admin/pricing' component={ManagePricing} />
+    <AuthRoute path='/admin/settings' exact component={Settings} />
+    <AuthRoute path='/admin/tos' exact component={Tos} />
+    <AuthRoute path='/admin/earnings' component={HostingEarnings} />
+    <AuthRoute path='/admin/factory-reset' component={FactoryResetInstructions} />
+    <AuthRoute path='/admin/style-demo' component={StyleDemo} />
   </>
 }

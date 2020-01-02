@@ -43,6 +43,12 @@
   flex: 1;
 }
 
+.reset-link {
+  
+}
+
+/* SettingsRow */
+
 .settings-row {
   display: flex;
   align-items: center;

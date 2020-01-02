@@ -32,7 +32,6 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
     case REQUEST: {
       console.log('\n INVOKING REQUEST CALL ****************************')
       console.log(' > Current Agent : ', currentAgent)
-      console.log(' > Counterparty Agent : ', counterparty)
       // initate request
       return holochainZomeCall(
         'holofuel',
@@ -49,7 +48,6 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
     case OFFER: {
       console.log('\n INVOKING OFFER CALL ****************************')
       console.log(' > Current Agent : ', currentAgent)
-      console.log(' > Counterparty Agent : ', counterparty)
       // initiate offer
       return holochainZomeCall(
         'holofuel',
@@ -66,7 +64,6 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
     case PAY: {
       console.log('\n INVOKING PAY CALL ****************************')
       console.log(' > Current Agent : ', currentAgent)
-      console.log(' > Counterparty Agent : ', counterparty)
       // offer in response to request
       return holochainZomeCall(
         'holofuel',
@@ -85,7 +82,6 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
     case ACCEPT: {
       console.log('\n INVOKING ACCEPT CALL ****************************')
       console.log(' > Current Agent : ', currentAgent)
-      console.log(' > Counterparty Agent : ', counterparty)
       // accept offer
       return holochainZomeCall(
         'holofuel',

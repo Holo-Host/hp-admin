@@ -24,7 +24,7 @@ export function SideMenu ({
           {settings.hostName || presentHash(settings.hostPubKey)}
         </h2>
 
-        <Link to='/settings' styleName='settings-link'>
+        <Link to='/admin/settings' styleName='settings-link'>
           <GearIcon styleName='gear-icon' /> <div>Settings</div>
         </Link>
 
@@ -33,12 +33,12 @@ export function SideMenu ({
       <nav styleName='nav'>
         <ul styleName='nav-list'>
           <li>
-            <Link to='/dashboard' styleName='nav-link'>
+            <Link to='/admin/dashboard' styleName='nav-link'>
               Home
             </Link>
           </li>
           <li>
-            <Link to='/holofuel' styleName='nav-link'>
+            <Link to='/admin/holofuel' styleName='nav-link'>
               HoloFuel
             </Link>
           </li>
@@ -53,7 +53,7 @@ export function SideMenu ({
           </p>
           <p>
             Learn more about out our&nbsp;
-            <a href='https://wheredoesthisgo.com' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
+            <a href='https://medium.com/@H_O_L_O_/253c473381fd' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
               Alpha Testnet.
             </a>
           </p>

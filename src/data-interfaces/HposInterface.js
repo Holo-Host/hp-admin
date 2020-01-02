@@ -22,7 +22,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
     return mockCallHpos(method, apiVersion, path)
   } else {
     return async params => {
-      const fullPath = process.env.REACT_APP_HPOS_URL + '/' + apiVersion + '/' + path
+      const fullPath = ((process.env.NODE_ENV === 'production') ? (window.location.protocol + '//' + window.location.hostname) : process.env.REACT_APP_HPOS_URL) + '/api/' + apiVersion + '/' + path
       const urlObj = new URL(fullPath)
 
       const signature = await signPayload(method, urlObj.pathname, params)
@@ -30,7 +30,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
       const headers = {
         ...axiosConfig.headers,
         ...userHeaders,
-        'X-Holo-Admin-Signature': signature
+        'X-Hpos-Admin-Signature': signature
       }
 
       let data
@@ -67,14 +67,14 @@ const presentHposStatus = (hposStatus) => {
 }
 
 const presentHposSettings = (hposSettings) => {
-  const { admin, holoportos, name } = hposSettings
+  const { admin, holoportos = {}, name } = hposSettings
   return {
     hostPubKey: admin.public_key,
     hostName: admin.name,
     registrationEmail: admin.email,
-    networkStatus: holoportos.network, // ie: 'live'
-    sshAccess: holoportos.sshAccess,
-    deviceName: name
+    networkStatus: holoportos.network || 'test', // ie: 'live'
+    sshAccess: holoportos.sshAccess || false,
+    deviceName: name || 'My HoloPort'
   }
 }
 
