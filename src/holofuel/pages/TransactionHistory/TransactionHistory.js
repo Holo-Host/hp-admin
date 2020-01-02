@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, capitalize, uniqBy, get } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
-import Button from 'holofuel/components/Button'
+import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
@@ -58,6 +58,11 @@ export default function TransactionsHistory () {
   const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
   const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
 
+  const [visibleTransactionCount, setVisibleTransactionCount] = useState(10)
+  const pagedCompletedTransactions = completedTransactions.slice(0, visibleTransactionCount)
+  const hasMoreTransactions = visibleTransactionCount < completedTransactions.length
+  const showMoreTransactions = () => setVisibleTransactionCount(visibleTransactionCount + 10)
+
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
@@ -71,17 +76,17 @@ export default function TransactionsHistory () {
   switch (filter) {
     case 'all':
       filteredPendingTransactions = pendingTransactions
-      filteredCompletedTransactions = completedTransactions
+      filteredCompletedTransactions = pagedCompletedTransactions
       transactionTypeName = 'transactions'
       break
     case 'withdrawals':
       filteredPendingTransactions = []
-      filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.outgoing)
+      filteredCompletedTransactions = pagedCompletedTransactions.filter(transaction => transaction.direction === DIRECTION.outgoing)
       transactionTypeName = 'withdrawals'
       break
     case 'deposits':
       filteredPendingTransactions = []
-      filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.incoming)
+      filteredCompletedTransactions = pagedCompletedTransactions.filter(transaction => transaction.direction === DIRECTION.incoming)
       transactionTypeName = 'deposits'
       break
     case 'pending':
@@ -122,6 +127,8 @@ export default function TransactionsHistory () {
           isFirst={index === 0} />)}
       </React.Fragment>)}
     </div>}
+
+    {hasMoreTransactions && <Button onClick={showMoreTransactions}>Load More</Button>}
 
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
