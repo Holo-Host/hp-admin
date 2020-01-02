@@ -21,20 +21,15 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
         {leftNav}
       </div>
       <div styleName='center-nav'>
-        <span styleName='title header-font'>
-          {title && <section styleName='page-header'>
-            <div styleName='page-title'>{title}</div>
-          </section>}
-        </span>
+        {title && <div styleName='page-header'>
+          <div styleName='page-title'>{title}</div>
+        </div>}
       </div>
-      <div styleName='right-nav account-number header-font'>
+      <div>
         <CopyAgentId agent={agent} isMe>
-          {agent.nickname || presentAgentId(agent.id)}
+          <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} data-testid='hash-icon' />
         </CopyAgentId>
       </div>
-      <CopyAgentId agent={agent} isMe>
-        <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} data-testid='hash-icon' />
-      </CopyAgentId>
     </section>
   </header>
 }

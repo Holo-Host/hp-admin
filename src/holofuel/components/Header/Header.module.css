@@ -1,6 +1,4 @@
 .left-nav {
-  flex: 1.33 1;
-  display: flex;
 }
 
 .center-nav {
@@ -55,18 +53,6 @@
   backdrop-filter: blur(27.1828px);
 }
 
-.header-font {
-  font-style: normal;
-  font-weight: bold;
-  flex-grow: 1;
-  font-size: 16px;
-  color: black
-}
-
-.title {
-  text-align: center;
-}
-
 /* We should turn this into a design-system component */
 .nav-badge {
   box-sizing: border-box;
@@ -106,7 +92,8 @@
 }
 
 .page-title {
-  /* */
+  font-size: 18px;
+  color: black;
 }
 
 .empty-spacer {
