@@ -20,6 +20,7 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
   return <PrimaryLayout showAlphaFlag={false}>
     <div styleName='amount-input-container'>
       <input styleName='amount-input-amount'
+        data-testid='amount'
         onChange={e => setInputValue(e.target.value)}
         value={`${presentHolofuelAmount(inputValue)}`} />
       <div styleName='numpad'>

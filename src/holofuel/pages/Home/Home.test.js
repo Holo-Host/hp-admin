@@ -63,7 +63,7 @@ describe('Home', () => {
       expect(getByText(`Hi ${nickname}!`)).toBeInTheDocument()
 
       history.push.mockReset()
-      fireEvent.click(getByText('Send / Request'))
+      fireEvent.click(getByText('New Transaction'))
       expect(history.push).toHaveBeenCalledWith(OFFER_REQUEST_PATH)
 
       expect(getByText(`${presentHolofuelAmount(balance)} TF`)).toBeInTheDocument()
@@ -157,8 +157,8 @@ describe('Home', () => {
         expect(getByText(notes)).toBeInTheDocument()
 
         const presentedAmount = direction === DIRECTION.incoming
-          ? `+ ${presentHolofuelAmount(amount)}`
-          : `- ${presentHolofuelAmount(amount)}`
+          ? `${presentHolofuelAmount(amount)} TF`
+          : `- ${presentHolofuelAmount(amount)} TF`
 
         expect(getByText(presentedAmount)).toBeInTheDocument()
         expect(getByText(counterparty.nickname)).toBeInTheDocument()

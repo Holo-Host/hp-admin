@@ -27,10 +27,7 @@ const FormValidationSchema = yup.object().shape({
   counterpartyId: yup.string()
     .required()
     .length(AGENT_ID_LENGTH)
-    .trim(),
-  amount: yup.number()
-    .required()
-    .positive()
+    .trim()
 })
 
 function useOfferMutation () {
@@ -61,7 +58,7 @@ const modePrepositions = {
 }
 
 export default function CreateOfferRequest ({ history: { push } }) {
-  const [numpadVisible, setNumpadVisible] = useState(false)
+  const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
@@ -91,7 +88,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const fee = (amount * FEE_PERCENTAGE) || 0
   const total = amount + fee
 
-  const onSubmit = ({ amount, counterpartyId, notes }) => {
+  const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
       case OFFER_MODE:
         createOffer(amount, counterpartyId, notes)
@@ -173,7 +170,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         </div>
       </div>
       <div styleName='form-row'>
-        <div><label htmlFor='amount' styleName='form-label'>For:</label></div>
+        <div><label htmlFor='notes' styleName='form-label'>For:</label></div>
         <input
           name='notes'
           id='notes'

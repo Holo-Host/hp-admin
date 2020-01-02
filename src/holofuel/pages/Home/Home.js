@@ -40,36 +40,13 @@ function useTransactionsWithCounterparties () {
   }
 }
 
-const transactions = [
-  {
-    id: 1,
-    counterparty: {
-      id: '1',
-      nickname: 'Jackson.the.human'
-    },
-    notes: 'you know...',
-    amount: 2000,
-    direction: DIRECTION.incoming
-  },
-  {
-    id: 2,
-    counterparty: {
-      id: '1',
-      nickname: 'Jackson.the.human'
-    },
-    notes: 'you know...',
-    amount: 2000,
-    direction: DIRECTION.outgoing
-  }
-]
-
 export default function Home () {
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
-  // const { transactions } = useTransactionsWithCounterparties()
+  const { transactions } = useTransactionsWithCounterparties()
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
 

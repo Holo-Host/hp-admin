@@ -71,34 +71,42 @@ const mocks = [
   counterpartyQueryMock
 ]
 
+const enterAmountAndMode = async ({ amount, modeLabel, getByTestId, getByText }) => {
+  await act(async () => {
+    fireEvent.change(getByTestId('amount'), { target: { value: amount } })
+    await wait(0)
+  })
+  await act(async () => {
+    fireEvent.click(getByText(modeLabel))
+    await wait(10)
+  })
+}
+
 describe('CreateOfferRequest', () => {
   describe('offer mode', () => {
     it('renders a form that can be filled out and submitted', async () => {
       const push = jest.fn()
 
-      const { getByLabelText, queryByTestId, getByTestId, getByPlaceholderText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
+
+      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
 
       expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
       await act(async () => {
-        fireEvent.change(getByLabelText('To'), { target: { value: counterparty.id } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: counterparty.id } })
         await wait(50)
       })
 
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
-      act(() => {
-        fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
-      })
-
-      expect(getByLabelText('Fee (1%)').value).toEqual((amount * FEE_PERCENTAGE).toFixed(2))
-
-      expect(getByLabelText('Total').value).toEqual((amount + (amount * FEE_PERCENTAGE)).toFixed(2))
+      expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
+      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
 
       act(() => {
-        fireEvent.change(getByPlaceholderText('What is this for?'), { target: { value: notes } })
+        fireEvent.change(getByLabelText('For:'), { target: { value: notes } })
       })
 
       await act(async () => {
@@ -121,14 +129,16 @@ describe('CreateOfferRequest', () => {
 
       const push = jest.fn()
 
-      const { getByLabelText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
+
+      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
 
       expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
       await act(async () => {
-        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.pub_sign_key } })
         await wait(0)
       })
 
@@ -161,14 +171,16 @@ describe('CreateOfferRequest', () => {
 
       const push = jest.fn()
 
-      const { getByLabelText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
+
+      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
 
       expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
       await act(async () => {
-        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.pub_sign_key } })
         await wait(0)
       })
 
@@ -200,14 +212,16 @@ describe('CreateOfferRequest', () => {
 
       const push = jest.fn()
 
-      const { getByLabelText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
+
+      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
 
       expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
       act(() => {
-        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.pub_sign_key } })
       })
 
       expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
@@ -236,9 +250,11 @@ describe('CreateOfferRequest', () => {
         }
       ]
 
-      const { getAllByTestId, getByLabelText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getAllByTestId, getByLabelText, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{}} />
       </MockedProvider>)
+
+      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
 
       const agentRows = getAllByTestId('agent-row')
 
@@ -250,7 +266,7 @@ describe('CreateOfferRequest', () => {
       expect(agent1Row).toBeInTheDocument()
       fireEvent.click(agent1Row)
 
-      expect(getByLabelText('To').value).toEqual(agent1.id)
+      expect(getByLabelText('To:').value).toEqual(agent1.id)
 
       const { getByText: getByTextInAgent1Row } = within(agent1Row)
       expect(getByTextInAgent1Row('Selected')).toBeInTheDocument()
@@ -262,57 +278,56 @@ describe('CreateOfferRequest', () => {
   })
 
   describe('request mode', () => {
-    it('renders a form that can be filled out and submitted', async () => {
-      const requestMock = {
-        request: {
-          query: HolofuelRequestMutation,
-          variables: { amount, counterpartyId: counterparty.id, notes }
-        },
-        result: {
-          data: {
-            holofuelRequest: {
-              notes: 'Nothing in this object matters except we need the keys to be here to avoid apollo warnings',
-              id: '123',
-              counterparty,
-              amount,
-              type: TYPE.request,
-              timestamp: moment().subtract(14, 'days'),
-              direction: '',
-              status: ''
-            }
+    const requestMock = {
+      request: {
+        query: HolofuelRequestMutation,
+        variables: { amount, counterpartyId: counterparty.id, notes }
+      },
+      result: {
+        data: {
+          holofuelRequest: {
+            notes: 'Nothing in this object matters except we need the keys to be here to avoid apollo warnings',
+            id: '123',
+            counterparty,
+            amount,
+            type: TYPE.request,
+            timestamp: moment().subtract(14, 'days'),
+            direction: '',
+            status: ''
           }
         }
       }
+    }
 
-      const mocks = [
-        requestMock,
-        counterpartyQueryMock
-      ]
+    const mocks = [
+      requestMock,
+      counterpartyQueryMock
+    ]
 
+    it('renders a form that can be filled out and submitted', async () => {      
       const push = jest.fn()
 
-      const { getByLabelText, getByText, queryByTestId, getByTestId, getByPlaceholderText, queryByLabelText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
 
-      await act(async () => {
-        fireEvent.click(getByText('Request'))
-        await wait(0)
-      })
+      await enterAmountAndMode({ amount, modeLabel: 'Request', getByTestId, getByText })
 
       expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
-      expect(queryByLabelText('Fee (1%)')).not.toBeInTheDocument()
 
       await act(async () => {
-        fireEvent.change(getByLabelText('From'), { target: { value: counterparty.id } })
-        await wait(0)
+        fireEvent.change(getByLabelText('From:'), { target: { value: counterparty.id } })
+        await wait(50)
       })
 
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
-      fireEvent.change(getByLabelText('Amount'), { target: { value: amount } })
+      expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
+      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
 
-      fireEvent.change(getByPlaceholderText('What is this for?'), { target: { value: notes } })
+      act(() => {
+        fireEvent.change(getByLabelText('For:'), { target: { value: notes } })
+      })
 
       await act(async () => {
         fireEvent.click(getByTestId('submit-button'))
