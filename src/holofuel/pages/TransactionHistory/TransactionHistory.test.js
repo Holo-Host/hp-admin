@@ -120,19 +120,10 @@ describe('TransactionsHistory', () => {
     const mocks = [
       {
         request: {
-          query: HolofuelCompletedTransactionsQuery,
-          variables: {
-            limit: 10
-          }
+          query: HolofuelCompletedTransactionsQuery
         },
         result: {
-          data: {
-            holofuelCompletedTransactions: {
-              transactions: completedTransactions,
-              hasMore: false,
-              earliestTimestamp: ''
-            }
-          }
+          data: { holofuelCompletedTransactions: completedTransactions }
         }
       },
       {
