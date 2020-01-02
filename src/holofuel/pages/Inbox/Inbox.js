@@ -117,7 +117,8 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox () {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+
   const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
@@ -151,15 +152,13 @@ export default function Inbox () {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
-  const displayBalance = ledgerLoading ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
-
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
   return <PrimaryLayout headerProps={{ title: 'Inbox' }} inboxCount={actionableTransactions.length}>
     <Jumbotron
       className='inbox-header'
-      title={displayBalance}
+      title={`${presentHolofuelAmount(holofuelBalance)} TF`}
       titleSuperscript='Balance'
     >
       <Button styleName='new-transaction-button' onClick={() => showNewTransactionModal()}>

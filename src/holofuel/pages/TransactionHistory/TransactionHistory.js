@@ -12,7 +12,7 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
+import { presentAgentId, presentHolofuelAmount, partitionByDate, createNewIsoDate } from 'utils'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
@@ -33,8 +33,22 @@ function useCancel () {
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'network-only' })
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'network-only' })
+  const {
+    data: { holofuelCompletedTransactions: holofuelCompletedTransactionList = {} } = {},
+    fetchMore: fetchMoreCompleted
+  } = useQuery(HolofuelCompletedTransactionsQuery, {
+    variables: {
+      limit: 10
+    },
+    fetchPolicy: 'network-only'
+  })
+
+  const {
+    transactions: holofuelCompletedTransactions = [],
+    hasMore: hasMoreCompleted // ,
+    // earliestTimestamp: earliestCompletedTimestamp
+  } = holofuelCompletedTransactionList
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
@@ -47,8 +61,25 @@ function useTransactionsWithCounterparties () {
   const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
 
   return {
+    pendingTransactions: updatedWaitingTransactions,
     completedTransactions: updatedCompletedTransactions,
-    pendingTransactions: updatedWaitingTransactions
+    hasMoreCompleted,
+    fetchMoreCompleted: () => fetchMoreCompleted({
+      variables: {
+        limit: 10,
+        // Instead of referencing the 'earliestCompletedTimestamp', we can set this number to the legal requirement (ie: 7 years ago)...
+        until: createNewIsoDate({ years: -7 })
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev
+        return {
+          holofuelCompletedTransactions: {
+            ...fetchMoreResult.holofuelCompletedTransactions,
+            transactions: prev.holofuelCompletedTransactions.transactions.concat(fetchMoreResult.holofuelCompletedTransactions.transactions)
+          }
+        }
+      }
+    })
   }
 }
 
@@ -61,7 +92,7 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 
 export default function TransactionsHistory () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
-  const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
+  const { completedTransactions, pendingTransactions, hasMoreCompleted, fetchMoreCompleted } = useTransactionsWithCounterparties()
 
   const [visibleTransactionCount, setVisibleTransactionCount] = useState(10)
   const pagedCompletedTransactions = completedTransactions.slice(0, visibleTransactionCount)
@@ -77,22 +108,26 @@ export default function TransactionsHistory () {
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []
   let transactionTypeName = ''
+  let showLoadMoreButton = false
 
   switch (filter) {
     case 'all':
       filteredPendingTransactions = pendingTransactions
       filteredCompletedTransactions = pagedCompletedTransactions
       transactionTypeName = 'transactions'
+      showLoadMoreButton = hasMoreCompleted
       break
     case 'withdrawals':
       filteredPendingTransactions = []
       filteredCompletedTransactions = pagedCompletedTransactions.filter(transaction => transaction.direction === DIRECTION.outgoing)
       transactionTypeName = 'withdrawals'
+      showLoadMoreButton = hasMoreCompleted
       break
     case 'deposits':
       filteredPendingTransactions = []
       filteredCompletedTransactions = pagedCompletedTransactions.filter(transaction => transaction.direction === DIRECTION.incoming)
       transactionTypeName = 'deposits'
+      showLoadMoreButton = hasMoreCompleted
       break
     case 'pending':
       filteredPendingTransactions = pendingTransactions
@@ -138,7 +173,7 @@ export default function TransactionsHistory () {
       </React.Fragment>)}
     </div>}
 
-    {hasMoreTransactions && <Button onClick={showMoreTransactions}>Load More</Button>}
+    {!noVisibleTransactions && hasMoreTransactions && <Button onClick={showMoreTransactions}>Load More</Button>}
 
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}

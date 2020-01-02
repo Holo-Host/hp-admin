@@ -1,5 +1,5 @@
 query HolofuelActionableTransactionsQuery {
-  holofuelActionableTransactions {
+  zholofuelActionableTransactions {
     id
     amount
     counterparty { id }

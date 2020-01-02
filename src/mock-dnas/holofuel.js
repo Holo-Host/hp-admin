@@ -73,8 +73,8 @@ export const transactionList = {
   },
   cover: {
     first: 0,
-    count: 5,
-    total: 5
+    count: 8,
+    total: 8
   },
   transactions: [
     ...someCompletedRequests,
@@ -372,6 +372,31 @@ export const transactionList = {
   ].sort((a, b) => a.timestamp.event > b.timestamp.event ? -1 : 1)
 }
 
+// const now = (new Date()).getTime()
+// const oneHour = 60 * 60 * 1000
+
+// const someRequests = Array.from({ length: 5 }, (_, id) => ({
+//   event: [
+//     id,
+//     new Date(now - Math.floor((id + 1) * oneHour)).toISOString(),
+//     {
+//       Request: {
+//         from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+//         to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+//         amount: Math.floor(Math.random() * 1000),
+//         fee: '2',
+//         deadline: '2020-12-02T00:00:00+00:00',
+//         notes: `I want my $${id}!`,
+//         synchronous: null
+//       }
+//     }
+//   ],
+//   provenance: [
+//     'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+//     'JSnAoopQg0fVHsA3dQIvJ3tRl5CRdtBbCAjzUZLMaWsD51G8nieRhoKK8JIKqkjscsprJe+j+ceun9oPpoc3AA=='
+//   ]
+// }))
+
 export const pendingList = {
   requests: [
     {
@@ -453,15 +478,37 @@ const agentArray = [{
 const whois = agentId => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
 
 function listPending ({ origins }) {
-  if (!origins) return pendingList
-  if (isString(origins)) {
-    const filter = entry => entry.event[0] === origins
-    return {
-      requests: pendingList.requests.filter(filter),
-      promises: pendingList.promises.filter(filter)
+  if (origins) {
+    if (isString(origins)) {
+      const filter = entry => entry.event[0] === origins
+      return {
+        ...pendingList,
+        requests: pendingList.requests.filter(filter),
+        promises: pendingList.promises.filter(filter)
+      }
     }
+    throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
+  } else {
+    return pendingList
   }
-  throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
+}
+
+function listTransactions ({ limit, until }) {
+  if (limit) {
+    const untilFilter = until
+      ? transaction => new Date(transaction.timestamp.event) > new Date(until)
+      : _ => true
+    // this is a hack and not how the dna does it, but close enough for testing
+    return {
+      ...transactionList,
+      transactions: transactionList.transactions
+        .filter(untilFilter)
+        .sort((a, b) => a.timestamp.event > b.timestamp.event ? -1 : 1)
+        .slice(0, limit)
+    }
+  } else {
+    return transactionList
+  }
 }
 
 function receivedPaymentsHashMap (promiseArr) {
@@ -483,7 +530,7 @@ const holofuel = {
     // whois is for discovering all other agents
     whois: ({ agents }) => typeof agents === 'string' ? Array.of(whois(agents)) : Array.of(agents.map(agent => whois(agent))),
     ledger_state: () => transactionList.ledger,
-    list_transactions: () => transactionList,
+    list_transactions: listTransactions,
     list_pending: listPending,
     list_pending_declined: [],
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),

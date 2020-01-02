@@ -70,6 +70,12 @@ type Transaction {
   happName: String
 }
 
+type TransactionList {
+  transactions: [Transaction]
+  hasMore: Boolean
+  earliestTimestamp: String
+}
+
 type Ledger {
   balance: Float
   credit: Float
@@ -113,7 +119,7 @@ type Query {
   happs: [Happ]
   happ(id: String!): Happ
   hostPricing: HostPricing
-  holofuelCompletedTransactions: [Transaction]
+  holofuelCompletedTransactions(limit: Int, until: String): TransactionList
   holofuelWaitingTransactions: [Transaction]
   holofuelNonPendingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
