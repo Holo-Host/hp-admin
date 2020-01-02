@@ -9,7 +9,7 @@ import HoloFuelIcon from 'components/icons/HoloFuelIcon'
 import useAuthContext from 'contexts/useAuthContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
-import { getHpAdminKeypair } from 'holochainClient'
+import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
 
 export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
@@ -18,14 +18,19 @@ export default function Login ({ history: { push } }) {
   const { newMessage } = useFlashMessageContext()
 
   const onSubmit = async ({ email, password }) => {
+    eraseHpAdminKeypair()
+    // we call this to SET the singleton value of HpAdminKeypair
+    await getHpAdminKeypair(email, password)
     const authResult = await checkAuth()
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
+
+    // we call this to SET the singleton value of HpAdminKeypair
+    await getHpAdminKeypair(email, password)
+
     setIsAuthed(isAuthed)
 
     if (isAuthed) {
-      // we call this to SET the singleton value of HpAdminKeypair
-      await getHpAdminKeypair(email, password)
-      push('/')
+      push('/admin')
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     }
