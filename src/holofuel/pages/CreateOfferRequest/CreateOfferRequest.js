@@ -78,14 +78,17 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
-    if (counterpartyId.length === AGENT_ID_LENGTH && counterpartyId === whoami.id) {
+    if (counterpartyId === whoami.id) {
       setIsFormValid(false)
       if (!hasDisplayedFlashMessage) {
         newMessage('You cannot send yourself TestFuel.')
         setHasDisplayedFlashMessage(true)
       }
-    } else {
+    } else if (counterpartyId.length === AGENT_ID_LENGTH) {
       setIsFormValid(true)
+      setHasDisplayedFlashMessage(false)
+    } else {
+      setIsFormValid(false)
       setHasDisplayedFlashMessage(false)
     }
   }, [counterpartyId, whoami, setIsFormValid, newMessage, hasDisplayedFlashMessage, setHasDisplayedFlashMessage])
@@ -208,7 +211,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length !== AGENT_ID_LENGTH || !isCounterpartyFound || !isFormValid}>Send</Button>
+      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={!isCounterpartyFound || !isFormValid}>Send</Button>
     </form>
   </PrimaryLayout>
 }
@@ -241,7 +244,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
       setCounterpartyFound(false)
       setHasDisplayedNotFoundMessage(false)
     }
-  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage, whoami, id])
+  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage, id])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.
