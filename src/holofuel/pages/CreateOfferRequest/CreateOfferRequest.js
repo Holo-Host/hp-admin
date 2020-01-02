@@ -145,7 +145,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         </Button>)}
     </div>
 
-    <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>      
+    <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
       <div styleName='form-row'>
         <div><label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}:</label></div>
         <div styleName='input-row'>
@@ -194,7 +194,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       styleName='recent-counterparties'
       agents={agents}
       selectedAgentId={counterpartyId}
-      selectAgent={selectAgent} />      
+      selectAgent={selectAgent} />
   </PrimaryLayout>
 }
 

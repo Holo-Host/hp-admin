@@ -304,7 +304,7 @@ describe('CreateOfferRequest', () => {
       counterpartyQueryMock
     ]
 
-    it('renders a form that can be filled out and submitted', async () => {      
+    it('renders a form that can be filled out and submitted', async () => {
       const push = jest.fn()
 
       const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
