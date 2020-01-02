@@ -28,6 +28,12 @@ export const resolvers = {
 
     holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
 
+    holofuelHomeCounterparties: async () => {
+      console.log("CHECKING");
+      const completed = await HoloFuelDnaInterface.transactions.allCompleted()
+      return getTxCounterparties(completed)
+    },
+
     holofuelHistoryCounterparties: async () => {
       const completed = await HoloFuelDnaInterface.transactions.allCompleted()
       const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
