@@ -24,6 +24,7 @@
   display: flex;
   justify-content: center;
   z-index: 1;
+  margin-top: 23px;
 }
 
 .mode-toggle-button {
@@ -52,12 +53,17 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-top: 20px;
-  flex-grow: 1;
+  margin-top: 45px;
+  padding: 0 24px;
 }
 
 .form-row {
 
+}
+
+.input-row {
+  display: flex;
+  width: 100%;
 }
 
 .form-label {
@@ -70,19 +76,37 @@
 }
 
 .form-input {
+  padding-top: 4px;
+  padding-bottom: 10px;
+  margin-bottom: 4px;
   border: none;
+  font-size: 16px;
   border-bottom: 1px solid var(--color-rhino-50);
   background-color: var(--color-alabaster);
+  color: var(--color-rhino);
+  width: 100%;
+}
+
+.form-input::placeholder {
+  color: var(--color-rhino-35);
 }
 
 .hash-and-nick {
   width: 150px;
   display: flex;
   margin-top: 3px;
+  margin-left: 5px;
+  align-items: center;
 }
 
 .hash-icon {
   margin-right: 5px;
+}
+
+.nickname {
+  color: var(--color-rhino);
+  font-weight: normal;
+  margin-bottom: 8px;
 }
 
 .number-input {
@@ -109,13 +133,28 @@
   height: 100px;
   align-self: center;
   margin-top: 50px;
+  width: 100%;
+}
+
+.total {
+  font-family: "Circular";
+  font-size: 18px;
+  color: var(--color-rhino);
+  margin-top: 14px;
+  margin-bottom: 32px;
 }
 
 .send-button {
-  justify-self: flex-end;
-  margin-top: auto;
-  height: 54px;
-  font-size: 24px;
+  width: 192px;
+  height: 42px;
+  font-size: 16px;
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
+  border: none;
+  align-self: center;
+}
+
+.disabled {
+  background-color: var(--color-iceberg);
 }
 
 .recent-counterparties {

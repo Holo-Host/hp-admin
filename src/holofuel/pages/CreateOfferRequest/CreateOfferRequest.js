@@ -109,7 +109,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)
 
-  const title = mode === OFFER_MODE ? 'Send Test Fuel' : 'Request Test Fuel'
+  const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
+
+  const disableSubmit = counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true
 
   if (numpadVisible) {
     const chooseSend = () => {
@@ -149,23 +151,25 @@ export default function CreateOfferRequest ({ history: { push } }) {
     <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>      
       <div styleName='form-row'>
         <div><label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}:</label></div>
-        <input
-          name='counterpartyId'
-          id='counterpartyId'
-          styleName='form-input'
-          placeholder='Who is this for?'
-          ref={register}
-          onChange={({ target: { value } }) => setCounterpartyId(value)} />
-        <div styleName='hash-and-nick'>
-          {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
-          {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
-            <RenderNickname
-              agentId={counterpartyId}
-              setCounterpartyNick={setCounterpartyNick}
-              counterpartyNick={counterpartyNick}
-              setCounterpartyFound={setCounterpartyFound}
-              newMessage={newMessage} />
-          </h4>}
+        <div styleName='input-row'>
+          <input
+            name='counterpartyId'
+            id='counterpartyId'
+            styleName='form-input'
+            placeholder='Who is this for?'
+            ref={register}
+            onChange={({ target: { value } }) => setCounterpartyId(value)} />
+          <div styleName='hash-and-nick'>
+            {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
+            {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname' styleName='nickname'>
+              <RenderNickname
+                agentId={counterpartyId}
+                setCounterpartyNick={setCounterpartyNick}
+                counterpartyNick={counterpartyNick}
+                setCounterpartyFound={setCounterpartyFound}
+                newMessage={newMessage} />
+            </h4>}
+          </div>
         </div>
       </div>
       <div styleName='form-row'>
@@ -178,7 +182,15 @@ export default function CreateOfferRequest ({ history: { push } }) {
           ref={register} />
         <div />
       </div>
-      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true}>Send</Button>
+
+      <div styleName='total'>Total Amount: {presentHolofuelAmount(total)} TF</div>
+
+      <Button
+        type='submit'
+        dataTestId='submit-button'
+        variant='green'
+        styleName={cx('send-button', { disabled: disableSubmit })}
+        disabled={disableSubmit}>{title}</Button>
     </form>
 
     {/* <RecentCounterparties
@@ -219,7 +231,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
       setHasDisplayedNotFoundMessage(false)
     }
   }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage])
- 
+
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.
     return <>
