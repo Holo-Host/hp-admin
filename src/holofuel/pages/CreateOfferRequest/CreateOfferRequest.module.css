@@ -24,12 +24,13 @@
   display: flex;
   justify-content: center;
   z-index: 1;
-  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
 }
 
 .mode-toggle-button {
   width: 132px;
+  font-size: 16px;
   border: none;
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
 }
 
 .left-button {
@@ -46,9 +47,6 @@
   background-color: var(--color-iceberg);
 }
 
-/* Old Code */
-
-
 
 .offer-form {
   display: flex;
@@ -59,28 +57,22 @@
 }
 
 .form-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  height: 32px;
+
 }
 
 .form-label {
-  font-size: 16px;
+  font-family: "Circular";
   font-weight: bold;
-  color: var(--color-tundora);
-  width: 150px;
-  text-align: right;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--color-rhino-60);
 }
 
 .form-input {
-  border: 1px solid var(--color-gray);
-  height: 25px;
-  margin: 0px 10px;
-  padding: 0px 5px;
-  font-size: 16px;
-  color: var(--color-dove-gray);
+  border: none;
+  border-bottom: 1px solid var(--color-rhino-50);
+  background-color: var(--color-alabaster);
 }
 
 .hash-and-nick {
@@ -119,10 +111,6 @@
   margin-top: 50px;
 }
 
-.recent-counterparties {
-  margin-top: 40px;
-}
-
 .send-button {
   justify-self: flex-end;
   margin-top: auto;
@@ -130,57 +118,7 @@
   font-size: 24px;
 }
 
-/* AmountInput */
-
-.amount-input-container {
-  height: 100%;
-  width: 100%;
-  background-color: var(--color-caribbean-green);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.recent-counterparties {
+  margin-top: 40px;
 }
 
-.amount-input-amount {
-  margin-top: 64px;
-  margin-bottom: 20px;
-  font-size: 36px;
-  text-align: center;
-  background-color: var(--color-caribbean-green);
-  color: white;
-  border: none;
-}
-
-.numpad {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 44px;
-}
-
-.numpad-row {
-  display: flex;
-}
-
-.numpad-button {
-  font-size: 24px;
-  color: var(--color-iceberg);
-  background-color: var(--color-caribbean-green);
-  padding: 32px 0px;
-  width: 78px;
-  text-align: center;
-  border: none;
-}
-
-.action-row {
-  display: flex;
-}
-
-.action-button {
-  font-size: 16px;
-  width: 128px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0px 10px;
-}

@@ -109,7 +109,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)
 
-  const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
+  const title = mode === OFFER_MODE ? 'Send Test Fuel' : 'Request Test Fuel'
 
   if (numpadVisible) {
     const chooseSend = () => {
@@ -129,7 +129,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     <div styleName='amount-backdrop' />
     <div styleName='amount-banner'>
       <h4 styleName='amount-label'>
-        Send Test Fuel
+        {title}
       </h4>
       <div styleName='amount'>
         {presentHolofuelAmount(amount)} TF
@@ -146,10 +146,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
         </Button>)}
     </div>
 
-    {/* 
-    <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
+    <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>      
       <div styleName='form-row'>
-        <label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}</label>
+        <div><label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}:</label></div>
         <input
           name='counterpartyId'
           id='counterpartyId'
@@ -170,50 +169,24 @@ export default function CreateOfferRequest ({ history: { push } }) {
         </div>
       </div>
       <div styleName='form-row'>
-        <label htmlFor='amount' styleName='form-label'>Amount</label>
+        <div><label htmlFor='amount' styleName='form-label'>For:</label></div>
         <input
-          name='amount'
-          id='amount'
-          type='number'
-          styleName='number-input'
-          ref={register}
-          value={amount}
-          onChange={({ target: { value } }) => setAmount(value)} />
-        <span styleName='hf'>TF</span>
+          name='notes'
+          id='notes'
+          styleName='form-input'
+          placeholder='What is this for?'
+          ref={register} />
+        <div />
       </div>
-      {mode === OFFER_MODE && <div styleName='form-row'>
-        <label htmlFor='fee' styleName='form-label'>Fee (1%)</label>
-        <input
-          name='fee'
-          id='fee'
-          value={fee.toFixed(2)}
-          readOnly
-          styleName='readonly-input' />
-        <span styleName='hf'>TF</span>
-      </div>}
-      <div styleName='form-row'>
-        <label htmlFor='total' styleName='form-label'>Total</label>
-        <input
-          name='total'
-          id='total'
-          value={total.toFixed(2)}
-          readOnly
-          styleName='readonly-input' />
-        <span styleName='hf'>TF</span>
-      </div>
-      <textarea
-        styleName='notes-input'
-        name='notes'
-        placeholder='What is this for?'
-        ref={register} />
-
-      <RecentCounterparties
-        styleName='recent-counterparties'
-        agents={agents}
-        selectedAgentId={counterpartyId}
-        selectAgent={selectAgent} />
       <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true}>Send</Button>
-    </form> */}
+    </form>
+
+    {/* <RecentCounterparties
+      styleName='recent-counterparties'
+      agents={agents}
+      selectedAgentId={counterpartyId}
+      selectAgent={selectAgent} /> */}
+      
   </PrimaryLayout>
 }
 
