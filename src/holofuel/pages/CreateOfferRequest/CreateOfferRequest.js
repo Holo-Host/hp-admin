@@ -69,6 +69,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const createRequest = useRequestMutation()
 
   const { newMessage } = useFlashMessageContext()
+  const [hasDisplayedFlashMessage, setHasDisplayedFlashMessage] = useState(false)
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
@@ -78,12 +79,16 @@ export default function CreateOfferRequest ({ history: { push } }) {
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
     if (counterpartyId.length === AGENT_ID_LENGTH && counterpartyId === whoami.id) {
-      newMessage('You cannot send yourself TestFuel.')
       setIsFormValid(false)
+      if (!hasDisplayedFlashMessage) {
+        newMessage('You cannot send yourself TestFuel.')
+        setHasDisplayedFlashMessage(true)
+      }
     } else {
       setIsFormValid(true)
+      setHasDisplayedFlashMessage(false)
     }
-  }, [counterpartyId, whoami, setIsFormValid])
+  }, [counterpartyId, whoami, setIsFormValid, newMessage, hasDisplayedFlashMessage, setHasDisplayedFlashMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 

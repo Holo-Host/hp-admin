@@ -67,9 +67,24 @@ const counterpartyQueryMock = {
   }
 }
 
+const mockWhoamiAgent = {
+  id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+  nickname: 'Sam'
+}
+
+const whoamiMock = {
+  request: {
+    query: HolofuelUserQuery
+  },
+  result: {
+    data: { holofuelUser: mockWhoamiAgent }
+  }
+}
+
 const mocks = [
   offerMock,
-  counterpartyQueryMock
+  counterpartyQueryMock,
+  whoamiMock
 ]
 
 describe('CreateOfferRequest', () => {
@@ -342,7 +357,8 @@ describe('CreateOfferRequest', () => {
 
       const mocks = [
         requestMock,
-        counterpartyQueryMock
+        counterpartyQueryMock,
+        whoamiMock
       ]
 
       const push = jest.fn()
