@@ -62,6 +62,15 @@ export const partitionByDate = flow(
   sortBy(partition => partition.transactions[0].timestamp),
   reverse)
 
+// defaults to returning today's date
+export function createNewIsoDate ({ days = 0, months = 0, years = 0 }) {
+  var date = new Date()
+  date.setDate(date.getDate() + days)
+  date.setMonth(date.getMonth() + months)
+  date.setFullYear(date.getFullYear() + years)
+  return date.toISOString()
+}
+
 // parking this here. Not currently used.
 function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
   const dateDifference = moment(isoDate).fromNow()

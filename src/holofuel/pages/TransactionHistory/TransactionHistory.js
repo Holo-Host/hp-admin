@@ -12,7 +12,7 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
-import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
+import { presentAgentId, presentHolofuelAmount, partitionByDate, createNewIsoDate } from 'utils'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
@@ -46,8 +46,8 @@ function useTransactionsWithCounterparties () {
 
   const {
     transactions: holofuelCompletedTransactions = [],
-    hasMore: hasMoreCompleted,
-    earliestTimestamp: earliestCompletedTimestamp
+    hasMore: hasMoreCompleted // ,
+    // earliestTimestamp: earliestCompletedTimestamp
   } = holofuelCompletedTransactionList
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
@@ -67,7 +67,8 @@ function useTransactionsWithCounterparties () {
     fetchMoreCompleted: () => fetchMoreCompleted({
       variables: {
         limit: 10,
-        until: earliestCompletedTimestamp
+        // Instead of referencing the 'earliestCompletedTimestamp', we can set this number to the legal requirement (ie: 7 years ago)...
+        until: createNewIsoDate({ years: -7 })
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev
