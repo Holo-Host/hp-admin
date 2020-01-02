@@ -60,9 +60,7 @@
   top: -5px;
   right: -15px;
   color: #FFF;
-  background-color: #cf2a27;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .2) inset,
-    0 0 0 1px rgba(0, 0, 0, .25);
+  background-color: var(--color-persimmon);
   font-size: .7em;
   min-width: 30px;
   line-height: 14px;

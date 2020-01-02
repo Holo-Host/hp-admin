@@ -93,10 +93,12 @@
 
 .plus-icon {
   position: fixed;
+  margin-left: 6px;
 }
 
 .new-transaction-text {
   margin: auto;
+  padding-left: 12px;
 }
 
 .transactions {
