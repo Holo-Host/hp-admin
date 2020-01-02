@@ -29,9 +29,9 @@ const txProfliferator = (iterNum) => {
 }
 
 const Agent2TransactionLedger = {
-  requests: txProfliferator(4),
+  requests: txProfliferator(8),
   offers: {
-    initated: txProfliferator(2)
+    initated: txProfliferator(8)
   }
 }
 
