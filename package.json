@@ -22,10 +22,10 @@
     "test": "npm run test:lint && npm run test:unit",
     "test:ci": "CI=1 npm run test",
     "test:wait-for-conductor": "node scripts/wait-for-conductor.js",
-    "preseed:holofuel": " node scripts/prepareHoloFuelData/index.js",
-    "preseed:hpadmin": " node scripts/prepareHpAdminData/index.js",
-    "test:preseed-data": "nix-shell --command 'npm run hc:start && npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data'",
-    "test:integration": " nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
+    "preseed:holofuel": "node scripts/prepareHoloFuelData/index.js",
+    "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",
+    "test:preseed-data": "nix-shell --command 'npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data'",
+    "test:integration": "nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "test:integration-with-setup": "npm run test:preseed-data && npm run test:integration"
   },
   "dependencies": {
@@ -33,7 +33,7 @@
     "@apollo/react-hooks": "^3.1.3",
     "@apollo/react-testing": "^3.1.3",
     "@babel/node": "^7.6.3",
-    "@holo-host/hp-admin-keypair": "^0.1.2",
+    "@holo-host/hp-admin-keypair": "0.1.2",
     "@holochain/hc-web-client": "^0.5.0",
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-client": "^2.6.4",

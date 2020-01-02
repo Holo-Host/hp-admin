@@ -15,7 +15,7 @@ export default function AuthRoute (props) {
     {...omit('component', props)}
     render={({ location }) => <Redirect
       to={{
-        pathname: '/login',
+        pathname: '/admin/login',
         state: { from: location }
       }}
     />}

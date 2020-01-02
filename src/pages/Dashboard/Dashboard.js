@@ -10,7 +10,7 @@ import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount, getCommunityUrl } from 'utils'
 import cx from 'classnames'
 import './Dashboard.module.css'
 
@@ -38,7 +38,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
     </div>
     <h2 styleName='greeting'>{greeting}</h2>
 
-    {false && <Card title='Hosting' linkTo='/browse-happs' subtitle='Manage your Holo applications'>
+    {false && <Card title='Hosting' linkTo='/admin/browse-happs' subtitle='Manage your Holo applications'>
       <div styleName='hosting-content' data-testid='hosted-apps'>
         {noInstalledHapps === 0 && <>
           <PlusInDiscIcon color='#06C470' />Host your first hApp!
@@ -49,7 +49,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    {false && <Card title='Earnings' linkTo='/earnings' subtitle='Track your TestFuel earnings'>
+    {false && <Card title='Earnings' linkTo='/admin/earnings' subtitle='Track your TestFuel earnings'>
       <div styleName={cx('balance', { 'empty-balance': isEarningsZero })}>
         <h4 styleName='balance-header'>
           {isEarningsZero ? 'Balance' : "Today's earnings"}
@@ -60,7 +60,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    <Card title='HoloFuel' linkTo='/holofuel' subtitle='Send, and receive TestFuel'>
+    <Card title='HoloFuel' linkTo='/admin/holofuel' subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Balance
@@ -71,14 +71,28 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>
 
-    <Card title='Community' linkTo='/community' subtitle='Connect with your peers' />
+    <Card title='Community' linkTo={getCommunityUrl()} subtitle='Connect with your peers' />
   </PrimaryLayout>
 }
 
 function Card ({ title, subtitle, linkTo, children }) {
-  return <Link styleName='card' to={linkTo}>
+  return <MixedLink styleName='card' to={linkTo}>
     <h1 styleName='card-title'>{title}</h1>
     <h3 styleName='card-subtitle'>{subtitle}</h3>
     {children}
-  </Link>
+  </MixedLink>
+}
+
+// a react-router link that can also take an external url
+function MixedLink ({ to, children, ...props }) {
+  const isExternal = /^https?:\/\//.test(to)
+  if (isExternal) {
+    return <a href={to} {...props}>
+      {children}
+    </a>
+  } else {
+    return <Link to={to} {...props}>
+      {children}
+    </Link>
+  }
 }
