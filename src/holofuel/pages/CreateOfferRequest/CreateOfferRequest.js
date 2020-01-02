@@ -7,6 +7,7 @@ import Loader from 'react-loader-spinner'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -62,19 +63,32 @@ const modePrepositions = {
 export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
 
   const { newMessage } = useFlashMessageContext()
+  const [hasDisplayedFlashMessage, setHasDisplayedFlashMessage] = useState(false)
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
   const [isCounterpartyFound, setCounterpartyFound] = useState(false)
+  const [isFormValid, setIsFormValid] = useState(false)
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
-  }, [counterpartyId])
+    if (counterpartyId.length === AGENT_ID_LENGTH && counterpartyId === whoami.id) {
+      setIsFormValid(false)
+      if (!hasDisplayedFlashMessage) {
+        newMessage('You cannot send yourself TestFuel.')
+        setHasDisplayedFlashMessage(true)
+      }
+    } else {
+      setIsFormValid(true)
+      setHasDisplayedFlashMessage(false)
+    }
+  }, [counterpartyId, whoami, setIsFormValid, newMessage, hasDisplayedFlashMessage, setHasDisplayedFlashMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
@@ -87,10 +101,16 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [total, setTotal] = useState(0)
 
   const onAmountChange = amount => {
-    if (isNaN(amount)) return
-    const newFee = Number(amount) * FEE_PERCENTAGE
-    setFee(newFee)
-    setTotal(Number(amount) + newFee)
+    if (isNaN(amount)) return null
+    else if (amount < 0) {
+      setIsFormValid(false)
+      return newMessage(`You cannot ${mode === OFFER_MODE ? 'send' : 'request'} negative amounts.`)
+    } else {
+      setIsFormValid(true)
+      const newFee = Number(amount) * FEE_PERCENTAGE
+      setFee(newFee)
+      setTotal(Number(amount) + newFee)
+    }
   }
 
   const onSubmit = ({ amount, counterpartyId, notes }) => {
@@ -140,7 +160,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
               setCounterpartyNick={setCounterpartyNick}
               counterpartyNick={counterpartyNick}
               setCounterpartyFound={setCounterpartyFound}
-              newMessage={newMessage} />
+              newMessage={newMessage}
+              whoami={whoami} />
           </h4>}
         </div>
       </div>
@@ -150,6 +171,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           name='amount'
           id='amount'
           type='number'
+          min='0'
           styleName='number-input'
           ref={register}
           onChange={({ target: { value } }) => onAmountChange(value)} />
@@ -186,19 +208,19 @@ export default function CreateOfferRequest ({ history: { push } }) {
         agents={agents}
         selectedAgentId={counterpartyId}
         selectAgent={selectAgent} />
-      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true}>Send</Button>
+      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length !== AGENT_ID_LENGTH || !isCounterpartyFound || !isFormValid}>Send</Button>
     </form>
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage, whoami }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
   const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
 
-  const { nickname, notFound } = holofuelCounterparty
+  const { nickname, notFound, id } = holofuelCounterparty
   useEffect(() => {
     setCounterpartyNick(nickname)
   }, [setCounterpartyNick, nickname])
@@ -219,7 +241,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
       setCounterpartyFound(false)
       setHasDisplayedNotFoundMessage(false)
     }
-  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage])
+  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage, whoami, id])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.

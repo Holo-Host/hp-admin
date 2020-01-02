@@ -83,15 +83,7 @@ function useCounterparty (agentId) {
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'network-only' })
-  const {
-    data: { holofuelActionableTransactions: holofuelActionableTransactionList = { transactions: [] } } = {},
-    fetchMore: fetchMoreActionable
-  } = useQuery(HolofuelActionableTransactionsQuery, {
-    fetchPolicy: 'network-only',
-    variables: {
-      limit: 10
-    }
-  })
+  const { data: { holofuelActionableTransactions: holofuelActionableTransactionList = { transactions: [] } } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'network-only' })
 
   console.log('holofuelActionableTransactionList', holofuelActionableTransactionList)
@@ -114,25 +106,6 @@ function useTransactionsWithCounterparties () {
 
   return {
     actionableTransactions: updatedActionableWOCanceledOffers,
-    hasMoreActionable: holofuelActionableTransactionList.hasMore,
-    fetchMoreActionable: () => fetchMoreActionable({
-      variables: {
-        limit: 10,
-        until: holofuelActionableTransactionList.earliestTimestamp
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        console.log('prev', prev)
-        console.log('fetchMoreResult', fetchMoreResult)
-        if (!fetchMoreResult) return prev
-        return {
-          holofuelActionableTransactions: {
-            ...fetchMoreResult.holofuelActionableTransactions,
-            transactions: prev.holofuelActionableTransactions.transactions.concat(fetchMoreResult.holofuelActionableTransactions.transactions)
-          }
-        }
-      }
-
-    }),
     recentTransactions: updatedNonPendingTransactions
   }
 }
@@ -148,15 +121,8 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox () {
-  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
-
-  const {
-    actionableTransactions,
-    fetchMoreActionable,
-    hasMoreActionable,
-    recentTransactions
-  } = useTransactionsWithCounterparties()
-
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+  const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -189,13 +155,15 @@ export default function Inbox () {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
+  const displayBalance = ledgerLoading ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
   return <PrimaryLayout headerProps={{ title: 'Inbox' }} inboxCount={actionableTransactions.length}>
     <Jumbotron
       className='inbox-header'
-      title={`${presentHolofuelAmount(holofuelBalance)} TF`}
+      title={displayBalance}
       titleSuperscript='Balance'
     >
       <Button styleName='new-transaction-button' onClick={() => showNewTransactionModal()}>
@@ -247,8 +215,6 @@ export default function Inbox () {
         </div>
       </React.Fragment>)}
     </div>}
-
-    {hasMoreActionable && <button onClick={fetchMoreActionable}>Load More</button>}
 
     <NewTransactionModal
       handleClose={() => setIsNewTransactionModalVisible(null)}
