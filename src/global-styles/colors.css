@@ -14,6 +14,7 @@
   --color-limed-spruce: #39474A;
   --color-granny-apple-50: rgba(211, 245, 230, 0.5);  
   --color-iceberg: #CFF3EC;
+  --color-rhino-02: rgba(44, 63, 89, 0.02);      
   --color-rhino-10: rgba(44, 63, 89, 0.10);      
   --color-rhino-35: rgba(44, 63, 89, 0.35);  
   --color-rhino-50: rgba(44, 63, 89, 0.50);    
@@ -26,6 +27,7 @@
   --color-havelock-blue: #41A1DC;
   --color-persimmon: #FE6847;
   --color-concrete: #F2F2F2;
+  --color-athens-gray: #FAFBFC;
   /* color-shocking used in StyleDemo only */
   --color-shocking: #E292C0;
 }

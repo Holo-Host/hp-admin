@@ -47,7 +47,20 @@ export const transactionList = {
           },
           reason: 'No longer need to buy book.'
         }
-      }
+      },
+      timestamp: {
+        origin: '2019-12-06T11:27:49+00:00',
+        event: '2019-12-06T11:29:00+00:00'
+      },
+      adjustment: {
+        Ok: {
+          balance: '0',
+          payable: '0',
+          receivable: '0',
+          fees: '0'
+        }
+      },
+      available: '0'
     },
     // Agent Sam cancelled transaction, Perry sees cancelled incoming transaction
     {
@@ -421,6 +434,7 @@ const holofuel = {
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: listPending,
+    list_pending_declined: [],
     request: ({ from, amount, deadline }) => bcrypt.hashSync((from + amount + deadline), NUM_SALT_ROUNDS),
     promise: ({ to, amount, request, deadline }) => bcrypt.hashSync((to + amount + request + deadline), NUM_SALT_ROUNDS),
     receive_payment: ({ promise, promise_sig: sig, promise_commit: commit }) => bcrypt.hashSync((promise + sig + commit + 'accepted'), NUM_SALT_ROUNDS),

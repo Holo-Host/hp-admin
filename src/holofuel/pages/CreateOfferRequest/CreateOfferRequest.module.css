@@ -85,6 +85,7 @@
   background-color: var(--color-alabaster);
   color: var(--color-rhino);
   width: 100%;
+  flex: 3;
 }
 
 .form-input::placeholder {
@@ -92,10 +93,9 @@
 }
 
 .hash-and-nick {
-  width: 150px;
   display: flex;
-  margin-top: 3px;
-  margin-left: 5px;
+  margin-left: 10px;
+  flex: 1;
   align-items: center;
 }
 
@@ -104,6 +104,7 @@
 }
 
 .nickname {
+  display: block;
   color: var(--color-rhino);
   font-weight: normal;
   margin-bottom: 8px;

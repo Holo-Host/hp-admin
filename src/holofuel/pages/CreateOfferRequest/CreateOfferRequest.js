@@ -20,7 +20,7 @@ import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
-export const FEE_PERCENTAGE = 0.01
+export const FEE_PERCENTAGE = 0.001
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
@@ -193,12 +193,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
         disabled={disableSubmit}>{title}</Button>
     </form>
 
-    {/* <RecentCounterparties
+    <RecentCounterparties
       styleName='recent-counterparties'
       agents={agents}
       selectedAgentId={counterpartyId}
-      selectAgent={selectAgent} /> */}
-      
+      selectAgent={selectAgent} />      
   </PrimaryLayout>
 }
 
