@@ -1,10 +1,7 @@
-const { Agent1, Agent2 } = require('./agent-config.js')
+const { Agent1, Agent2 } = require('../get-agent.js')
 const Agent1TransactionLedger = require('./agent1-hf-ledger.js')
 const Agent2TransactionLedger = require('./agent2-hf-ledger.js')
 const holochainZomeCall = require('../invoke-holochain-zome-call.js')
-
-// TODO: INCLUDE DNA INSTANCE `AGENT_2_DNA_INSTANCE` ONCE RELIABLE NETWORKING IS IN PLACE....
-const { AGENT_1_DNA_INSTANCE } = require('./agent-config.js') // { AGENT_1_DNA_INSTANCE, AGENT_2_DNA_INSTANCE }
 
 // Transaction Types :
 const REQUEST = 'requests'
@@ -14,15 +11,13 @@ const ACCEPT = 'offers.accepted'
 
 // HoloFuel ZomeCall Handler :
 const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrace, originId }) => {
-  let DNA_INSTANCE, counterparty
+  let currentAgent, counterparty
   if (agentTransactionLedger === Agent1TransactionLedger) {
-    counterparty = Agent2.agentId
-    DNA_INSTANCE = AGENT_1_DNA_INSTANCE
+    counterparty = Agent2.id
+    currentAgent = 0
   } else {
-    counterparty = Agent1.agentId
-    // TODO: Comment back in DNA Instance below with `AGENT_2_DNA_INSTANCE` ASAP.
-    // DNA_INSTANCE = AGENT_2_DNA_INSTANCE
-    DNA_INSTANCE = AGENT_1_DNA_INSTANCE
+    counterparty = Agent1.id
+    currentAgent = 1
   }
 
   const txType = type === OFFER ? agentTransactionLedger[`offers`][`initated`] : agentTransactionLedger[type]
@@ -36,40 +31,45 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
   switch (type) {
     case REQUEST: {
       console.log('\n INVOKING REQUEST CALL ****************************')
-      console.log(' > DNA_INSTANCE for the current REQUEST ZomeCall : \n', DNA_INSTANCE)
+      console.log(' > Current Agent : ', currentAgent)
+      console.log(' > Counterparty Agent : ', counterparty)
       // initate request
       return holochainZomeCall(
-        DNA_INSTANCE,
+        'holofuel',
         'transactions',
         'request',
         { from: counterparty,
           amount: txType[index].amount,
           notes: txType[index].notes,
           deadline: txType[index].deadline
-        }
+        },
+        currentAgent
       )
     }
     case OFFER: {
       console.log('\n INVOKING OFFER CALL ****************************')
-      console.log(' > DNA_INSTANCE for the current REQUEST ZomeCall : \n', DNA_INSTANCE)
+      console.log(' > Current Agent : ', currentAgent)
+      console.log(' > Counterparty Agent : ', counterparty)
       // initiate offer
       return holochainZomeCall(
-        DNA_INSTANCE,
+        'holofuel',
         'transactions',
         'promise',
         { to: counterparty,
           amount: txType[index].amount,
           notes: txType[index].notes,
           deadline: txType[index].deadline
-        }
+        },
+        currentAgent
       )
     }
     case PAY: {
       console.log('\n INVOKING PAY CALL ****************************')
-      console.log(' > DNA_INSTANCE for the current REQUEST ZomeCall : \n', DNA_INSTANCE)
+      console.log(' > Current Agent : ', currentAgent)
+      console.log(' > Counterparty Agent : ', counterparty)
       // offer in response to request
       return holochainZomeCall(
-        DNA_INSTANCE,
+        'holofuel',
         'transactions',
         'promise',
         {
@@ -78,20 +78,23 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
           notes: 'Here is your Fuel!',
           deadline: origininatingTx.deadline,
           requestId: originId
-        }
+        },
+        currentAgent
       )
     }
     case ACCEPT: {
       console.log('\n INVOKING ACCEPT CALL ****************************')
-      console.log(' > DNA_INSTANCE for the current REQUEST ZomeCall : \n', DNA_INSTANCE)
+      console.log(' > Current Agent : ', currentAgent)
+      console.log(' > Counterparty Agent : ', counterparty)
       // accept offer
       return holochainZomeCall(
-        DNA_INSTANCE,
+        'holofuel',
         'transactions',
         'receive_payments_pending',
         {
           promises: originId
-        }
+        },
+        currentAgent
       )
     }
     default:
