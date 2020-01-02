@@ -13,6 +13,7 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
+import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
@@ -84,7 +85,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     setFormValue('counterpartyId', id)
   }
 
-  const [amount, setAmountRaw] = useState(0)
+  const [amount, setAmountRaw] = useState(30000)
   const setAmount = amount => setAmountRaw(Number(amount))
 
   const fee = (amount * FEE_PERCENTAGE) || 0
@@ -125,17 +126,27 @@ export default function CreateOfferRequest ({ history: { push } }) {
   }
 
   return <PrimaryLayout headerProps={{ title }} showAlphaFlag={false}>
+    <div styleName='amount-backdrop' />
     <div styleName='amount-banner'>
+      <h4 styleName='amount-label'>
+        Send Test Fuel
+      </h4>
+      <div styleName='amount'>
+        {presentHolofuelAmount(amount)} TF
+      </div>
     </div>
 
-    {/* <div styleName='mode-toggle'>
-      {[OFFER_MODE, REQUEST_MODE].map(buttonMode =>
-        <Button styleName={cx('mode-toggle-button', { selected: buttonMode === mode })}
+    <div styleName='mode-toggle'>
+      {[OFFER_MODE, REQUEST_MODE].map((buttonMode, i) =>
+        <Button styleName={cx('mode-toggle-button', { 'left-button': i === 0, 'right-button': i === 1, selected: buttonMode === mode })}
+          variant='white'
           onClick={() => setMode(buttonMode)}
           key={buttonMode}>
           {modeVerbs[buttonMode]}
         </Button>)}
     </div>
+
+    {/* 
     <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
       <div styleName='form-row'>
         <label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}</label>
@@ -235,7 +246,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
       setHasDisplayedNotFoundMessage(false)
     }
   }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage])
-
+ 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.
     return <>
@@ -252,42 +263,4 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
 
   if (queryError || !nickname) return <>No nickname available.</>
   return <>{nickname}</>
-}
-
-export function AmountInput ({ amount, setAmount, chooseSend, chooseRequest }) {
-  // we can't just use amount because amount is a number, and here we need to distinguish between values like '23' and '23.'
-  const [inputValue, setInputValueRaw] = useState(String(amount))
-
-  const setInputValue = value => {
-    const cleanValue = value.replace(/[^0-9.]/g, '') || 0 // strips non numerical characters
-    setInputValueRaw(cleanValue)
-    setAmount(Number(cleanValue))
-  }
-
-  const addDigit = digit => () => setInputValue(String(inputValue) + String(digit))
-  const removeDigit = () => setInputValue(String(inputValue).slice(0, -1))
-
-  return <PrimaryLayout showAlphaFlag={false}>
-    <div styleName='amount-input-container'>
-      <input styleName='amount-input-amount'
-        onChange={e => setInputValue(e.target.value)}
-        value={`${presentHolofuelAmount(inputValue)}`} />
-      <div styleName='numpad'>
-        {[1, 4, 7].map(rowStart => <div styleName='numpad-row' key={rowStart}>
-          {[0, 1, 2].map(offset => <button styleName='numpad-button' onClick={addDigit(rowStart + offset)} key={offset}>
-            {rowStart + offset}
-          </button>)}
-        </div>)}
-        <div styleName='numpad-row'>
-          <button styleName='numpad-button' onClick={addDigit('.')}>.</button>
-          <button styleName='numpad-button' onClick={addDigit(0)}>0</button>
-          <button styleName='numpad-button' onClick={removeDigit}>{'<'}</button>
-        </div>
-      </div>
-      <div styleName='action-row'>
-        <Button onClick={chooseSend} variant='white' styleName='action-button'>Send</Button>
-        <Button onClick={chooseRequest} variant='white' styleName='action-button'>Request</Button>
-      </div>
-    </div>
-  </PrimaryLayout>
 }

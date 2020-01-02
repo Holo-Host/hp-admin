@@ -1,0 +1,52 @@
+.amount-input-container {
+  height: 100%;
+  width: 100%;
+  background-color: var(--color-caribbean-green);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.amount-input-amount {
+  margin-top: 64px;
+  margin-bottom: 20px;
+  font-size: 36px;
+  text-align: center;
+  background-color: var(--color-caribbean-green);
+  color: white;
+  border: none;
+}
+
+.numpad {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 44px;
+}
+
+.numpad-row {
+  display: flex;
+}
+
+.numpad-button {
+  font-size: 24px;
+  color: var(--color-iceberg);
+  background-color: var(--color-caribbean-green);
+  padding: 32px 0px;
+  width: 78px;
+  text-align: center;
+  border: none;
+}
+
+.action-row {
+  display: flex;
+}
+
+.action-button {
+  font-size: 16px;
+  width: 128px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0px 10px;
+}
