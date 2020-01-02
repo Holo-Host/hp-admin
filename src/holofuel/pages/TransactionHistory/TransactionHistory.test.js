@@ -184,6 +184,66 @@ describe('TransactionsHistory', () => {
       expect(getByText(completedOutgoingAmount)).toBeInTheDocument()
       expect(getByText(completedIncomingAmount)).toBeInTheDocument()
       expect(getByText(pendingOutgoingAmount)).toBeInTheDocument()
+
+      expect(queryByText('Load More')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('with more than 10 transactions', () => {
+    const TOTAL_TRANSACTIONS = 12
+
+    const completedTransactions = Array.from({ length: TOTAL_TRANSACTIONS }, (_, id) => ({
+      ...defaultTransaction,
+      id,
+      counterparty: {
+        id: agent2.id
+      },
+      status: STATUS.completed,
+      direction: DIRECTION.incoming,
+      amount: '47863',
+      notes: 'Good stuff'
+    }))
+
+    const mocks = [
+      {
+        request: {
+          query: HolofuelCompletedTransactionsQuery
+        },
+        result: {
+          data: { holofuelCompletedTransactions: completedTransactions }
+        }
+      },
+      {
+        request: {
+          query: HolofuelWaitingTransactionsQuery
+        },
+        result: {
+          data: { holofuelWaitingTransactions: [] }
+        }
+      },
+      {
+        request: {
+          query: HolofuelHistoryCounterpartiesQuery
+        },
+        result: {
+          data: { holofuelHistoryCounterparties: [agent1, agent2] }
+        }
+      }
+    ]
+
+    it('shows a working "Load More" button', async () => {
+      const { getByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <TransactionsHistory />
+      </MockedProvider>)
+
+      const loadMoreButton = getByText('Load More')
+      expect(loadMoreButton).toBeInTheDocument()
+      expect(getAllByTestId('transaction-row')).toHaveLength(10)
+
+      fireEvent.click(loadMoreButton)
+
+      expect(loadMoreButton).not.toBeInTheDocument()
+      expect(getAllByTestId('transaction-row')).toHaveLength(TOTAL_TRANSACTIONS)
     })
   })
 

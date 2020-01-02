@@ -1,12 +1,12 @@
-const fs = require('fs')
-const toml = require('toml')
+// const fs = require('fs')
+// const toml = require('toml')
 const holochainZomeCall = require('../invoke-holochain-zome-call.js')
 const happConfig = require('./happ-data.js')
 
 // DNA Instance Identifiers :
-const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
-const HAPP_STORE_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'happ-store').id
-const HHA_DNA_INSTANCE = config.instances.find(instance => instance.dna === 'holo-hosting-app').id
+// const config = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
+const HAPP_STORE_DNA_INSTANCE = 'happ-store'
+const HHA_DNA_INSTANCE = 'holo-hosting-app'
 
 const providerShims = {
   // 1. Register Provider in hha

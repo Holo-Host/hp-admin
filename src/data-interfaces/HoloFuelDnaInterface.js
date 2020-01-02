@@ -252,6 +252,7 @@ const HoloFuelDnaInterface = {
     },
     allDeclinedTransactions: async () => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')()
+      console.log('declinedResult', declinedResult)
       const listOfDeclinedTransactions = declinedResult.map(presentDeclinedTransaction)
 
       return listOfDeclinedTransactions

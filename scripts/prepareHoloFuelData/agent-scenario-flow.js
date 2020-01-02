@@ -65,7 +65,6 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
         console.log('\n Full Request Array Iteration Number (index) : ', i)
         let txOriginId
         // Agent 1 Requests HF
-        // AGENT_1_DNA_INSTANCE
         transactHoloFuel(CURRENT_AGENT_LEDGER, REQUEST, { index: i })
         // Agent 2 Offers HF in response to Agent 1's request
           .then(r => {
@@ -75,7 +74,6 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
             return transactHoloFuel(COUNTERPARTY_LEDGER, PAY, { transactionTrace: i, originId })
           })
           // Agent 1 Accepts HF offered by Agent 2 and completes originating Request
-          // AGENT_1_DNA_INSTANCE
           .then(res => {
             setTimeout(() => resolve(transactHoloFuel(CURRENT_AGENT_LEDGER, ACCEPT, { originId: txOriginId })), 5000)
           })
