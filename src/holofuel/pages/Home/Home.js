@@ -80,10 +80,13 @@ export default function Home () {
               Balance
             </h4>
             <div styleName='balance-row'>
+              <div styleName='balance-padding' />
               <div styleName='balance-amount'>
                 {presentHolofuelAmount(holofuelBalance)} TF
               </div>
-              <ArrowRightIcon color='white' styleName='balance-arrow' />
+              <div styleName='balance-arrow-wrapper'>
+                <ArrowRightIcon color='white' styleName='balance-arrow' />
+              </div>
             </div>
           </div>
         </Link>

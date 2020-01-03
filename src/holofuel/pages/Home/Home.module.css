@@ -61,11 +61,20 @@
   align-items: center;
 }
 
+.balance-padding {
+  flex: 1;
+}
+
 .balance-amount {
   text-align: center;
   font-size: 36px;
   font-weight: bold;
   color: white;
+}
+
+.balance-arrow-wrapper {
+  flex: 1;
+  display: flex;
 }
 
 .balance-arrow {
