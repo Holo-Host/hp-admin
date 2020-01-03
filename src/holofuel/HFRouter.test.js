@@ -32,7 +32,7 @@ jest.mock('holofuel/pages/TransactionHistory')
 TransactionHistory.mockImplementation(makeMockHFPage('TransactionHistory'))
 
 const testLinks = ui => {
-  const { getAllByText, getByText } = render(ui)
+  const { getByText } = render(ui)
 
   expect(getByText('Home')).toBeInTheDocument()
 
