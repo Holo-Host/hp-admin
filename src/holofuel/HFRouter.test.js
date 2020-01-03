@@ -57,7 +57,7 @@ describe('HFRouter', () => {
     testLinks(<MemoryRouter initialEntries={['/holofuel']}><HFRouter /></MemoryRouter>)
   })
 
-  it.skip('works from /holofuel/', () => {
+  it('works from /holofuel/', () => {
     testLinks(<MemoryRouter initialEntries={['/holofuel/']}><HFRouter /></MemoryRouter>)
   })
 })
