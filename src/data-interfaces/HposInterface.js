@@ -40,7 +40,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
           ({ data } = await axios.get(fullPath, { params, headers }))
           return data
         case 'post':
-          ({ data } = await axios.post(fullPath, { params, headers }))
+          ({ data } = await axios.post(fullPath, params, headers ))
           return data
         case 'put':
           ({ data } = await axios.put(fullPath, params, headers ))
