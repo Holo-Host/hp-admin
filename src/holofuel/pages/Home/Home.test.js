@@ -5,7 +5,7 @@ import Home from './Home'
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelHomeCounterpartiesQuery from 'graphql/HolofuelHomeCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
@@ -130,11 +130,11 @@ describe('Home', () => {
       },
       {
         request: {
-          query: HolofuelHistoryCounterpartiesQuery
+          query: HolofuelHomeCounterpartiesQuery
         },
         result: {
           data: {
-            holofuelHistoryCounterparties: transactions.map(transaction => transaction.counterparty)
+            holofuelHomeCounterparties: transactions.map(transaction => transaction.counterparty)
           }
         }
       }
