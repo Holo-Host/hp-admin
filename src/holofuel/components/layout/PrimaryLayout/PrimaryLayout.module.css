@@ -18,6 +18,7 @@
   position: absolute;
   right: 0px;
   top: 80px;
+  z-index: 1;
 }
 
 .content {

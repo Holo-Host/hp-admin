@@ -95,13 +95,12 @@
   border: 0;
   box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
   font-size: 16px;
-
-  position: fixed;
-  margin-top: 137px;
+  position: absolute;
+  top: 137px;
 } 
 
 .plus-icon {
-  position: fixed;
+  position: absolute;
   margin-left: 6px;
 }
 
