@@ -54,8 +54,13 @@ function useTransactionsWithCounterparties () {
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
+const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
+  if (ledgerLoading) return <>-- TF</>
+  else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
+}
+
 export default function TransactionsHistory () {
-  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
 
   const cancelTransaction = useCancel()
@@ -104,7 +109,12 @@ export default function TransactionsHistory () {
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='balance'>
       <div styleName='balance-label'>Available Balance</div>
-      <div styleName='balance-amount'>{presentHolofuelAmount(balance)} TF</div>
+      <div styleName='balance-amount'>
+        <DisplayBalance
+          holofuelBalance={holofuelBalance}
+          ledgerLoading={ledgerLoading}
+        />
+      </div>
     </div>
     <FilterButtons filter={filter} setFilter={setFilter} />
 

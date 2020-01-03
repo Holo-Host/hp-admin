@@ -38,9 +38,14 @@ function useTransactionsWithCounterparties () {
   }
 }
 
+const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
+  if (ledgerLoading) return <>-- TF</>
+  else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
+}
+
 export default function Home () {
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
@@ -84,7 +89,9 @@ export default function Home () {
             </div>
           </div>
           <div styleName='balance-amount'>
-            {presentHolofuelAmount(holofuelBalance)} TF
+            <DisplayBalance
+              ledgerLoading={ledgerLoading}
+              holofuelBalance={holofuelBalance} />
           </div>
         </div>
       </Link>
