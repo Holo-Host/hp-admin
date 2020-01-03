@@ -20,7 +20,8 @@ export default function SideMenu ({
   agent,
   agentLoading,
   inboxCount,
-  holofuelBalance
+  holofuelBalance,
+  ledgerLoading
 }) {
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
@@ -32,8 +33,10 @@ export default function SideMenu ({
           {agent.nickname || (agentLoading && <>Loading...</>)}
         </h3>
 
-        <h1 styleName='balance'>{presentHolofuelAmount(holofuelBalance)} TF</h1>
-
+        <h1 styleName='balance'><DisplayBalance
+          holofuelBalance={holofuelBalance}
+          ledgerLoading={ledgerLoading} />
+        </h1>
       </header>
 
       <nav styleName='nav'>
@@ -88,6 +91,11 @@ export default function SideMenu ({
     </div>
     <div styleName='drawer-overlay' onClick={handleClose} />
   </aside>
+}
+
+function DisplayBalance ({ ledgerLoading, holofuelBalance }) {
+  if (ledgerLoading) return <>-- TF</>
+  else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 
 function InboxBadge ({ count = 0 }) {

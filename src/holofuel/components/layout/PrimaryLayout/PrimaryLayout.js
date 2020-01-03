@@ -22,7 +22,7 @@ export function PrimaryLayout ({
 }) {
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
   const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
 
   const inboxCount = actionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request))).length
 
@@ -40,6 +40,7 @@ export function PrimaryLayout ({
       agentLoading={holofuelUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
+      ledgerLoading={ledgerLoading}
       isWide={isWide}
     />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
