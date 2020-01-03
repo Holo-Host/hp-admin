@@ -161,33 +161,18 @@ describe('CreateOfferRequest', () => {
 
       const push = jest.fn()
 
-      const { getByLabelText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
 
+      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
+
       await act(async () => {
-        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.pub_sign_key } })
         await wait(0)
       })
 
-      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send yourself TestFuel.`)
-    })
-
-    it('renders error message upon attempt to transact with a negative number.', async () => {
-      const push = jest.fn()
-
-      const NEGATIVE_AMOUNT = -2
-
-      const { getByLabelText } = await renderAndWait(<MockedProvider mocks={[]} addTypename={false}>
-        <CreateOfferRequest history={{ push }} />
-      </MockedProvider>)
-
-      await act(async () => {
-        fireEvent.change(getByLabelText('Amount'), { target: { value: NEGATIVE_AMOUNT } })
-        await wait(0)
-      })
-
-      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send negative amounts.`)
+      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send yourself TestFuel.`, 5000)
     })
 
     it('renders the counterparty nickname upon *successful* fetch', async () => {

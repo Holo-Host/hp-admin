@@ -94,12 +94,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const fee = (amount * FEE_PERCENTAGE) || 0
   const total = amount + fee
 
-  useEffect(() => {
-    if (amount < 0) {
-      return newMessage(`You cannot ${mode === OFFER_MODE ? 'send' : 'request'} negative amounts.`, 5000)
-    }
-  })
-
   const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
       case OFFER_MODE:
