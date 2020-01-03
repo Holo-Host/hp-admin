@@ -24,7 +24,13 @@ export function presentAgentId (agentId) {
 }
 
 export function presentHolofuelAmount (amount) {
-  return Number.parseFloat(amount).toLocaleString()
+  const hasTrailingDot = /\.$/.test(amount)
+  const parsed = Number.parseFloat(amount).toLocaleString()
+  if (hasTrailingDot) {
+    return parsed + '.'
+  } else {
+    return parsed
+  }
 }
 
 export function presentDateAndTime (dateTime) {

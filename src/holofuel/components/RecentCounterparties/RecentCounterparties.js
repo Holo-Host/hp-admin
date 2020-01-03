@@ -9,7 +9,7 @@ export default function RecentCounterparties ({ agents = [], selectedAgentId, se
   const recentAgents = agents.slice(0, 6)
 
   return <div styleName='recent-counterparties' className={className}>
-    <div styleName='header'>Recent Peers</div>
+    <h4 styleName='header'>Recent Peers</h4>
     {isEmpty(agents) && <div>You have no recent peers.</div>}
     {recentAgents.map(agent => <AgentRow
       agent={agent}
@@ -24,7 +24,7 @@ function AgentRow ({ agent, selectThisAgent, selected }) {
   const agentName = agent.nickname || presentAgentId(agent.id)
 
   return <div styleName={cx('agent-row', { selected })} onClick={selectThisAgent} data-testid='agent-row'>
-    <HashIcon hash={agent.id} size={24} styleName='avatar' />
+    <HashIcon hash={agent.id} size={32} styleName='avatar' />
     <div styleName='name-and-id'>
       <div styleName='name'>{agentName}</div>
       {agent.nickname && <div styleName='id'>{presentAgentId(agent.id)}</div>}

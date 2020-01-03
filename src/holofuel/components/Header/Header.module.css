@@ -1,6 +1,4 @@
 .left-nav {
-  flex: 1.33 1;
-  display: flex;
 }
 
 .center-nav {
@@ -55,18 +53,6 @@
   backdrop-filter: blur(27.1828px);
 }
 
-.header-font {
-  font-style: normal;
-  font-weight: bold;
-  flex-grow: 1;
-  font-size: 16px;
-  color: black
-}
-
-.title {
-  text-align: center;
-}
-
 /* We should turn this into a design-system component */
 .nav-badge {
   box-sizing: border-box;
@@ -74,9 +60,7 @@
   top: -5px;
   right: -15px;
   color: #FFF;
-  background-color: #cf2a27;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .2) inset,
-    0 0 0 1px rgba(0, 0, 0, .25);
+  background-color: var(--color-persimmon);
   font-size: .7em;
   min-width: 30px;
   line-height: 14px;
@@ -106,7 +90,8 @@
 }
 
 .page-title {
-  /* */
+  font-size: 18px;
+  color: black;
 }
 
 .empty-spacer {

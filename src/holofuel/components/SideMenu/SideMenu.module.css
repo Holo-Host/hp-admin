@@ -16,12 +16,11 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 60px 20px 20px;
-  background-color: #444;
-  color: #ccc;
+  padding: 32px 22px 20px;
+  background-color: var(--color-alabaster-light);
   transform: translateX(-10%);
   transition: transform .3s ease;
-  box-shadow: 0 5px 8px rgba(0, 0, 0, .6);
+  box-shadow: 0px 9.5px 10px rgba(0, 0, 0, 0.5);
   will-change: transform;
   pointer-events: none;
 }
@@ -38,7 +37,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #000;
   opacity: 0;
   z-index: -1;
   will-change: opacity;
@@ -52,30 +50,40 @@
 }
 
 .header {
-  margin: 0 0 20px;
   text-align: center;
+  border-bottom: 1px solid var(--color-loblolly);
+  padding-bottom: 20px;
 }
 
-.nav {
-  color: #fff;
+.nickname {
+
 }
 
-.footer {
-  justify-self: flex-end;
-  margin-top: auto;
+.balance {
+  
 }
 
-.alpha-info {
-  position: relative;
-  margin: 0 -32px 20px -32px;
-  padding: 30px 24px;
+.settings-link {
+  margin-top: 12px;
   font-family: 'Circular';
   font-size: 14px;
   line-height: 16px;
-  color: #fff;
+  color: var(--color-cape-cod);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--color-cape-cod);
 }
 
-.alpha-link {
+.gear-icon {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  margin-right: 2px;
+}
+
+.nav {
   color: #fff;
 }
 
@@ -109,109 +117,74 @@
 .nav-list {
   padding: 0;
   list-style-type: none;
+  margin: 15px 10px;
 }
 
 .nav-link {
-  display: block;
-  padding: 16px 0;
-  color: #fff;
+  display: flex;
+  padding: 10px 0;
+  color: var(--color-outerspace);
   text-decoration: none;
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: .03em;
+  font-size: 15px;
+  line-height: 22px;  
+  letter-spacing: -0.05px;
+  font-weight: bold;
 }
 
-.nav-icon {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  background-color: #aaa;
-  vertical-align: middle;
-  margin-right: 10px;
-  margin-top: -3px;
+.alpha-info {
+  position: relative;
+  margin: 0 -32px 60px -32px;
+  padding: 30px 12px;
+  font-family: 'Circular';
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--color-rhino);
+  background-color: var(--color-iceberg);
 }
 
-.disabled {
-  background-color: #615e5e !important;
+.alpha-flag {
+  position: absolute;
+  top: -16px;
+  left: 0px;
 }
 
-/* We should turn this into a design-system component */
-.nav-badge {
-  box-sizing: border-box;
-  float: right;
-  background-color: #36f;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .2) inset,
-    0 0 0 1px rgba(0, 0, 0, .25);
-  font-size: .7em;
-  min-width: 30px;
-  line-height: 14px;
-  text-align: center;
-  border-radius: 9999px;
-  font-weight: 700;
-  padding: 8px;
-}
-
-.disabled-link {
-  /* pointer-events: none; */
-  color: #615e5e;
+.alpha-link {
+  color: var(--color-rhino);
 }
 
 /* Footer */
+
+.footer {
+  justify-self: flex-end;
+  margin: auto 10px 0px 10px;
+}
 
 .footer-list {
   padding: 0;
   list-style-type: none;
 }
 
+.footer-list-item {
+  padding: 4px 0px;
+}
+
 .footer-link {
-  color: #888;
-  display: block;
-  padding: 6px 0;
   text-decoration: none;
-}
-
-/* Modal */
-.modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.topmost {
-  z-index: 999;
-}
-
-.modal-title {
-  margin-bottom: 10px;
-}
-
-.modal-text {
   font-size: 14px;
-  margin-bottom: 30px;
+  line-height: 16px;
+  color: var(--color-caribbean-green);
 }
 
-.modal-counterparty {
+/* InboxBadge */
+
+.inbox-badge {
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-persimmon);
+  color: white;
+  border-radius: 50%;
   font-weight: bold;
-  white-space: nowrap;
-}
-
-.modal-amount {
-  font-weight: bold;
-}
-
-.modal-buttons {
-  margin-top: auto;
-  margin-left: auto;
-}
-
-.modal-button, .modal-button-no, .modal-button-yes {
-  border: none !important;
-  text-decoration: underline;
-  color: #0000EE !important;
-  font-weight: normal !important;
-  margin: 2px 10px;
-}
-
-.modal-button-yes {
-  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+  margin-left: 10px;
 }

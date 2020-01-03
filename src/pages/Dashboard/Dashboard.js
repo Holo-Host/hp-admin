@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
-import PlusIcon from 'components/icons/PlusIcon'
+import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
@@ -41,7 +41,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
     {false && <Card title='Hosting' linkTo='/admin/browse-happs' subtitle='Manage your Holo applications'>
       <div styleName='hosting-content' data-testid='hosted-apps'>
         {noInstalledHapps === 0 && <>
-          <PlusInDiscIcon />Host your first hApp!
+          <PlusInDiscIcon color='#06C470' />Host your first hApp!
         </>}
         {noInstalledHapps > 0 && <>
           <LaptopIcon styleName='laptop-icon' color='rgba(44, 63, 89, 0.80)' /> {noInstalledHapps} hApp{noInstalledHapps > 1 && 's'}
@@ -81,12 +81,6 @@ function Card ({ title, subtitle, linkTo, children }) {
     <h3 styleName='card-subtitle'>{subtitle}</h3>
     {children}
   </MixedLink>
-}
-
-function PlusInDiscIcon () {
-  return <div styleName='disc-icon'>
-    <PlusIcon styleName='plus-icon' color='#06C470' />
-  </div>
 }
 
 // a react-router link that can also take an external url
