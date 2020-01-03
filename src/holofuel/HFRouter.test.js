@@ -34,15 +34,15 @@ TransactionHistory.mockImplementation(makeMockHFPage('TransactionHistory'))
 const testLinks = ui => {
   const { getAllByText, getByText } = render(ui)
 
-  expect(getAllByText('Home')[0]).toBeInTheDocument()
+  expect(getByText('Home')).toBeInTheDocument()
 
-  fireEvent.click(getAllByText('inbox')[0])
+  fireEvent.click(getByText('inbox'))
   expect(getByText('Inbox')).toBeInTheDocument()
 
-  fireEvent.click(getAllByText('offer-request')[0])
+  fireEvent.click(getByText('offer-request'))
   expect(getByText('CreateOfferRequest')).toBeInTheDocument()
 
-  fireEvent.click(getAllByText('history')[0])
+  fireEvent.click(getByText('history'))
   expect(getByText('TransactionHistory')).toBeInTheDocument()
 }
 
