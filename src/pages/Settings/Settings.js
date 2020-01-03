@@ -46,6 +46,7 @@ export function Settings ({ history: { push } }) {
   const saveDeviceName = () => {
     updateSettings({
       variables: {
+        ...settings,
         deviceName: editedDeviceName
       }
     })
