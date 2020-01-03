@@ -10,7 +10,7 @@ import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentHolofuelAmount, getCommunityUrl } from 'utils'
+import { presentHolofuelAmount } from 'utils'
 import cx from 'classnames'
 import './Dashboard.module.css'
 
