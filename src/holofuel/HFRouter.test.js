@@ -32,16 +32,17 @@ jest.mock('holofuel/pages/TransactionHistory')
 TransactionHistory.mockImplementation(makeMockHFPage('TransactionHistory'))
 
 const testLinks = ui => {
-  const { getAllByText, getByText } = render(ui)
-  expect(getAllByText('Home')[0]).toBeInTheDocument()
+  const { getByText } = render(ui)
 
-  fireEvent.click(getAllByText('inbox')[0])
+  expect(getByText('Home')).toBeInTheDocument()
+
+  fireEvent.click(getByText('inbox'))
   expect(getByText('Inbox')).toBeInTheDocument()
 
-  fireEvent.click(getAllByText('offer-request')[0])
+  fireEvent.click(getByText('offer-request'))
   expect(getByText('CreateOfferRequest')).toBeInTheDocument()
 
-  fireEvent.click(getAllByText('history')[0])
+  fireEvent.click(getByText('history'))
   expect(getByText('TransactionHistory')).toBeInTheDocument()
 }
 
@@ -56,7 +57,7 @@ describe('HFRouter', () => {
     testLinks(<MemoryRouter initialEntries={['/holofuel']}><HFRouter /></MemoryRouter>)
   })
 
-  it.skip('works from /holofuel/', () => {
+  it('works from /holofuel/', () => {
     testLinks(<MemoryRouter initialEntries={['/holofuel/']}><HFRouter /></MemoryRouter>)
   })
 })
