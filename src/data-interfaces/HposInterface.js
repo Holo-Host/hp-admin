@@ -3,7 +3,7 @@ import mockCallHpos from 'mock-dnas/mockCallHpos'
 import { signPayload, hashResponseBody } from 'holochainClient'
 
 const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
-const mockHposConnection = process.env.NODE_ENV === 'production' || true // boolean to toggle hpos mock data reference while in dev context...
+const mockHposConnection = process.env.NODE_ENV !== 'production' && true // boolean to toggle hpos mock data reference while in dev context...
 export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? preLocalHposImageIntegration
   : process.env.NODE_ENV === 'test'
