@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
@@ -7,6 +7,7 @@ import Loader from 'react-loader-spinner'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -61,11 +62,13 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
 
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
 
-  const { newMessage } = useFlashMessageContext()
+  const { newMessage: newMessageRaw } = useFlashMessageContext()
+  const newMessage = useCallback(newMessageRaw, [newMessageRaw])
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
@@ -73,7 +76,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
-  }, [counterpartyId])
+    if (counterpartyId === whoami.id) {
+      newMessage('You cannot send yourself TestFuel.', 5000)
+    }
+  }, [whoami.id, counterpartyId, newMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
@@ -87,6 +93,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const fee = (amount * FEE_PERCENTAGE) || 0
   const total = amount + fee
+
+  useEffect(() => {
+    if (amount < 0) {
+      return newMessage(`You cannot ${mode === OFFER_MODE ? 'send' : 'request'} negative amounts.`, 5000)
+    }
+  })
 
   const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
@@ -108,7 +120,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 
-  const disableSubmit = counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true
+  const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
+    !isCounterpartyFound ||
+    counterpartyId === whoami.id ||
+    amount < 0
 
   if (numpadVisible) {
     const chooseSend = () => {
@@ -203,14 +218,14 @@ export default function CreateOfferRequest ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage, whoami }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
   const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
 
-  const { nickname, notFound } = holofuelCounterparty
+  const { nickname, notFound, id } = holofuelCounterparty
   useEffect(() => {
     setCounterpartyNick(nickname)
   }, [setCounterpartyNick, nickname])
@@ -231,7 +246,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
       setCounterpartyFound(false)
       setHasDisplayedNotFoundMessage(false)
     }
-  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage])
+  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage, id])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.

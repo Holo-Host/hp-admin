@@ -8,6 +8,7 @@ import { TYPE } from 'models/Transaction'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { presentHolofuelAmount } from 'utils'
@@ -66,9 +67,24 @@ const counterpartyQueryMock = {
   }
 }
 
+const mockWhoamiAgent = {
+  id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+  nickname: 'Sam'
+}
+
+const whoamiMock = {
+  request: {
+    query: HolofuelUserQuery
+  },
+  result: {
+    data: { holofuelUser: mockWhoamiAgent }
+  }
+}
+
 const mocks = [
   offerMock,
-  counterpartyQueryMock
+  counterpartyQueryMock,
+  whoamiMock
 ]
 
 const enterAmountAndMode = async ({ amount, modeLabel, getByTestId, getByText }) => {
@@ -117,6 +133,61 @@ describe('CreateOfferRequest', () => {
 
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
+    })
+
+    it('renders error message upon attempt to transact with self', async () => {
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
+      const mockWhoamiAgent = {
+        id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+        nickname: 'Perry'
+      }
+
+      const whoamiMock = {
+        request: {
+          query: HolofuelUserQuery
+        },
+        result: {
+          data: { holofuelUser: mockWhoamiAgent }
+        }
+      }
+
+      const mocks = [
+        counterpartyQueryMock,
+        whoamiMock
+      ]
+
+      const push = jest.fn()
+
+      const { getByLabelText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <CreateOfferRequest history={{ push }} />
+      </MockedProvider>)
+
+      await act(async () => {
+        fireEvent.change(getByLabelText('To'), { target: { value: mockAgent1.pub_sign_key } })
+        await wait(0)
+      })
+
+      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send yourself TestFuel.`)
+    })
+
+    it('renders error message upon attempt to transact with a negative number.', async () => {
+      const push = jest.fn()
+
+      const NEGATIVE_AMOUNT = -2
+
+      const { getByLabelText } = await renderAndWait(<MockedProvider mocks={[]} addTypename={false}>
+        <CreateOfferRequest history={{ push }} />
+      </MockedProvider>)
+
+      await act(async () => {
+        fireEvent.change(getByLabelText('Amount'), { target: { value: NEGATIVE_AMOUNT } })
+        await wait(0)
+      })
+
+      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send negative amounts.`)
     })
 
     it('renders the counterparty nickname upon *successful* fetch', async () => {
@@ -302,7 +373,8 @@ describe('CreateOfferRequest', () => {
 
     const mocks = [
       requestMock,
-      counterpartyQueryMock
+      counterpartyQueryMock,
+      whoamiMock
     ]
 
     it('renders a form that can be filled out and submitted', async () => {
