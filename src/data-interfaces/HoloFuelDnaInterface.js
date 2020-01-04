@@ -110,7 +110,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest(declinedTx, true) : presentPendingOffer(declinedTx, true)
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
   return {
     ...transaction,
     status: STATUS.declined
@@ -119,12 +119,10 @@ const presentDeclinedTransaction = declinedTx => {
 
 const presentCanceledTransaction = canceledTx => {
   if (!canceledTx.event[2].Cancel.entry) throw new Error('The Canceled Transaction Entry (canceledTx.event[2].Cancel.entry) is UNDEFINED : ', canceledTx)
-  console.log('canceledTx : ', canceledTx.event[2].Cancel)
-
   let { event } = canceledTx
   event = [event[0], event[1], event[2].Cancel.entry]
   canceledTx = { ...canceledTx, event }
-  const transaction = !canceledTx.event[2].Cancel.entry.Request ? presentPendingRequest(canceledTx, false) : presentPendingOffer(canceledTx, false)
+  const transaction = canceledTx.event[2].Request ? presentPendingRequest(canceledTx, false) : presentPendingOffer(canceledTx, false)
   return {
     ...transaction,
     status: STATUS.canceled
@@ -132,8 +130,7 @@ const presentCanceledTransaction = canceledTx => {
 }
 
 function presentPendingRequest (transaction, declined = false) {
-  let { event, provenance } = transaction
-  if (declined) event = transaction
+  const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.outgoing // this indicates the recipient of funds. (Note: This is an actionable Tx.)
   const status = STATUS.pending
@@ -145,8 +142,7 @@ function presentPendingRequest (transaction, declined = false) {
 }
 
 function presentPendingOffer (transaction, declined = false) {
-  let { event, provenance } = transaction
-  if (declined) event = transaction
+  const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)
   const status = STATUS.pending
@@ -327,10 +323,7 @@ const HoloFuelDnaInterface = {
     },
     /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */
     recoverFunds: async (transactionId) => {
-      // const reason = annulTransactionReason
       const transaction = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId, { raw: true })
-      console.log('transaction', transaction)
-
       const canceledProof = await createZomeCall('transactions/cancel')({ entry: transaction })
       return {
         ...transaction,

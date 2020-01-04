@@ -382,7 +382,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   const { newMessage } = useFlashMessageContext()
   const { id, amount, type, action } = transaction
   const { counterparty = {} } = transaction
-  const { holofuelCounterparty } = useCounterparty(counterparty.id)
+  const { loading: loaderCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
   const { notFound } = holofuelCounterparty
 
   const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
@@ -391,7 +391,14 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   useEffect(() => {
     // eslint-disable-next-line no-useless-return
     if (isEmpty(transaction)) return
-    else if (!isEmpty(holofuelCounterparty)) {
+    else if (loaderCounterparty) {
+      setCounterpartyNotFound(true)
+      setHasDisplayedNotFoundMessage(false)
+      if (!hasDisplayedFetchingCounterpartyMessage) {
+        newMessage('Verifying your counterparty is online.', 5000)
+        setHasDisplayedFetchingCounterpartyMessage(true)
+      }
+    } else if (!isEmpty(holofuelCounterparty)) {
       if (notFound) {
         setCounterpartyNotFound(true)
         setHasDisplayedFetchingCounterpartyMessage(false)
@@ -404,15 +411,9 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
         setHasDisplayedFetchingCounterpartyMessage(false)
       }
     } else {
-      console.log('transaction in modal : ', transaction)
-      setCounterpartyNotFound(true)
-      setHasDisplayedNotFoundMessage(false)
-      if (!hasDisplayedFetchingCounterpartyMessage) {
-        newMessage('Verifying your counterparty is online...')
-        setHasDisplayedFetchingCounterpartyMessage(true)
-      }
+      newMessage('', 0)
     }
-  }, [transaction, setCounterpartyNotFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, notFound, holofuelCounterparty, setHasDisplayedFetchingCounterpartyMessage, hasDisplayedFetchingCounterpartyMessage, newMessage])
+  }, [transaction, loaderCounterparty, setCounterpartyNotFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, notFound, holofuelCounterparty, setHasDisplayedFetchingCounterpartyMessage, hasDisplayedFetchingCounterpartyMessage, newMessage])
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {

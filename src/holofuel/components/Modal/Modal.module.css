@@ -3,13 +3,11 @@
   margin: 0 auto;
   top: 30%;
   background-color: white;
-  border: 1px solid black;
   border-radius: 1px;
-  padding: 50px;
+  padding: 50px 1rem;
   position: relative;
-
-  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(27.1828px);
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
+  backdrop-filter: grayscale(0.5) blur(27.1828px);
 }
 
 /* TODO: Handle focus properly */
