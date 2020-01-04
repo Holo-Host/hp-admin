@@ -112,7 +112,7 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 }
 
 let holochainClient
-let hcFlag = false;
+let hcFlag = false
 
 async function init () {
   hcFlag = true
