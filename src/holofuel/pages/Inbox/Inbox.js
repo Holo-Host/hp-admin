@@ -22,10 +22,11 @@ import Loader from 'react-loader-spinner'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
-import AddIcon from 'components/icons/AddIcon'
+import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } from 'utils'
+import { caribbeanGreen } from 'utils/colors'
 import { Link } from 'react-router-dom'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS } from 'models/Transaction'
@@ -36,6 +37,9 @@ function useOffer () {
     variables: { amount, counterpartyId: counterparty.id, requestId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
+    },
+    {
+      query: HolofuelLedgerQuery
     }]
   })
 }
@@ -59,16 +63,22 @@ function useDecline () {
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
+    },
+    {
+      query: HolofuelLedgerQuery
     }]
   })
 }
 
 function useRefund () {
   const [recoverFunds] = useMutation(HolofuelRecoverFundsMutation)
-  return (id) => recoverFunds({
+  return ({ id }) => recoverFunds({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
+    },
+    {
+      query: HolofuelLedgerQuery
     }]
   })
 }
@@ -163,7 +173,7 @@ export default function Inbox () {
       titleSuperscript='Balance'
     >
       <Button styleName='new-transaction-button' onClick={() => showNewTransactionModal()}>
-        <AddIcon styleName='add-icon' color='#0DC39F' />
+        <PlusInDiscIcon styleName='plus-icon' color={caribbeanGreen} backgroundColor='white' />
         <h3 styleName='button-text'>New Transaction</h3>
       </Button>
 
@@ -188,9 +198,7 @@ export default function Inbox () {
           ? 'You have no pending offers or requests'
           : 'You have no recent activity'}>
         <div onClick={() => showNewTransactionModal()}>
-          <AddIcon styleName='add-icon' color='#0DC39F' />
-          {/* TODO: Remove once the above ADD Icon works... */}
-          <p style={{ fontSize: 30 }}>+</p>
+          <PlusInDiscIcon styleName='plus-icon-mini' color={caribbeanGreen} backgroundColor='#CFF3EC' />
         </div>
       </NullStateMessage>
     </>}
@@ -378,19 +386,33 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   const { notFound } = holofuelCounterparty
 
   const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
+  const [hasDisplayedFetchingCounterpartyMessage, setHasDisplayedFetchingCounterpartyMessage] = useState(false)
 
   useEffect(() => {
-    if (!transaction) return null
+    // eslint-disable-next-line no-useless-return
+    if (isEmpty(transaction)) return
     else if (!isEmpty(holofuelCounterparty)) {
       if (notFound) {
         setCounterpartyNotFound(true)
+        setHasDisplayedFetchingCounterpartyMessage(false)
         if (!hasDisplayedNotFoundMessage) {
           newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.')
           setHasDisplayedNotFoundMessage(true)
         }
-      } else setCounterpartyNotFound(false)
+      } else {
+        setCounterpartyNotFound(false)
+        setHasDisplayedFetchingCounterpartyMessage(false)
+      }
+    } else {
+      console.log('transaction in modal : ', transaction)
+      setCounterpartyNotFound(true)
+      setHasDisplayedNotFoundMessage(false)
+      if (!hasDisplayedFetchingCounterpartyMessage) {
+        newMessage('Verifying your counterparty is online...')
+        setHasDisplayedFetchingCounterpartyMessage(true)
+      }
     }
-  }, [setCounterpartyNotFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, notFound, holofuelCounterparty, transaction, newMessage])
+  }, [transaction, setCounterpartyNotFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, notFound, holofuelCounterparty, setHasDisplayedFetchingCounterpartyMessage, hasDisplayedFetchingCounterpartyMessage, newMessage])
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
@@ -436,6 +458,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       actionParams = { id }
       actionHook = refundTransaction
       message = <div styleName='modal-text' data-testid='modal-message'>Cancel your declined {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {type === TYPE.offer ? 'to' : 'from'} <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>?<br /><br /><div styleName='modal-note-text'>Note: Canceling will credit your balance by the outstanding amount.</div></div>
+      flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully cancelled`
       break
     }
     default:

@@ -1,18 +1,22 @@
 /* Buttons & Icons */
 
-.add-icon {
+.plus-icon {
   display: inline-flex;
   flex: 1;
-  background: #FFF;
-  width: 15px;
-  border-radius: 8px;
-  margin: 2px 8px 0px -6px;
+  width: 21px;
+  height: 21px;
+  position: relative;
+  top: 5px;
+}
+
+.plus-icon-mini {
+  composes: plus-icon;
+  margin-top: 20px;
 }
 
 .button-text {
   display: inline-flex;
   flex: 1;
-  margin: 0px;
 }
 
 .button {
@@ -44,19 +48,18 @@
 .green-classic-btn {
   color: white;
   background-color: #0DC39F;
-  padding: 8px;
   margin: 12px 0px;
   margin-left: auto;
   border-radius: 100px;
-  box-shadow: 0px 2.5px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
 }
 
 .new-transaction-button {
   composes: green-classic-btn;
   font-size: 13px;
   line-height: 15px;
-  width: 175px;
-  padding: 8px;
+  width: 212px;
+  height: 46px;
 }
 
 

@@ -286,12 +286,14 @@ const HoloFuelDnaInterface = {
       }
     },
     /* NOTE: This is to allow handling of the other side of the transaction that was declined.  */
-    getPendingDeclined: async (transactionId) => {
+    getPendingDeclined: async (transactionId, { raw = false }) => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')({ origins: transactionId })
       const transactionArray = declinedResult.map(presentDeclinedTransaction)
 
       if (transactionArray.length === 0) {
         throw new Error(`no pending transaction with id ${transactionId} found.`)
+      } else if (raw) {
+        return declinedResult[0][2]
       } else {
         return transactionArray[0]
       }
@@ -320,18 +322,20 @@ const HoloFuelDnaInterface = {
         id: transactionId,
         status: STATUS.canceled
       }
-    }
-  },
-  /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */
-  recoverFunds: async (transactionId) => {
-    const reason = annulTransactionReason
-    const transaction = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId)
-    const canceledProof = await createZomeCall('transactions/cancel')({ entry: transaction, reason })
-    return {
-      ...transaction,
-      id: transactionId,
-      status: STATUS.canceled,
-      canceledReference: canceledProof
+    },
+    /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */
+    recoverFunds: async (transactionId) => {
+      // const reason = annulTransactionReason
+      const transaction = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId, { raw: true })
+      console.log('transaction', transaction)
+
+      const canceledProof = await createZomeCall('transactions/cancel')({ entry: transaction })
+      return {
+        ...transaction,
+        id: transactionId,
+        status: STATUS.canceled,
+        canceledReference: canceledProof
+      }
     }
   },
   requests: {
