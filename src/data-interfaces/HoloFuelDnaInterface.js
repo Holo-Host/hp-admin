@@ -119,6 +119,8 @@ const presentDeclinedTransaction = declinedTx => {
 
 const presentCanceledTransaction = canceledTx => {
   if (!canceledTx.event[2].Cancel.entry) throw new Error('The Canceled Transaction Entry (canceledTx.event[2].Cancel.entry) is UNDEFINED : ', canceledTx)
+  console.log('canceledTx : ', canceledTx.event[2].Cancel)
+
   let { event } = canceledTx
   event = [event[0], event[1], event[2].Cancel.entry]
   canceledTx = { ...canceledTx, event }

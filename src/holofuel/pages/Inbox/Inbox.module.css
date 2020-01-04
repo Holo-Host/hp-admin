@@ -17,6 +17,8 @@
 .button-text {
   display: inline-flex;
   flex: 1;
+  font-size: 16px;
+  margin-left: 14px;
 }
 
 .button {
