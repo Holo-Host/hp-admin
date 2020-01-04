@@ -235,7 +235,7 @@ const HoloFuelDnaInterface = {
         if (tx.status === STATUS.canceled) return { ...tx, canceledBy: tx.counterparty.id }
         else return tx
       })
-      console.log('displayReadyActionableTransactions : ', displayReadyActionableTransactions)
+      console.log(' +++++ displayReadyActionableTransactions : ', displayReadyActionableTransactions)
 
       return displayReadyActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
@@ -275,12 +275,11 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
       const displayReadyNonActionableTransactions = noDuplicateIds.map(tx => {
         if (tx.status === STATUS.canceled) return { ...tx, canceledBy: 'me' }
-        // eslint-disable-next-line no-useless-return
-        else if (tx.status === STATUS.pending) return
         else return tx
       })
 
-      return displayReadyNonActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      console.log(' ------ displayReadyNonActionableTransactions : ', displayReadyNonActionableTransactions)
+      return displayReadyNonActionableTransactions.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
