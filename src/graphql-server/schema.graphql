@@ -68,6 +68,7 @@ type Transaction {
   presentBalance: Float
   notes: String
   happName: String
+  canceledBy: String
 }
 
 type Ledger {
