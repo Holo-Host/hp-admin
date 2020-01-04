@@ -2,6 +2,7 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import stringify from 'json-stable-stringify'
+import wait from 'waait'
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -111,9 +112,14 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 }
 
 let holochainClient
+let hcFlag = false;
 
-async function initAndGetHolochainClient () {
-  if (holochainClient) return holochainClient
+(async () => {
+  holochainClient = await init()
+})()
+
+async function init () {
+  hcFlag = true
   try {
     let url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
     // Construct url with query param X-Hpos-Admin-Signature = signature
@@ -131,13 +137,27 @@ async function initAndGetHolochainClient () {
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
+    hcFlag = false
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
+    hcFlag = false
     throw (error)
   }
+}
+async function initAndGetHolochainClient () {
+  let counter = 0
+  while (hcFlag) {
+    counter++
+    await wait(100)
+    if (counter === 10) {
+      hcFlag = false
+    }
+  }
+  if (holochainClient) return holochainClient
+  else return init()
 }
 
 export function createZomeCall (zomeCallPath, callOpts = {}) {
