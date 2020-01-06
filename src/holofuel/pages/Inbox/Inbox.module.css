@@ -184,6 +184,10 @@
   opacity: 0.8;
 }
 
+.annulled {
+  opacity: 0.8;
+}
+
 .modal-note-text {
   composes: notes;
   text-transform: none;

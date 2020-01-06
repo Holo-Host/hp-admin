@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import cx from 'classnames'
-import { isEmpty } from 'lodash/fp' // , uniqBy
+import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-// import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-// import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelRecoverFundsMutation from 'graphql/HolofuelRecoverFundsMutation.gql'
+import HolofuelRefundAllDeclinedMutation from 'graphql/HolofuelRefundAllDeclinedMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
@@ -30,6 +30,8 @@ import { caribbeanGreen } from 'utils/colors'
 import { Link } from 'react-router-dom'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS } from 'models/Transaction'
+
+// const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction Inbox to view and/or cancel your pending transaction.'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -83,6 +85,20 @@ function useRefund () {
   })
 }
 
+// cancel_transactions
+function useRefundAllDeclinedTransactions () {
+  const [refundAllDeclined] = useMutation(HolofuelRefundAllDeclinedMutation)
+  return ({ declinedTransactions }) => refundAllDeclined({
+    variables: { listOfDeclinedTransactions: declinedTransactions },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    },
+    {
+      query: HolofuelLedgerQuery
+    }]
+  })
+}
+
 function useCounterparty (agentId) {
   const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
@@ -91,19 +107,8 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
-  // const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  // const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-
-  // const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
-  //   ...transaction,
-  //   counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
-  // }))
-
-  // const allCounterparties = uniqBy('id', holofuelInboxCounterparties.concat([whoami]))
-
-  // const updatedActionableTransactions = updateCounterparties(holofuelActionableTransactions, allCounterparties)
 
   const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
@@ -112,7 +117,8 @@ function useUpdatedTransactionLists () {
 
   return {
     actionableTransactions: updatedActionableWOCanceledOffers,
-    recentTransactions: updatedNonPendingTransactions
+    recentTransactions: updatedNonPendingTransactions,
+    declinedTransactions: updatedDeclinedTransactions
   }
 }
 
@@ -126,16 +132,29 @@ const presentTruncatedAmount = (string, number = 15) => {
   return sliceHash(string, number)
 }
 
-export default function Inbox () {
+export default function Inbox (props) {
+  // console.log('whoami in inbox', props)
+
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { actionableTransactions, recentTransactions } = useUpdatedTransactionLists()
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { actionableTransactions, recentTransactions, declinedTransactions } = useUpdatedTransactionLists()
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
   const refundTransaction = useRefund()
+  const refundAllDeclinedTransactions = useRefundAllDeclinedTransactions()
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
+  const [isDeclinedTransactionModalVisible, setIsDeclinedTransactionModalVisible] = useState(false)
   const [isNewTransactionModalVisible, setIsNewTransactionModalVisible] = useState(false)
   const [modalTransaction, setModalTransaction] = useState(null)
+
+  const filterActionableTransactionsByStatus = useCallback(status => actionableTransactions.filter(actionableTx => actionableTx.status === status), [actionableTransactions])
+
+  useEffect(() => {
+    if (!isEmpty(filterActionableTransactionsByStatus('declined'))) {
+      setIsDeclinedTransactionModalVisible(true)
+    }
+  }, [filterActionableTransactionsByStatus, setIsDeclinedTransactionModalVisible])
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
@@ -166,7 +185,7 @@ export default function Inbox () {
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
-  return <PrimaryLayout headerProps={{ title: 'Inbox' }} inboxCount={actionableTransactions.length}>
+  return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
     <Jumbotron
       className='inbox-header'
       title={displayBalance}
@@ -208,6 +227,7 @@ export default function Inbox () {
         <PageDivider title={dateLabel} />
         <div styleName='transaction-list'>
           {transactions.map(transaction => <TransactionRow
+            whoami={whoami}
             transaction={transaction}
             actionsVisibleId={actionsVisibleId}
             actionsClickWithTxId={actionsClickWithTxId}
@@ -220,8 +240,14 @@ export default function Inbox () {
       </React.Fragment>)}
     </div>}
 
+    <DeclinedTransactionModal
+      handleClose={() => setIsDeclinedTransactionModalVisible(false)}
+      isDeclinedTransactionModalVisible={isDeclinedTransactionModalVisible}
+      declinedTransactions={declinedTransactions}
+      refundAllDeclinedTransactions={refundAllDeclinedTransactions} />
+
     <NewTransactionModal
-      handleClose={() => setIsNewTransactionModalVisible(null)}
+      handleClose={() => setIsNewTransactionModalVisible(false)}
       isNewTransactionModalVisible={isNewTransactionModalVisible} />
 
     <ConfirmationModal
@@ -236,7 +262,7 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisibleId, showConfirmationModal, isActionable }) {
+export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisibleId, showConfirmationModal, isActionable, whoami }) {
   const { counterparty, presentBalance, amount, type, status, notes, canceledBy } = transaction
   const agent = canceledBy || counterparty
 
@@ -252,21 +278,20 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
 
   let story
   if (isActionable && !isDeclined) story = isOffer ? ' is offering' : ' is requesting'
-  else if (isDeclined && isOffer) story = 'has declined'
+  else if (isDeclined && isOffer) story = 'declined'
 
-  let fullNotes, cancelMsg
+  let fullNotes
   if (isCanceled) {
     if (canceledBy) {
-      cancelMsg = isOffer ? ` Canceled Offer to ${counterparty.nickname || presentAgentId(counterparty.id)}` : ` Canceled Request to ${counterparty.nickname || presentAgentId(counterparty.id)}`
-      fullNotes = notes
-    } else {
-      fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
+      story = isOffer ? ` Canceled an Offer to ${counterparty.id === whoami.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === whoami.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
     }
+    fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
   } else if (isDeclined) {
-    fullNotes = isOffer ? notes : ` Declined Request: ${notes}`
+    fullNotes = isOffer ? ` Declined Offer: ${notes}` : ` Declined Request: ${notes}`
   } else fullNotes = notes
 
-  return <div styleName='transaction-row' role='listitem'>
+  /* eslint-disable-next-line quote-props */
+  return <div styleName={cx('transaction-row', { 'annulled': isCanceled || isDeclined })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -276,11 +301,10 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {agent.nickname || presentAgentId(agent.id)}
+          {(agent.id === whoami.id ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
-      { cancelMsg && <div styleName='notes'>{cancelMsg}</div>}
       <div styleName='notes'>{fullNotes}</div>
     </div>
 
@@ -365,6 +389,37 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
     styleName='reject-button'>
     <p>{isDeclined ? 'Cancel' : 'Decline'}</p>
   </Button>
+}
+
+function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions={refundAllDeclinedTransactions} }) {
+  const { newMessage } = useFlashMessageContext()
+  const totalSum = (sum, currentAmount) => sum + currentAmount
+  const declinedTransactionSum = declinedTransactions.map(({ amount }) => amount).reduce(totalSum)
+
+  const onYes = () => {
+    newMessage(<>
+      <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
+    </>, 5000)
+    refundAllDeclinedTransactions({ declinedTransactions }).then(() => {
+      newMessage(`Funds succesfully returned`, 5000)
+    }).catch(() => {
+      newMessage('Sorry Something went wrong', 5000)
+    })
+    handleClose()
+  }
+
+  return <Modal
+    contentLabel={'Create a new transaction.'}
+    isOpen={isDeclinedTransactionModalVisible}
+    handleClose={handleClose}
+    styleName='modal'>
+    <div styleName='modal-title'> {declinedTransactions.length} of your offers were declined. {declinedTransactionSum} TF will be returned to your account.</div>
+    <Button
+      onClick={onYes}
+      styleName='modal-button-yes'>
+      Return all funds
+    </Button>
+  </Modal>
 }
 
 function NewTransactionModal ({ handleClose, isNewTransactionModalVisible }) {

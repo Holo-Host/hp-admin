@@ -1,9 +1,8 @@
-import React from 'react' // useState,
+import React from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
-import { isEmpty, get } from 'lodash/fp' // uniqBy,
+import { isEmpty, get } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-// import HolofuelHomeCounterpartiesQuery from 'graphql/HolofuelHomeCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
@@ -17,25 +16,6 @@ import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
-// function useTransactionsWithCounterparties () {
-//   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-//   // const { data: { holofuelHomeCounterparties = [] } = {} } = useQuery(HolofuelHomeCounterpartiesQuery)
-//   const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
-
-//   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
-//     ...transaction,
-//     counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
-//   }))
-
-//   // const allCounterparties = uniqBy('id', holofuelHomeCounterparties.concat([whoami]))
-
-//   const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
-
-//   return {
-//     transactions: updatedCompletedTransactions
-//   }
-// }
-
 const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
   if (ledgerLoading) return <>-- TF</>
   else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
@@ -47,7 +27,6 @@ export default function Home () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
-  // const { transactions } = useTransactionsWithCounterparties()
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
 

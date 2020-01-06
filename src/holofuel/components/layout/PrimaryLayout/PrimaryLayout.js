@@ -18,10 +18,6 @@ import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 
-import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-
-const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction Inbox to view and/or cancel your pending transaction.'
-
 export function PrimaryLayout ({
   children,
   headerProps = {},
@@ -41,16 +37,18 @@ export function PrimaryLayout ({
   const history = useHistory()
   const goToInbox = () => history.push(INBOX_PATH)
 
-  const { newMessage } = useFlashMessageContext()
   const filterActionableTransactionsByStatus = useCallback(status => actionableTransactions.filter(actionableTx => actionableTx.status === status), [actionableTransactions])
 
   useEffect(() => {
     if (!isEmpty(filterActionableTransactionsByStatus('declined'))) {
-      // TODO: redirect to inbox, and turn this message into a modal instead...
-      newMessage(declinedTransactionNotice)
-      // goToInbox()
+      goToInbox()
     }
-  }, [filterActionableTransactionsByStatus, newMessage])
+  }, [filterActionableTransactionsByStatus])
+
+  // console.log('holofuelUser IN PRIMARY LAYOUT :', holofuelUser)
+  const childrenWithProps = React.Children.map(children, child => {
+    if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })
+  })
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
@@ -67,7 +65,7 @@ export function PrimaryLayout ({
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />
-      {children}
+      {childrenWithProps}
     </div>
   </div>
 }

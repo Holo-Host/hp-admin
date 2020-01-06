@@ -126,7 +126,7 @@ const presentIncomingCanceledTransaction = canceledTx => {
   let { event, provenance } = canceledTx
   event = [event[0], event[1], event[2].Cancel.entry]
   canceledTx = { ...canceledTx, event }
-  const transaction = canceledTx.event[2].Request ? presentPendingRequest(canceledTx, false) : presentPendingOffer(canceledTx, true)
+  const transaction = canceledTx.event[2].Request ? presentPendingRequest(canceledTx, true) : presentPendingOffer(canceledTx, true)
 
   return {
     ...transaction,
@@ -354,6 +354,20 @@ const HoloFuelDnaInterface = {
         id: transactionId,
         status: STATUS.canceled
       }
+    },
+    cancelAllDeclined: async (listOfDeclinedTransactions) => {
+      const listOfTransactionIds = listOfDeclinedTransactions.map(({ id }) => id)
+      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
+      if (!canceledProof) throw new Error('Cancel Error.', canceledProof)
+
+      const canceledDeclined = listOfDeclinedTransactions.map(transaction => {
+        return {
+          ...transaction,
+          status: STATUS.canceled
+        }
+      })
+
+      return canceledDeclined
     }
   },
   requests: {

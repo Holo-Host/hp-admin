@@ -110,6 +110,8 @@ export const resolvers = {
 
     holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
 
+    holofuelRefundAllDeclined: (_, { listOfDeclinedTransactions }) => HoloFuelDnaInterface.transactions.cancelAllDeclined(listOfDeclinedTransactions),
+
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 
     hposUpdateVersion: () => HposInterface.os.updateVersion(),
