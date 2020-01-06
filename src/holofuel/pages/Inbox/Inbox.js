@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
-import { isEmpty, uniqBy } from 'lodash/fp'
+import { isEmpty } from 'lodash/fp' // , uniqBy
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+// import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
+// import HolofuelInboxCounterpartiesQuery from 'graphql/HolofuelInboxCounterpartiesQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -90,25 +90,25 @@ function useCounterparty (agentId) {
   return { holofuelCounterparty, loading }
 }
 
-function useTransactionsWithCounterparties () {
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
+function useUpdatedTransactionLists () {
+  // const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+  // const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
-  const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
-    ...transaction,
-    counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
-  }))
+  // const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
+  //   ...transaction,
+  //   counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
+  // }))
 
-  const allCounterparties = uniqBy('id', holofuelInboxCounterparties.concat([whoami]))
+  // const allCounterparties = uniqBy('id', holofuelInboxCounterparties.concat([whoami]))
 
-  const updatedActionableTransactions = updateCounterparties(holofuelActionableTransactions, allCounterparties)
+  // const updatedActionableTransactions = updateCounterparties(holofuelActionableTransactions, allCounterparties)
 
-  const updatedActionableWOCanceledOffers = updatedActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
-  const updatedCanceledTransactions = updatedActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
-  const updatedDeclinedTransactions = updatedActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
-  const updatedNonPendingTransactions = updateCounterparties(holofuelNonPendingTransactions, allCounterparties).concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
+  const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
+  const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
+  const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
+  const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
 
   return {
     actionableTransactions: updatedActionableWOCanceledOffers,
@@ -128,7 +128,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
+  const { actionableTransactions, recentTransactions } = useUpdatedTransactionLists()
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -237,8 +237,8 @@ export default function Inbox () {
 }
 
 export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisibleId, showConfirmationModal, isActionable }) {
-  const { counterparty, presentBalance, amount, type, status, notes } = transaction
-  const agent = counterparty
+  const { counterparty, presentBalance, amount, type, status, notes, canceledBy } = transaction
+  const agent = canceledBy || counterparty
 
   const handleCloseReveal = () => {
     if (!isEmpty(actionsVisibleId) && actionsVisibleId !== transaction.id) return actionsClickWithTxId(transaction.id)
@@ -254,9 +254,14 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
   if (isActionable && !isDeclined) story = isOffer ? ' is offering' : ' is requesting'
   else if (isDeclined && isOffer) story = 'has declined'
 
-  let fullNotes
+  let fullNotes, cancelMsg
   if (isCanceled) {
-    fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
+    if (canceledBy) {
+      cancelMsg = isOffer ? ` Canceled Offer to ${counterparty.nickname || presentAgentId(counterparty.id)}` : ` Canceled Request to ${counterparty.nickname || presentAgentId(counterparty.id)}`
+      fullNotes = notes
+    } else {
+      fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
+    }
   } else if (isDeclined) {
     fullNotes = isOffer ? notes : ` Declined Request: ${notes}`
   } else fullNotes = notes
@@ -275,6 +280,7 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
+      { cancelMsg && <div styleName='notes'>{cancelMsg}</div>}
       <div styleName='notes'>{fullNotes}</div>
     </div>
 

@@ -8,8 +8,8 @@ import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+// import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+// import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
@@ -30,27 +30,27 @@ function useCancel () {
   })
 }
 
-function useTransactionsWithCounterparties () {
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+// function useTransactionsWithCounterparties () {
+//   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+//   const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
+//   // const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+//   // const { data: { holofuelWaitingTransactions  = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
-  const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
-    ...transaction,
-    counterparty: counterparties.find(counterparty => counterparty.id === get('counterparty.id', transaction)) || transaction.counterparty
-  }))
+//   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
+//     ...transaction,
+//     counterparty: counterparties.find(counterparty => counterparty.id === get('counterparty.id', transaction)) || transaction.counterparty
+//   }))
 
-  const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
+//   const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
 
-  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
-  const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
+//   // const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
+//   // const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
 
-  return {
-    completedTransactions: updatedCompletedTransactions,
-    pendingTransactions: updatedWaitingTransactions
-  }
-}
+//   return {
+//     completedTransactions: updatedCompletedTransactions,
+//     pendingTransactions: updatedWaitingTransactions
+//   }
+// }
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
@@ -61,7 +61,9 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 
 export default function TransactionsHistory () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
-  const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
+  const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  // const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
