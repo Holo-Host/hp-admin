@@ -1,6 +1,6 @@
 {
   "name": "hp-admin",
-  "version": "0.2.1",
+  "version": "0.9.0",
   "private": true,
   "scripts": {
     "start-mock": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_MOCK_DNA_CONNECTION='true' node scripts/start.js",
