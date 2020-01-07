@@ -107,10 +107,15 @@ type HposAuth {
   isAuthed: Boolean
 }
 
+input HolofuelUserInput {
+  id: ID
+  nickname: String
+}
+
 input CancelDeclinedTransactionsInput {
   id: ID # ID will be the origin commit hash
   amount: Float
-  counterparty: HolofuelUser
+  counterparty: HolofuelUserInput
   direction: TransactionDirection
   status: TransactionStatus
   type: TransactionType
@@ -119,7 +124,7 @@ input CancelDeclinedTransactionsInput {
   presentBalance: Float
   notes: String
   happName: String
-  canceledBy: HolofuelUser
+  canceledBy: HolofuelUserInput
 }
 
 type Query {
