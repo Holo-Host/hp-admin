@@ -10,10 +10,11 @@ import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransaction
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
-import TransactionsHistory, { TransactionRow, ConfirmCancellationModal } from './TransactionHistory'
+import TransactionHistory, { TransactionRow, ConfirmCancellationModal } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
+import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
@@ -40,7 +41,7 @@ const defaultTransaction = {
   notes: ''
 }
 
-describe('TransactionsHistory', () => {
+describe('TransactionHistory', () => {
   describe('With a balance and no transactions', () => {
     const balance = '39085'
     const mocks = [{
@@ -59,15 +60,19 @@ describe('TransactionsHistory', () => {
     }]
 
     it('renders the balance and the empty state', async () => {
-      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionsHistory />
+      const push = jest.fn()
+      const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <TransactionHistory history={{ push }} />
       </MockedProvider>)
 
       const presentedBalance = `${presentHolofuelAmount(balance)} TF`
 
       expect(getByText(presentedBalance)).toBeInTheDocument()
 
-      expect(getByText('You have no transactions.')).toBeInTheDocument()
+      expect(getByText('You have no recent activity')).toBeInTheDocument()
+
+      fireEvent.click(getByTestId('create-transaction-button'))
+      expect(push).toHaveBeenCalledWith(OFFER_REQUEST_PATH)
     })
   })
 
@@ -146,7 +151,7 @@ describe('TransactionsHistory', () => {
 
     it('renders the transactions, and filters based on tab', async () => {
       const { getByText, queryByText, getAllByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionsHistory />
+        <TransactionHistory history={{}} />
       </MockedProvider>)
 
       expect(getAllByTestId('transaction-row')).toHaveLength(3)

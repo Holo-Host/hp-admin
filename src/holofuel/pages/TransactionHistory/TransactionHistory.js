@@ -57,7 +57,7 @@ function useTransactionsWithCounterparties () {
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
-export default function TransactionsHistory ({ history: { push }}) {
+export default function TransactionsHistory ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
 
@@ -113,12 +113,12 @@ export default function TransactionsHistory ({ history: { push }}) {
       <FilterButtons filter={filter} setFilter={setFilter} />
     </div>
 
-    {!noVisibleTransactions && <div styleName='transactions-empty'>
+    {noVisibleTransactions && <div styleName='transactions-empty'>
       <div styleName='transactions-empty-text'>You have no recent activity</div>
-      <PlusInDiscIcon styleName='plus-icon' color={caribbeanGreen} onClick={goToCreateTransaction} />
+      <PlusInDiscIcon styleName='plus-icon' color={caribbeanGreen} onClick={goToCreateTransaction} dataTestId='create-transaction-button' />
     </div>}
 
-    {noVisibleTransactions && <div styleName='transactions'>
+    {!noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
         <h4 styleName='partition-label'>{label}</h4>
         {transactions.map((transaction, index) => <TransactionRow
