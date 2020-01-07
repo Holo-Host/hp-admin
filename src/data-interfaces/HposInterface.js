@@ -28,12 +28,13 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
 
       const signature = await signPayload(method, urlObj.pathname, params)
 
-      const headers = {
+      let headers = {
         ...axiosConfig.headers,
         ...userHeaders,
-        'X-Hpos-Admin-Signature': signature,
-        'X-Original-Body': stringify(params) || null
+        'X-Hpos-Admin-Signature': signature
       }
+
+      if (params) headers = {...headers, 'X-Original-Body': stringify(params)}
 
       let data
 
