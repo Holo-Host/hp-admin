@@ -1,11 +1,10 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
 import { signPayload, hashResponseBody } from 'holochainClient'
-import { stringify } from 'querystring';
-import { stringify as jsonStringify } from 'json-stable-stringify'
+import stringify from 'json-stable-stringify'
 
 const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
-const mockHposConnection = process.env.NODE_ENV !== 'production' && true // boolean to toggle hpos mock data reference while in dev context...
+const mockHposConnection = process.env.NODE_ENV !== 'production' // boolean to toggle hpos mock data reference while in dev context...
 export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? preLocalHposImageIntegration
   : process.env.NODE_ENV === 'test'
@@ -33,7 +32,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
         ...axiosConfig.headers,
         ...userHeaders,
         'X-Hpos-Admin-Signature': signature,
-        'X-Original-Body': jsonStringify(params)
+        'X-Original-Body': stringify(params)
       }
 
       let data
