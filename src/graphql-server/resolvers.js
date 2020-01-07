@@ -110,7 +110,10 @@ export const resolvers = {
 
     holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
 
-    holofuelRefundAllDeclined: (_, { listOfDeclinedTransactions }) => HoloFuelDnaInterface.transactions.cancelAllDeclined(listOfDeclinedTransactions),
+    holofuelRefundAllDeclined: (_, { listOfDeclinedTransactions }) => {
+      console.log('LIST OF DECLINED TRANSACTIONS for cancelAllDeclined endpoint : ', listOfDeclinedTransactions)
+      HoloFuelDnaInterface.transactions.refundAllDeclined(listOfDeclinedTransactions)
+    },
 
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 

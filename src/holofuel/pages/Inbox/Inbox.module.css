@@ -352,6 +352,13 @@
   border-radius: 100px;
 }
 
+.modal-button-return-funds {
+  composes: modal-button-yes;
+  font-size: 1rem;
+  font-weight: bolder;
+  width: 15rem;
+}
+
 .modal-muted-btn {
   background-color: #05a484;
   border-radius: 100px;

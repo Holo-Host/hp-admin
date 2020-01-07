@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import cx from 'classnames'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, omitBy, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -85,11 +85,10 @@ function useRefund () {
   })
 }
 
-// cancel_transactions
 function useRefundAllDeclinedTransactions () {
   const [refundAllDeclined] = useMutation(HolofuelRefundAllDeclinedMutation)
-  return ({ declinedTransactions }) => refundAllDeclined({
-    variables: { listOfDeclinedTransactions: declinedTransactions },
+  return ({ cleanedTransactions }) => refundAllDeclined({
+    variables: { listOfDeclinedTransactions: cleanedTransactions },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },
@@ -391,19 +390,21 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
   </Button>
 }
 
-function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions={refundAllDeclinedTransactions} }) {
+function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
   const { newMessage } = useFlashMessageContext()
   const totalSum = (sum, currentAmount) => sum + currentAmount
-  const declinedTransactionSum = declinedTransactions.map(({ amount }) => amount).reduce(totalSum)
+  const declinedTransactionSum = declinedTransactions.map(({ amount }) => amount).reduce(totalSum, 0)
 
   const onYes = () => {
     newMessage(<>
       <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
     </>, 5000)
-    refundAllDeclinedTransactions({ declinedTransactions }).then(() => {
+
+    const cleanedTransactions = declinedTransactions.map(tx => omitBy(isNil, tx))
+    refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
       newMessage(`Funds succesfully returned`, 5000)
     }).catch(() => {
-      newMessage('Sorry Something went wrong', 5000)
+      newMessage('Sorry, something went wrong', 5000)
     })
     handleClose()
   }
@@ -413,10 +414,10 @@ function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisi
     isOpen={isDeclinedTransactionModalVisible}
     handleClose={handleClose}
     styleName='modal'>
-    <div styleName='modal-title'> {declinedTransactions.length} of your offers were declined. {declinedTransactionSum} TF will be returned to your account.</div>
+    <div styleName='modal-title'> {declinedTransactions.length} of your offers {declinedTransactions.length === 1 ? 'was' : 'were'} declined. {declinedTransactionSum} TF will be returned to your account.</div>
     <Button
       onClick={onYes}
-      styleName='modal-button-yes'>
+      styleName='modal-button-return-funds'>
       Return all funds
     </Button>
   </Modal>
@@ -495,7 +496,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       message = <div styleName='modal-text' data-testid='modal-message'>
         Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
       </div>
-      flashMessage = 'Offer Accepted succesfully'
+      flashMessage = 'Offer accepted succesfully'
       break
     }
     case 'decline': {
@@ -537,7 +538,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     actionHook(actionParams).then(() => {
       newMessage(flashMessage, 5000)
     }).catch(() => {
-      newMessage('Sorry Something went wrong', 5000)
+      newMessage('Sorry, something went wrong', 5000)
     })
     handleClose()
   }

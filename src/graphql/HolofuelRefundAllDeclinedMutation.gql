@@ -1,16 +1,14 @@
 mutation HolofuelRefundAllDeclined {
-  holofuelRefundAllDeclined (input: [{
+  holofuelRefundAllDeclined (listOfDeclinedTransactions: [{
     id: ID # ID will be the origin commit hash
     amount: Float
-    counterparty: HolofuelUser
+    counterparty: HolofuelUserInput
     direction: TransactionDirection
     status: TransactionStatus
     type: TransactionType
     timestamp: String
     fees: Float
-    presentBalance: Float
     notes: String
-    happName: String
   }]) {
     id
     amount
