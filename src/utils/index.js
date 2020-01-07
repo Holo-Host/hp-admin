@@ -103,7 +103,3 @@ function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
     // Throw Error, iso-timedate cannot be parsed into valid format
   } else throw new Error('Iso timedate is unable to be parsed.', isoDate)
 }
-
-export function getCommunityUrl () {
-  return window.location.protocol + '//' + window.location.host + '/community/'
-}
