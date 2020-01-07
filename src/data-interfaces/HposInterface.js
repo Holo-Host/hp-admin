@@ -34,7 +34,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
         'X-Hpos-Admin-Signature': signature
       }
 
-      if (params) headers = {...headers, 'X-Original-Body': stringify(params)}
+      if (params) headers = { ...headers, 'X-Original-Body': stringify(params) }
 
       let data
 
@@ -91,6 +91,7 @@ const HposInterface = {
 
     updateSettings: async (hostPubKey, hostName, deviceName, sshAccess) => {
       const settingsResponse = await hposCall({ method: 'get', path: 'config' })()
+      const { email } = settingsResponse
 
       // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
       const headers = {
@@ -99,7 +100,7 @@ const HposInterface = {
 
       const settingsConfig = {
         admin: {
-          name: hostName,
+          email,
           public_key: hostPubKey
         },
         holoportos: {
