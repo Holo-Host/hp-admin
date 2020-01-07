@@ -6,6 +6,7 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
@@ -13,9 +14,11 @@ import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
+import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
+import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 // Data - Mutation hooks with refetch:
 function useCancel () {
@@ -54,7 +57,7 @@ function useTransactionsWithCounterparties () {
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
-export default function TransactionsHistory () {
+export default function TransactionsHistory ({ history: { push }}) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
 
@@ -62,32 +65,29 @@ export default function TransactionsHistory () {
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
+  const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
+
   const [filter, setFilter] = useState(FILTER_TYPES[0])
 
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []
-  let transactionTypeName = ''
 
   switch (filter) {
     case 'all':
       filteredPendingTransactions = pendingTransactions
       filteredCompletedTransactions = completedTransactions
-      transactionTypeName = 'transactions'
       break
     case 'withdrawals':
       filteredPendingTransactions = []
       filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.outgoing)
-      transactionTypeName = 'withdrawals'
       break
     case 'deposits':
       filteredPendingTransactions = []
       filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.incoming)
-      transactionTypeName = 'deposits'
       break
     case 'pending':
       filteredPendingTransactions = pendingTransactions
       filteredCompletedTransactions = []
-      transactionTypeName = 'pending transactions'
       break
     default:
       throw new Error(`unrecognized filter type: "${filter}"`)
@@ -113,11 +113,12 @@ export default function TransactionsHistory () {
       <FilterButtons filter={filter} setFilter={setFilter} />
     </div>
 
-    {noVisibleTransactions && <div styleName='transactions-empty'>
-      You have no {transactionTypeName}.
+    {!noVisibleTransactions && <div styleName='transactions-empty'>
+      <div styleName='transactions-empty-text'>You have no recent activity</div>
+      <PlusInDiscIcon styleName='plus-icon' color={caribbeanGreen} onClick={goToCreateTransaction} />
     </div>}
 
-    {!noVisibleTransactions && <div styleName='transactions'>
+    {noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
         <h4 styleName='partition-label'>{label}</h4>
         {transactions.map((transaction, index) => <TransactionRow

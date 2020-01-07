@@ -16,14 +16,27 @@
 }
 
 .transactions-empty {
-  border: 1px solid black;
   border-radius: 4px;
-  background-color: lightgray;
+  background-color: white;
   height: 120px;
-  padding-top: 80px;
-  margin: 50px 30px 0px 30px;
+  padding-top: 47px;
+  margin: 36px 30px 0px 30px;
   text-align: center;
   font-size: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.transactions-empty-text {
+  font-family: "Circular";
+  font-size: 18px;
+  text-align: center;
+  color: var(--color-rhino-60);
+  margin-bottom: 44px;
+}
+
+.plus-icon {
+  align-self: center;
 }
 
 .transactions {
