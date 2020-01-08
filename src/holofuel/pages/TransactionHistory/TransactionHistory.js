@@ -35,9 +35,9 @@ function useCancel () {
 
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'network-only' })
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'network-only' })
-  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
+  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,

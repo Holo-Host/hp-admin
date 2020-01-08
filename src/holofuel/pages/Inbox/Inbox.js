@@ -82,9 +82,9 @@ function useCounterparty (agentId) {
 
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'network-only' })
-  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
-  const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
+  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
@@ -117,7 +117,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()

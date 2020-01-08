@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, uniqBy } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelHomeCounterpartiesQuery from 'graphql/HolofuelHomeCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -23,7 +23,7 @@ const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of 
 
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { data: { holofuelHomeCounterparties = [] } = {} } = useQuery(HolofuelHomeCounterpartiesQuery)
   const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
@@ -31,7 +31,7 @@ function useTransactionsWithCounterparties () {
     counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
   }))
 
-  const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
+  const allCounterparties = uniqBy('id', holofuelHomeCounterparties.concat([whoami]))
 
   const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
 
@@ -46,8 +46,8 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 }
 
 export default function Home () {
-  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
