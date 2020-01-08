@@ -126,18 +126,18 @@ export default function Inbox ({ history: { push } }) {
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
   const [modalTransaction, setModalTransaction] = useState(null)
 
-  useEffect(() => {
-    if (actionableTransactions && actionableTransactions.length > 0) {
-      setModalTransaction({ ...actionableTransactions[0], action: 'pay' })
-    }
-  }, [actionableTransactions])
+  // useEffect(() => {
+  //   if (actionableTransactions && actionableTransactions.length > 0) {
+  //     setModalTransaction({ ...actionableTransactions[0], action: 'pay' })
+  //   }
+  // }, [actionableTransactions])
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
     if (!isEmpty(transaction) && action !== '') setModalTransaction(modalTransaction)
   }
 
-  const [actionsVisibleId, setActionsVisibleId] = useState('QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz')
+  const [actionsVisibleId, setActionsVisibleId] = useState()
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   const [inboxView, setInboxView] = useState(VIEW.actionable)
