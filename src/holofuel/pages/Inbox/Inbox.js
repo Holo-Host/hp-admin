@@ -126,12 +126,6 @@ export default function Inbox ({ history: { push } }) {
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
   const [modalTransaction, setModalTransaction] = useState(null)
 
-  // useEffect(() => {
-  //   if (actionableTransactions && actionableTransactions.length > 0) {
-  //     setModalTransaction({ ...actionableTransactions[0], action: 'pay' })
-  //   }
-  // }, [actionableTransactions])
-
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
     if (!isEmpty(transaction) && action !== '') setModalTransaction(modalTransaction)
@@ -183,7 +177,7 @@ export default function Inbox ({ history: { push } }) {
       </div>
     </Jumbotron>
 
-    {isEmpty(displayTransactions) && <>
+    {isDisplayTransactionsEmpty && <>
       <PageDivider title='Today' />
       <NullStateMessage
         styleName='null-state-message'
@@ -191,7 +185,7 @@ export default function Inbox ({ history: { push } }) {
           ? 'You have no pending offers or requests'
           : 'You have no recent activity'}>
         <div onClick={() => push(OFFER_REQUEST_PATH)}>
-          Add Icon
+          <PlusInDiscIcon styleName='null-add-icon' backgroundColor={caribbeanGreen} />
         </div>
       </NullStateMessage>
     </>}

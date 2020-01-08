@@ -25,7 +25,8 @@
 }
 
 .plus-in-disc {
-  margin-top: -2px;
+  margin-top: -3px;
+  margin-left: -4px;
 }
 
 .view-button {
@@ -49,8 +50,14 @@
   background: #FFFFFF;
   border-radius: 4px;
   padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.null-add-icon {
+  margin-top: 20px;
+}
 
 /* Transaction Row */
 
@@ -235,8 +242,14 @@
 
 /* ConfirmationModal */
 
-.modal {
+.modal-amount {
 
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .modal-message {
@@ -245,26 +258,30 @@
   line-height: 24px;
   text-align: center;
   color: var(--color-rhino-60);
-}
-
-.modal-counterparty {
-}
-
-.modal-amount {
+  padding: 50px 50px 25px;
 }
 
 .modal-buttons {
-
+  margin-bottom: 34px;
 }
 
 .modal-button {
-
+  height: 42px;
+  width: 132px;
+  color: var(--color-caribbean-green);
+  color: white;
+  border: none;
 }
 
 .modal-button-no {
-
+  composes: modal-button;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .modal-button-yes {
-  
+  composes: modal-button;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: var(--color-ocean-green);
 }
