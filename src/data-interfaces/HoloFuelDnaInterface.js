@@ -356,10 +356,7 @@ const HoloFuelDnaInterface = {
       }
     },
     refundAllDeclined: async (listOfDeclinedTransactions) => {
-      console.log('LIST OF DECLINED TRANSACTIONS for refundAllDeclined endpoint : ', listOfDeclinedTransactions)
       const listOfTransactionIds = listOfDeclinedTransactions.map(({ id }) => id)
-
-      console.log('listOfTransactionIds in refundAllDeclined endpoint : ', listOfTransactionIds)
       const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
       if (!canceledProof) throw new Error('Cancel Error.', canceledProof)
 

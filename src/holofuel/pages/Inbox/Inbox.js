@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import cx from 'classnames'
-import { isEmpty, omitBy, isNil } from 'lodash/fp'
+import { isEmpty, pick } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -29,7 +29,7 @@ import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } fro
 import { caribbeanGreen } from 'utils/colors'
 import { Link } from 'react-router-dom'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 
 // const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction Inbox to view and/or cancel your pending transaction.'
 
@@ -262,7 +262,7 @@ export default function Inbox (props) {
 }
 
 export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisibleId, showConfirmationModal, isActionable, whoami }) {
-  const { counterparty, presentBalance, amount, type, status, notes, canceledBy } = transaction
+  const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy } = transaction
   const agent = canceledBy || counterparty
 
   const handleCloseReveal = () => {
@@ -272,6 +272,7 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
 
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request
+  const isOutgoing = direction === DIRECTION.outgoing
   const isCanceled = status === STATUS.canceled
   const isDeclined = status === STATUS.declined
 
@@ -313,10 +314,11 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
         isRequest={isRequest}
         isOffer={isOffer}
         isActionable={isActionable}
+        isOutgoing={isOutgoing}
         isDeclined={isDeclined}
         isCanceled={isCanceled}
       />
-      {!isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
+      {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
     </div>
 
     {isActionable && <>
@@ -355,8 +357,13 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, isActionable, isCanceled, isDeclined }) {
-  const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
+function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isCanceled, isDeclined }) {
+  let amountDisplay
+  if (isActionable) {
+    amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
+  } else {
+    amountDisplay = isOutgoing ? `-${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}` : `+${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}`
+  }
   return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && isDeclined) }, { credit: (isOffer && isActionable) || (isRequest && isDeclined) }, { removed: isDeclined || isCanceled })}>
     {amountDisplay} TF
   </div>
@@ -393,14 +400,18 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
 function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
   const { newMessage } = useFlashMessageContext()
   const totalSum = (sum, currentAmount) => sum + currentAmount
-  const declinedTransactionSum = declinedTransactions.map(({ amount }) => amount).reduce(totalSum, 0)
+  const declinedTransactionSum = declinedTransactions.map(({ amount, fees }) => amount + fees).reduce(totalSum, 0)
 
   const onYes = () => {
     newMessage(<>
       <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
     </>, 5000)
 
-    const cleanedTransactions = declinedTransactions.map(tx => omitBy(isNil, tx))
+    const cleanedTransactions = declinedTransactions.map(tx => {
+      const cleanedObj = pick(['id', 'amount', 'counterparty', 'direction', 'status', 'type', 'timestamp', 'fees', 'notes'], tx)
+      const cleanedCounterparty = pick(['id', 'nickname'], cleanedObj.counterparty)
+      return { ...cleanedObj, counterparty: cleanedCounterparty }
+    })
     refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
       newMessage(`Funds succesfully returned`, 5000)
     }).catch(() => {
@@ -414,7 +425,7 @@ function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisi
     isOpen={isDeclinedTransactionModalVisible}
     handleClose={handleClose}
     styleName='modal'>
-    <div styleName='modal-title'> {declinedTransactions.length} of your offers {declinedTransactions.length === 1 ? 'was' : 'were'} declined. {declinedTransactionSum} TF will be returned to your account.</div>
+    <div styleName='modal-title'> {declinedTransactions.length} of your offers {declinedTransactions.length === 1 ? 'was' : 'were'} declined. {declinedTransactionSum} TF will be returned to your available balance.</div>
     <Button
       onClick={onYes}
       styleName='modal-button-return-funds'>
