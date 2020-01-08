@@ -69,6 +69,7 @@ type Transaction {
   notes: String
   happName: String
   canceledBy: HolofuelUser
+  declinedBy: HolofuelUser
 }
 
 type Ledger {

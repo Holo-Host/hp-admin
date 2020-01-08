@@ -326,7 +326,8 @@ const HoloFuelDnaInterface = {
       return {
         ...transaction,
         id: transactionId,
-        status: STATUS.declined
+        status: STATUS.declined,
+        declinedBy: transaction.counterparty
       }
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored. */

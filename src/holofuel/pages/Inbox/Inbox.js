@@ -131,7 +131,6 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox (props) {
   // console.log('whoami in inbox', props)
-
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { actionableTransactions, recentTransactions, declinedTransactions } = useUpdatedTransactionLists()
@@ -142,6 +141,7 @@ export default function Inbox (props) {
   const refundAllDeclinedTransactions = useRefundAllDeclinedTransactions()
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
   const [isDeclinedTransactionModalVisible, setIsDeclinedTransactionModalVisible] = useState(false)
+  const [hasDisplayedDeclinedTransactionsMessage, setHasDisplayedDeclinedTransactionsMessage] = useState(false)
   const [isNewTransactionModalVisible, setIsNewTransactionModalVisible] = useState(false)
   const [modalTransaction, setModalTransaction] = useState(null)
 
@@ -149,7 +149,12 @@ export default function Inbox (props) {
 
   useEffect(() => {
     if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
-      setIsDeclinedTransactionModalVisible(true)
+      if (!hasDisplayedDeclinedTransactionsMessage) {
+        setIsDeclinedTransactionModalVisible(true)
+        setHasDisplayedDeclinedTransactionsMessage(true)
+      }
+    } else {
+      setHasDisplayedDeclinedTransactionsMessage(false)
     }
   }, [filterActionableTransactionsByStatusAndType, setIsDeclinedTransactionModalVisible])
 
@@ -399,6 +404,14 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
 
 function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
   const { newMessage } = useFlashMessageContext()
+
+  if (declinedTransactions.length <= 0) return null
+
+  const incomingDeclinedTransactions = declinedTransactions.filter(tx => (!tx.declinedBy))
+  console.log('incomingDeclinedTransactions : ', incomingDeclinedTransactions)
+
+  if (incomingDeclinedTransactions.length <= 0) return null
+
   const totalSum = (sum, currentAmount) => sum + currentAmount
   const declinedTransactionSum = declinedTransactions.map(({ amount, fees }) => amount + fees).reduce(totalSum, 0)
 
@@ -421,7 +434,7 @@ function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisi
   }
 
   return <Modal
-    contentLabel={'Create a new transaction.'}
+    contentLabel={'Restore funds from declined offer.'}
     isOpen={isDeclinedTransactionModalVisible}
     handleClose={handleClose}
     styleName='modal'>
