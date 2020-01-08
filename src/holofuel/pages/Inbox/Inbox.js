@@ -31,8 +31,6 @@ import { Link } from 'react-router-dom'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 
-// const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction Inbox to view and/or cancel your pending transaction.'
-
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
   return ({ id, amount, counterparty }) => offer({
@@ -147,13 +145,13 @@ export default function Inbox (props) {
   const [isNewTransactionModalVisible, setIsNewTransactionModalVisible] = useState(false)
   const [modalTransaction, setModalTransaction] = useState(null)
 
-  const filterActionableTransactionsByStatus = useCallback(status => actionableTransactions.filter(actionableTx => actionableTx.status === status), [actionableTransactions])
+  const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
   useEffect(() => {
-    if (!isEmpty(filterActionableTransactionsByStatus('declined'))) {
+    if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
       setIsDeclinedTransactionModalVisible(true)
     }
-  }, [filterActionableTransactionsByStatus, setIsDeclinedTransactionModalVisible])
+  }, [filterActionableTransactionsByStatusAndType, setIsDeclinedTransactionModalVisible])
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
@@ -361,6 +359,8 @@ function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isC
   let amountDisplay
   if (isActionable) {
     amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
+  } else if (isDeclined) {
+    amountDisplay = isRequest ? `+${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}` : `-${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}`
   } else {
     amountDisplay = isOutgoing ? `-${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}` : `+${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}`
   }

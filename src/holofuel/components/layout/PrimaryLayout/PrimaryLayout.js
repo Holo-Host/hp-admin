@@ -37,13 +37,13 @@ export function PrimaryLayout ({
   const history = useHistory()
   const goToInbox = () => history.push(INBOX_PATH)
 
-  const filterActionableTransactionsByStatus = useCallback(status => actionableTransactions.filter(actionableTx => actionableTx.status === status), [actionableTransactions])
+  const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
   useEffect(() => {
-    if (!isEmpty(filterActionableTransactionsByStatus('declined'))) {
+    if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
       goToInbox()
     }
-  }, [filterActionableTransactionsByStatus])
+  }, [filterActionableTransactionsByStatusAndType])
 
   // console.log('holofuelUser IN PRIMARY LAYOUT :', holofuelUser)
   const childrenWithProps = React.Children.map(children, child => {
