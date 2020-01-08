@@ -5,9 +5,8 @@
   box-sizing: border-box;
   text-align: left;
   left: 0px;
-  padding: 0.5rem 2rem;
-  border-radius: .3rem;
-  background: #CFF3EC;
+  padding: 20px 24px 0 24px;
+  background: var(--color-iceberg);
   font-family: 'CircularStd', sans-serif;
   color: #2C405A;
   font-size: 16px;
@@ -28,6 +27,7 @@
   font-size: 36px;
   line-height: 28px; 
   text-align: left;
+  margin-bottom: 20px;
 }
 
 .jumbotron-superscript {

@@ -15,18 +15,18 @@ import HolofuelRecoverFundsMutation from 'graphql/HolofuelRecoverFundsMutation.g
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
-import Button from 'holofuel/components/Button'
+import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
 import Loader from 'react-loader-spinner'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
-import AddIcon from 'components/icons/AddIcon'
+import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } from 'utils'
-import { Link } from 'react-router-dom'
+import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS } from 'models/Transaction'
 
@@ -116,7 +116,7 @@ const presentTruncatedAmount = (string, number = 15) => {
   return sliceHash(string, number)
 }
 
-export default function Inbox () {
+export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
   const payTransaction = useOffer()
@@ -124,20 +124,22 @@ export default function Inbox () {
   const declineTransaction = useDecline()
   const refundTransaction = useRefund()
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
-  const [isNewTransactionModalVisible, setIsNewTransactionModalVisible] = useState(false)
   const [modalTransaction, setModalTransaction] = useState(null)
+
+  useEffect(() => {
+    if (actionableTransactions && actionableTransactions.length > 0) {
+      setModalTransaction({ ...actionableTransactions[0], action: 'pay' })
+    }
+  }, [actionableTransactions])
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
     if (!isEmpty(transaction) && action !== '') setModalTransaction(modalTransaction)
   }
 
-  const showNewTransactionModal = () => setIsNewTransactionModalVisible(true)
+  const [actionsVisibleId, setActionsVisibleId] = useState('QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz')
 
-  const [actionsVisibleId, setActionsVisibleId] = useState(null)
-  const actionsClickWithTxId = transactionId => setActionsVisibleId(transactionId)
-
-  const toggleButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
+  const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   switch (inboxView) {
@@ -162,17 +164,18 @@ export default function Inbox () {
       title={displayBalance}
       titleSuperscript='Balance'
     >
-      <Button styleName='new-transaction-button' onClick={() => showNewTransactionModal()}>
-        <AddIcon styleName='add-icon' color='#0DC39F' />
-        <h3 styleName='button-text'>New Transaction</h3>
+      <Button styleName='new-transaction-button'
+        variant='green'
+        onClick={() => push(OFFER_REQUEST_PATH)}>
+        <PlusInDiscIcon styleName='plus-in-disc' color={caribbeanGreen} backgroundColor={'white'} />
+        <div styleName='button-text'>New Transaction</div>
       </Button>
 
       <div>
-        {toggleButtons.map(button =>
+        {viewButtons.map(button =>
           <Button
-            variant={button.view === inboxView ? 'toggle-selected' : 'toggle'}
+            styleName={button.view === inboxView ? 'view-button-selected' : 'view-button'}
             onClick={() => setInboxView(VIEW[button.view])}
-            className={cx(`${button.view}-button`)} /* eslint-disable-line quote-props */
             dataTestId={`${button.view}-transactions`}
             key={button.view}>
             {button.label}
@@ -187,10 +190,8 @@ export default function Inbox () {
         message={inboxView === VIEW.actionable
           ? 'You have no pending offers or requests'
           : 'You have no recent activity'}>
-        <div onClick={() => showNewTransactionModal()}>
-          <AddIcon styleName='add-icon' color='#0DC39F' />
-          {/* TODO: Remove once the above ADD Icon works... */}
-          <p style={{ fontSize: 30 }}>+</p>
+        <div onClick={() => push(OFFER_REQUEST_PATH)}>
+          Add Icon
         </div>
       </NullStateMessage>
     </>}
@@ -202,7 +203,7 @@ export default function Inbox () {
           {transactions.map(transaction => <TransactionRow
             transaction={transaction}
             actionsVisibleId={actionsVisibleId}
-            actionsClickWithTxId={actionsClickWithTxId}
+            setActionsVisibleId={setActionsVisibleId}
             role='list'
             view={VIEW}
             isActionable={inboxView === VIEW.actionable}
@@ -211,10 +212,6 @@ export default function Inbox () {
         </div>
       </React.Fragment>)}
     </div>}
-
-    <NewTransactionModal
-      handleClose={() => setIsNewTransactionModalVisible(null)}
-      isNewTransactionModalVisible={isNewTransactionModalVisible} />
 
     <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
@@ -228,13 +225,15 @@ export default function Inbox () {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisibleId, showConfirmationModal, isActionable }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, showConfirmationModal, isActionable }) {
   const { counterparty, presentBalance, amount, type, status, notes } = transaction
   const agent = counterparty
 
+  const drawerIsOpen = transaction.id === actionsVisibleId
+
   const handleCloseReveal = () => {
-    if (!isEmpty(actionsVisibleId) && actionsVisibleId !== transaction.id) return actionsClickWithTxId(transaction.id)
-    else return actionsClickWithTxId(null)
+    if (!isEmpty(actionsVisibleId) && actionsVisibleId !== transaction.id) return setActionsVisibleId(transaction.id)
+    else return setActionsVisibleId(null)
   }
 
   const isOffer = type === TYPE.offer
@@ -253,7 +252,7 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
     fullNotes = isOffer ? notes : ` Declined Request: ${notes}`
   } else fullNotes = notes
 
-  return <div styleName='transaction-row' role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -285,8 +284,8 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
     {isActionable && <>
       <RevealActionsButton
         actionsVisibleId={actionsVisibleId}
-        istransaction={transaction.id === actionsVisibleId}
-        actionsClick={() => actionsClickWithTxId(transaction.id)}
+        visible={drawerIsOpen}
+        actionsClick={() => setActionsVisibleId(transaction.id)}
         handleClose={handleCloseReveal}
       />
       <ActionOptions
@@ -302,8 +301,8 @@ export function TransactionRow ({ transaction, actionsClickWithTxId, actionsVisi
   </div>
 }
 
-function RevealActionsButton ({ actionsClick, handleClose, actionsVisibleId, istransaction }) {
-  return <div onClick={actionsVisibleId ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !(actionsVisibleId && istransaction) })} data-testid='reveal-actions-button'>
+function RevealActionsButton ({ actionsClick, handleClose, actionsVisibleId, visible }) {
+  return <div onClick={actionsVisibleId ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !(actionsVisibleId && visible) })} data-testid='reveal-actions-button'>
     <ForwardIcon styleName='forward-icon' color='#2c405a4d' dataTestId='forward-icon' />
   </div>
 }
@@ -338,7 +337,7 @@ function PayButton ({ showConfirmationModal, transaction }) {
   const action = 'pay'
   return <Button
     onClick={() => showConfirmationModal(transaction, action)}
-    styleName='pay-button'>
+    styleName='accept-button'>
     {/* NB: Not a typo. This is to 'Accept Request for Payment' */}
     <p>Accept</p>
   </Button>
@@ -351,23 +350,6 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
     styleName='reject-button'>
     <p>{isDeclined ? 'Cancel' : 'Decline'}</p>
   </Button>
-}
-
-function NewTransactionModal ({ handleClose, isNewTransactionModalVisible }) {
-  return <Modal
-    contentLabel={'Create a new transaction.'}
-    isOpen={isNewTransactionModalVisible}
-    handleClose={handleClose}
-    styleName='modal'>
-    <div styleName='modal-title'>Create a new transaction.</div>
-    <Button styleName='modal-buttons' onClick={handleClose}>
-      <Link to={OFFER_REQUEST_PATH} styleName='button-link'>
-        <div styleName='modal-offer-link'>
-          Send / Request
-        </div>
-      </Link>
-    </Button>
-  </Modal>
 }
 
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
@@ -398,9 +380,9 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = 'Pay request'
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>
+      message = <>
         Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
-      </div>
+      </>
       flashMessage = 'Payment sent succesfully'
       break
     }
@@ -408,9 +390,9 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = 'Accept offer'
       actionParams = { id }
       actionHook = acceptOffer
-      message = <div styleName='modal-text' data-testid='modal-message'>
+      message = <>
         Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
-      </div>
+      </>
       flashMessage = 'Offer Accepted succesfully'
       break
     }
@@ -419,13 +401,13 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       actionParams = { id }
       actionHook = declineTransaction
       if (type === 'offer') {
-        message = <div styleName='modal-text' data-testid='modal-message'>
+        message = <>
           Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
-        </div>
+        </>
       } else {
-        message = <div styleName='modal-text' data-testid='modal-message'>
+        message = <>
           Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
-        </div>
+        </>
       }
       flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`
 
@@ -435,7 +417,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       contentLabel = `Cancel ${type}?`
       actionParams = { id }
       actionHook = refundTransaction
-      message = <div styleName='modal-text' data-testid='modal-message'>Cancel your declined {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {type === TYPE.offer ? 'to' : 'from'} <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>?<br /><br /><div styleName='modal-note-text'>Note: Canceling will credit your balance by the outstanding amount.</div></div>
+      message = <>Cancel your declined {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {type === TYPE.offer ? 'to' : 'from'} <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>?<br /><br /><div styleName='modal-note-text'>Note: Canceling will credit your balance by the outstanding amount.</div></>
       break
     }
     default:
@@ -462,15 +444,13 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     isOpen={!isEmpty(transaction)}
     handleClose={handleClose}
     styleName='modal'>
-    <div styleName='modal-title'>Are you sure?</div>
-    {message}
+    <div styleName='modal-message'>{message}</div>
     <div styleName='modal-buttons'>
       <Button
         onClick={handleClose}
         styleName='modal-button-no'>
         No
       </Button>
-      <div styleName='button-divide' />
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
