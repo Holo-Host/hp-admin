@@ -94,8 +94,8 @@ export const signPayload = async (method, request, body) => {
   }
 }
 
-export const hashResponseBody = async (data) => {
-  const dataBytes = Buffer.from(stringify(data))
+export const hashBody = async (string) => {
+  const dataBytes = Buffer.from(string)
   const hashBytes = await crypto.subtle.digest('SHA-512', dataBytes)
 
   return Buffer.from(hashBytes).toString('base64')
