@@ -21,7 +21,7 @@ import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
-export const FEE_PERCENTAGE = 0.0
+export const FEE_PERCENTAGE = 0.1
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
@@ -92,7 +92,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const setAmount = amount => setAmountRaw(Number(amount))
 
   const fee = (amount * FEE_PERCENTAGE) || 0
-  const total = amount + fee
+  const total = mode === OFFER_MODE
+    ? amount + fee
+    : amount
 
   const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
