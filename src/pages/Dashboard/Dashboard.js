@@ -10,7 +10,7 @@ import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentHolofuelAmount, getCommunityUrl } from 'utils'
+import { presentHolofuelAmount } from 'utils'
 import cx from 'classnames'
 import './Dashboard.module.css'
 
@@ -60,7 +60,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    <Card title='HoloFuel' linkTo='/admin/holofuel' subtitle='Send, and receive TestFuel'>
+    <Card title='HoloFuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Balance
@@ -71,7 +71,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>
 
-    <Card title='Community' linkTo={getCommunityUrl()} subtitle='Connect with your peers' />
+    <Card title='Community' linkTo={'/community/'} subtitle='Connect with your peers' />
   </PrimaryLayout>
 }
 

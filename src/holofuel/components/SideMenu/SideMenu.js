@@ -57,7 +57,7 @@ export default function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to='/makemework' styleName='nav-link'>
+            <Link to='/admin/' styleName='nav-link'>
               HP Admin
             </Link>
           </li>

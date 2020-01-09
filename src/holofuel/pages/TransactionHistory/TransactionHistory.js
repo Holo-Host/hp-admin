@@ -3,17 +3,20 @@ import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, capitalize } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
-import Button from 'holofuel/components/Button'
+import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
+import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
+import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 // Data - Mutation hooks with refetch:
 function useCancel () {
@@ -30,12 +33,7 @@ function useCancel () {
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
-const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
-  if (ledgerLoading) return <>-- TF</>
-  else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
-}
-
-export default function TransactionsHistory () {
+export default function TransactionsHistory ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
@@ -44,32 +42,29 @@ export default function TransactionsHistory () {
   const [modalTransaction, setModalTransaction] = useState()
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
+  const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
+
   const [filter, setFilter] = useState(FILTER_TYPES[0])
 
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []
-  let transactionTypeName = ''
 
   switch (filter) {
     case 'all':
       filteredPendingTransactions = pendingTransactions
       filteredCompletedTransactions = completedTransactions
-      transactionTypeName = 'transactions'
       break
     case 'withdrawals':
       filteredPendingTransactions = []
       filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.outgoing)
-      transactionTypeName = 'withdrawals'
       break
     case 'deposits':
       filteredPendingTransactions = []
       filteredCompletedTransactions = completedTransactions.filter(transaction => transaction.direction === DIRECTION.incoming)
-      transactionTypeName = 'deposits'
       break
     case 'pending':
       filteredPendingTransactions = pendingTransactions
       filteredCompletedTransactions = []
-      transactionTypeName = 'pending transactions'
       break
     default:
       throw new Error(`unrecognized filter type: "${filter}"`)
@@ -84,24 +79,25 @@ export default function TransactionsHistory () {
     .filter(({ transactions }) => !isEmpty(transactions))
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
-    <div styleName='balance'>
-      <div styleName='balance-label'>Available Balance</div>
+    <div styleName='header'>
+      <h4 styleName='balance-label'>Balance</h4>
       <div styleName='balance-amount'>
         <DisplayBalance
           holofuelBalance={holofuelBalance}
-          ledgerLoading={ledgerLoading}
-        />
+          ledgerLoading={ledgerLoading} />
       </div>
+
+      <FilterButtons filter={filter} setFilter={setFilter} />
     </div>
-    <FilterButtons filter={filter} setFilter={setFilter} />
 
     {noVisibleTransactions && <div styleName='transactions-empty'>
-      You have no {transactionTypeName}.
+      <div styleName='transactions-empty-text'>You have no recent activity</div>
+      <PlusInDiscIcon styleName='plus-icon' color={caribbeanGreen} onClick={goToCreateTransaction} dataTestId='create-transaction-button' />
     </div>}
 
     {!noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
-        <div styleName='partition-label'>{label}</div>
+        <h4 styleName='partition-label'>{label}</h4>
         {transactions.map((transaction, index) => <TransactionRow
           transaction={transaction}
           key={transaction.id}
@@ -115,6 +111,11 @@ export default function TransactionsHistory () {
       transaction={modalTransaction}
       cancelTransaction={cancelTransaction} />
   </PrimaryLayout>
+}
+
+const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
+  if (ledgerLoading) return <>-- TF</>
+  else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 
 function FilterButtons ({ filter, setFilter }) {
@@ -145,7 +146,7 @@ export function TransactionRow ({ transaction, showCancellationModal, isFirst })
       </CopyAgentId>
     </div>
     <div styleName='name-and-notes'>
-      <div styleName='name'>
+      <div styleName={cx('name', { 'pending-style': pending })}>
         <CopyAgentId agent={counterparty}>
           {counterparty.nickname || presentAgentId(counterparty.id)}
         </CopyAgentId>
@@ -155,7 +156,7 @@ export function TransactionRow ({ transaction, showCancellationModal, isFirst })
       </div>
     </div>
     <div styleName='amount-and-balance'>
-      <div styleName='amount'>
+      <div styleName={cx('amount', { 'pending-style': pending })}>
         {presentedAmount}
       </div>
       {presentBalance && <div styleName='transaction-balance'>
@@ -188,18 +189,19 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
     isOpen={!!transaction}
     handleClose={handleClose}
     styleName='modal'>
-    <div styleName='modal-title'>Are you sure?</div>
     <div styleName='modal-text' role='heading'>
-      Cancel {capitalize(type)} of <span styleName='modal-amount' data-testid='modal-amount'>{presentHolofuelAmount(amount)} TF</span> {direction === 'incoming' ? 'from' : 'to'} <span styleName='modal-counterparty' testid='modal-counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span> ?
+      Cancel {capitalize(type)} of {presentHolofuelAmount(amount)} TF {direction === 'incoming' ? 'from' : 'to'} {counterparty.nickname || presentAgentId(counterparty.id)}?
     </div>
     <div styleName='modal-buttons'>
       <Button
         onClick={handleClose}
+        variant='green'
         styleName='modal-button-no'>
         No
       </Button>
       <Button
         onClick={onYes}
+        variant='green'
         styleName='modal-button-yes'>
         Yes
       </Button>
