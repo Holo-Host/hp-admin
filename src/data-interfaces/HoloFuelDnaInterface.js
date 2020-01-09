@@ -325,9 +325,7 @@ const HoloFuelDnaInterface = {
       if (!declinedProof) throw new Error('Decline Error.', declinedProof)
       return {
         ...transaction,
-        id: transactionId,
-        status: STATUS.declined,
-        declinedBy: transaction.counterparty
+        id: transactionId
       }
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
@@ -339,8 +337,7 @@ const HoloFuelDnaInterface = {
 
       return {
         ...transaction,
-        id: transactionId,
-        status: STATUS.canceled
+        id: transactionId
       }
     },
     /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */

@@ -7,6 +7,5 @@ mutation HolofuelDeclineMutation ($transactionId: ID) {
     status
     type
     timestamp
-    declinedBy { id, nickname }
   }
 }

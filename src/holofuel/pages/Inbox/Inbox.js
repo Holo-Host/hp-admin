@@ -156,7 +156,7 @@ export default function Inbox (props) {
     } else {
       setHasDisplayedDeclinedTransactionsMessage(false)
     }
-  }, [filterActionableTransactionsByStatusAndType, setIsDeclinedTransactionModalVisible])
+  }, [filterActionableTransactionsByStatusAndType, hasDisplayedDeclinedTransactionsMessage, setIsDeclinedTransactionModalVisible])
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
@@ -404,14 +404,7 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
 
 function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
   const { newMessage } = useFlashMessageContext()
-
   if (declinedTransactions.length <= 0) return null
-
-  const incomingDeclinedTransactions = declinedTransactions.filter(tx => (!tx.declinedBy))
-  console.log('incomingDeclinedTransactions : ', incomingDeclinedTransactions)
-
-  if (incomingDeclinedTransactions.length <= 0) return null
-
   const totalSum = (sum, currentAmount) => sum + currentAmount
   const declinedTransactionSum = declinedTransactions.map(({ amount, fees }) => amount + fees).reduce(totalSum, 0)
 
