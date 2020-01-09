@@ -139,7 +139,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       <h4 styleName='amount-label'>
         {title}
       </h4>
-      <div styleName='amount'>
+      <div styleName='amount' onClick={() => setNumpadVisible(true)}>
         {presentHolofuelAmount(amount)} TF
       </div>
       <div styleName='fee-notice'>

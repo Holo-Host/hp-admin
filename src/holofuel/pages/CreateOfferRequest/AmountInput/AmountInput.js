@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
-import { presentHolofuelAmount } from 'utils'
 import './AmountInput.module.css'
 
 export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequest }) {
@@ -14,7 +13,12 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
     setAmount(Number(cleanValue))
   }
 
-  const addDigit = digit => () => setInputValue(String(inputValue) + String(digit))
+  const addDigit = digit => () => {
+    // return early if trying to add a second .
+    if (digit === '.' && /\./.test(inputValue)) return
+
+    setInputValue(String(inputValue) + String(digit))
+  }
   const removeDigit = () => setInputValue(String(inputValue).slice(0, -1))
 
   return <PrimaryLayout showAlphaFlag={false}>
@@ -22,7 +26,7 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
       <input styleName='amount-input-amount'
         data-testid='amount'
         onChange={e => setInputValue(e.target.value)}
-        value={`${presentHolofuelAmount(inputValue)}`} />
+        value={`${presentHolofuelString(inputValue)}`} />
       <div styleName='numpad'>
         {[1, 4, 7].map(rowStart => <div styleName='numpad-row' key={rowStart}>
           {[0, 1, 2].map(offset => <button styleName='numpad-button' onClick={addDigit(rowStart + offset)} key={offset}>
@@ -41,4 +45,15 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
       </div>
     </div>
   </PrimaryLayout>
+}
+
+function presentHolofuelString (amount) {
+  const hasDot = /\./.test(amount)
+  const [integer, fraction] = amount.split('.')
+  const parsedInteger = Number.parseFloat(integer).toLocaleString()
+  if (hasDot) {
+    return parsedInteger + '.' + fraction
+  } else {
+    return parsedInteger
+  }
 }

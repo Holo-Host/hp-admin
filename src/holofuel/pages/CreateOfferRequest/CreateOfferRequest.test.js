@@ -329,6 +329,16 @@ describe('CreateOfferRequest', () => {
       expect(getByTextInAgent1Row('Selected')).toBeInTheDocument()
     })
 
+    it('takes you back to the amount edit screen when clicking on the amount', async () => {
+      const { getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <CreateOfferRequest history={{}} />
+      </MockedProvider>)
+
+      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
+      fireEvent.click(getByText(`${presentHolofuelAmount(amount)} TF`))
+      expect(getByTestId('amount').value).toEqual(presentHolofuelAmount(amount))
+    })
+
     it.skip('responds appropriately to bad input', () => {
       // this is a placeholder for once we add proper error handling
     })
@@ -396,5 +406,44 @@ describe('CreateOfferRequest', () => {
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
+  })
+})
+
+describe('AmountInput', () => {
+  it('allows input of non integer amounts where the fractional part begins with 0', async () => {
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={[]}>
+      <CreateOfferRequest history={{ }} />
+    </MockedProvider>)
+
+    fireEvent.click(getByText('1'))
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('0'))
+
+    expect(getByTestId('amount').value).toEqual('1.0')
+
+    fireEvent.click(getByText('2'))
+
+    fireEvent.click(getByText('Send'))
+    expect(getByText(`${presentHolofuelAmount(1.02)} TF`)).toBeInTheDocument()
+  })
+
+  it('ignores all presses of . beyond the first', async () => {
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={[]}>
+      <CreateOfferRequest history={{ }} />
+    </MockedProvider>)
+
+    fireEvent.click(getByText('1'))
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('0'))
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('3'))
+
+    expect(getByTestId('amount').value).toEqual('1.03')
+
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('4'))
+
+    fireEvent.click(getByText('Send'))
+    expect(getByText(`${presentHolofuelAmount('1.034')} TF`)).toBeInTheDocument()
   })
 })
