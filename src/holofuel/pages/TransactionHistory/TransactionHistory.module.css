@@ -43,16 +43,6 @@
   background-color: white;
 }
 
-.partition-label {
-  color: var(--color-rhino-50);
-  background-color: var(--color-rhino-10);
-  margin: 0;
-  padding: 0 24px;
-  height: 24px;  
-  display: flex;
-  align-items: center;
-}
-
 /* FilterButtons */
 
 .filter-buttons {
@@ -72,6 +62,23 @@
 .selected {
   border-bottom: 2px solid var(--color-caribbean-green);
   color: var(--color-rhino);
+}
+
+/* TransactionPartition */
+.partition-label {
+  color: var(--color-rhino-50);
+  background-color: var(--color-rhino-10);
+  margin: 0;
+  padding: 0 24px;
+  height: 24px;  
+  display: flex;
+  align-items: center;
+}
+
+.partition-loading {
+  padding: 30px 0px;
+  display: flex;
+  justify-content: center;
 }
 
 /* TransactionRow */

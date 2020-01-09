@@ -19,6 +19,7 @@ import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
+import { caribbeanGreen } from '../../../utils/colors'
 
 // TODO: these constants should come from somewhere more scientific
 export const FEE_PERCENTAGE = 0
@@ -59,14 +60,15 @@ const modePrepositions = {
 }
 
 export default function CreateOfferRequest ({ history: { push } }) {
-  const [numpadVisible, setNumpadVisible] = useState(true)
+  const [numpadVisible, setNumpadVisible] = useState(false)
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== whoami.id)
+
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
-
   const { newMessage: newMessageRaw } = useFlashMessageContext()
   const newMessage = useCallback(newMessageRaw, [newMessageRaw])
 
@@ -88,7 +90,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     setFormValue('counterpartyId', id)
   }
 
-  const [amount, setAmountRaw] = useState(0)
+  const [amount, setAmountRaw] = useState(345)
   const setAmount = amount => setAmountRaw(Number(amount))
 
   const fee = (amount * FEE_PERCENTAGE) || 0
@@ -206,9 +208,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
     <RecentCounterparties
       styleName='recent-counterparties'
-      agents={agents}
+      agents={recentCounterpartiesWithoutMe}
       selectedAgentId={counterpartyId}
-      selectAgent={selectAgent} />
+      selectAgent={selectAgent}
+      loading={loadingRecentCounterparties} />
   </PrimaryLayout>
 }
 
@@ -247,12 +250,9 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
     return <>
       <Loader
         type='ThreeDots'
-        color='#00BFFF'
+        color={caribbeanGreen}
         height={30}
-        width={30}
-        timeout={3000}
-      />
-       Loading
+        width={30} />
     </>
   }
 

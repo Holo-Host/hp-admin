@@ -2,21 +2,24 @@ import React from 'react'
 import { isEmpty } from 'lodash/fp'
 import cx from 'classnames'
 import HashIcon from 'holofuel/components/HashIcon'
+import Loading from 'components/Loading'
 import { presentAgentId } from 'utils'
 import './RecentCounterparties.module.css'
 
-export default function RecentCounterparties ({ agents = [], selectedAgentId, selectAgent, className }) {
+export default function RecentCounterparties ({ agents = [], selectedAgentId, selectAgent, className, loading }) {
   const recentAgents = agents.slice(0, 6)
 
   return <div styleName='recent-counterparties' className={className}>
     <h4 styleName='header'>Recent Peers</h4>
-    {isEmpty(agents) && <div>You have no recent peers.</div>}
-    {recentAgents.map(agent => <AgentRow
+    {/* {loading && <Loading styleName='loading' />} */}
+    {/* {!loading && isEmpty(agents) && <div>You have no recent peers.</div>} */}
+    {<div styleName='no-peers'>You have no recent peers.</div>}
+    {/* {recentAgents.map(agent => <AgentRow
       agent={agent}
       selected={agent.id === selectedAgentId}
       selectThisAgent={() => selectAgent(agent.id)}
       key={agent.id}
-    />)}
+    />)} */}
   </div>
 }
 

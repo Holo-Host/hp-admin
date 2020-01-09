@@ -7,6 +7,7 @@ import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
+import Loading from 'components/Loading'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
@@ -36,8 +37,8 @@ function useCancel () {
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
@@ -51,7 +52,9 @@ function useTransactionsWithCounterparties () {
 
   return {
     completedTransactions: updatedCompletedTransactions,
-    pendingTransactions: updatedWaitingTransactions
+    pendingTransactions: updatedWaitingTransactions,
+    loadingCompletedTransactions,
+    loadingPendingTransactions
   }
 }
 
@@ -59,7 +62,7 @@ const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
 export default function TransactionsHistory ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
-  const { completedTransactions, pendingTransactions } = useTransactionsWithCounterparties()
+  const { completedTransactions, pendingTransactions, loadingCompletedTransactions, loadingPendingTransactions } = useTransactionsWithCounterparties()
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -93,13 +96,24 @@ export default function TransactionsHistory ({ history: { push } }) {
       throw new Error(`unrecognized filter type: "${filter}"`)
   }
 
-  const noVisibleTransactions = isEmpty(filteredPendingTransactions) && isEmpty(filteredCompletedTransactions)
+  const noVisibleTransactions = isEmpty(filteredPendingTransactions) &&
+    isEmpty(filteredCompletedTransactions) &&
+    !loadingPendingTransactions &&
+    !loadingCompletedTransactions
 
   const partitionedTransactions = ([{
     label: 'Pending',
-    transactions: filteredPendingTransactions
-  }].concat(partitionByDate(filteredCompletedTransactions)))
-    .filter(({ transactions }) => !isEmpty(transactions))
+    transactions: filteredPendingTransactions,
+    loading: loadingPendingTransactions
+  }]
+    .concat([{
+      // this partition only displays if completed transactions is loading
+      label: 'Completed',
+      transactions: [],
+      loading: loadingCompletedTransactions
+    }])
+    .concat(partitionByDate(filteredCompletedTransactions)))
+    .filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='header'>
@@ -119,14 +133,10 @@ export default function TransactionsHistory ({ history: { push } }) {
     </div>}
 
     {!noVisibleTransactions && <div styleName='transactions'>
-      {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
-        <h4 styleName='partition-label'>{label}</h4>
-        {transactions.map((transaction, index) => <TransactionRow
-          transaction={transaction}
-          key={transaction.id}
-          showCancellationModal={showCancellationModal}
-          isFirst={index === 0} />)}
-      </React.Fragment>)}
+      {partitionedTransactions.map(partition =>
+        <TransactionPartition key={partition.label}
+          partition={partition}
+          showCancellationModal={showCancellationModal} />)}
     </div>}
 
     <ConfirmCancellationModal
@@ -152,6 +162,19 @@ function FilterButtons ({ filter, setFilter }) {
       {capitalizeFirstLetter(type)}
     </div>)}
   </div>
+}
+
+function TransactionPartition ({ partition, showCancellationModal }) {
+  const { label, loading, transactions } = partition
+  return <>
+    <h4 styleName='partition-label'>{label}</h4>
+    {loading && <Loading styleName='partition-loading' />}
+    {transactions.map((transaction, index) => <TransactionRow
+      transaction={transaction}
+      key={transaction.id}
+      showCancellationModal={showCancellationModal}
+      isFirst={index === 0} />)}
+  </>
 }
 
 export function TransactionRow ({ transaction, showCancellationModal, isFirst }) {

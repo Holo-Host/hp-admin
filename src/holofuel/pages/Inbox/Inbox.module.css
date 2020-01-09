@@ -44,6 +44,12 @@
   border-bottom: 2px solid var(--color-caribbean-green);
 }
 
+.display-loading {
+  padding: 50px;
+  display: flex;
+  justify-content: center;
+}
+
 /* Null State */
 
 .null-state-message {

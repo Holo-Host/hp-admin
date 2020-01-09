@@ -10,6 +10,7 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import Loading from 'components/Loading'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
@@ -46,7 +47,7 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 }
 
 export default function Home () {
-  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingTransactions, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
@@ -105,7 +106,11 @@ export default function Home () {
 
         <div styleName='transactions'>
 
-          {isTransactionsEmpty && <div styleName='transactions-empty'>
+          {loadingTransactions && <div styleName='transactions-empty'>
+            <Loading />
+          </div>}
+
+          {isTransactionsEmpty && !loadingTransactions && <div styleName='transactions-empty'>
             You have no offers or requests
           </div>}
 
