@@ -75,7 +75,8 @@ function useRefund () {
   return ({ id }) => recoverFunds({
     variables: { transactionId: id },
     refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
+      query: HolofuelActionableTransactionsQuery,
+      fetchPolicy: 'cache-and-network'
     },
     {
       query: HolofuelLedgerQuery
