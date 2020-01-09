@@ -21,7 +21,7 @@ import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
-export const FEE_PERCENTAGE = 0.01
+export const FEE_PERCENTAGE = 0
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
