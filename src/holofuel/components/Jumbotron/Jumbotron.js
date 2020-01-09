@@ -2,7 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import './Jumbotron.module.css'
 
-function Jumbotron ({
+export default function Jumbotron ({
   wide = false,
   className,
   titleSuperscript,
@@ -24,5 +24,3 @@ function Jumbotron ({
     </div>
   )
 }
-
-export default Jumbotron

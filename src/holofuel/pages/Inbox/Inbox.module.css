@@ -21,55 +21,33 @@
   margin-left: 14px;
 }
 
-.button {
-  flex: 1;
-  flex-basis: content;
-  font-weight: normal;
-  padding: 10px;
-  width: 100%;
-  height: auto;
-  margin-bottom: 10px;
-}
-
-.selected {
-  color: #2C405A;
-  text-decoration: underline 2px solid #0DC39F;
-}
-
-.button-divide {
-  border: 1px solid rgba(44, 64, 90, 0.5);
-  top: 19px;
-}
-
-.button-link {
-  flex: 1;
-  text-decoration: none;
-  margin: -3px;
-}
-
-.green-classic-btn {
-  color: white;
-  background-color: #0DC39F;
-  margin: 12px 0px;
-  margin-left: auto;
-  border-radius: 100px;
-  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
-}
-
 .new-transaction-button {
-  composes: green-classic-btn;
   font-size: 13px;
   line-height: 15px;
-  width: 212px;
-  height: 46px;
+  display: flex;
+  height: 32px;
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
+  margin-bottom: 30px;
 }
 
+.plus-in-disc {
+  margin-top: -3px;
+  margin-left: -4px;
+}
 
-.new-transaction-button-mini {
-  font-size: 13px;
-  line-height: 15px;
-  width: 175px;
-  padding: 8px;
+.view-button {
+  font-family: "Circular";
+  font-size: 16px;
+  color: var(--color-rhino-50);
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.view-button-selected {
+  composes: view-button;
+  color: var(--color-rhino);
+  border-bottom: 2px solid var(--color-caribbean-green);
 }
 
 /* Null State */
@@ -78,8 +56,14 @@
   background: #FFFFFF;
   border-radius: 4px;
   padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.null-add-icon {
+  margin-top: 20px;
+}
 
 /* Transaction Row */
 
@@ -89,13 +73,20 @@
 
 .transaction-row {
   display: flex;
+  height: 72px;
+  align-items: center;
   border-bottom: 1px solid rgba(44, 64, 90, 0.1);
   font-size: 14px;
-  padding: 10px 5px 10px;
+  padding: 0 14px;
   background-color: #FFFFFF;
   justify-content: space-between;
   /* width: 80px; */
   transition: transform 1s ease-in-out;
+}
+
+.transaction-row-drawer-open {
+  padding-left: 4px;
+  padding-right: 0px;
 }
 
 /* Avatar and Description Cells */
@@ -115,10 +106,7 @@
 }
 
 .counterparty {
-  font-weight: bold;
   font-size: 14px;
-  line-height: 19px;
-  margin-bottom: 1px !important;
   color: rgba(44, 64, 90, 0.8);
 }
 
@@ -221,60 +209,52 @@
   flex-direction: row nowrap;
 }
 
-/* .drawer {
-  bottom: 0;
-  z-index: 98;
-} */
-
 .drawer {
-  /* transform: translateX(0%); */
   flex: 1;
 }
 
 .drawer-close {
   display: flex;
-  /* transform: translateX(100%); */
   flex: 0 0 0;
   visibility: visible;
 }
+
 .drawer-close .forward-icon{
-  /* transform: translateX(0%); */
   visibility: visible;
 }
 
 .drawer-close .actions {
-  /* transform: translateX(100%); */
   display: none;
 }
 
-.accept-button {
-  composes: button;
-  margin: -10px 0px;
-  min-width: 70px;
-  height: 70px;
+
+.action-button {
+  border-radius: 0;
+  border: 0;
   color: white;
-  background-color: #23CC80;
+  height: 72px;
+  width: 64px;
+  font-family: "Circular";
+  font-size: 10px;
+  text-align: center;
+  text-transform: capitalize;
 }
 
-.pay-button {
-  composes: button;
-  margin: -10px 0px;
-  min-width: 70px;
-  height: 70px;
-  color: white;
-  background-color: #23CC80;
+.accept-button {
+  composes: action-button;
+  background-color: var(--color-mountain-meadow);
 }
 
 .reject-button {
-  composes: button;
-  margin: -10px 0px;
-  min-width: 70px;
-  height: 70px;
-  color: white;
-  background-color: #EE4266;
+  composes: action-button;
+  background-color: var(--color-amaranth);
 }
 
-/* Modal */
+/* ConfirmationModal */
+
+.modal-amount {
+
+}
 
 .modal {
   display: flex;
@@ -282,88 +262,36 @@
   align-items: center;
 }
 
-.modal-title {
-  margin-bottom: 30px;
+.modal-message {
+  font-family: "Circular";
   font-size: 18px;
   line-height: 24px;
   text-align: center;
-  color: rgba(44, 64, 90, 0.6);
-}
-
-.modal-text {
-  text-align: center;
-  font-size: 14px;
-  margin-bottom: 30px;
-}
-
-.modal-counterparty {
-  font-weight: bold;
-}
-
-.modal-amount {
-  font-weight: bold;
+  color: var(--color-rhino-60);
+  padding: 50px 50px 25px;
 }
 
 .modal-buttons {
-  composes: green-classic-btn;
-  padding: 0px;
-  margin-top: auto;
-  margin-left: auto;
-  display: flex;
-  flex-flow: row nowrap;
-  margin: 0 auto;
-  width: 300px;
-  height: 50px;
-  color: #FFFFFF;
-  justify-content: space-evenly;
-  align-self: flex-start;
+  margin-bottom: 34px;
 }
 
 .modal-button {
-  flex: 1;
-  color: #FFFFFF;
-  font-size: 20px;
-  line-height: 19px;
-  padding: 11px 8px;
-  text-decoration: none;
+  height: 42px;
+  width: 132px;
+  color: var(--color-caribbean-green);
+  color: white;
   border: none;
-  font-weight: normal;
-}
-
-.modal-offer-link {
-  composes: modal-button;
-  border-radius: 100px;
-}
-
-.modal-request-link {
-  composes: modal-button;
-  border-radius: 100px;
 }
 
 .modal-button-no {
   composes: modal-button;
-  background-color: #0DC39F;
-  border-radius: 100px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .modal-button-yes {
   composes: modal-button;
-  background-color: #0DC39F;
-  border-radius: 100px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: var(--color-ocean-green);
 }
-
-.modal-button-return-funds {
-  composes: modal-button-yes;
-  font-size: 1rem;
-  font-weight: bolder;
-  width: 15rem;
-}
-
-.modal-muted-btn {
-  background-color: #05a484;
-  border-radius: 100px;
-}
-
-/* .ReactModal__Overlay .ReactModal__Overlay--after-open {
-  background-color: rgba(44, 64, 90, 0.3);
-} */

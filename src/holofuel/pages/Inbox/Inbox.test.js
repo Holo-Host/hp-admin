@@ -50,7 +50,7 @@ jest.mock('holofuel/contexts/useFlashMessageContext')
 describe('Inbox Connected (with Agent Nicknames)', () => {
   it('renders', async () => {
     const { getAllByRole, getByText } = await renderAndWait(<ApolloProvider client={apolloClient}>
-      <Inbox />
+      <Inbox history={{}} />
     </ApolloProvider>, 15)
 
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
@@ -133,7 +133,7 @@ const whoamiMock = {
 describe('Ledger Jumbotron', () => {
   it('renders the balance and the empty state', async () => {
     const { getByText, getAllByText } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
-      <Inbox />
+      <Inbox history={{}} />
     </MockedProvider>)
 
     const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} TF`
@@ -158,7 +158,7 @@ describe('Inbox Null States', () => {
 
   it('renders the correct null state text whenever no actionable transactions exist', async () => {
     const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-      <Inbox />
+      <Inbox history={{}} />
     </MockedProvider>)
 
     expect(getByTestId('recent-transactions')).toBeInTheDocument()
@@ -172,7 +172,7 @@ describe('Inbox Null States', () => {
 
   it('renders the correct null state text whenever no recent transactions exist', async () => {
     const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-      <Inbox />
+      <Inbox history={{}} />
     </MockedProvider>)
 
     expect(getByTestId('actionable-transactions')).toBeInTheDocument()
@@ -315,7 +315,7 @@ describe('TransactionRow', () => {
   describe('Reveal actionable-buttons slider', () => {
     it('shows whenever actionable transactions are shown ', async () => {
       const { getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} actionsClickWithTxId={jest.fn()} isActionable />
+        <TransactionRow transaction={offer} whoami={mockAgent1} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -323,7 +323,7 @@ describe('TransactionRow', () => {
 
     it('does not show whenever actionable transactions are shown ', async () => {
       const { queryByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} actionsClickWithTxId={jest.fn()} />
+        <TransactionRow transaction={offer} whoami={mockAgent1} setActionsVisibleId={jest.fn()} />
       </MockedProvider>, 0)
 
       expect(queryByTestId('forward-icon')).not.toBeInTheDocument()
@@ -331,7 +331,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for requests ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={request} whoami={mockAgent1} actionsClickWithTxId={jest.fn()} isActionable />
+        <TransactionRow transaction={request} whoami={mockAgent1} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -346,7 +346,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for offers ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} actionsClickWithTxId={jest.fn()} isActionable />
+        <TransactionRow transaction={offer} whoami={mockAgent1} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -364,7 +364,7 @@ describe('TransactionRow', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
-        actionsClickWithTxId: jest.fn(),
+        setActionsVisibleId: jest.fn(),
         showConfirmationModal: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true,
@@ -438,7 +438,7 @@ describe('TransactionRow', () => {
     it('responds properly', async () => {
       const props = {
         transaction: offer,
-        actionsClickWithTxId: jest.fn(),
+        setActionsVisibleId: jest.fn(),
         showConfirmationModal: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true,
