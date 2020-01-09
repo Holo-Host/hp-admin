@@ -120,7 +120,7 @@ describe('CreateOfferRequest', () => {
 
       expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
       expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
-      expect(getByText(`A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).toBeInTheDocument()
+      expect(getByText(`For TestFuel, a ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).toBeInTheDocument()
 
       act(() => {
         fireEvent.change(getByLabelText('For:'), { target: { value: notes } })

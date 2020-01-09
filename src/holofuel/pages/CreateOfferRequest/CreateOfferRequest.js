@@ -21,7 +21,7 @@ import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
-export const FEE_PERCENTAGE = 0.01
+export const FEE_PERCENTAGE = 0.0
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
@@ -144,7 +144,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       </div>
       <div styleName='fee-notice'>
         {mode === OFFER_MODE
-          ? `A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`
+          ? `For TestFuel, a ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`
           : ' '}
       </div>
     </div>
