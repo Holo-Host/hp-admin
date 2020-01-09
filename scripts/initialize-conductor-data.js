@@ -152,41 +152,41 @@ async function populateHoloFuelData () {
       return cancelRequest
     })
 
-  // 11.) Scenario: A request from agent1 to agent2, which agent 2 has paid and agent1 Accepts:
-  // Part 1) : Agent 1 accpets requested HF from Agent 2
-  console.log('\nTEST SCENARIO #11 : Agent 1 accepts Paid Request from Agent 2')
-  await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '1100' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log('transaction originId : ', originId)
-      await wait(6000)
-      console.log('Part 2 :')
-      // Part 2) : Agent 2 Pays HF in response to Agent 1's Request
-      const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, amount: '1100', request: originId })
-      console.log(' >> Pay Request Success Hash', payRequest)
-      // Part 3) : Agent 2 Accepts HF in response to Agent 1's Request
-      const acceptPaidRequest = await createZomeCall('holofuel', 'transactions', 'receive_payments_pending', agent1Index)({ promises: originId })
-      console.log(' >> Accept Paid Request Success Hash', acceptPaidRequest)
-      return acceptPaidRequest
-    })
+  // // 11.) Scenario: A request from agent1 to agent2, which agent 2 has paid and agent1 Accepts:
+  // // Part 1) : Agent 1 accpets requested HF from Agent 2
+  // console.log('\nTEST SCENARIO #11 : Agent 1 accepts Paid Request from Agent 2')
+  // await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '1100' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log('transaction originId : ', originId)
+  //     await wait(6000)
+  //     console.log('Part 2 :')
+  //     // Part 2) : Agent 2 Pays HF in response to Agent 1's Request
+  //     const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, amount: '1100', request: originId })
+  //     console.log(' >> Pay Request Success Hash', payRequest)
+  //     // Part 3) : Agent 2 Accepts HF in response to Agent 1's Request
+  //     const acceptPaidRequest = await createZomeCall('holofuel', 'transactions', 'receive_payments_pending', agent1Index)({ promises: originId })
+  //     console.log(' >> Accept Paid Request Success Hash', acceptPaidRequest)
+  //     return acceptPaidRequest
+  //   })
 
-  // 12.) Scenario: A request from agent1 to agent2, which agent 2 has paid, agent1 Declines AND Agent2 Cancels:
-  // Part 1) : Agent 1 declines paid request HF from Agent 2; agent 2 cancels outstanding payment
-  console.log('\nTEST SCENARIO #12 : Agent 1 declines Paid Request from Agent 2 and Agent 2 cancels outstanding declined payment')
-  await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '1100' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log('transaction originId : ', originId)
-      await wait(6000)
-      console.log('Part 2 :')
-      // Part 2) : Agent 2 Pays HF in response to Agent 1's Request
-      const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, amount: '1100', request: originId })
-      console.log(' >> Pay Request Success Hash', payRequest)
-      // Part 3) : Agent 2 Accepts HF in response to Agent 1's Request
-      const declinePaidRequest = await createZomeCall('holofuel', 'transactions', 'decline_pending', agent1Index)({ origins: originId })
-      console.log(' >> Decline Paid Request Success Hash', declinePaidRequest)
-      return declinePaidRequest
-    })
+  // // 12.) Scenario: A request from agent1 to agent2, which agent 2 has paid, agent1 Declines AND Agent2 Cancels:
+  // // Part 1) : Agent 1 declines paid request HF from Agent 2; agent 2 cancels outstanding payment
+  // console.log('\nTEST SCENARIO #12 : Agent 1 declines Paid Request from Agent 2 and Agent 2 cancels outstanding declined payment')
+  // await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '1100' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log('transaction originId : ', originId)
+  //     await wait(6000)
+  //     console.log('Part 2 :')
+  //     // Part 2) : Agent 2 Pays HF in response to Agent 1's Request
+  //     const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, amount: '1100', request: originId })
+  //     console.log(' >> Pay Request Success Hash', payRequest)
+  //     // Part 3) : Agent 2 Accepts HF in response to Agent 1's Request
+  //     const declinePaidRequest = await createZomeCall('holofuel', 'transactions', 'decline_pending', agent1Index)({ origins: originId })
+  //     console.log(' >> Decline Paid Request Success Hash', declinePaidRequest)
+  //     return declinePaidRequest
+  //   })
 
   console.log('Waiting to allow for data propagation...')
   await wait(0)

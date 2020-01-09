@@ -271,6 +271,11 @@
   padding: 50px 50px 25px;
 }
 
+.decline-modal-message {
+  composes: modal-message;
+  padding: 50px 25px;
+}
+
 .modal-buttons {
   margin-bottom: 34px;
 }
@@ -294,4 +299,11 @@
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   background-color: var(--color-ocean-green);
+}
+
+.modal-button-return-funds {	
+  composes: modal-button;	
+  font-size: 1rem;	
+  font-weight: bolder;
+  width: 15rem;	
 }

@@ -425,7 +425,7 @@ function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisi
     isOpen={isDeclinedTransactionModalVisible}
     handleClose={handleClose}
     styleName='modal'>
-    <div styleName='modal-title'> {declinedTransactions.length} of your offers {declinedTransactions.length === 1 ? 'was' : 'were'} declined. {declinedTransactionSum} TF will be returned to your available balance.</div>
+    <div styleName='decline-modal-message'> {declinedTransactions.length} of your offers {declinedTransactions.length === 1 ? 'was' : 'were'} declined. {declinedTransactionSum} TF will be returned to your available balance.</div>
     <Button
       onClick={onYes}
       styleName='modal-button-return-funds'>
