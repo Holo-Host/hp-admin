@@ -17,7 +17,7 @@ function PageDivider ({
       styleName={classes}
       data-testid={dataTestId}
     >
-      <h6 styleName='divider-title'>{title}</h6>
+      {title}
     </div>
   )
 }
