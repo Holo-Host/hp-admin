@@ -130,8 +130,7 @@ const presentTruncatedAmount = (string, number = 15) => {
   return sliceHash(string, number)
 }
 
-export default function Inbox (props) {
-  // console.log('whoami in inbox', props)
+export default function Inbox () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { actionableTransactions, recentTransactions, declinedTransactions } = useUpdatedTransactionLists()

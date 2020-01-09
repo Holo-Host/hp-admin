@@ -45,7 +45,6 @@ export function PrimaryLayout ({
     }
   }, [filterActionableTransactionsByStatusAndType])
 
-  // console.log('holofuelUser IN PRIMARY LAYOUT :', holofuelUser)
   const childrenWithProps = React.Children.map(children, child => {
     if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })
   })
