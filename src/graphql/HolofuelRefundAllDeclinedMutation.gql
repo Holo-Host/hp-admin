@@ -1,0 +1,14 @@
+mutation HolofuelRefundAllDeclined ($listOfDeclinedTransactions:[CancelDeclinedTransactionsInput]) {
+  holofuelRefundAllDeclined (listOfDeclinedTransactions: $listOfDeclinedTransactions) {
+    id
+    amount
+    counterparty { id, nickname }
+    direction
+    status
+    type
+    timestamp
+    fees 
+    presentBalance
+    notes
+  }
+}

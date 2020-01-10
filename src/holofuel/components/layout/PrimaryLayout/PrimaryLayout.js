@@ -1,5 +1,7 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
+import { useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
+import { isEmpty } from 'lodash/fp'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -11,6 +13,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { TYPE, STATUS } from 'models/Transaction'
+import { INBOX_PATH } from 'holofuel/utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -31,6 +34,21 @@ export function PrimaryLayout ({
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
 
+  const history = useHistory()
+  const goToInbox = () => history.push(INBOX_PATH)
+
+  const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
+
+  useEffect(() => {
+    if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
+      goToInbox()
+    }
+  }, [filterActionableTransactionsByStatusAndType])
+
+  const childrenWithProps = React.Children.map(children, child => {
+    if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })
+  })
+
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
@@ -46,7 +64,7 @@ export function PrimaryLayout ({
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />
-      {children}
+      {childrenWithProps}
     </div>
   </div>
 }

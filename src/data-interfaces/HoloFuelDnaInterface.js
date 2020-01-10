@@ -6,7 +6,6 @@ import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
 
 export const currentDataTimeIso = () => new Date().toISOString()
-export const annulTransactionReason = 'I need to revert the transaction.'
 
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
@@ -21,7 +20,14 @@ export async function getTxCounterparties (transactionList) {
   return noDuplicatesAgentList
 }
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, reason }) => {
+const addFullCounterpartyToTx = async (tx) => {
+  const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })
+  return { ...tx, counterparty: fullCounterparty }
+}
+
+const getTxWithCounterparties = transactionList => promiseMap(transactionList, addFullCounterpartyToTx)
+
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -33,12 +39,11 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     type: TYPE.request,
     timestamp: eventTimestamp,
     notes: notes || event.Request.notes,
-    fees,
-    reason
+    fees
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, reason }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -50,8 +55,7 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     type: TYPE.offer,
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
-    fees,
-    reason
+    fees
   }
 }
 
@@ -110,47 +114,47 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest(declinedTx, true) : presentPendingOffer(declinedTx, true)
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
   return {
     ...transaction,
     status: STATUS.declined
   }
 }
 
-const presentCanceledTransaction = canceledTx => {
+const presentIncomingCanceledTransaction = canceledTx => {
   if (!canceledTx.event[2].Cancel.entry) throw new Error('The Canceled Transaction Entry (canceledTx.event[2].Cancel.entry) is UNDEFINED : ', canceledTx)
-  let { event } = canceledTx
+  let { event, provenance } = canceledTx
   event = [event[0], event[1], event[2].Cancel.entry]
   canceledTx = { ...canceledTx, event }
-  const transaction = !canceledTx.event[2].Cancel.entry.Request ? presentPendingRequest(canceledTx, false) : presentPendingOffer(canceledTx, false)
+  const transaction = canceledTx.event[2].Request ? presentPendingRequest(canceledTx, true) : presentPendingOffer(canceledTx, true)
+
   return {
     ...transaction,
-    status: STATUS.canceled
+    status: STATUS.canceled,
+    canceledBy: { id: provenance[0] }
   }
 }
 
-function presentPendingRequest (transaction, declined = false) {
-  let { event, provenance } = transaction
-  if (declined) event = transaction
+function presentPendingRequest (transaction, annuled = false) {
+  const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.outgoing // this indicates the recipient of funds. (Note: This is an actionable Tx.)
   const status = STATUS.pending
   const type = TYPE.request
   const eventTimestamp = event[1]
-  const counterpartyId = declined ? event[2].Request.from : provenance[0]
+  const counterpartyId = annuled ? event[2].Request.from : provenance[0]
   const { amount, notes, fee } = event[2].Request
   return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
-function presentPendingOffer (transaction, declined = false) {
-  let { event, provenance } = transaction
-  if (declined) event = transaction
+function presentPendingOffer (transaction, annuled = false) {
+  const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)
   const status = STATUS.pending
   const type = TYPE.offer
   const eventTimestamp = event[1]
-  const counterpartyId = declined ? event[2].Promise.tx.to : provenance[0]
+  const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
   return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
@@ -169,8 +173,8 @@ function presentTransaction (transaction) {
     }
 
     case 'canceled': {
-      if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled, reason: event.Cancel.reason })
-      if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled, reason: event.Cancel.reason })
+      if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
+      if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
       throw new Error('Canceled event did not have a Request or Promise event')
     }
     /* **************************  NOTE: ********************************** */
@@ -230,14 +234,16 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
+      const displayReadyCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
 
-      return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return displayReadyCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentCanceledTransaction))
+      const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentIncomingCanceledTransaction))
+      const displayReadyActionableTransactions = await getTxWithCounterparties(actionableTransactions)
 
-      return actionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return displayReadyActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
@@ -245,10 +251,11 @@ const HoloFuelDnaInterface = {
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
       const noDuplicateIdsWaitingList = _.uniqBy(listOfNonActionableTransactions, 'id')
       const listOfDeclinedTransactions = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
-      // Filter out transactions that share a TX ID with a Declined Transaction (FYI: pending declined txs (on the counterparty side?) will also result from a canceled tx..)
+      // Filter out transactions that share a TX ID with a Declined or Cancelled Transaction
       const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(noDuplicateIdsWaitingList, listOfDeclinedTransactions, 'id')
+      const displayReadyWaitingTransactions = await getTxWithCounterparties(uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending'))
 
-      return uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return displayReadyWaitingTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')()
@@ -274,7 +281,17 @@ const HoloFuelDnaInterface = {
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
 
-      return noDuplicateIds.filter(tx => tx.status !== 'pending').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      const whoami = await HoloFuelDnaInterface.user.get()
+      const nonActionableTransactionsWithCancelByKey = noDuplicateIds
+        .filter(tx => tx.status !== 'pending')
+        .map(tx => {
+          if (tx.status === STATUS.canceled) return { ...tx, canceledBy: whoami }
+          else return { ...tx, canceledBy: null }
+        })
+
+      const displayReadyNonActionableTransactions = await getTxWithCounterparties(nonActionableTransactionsWithCancelByKey)
+
+      return displayReadyNonActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
@@ -286,12 +303,17 @@ const HoloFuelDnaInterface = {
       }
     },
     /* NOTE: This is to allow handling of the other side of the transaction that was declined.  */
-    getPendingDeclined: async (transactionId) => {
+    getPendingDeclined: async (transactionId, { raw = false }) => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')({ origins: transactionId })
       const transactionArray = declinedResult.map(presentDeclinedTransaction)
 
       if (transactionArray.length === 0) {
         throw new Error(`no pending transaction with id ${transactionId} found.`)
+      } else if (raw) {
+        return {
+          rawTransaction: declinedResult[0][2],
+          transaction: transactionArray[0]
+        }
       } else {
         return transactionArray[0]
       }
@@ -303,35 +325,47 @@ const HoloFuelDnaInterface = {
       if (!declinedProof) throw new Error('Decline Error.', declinedProof)
       return {
         ...transaction,
-        id: transactionId,
-        status: STATUS.declined
+        id: transactionId
       }
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
     cancel: async (transactionId) => {
       const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'])
       const transaction = authoredRequests.find(authoredRequest => authoredRequest.id === transactionId)
-      const reason = annulTransactionReason
-      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: transactionId, reason })
-      if (!canceledProof) throw new Error('Decline Error.', canceledProof)
+      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: transactionId })
+      if (!canceledProof) throw new Error('Cancel Error.', canceledProof)
+
+      return {
+        ...transaction,
+        id: transactionId
+      }
+    },
+    /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */
+    recoverFunds: async (transactionId) => {
+      // const TX_DECLINED = 'declined-transaction'
+      const { rawTransaction, transaction } = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId, { raw: true })
+      const canceledProof = await createZomeCall('transactions/cancel')({ entry: rawTransaction })
+      if (!canceledProof) throw new Error('Recover Funds Error.', canceledProof)
 
       return {
         ...transaction,
         id: transactionId,
         status: STATUS.canceled
       }
-    }
-  },
-  /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */
-  recoverFunds: async (transactionId) => {
-    const reason = annulTransactionReason
-    const transaction = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId)
-    const canceledProof = await createZomeCall('transactions/cancel')({ entry: transaction, reason })
-    return {
-      ...transaction,
-      id: transactionId,
-      status: STATUS.canceled,
-      canceledReference: canceledProof
+    },
+    refundAllDeclined: async (listOfDeclinedTransactions) => {
+      const listOfTransactionIds = listOfDeclinedTransactions.map(({ id }) => id)
+      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
+      if (!canceledProof) throw new Error('Cancel Error.', canceledProof)
+
+      const canceledDeclined = listOfDeclinedTransactions.map(transaction => {
+        return {
+          ...transaction,
+          status: STATUS.canceled
+        }
+      })
+
+      return canceledDeclined
     }
   },
   requests: {
