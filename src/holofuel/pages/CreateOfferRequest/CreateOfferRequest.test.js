@@ -282,7 +282,7 @@ describe('CreateOfferRequest', () => {
       })
 
       expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
-      expect(within(getByTestId('counterparty-nickname')).getByText('Loading')).toBeInTheDocument()
+      expect(getByTestId('counterparty-loading')).toBeInTheDocument()
     })
 
     it('renders a clickable list of recent counterparties', async () => {

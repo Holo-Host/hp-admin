@@ -7,9 +7,10 @@ export default function Loading ({
   type = 'TailSpin',
   height = 60,
   width = 60,
-  className
+  className,
+  dataTestId
 }) {
-  return <div className={className}>
+  return <div className={className} data-testid={dataTestId}>
     <Loader
       type={type}
       color={color}

@@ -3,7 +3,6 @@ import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
-import Loader from 'react-loader-spinner'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
@@ -13,13 +12,13 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
+import Loading from 'components/Loading'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
-import { caribbeanGreen } from '../../../utils/colors'
 
 // TODO: these constants should come from somewhere more scientific
 export const FEE_PERCENTAGE = 0
@@ -60,7 +59,7 @@ const modePrepositions = {
 }
 
 export default function CreateOfferRequest ({ history: { push } }) {
-  const [numpadVisible, setNumpadVisible] = useState(false)
+  const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
@@ -90,7 +89,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     setFormValue('counterpartyId', id)
   }
 
-  const [amount, setAmountRaw] = useState(345)
+  const [amount, setAmountRaw] = useState(0)
   const setAmount = amount => setAmountRaw(Number(amount))
 
   const fee = (amount * FEE_PERCENTAGE) || 0
@@ -248,9 +247,9 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.
     return <>
-      <Loader
+      <Loading
+        dataTestId='counterparty-loading'
         type='ThreeDots'
-        color={caribbeanGreen}
         height={30}
         width={30} />
     </>

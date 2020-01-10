@@ -11,15 +11,17 @@ export default function RecentCounterparties ({ agents = [], selectedAgentId, se
 
   return <div styleName='recent-counterparties' className={className}>
     <h4 styleName='header'>Recent Peers</h4>
-    {/* {loading && <Loading styleName='loading' />} */}
-    {/* {!loading && isEmpty(agents) && <div>You have no recent peers.</div>} */}
-    {<div styleName='no-peers'>You have no recent peers.</div>}
-    {/* {recentAgents.map(agent => <AgentRow
+
+    {loading && <Loading styleName='loading' />}
+
+    {!loading && isEmpty(agents) && <div styleName='no-peers'>You have no recent peers.</div>}
+
+    {recentAgents.map(agent => <AgentRow
       agent={agent}
       selected={agent.id === selectedAgentId}
       selectThisAgent={() => selectAgent(agent.id)}
       key={agent.id}
-    />)} */}
+    />)}
   </div>
 }
 
