@@ -446,4 +446,22 @@ describe('AmountInput', () => {
     fireEvent.click(getByText('Send'))
     expect(getByText(`${presentHolofuelAmount('1.034')} TF`)).toBeInTheDocument()
   })
+
+  it('presses of < if string is empty', async () => {
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={[]}>
+      <CreateOfferRequest history={{ }} />
+    </MockedProvider>)
+
+    fireEvent.click(getByText('1'))
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('0'))
+    fireEvent.click(getByText('<'))
+    fireEvent.click(getByText('<'))
+    fireEvent.click(getByText('<'))
+    fireEvent.click(getByText('<'))
+
+    expect(getByTestId('amount').value).toEqual('0')
+    fireEvent.click(getByText('Send'))
+    expect(getByText(`${presentHolofuelAmount('0')} TF`)).toBeInTheDocument()
+  })
 })

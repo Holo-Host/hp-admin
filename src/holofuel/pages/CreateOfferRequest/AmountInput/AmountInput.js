@@ -8,7 +8,7 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
   const [inputValue, setInputValueRaw] = useState(String(amount))
 
   const setInputValue = value => {
-    const cleanValue = value.replace(/[^0-9.]/g, '') || 0 // strips non numerical characters
+    const cleanValue = value.replace(/[^0-9.]/g, '') || '0' // strips non numerical characters
     setInputValueRaw(cleanValue)
     setAmount(Number(cleanValue))
   }
@@ -17,9 +17,10 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
     // return early if trying to add a second .
     if (digit === '.' && /\./.test(inputValue)) return
 
-    setInputValue(String(inputValue) + String(digit))
+    setInputValue(inputValue + String(digit))
   }
-  const removeDigit = () => setInputValue(String(inputValue).slice(0, -1))
+
+  const removeDigit = () => setInputValue(inputValue.slice(0, -1))
 
   return <PrimaryLayout showAlphaFlag={false}>
     <div styleName='amount-input-container'>
