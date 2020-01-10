@@ -396,7 +396,7 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
   </Button>
 }
 
-function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
+export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
   const { newMessage } = useFlashMessageContext()
   if (declinedTransactions.length <= 0) return null
   const totalSum = (sum, currentAmount) => sum + currentAmount

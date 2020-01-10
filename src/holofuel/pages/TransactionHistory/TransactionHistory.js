@@ -99,8 +99,8 @@ export default function TransactionsHistory ({ history: { push } }) {
       {partitionedTransactions.map(({ label, transactions }) => <React.Fragment key={label}>
         <h4 styleName='partition-label'>{label}</h4>
         {transactions.map((transaction, index) => <TransactionRow
-          transaction={transaction}
           key={transaction.id}
+          transaction={transaction}
           showCancellationModal={showCancellationModal}
           isFirst={index === 0} />)}
       </React.Fragment>)}

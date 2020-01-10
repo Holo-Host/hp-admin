@@ -6,7 +6,7 @@ import { reverse } from 'lodash/fp'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
-import Inbox, { TransactionRow, ConfirmationModal } from './Inbox'
+import Inbox, { TransactionRow, ConfirmationModal, DeclinedTransactionModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
 import { TYPE } from 'models/Transaction'
 import { presentHolofuelAmount, getDateLabel } from 'utils'
@@ -17,10 +17,12 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+import HolofuelRefundAllDeclinedMutation from 'graphql/HolofuelRefundAllDeclinedMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 import { presentAgentId } from '../../../utils'
+import { STATUS } from '../../../models/Transaction'
 
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).reverse().map(item => {
   if (item.event[2].Request) {
@@ -459,6 +461,60 @@ describe('TransactionRow', () => {
 
       fireEvent.click(getByText('Decline'))
       expect(props.showConfirmationModal).toHaveBeenCalledWith(offer, 'decline')
+    })
+  })
+
+  describe('Cancel Declined Offer Modal', () => {
+    it('responds properly', async () => {
+      const mockCanceledTransaction = {
+        ...offer,
+        status: STATUS.canceled
+      }
+
+      const refundAllDeclinedMock = {
+        request: {
+          query: HolofuelRefundAllDeclinedMutation,
+          variables: { listOfDeclinedTransactions: [{
+            ...offer,
+            status: STATUS.declined
+          }] },
+          refetchQueries: [{
+            query: ledgerMock
+          }, {
+            query: actionableTransactionsMock
+          }]
+        },
+        result: {
+          data: { holofuelRefundAllDeclined: mockCanceledTransaction }
+        },
+        newData: jest.fn()
+      }
+
+      const props = {
+        handleClose: jest.fn(),
+        declinedTransactions: [{ ...offer, status: STATUS.declined }],
+        refundAllDeclinedTransactions: jest.fn(),
+        isDeclinedTransactionModalVisible: false
+      }
+
+      const mocks = [
+        whoamiMock,
+        offerMock,
+        actionableTransactionsMock,
+        refundAllDeclinedMock
+      ]
+
+      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <DeclinedTransactionModal {...props} />
+      </MockedProvider>, 0)
+
+      expect(getByText('Return all funds')).toBeInTheDocument()
+      await act(async () => {
+        fireEvent.click(getByText('Return all funds'))
+        await wait(0)
+      })
+      expect(props.handleClose).toHaveBeenCalledWith()
+      expect(refundAllDeclinedMock.newData).toHaveBeenCalled()
     })
   })
 })

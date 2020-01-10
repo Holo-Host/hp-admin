@@ -28,23 +28,12 @@ export const resolvers = {
 
     holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
 
-    // holofuelHomeCounterparties: async () => {
-    //   const completed = await HoloFuelDnaInterface.transactions.allCompleted()
-    //   return getTxCounterparties(completed)
-    // },
-
     holofuelHistoryCounterparties: async () => {
       const completed = await HoloFuelDnaInterface.transactions.allCompleted()
       const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
       const historyTransactions = completed.concat(waiting)
       return getTxCounterparties(historyTransactions)
     },
-
-    // holofuelInboxCounterparties: () => {
-    //   const historyTransactions = HoloFuelDnaInterface.transactions.allActionable()
-    //   const transactionCounterparties = historyTransactions.then(getTxCounterparties)
-    //   return transactionCounterparties
-    // },
 
     holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
 
