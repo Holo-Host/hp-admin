@@ -422,6 +422,10 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
       const cleanedCounterparty = pick(['id', 'nickname'], cleanedObj.counterparty)
       return { ...cleanedObj, counterparty: cleanedCounterparty }
     })
+
+    console.log('declinedTransactions : ', declinedTransactions)
+    console.log('cleanedTransactions : ', cleanedTransactions)
+
     refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
       newMessage(`Funds succesfully returned`, 5000)
     }).catch(() => {

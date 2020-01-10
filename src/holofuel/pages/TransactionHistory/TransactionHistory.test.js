@@ -82,7 +82,8 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 1,
       counterparty: {
-        id: agent1.id
+        id: agent1.id,
+        nickname: agent1.nickname
       },
       status: STATUS.completed,
       direction: DIRECTION.outgoing,
@@ -95,7 +96,8 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 2,
       counterparty: {
-        id: agent2.id
+        id: agent2.id,
+        nickname: agent2.nickname
       },
       status: STATUS.completed,
       direction: DIRECTION.incoming,
@@ -107,7 +109,8 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 3,
       counterparty: {
-        id: agent1.id
+        id: agent1.id,
+        nickname: agent1.nickname
       },
       status: STATUS.completed,
       direction: DIRECTION.outgoing,

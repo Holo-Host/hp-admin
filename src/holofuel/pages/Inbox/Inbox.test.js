@@ -492,9 +492,12 @@ describe('TransactionRow', () => {
 
       const props = {
         handleClose: jest.fn(),
-        declinedTransactions: [{ ...offer, status: STATUS.declined }],
-        refundAllDeclinedTransactions: jest.fn(),
-        isDeclinedTransactionModalVisible: false
+        isDeclinedTransactionModalVisible: true,
+        declinedTransactions: [{ ...offer,
+          status: STATUS.declined,
+          counterparty: { id: 'last 6', nickname: 'my name' }
+        }],
+        refundAllDeclinedTransactions: refundAllDeclinedMock.result.data.holofuelRefundAllDeclined
       }
 
       const mocks = [
