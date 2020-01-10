@@ -9,7 +9,6 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import TransactionHistory, { TransactionRow, ConfirmCancellationModal } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
@@ -41,23 +40,25 @@ const defaultTransaction = {
   notes: ''
 }
 
+const balance = '39085'
+const ledgerMock = {
+  request: { query: HolofuelLedgerQuery },
+  result: {
+    data: {
+      holofuelLedger: {
+        balance,
+        credit: 0,
+        payable: 0,
+        receivable: 0,
+        fees: 0
+      }
+    }
+  }
+}
+
 describe('TransactionHistory', () => {
   describe('With a balance and no transactions', () => {
-    const balance = '39085'
-    const mocks = [{
-      request: { query: HolofuelLedgerQuery },
-      result: {
-        data: {
-          holofuelLedger: {
-            balance,
-            credit: 0,
-            payable: 0,
-            receivable: 0,
-            fees: 0
-          }
-        }
-      }
-    }]
+    const mocks = [ledgerMock]
 
     it('renders the balance and the empty state', async () => {
       const push = jest.fn()
@@ -123,6 +124,7 @@ describe('TransactionHistory', () => {
     ]
 
     const mocks = [
+      ledgerMock,
       {
         request: {
           query: HolofuelCompletedTransactionsQuery
@@ -137,14 +139,6 @@ describe('TransactionHistory', () => {
         },
         result: {
           data: { holofuelWaitingTransactions: pendingTransactions }
-        }
-      },
-      {
-        request: {
-          query: HolofuelHistoryCounterpartiesQuery
-        },
-        result: {
-          data: { holofuelHistoryCounterparties: [agent1, agent2] }
         }
       }
     ]
