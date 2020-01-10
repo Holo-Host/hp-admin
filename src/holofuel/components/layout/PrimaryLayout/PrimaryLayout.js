@@ -34,8 +34,8 @@ export function PrimaryLayout ({
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
 
-  const history = useHistory()
-  const goToInbox = () => history.push(INBOX_PATH)
+  const { push } = useHistory()
+  const goToInbox = () => push(INBOX_PATH)
 
   const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
@@ -43,7 +43,7 @@ export function PrimaryLayout ({
     if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
       goToInbox()
     }
-  }, [filterActionableTransactionsByStatusAndType])
+  }, [filterActionableTransactionsByStatusAndType, goToInbox])
 
   const childrenWithProps = React.Children.map(children, child => {
     if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })
