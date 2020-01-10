@@ -86,9 +86,8 @@ in
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
-      holochain-cli
-      holochain-conductor
-      nodejs-12_x
+      holochain-rust
+      nodejs
       pkgconfig
       cairo
       giflib
@@ -133,9 +132,8 @@ in
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
-      holochain-cli
-      holochain-conductor
-      nodejs-12_x
+      holochain-rust
+      nodejs
       pkgconfig
       cairo
       giflib
