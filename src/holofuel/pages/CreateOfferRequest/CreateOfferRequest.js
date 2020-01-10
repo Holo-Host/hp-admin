@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
@@ -7,29 +7,28 @@ import Loader from 'react-loader-spinner'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
-import Button from 'holofuel/components/Button'
+import Button from 'components/UIButton'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
+import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
-export const FEE_PERCENTAGE = 0.01
+export const FEE_PERCENTAGE = 0
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
   counterpartyId: yup.string()
     .required()
     .length(AGENT_ID_LENGTH)
-    .trim(),
-  amount: yup.number()
-    .required()
-    .positive()
+    .trim()
 })
 
 function useOfferMutation () {
@@ -60,13 +59,16 @@ const modePrepositions = {
 }
 
 export default function CreateOfferRequest ({ history: { push } }) {
+  const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
 
+  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
 
-  const { newMessage } = useFlashMessageContext()
+  const { newMessage: newMessageRaw } = useFlashMessageContext()
+  const newMessage = useCallback(newMessageRaw, [newMessageRaw])
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
@@ -74,7 +76,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
-  }, [counterpartyId])
+    if (counterpartyId === whoami.id) {
+      newMessage('You cannot send yourself TestFuel.', 5000)
+    }
+  }, [whoami.id, counterpartyId, newMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
@@ -83,17 +88,13 @@ export default function CreateOfferRequest ({ history: { push } }) {
     setFormValue('counterpartyId', id)
   }
 
-  const [fee, setFee] = useState(0)
-  const [total, setTotal] = useState(0)
+  const [amount, setAmountRaw] = useState(0)
+  const setAmount = amount => setAmountRaw(Number(amount))
 
-  const onAmountChange = amount => {
-    if (isNaN(amount)) return
-    const newFee = Number(amount) * FEE_PERCENTAGE
-    setFee(newFee)
-    setTotal(Number(amount) + newFee)
-  }
+  const fee = (amount * FEE_PERCENTAGE) || 0
+  const total = amount + fee
 
-  const onSubmit = ({ amount, counterpartyId, notes }) => {
+  const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
       case OFFER_MODE:
         createOffer(amount, counterpartyId, notes)
@@ -113,92 +114,112 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 
-  return <PrimaryLayout headerProps={{ title }}>
+  const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
+    !isCounterpartyFound ||
+    counterpartyId === whoami.id ||
+    amount < 0
+
+  if (numpadVisible) {
+    const chooseSend = () => {
+      setMode(OFFER_MODE)
+      setNumpadVisible(false)
+    }
+
+    const chooseRequest = () => {
+      setMode(REQUEST_MODE)
+      setNumpadVisible(false)
+    }
+
+    return <AmountInput amount={amount} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
+  }
+
+  return <PrimaryLayout headerProps={{ title }} showAlphaFlag={false}>
+    <div styleName='amount-backdrop' />
+    <div styleName='amount-banner'>
+      <h4 styleName='amount-label'>
+        {title}
+      </h4>
+      <div styleName='amount'>
+        {presentHolofuelAmount(amount)} TF
+      </div>
+      <div styleName='fee-notice'>
+        {mode === OFFER_MODE
+          ? `A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`
+          : ' '}
+      </div>
+    </div>
+
     <div styleName='mode-toggle'>
-      {[OFFER_MODE, REQUEST_MODE].map(buttonMode =>
-        <Button styleName={cx('mode-toggle-button', { selected: buttonMode === mode })}
+      {[OFFER_MODE, REQUEST_MODE].map((buttonMode, i) =>
+        <Button styleName={cx('mode-toggle-button', { 'left-button': i === 0, 'right-button': i === 1, selected: buttonMode === mode })}
+          variant='white'
           onClick={() => setMode(buttonMode)}
           key={buttonMode}>
           {modeVerbs[buttonMode]}
         </Button>)}
     </div>
+
     <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
       <div styleName='form-row'>
-        <label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}</label>
-        <input
-          name='counterpartyId'
-          id='counterpartyId'
-          styleName='form-input'
-          placeholder='Who is this for?'
-          ref={register}
-          onChange={({ target: { value } }) => setCounterpartyId(value)} />
-        <div styleName='hash-and-nick'>
-          {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
-          {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname'>
-            <RenderNickname
-              agentId={counterpartyId}
-              setCounterpartyNick={setCounterpartyNick}
-              counterpartyNick={counterpartyNick}
-              setCounterpartyFound={setCounterpartyFound}
-              newMessage={newMessage} />
-          </h4>}
+        <div><label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}:</label></div>
+        <div styleName='input-row'>
+          <input
+            name='counterpartyId'
+            id='counterpartyId'
+            styleName='form-input'
+            placeholder='Who is this for?'
+            ref={register}
+            onChange={({ target: { value } }) => setCounterpartyId(value)} />
+          <div styleName='hash-and-nick'>
+            {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
+            {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname' styleName='nickname'>
+              <RenderNickname
+                agentId={counterpartyId}
+                setCounterpartyNick={setCounterpartyNick}
+                counterpartyNick={counterpartyNick}
+                setCounterpartyFound={setCounterpartyFound}
+                newMessage={newMessage} />
+            </h4>}
+          </div>
         </div>
       </div>
       <div styleName='form-row'>
-        <label htmlFor='amount' styleName='form-label'>Amount</label>
+        <div><label htmlFor='notes' styleName='form-label'>For:</label></div>
         <input
-          name='amount'
-          id='amount'
-          type='number'
-          styleName='number-input'
-          ref={register}
-          onChange={({ target: { value } }) => onAmountChange(value)} />
-        <span styleName='hf'>TF</span>
+          name='notes'
+          id='notes'
+          styleName='form-input'
+          placeholder='What is this for?'
+          ref={register} />
+        <div />
       </div>
-      {mode === OFFER_MODE && <div styleName='form-row'>
-        <label htmlFor='fee' styleName='form-label'>Fee (1%)</label>
-        <input
-          name='fee'
-          id='fee'
-          value={fee.toFixed(2)}
-          readOnly
-          styleName='readonly-input' />
-        <span styleName='hf'>TF</span>
-      </div>}
-      <div styleName='form-row'>
-        <label htmlFor='total' styleName='form-label'>Total</label>
-        <input
-          name='total'
-          id='total'
-          value={total.toFixed(2)}
-          readOnly
-          styleName='readonly-input' />
-        <span styleName='hf'>TF</span>
-      </div>
-      <textarea
-        styleName='notes-input'
-        name='notes'
-        placeholder='What is this for?'
-        ref={register} />
 
-      <RecentCounterparties
-        styleName='recent-counterparties'
-        agents={agents}
-        selectedAgentId={counterpartyId}
-        selectAgent={selectAgent} />
-      <Button type='submit' dataTestId='submit-button' wide variant='secondary' styleName='send-button' disabled={counterpartyId.length === AGENT_ID_LENGTH ? !isCounterpartyFound : true}>Send</Button>
+      <div styleName='total'>Total Amount: {presentHolofuelAmount(total)} TF</div>
+
+      <Button
+        type='submit'
+        dataTestId='submit-button'
+        variant='green'
+        styleName={cx('send-button', { disabled: disableSubmit })}
+        disabled={disableSubmit}>{title}</Button>
     </form>
+
+    <RecentCounterparties
+      styleName='recent-counterparties'
+      agents={agents}
+      selectedAgentId={counterpartyId}
+      selectAgent={selectAgent} />
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage, whoami }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
   const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
 
-  const { nickname, notFound } = holofuelCounterparty
+  const { nickname, notFound, id } = holofuelCounterparty
   useEffect(() => {
     setCounterpartyNick(nickname)
   }, [setCounterpartyNick, nickname])
@@ -219,7 +240,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
       setCounterpartyFound(false)
       setHasDisplayedNotFoundMessage(false)
     }
-  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage])
+  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage, id])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.

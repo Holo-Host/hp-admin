@@ -5,7 +5,6 @@ import './Header.module.css'
 import { withRouter } from 'react-router'
 import MenuIcon from 'components/icons/MenuIcon'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
-import { presentAgentId } from 'utils'
 
 export function Header ({ title, agent, agentLoading, avatarUrl, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
@@ -21,20 +20,15 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
         {leftNav}
       </div>
       <div styleName='center-nav'>
-        <span styleName='title header-font'>
-          {title && <section styleName='page-header'>
-            <div styleName='page-title'>{title}</div>
-          </section>}
-        </span>
+        {title && <div styleName='page-header'>
+          <div styleName='page-title'>{title}</div>
+        </div>}
       </div>
-      <div styleName='right-nav account-number header-font'>
+      <div>
         <CopyAgentId agent={agent} isMe>
-          {agent.nickname || presentAgentId(agent.id)}
+          <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} dataTestId='hash-icon' />
         </CopyAgentId>
       </div>
-      <CopyAgentId agent={agent} isMe>
-        <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} data-testid='hash-icon' />
-      </CopyAgentId>
     </section>
   </header>
 }

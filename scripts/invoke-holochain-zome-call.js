@@ -1,8 +1,8 @@
 const initAndGetHolochainClient = require('./holochain-client.js')
 
 // Zome Call :
-const holochainZomeCall = async (instance, zomeName, zomeFuncName, args = {}) => {
-  const { callZome } = await initAndGetHolochainClient()
+const holochainZomeCall = async (instance, zomeName, zomeFuncName, args = {}, agentIndex = 0) => {
+  const { callZome } = await initAndGetHolochainClient(agentIndex)
 
   console.log('------------------------------------------------------------------')
   console.log(` ARGS for the current /${zomeFuncName.toUpperCase()}/ ZomeCall : `, args)

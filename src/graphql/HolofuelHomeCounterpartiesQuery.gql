@@ -1,0 +1,6 @@
+query HolofuelHomeCounterparties {
+  holofuelHomeCounterparties {
+    id
+    nickname
+  }
+}

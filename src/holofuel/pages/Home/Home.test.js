@@ -5,7 +5,7 @@ import Home from './Home'
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelHomeCounterpartiesQuery from 'graphql/HolofuelHomeCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
@@ -63,7 +63,7 @@ describe('Home', () => {
       expect(getByText(`Hi ${nickname}!`)).toBeInTheDocument()
 
       history.push.mockReset()
-      fireEvent.click(getByText('Send / Request'))
+      fireEvent.click(getByText('New Transaction'))
       expect(history.push).toHaveBeenCalledWith(OFFER_REQUEST_PATH)
 
       expect(getByText(`${presentHolofuelAmount(balance)} TF`)).toBeInTheDocument()
@@ -130,11 +130,11 @@ describe('Home', () => {
       },
       {
         request: {
-          query: HolofuelHistoryCounterpartiesQuery
+          query: HolofuelHomeCounterpartiesQuery
         },
         result: {
           data: {
-            holofuelHistoryCounterparties: transactions.map(transaction => transaction.counterparty)
+            holofuelHomeCounterparties: transactions.map(transaction => transaction.counterparty)
           }
         }
       }
@@ -157,8 +157,8 @@ describe('Home', () => {
         expect(getByText(notes)).toBeInTheDocument()
 
         const presentedAmount = direction === DIRECTION.incoming
-          ? `+ ${presentHolofuelAmount(amount)}`
-          : `- ${presentHolofuelAmount(amount)}`
+          ? `${presentHolofuelAmount(amount)} TF`
+          : `- ${presentHolofuelAmount(amount)} TF`
 
         expect(getByText(presentedAmount)).toBeInTheDocument()
         expect(getByText(counterparty.nickname)).toBeInTheDocument()

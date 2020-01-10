@@ -33,6 +33,7 @@ TransactionHistory.mockImplementation(makeMockHFPage('TransactionHistory'))
 
 const testLinks = ui => {
   const { getByText } = render(ui)
+
   expect(getByText('Home')).toBeInTheDocument()
 
   fireEvent.click(getByText('inbox'))

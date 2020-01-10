@@ -9,6 +9,7 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
+import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { TYPE, STATUS } from 'models/Transaction'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
@@ -16,11 +17,12 @@ import 'holofuel/global-styles/index.css'
 
 export function PrimaryLayout ({
   children,
-  headerProps = {}
+  headerProps = {},
+  showAlphaFlag = true
 }) {
-  const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'network-only' })
+  const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelLedger: { balance: holofuelBalance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
   const inboxCount = actionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request))).length
 
@@ -38,8 +40,10 @@ export function PrimaryLayout ({
       agentLoading={holofuelUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
+      ledgerLoading={ledgerLoading}
       isWide={isWide}
     />
+    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />
       {children}

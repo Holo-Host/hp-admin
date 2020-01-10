@@ -121,13 +121,14 @@ type Query {
   holofuelLedger: Ledger
   holofuelUser: HolofuelUser
   holofuelCounterparty(agentId: String!): HolofuelUser
+  holofuelHomeCounterparties: [HolofuelUser]
   holofuelHistoryCounterparties: [HolofuelUser]
   holofuelInboxCounterparties: [HolofuelUser]
   hposSettings: HposSettings
   hposStatus: HposStatus
 }
 
-type Mutation { 
+type Mutation {
   registerUser(name: String, avatarUrl: String): Me
   registerHostingUser: HhaUser
   enableHapp(appId: String): Happ
@@ -135,7 +136,7 @@ type Mutation {
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
   holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
   holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
-  holofuelAcceptOffer(transactionId: ID): Transaction 
+  holofuelAcceptOffer(transactionId: ID): Transaction
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
   holofuelRecoverFunds(transaction: ID): Transaction

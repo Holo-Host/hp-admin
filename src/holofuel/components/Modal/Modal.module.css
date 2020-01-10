@@ -1,13 +1,7 @@
 .container {
-  max-width: 90%;
-  margin: 0 auto;
   top: 30%;
   background-color: white;
-  border: 1px solid black;
-  border-radius: 1px;
-  padding: 50px;
   position: relative;
-
   box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(27.1828px);
 }

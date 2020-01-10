@@ -5,12 +5,12 @@ import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
-import PlusIcon from 'components/icons/PlusIcon'
+import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentHolofuelAmount, getCommunityUrl } from 'utils'
+import { presentHolofuelAmount } from 'utils'
 import cx from 'classnames'
 import './Dashboard.module.css'
 
@@ -41,7 +41,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
     {false && <Card title='Hosting' linkTo='/admin/browse-happs' subtitle='Manage your Holo applications'>
       <div styleName='hosting-content' data-testid='hosted-apps'>
         {noInstalledHapps === 0 && <>
-          <PlusInDiscIcon />Host your first hApp!
+          <PlusInDiscIcon color='#06C470' />Host your first hApp!
         </>}
         {noInstalledHapps > 0 && <>
           <LaptopIcon styleName='laptop-icon' color='rgba(44, 63, 89, 0.80)' /> {noInstalledHapps} hApp{noInstalledHapps > 1 && 's'}
@@ -60,7 +60,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    <Card title='HoloFuel' linkTo='/admin/holofuel' subtitle='Send, and receive TestFuel'>
+    <Card title='HoloFuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Balance
@@ -71,7 +71,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>
 
-    <Card title='Community' linkTo={getCommunityUrl()} subtitle='Connect with your peers' />
+    <Card title='Community' linkTo={'/community/'} subtitle='Connect with your peers' />
   </PrimaryLayout>
 }
 
@@ -81,12 +81,6 @@ function Card ({ title, subtitle, linkTo, children }) {
     <h3 styleName='card-subtitle'>{subtitle}</h3>
     {children}
   </MixedLink>
-}
-
-function PlusInDiscIcon () {
-  return <div styleName='disc-icon'>
-    <PlusIcon styleName='plus-icon' color='#06C470' />
-  </div>
 }
 
 // a react-router link that can also take an external url

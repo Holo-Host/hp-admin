@@ -24,7 +24,13 @@ export function presentAgentId (agentId) {
 }
 
 export function presentHolofuelAmount (amount) {
-  return Number.parseFloat(amount).toLocaleString()
+  const hasTrailingDot = /\.$/.test(amount)
+  const parsed = Number.parseFloat(amount).toLocaleString()
+  if (hasTrailingDot) {
+    return parsed + '.'
+  } else {
+    return parsed
+  }
 }
 
 export function presentDateAndTime (dateTime) {
@@ -96,8 +102,4 @@ function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
     }
     // Throw Error, iso-timedate cannot be parsed into valid format
   } else throw new Error('Iso timedate is unable to be parsed.', isoDate)
-}
-
-export function getCommunityUrl () {
-  return window.location.protocol + '//' + window.location.host + '/community/'
 }
