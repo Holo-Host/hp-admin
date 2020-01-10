@@ -497,7 +497,7 @@ describe('TransactionRow', () => {
           status: STATUS.declined,
           counterparty: { id: 'last 6', nickname: 'my name' }
         }],
-        refundAllDeclinedTransactions: refundAllDeclinedMock.result.data.holofuelRefundAllDeclined
+        refundAllDeclinedTransactions: jest.fn()
       }
 
       const mocks = [

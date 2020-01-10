@@ -371,8 +371,37 @@ export const pendingList = {
       ]
     }
   ],
-  // TODO: >> RESOLVE QUESTION: Is this an Anti-Faud measure (?? => determine use case of actionable decline event) >> Spender must accept Spender's proposed decline of a offered HF ??
-  declined: [],
+  declined: [[
+    'QmYrTWtzTcqA5N75Za5pjcd2RE5HbJj9W5xBBeTi8WtTPL',
+    '2020-01-10T21:40:48+00:00',
+    {
+      Request: {
+        amount: '900',
+        deadline: '2019-12-31T21:39:40.697+00:00',
+        fee: '9',
+        from: 'HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi',
+        notes: 'Pre-Seed Data',
+        synchronous: null,
+        to: 'HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi',
+      }
+    }
+  ], [
+    'QmcH3rDq94ENu5gkZHHMTiNG2ocF6qns3NdQBwU7ZeN3pW',
+    '2020-01-10T21:40:11+00:00',
+    {
+      Promise: {
+        tx: {
+          amount: '600',
+          deadline: '2019-12-31T21:39:40.697+00:00',
+          fee: '6',
+          from: 'HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi',
+          notes: 'Pre-Seed Data',
+          synchronous: null,
+          to: 'HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi',
+        }
+      }
+    }
+  ]],
   // NOTE: This is to allow Spender Refunds >> Recipient must accept proposed cancelation of a completed Transfer, in order for the Spender to be refunded.
   canceled: []
 }

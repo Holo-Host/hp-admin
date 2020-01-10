@@ -412,7 +412,7 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
   const totalSum = (sum, currentAmount) => sum + currentAmount
   const declinedTransactionSum = declinedTransactions.map(({ amount, fees }) => amount + fees).reduce(totalSum, 0)
 
-  const onYes = () => {
+  const returnAndClose = () => {
     newMessage(<>
       <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
     </>, 5000)
@@ -422,9 +422,6 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
       const cleanedCounterparty = pick(['id', 'nickname'], cleanedObj.counterparty)
       return { ...cleanedObj, counterparty: cleanedCounterparty }
     })
-
-    console.log('declinedTransactions : ', declinedTransactions)
-    console.log('cleanedTransactions : ', cleanedTransactions)
 
     refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
       newMessage(`Funds succesfully returned`, 5000)
@@ -437,11 +434,11 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
   return <Modal
     contentLabel={'Restore funds from declined offer.'}
     isOpen={isDeclinedTransactionModalVisible}
-    handleClose={handleClose}
+    handleClose={returnAndClose}
     styleName='modal'>
     <div styleName='decline-modal-message'> {declinedTransactions.length} of your offers {declinedTransactions.length === 1 ? 'was' : 'were'} declined. {declinedTransactionSum} TF will be returned to your available balance.</div>
     <Button
-      onClick={onYes}
+      onClick={returnAndClose}
       styleName='modal-button-return-funds'>
       Return all funds
     </Button>

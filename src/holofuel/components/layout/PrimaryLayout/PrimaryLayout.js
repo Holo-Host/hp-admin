@@ -27,6 +27,8 @@ export function PrimaryLayout ({
   const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
+  const [hasCalledReroute, setHasCalledReroute] = useState(false)
+
   const inboxCount = actionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request))).length
 
   const isWide = useContext(ScreenWidthContext)
@@ -35,7 +37,12 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   const { push } = useHistory()
-  const goToInbox = () => useCallback(() => push(INBOX_PATH))
+  const goToInbox = useCallback(() => {
+    if (!hasCalledReroute) {
+      push(INBOX_PATH)
+      setHasCalledReroute(true)
+    }
+  })
 
   const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
