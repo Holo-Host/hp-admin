@@ -3,7 +3,6 @@ import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
-import Loader from 'react-loader-spinner'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
@@ -13,6 +12,7 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
+import Loading from 'components/Loading'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
@@ -63,10 +63,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== whoami.id)
+
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
-
   const { newMessage: newMessageRaw } = useFlashMessageContext()
   const newMessage = useCallback(newMessageRaw, [newMessageRaw])
 
@@ -206,9 +207,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
     <RecentCounterparties
       styleName='recent-counterparties'
-      agents={agents}
+      agents={recentCounterpartiesWithoutMe}
       selectedAgentId={counterpartyId}
-      selectAgent={selectAgent} />
+      selectAgent={selectAgent}
+      loading={loadingRecentCounterparties} />
   </PrimaryLayout>
 }
 
@@ -245,14 +247,11 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.
     return <>
-      <Loader
+      <Loading
+        dataTestId='counterparty-loading'
         type='ThreeDots'
-        color='#00BFFF'
         height={30}
-        width={30}
-        timeout={3000}
-      />
-       Loading
+        width={30} />
     </>
   }
 

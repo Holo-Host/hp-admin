@@ -22,6 +22,7 @@ import Loader from 'react-loader-spinner'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
+import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
@@ -83,8 +84,8 @@ function useCounterparty (agentId) {
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelInboxCounterparties = [] } = {} } = useQuery(HolofuelInboxCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
-  const { data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
@@ -102,7 +103,9 @@ function useTransactionsWithCounterparties () {
 
   return {
     actionableTransactions: updatedActionableWOCanceledOffers,
-    recentTransactions: updatedNonPendingTransactions
+    recentTransactions: updatedNonPendingTransactions,
+    actionableLoading,
+    recentLoading
   }
 }
 
@@ -118,7 +121,8 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { actionableTransactions, recentTransactions } = useTransactionsWithCounterparties()
+  const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useTransactionsWithCounterparties()
+
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -136,12 +140,15 @@ export default function Inbox ({ history: { push } }) {
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
+  let isDisplayLoading
   switch (inboxView) {
     case VIEW.actionable:
       displayTransactions = actionableTransactions
+      isDisplayLoading = actionableLoading
       break
     case VIEW.recent:
       displayTransactions = recentTransactions
+      isDisplayLoading = recentLoading
       break
     default:
       throw new Error('Invalid inboxView: ' + inboxView)
@@ -177,7 +184,11 @@ export default function Inbox ({ history: { push } }) {
       </div>
     </Jumbotron>
 
-    {isDisplayTransactionsEmpty && <>
+    {isDisplayLoading && <>
+      <Loading styleName='display-loading' />
+    </>}
+
+    {isDisplayTransactionsEmpty && !isDisplayLoading && <>
       <PageDivider title='Today' />
       <NullStateMessage
         styleName='null-state-message'
