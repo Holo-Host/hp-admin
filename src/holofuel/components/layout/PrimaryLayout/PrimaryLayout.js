@@ -35,7 +35,7 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   const { push } = useHistory()
-  const goToInbox = () => push(INBOX_PATH)
+  const goToInbox = () => useCallback(() => push(INBOX_PATH))
 
   const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
