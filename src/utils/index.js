@@ -14,6 +14,11 @@ export async function promiseMap (array, fn) {
   return resolved
 }
 
+export function sliceAmount (hashString = '', desiredLength = 6) {
+  if (typeof desiredLength !== 'number') throw new Error('Fn sliceAmount requires a number input.')
+  return (hashString).slice(0, desiredLength)
+}
+
 export function sliceHash (hashString = '', desiredLength = 6) {
   if (typeof desiredLength !== 'number') throw new Error('Fn sliceHash requires a number input.')
   return (hashString).slice(-desiredLength)

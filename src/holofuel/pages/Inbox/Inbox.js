@@ -25,7 +25,7 @@ import HashAvatar from 'components/HashAvatar'
 import AddIcon from 'components/icons/AddIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } from 'utils'
+import { presentAgentId, presentHolofuelAmount, sliceAmount, partitionByDate } from 'utils'
 import { Link } from 'react-router-dom'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS } from 'models/Transaction'
@@ -112,8 +112,8 @@ const VIEW = {
 }
 
 const presentTruncatedAmount = (string, number = 15) => {
-  if (string.length > number) return `${sliceHash(string, number)}...`
-  return sliceHash(string, number)
+  if (string.length > number) return `${sliceAmount(string, number)}...`
+  return sliceAmount(string, number)
 }
 
 export default function Inbox () {
@@ -319,6 +319,8 @@ function ActionOptions ({ isOffer, isRequest, transaction, showConfirmationModal
 }
 
 function AmountCell ({ amount, isRequest, isOffer, isActionable, isCanceled, isDeclined }) {
+  console.log('TRANSACTION AMOUNT >> ', amount)
+
   const amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
   return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && isDeclined) }, { credit: (isOffer && isActionable) || (isRequest && isDeclined) }, { removed: isDeclined || isCanceled })}>
     {amountDisplay} TF
