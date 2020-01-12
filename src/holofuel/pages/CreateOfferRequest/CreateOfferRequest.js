@@ -93,7 +93,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const setAmount = amount => setAmountRaw(Number(amount))
 
   const fee = (amount * FEE_PERCENTAGE) || 0
-  const total = amount + fee
+  const total = mode === OFFER_MODE
+    ? amount + fee
+    : amount
 
   const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
@@ -140,12 +142,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
       <h4 styleName='amount-label'>
         {title}
       </h4>
-      <div styleName='amount'>
+      <div styleName='amount' onClick={() => setNumpadVisible(true)}>
         {presentHolofuelAmount(amount)} TF
       </div>
       <div styleName='fee-notice'>
         {mode === OFFER_MODE
-          ? `A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`
+          ? `For TestFuel, a ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`
           : ' '}
       </div>
     </div>
