@@ -191,14 +191,12 @@ export default function Inbox ({ history: { push } }) {
 
   const disableActionedTransaction = transactionId => {
     if (hasTransactionBeenActioned.idList) {
-      const txList = hasTransactionBeenActioned.idList.find(txid => txid === transactionId)
-      console.log('transactionId, : ', transactionId)
-      console.log('txList, : ', txList)
-      return txList
+      return hasTransactionBeenActioned.idList.find(txid => txid === transactionId)
     } else return false
   }
   const increaseAction = () => includes(DIRECTION.incoming, hasTransactionBeenActioned)
   const decreseAction = () => includes(DIRECTION.outgoing, hasTransactionBeenActioned)
+  const statusQuoAction = () => includes('status-quo', hasTransactionBeenActioned)
 
   return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
     <Jumbotron
@@ -258,6 +256,7 @@ export default function Inbox ({ history: { push } }) {
             disableActionedTransaction={disableActionedTransaction}
             increaseAction={increaseAction}
             decreseAction={decreseAction}
+            statusQuoAction={statusQuoAction}
             key={transaction.id} />)}
         </div>
       </React.Fragment>)}
@@ -278,11 +277,12 @@ export default function Inbox ({ history: { push } }) {
       declineTransaction={declineTransaction}
       refundTransaction={refundTransaction}
       setCounterpartyNotFound={setCounterpartyNotFound}
-      counterpartyNotFound={counterpartyNotFound} />
+      counterpartyNotFound={counterpartyNotFound}
+      setHasTransactionBeenActioned={setHasTransactionBeenActioned} />
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, showConfirmationModal, isActionable, whoami, disableActionedTransaction, increaseAction, decreseAction }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, showConfirmationModal, isActionable, whoami, disableActionedTransaction, increaseAction, decreseAction, statusQuoAction }) {
   const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy } = transaction
   const agent = canceledBy || counterparty
 
@@ -314,14 +314,15 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   } else fullNotes = notes
 
   const disabledTransaction = disableActionedTransaction(transaction.id)
-  let higlightGreen, highlightRed
+  let higlightGreen, highlightRed, highlightNeutral
   if (disabledTransaction) {
-    higlightGreen = increaseAction
-    highlightRed = decreseAction
+    higlightGreen = increaseAction()
+    highlightRed = decreseAction()
+    highlightNeutral = statusQuoAction()
   }
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disable: disabledTransaction }, { higlightGreen }, { highlightRed })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disable: disabledTransaction }, { higlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -476,7 +477,7 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
   </Modal>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound, setHasTransactionBeenActioned }) {
   const { newMessage } = useFlashMessageContext()
   const { id, amount, type, action } = transaction
   const { counterparty = {} } = transaction
@@ -513,10 +514,11 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
   }, [transaction, loaderCounterparty, setCounterpartyNotFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, notFound, holofuelCounterparty, setHasDisplayedFetchingCounterpartyMessage, hasDisplayedFetchingCounterpartyMessage, newMessage])
 
-  let message, actionHook, actionParams, contentLabel, flashMessage
+  let message, actionHook, actionParams, contentLabel, flashMessage, transactionDirection
   switch (action) {
     case 'pay': {
       contentLabel = 'Pay request'
+      transactionDirection = DIRECTION.outgoing
       actionParams = { id, amount, counterparty }
       actionHook = payTransaction
       message = <>
@@ -527,6 +529,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
     case 'acceptOffer': {
       contentLabel = 'Accept offer'
+      transactionDirection = DIRECTION.incoming
       actionParams = { id }
       actionHook = acceptOffer
       message = <>
@@ -537,6 +540,8 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
     case 'decline': {
       contentLabel = `Decline ${type}?`
+      // TODO: Determine if we want to show a different highlight color for 'decline action' as they don't (negative / positively) affect the balance
+      transactionDirection = 'status-quo'
       actionParams = { id }
       actionHook = declineTransaction
       if (type === 'offer') {
@@ -554,6 +559,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
     case 'cancel': {
       contentLabel = `Cancel ${type}?`
+      transactionDirection = 'status-quo'
       actionParams = { id }
       actionHook = refundTransaction
       message = <>Cancel your declined {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {type === TYPE.offer ? 'to' : 'from'} <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>?<br /><br /><div styleName='modal-note-text'>Note: Canceling will credit your balance by the outstanding amount.</div></>
@@ -570,6 +576,11 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     newMessage(<>
       <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
     </>, 5000)
+
+    setHasTransactionBeenActioned({
+      direction: transactionDirection,
+      idList: [id]
+    })
 
     actionHook(actionParams).then(() => {
       newMessage(flashMessage, 5000)

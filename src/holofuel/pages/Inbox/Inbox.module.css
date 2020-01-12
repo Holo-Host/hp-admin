@@ -193,11 +193,15 @@
 }
 
 .higlightGreen {
-  background-color: var(--color-caribbean-green);
+  background-color: #CFF3EC;
 }
 
 .highlightRed {
   background-color: #FCE3E8;
+}
+
+.highlightNeutral {
+  background-color: #e4e6e9;
 }
 
 /* ActionsCell */
