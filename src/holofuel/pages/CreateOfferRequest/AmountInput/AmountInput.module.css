@@ -15,6 +15,7 @@
   background-color: var(--color-caribbean-green);
   color: white;
   border: none;
+  width: 90%;
 }
 
 .numpad {
