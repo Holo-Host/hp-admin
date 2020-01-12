@@ -187,6 +187,19 @@
   text-transform: none;
 }
 
+.disable {
+ opacity: 0.8;
+ pointer-events: none;
+}
+
+.higlightGreen {
+  background-color: var(--color-caribbean-green);
+}
+
+.highlightRed {
+  background-color: #FCE3E8;
+}
+
 /* ActionsCell */
 
 .reveal-actions-button  {

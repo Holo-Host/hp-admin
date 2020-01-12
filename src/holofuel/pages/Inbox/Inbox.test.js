@@ -55,6 +55,8 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       <Inbox history={{}} />
     </ApolloProvider>, 15)
 
+    // EXPECT BULK CANCEL MODAL TO APPEAR HERE.... >> UPDATE TESTS WITH LAST TEST....
+
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
 
     const listItems = getAllByRole('listitem')

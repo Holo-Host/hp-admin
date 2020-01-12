@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import cx from 'classnames'
-import { isEmpty, pick } from 'lodash/fp'
+import { isEmpty, pick, includes } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -165,6 +165,7 @@ export default function Inbox ({ history: { push } }) {
   }
 
   const [actionsVisibleId, setActionsVisibleId] = useState()
+  const [hasTransactionBeenActioned, setHasTransactionBeenActioned] = useState({})
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   const [inboxView, setInboxView] = useState(VIEW.actionable)
@@ -187,6 +188,17 @@ export default function Inbox ({ history: { push } }) {
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
+
+  const disableActionedTransaction = transactionId => {
+    if (hasTransactionBeenActioned.idList) {
+      const txList = hasTransactionBeenActioned.idList.find(txid => txid === transactionId)
+      console.log('transactionId, : ', transactionId)
+      console.log('txList, : ', txList)
+      return txList
+    } else return false
+  }
+  const increaseAction = () => includes(DIRECTION.incoming, hasTransactionBeenActioned)
+  const decreseAction = () => includes(DIRECTION.outgoing, hasTransactionBeenActioned)
 
   return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
     <Jumbotron
@@ -243,6 +255,9 @@ export default function Inbox ({ history: { push } }) {
             view={VIEW}
             isActionable={inboxView === VIEW.actionable}
             showConfirmationModal={showConfirmationModal}
+            disableActionedTransaction={disableActionedTransaction}
+            increaseAction={increaseAction}
+            decreseAction={decreseAction}
             key={transaction.id} />)}
         </div>
       </React.Fragment>)}
@@ -252,7 +267,8 @@ export default function Inbox ({ history: { push } }) {
       handleClose={() => setIsDeclinedTransactionModalVisible(false)}
       isDeclinedTransactionModalVisible={isDeclinedTransactionModalVisible}
       declinedTransactions={declinedTransactions}
-      refundAllDeclinedTransactions={refundAllDeclinedTransactions} />
+      refundAllDeclinedTransactions={refundAllDeclinedTransactions}
+      setHasTransactionBeenActioned={setHasTransactionBeenActioned} />
 
     <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
@@ -266,7 +282,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, showConfirmationModal, isActionable, whoami }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, showConfirmationModal, isActionable, whoami, disableActionedTransaction, increaseAction, decreseAction }) {
   const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy } = transaction
   const agent = canceledBy || counterparty
 
@@ -297,8 +313,15 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     fullNotes = isOffer ? ` Declined Offer: ${notes}` : ` Declined Request: ${notes}`
   } else fullNotes = notes
 
+  const disabledTransaction = disableActionedTransaction(transaction.id)
+  let higlightGreen, highlightRed
+  if (disabledTransaction) {
+    higlightGreen = increaseAction
+    highlightRed = decreseAction
+  }
+
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disable: disabledTransaction }, { higlightGreen }, { highlightRed })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -328,7 +351,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
       {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
     </div>
 
-    {isActionable && <>
+    {isActionable && !disabledTransaction && <>
       <RevealActionsButton
         actionsVisibleId={actionsVisibleId}
         visible={drawerIsOpen}
@@ -406,7 +429,7 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
   </Button>
 }
 
-export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
+export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions, setHasTransactionBeenActioned }) {
   const { newMessage } = useFlashMessageContext()
   if (declinedTransactions.length <= 0) return null
   const totalSum = (sum, currentAmount) => sum + currentAmount
@@ -418,9 +441,17 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
     </>, 5000)
 
     const cleanedTransactions = declinedTransactions.map(tx => {
+      console.log('tx.id : ', tx.id)
+
       const cleanedObj = pick(['id', 'amount', 'counterparty', 'direction', 'status', 'type', 'timestamp', 'fees', 'notes'], tx)
       const cleanedCounterparty = pick(['id', 'nickname'], cleanedObj.counterparty)
       return { ...cleanedObj, counterparty: cleanedCounterparty }
+    })
+
+    const displayActionedTransactionsIdArray = cleanedTransactions.map(tx => tx.id)
+    setHasTransactionBeenActioned({
+      direction: DIRECTION.incoming,
+      idList: displayActionedTransactionsIdArray
     })
 
     refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
