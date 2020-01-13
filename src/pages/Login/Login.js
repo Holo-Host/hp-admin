@@ -22,7 +22,10 @@ export default function Login ({ history: { push } }) {
     // we call this to SET the singleton value of HpAdminKeypair
     await getHpAdminKeypair(email, password)
     const authResult = await checkAuth()
-    const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
+
+    // TODO: REMOVE before merging
+    // const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
+    const isAuthed = true
 
     // we call this to SET the singleton value of HpAdminKeypair
     await getHpAdminKeypair(email, password)
