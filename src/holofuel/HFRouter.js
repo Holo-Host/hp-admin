@@ -8,10 +8,10 @@ import CreateOfferRequest from 'holofuel/pages/CreateOfferRequest'
 
 export default function HFRouter () {
   return <>
-    <Route path='/holofuel' exact component={() => <Redirect to='/holofuel/' />} />
     <Route path='(/|/holofuel/)(|home)' exact component={Home} />
     <Route path='(/|/holofuel/)inbox' exact component={Inbox} />
-    <Route path='(/|/holofuel/)history' component={TransactionHistory} />
-    <Route path='(/|/holofuel/)offer-request' component={CreateOfferRequest} />
+    <Route path='(/|/holofuel/)history' exact component={TransactionHistory} />
+    <Route path='(/|/holofuel/)offer-request' exact component={CreateOfferRequest} />
+    <Route path='/holofuel' exact component={() => <Redirect to='/holofuel/' />} />
   </>
 }
