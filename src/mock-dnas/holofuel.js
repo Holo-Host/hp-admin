@@ -382,7 +382,7 @@ export const pendingList = {
         from: 'HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi',
         notes: 'Pre-Seed Data',
         synchronous: null,
-        to: 'HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi',
+        to: 'HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi'
       }
     }
   ], [
@@ -397,7 +397,7 @@ export const pendingList = {
           from: 'HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi',
           notes: 'Pre-Seed Data',
           synchronous: null,
-          to: 'HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi',
+          to: 'HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi'
         }
       }
     }
