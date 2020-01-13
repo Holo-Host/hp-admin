@@ -11,7 +11,7 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
     const cleanValue = value.replace(/[^0-9.]/g, '') || '0' // strips non numerical characters
     setInputValueRaw(cleanValue)
     setAmount(Number(cleanValue))
-    console.log('cleanValue : ', cleanValue)
+    console.log('cleanValue : ', typeof cleanValue, cleanValue)
     console.log('Number(cleanValue) : ', Number(cleanValue))
   }
 
