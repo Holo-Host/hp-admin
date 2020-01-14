@@ -1,14 +1,15 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
-import { signPayload, hashResponseBody } from 'holochainClient'
+import { signPayload, hashBody } from 'holochainClient'
+import stringify from 'json-stable-stringify'
 
 const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
-const developmentMockHposConnection = false // boolean to toggle hpos mock data reference while in dev context...
+const mockHposConnection = process.env.NODE_ENV !== 'production' // boolean to toggle hpos mock data reference while in dev context...
 export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? preLocalHposImageIntegration
   : process.env.NODE_ENV === 'test'
     ? true
-    : developmentMockHposConnection
+    : mockHposConnection
 
 const axiosConfig = {
   headers: {
@@ -27,10 +28,15 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
 
       const signature = await signPayload(method, urlObj.pathname, params)
 
-      const headers = {
+      let headers = {
         ...axiosConfig.headers,
         ...userHeaders,
         'X-Hpos-Admin-Signature': signature
+      }
+
+      if (params) {
+        params = stringify(params)
+        headers = { ...headers, 'X-Body-Hash': hashBody(params) }
       }
 
       let data
@@ -40,10 +46,10 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
           ({ data } = await axios.get(fullPath, { params, headers }))
           return data
         case 'post':
-          ({ data } = await axios.post(fullPath, { params, headers }))
+          ({ data } = await axios.post(fullPath, params, { headers }))
           return data
         case 'put':
-          ({ data } = await axios.put(fullPath, { params, headers }))
+          ({ data } = await axios.put(fullPath, params, { headers }))
           return data
         default:
           throw new Error(`No case in hposCall for ${method} method`)
@@ -88,15 +94,17 @@ const HposInterface = {
 
     updateSettings: async (hostPubKey, hostName, deviceName, sshAccess) => {
       const settingsResponse = await hposCall({ method: 'get', path: 'config' })()
+      const xHpAdminCas = await hposCall({ method: 'get', path: 'config_cas' })()
+      const { email } = settingsResponse
 
       // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
       const headers = {
-        'x-hp-admin-cas': await hashResponseBody(settingsResponse)
+        'x-hp-admin-cas': xHpAdminCas
       }
 
       const settingsConfig = {
         admin: {
-          name: hostName,
+          email,
           public_key: hostPubKey
         },
         holoportos: {

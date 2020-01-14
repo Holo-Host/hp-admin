@@ -1,4 +1,4 @@
-{ pkgs ? import ./pkgs.nix {} }:
+{ pkgs ? import ./nixpkgs.nix {} }:
 
 with pkgs;
 
@@ -86,9 +86,8 @@ in
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
-      holochain-cli
-      holochain-conductor
-      nodejs-12_x
+      holochain-rust
+      nodejs
       pkgconfig
       cairo
       giflib
@@ -133,9 +132,8 @@ in
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
-      holochain-cli
-      holochain-conductor
-      nodejs-12_x
+      holochain-rust
+      nodejs
       pkgconfig
       cairo
       giflib
