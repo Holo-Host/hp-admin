@@ -442,8 +442,6 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
     </>, 5000)
 
     const cleanedTransactions = declinedTransactions.map(tx => {
-      console.log('tx.id : ', tx.id)
-
       const cleanedObj = pick(['id', 'amount', 'counterparty', 'direction', 'status', 'type', 'timestamp', 'fees', 'notes'], tx)
       const cleanedCounterparty = pick(['id', 'nickname'], cleanedObj.counterparty)
       return { ...cleanedObj, counterparty: cleanedCounterparty }

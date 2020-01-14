@@ -372,20 +372,6 @@ export const pendingList = {
     }
   ],
   declined: [[
-    'QmYrTWtzTcqA5N75Za5pjcd2RE5HbJj9W5xBBeTi8WtTPL',
-    '2020-01-10T21:40:48+00:00',
-    {
-      Request: {
-        amount: '900',
-        deadline: '2019-12-31T21:39:40.697+00:00',
-        fee: '9',
-        from: 'HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi',
-        notes: 'Pre-Seed Data',
-        synchronous: null,
-        to: 'HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi'
-      }
-    }
-  ], [
     'QmcH3rDq94ENu5gkZHHMTiNG2ocF6qns3NdQBwU7ZeN3pW',
     '2020-01-10T21:40:11+00:00',
     {
@@ -394,10 +380,10 @@ export const pendingList = {
           amount: '600',
           deadline: '2019-12-31T21:39:40.697+00:00',
           fee: '6',
-          from: 'HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi',
+          from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
           notes: 'Pre-Seed Data',
           synchronous: null,
-          to: 'HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi'
+          to: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
         }
       }
     }
