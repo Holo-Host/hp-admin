@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react' // useState,
+import React, { useEffect, useCallback, useState } from 'react' // useState,
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, uniqBy } from 'lodash/fp'
@@ -20,7 +20,7 @@ import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
-const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction Inbox to view and/or cancel your pending transaction.'
+const declinedTransactionNotice = 'Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction Inbox to view and/or cancel your pending transaction.'
 
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
@@ -63,9 +63,14 @@ export default function Home () {
 
   const filterActionableTransactionsByStatus = useCallback(status => holofuelActionableTransactions.filter(actionableTx => actionableTx.status === status), [holofuelActionableTransactions])
 
+  // This is temporary, pending better UX for declined transactions
+  const [hasShownDeclinedTransactionNotice, setHasShownDeclinedTransactionNotice] = useState(false)
   useEffect(() => {
-    if (!isEmpty(filterActionableTransactionsByStatus('declined'))) {
+    if (!isEmpty(filterActionableTransactionsByStatus('declined')) && !hasShownDeclinedTransactionNotice) {
       newMessage(declinedTransactionNotice)
+      setHasShownDeclinedTransactionNotice(true)
+    } else {
+      setHasShownDeclinedTransactionNotice(false)
     }
   }, [filterActionableTransactionsByStatus, newMessage])
 
@@ -111,7 +116,7 @@ export default function Home () {
           </div>}
 
           {isTransactionsEmpty && !loadingTransactions && <div styleName='transactions-empty'>
-            You have no offers or requests
+            You have no recent transactions
           </div>}
 
           {!isTransactionsEmpty && <h2 styleName='transactions-label'>Recent Transactions</h2>}

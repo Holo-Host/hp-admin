@@ -46,13 +46,9 @@ const testLinks = ui => {
   expect(getByText('TransactionHistory')).toBeInTheDocument()
 }
 
-// we test three cases here, urls of the form '/', '/holofuel' and '/holofuel/'
+// we test two cases here, urls of the form '/holofuel' and '/holofuel/'
 
 describe('HFRouter', () => {
-  it('works with root url', () => {
-    testLinks(<MemoryRouter initialEntries={['/']}><HFRouter /></MemoryRouter>)
-  })
-
   it('works from /holofuel', () => {
     testLinks(<MemoryRouter initialEntries={['/holofuel']}><HFRouter /></MemoryRouter>)
   })

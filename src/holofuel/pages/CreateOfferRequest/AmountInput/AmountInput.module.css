@@ -51,3 +51,7 @@
   justify-content: center;
   margin: 0px 10px;
 }
+
+.invalid {
+  background-color: var(--color-iceberg);
+}
