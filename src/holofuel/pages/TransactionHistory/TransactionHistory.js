@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import _, { isEmpty, capitalize, uniqBy, get } from 'lodash/fp'
+import { isEmpty, capitalize, uniqBy, get, remove } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -48,7 +48,6 @@ function useTransactionsWithCounterparties () {
     }
     if (hasCompletedInitialPageLoad) {
       const since = holofuelCompletedTransactions[0].timestamp
-      console.log('SINCE VALUE >> (timestamp of latest tx) : ', since)
 
       stopPolling()
       refetchCompletedTransactions({ variables: { since } })
@@ -133,7 +132,7 @@ export default function TransactionsHistory ({ history: { push } }) {
     .filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
 
   if (hasCompletedInitialPageLoad) {
-    partitionedTransactions = _.remove({ label: 'Completed' }, partitionedTransactions)
+    partitionedTransactions = remove({ label: 'Completed' }, partitionedTransactions)
   }
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
