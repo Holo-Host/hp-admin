@@ -68,7 +68,7 @@ describe('Home', () => {
 
       expect(getByText(`${presentHolofuelAmount(balance)} TF`)).toBeInTheDocument()
 
-      expect(getByText('You have no offers or requests')).toBeInTheDocument()
+      expect(getByText('You have no recent transactions')).toBeInTheDocument()
     })
   })
 
