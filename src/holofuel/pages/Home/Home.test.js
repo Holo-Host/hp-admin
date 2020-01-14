@@ -137,7 +137,11 @@ describe('Home', () => {
         <Home />
       </MockedProvider>)
 
+<<<<<<< HEAD
       expect(queryByText('You have no offers or requests')).not.toBeInTheDocument()
+=======
+      expect(queryByText('You have no recent no offers or requests')).not.toBeInTheDocument()
+>>>>>>> b548595c70bcb2e17e1c57515c4a31d20e478876
 
       const listItems = getAllByRole('listitem')
       expect(listItems).toHaveLength(2)
