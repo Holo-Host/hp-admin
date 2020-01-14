@@ -226,8 +226,13 @@ const HoloFuelDnaInterface = {
     }
   },
   transactions: {
-    allCompleted: async () => {
-      const { transactions } = await createZomeCall('transactions/list_transactions')()
+    allCompleted: async ({ since }) => {
+      let params
+      if (since) {
+        params = { since }
+      } else params = {}
+
+      const { transactions } = await createZomeCall('transactions/list_transactions')(params)
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
 
