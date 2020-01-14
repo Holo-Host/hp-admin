@@ -37,6 +37,7 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   const { push } = useHistory()
+  // eslint-disable-next-line
   const goToInbox = useCallback(() => {
     if (!hasCalledReroute) {
       push(INBOX_PATH)
