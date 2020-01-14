@@ -5,7 +5,6 @@ import Home from './Home'
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelHomeCounterpartiesQuery from 'graphql/HolofuelHomeCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
@@ -127,16 +126,6 @@ describe('Home', () => {
             ]
           }
         }
-      },
-      {
-        request: {
-          query: HolofuelHomeCounterpartiesQuery
-        },
-        result: {
-          data: {
-            holofuelHomeCounterparties: transactions.map(transaction => transaction.counterparty)
-          }
-        }
       }
     ]
 
@@ -145,7 +134,7 @@ describe('Home', () => {
         <Home />
       </MockedProvider>)
 
-      expect(queryByText('You have no recent transactions')).not.toBeInTheDocument()
+      expect(queryByText('You have no recent no offers or requests')).not.toBeInTheDocument()
 
       const listItems = getAllByRole('listitem')
       expect(listItems).toHaveLength(2)
