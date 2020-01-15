@@ -56,7 +56,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
 
     const listItems = getAllByRole('listitem')
-    expect(listItems).toHaveLength(2)
+    expect(listItems).toHaveLength(3)
 
     const getByTextParent = getByText
 

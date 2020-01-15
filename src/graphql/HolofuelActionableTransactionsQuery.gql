@@ -9,5 +9,6 @@ query HolofuelActionableTransactionsQuery {
     timestamp
     notes
     fees
+    isPayingARequest
   }
 }

@@ -38,7 +38,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, reason }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, reason, isPayingARequest = false }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -51,7 +51,8 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
     fees,
-    reason
+    reason,
+    isPayingARequest
   }
 }
 
@@ -85,7 +86,8 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     timestamp: eventTimestamp,
     fees,
     presentBalance,
-    notes: event.Receipt.cheque.invoice.promise.tx.notes
+    notes: event.Receipt.cheque.invoice.promise.tx.notes,
+    isPayingARequest: false
   }
 }
 
@@ -152,7 +154,8 @@ function presentPendingOffer (transaction, declined = false) {
   const eventTimestamp = event[1]
   const counterpartyId = declined ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
+  const isPayingARequest = !!event[2].Promise.request
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest })
 }
 
 function presentTransaction (transaction) {
@@ -236,6 +239,8 @@ const HoloFuelDnaInterface = {
     allActionable: async () => {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
       const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentCanceledTransaction))
+
+      console.log('actionableTransactions', actionableTransactions)
 
       return actionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
