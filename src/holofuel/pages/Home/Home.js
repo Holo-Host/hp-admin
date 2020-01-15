@@ -72,7 +72,7 @@ export default function Home () {
     } else {
       setHasShownDeclinedTransactionNotice(false)
     }
-  }, [filterActionableTransactionsByStatus, newMessage])
+  }, [filterActionableTransactionsByStatus, newMessage, hasShownDeclinedTransactionNotice, setHasShownDeclinedTransactionNotice])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>
