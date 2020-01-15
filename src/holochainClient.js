@@ -67,12 +67,12 @@ export const getHpAdminKeypair = async (email = undefined, password = undefined)
 }
 
 // Return empty string if HpAdminKeypair is still not initialized
-export const signPayload = async (method, request, body) => {
+export const signPayload = async (method, request, bodyHash) => {
   const keypair = await getHpAdminKeypair()
 
   if (keypair === null) return ''
 
-  const payload = { method: method.toLowerCase(), request, body: stringify(body) || '' }
+  const payload = { method: method.toLowerCase(), request, body: bodyHash || '' }
 
   try {
     if (HOLOCHAIN_LOGGING) {
@@ -94,7 +94,7 @@ export const signPayload = async (method, request, body) => {
   }
 }
 
-export const hashBody = async (string) => {
+export const hashString = async (string) => {
   const dataBytes = Buffer.from(string)
   const hashBytes = await crypto.subtle.digest('SHA-512', dataBytes)
 

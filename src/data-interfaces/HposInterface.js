@@ -1,6 +1,6 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
-import { signPayload, hashBody } from 'holochainClient'
+import { signPayload, hashString } from 'holochainClient'
 import stringify from 'json-stable-stringify'
 
 const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
@@ -26,17 +26,21 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
       const fullPath = ((process.env.NODE_ENV === 'production') ? (window.location.protocol + '//' + window.location.hostname) : process.env.REACT_APP_HPOS_URL) + '/api/' + apiVersion + '/' + path
       const urlObj = new URL(fullPath)
 
-      const signature = await signPayload(method, urlObj.pathname, params)
-
-      let headers = {
-        ...axiosConfig.headers,
-        ...userHeaders,
-        'X-Hpos-Admin-Signature': signature
-      }
+      let headers = {};
+      let bodyHash = undefined;
 
       if (params) {
-        params = stringify(params)
-        headers = { ...headers, 'X-Body-Hash': hashBody(params) }
+        bodyHash = await hashString(stringify(params))
+        headers = { 'X-Body-Hash': bodyHash }
+      }
+
+      const signature = await signPayload(method, urlObj.pathname, bodyHash)
+
+      headers = {
+        ...axiosConfig.headers,
+        ...userHeaders,
+        ...headers,
+        'X-Hpos-Admin-Signature': signature
       }
 
       let data
@@ -94,12 +98,11 @@ const HposInterface = {
 
     updateSettings: async (hostPubKey, hostName, deviceName, sshAccess) => {
       const settingsResponse = await hposCall({ method: 'get', path: 'config' })()
-      const xHpAdminCas = await hposCall({ method: 'get', path: 'config_cas' })()
       const { email } = settingsResponse
 
       // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
       const headers = {
-        'x-hp-admin-cas': xHpAdminCas
+        'x-hp-admin-cas': await hashString(stringify(settingsResponse))
       }
 
       const settingsConfig = {
