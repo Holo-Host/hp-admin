@@ -1,7 +1,7 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
 import { signPayload, hashString } from 'holochainClient'
-import stringify from 'json-stable-stringify'
+import stringify from 'fast-json-stable-stringify'
 
 const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
 const mockHposConnection = process.env.NODE_ENV !== 'production' // boolean to toggle hpos mock data reference while in dev context...
@@ -30,7 +30,8 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
       let bodyHash = undefined;
 
       if (params) {
-        bodyHash = await hashString(stringify(params))
+        params = stringify(params) // replace with serialized version, to send below!
+        bodyHash = await hashString(params)
         headers = { 'X-Body-Hash': bodyHash }
       }
 
@@ -100,24 +101,31 @@ const HposInterface = {
       const settingsResponse = await hposCall({ method: 'get', path: 'config' })()
       const { email } = settingsResponse
 
-      // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
+      // Updating the config endpoint requires the hash of the current config to make sure nothing has changed.
       const headers = {
-        'x-hp-admin-cas': await hashString(stringify(settingsResponse))
+        'X-Hpos-Admin-CAS': await hashString(stringify(settingsResponse))
       }
 
-      const settingsConfig = {
-        admin: {
-          email,
-          public_key: hostPubKey
-        },
-        holoportos: {
+      // settingsConfig must contain .admin.{email,public_key}, but may contain other arbitrary
+      // data.  We must only update what we have authority over, and data supplied for.
+      let settingsConfig = {
+        ...settingsResponse
+      }
+      if (hostPubKey !== undefined) {
+        settingsConfig.admin.public_key = hostPubKey
+      }
+      if (deviceName !== undefined) {
+        settingsConfig.name = deviceName
+      }
+      if (sshAccess !== undefined) {
+        settingsConfig.holoportos = {
           sshAccess: sshAccess
-        },
-        name: deviceName
+        }
       }
 
-      const result = await hposCall({ method: 'put', path: 'config', headers })(settingsConfig)
-      return presentHposSettings(result)
+      await hposCall({ method: 'put', path: 'config', headers })(settingsConfig)
+      // We don't assume the successful PUT /api/v1/config returns the current config
+      return presentHposSettings(settingsConfig)
     },
 
     // HOLOPORT_OS STATUS
