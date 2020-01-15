@@ -87,6 +87,8 @@ function useTransactionsWithCounterparties () {
   const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
+  console.log('holofuelActionableTransactions', holofuelActionableTransactions)
+
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
     counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty

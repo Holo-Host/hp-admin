@@ -21,7 +21,7 @@ export async function getTxCounterparties (transactionList) {
   return noDuplicatesAgentList
 }
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, reason }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, reason, isPayingARequest = false }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -34,7 +34,8 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     timestamp: eventTimestamp,
     notes: notes || event.Request.notes,
     fees,
-    reason
+    reason,
+    isPayingARequest
   }
 }
 
@@ -86,8 +87,7 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     timestamp: eventTimestamp,
     fees,
     presentBalance,
-    notes: event.Receipt.cheque.invoice.promise.tx.notes,
-    isPayingARequest: false
+    notes: event.Receipt.cheque.invoice.promise.tx.notes
   }
 }
 
@@ -240,7 +240,7 @@ const HoloFuelDnaInterface = {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
       const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentCanceledTransaction))
 
-      console.log('actionableTransactions', actionableTransactions)
+      console.log('actionableTransactions', actionableTransactions) 
 
       return actionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },

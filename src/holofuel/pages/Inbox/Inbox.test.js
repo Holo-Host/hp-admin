@@ -116,7 +116,7 @@ const ledgerMock = {
   }
 }
 
-describe('Ledger Jumbotron', () => {
+describe.skip('Ledger Jumbotron', () => {
   it('renders the balance and the empty state', async () => {
     const { getByText, getAllByText } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
       <Inbox history={{}} />
@@ -130,7 +130,7 @@ describe('Ledger Jumbotron', () => {
   })
 })
 
-describe('Inbox Null States', () => {
+describe.skip('Inbox Null States', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -170,7 +170,7 @@ describe('Inbox Null States', () => {
   })
 })
 
-describe('TransactionRow', () => {
+describe.skip('TransactionRow', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
