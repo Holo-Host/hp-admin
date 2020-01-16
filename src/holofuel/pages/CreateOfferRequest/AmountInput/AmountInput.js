@@ -44,10 +44,10 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
         </div>
       </div>
       <div styleName='action-row'>
-        <Button onClick={chooseSend} disabled={!isValidAmount} variant='white' styleName={cx('action-button', { invalid: !isValidAmount })}>
+        <Button onClick={chooseSend} disabled={!isValidAmount} variant='white' styleName={cx('action-button', { disabled: !isValidAmount })}>
           Send
         </Button>
-        <Button onClick={chooseRequest} disabled={!isValidAmount} variant='white' styleName={cx('action-button', { invalid: !isValidAmount })}>
+        <Button onClick={chooseRequest} disabled={!isValidAmount} variant='white' styleName={cx('action-button', { disabled: !isValidAmount })}>
           Request
         </Button>
       </div>

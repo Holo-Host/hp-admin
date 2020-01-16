@@ -52,6 +52,6 @@
   margin: 0px 10px;
 }
 
-.invalid {
+.disabled {
   background-color: var(--color-iceberg);
 }
