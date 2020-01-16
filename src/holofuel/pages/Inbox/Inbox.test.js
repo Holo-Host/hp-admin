@@ -2,7 +2,6 @@ import React from 'react'
 import { fireEvent, act, within } from '@testing-library/react'
 import wait from 'waait'
 import moment from 'moment'
-import { reverse } from 'lodash/fp'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
@@ -22,7 +21,7 @@ import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 import { presentAgentId } from '../../../utils'
 
-const actionableTransactions = pendingList.requests.concat(pendingList.promises).reverse().map(item => {
+const actionableTransactions = pendingList.promises.concat(pendingList.requests).map(item => {
   if (item.event[2].Request) {
     return {
       type: 'request',
@@ -35,12 +34,15 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
       type: 'offer',
       ...item.event[2].Promise.tx,
       counterparty: item.event[2].Promise.tx.from,
-      timestamp: item.event[1]
+      timestamp: item.event[1],
+      isPayingARequest: !!item.event[2].Promise.request
     }
   } else {
     throw new Error('unrecognized transaction type', item.toString())
   }
 })
+  .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+
 const { ledger } = transactionList
 
 jest.mock('data-interfaces/EnvoyInterface')
@@ -60,7 +62,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
 
     const getByTextParent = getByText
 
-    reverse(listItems).forEach(async (item, index) => {
+    listItems.forEach(async (item, index) => {
       const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
 
       const { getByText } = within(item)
@@ -68,7 +70,11 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
       const transaction = actionableTransactions[index]
       expect(getByText(transaction.notes)).toBeInTheDocument()
       const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) TF` : `${presentHolofuelAmount(transaction.amount)} TF`
-      const story = transaction.type === 'request' ? 'is requesting' : 'is offering'
+      const story = transaction.type === 'request'
+        ? 'is requesting'
+        : transaction.isPayingARequest
+          ? 'is paying your request'
+          : 'is offering'
       expect(getByText(amountToMatch)).toBeInTheDocument()
       expect(getByText(story)).toBeInTheDocument()
       expect(getByText(whois.nickname)).toBeInTheDocument()
@@ -116,7 +122,7 @@ const ledgerMock = {
   }
 }
 
-describe.skip('Ledger Jumbotron', () => {
+describe('Ledger Jumbotron', () => {
   it('renders the balance and the empty state', async () => {
     const { getByText, getAllByText } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
       <Inbox history={{}} />
@@ -130,7 +136,7 @@ describe.skip('Ledger Jumbotron', () => {
   })
 })
 
-describe.skip('Inbox Null States', () => {
+describe('Inbox Null States', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -170,7 +176,7 @@ describe.skip('Inbox Null States', () => {
   })
 })
 
-describe.skip('TransactionRow', () => {
+describe('TransactionRow', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })

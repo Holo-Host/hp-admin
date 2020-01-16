@@ -240,8 +240,6 @@ const HoloFuelDnaInterface = {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
       const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentCanceledTransaction))
 
-      console.log('actionableTransactions', actionableTransactions) 
-
       return actionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
@@ -268,7 +266,7 @@ const HoloFuelDnaInterface = {
       const cleanedList = _.uniqBy(listOfNonActionableTransactions, 'id')
 
       if (cleanedList.length === 0) {
-        console.error(`No pending transaction with id ${transactionId} found.`)
+        throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
         return cleanedList
       }
