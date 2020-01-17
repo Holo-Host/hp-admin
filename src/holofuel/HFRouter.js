@@ -13,5 +13,6 @@ export default function HFRouter () {
     <Route path='/holofuel/history' exact component={TransactionHistory} />
     <Route path='/holofuel/offer-request' exact component={CreateOfferRequest} />
     <Route path='/holofuel' exact component={() => <Redirect to='/holofuel/' />} />
+    <Route path='/' exact component={() => <Redirect to='/holofuel/' />} />
   </Switch>
 }

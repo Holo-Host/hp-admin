@@ -3,8 +3,9 @@
   "version": "0.2.1",
   "private": true,
   "scripts": {
-    "start-mock": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_MOCK_DNA_CONNECTION='true' node scripts/start.js",
-    "start-live": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_MOCK_DNA_CONNECTION='false' node scripts/start.js",
+    "start": "npm run start:mock",
+    "start:mock": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_MOCK_DNA_CONNECTION='true' node scripts/start.js",
+    "start:live": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_MOCK_DNA_CONNECTION='false' node scripts/start.js",
     "start:holofuel-agent-1": "PORT=3100 REACT_APP_DNA_INTERFACE_URL=ws://localhost:3400 npm run start:holofuel-live",
     "start:holofuel-agent-2": "PORT=3101 REACT_APP_DNA_INTERFACE_URL=ws://localhost:3401 npm run start:holofuel-live",
     "start:holofuel-mock": "REACT_APP_HOLOFUEL_APP=true npm run start-mock",
