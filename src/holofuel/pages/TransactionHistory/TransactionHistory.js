@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, capitalize, uniqBy, get, remove } from 'lodash/fp'
@@ -51,18 +51,20 @@ function useTransactionsWithCounterparties () {
   const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
+  const fetchNewCompleted = useFetchNewCompletedTransactions
+
   const [hasCompletedInitialPageLoad, setHasCompletedInitialPageLoad] = useState(false)
-  let holofuelCompletedTransactionsUpdates = []
+  const [newCompletedTransactions, setNewCompletedTransactions] = useState(false)
 
   if (!isEmpty(holofuelCompletedTransactions)) {
-    setHasCompletedInitialPageLoad(true)
     const since = holofuelCompletedTransactions[0].timestamp
-    const { loadingNewCompletedTransactions, holofuelNewCompletedTransactions } = useFetchNewCompletedTransactions({ since })
+    const { loadingNewCompletedTransactions, holofuelNewCompletedTransactions } = fetchNewCompleted({ since })
 
     console.log('loadingNewCompletedTransactions : ', loadingNewCompletedTransactions)
     console.log('holofuelNewCompletedTransactions : ', holofuelNewCompletedTransactions)
 
-    // holofuelCompletedTransactionsUpdates = holofuelNewCompletedTransactions
+    setHasCompletedInitialPageLoad(true)
+    setNewCompletedTransactions(holofuelNewCompletedTransactions)
   }
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
@@ -72,7 +74,7 @@ function useTransactionsWithCounterparties () {
 
   const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
 
-  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions.concat(holofuelCompletedTransactionsUpdates), allCounterparties)
+  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions.concat(newCompletedTransactions), allCounterparties)
   const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
 
   return {
