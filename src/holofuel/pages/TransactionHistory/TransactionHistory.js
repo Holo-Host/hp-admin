@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, capitalize, uniqBy, get, remove } from 'lodash/fp'
@@ -10,6 +10,8 @@ import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import Loading from 'components/Loading'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
+import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
+
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -34,26 +36,34 @@ function useCancel () {
   })
 }
 
+function useFetchNewCompletedTransactions ({ since }) {
+  const { loading: loadingNewCompletedTransactions, data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
+
+  return {
+    loadingNewCompletedTransactions,
+    holofuelNewCompletedTransactions
+  }
+}
+
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {}, refetch: refetchCompletedTransactions, startPolling, stopPolling } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const [hasCompletedInitialPageLoad, setHasCompletedInitialPageLoad] = useState(false)
+  let holofuelCompletedTransactionsUpdates = []
 
-  useEffect(() => {
-    if (!isEmpty(holofuelCompletedTransactions)) {
-      setHasCompletedInitialPageLoad(true)
-    }
-    if (hasCompletedInitialPageLoad) {
-      const since = holofuelCompletedTransactions[0].timestamp
+  if (!isEmpty(holofuelCompletedTransactions)) {
+    setHasCompletedInitialPageLoad(true)
+    const since = holofuelCompletedTransactions[0].timestamp
+    const { loadingNewCompletedTransactions, holofuelNewCompletedTransactions } = useFetchNewCompletedTransactions({ since })
 
-      stopPolling()
-      refetchCompletedTransactions({ variables: { since } })
-      startPolling(5000)
-    }
-  }, [setHasCompletedInitialPageLoad, hasCompletedInitialPageLoad, holofuelCompletedTransactions, stopPolling, refetchCompletedTransactions, startPolling])
+    console.log('loadingNewCompletedTransactions : ', loadingNewCompletedTransactions)
+    console.log('holofuelNewCompletedTransactions : ', holofuelNewCompletedTransactions)
+
+    // holofuelCompletedTransactionsUpdates = holofuelNewCompletedTransactions
+  }
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
@@ -62,7 +72,7 @@ function useTransactionsWithCounterparties () {
 
   const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
 
-  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
+  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions.concat(holofuelCompletedTransactionsUpdates), allCounterparties)
   const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
 
   return {
