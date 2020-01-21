@@ -11,7 +11,7 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelRecoverFundsMutation from 'graphql/HolofuelRecoverFundsMutation.gql'
-import holofuelRefundDeclinedMutation from 'graphql/holofuelRefundDeclinedMutation.gql'
+import holofuelRefundDeclinedMutation from 'graphql/HolofuelRefundDeclinedMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
