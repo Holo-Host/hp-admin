@@ -352,14 +352,14 @@ const HoloFuelDnaInterface = {
         status: STATUS.canceled
       }
     },
-    refundDeclined: async (transactionIds) => {
-      const listOfTransactionIds = transactionIds.map(({ id }) => id)
+    refundDeclined: async (transactions) => {
+      const listOfTransactionIds = transactions.map(({ id }) => id)
       const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
       if (!canceledProof) {
-        throw new Error(`Recover Funds Error.  Couldn'\t find a transactions with ids ${transactionIds}`)
+        throw new Error(`Recover Funds Error.  Couldn'\t find a transactions with ids ${transactions}`)
       }
 
-      const canceledDeclined = transactionIds.map(transaction => {
+      const canceledDeclined = transactions.map(transaction => {
         return {
           ...transaction,
           status: STATUS.canceled

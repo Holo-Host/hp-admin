@@ -16,7 +16,7 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-import holofuelRefundDeclinedMutation from 'graphql/holofuelRefundDeclinedMutation.gql'
+import holofuelRefundDeclinedMutation from 'graphql/HolofuelRefundDeclinedMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
@@ -426,7 +426,7 @@ describe('TransactionRow', () => {
       const refundAllDeclinedMock = {
         request: {
           query: holofuelRefundDeclinedMutation,
-          variables: { transactionIds: [{
+          variables: { transactions: [{
             ...offer,
             status: STATUS.declined
           }] },

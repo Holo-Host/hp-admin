@@ -87,7 +87,7 @@ function useRefund () {
 function useRefundAllDeclinedTransactions () {
   const [refundAllDeclined] = useMutation(holofuelRefundDeclinedMutation)
   return ({ cleanedTransactions }) => refundAllDeclined({
-    variables: { transactionIds: cleanedTransactions },
+    variables: { transactions: cleanedTransactions },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },
