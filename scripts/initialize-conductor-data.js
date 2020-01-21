@@ -1,7 +1,6 @@
 const createZomeCall = require('./create-zome-call')
 const { Agent1, Agent2 } = require('./get-agent')
 const moment = require('moment')
-const _ = require('lodash/fp')
 const util = require('util')
 const ncp = util.promisify(require('ncp').ncp)
 const wait = require('waait')
