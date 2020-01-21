@@ -250,18 +250,18 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction)
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
       const noDuplicateIdsWaitingList = _.uniqBy(nonActionableTransactions, 'id')
-      const listOfDeclinedTransactions = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
+      const transactionIds = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
       // Filter out transactions that share a TX ID with a Declined or Cancelled Transaction
-      const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(noDuplicateIdsWaitingList, listOfDeclinedTransactions, 'id')
+      const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(noDuplicateIdsWaitingList, transactionIds, 'id')
       const presentedWaitingTransactions = await getTxWithCounterparties(uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending'))
 
       return presentedWaitingTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')()
-      const listOfDeclinedTransactions = declinedResult.map(presentDeclinedTransaction)
+      const transactionIds = declinedResult.map(presentDeclinedTransaction)
 
-      return listOfDeclinedTransactions
+      return transactionIds
     },
     allEarnings: () => mockEarningsData,
     allNonActionableByState: async (transactionId, stateFilter = []) => {
@@ -296,7 +296,7 @@ const HoloFuelDnaInterface = {
       if (transactionArray.length === 0) {
         throw new Error(`no pending transaction with id ${transactionId} found.`)
       } else {
-        return transactionArray[0]
+        return addFullCounterpartyToTx(transactionArray[0])
       }
     },
     /* NOTE: This is to allow handling of the other side of the transaction that was declined.  */
@@ -342,7 +342,9 @@ const HoloFuelDnaInterface = {
       // const TX_DECLINED = 'declined-transaction'
       const { rawTransaction, transaction } = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId, { raw: true })
       const canceledProof = await createZomeCall('transactions/cancel')({ entry: rawTransaction })
-      if (!canceledProof) throw new Error('Recover Funds Error.', canceledProof)
+      if (!canceledProof) {
+        throw new Error(`Recover Funds Error.  Couldn'\t find a transaction with id ${transactionId}`)
+      }
 
       return {
         ...transaction,
@@ -350,12 +352,14 @@ const HoloFuelDnaInterface = {
         status: STATUS.canceled
       }
     },
-    refundAllDeclined: async (listOfDeclinedTransactions) => {
-      const listOfTransactionIds = listOfDeclinedTransactions.map(({ id }) => id)
+    refundDeclined: async (transactionIds) => {
+      const listOfTransactionIds = transactionIds.map(({ id }) => id)
       const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
-      if (!canceledProof) throw new Error('Cancel Error.', canceledProof)
+      if (!canceledProof) {
+        throw new Error(`Recover Funds Error.  Couldn'\t find a transactions with ids ${transactionIds}`)
+      }
 
-      const canceledDeclined = listOfDeclinedTransactions.map(transaction => {
+      const canceledDeclined = transactionIds.map(transaction => {
         return {
           ...transaction,
           status: STATUS.canceled

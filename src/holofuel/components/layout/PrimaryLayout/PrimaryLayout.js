@@ -37,6 +37,7 @@ export function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   const { push } = useHistory()
+  // TODO: research a better way of informing state & update/render logic
   // eslint-disable-next-line
   const goToInbox = useCallback(() => {
     if (!hasCalledReroute) {

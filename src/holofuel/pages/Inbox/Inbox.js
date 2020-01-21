@@ -11,7 +11,7 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelRecoverFundsMutation from 'graphql/HolofuelRecoverFundsMutation.gql'
-import HolofuelRefundAllDeclinedMutation from 'graphql/HolofuelRefundAllDeclinedMutation.gql'
+import holofuelRefundDeclinedMutation from 'graphql/holofuelRefundDeclinedMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
@@ -85,9 +85,9 @@ function useRefund () {
 }
 
 function useRefundAllDeclinedTransactions () {
-  const [refundAllDeclined] = useMutation(HolofuelRefundAllDeclinedMutation)
+  const [refundAllDeclined] = useMutation(holofuelRefundDeclinedMutation)
   return ({ cleanedTransactions }) => refundAllDeclined({
-    variables: { listOfDeclinedTransactions: cleanedTransactions },
+    variables: { transactionIds: cleanedTransactions },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },

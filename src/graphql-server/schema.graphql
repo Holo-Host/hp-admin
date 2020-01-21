@@ -156,7 +156,7 @@ type Mutation {
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
   holofuelRecoverFunds(transactionId: ID): Transaction
-  holofuelRefundAllDeclined(listOfDeclinedTransactions: [CancelDeclinedTransactionsInput]): [Transaction]
+  holofuelRefundDeclined(transactionIds: [CancelDeclinedTransactionsInput]): [Transaction]
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings
   hposUpdateVersion: HposStatus
   hposCheckAuth: HposAuth
