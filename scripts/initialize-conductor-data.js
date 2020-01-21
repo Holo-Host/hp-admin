@@ -1,12 +1,12 @@
 const createZomeCall = require('./create-zome-call')
 const { Agent1, Agent2 } = require('./get-agent')
 const moment = require('moment')
-// const _ = require('lodash/fp')
-// const util = require('util')
-// const ncp = util.promisify(require('ncp').ncp)
+const _ = require('lodash/fp')
+const util = require('util')
+const ncp = util.promisify(require('ncp').ncp)
 const wait = require('waait')
-// const { promiseMap, createAndRegister, happConfigKeys } = require('./prepareHpAdminData')
-// const { providerShims, HAPP_STORE_DNA_INSTANCE, HHA_DNA_INSTANCE } = require('./prepareHpAdminData/provider-shims.js')
+const { promiseMap, createAndRegister, happConfigKeys } = require('./prepareHpAdminData')
+const { providerShims, HAPP_STORE_DNA_INSTANCE, HHA_DNA_INSTANCE } = require('./prepareHpAdminData/provider-shims.js')
 require('dotenv').config()
 
 const txParams = {
@@ -15,9 +15,9 @@ const txParams = {
   deadline: moment().subtract(10, 'days').toISOString()
 }
 
-// function snapshotStrorage () {
-//   return ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT)
-// }
+function snapshotStrorage () {
+  return ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT)
+}
 
 async function populateHoloFuelData () {
   const agent1Index = 0
@@ -205,27 +205,27 @@ async function populateHoloFuelData () {
   return wait(0)
 }
 
-// const populateHpAdminData = async () => {
-//   console.log('\n ************************************************************* ')
-//   console.log(' HAPP_STORE_DNA_INSTANCE : ', HAPP_STORE_DNA_INSTANCE)
-//   console.log(' HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
-//   console.log(' ************************************************************* \n')
+const populateHpAdminData = async () => {
+  console.log('\n ************************************************************* ')
+  console.log(' HAPP_STORE_DNA_INSTANCE : ', HAPP_STORE_DNA_INSTANCE)
+  console.log(' HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
+  console.log(' ************************************************************* \n')
 
-//   const registerProvider = new Promise((resolve) => resolve(providerShims.registerAsProvider()))
-//   const fillHappStore = () => promiseMap(happConfigKeys, happId => createAndRegister(happId))
+  const registerProvider = new Promise((resolve) => resolve(providerShims.registerAsProvider()))
+  const fillHappStore = () => promiseMap(happConfigKeys, happId => createAndRegister(happId))
 
-//   return registerProvider
-//     .then(_ => fillHappStore())
-//     .then(_ => providerShims.addHolofuelAccount())
-//     .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
-// }
+  return registerProvider
+    .then(_ => fillHappStore())
+    .then(_ => providerShims.addHolofuelAccount())
+    .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
+}
 
 populateHoloFuelData()
   .then(() => console.log('Finished loading HoloFuel data...'))
-  // .then(() => populateHpAdminData())
-  // .then(() => console.log('Finished loading HPAdmin data...'))
-  // .then(() => snapshotStrorage())
-  // .then(() => console.log('Loaded Snapshot Storage'))
+  .then(() => populateHpAdminData())
+  .then(() => console.log('Finished loading HPAdmin data...'))
+  .then(() => snapshotStrorage())
+  .then(() => console.log('Loaded Snapshot Storage'))
   .then(() => process.exit())
   .catch(e => {
     console.log('error', e)
