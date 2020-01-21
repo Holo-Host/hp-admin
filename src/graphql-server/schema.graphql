@@ -139,9 +139,7 @@ type Query {
   holofuelLedger: Ledger
   holofuelUser: HolofuelUser
   holofuelCounterparty(agentId: String!): HolofuelUser
-  holofuelHomeCounterparties: [HolofuelUser]
   holofuelHistoryCounterparties: [HolofuelUser]
-  holofuelInboxCounterparties: [HolofuelUser]
   hposSettings: HposSettings
   hposStatus: HposStatus
 }
