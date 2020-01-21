@@ -1,12 +1,11 @@
 import React from 'react'
-// import Modal from 'react-modal'
 import { fireEvent, act, within } from '@testing-library/react'
 import wait from 'waait'
 import moment from 'moment'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
-import Inbox, { TransactionRow, ConfirmationModal, DeclinedTransactionModal } from './Inbox' // , DeclinedTransactionModal
+import Inbox, { TransactionRow, ConfirmationModal, DeclinedTransactionModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
 import { TYPE, STATUS } from 'models/Transaction'
 import { presentHolofuelAmount, getDateLabel } from 'utils'

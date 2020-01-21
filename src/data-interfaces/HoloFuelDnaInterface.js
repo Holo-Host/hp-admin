@@ -232,24 +232,24 @@ const HoloFuelDnaInterface = {
   transactions: {
     allCompleted: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
-      const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
-      const displayReadyCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
+      const nonActionableTransactions = transactions.map(presentTransaction)
+      const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
+      const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
 
-      return displayReadyCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
       const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentIncomingCanceledTransaction))
-      const displayReadyActionableTransactions = await getTxWithCounterparties(actionableTransactions)
+      const presentedActionableTransactions = await getTxWithCounterparties(actionableTransactions)
 
-      return displayReadyActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
-      const listOfNonActionableTransactions = transactions.map(presentTransaction)
+      const nonActionableTransactions = transactions.map(presentTransaction)
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
-      const noDuplicateIdsWaitingList = _.uniqBy(listOfNonActionableTransactions, 'id')
+      const noDuplicateIdsWaitingList = _.uniqBy(nonActionableTransactions, 'id')
       const listOfDeclinedTransactions = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
       // Filter out transactions that share a TX ID with a Declined or Cancelled Transaction
       const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(noDuplicateIdsWaitingList, listOfDeclinedTransactions, 'id')
@@ -266,8 +266,8 @@ const HoloFuelDnaInterface = {
     allEarnings: () => mockEarningsData,
     allNonActionableByState: async (transactionId, stateFilter = []) => {
       const { transactions } = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
-      const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      const cleanedList = _.uniqBy(listOfNonActionableTransactions, 'id')
+      const nonActionableTransactions = transactions.map(presentTransaction)
+      const cleanedList = _.uniqBy(nonActionableTransactions, 'id')
 
       if (cleanedList.length === 0) {
         console.error(`No pending transaction with id ${transactionId} found.`)
@@ -278,16 +278,13 @@ const HoloFuelDnaInterface = {
     /* NOTE: allNonPending will include Declined and Canceled Transactions:  */
     allNonPending: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
-      const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
+      const nonActionableTransactions = transactions.map(presentTransaction)
+      const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
       const whoami = await HoloFuelDnaInterface.user.get()
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')
-        .map(tx => {
-          if (tx.status === STATUS.canceled) return { ...tx, canceledBy: whoami }
-          else return { ...tx, canceledBy: null }
-        })
+        .map(tx => tx.status === STATUS.cancelled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
 
       const displayReadyNonActionableTransactions = await getTxWithCounterparties(nonActionableTransactionsWithCancelByKey)
 
