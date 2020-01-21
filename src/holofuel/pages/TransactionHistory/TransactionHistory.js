@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, uniqBy, get } from 'lodash/fp'
+import { isEmpty, capitalize } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -10,8 +10,6 @@ import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import Loading from 'components/Loading'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
@@ -34,35 +32,12 @@ function useCancel () {
   })
 }
 
-function useTransactionsWithCounterparties () {
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-
-  const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
-    ...transaction,
-    counterparty: counterparties.find(counterparty => counterparty.id === get('counterparty.id', transaction)) || transaction.counterparty
-  }))
-
-  const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
-
-  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
-  const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
-
-  return {
-    completedTransactions: updatedCompletedTransactions,
-    pendingTransactions: updatedWaitingTransactions,
-    loadingCompletedTransactions,
-    loadingPendingTransactions
-  }
-}
-
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
 export default function TransactionsHistory ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
-  const { completedTransactions, pendingTransactions, loadingCompletedTransactions, loadingPendingTransactions } = useTransactionsWithCounterparties()
+  const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions: completedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions: pendingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -170,8 +145,8 @@ function TransactionPartition ({ partition, showCancellationModal }) {
     <h4 styleName='partition-label'>{label}</h4>
     {loading && <Loading styleName='partition-loading' />}
     {transactions.map((transaction, index) => <TransactionRow
-      transaction={transaction}
       key={transaction.id}
+      transaction={transaction}
       showCancellationModal={showCancellationModal}
       isFirst={index === 0} />)}
   </>
