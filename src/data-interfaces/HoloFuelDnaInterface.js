@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { pickBy, isEmpty } from 'lodash/fp'
+import { pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'

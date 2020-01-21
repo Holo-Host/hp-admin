@@ -58,9 +58,6 @@ function useTransactionsWithCounterparties () {
   const filteredTransactionById = intersectionBy('id', updatedCompletedTransactions, updatedWaitingTransactions)
   const pendingTransactions = without(filteredTransactionById, updatedWaitingTransactions)
 
-  console.log('filteredTransactionById :', filteredTransactionById)
-  console.log('pendingTransactions :', pendingTransactions)
-
   return {
     completedTransactions: updatedCompletedTransactions,
     pendingTransactions,
