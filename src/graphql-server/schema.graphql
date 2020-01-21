@@ -112,7 +112,7 @@ input HolofuelUserInput {
   nickname: String
 }
 
-input TransactionsInput {
+input TransactionInput {
   id: ID # ID will be the origin commit hash
   amount: Float
   counterparty: HolofuelUserInput
@@ -156,7 +156,7 @@ type Mutation {
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
   holofuelRecoverFunds(transactionId: ID): Transaction
-  holofuelRefundDeclined(transactions: [TransactionsInput]): [Transaction]
+  holofuelRefundDeclined(transactions: [TransactionInput]): [Transaction]
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings
   hposUpdateVersion: HposStatus
   hposCheckAuth: HposAuth
