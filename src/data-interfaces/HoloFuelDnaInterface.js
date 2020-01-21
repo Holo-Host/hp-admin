@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { pickBy } from 'lodash/fp'
+import { pickBy, isEmpty } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -226,9 +226,18 @@ const HoloFuelDnaInterface = {
     }
   },
   transactions: {
-    allCompleted: async ({ since }) => {
-      const params = since ? { since } : {}
-      const { transactions } = await createZomeCall('transactions/list_transactions')(params)
+    allCompleted: async () => {
+      const { transactions } = await createZomeCall('transactions/list_transactions')()
+      const listOfNonActionableTransactions = transactions.map(presentTransaction)
+      const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
+
+      return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+    },
+    allNewCompleted: async (since) => {
+      if (!since) throw new Error(`Attempted call to allNewCompleted with since param value, ${since === '' ? "''" : since}, found.`)
+      // const params = !isEmpty(since) ? { since } : {}
+
+      const { transactions } = await createZomeCall('transactions/list_transactions')({ since })
       const listOfNonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
 

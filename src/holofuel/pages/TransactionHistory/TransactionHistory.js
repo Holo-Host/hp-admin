@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, uniqBy, get, remove } from 'lodash/fp'
+import { isEmpty, capitalize, uniqBy, intersectionBy, get, without } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -36,36 +36,14 @@ function useCancel () {
   })
 }
 
-function useFetchNewCompletedTransactions ({ since }) {
-  const { loading: loadingNewCompletedTransactions, data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
-
-  return {
-    loadingNewCompletedTransactions,
-    holofuelNewCompletedTransactions
-  }
-}
-
 function useTransactionsWithCounterparties () {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
   const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
-  const fetchNewCompleted = useFetchNewCompletedTransactions
-
-  const [hasCompletedInitialPageLoad, setHasCompletedInitialPageLoad] = useState(false)
-  const [newCompletedTransactions, setNewCompletedTransactions] = useState(false)
-
-  if (!isEmpty(holofuelCompletedTransactions)) {
-    const since = holofuelCompletedTransactions[0].timestamp
-    const { loadingNewCompletedTransactions, holofuelNewCompletedTransactions } = fetchNewCompleted({ since })
-
-    console.log('loadingNewCompletedTransactions : ', loadingNewCompletedTransactions)
-    console.log('holofuelNewCompletedTransactions : ', holofuelNewCompletedTransactions)
-
-    setHasCompletedInitialPageLoad(true)
-    setNewCompletedTransactions(holofuelNewCompletedTransactions)
-  }
+  const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
+  const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
 
   const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
     ...transaction,
@@ -74,23 +52,28 @@ function useTransactionsWithCounterparties () {
 
   const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
 
-  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions.concat(newCompletedTransactions), allCounterparties)
+  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions.concat(holofuelNewCompletedTransactions), allCounterparties)
   const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
+
+  const filteredTransactionById = intersectionBy('id', updatedCompletedTransactions, updatedWaitingTransactions)
+  const pendingTransactions = without(filteredTransactionById, updatedWaitingTransactions)
+
+  console.log('filteredTransactionById :', filteredTransactionById)
+  console.log('pendingTransactions :', pendingTransactions)
 
   return {
     completedTransactions: updatedCompletedTransactions,
-    pendingTransactions: updatedWaitingTransactions,
+    pendingTransactions,
     loadingCompletedTransactions,
-    loadingPendingTransactions,
-    hasCompletedInitialPageLoad
+    loadingPendingTransactions
   }
 }
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
 export default function TransactionsHistory ({ history: { push } }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
-  const { completedTransactions, pendingTransactions, loadingCompletedTransactions, loadingPendingTransactions, hasCompletedInitialPageLoad } = useTransactionsWithCounterparties()
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only', pollInterval: 5000 })
+  const { completedTransactions, pendingTransactions, loadingCompletedTransactions, loadingPendingTransactions } = useTransactionsWithCounterparties()
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()
@@ -133,19 +116,20 @@ export default function TransactionsHistory ({ history: { push } }) {
     label: 'Pending',
     transactions: filteredPendingTransactions,
     loading: loadingPendingTransactions
-  }]
-    .concat([{
-      // this partition only displays if completed transactions is loading
-      label: 'Completed',
-      transactions: [],
-      loading: loadingCompletedTransactions
-    }])
-    .concat(partitionByDate(filteredCompletedTransactions)))
-    .filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
+  }])
 
-  if (hasCompletedInitialPageLoad) {
-    partitionedTransactions = remove({ label: 'Completed' }, partitionedTransactions)
+  let firstCompletedLabel, firstCompletedTransaction
+  if (partitionByDate(filteredCompletedTransactions)[0]) {
+    firstCompletedLabel = partitionByDate(filteredCompletedTransactions)[0].label
+    firstCompletedTransaction = partitionByDate(filteredCompletedTransactions)[0].transactions
   }
+  const completedPartitionedTransactions = [{
+    label: firstCompletedLabel || 'Completed',
+    transactions: firstCompletedTransaction || [],
+    loading: loadingCompletedTransactions
+  }].concat(partitionByDate(filteredCompletedTransactions).slice(1))
+
+  partitionedTransactions = partitionedTransactions.concat(completedPartitionedTransactions).filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='header'>
@@ -168,7 +152,6 @@ export default function TransactionsHistory ({ history: { push } }) {
       {partitionedTransactions.map(partition =>
         <TransactionPartition key={partition.label}
           partition={partition}
-          hasCompletedInitialPageLoad={hasCompletedInitialPageLoad}
           showCancellationModal={showCancellationModal} />)}
     </div>}
 
@@ -197,14 +180,15 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-function TransactionPartition ({ partition, hasCompletedInitialPageLoad, showCancellationModal }) {
+function TransactionPartition ({ partition, showCancellationModal }) {
   const { label, loading, transactions } = partition
+
   return <>
     <h4 styleName='partition-label'>{label}</h4>
     {loading && <Loading styleName='partition-loading' />}
     {transactions.map((transaction, index) => <TransactionRow
-      transaction={transaction}
       key={transaction.id}
+      transaction={transaction}
       showCancellationModal={showCancellationModal}
       isFirst={index === 0} />)}
   </>
