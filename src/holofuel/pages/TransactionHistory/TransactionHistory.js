@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, uniqBy, intersectionBy, get, without } from 'lodash/fp'
+import { isEmpty, capitalize, intersectionBy, without } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -11,9 +11,6 @@ import Loading from 'components/Loading'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
-
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
@@ -36,41 +33,19 @@ function useCancel () {
   })
 }
 
-function useTransactionsWithCounterparties () {
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
+
+export default function TransactionsHistory ({ history: { push } }) {
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only' })
   const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
   const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
 
-  const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
-    ...transaction,
-    counterparty: counterparties.find(counterparty => counterparty.id === get('counterparty.id', transaction)) || transaction.counterparty
-  }))
-
-  const allCounterparties = uniqBy('id', holofuelHistoryCounterparties.concat([whoami]))
-
-  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions.concat(holofuelNewCompletedTransactions), allCounterparties)
-  const updatedWaitingTransactions = updateCounterparties(holofuelWaitingTransactions, allCounterparties)
-
-  const filteredTransactionById = intersectionBy('id', updatedCompletedTransactions, updatedWaitingTransactions)
-  const pendingTransactions = without(filteredTransactionById, updatedWaitingTransactions)
-
-  return {
-    completedTransactions: updatedCompletedTransactions,
-    pendingTransactions,
-    loadingCompletedTransactions,
-    loadingPendingTransactions
-  }
-}
-
-const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
-
-export default function TransactionsHistory ({ history: { push } }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'network-only', pollInterval: 5000 })
-  const { completedTransactions, pendingTransactions, loadingCompletedTransactions, loadingPendingTransactions } = useTransactionsWithCounterparties()
+  const completedTransactions = holofuelCompletedTransactions.concat(holofuelNewCompletedTransactions)
+  const filteredTransactionById = intersectionBy('id', completedTransactions, holofuelWaitingTransactions)
+  const pendingTransactions = without(filteredTransactionById, holofuelWaitingTransactions)
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()

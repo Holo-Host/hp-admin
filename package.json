@@ -1,6 +1,6 @@
 {
   "name": "hp-admin",
-  "version": "0.2.1",
+  "version": "0.9.1",
   "private": true,
   "scripts": {
     "start-mock": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_MOCK_DNA_CONNECTION='true' node scripts/start.js",
@@ -24,7 +24,7 @@
     "test:wait-for-conductor": "node scripts/wait-for-conductor.js",
     "preseed:holofuel": "node scripts/prepareHoloFuelData/index.js",
     "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",
-    "test:preseed-data": "nix-shell --command 'npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data'",
+    "test:preseed-data": "npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data",
     "test:integration": "nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "test:integration-with-setup": "npm run test:preseed-data && npm run test:integration"
   },

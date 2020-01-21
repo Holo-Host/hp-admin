@@ -2,7 +2,7 @@ query HolofuelCompletedTransactionsQuery {
   holofuelCompletedTransactions {
     id
     amount
-    counterparty { id }
+    counterparty { id, nickname }
     direction
     status
     type
