@@ -283,7 +283,7 @@ export default function Inbox ({ history: { push } }) {
 }
 
 export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, showConfirmationModal, isActionable, whoami, disableActionedTransaction, increaseAction, decreseAction, statusQuoAction }) {
-  const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy } = transaction
+  const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
   const agent = canceledBy || counterparty
 
   const drawerIsOpen = transaction.id === actionsVisibleId
@@ -300,8 +300,19 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   const isDeclined = status === STATUS.declined
 
   let story
-  if (isActionable && !isDeclined) story = isOffer ? ' is offering' : ' is requesting'
-  else if (isDeclined && isOffer) story = 'declined'
+  if (isActionable && !isDeclined) {
+    if (isOffer) {
+      if (isPayingARequest) {
+        story = ' is paying your request'
+      } else {
+        story = ' is offering'
+      }
+    } else {
+      story = ' is requesting'
+    }
+  } else if (isDeclined && isOffer) {
+    story = 'has declined'
+  }
 
   let fullNotes
   if (isCanceled) {

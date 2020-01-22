@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import cx from 'classnames'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import './AmountInput.module.css'
@@ -6,6 +7,8 @@ import './AmountInput.module.css'
 export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequest }) {
   // we can't just use amount because amount is a number, and here we need to distinguish between values like '23' and '23.'
   const [inputValue, setInputValueRaw] = useState(String(amount))
+
+  const isValidAmount = amount > 0
 
   const setInputValue = value => {
     const cleanValue = value.replace(/[^0-9.]/g, '') || '0' // strips non numerical characters
@@ -41,8 +44,12 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
         </div>
       </div>
       <div styleName='action-row'>
-        <Button onClick={chooseSend} variant='white' styleName='action-button'>Send</Button>
-        <Button onClick={chooseRequest} variant='white' styleName='action-button'>Request</Button>
+        <Button onClick={chooseSend} disabled={!isValidAmount} variant='white' styleName={cx('action-button', { disabled: !isValidAmount })}>
+          Send
+        </Button>
+        <Button onClick={chooseRequest} disabled={!isValidAmount} variant='white' styleName={cx('action-button', { disabled: !isValidAmount })}>
+          Request
+        </Button>
       </div>
     </div>
   </PrimaryLayout>
