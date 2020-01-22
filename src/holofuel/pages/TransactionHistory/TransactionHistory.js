@@ -33,6 +33,11 @@ function useCancel () {
   })
 }
 
+function usePollCompletedTransactions ({ since }) {
+  const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
+  return holofuelNewCompletedTransactions
+}
+
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
 export default function TransactionsHistory ({ history: { push } }) {
@@ -40,10 +45,19 @@ export default function TransactionsHistory ({ history: { push } }) {
   const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
-  const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
-  const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
+  // const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
+  // const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
 
-  const completedTransactions = holofuelCompletedTransactions.concat(holofuelNewCompletedTransactions)
+  const [newCompletedTransactions, setNewCompletedTransactions] = useState([])
+  const pollCompletedTransactions = usePollCompletedTransactions
+
+  if (!isEmpty(holofuelCompletedTransactions)) {
+    const since = holofuelCompletedTransactions[0].timestamp
+    const pollingResult = pollCompletedTransactions({ since })
+    setNewCompletedTransactions(pollingResult)
+  }
+
+  const completedTransactions = holofuelCompletedTransactions.concat(newCompletedTransactions)
   const filteredTransactionById = intersectionBy('id', completedTransactions, holofuelWaitingTransactions)
   const pendingTransactions = without(filteredTransactionById, holofuelWaitingTransactions)
 
@@ -84,12 +98,6 @@ export default function TransactionsHistory ({ history: { push } }) {
     !loadingPendingTransactions &&
     !loadingCompletedTransactions
 
-  let partitionedTransactions = ([{
-    label: 'Pending',
-    transactions: filteredPendingTransactions,
-    loading: loadingPendingTransactions
-  }])
-
   let firstCompletedLabel, firstCompletedTransaction
   if (partitionByDate(filteredCompletedTransactions)[0]) {
     firstCompletedLabel = partitionByDate(filteredCompletedTransactions)[0].label
@@ -101,7 +109,11 @@ export default function TransactionsHistory ({ history: { push } }) {
     loading: loadingCompletedTransactions
   }].concat(partitionByDate(filteredCompletedTransactions).slice(1))
 
-  partitionedTransactions = partitionedTransactions.concat(completedPartitionedTransactions).filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
+  const partitionedTransactions = ([{
+    label: 'Pending',
+    transactions: filteredPendingTransactions,
+    loading: loadingPendingTransactions
+  }]).concat(completedPartitionedTransactions).filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='header'>

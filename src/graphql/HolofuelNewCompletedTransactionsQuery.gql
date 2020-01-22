@@ -1,4 +1,4 @@
-query HolofuelNewCompletedTransactionsQuery($since: String!) {
+query HolofuelNewCompletedTransactionsQuery($since: String) {
   holofuelNewCompletedTransactions(since: $since) {
     id
     amount
