@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react' // useState,
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get } from 'lodash/fp'
@@ -76,7 +76,7 @@ export default function Home () {
           </div>}
 
           {isTransactionsEmpty && !loadingTransactions && <div styleName='transactions-empty'>
-            You have no offers or requests
+            You have no recent transactions
           </div>}
 
           {!isTransactionsEmpty && <h2 styleName='transactions-label'>Recent Transactions</h2>}
