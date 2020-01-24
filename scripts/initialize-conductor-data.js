@@ -221,10 +221,10 @@ const populateHpAdminData = async () => {
 
 populateHoloFuelData()
   .then(() => console.log('Finished loading HoloFuel data...'))
-  // .then(() => populateHpAdminData())
-  // .then(() => console.log('Finished loading HPAdmin data...'))
-  // .then(() => snapshotStrorage())
-  // .then(() => console.log('Loaded Snapshot Storage'))
+  .then(() => populateHpAdminData())
+  .then(() => console.log('Finished loading HPAdmin data...'))
+  .then(() => snapshotStrorage())
+  .then(() => console.log('Loaded Snapshot Storage'))
   .then(() => process.exit())
   .catch(e => {
     console.log('error', e)
