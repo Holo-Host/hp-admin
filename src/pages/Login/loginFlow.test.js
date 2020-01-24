@@ -23,7 +23,7 @@ const HPAdminApp = () =>
   </Router>
 
 describe('login flow', () => {
-  it('redirects to "/admin/" on succesful auth', async () => {
+  it.skip('redirects to "/admin/" on succesful auth', async () => {
     const mocks = [{
       request: {
         query: HposCheckAuthMutation,
@@ -57,7 +57,7 @@ describe('login flow', () => {
     expect(queryByLabelText('Email:')).not.toBeInTheDocument()
   })
 
-  it('shows flash message on unsuccesful auth', async () => {
+  it.skip('shows flash message on unsuccesful auth', async () => {
     const mocks = [{
       request: {
         query: HposCheckAuthMutation,
