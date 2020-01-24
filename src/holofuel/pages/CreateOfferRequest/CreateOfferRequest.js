@@ -221,8 +221,6 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
     variables: { agentId }
   })
 
-  const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
-
   const { nickname, notFound, id } = holofuelCounterparty
   useEffect(() => {
     setCounterpartyNick(nickname)
@@ -231,20 +229,16 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
   useEffect(() => {
     if (!loading) {
       if (notFound) {
+        console.log('bam')
         setCounterpartyFound(false)
-        if (!hasDisplayedNotFoundMessage) {
-          newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
-          setHasDisplayedNotFoundMessage(true)
-        }
+        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
       } else {
         setCounterpartyFound(true)
-        setHasDisplayedNotFoundMessage(false)
       }
     } else {
       setCounterpartyFound(false)
-      setHasDisplayedNotFoundMessage(false)
     }
-  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage, id])
+  }, [setCounterpartyFound, loading, notFound, newMessage, id])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.
