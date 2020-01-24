@@ -27,7 +27,7 @@ const addFullCounterpartyToTx = async (tx) => {
 
 const getTxWithCounterparties = transactionList => promiseMap(transactionList, addFullCounterpartyToTx)
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -39,11 +39,12 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     type: TYPE.request,
     timestamp: eventTimestamp,
     notes: notes || event.Request.notes,
-    fees
+    fees,
+    isPayingARequest
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -55,7 +56,8 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     type: TYPE.offer,
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
-    fees
+    fees,
+    isPayingARequest
   }
 }
 
@@ -156,7 +158,8 @@ function presentPendingOffer (transaction, annuled = false) {
   const eventTimestamp = event[1]
   const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
+  const isPayingARequest = !!event[2].Promise.request
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest })
 }
 
 function presentTransaction (transaction) {
@@ -281,7 +284,7 @@ const HoloFuelDnaInterface = {
       const cleanedList = _.uniqBy(nonActionableTransactions, 'id')
 
       if (cleanedList.length === 0) {
-        console.error(`No pending transaction with id ${transactionId} found.`)
+        throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
         return cleanedList
       }

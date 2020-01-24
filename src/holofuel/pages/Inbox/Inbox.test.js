@@ -19,14 +19,100 @@ import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import holofuelRefundDeclinedMutation from 'graphql/HolofuelRefundDeclinedMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
-import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 import { presentAgentId } from '../../../utils'
-
-const { ledger } = transactionList
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+
+const actionableTransactions = pendingList.requests.concat(pendingList.promises).concat(pendingList.declined).map(item => {
+  if (item.event) {
+    if (item.event[2].Request) {
+      return {
+        type: 'request',
+        ...item.event[2].Request,
+        counterparty: item.event[2].Request.from,
+        timestamp: item.event[1],
+        status: STATUS.pending,
+        isPayingARequest: false
+      }
+    } else if (item.event[2].Promise) {
+      return {
+        type: 'offer',
+        ...item.event[2].Promise.tx,
+        counterparty: item.event[2].Promise.tx.from,
+        timestamp: item.event[1],
+        status: STATUS.pending,
+        isPayingARequest: !!item.event[2].Promise.request
+      }
+    }
+  } else if (item[2]) {
+    if (item[2].Request) {
+      return {
+        type: 'request',
+        ...item[2].Request,
+        counterparty: item[2].Request.from,
+        timestamp: item[1],
+        status: STATUS.declined,
+        isPayingARequest: false
+      }
+    } else if (item[2].Promise) {
+      return {
+        type: 'offer',
+        ...item[2].Promise.tx,
+        counterparty: item[2].Promise.tx.from,
+        timestamp: item[1],
+        status: STATUS.declined,
+        isPayingARequest: false
+      }
+    }
+  } else {
+    throw new Error('unrecognized transaction type', item.toString())
+  }
+}).sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+
+const { ledger } = transactionList
+
+describe('Inbox Connected (with Agent Nicknames)', () => {
+  it('renders', async () => {
+    const { getAllByRole, getByText } = await renderAndWait(<ApolloProvider client={apolloClient}>
+      <Inbox history={{}} />
+    </ApolloProvider>, 15)
+
+    expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
+
+    const listItems = getAllByRole('listitem')
+    expect(listItems).toHaveLength(4)
+
+    const getByTextParent = getByText
+
+    listItems.forEach(async (item, index) => {
+      const { getByText } = within(item)
+
+      const transaction = actionableTransactions[index]
+      expect(getByText(transaction.notes, { exact: false })).toBeInTheDocument()
+      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) TF` : `${presentHolofuelAmount(transaction.amount)} TF`
+
+      let story
+
+      if (transaction.status === STATUS.declined) {
+        story = 'has declined'
+      } else if (transaction.type === 'request') {
+        story = 'is requesting'
+      } else if (transaction.type === 'offer') {
+        if (transaction.isPayingARequest) {
+          story = 'is paying your request'
+        } else {
+          story = 'is offering'
+        }
+      }
+
+      expect(getByText(amountToMatch)).toBeInTheDocument()
+      expect(getByText(story)).toBeInTheDocument()
+      expect(getByTextParent(getDateLabel(transaction.timestamp))).toBeInTheDocument()
+    })
+  })
+})
 
 const actionableTransactionsMock = {
   request: {
@@ -469,93 +555,6 @@ describe('TransactionRow', () => {
         await wait(0)
       })
       expect(props.handleClose).toHaveBeenCalled()
-    })
-  })
-})
-
-const actionableTransactions = pendingList.requests.concat(pendingList.promises).concat(pendingList.declined).map(item => {
-  if (item.event) {
-    if (item.event[2].Request) {
-      return {
-        type: 'request',
-        ...item.event[2].Request,
-        counterparty: item.event[2].Request.from,
-        timestamp: item.event[1],
-        status: STATUS.pending,
-        whoami: item.event[2].Request.to
-      }
-    } else if (item.event[2].Promise) {
-      return {
-        type: 'offer',
-        ...item.event[2].Promise.tx,
-        counterparty: item.event[2].Promise.tx.from,
-        timestamp: item.event[1],
-        status: STATUS.pending,
-        whoami: item.event[2].Promise.tx.from
-      }
-    }
-  } else if (item[2]) {
-    if (item[2].Request) {
-      return {
-        type: 'request',
-        ...item[2].Request,
-        counterparty: item[2].Request.from,
-        timestamp: item[1],
-        status: STATUS.declined,
-        whoami: item[2].Request.to
-      }
-    } else if (item[2].Promise) {
-      return {
-        type: 'offer',
-        ...item[2].Promise.tx,
-        counterparty: item[2].Promise.tx.from,
-        timestamp: item[1],
-        status: STATUS.declined,
-        whoami: item[2].Promise.tx.to
-      }
-    }
-  } else {
-    throw new Error('unrecognized transaction type', item.toString())
-  }
-}).sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
-
-describe('Inbox Connected (with Agent Nicknames)', () => {
-  it('renders', async () => {
-    const { getAllByRole, getByText } = await renderAndWait(<ApolloProvider client={apolloClient}>
-      <Inbox history={{}} />
-    </ApolloProvider>, 15)
-
-    expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
-
-    const listItems = getAllByRole('listitem')
-    expect(listItems).toHaveLength(3)
-
-    const getByTextParent = getByText
-
-    listItems.forEach(async (item, index) => {
-      const whois = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].counterparty })
-      const whoami = await HoloFuelDnaInterface.user.getCounterparty({ agentId: actionableTransactions[index].whoami })
-      const { getByText } = within(item)
-
-      const transaction = actionableTransactions[index]
-      expect(getByText(transaction.notes, { exact: false })).toBeInTheDocument()
-      const amountToMatch = transaction.type === 'request' ? `(${presentHolofuelAmount(transaction.amount)}) TF` : `${presentHolofuelAmount(transaction.amount)} TF`
-      let story, counterpartyNickname
-      if (transaction.status === STATUS.declined) {
-        story = 'declined'
-        counterpartyNickname = whoami.nickname
-      } else if (transaction.type === 'request') {
-        story = 'is requesting'
-        counterpartyNickname = whois.nickname
-      } else if (transaction.type === 'offer') {
-        story = 'is offering'
-        counterpartyNickname = whois.nickname
-      }
-
-      expect(getByText(amountToMatch)).toBeInTheDocument()
-      expect(getByText(story)).toBeInTheDocument()
-      expect(getByText(counterpartyNickname)).toBeInTheDocument()
-      expect(getByTextParent(getDateLabel(transaction.timestamp))).toBeInTheDocument()
     })
   })
 })
