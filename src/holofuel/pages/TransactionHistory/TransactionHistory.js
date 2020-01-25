@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, intersectionBy, without } from 'lodash/fp'
+import { isEmpty, capitalize, intersectionBy, find, reject } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -45,21 +45,12 @@ export default function TransactionsHistory ({ history: { push } }) {
   const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
-  // const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
-  // const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
+  const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
+  const pollingResult = usePollCompletedTransactions({ since })
 
-  const [newCompletedTransactions, setNewCompletedTransactions] = useState([])
-  const pollCompletedTransactions = usePollCompletedTransactions
-
-  if (!isEmpty(holofuelCompletedTransactions)) {
-    const since = holofuelCompletedTransactions[0].timestamp
-    const pollingResult = pollCompletedTransactions({ since })
-    setNewCompletedTransactions(pollingResult)
-  }
-
-  const completedTransactions = holofuelCompletedTransactions.concat(newCompletedTransactions)
+  const completedTransactions = holofuelCompletedTransactions.concat(pollingResult)
   const filteredTransactionById = intersectionBy('id', completedTransactions, holofuelWaitingTransactions)
-  const pendingTransactions = without(filteredTransactionById, holofuelWaitingTransactions)
+  const pendingTransactions = reject(({ id }) => find({ id }, filteredTransactionById), holofuelWaitingTransactions)
 
   const cancelTransaction = useCancel()
   const [modalTransaction, setModalTransaction] = useState()

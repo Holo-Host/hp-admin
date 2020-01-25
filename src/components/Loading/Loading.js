@@ -4,7 +4,7 @@ import { caribbeanGreen } from 'utils/colors'
 
 export default function Loading ({
   color = caribbeanGreen,
-  type = 'TailSpin',
+  type = 'Circles',
   height = 60,
   width = 60,
   className,

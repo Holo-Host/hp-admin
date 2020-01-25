@@ -243,15 +243,6 @@ const HoloFuelDnaInterface = {
 
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
-    allNewCompleted: async (since) => {
-      if (!since) throw new Error(`Attempted call to allNewCompleted with since param value, ${since === '' ? "''" : since}, found.`)
-
-      const { transactions } = await createZomeCall('transactions/list_transactions')({ since })
-      const listOfNonActionableTransactions = transactions.map(presentTransaction)
-      const noDuplicateIds = _.uniqBy(listOfNonActionableTransactions, 'id')
-
-      return noDuplicateIds.filter(tx => tx.status === 'completed').sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
-    },
     allActionable: async () => {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
       const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentIncomingCanceledTransaction))
