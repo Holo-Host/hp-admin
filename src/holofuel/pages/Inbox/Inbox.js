@@ -143,21 +143,17 @@ export default function Inbox ({ history: { push } }) {
   const refundAllDeclinedTransactions = useRefundAllDeclinedTransactions()
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
   const [isDeclinedTransactionModalVisible, setIsDeclinedTransactionModalVisible] = useState(false)
-  const [hasDisplayedDeclinedTransactionsMessage, setHasDisplayedDeclinedTransactionsMessage] = useState(false)
   const [modalTransaction, setModalTransaction] = useState(null)
 
   const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
+  const shouldShowDeclinedTransactionModal = !isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))
+
   useEffect(() => {
-    if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
-      if (!hasDisplayedDeclinedTransactionsMessage) {
-        setIsDeclinedTransactionModalVisible(true)
-        setHasDisplayedDeclinedTransactionsMessage(true)
-      }
-    } else {
-      setHasDisplayedDeclinedTransactionsMessage(false)
+    if (shouldShowDeclinedTransactionModal) {
+      setIsDeclinedTransactionModalVisible(true)
     }
-  }, [filterActionableTransactionsByStatusAndType, hasDisplayedDeclinedTransactionsMessage, setIsDeclinedTransactionModalVisible])
+  }, [shouldShowDeclinedTransactionModal, setIsDeclinedTransactionModalVisible])
 
   const showConfirmationModal = (transaction = {}, action = '') => {
     const modalTransaction = { ...transaction, action }
@@ -493,35 +489,21 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
   const { loading: loaderCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
   const { notFound } = holofuelCounterparty
 
-  const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
-  const [hasDisplayedFetchingCounterpartyMessage, setHasDisplayedFetchingCounterpartyMessage] = useState(false)
-
   useEffect(() => {
-    // eslint-disable-next-line no-useless-return
     if (isEmpty(transaction)) return
-    else if (loaderCounterparty) {
+
+    if (loaderCounterparty) {
       setCounterpartyNotFound(true)
-      setHasDisplayedNotFoundMessage(false)
-      if (!hasDisplayedFetchingCounterpartyMessage) {
-        newMessage('Verifying your counterparty is online.', 5000)
-        setHasDisplayedFetchingCounterpartyMessage(true)
-      }
+      newMessage('Verifying your counterparty is online.', 5000)
     } else if (!isEmpty(holofuelCounterparty)) {
       if (notFound) {
         setCounterpartyNotFound(true)
-        setHasDisplayedFetchingCounterpartyMessage(false)
-        if (!hasDisplayedNotFoundMessage) {
-          newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.')
-          setHasDisplayedNotFoundMessage(true)
-        }
+        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.')
       } else {
         setCounterpartyNotFound(false)
-        setHasDisplayedFetchingCounterpartyMessage(false)
       }
-    } else {
-      newMessage('', 0)
     }
-  }, [transaction, loaderCounterparty, setCounterpartyNotFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, notFound, holofuelCounterparty, setHasDisplayedFetchingCounterpartyMessage, hasDisplayedFetchingCounterpartyMessage, newMessage])
+  }, [transaction, loaderCounterparty, setCounterpartyNotFound, notFound, holofuelCounterparty, newMessage])
 
   let message, actionHook, actionParams, contentLabel, flashMessage, transactionDirection
   switch (action) {

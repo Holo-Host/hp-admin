@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { render, fireEvent, act } from '@testing-library/react'
 import wait from 'waait'
 import FlashMessage from './FlashMessage.js'
@@ -11,6 +11,18 @@ function MockFlashMessageConsumer ({ message, time }) {
   return <button onClick={() => newMessage(message, time)}>
     New Message
   </button>
+}
+
+function MockConsumerUsingEffect ({ message }) {
+  const { newMessage } = useFlashMessageContext()
+
+  useEffect(() => {
+    if (message) {
+      newMessage(message)
+    }
+  }, [newMessage, message])
+
+  return <div />
 }
 
 it('should render a closable message', () => {
@@ -50,6 +62,22 @@ it('should render a message which closes itself after the given time', async () 
   expect(queryByText(message)).toBeInTheDocument()
 
   await act(() => wait(time * 2))
+
+  expect(queryByText(message)).not.toBeInTheDocument()
+})
+
+it('newMessage function should not cause rerenders', () => {
+  const message = 'this is the message'
+  const { queryByText, getByText } = render(
+    <FlashMessageProvider>
+      <FlashMessage />
+      <MockConsumerUsingEffect message={message} />
+    </FlashMessageProvider>
+  )
+
+  expect(queryByText(message)).toBeInTheDocument()
+
+  fireEvent.click(getByText('x'))
 
   expect(queryByText(message)).not.toBeInTheDocument()
 })
