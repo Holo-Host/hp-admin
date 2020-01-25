@@ -89,16 +89,18 @@ export default function TransactionsHistory ({ history: { push } }) {
     !loadingPendingTransactions &&
     !loadingCompletedTransactions
 
+  const completedTransactionsPartitionedByDate = partitionByDate(filteredCompletedTransactions)
+
   let firstCompletedLabel, firstCompletedTransaction
-  if (partitionByDate(filteredCompletedTransactions)[0]) {
-    firstCompletedLabel = partitionByDate(filteredCompletedTransactions)[0].label
-    firstCompletedTransaction = partitionByDate(filteredCompletedTransactions)[0].transactions
+  if (completedTransactionsPartitionedByDate[0]) {
+    firstCompletedLabel = completedTransactionsPartitionedByDate[0].label
+    firstCompletedTransaction = completedTransactionsPartitionedByDate[0].transactions
   }
   const completedPartitionedTransactions = [{
     label: firstCompletedLabel || 'Completed',
     transactions: firstCompletedTransaction || [],
     loading: loadingCompletedTransactions
-  }].concat(partitionByDate(filteredCompletedTransactions).slice(1))
+  }].concat(completedTransactionsPartitionedByDate.slice(1))
 
   const partitionedTransactions = ([{
     label: 'Pending',
