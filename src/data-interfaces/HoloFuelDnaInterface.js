@@ -233,8 +233,10 @@ const HoloFuelDnaInterface = {
     }
   },
   transactions: {
-    allCompleted: async () => {
-      const { transactions } = await createZomeCall('transactions/list_transactions')()
+    allCompleted: async (since) => {
+      const params = since ? { since } : {}
+
+      const { transactions } = await createZomeCall('transactions/list_transactions')(params)
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
@@ -285,9 +287,10 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
       const whoami = await HoloFuelDnaInterface.user.get()
+
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')
-        .map(tx => tx.status === STATUS.cancelled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
+        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
 
       const presentedNonActionableTransactions = await getTxWithCounterparties(nonActionableTransactionsWithCancelByKey)
 
