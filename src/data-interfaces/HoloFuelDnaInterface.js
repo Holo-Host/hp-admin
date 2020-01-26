@@ -287,9 +287,10 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
       const whoami = await HoloFuelDnaInterface.user.get()
+
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')
-        .map(tx => tx.status === STATUS.cancelled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
+        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
 
       const presentedNonActionableTransactions = await getTxWithCounterparties(nonActionableTransactionsWithCancelByKey)
 
