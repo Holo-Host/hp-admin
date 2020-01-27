@@ -1,4 +1,4 @@
-{ pkgs ? import ./pkgs.nix {} }:
+{ pkgs ? import ./pkgs.nix {}, shell ? false }:
 
 with pkgs;
 
@@ -82,13 +82,13 @@ in
 {
 
   hp-admin-ui = stdenv.mkDerivation rec {
+    inherit shell;
     name = "hp-admin-ui";
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
-      holochain-cli
-      holochain-conductor
-      nodejs-12_x
+      holochain-rust
+      nodejs
       pkgconfig
       cairo
       giflib
@@ -133,9 +133,8 @@ in
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
-      holochain-cli
-      holochain-conductor
-      nodejs-12_x
+      holochain-rust
+      nodejs
       pkgconfig
       cairo
       giflib
@@ -201,7 +200,7 @@ in
       }
     ];
     network = {
-      sim2h_url = "wss://sim2h.holochain.org:9000";
+      sim2h_url = "ws://public.sim2h.net:9000";
       type = "sim2h";
     };
     logger = {
@@ -248,7 +247,7 @@ in
       }
     ];
     network = {
-      sim2h_url = "wss://sim2h.holochain.org:9000";
+      sim2h_url = "ws://public.sim2h.net:9000";
       type = "sim2h";
     };
     logger = {

@@ -369,10 +369,49 @@ export const pendingList = {
         'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
         '3+BrqUuu3sC4bZmub4qGvkmfeKnkJfkm5qZGOM88uompxM0/gE2KNpvTyxpGg44MCbNMB8i8vHBmhTIDMjFwAQ=='
       ]
+    },
+    {
+      event: [
+        'QmYNt6DYMiymJtf8oeZ4qn86yWANurFEuAzKuzMQGhsnsj',
+        '2020-01-05T11:45:10+00:00',
+        {
+          Promise: {
+            tx: {
+              from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+              to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+              amount: '5000',
+              fee: '0',
+              deadline: '2020-01-22T00:00:00-02:00',
+              notes: "Here's that HF you asked for",
+              synchronous: null
+            },
+            request: 'QmYNt6DYMiymJtf8oeZ4qn86yWANurFEuAzKuzMQGhbHgN'
+          }
+        }
+      ],
+      provenance: [
+        'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+        '3+BrqUuu3sC4bZmub4qGvkmfeKnkJfkm5qZGOM88uompxM0/gE2KNpvTyxpGg44MCbNMB8i8vHBmhTIDMjFwAQ=='
+      ]
     }
   ],
-  // TODO: >> RESOLVE QUESTION: Is this an Anti-Faud measure (?? => determine use case of actionable decline event) >> Spender must accept Spender's proposed decline of a offered HF ??
-  declined: [],
+  declined: [[
+    'QmcH3rDq94ENu5gkZHHMTiNG2ocF6qns3NdQBwU7ZeN3pW',
+    '2020-01-10T21:40:11+00:00',
+    {
+      Promise: {
+        tx: {
+          amount: '600',
+          deadline: '2019-12-31T21:39:40.697+00:00',
+          fee: '6',
+          from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+          notes: 'Pre-Seed Data',
+          synchronous: null,
+          to: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+        }
+      }
+    }
+  ]],
   // NOTE: This is to allow Spender Refunds >> Recipient must accept proposed cancelation of a completed Transfer, in order for the Spender to be refunded.
   canceled: []
 }

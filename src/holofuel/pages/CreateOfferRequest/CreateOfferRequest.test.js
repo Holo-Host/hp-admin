@@ -120,7 +120,7 @@ describe('CreateOfferRequest', () => {
 
       expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
       expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
-      expect(getByText(`A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).toBeInTheDocument()
+      expect(getByText(`For TestFuel, a ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).toBeInTheDocument()
 
       act(() => {
         fireEvent.change(getByLabelText('For:'), { target: { value: notes } })
@@ -282,7 +282,7 @@ describe('CreateOfferRequest', () => {
       })
 
       expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
-      expect(within(getByTestId('counterparty-nickname')).getByText('Loading')).toBeInTheDocument()
+      expect(getByTestId('counterparty-loading')).toBeInTheDocument()
     })
 
     it('renders a clickable list of recent counterparties', async () => {
@@ -327,6 +327,16 @@ describe('CreateOfferRequest', () => {
 
       const { getByText: getByTextInAgent1Row } = within(agent1Row)
       expect(getByTextInAgent1Row('Selected')).toBeInTheDocument()
+    })
+
+    it('takes you back to the amount edit screen when clicking on the amount', async () => {
+      const { getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <CreateOfferRequest history={{}} />
+      </MockedProvider>)
+
+      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
+      fireEvent.click(getByText(`${presentHolofuelAmount(amount)} TF`))
+      expect(getByTestId('amount').value).toEqual(presentHolofuelAmount(amount))
     })
 
     it.skip('responds appropriately to bad input', () => {
@@ -396,5 +406,77 @@ describe('CreateOfferRequest', () => {
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
+  })
+})
+
+describe('AmountInput', () => {
+  it('allows input of non integer amounts where the fractional part begins with 0', async () => {
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={[]}>
+      <CreateOfferRequest history={{ }} />
+    </MockedProvider>)
+
+    fireEvent.click(getByText('1'))
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('0'))
+
+    expect(getByTestId('amount').value).toEqual('1.0')
+
+    fireEvent.click(getByText('2'))
+
+    fireEvent.click(getByText('Send'))
+    expect(getByText(`${presentHolofuelAmount(1.02)} TF`)).toBeInTheDocument()
+  })
+
+  it('ignores all presses of . beyond the first', async () => {
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={[]}>
+      <CreateOfferRequest history={{ }} />
+    </MockedProvider>)
+
+    fireEvent.click(getByText('1'))
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('0'))
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('3'))
+
+    expect(getByTestId('amount').value).toEqual('1.03')
+
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('4'))
+
+    fireEvent.click(getByText('Send'))
+    expect(getByText(`${presentHolofuelAmount('1.034')} TF`)).toBeInTheDocument()
+  })
+
+  it('presses of < if string is empty', async () => {
+    const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={[]}>
+      <CreateOfferRequest history={{ }} />
+    </MockedProvider>)
+
+    fireEvent.click(getByText('1'))
+    fireEvent.click(getByText('.'))
+    fireEvent.click(getByText('0'))
+    fireEvent.click(getByText('<'))
+    fireEvent.click(getByText('<'))
+    fireEvent.click(getByText('<'))
+    fireEvent.click(getByText('<'))
+
+    expect(getByTestId('amount').value).toEqual('0')
+  })
+
+  it("doesn't allow amount of zero to be submitted", async () => {
+    const { getByText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={[]}>
+      <CreateOfferRequest history={{ }} />
+    </MockedProvider>)
+
+    fireEvent.click(getByText('Send'))
+    expect(getByTestId('amount')).toBeInTheDocument()
+
+    fireEvent.click(getByText('Request'))
+    expect(getByTestId('amount')).toBeInTheDocument()
+
+    fireEvent.click(getByText('1'))
+
+    fireEvent.click(getByText('Send'))
+    expect(queryByTestId('amount')).not.toBeInTheDocument()
   })
 })

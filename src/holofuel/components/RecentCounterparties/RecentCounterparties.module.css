@@ -1,5 +1,6 @@
 .recent-counterparties {
   background-color: white;
+  height: 100%;
 }
 
 .header {
@@ -13,6 +14,24 @@
   display: flex;
   align-items: center;
 }
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 50px;
+}
+
+.no-peers {  
+  padding-top: 80px;
+  text-align: center;
+  height: 100%;
+  font-family: "Circular";
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--color-rhino-60);
+}
+
+/* AgentRow */
 
 .agent-row {
   display: flex;

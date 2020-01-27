@@ -3,7 +3,6 @@ import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import useForm from 'react-hook-form'
 import * as yup from 'yup'
-import Loader from 'react-loader-spinner'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
@@ -13,6 +12,7 @@ import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpa
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
+import Loading from 'components/Loading'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
@@ -21,7 +21,7 @@ import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
-export const FEE_PERCENTAGE = 0.01
+export const FEE_PERCENTAGE = 0
 const AGENT_ID_LENGTH = 63
 
 const FormValidationSchema = yup.object().shape({
@@ -63,10 +63,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHistoryCounterparties: agents } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== whoami.id)
+
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
-
   const { newMessage: newMessageRaw } = useFlashMessageContext()
   const newMessage = useCallback(newMessageRaw, [newMessageRaw])
 
@@ -92,7 +93,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const setAmount = amount => setAmountRaw(Number(amount))
 
   const fee = (amount * FEE_PERCENTAGE) || 0
-  const total = amount + fee
+  const total = mode === OFFER_MODE
+    ? amount + fee
+    : amount
 
   const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
@@ -139,12 +142,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
       <h4 styleName='amount-label'>
         {title}
       </h4>
-      <div styleName='amount'>
+      <div styleName='amount' onClick={() => setNumpadVisible(true)}>
         {presentHolofuelAmount(amount)} TF
       </div>
       <div styleName='fee-notice'>
         {mode === OFFER_MODE
-          ? `A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`
+          ? `For TestFuel, a ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`
           : ' '}
       </div>
     </div>
@@ -206,9 +209,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
     <RecentCounterparties
       styleName='recent-counterparties'
-      agents={agents}
+      agents={recentCounterpartiesWithoutMe}
       selectedAgentId={counterpartyId}
-      selectAgent={selectAgent} />
+      selectAgent={selectAgent}
+      loading={loadingRecentCounterparties} />
   </PrimaryLayout>
 }
 
@@ -216,8 +220,6 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
-
-  const [hasDisplayedNotFoundMessage, setHasDisplayedNotFoundMessage] = useState(false)
 
   const { nickname, notFound, id } = holofuelCounterparty
   useEffect(() => {
@@ -228,31 +230,23 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
     if (!loading) {
       if (notFound) {
         setCounterpartyFound(false)
-        if (!hasDisplayedNotFoundMessage) {
-          newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
-          setHasDisplayedNotFoundMessage(true)
-        }
+        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
       } else {
         setCounterpartyFound(true)
-        setHasDisplayedNotFoundMessage(false)
       }
     } else {
       setCounterpartyFound(false)
-      setHasDisplayedNotFoundMessage(false)
     }
-  }, [setCounterpartyFound, setHasDisplayedNotFoundMessage, hasDisplayedNotFoundMessage, loading, notFound, newMessage, id])
+  }, [setCounterpartyFound, loading, notFound, newMessage, id])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.
     return <>
-      <Loader
+      <Loading
+        dataTestId='counterparty-loading'
         type='ThreeDots'
-        color='#00BFFF'
         height={30}
-        width={30}
-        timeout={3000}
-      />
-       Loading
+        width={30} />
     </>
   }
 
