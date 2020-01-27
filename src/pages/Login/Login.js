@@ -7,6 +7,7 @@ import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import HoloFuelIcon from 'components/icons/HoloFuelIcon'
 import useAuthContext from 'contexts/useAuthContext'
+import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
 import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
@@ -14,6 +15,7 @@ import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
 export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
   const { register, handleSubmit, errors } = useForm()
+  const { isConnected } = useConnectionContext()
   const { setIsAuthed } = useAuthContext()
   const { newMessage } = useFlashMessageContext()
 
@@ -52,7 +54,8 @@ export default function Login ({ history: { push } }) {
             name='email'
             id='email'
             styleName='input'
-            ref={register({ required: true })} />
+            ref={register({ required: true })}
+            disabled={!isConnected} />
           {errors.email && <small styleName='field-error'>
             You need to provide a valid email address.
           </small>}
@@ -63,7 +66,8 @@ export default function Login ({ history: { push } }) {
             name='password'
             id='password'
             styleName='input'
-            ref={register({ required: true, minLength: 6 })} />
+            ref={register({ required: true, minLength: 6 })}
+            disabled={!isConnected} />
           {errors.password && <small styleName='field-error'>
             {errors.password.type === 'required' && 'Type in your password, please.'}
             {errors.password.type === 'minLength' && 'Password need to be at least 6 characters long.'}

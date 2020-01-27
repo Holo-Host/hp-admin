@@ -108,6 +108,10 @@ type HposAuth {
   isAuthed: Boolean
 }
 
+type HposConnection {
+  connection: Boolean
+}
+
 input HolofuelUserInput {
   id: ID
   nickname: String
@@ -144,6 +148,7 @@ type Query {
   holofuelHistoryCounterparties: [HolofuelUser]
   hposSettings: HposSettings
   hposStatus: HposStatus
+  hposConnection: HposConnection
 }
 
 type Mutation {

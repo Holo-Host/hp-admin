@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
+import { get } from 'lodash'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
@@ -7,7 +8,10 @@ import FlashMessage from 'components/FlashMessage'
 import SideMenu from 'components/SideMenu'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
+import HposConnectionQuery from 'graphql/HposConnectionQuery.gql'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import useConnectionContext from 'contexts/useConnectionContext'
+import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -19,7 +23,18 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
+  const { data: { hposConnection = {} } = {} } = useQuery(HposConnectionQuery)
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
+  const { newMessage } = useFlashMessageContext()
+  const { setIsConnected } = useConnectionContext()
+  const connection = get(hposConnection, 'connection', false)
+
+  useEffect(() => {
+    setIsConnected(connection)
+    if (!connection) {
+      newMessage('Your Holoport is currently unreachable.', 30000)
+    }
+  }, [connection, setIsConnected, newMessage])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -30,11 +45,11 @@ export function PrimaryLayout ({
     {showHeader && <Header
       {...headerProps}
       hamburgerClick={showSideMenu && hamburgerClick}
-      settings={settings} />}
+      settings={connection ? settings : {}} />}
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      settings={settings} />
+      settings={connection ? settings : {}} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />
