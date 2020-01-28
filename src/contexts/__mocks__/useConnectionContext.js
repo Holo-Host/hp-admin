@@ -1,4 +1,4 @@
-const isConnected = false
+const isConnected = true
 const setIsConnected = jest.fn()
 
 export default () => ({
