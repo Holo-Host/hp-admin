@@ -8,11 +8,11 @@ import ReactModal from 'react-modal'
 import HFRouter from './holofuel/HFRouter'
 import ScreenWidthContext from 'contexts/screenWidth'
 import { ConnectionProvider } from 'contexts/useConnectionContext'
-// import { WhoamiProvider } from 'contexts/useWhoamiContext'
+import { WhoamiProvider } from 'contexts/useWhoamiContext'
 import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
-import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
+import { FlashMessageProvider as HFFlashMessageProvider, WhoamiProvider as HFWhoamiProvider } from 'holofuel/contexts/useFlashMessageContext'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
@@ -27,9 +27,11 @@ function HoloFuelAppCore () {
   const isWide = useMediaPredicate('(min-width: 550px)')
 
   return <HFScreenWidthContext.Provider value={isWide}>
-    <HFFlashMessageProvider>
-      <HFRouter />
-    </HFFlashMessageProvider>
+    <HFWhoamiProvider>
+      <HFFlashMessageProvider>
+        <HFRouter />
+      </HFFlashMessageProvider>
+    </HFWhoamiProvider>
   </HFScreenWidthContext.Provider>
 }
 
@@ -49,10 +51,12 @@ export function HPAdminApp () {
       <ScreenWidthContext.Provider value={isWide}>
         <ConnectionProvider>
           <AuthProvider>
-            <FlashMessageProvider>
-              <HPAdminRouter />
-              <Route path='/holofuel' component={HoloFuelAppCore} />
-            </FlashMessageProvider>
+            <WhoamiProvider>
+              <FlashMessageProvider>
+                <HPAdminRouter />
+                <Route path='/holofuel' component={HoloFuelAppCore} />
+              </FlashMessageProvider>
+            </WhoamiProvider>
           </AuthProvider>
         </ConnectionProvider>
       </ScreenWidthContext.Provider>
