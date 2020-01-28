@@ -122,15 +122,17 @@ export const resolvers = {
     hposUpdateVersion: () => HposInterface.os.updateVersion(),
 
     hposCheckAuth: async () => {
+      let settings
       try {
-        await HposInterface.os.settings()
+        settings = await HposInterface.os.settings()
       } catch (error) {
         return {
           isAuthed: false
         }
       }
       return {
-        isAuthed: true
+        isAuthed: true,
+        hostSettings: settings
       }
     }
   }

@@ -106,6 +106,7 @@ type HposStatus {
 
 type HposAuth {
   isAuthed: Boolean
+  hostSettings: HposSettings
 }
 
 type HposConnection {
