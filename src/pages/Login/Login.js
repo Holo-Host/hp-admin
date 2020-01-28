@@ -73,7 +73,7 @@ export default function Login ({ history: { push } }) {
             {errors.password.type === 'minLength' && 'Password need to be at least 6 characters long.'}
           </small>}
         </div>
-        <Button type='submit' variant='green' wide styleName='login-button'>Login</Button>
+        <Button type='submit' variant='green' wide styleName='login-button' disabled={!isConnected}>Login</Button>
       </form>
       <div styleName='reminder-text-block'>*Remember, Holo doesn’t store your password so we can’t recover it for you. Please save your password securely!</div>
       <div styleName='reminder-text-block'>
