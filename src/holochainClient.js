@@ -112,10 +112,10 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 }
 
 let holochainClient
-let hcFlag = false
+let isInitiatingHcConnection = false
 
-async function init () {
-  hcFlag = true
+async function initHolochainClient() {
+  isInitiatingHcConnection = true
   try {
     let url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
     // Construct url with query param X-Hpos-Admin-Signature = signature
@@ -133,27 +133,27 @@ async function init () {
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
-    hcFlag = false
+    isInitiatingHcConnection = false
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
-    hcFlag = false
+    isInitiatingHcConnection = false
     throw (error)
   }
 }
 async function initAndGetHolochainClient () {
   let counter = 0
-  while (hcFlag) {
+  while (isInitiatingHcConnection) {
     counter++
     await wait(100)
     if (counter === 10) {
-      hcFlag = false
+      isInitiatingHcConnection = false
     }
   }
   if (holochainClient) return holochainClient
-  else return init()
+  else return initHolochainClient()
 }
 
 export function createZomeCall (zomeCallPath, callOpts = {}) {
