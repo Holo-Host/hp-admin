@@ -12,7 +12,8 @@ import { WhoamiProvider } from 'contexts/useWhoamiContext'
 import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
-import { FlashMessageProvider as HFFlashMessageProvider, WhoamiProvider as HFWhoamiProvider } from 'holofuel/contexts/useFlashMessageContext'
+import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
+import { WhoamiProvider as HFWhoamiProvider } from 'holofuel/contexts/useWhoamiContext'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {

@@ -8,6 +8,8 @@ import MenuIcon from 'components/icons/MenuIcon'
 
 export default function Header ({ title, hamburgerClick }) {
   const { whoami } = useWhoamiContext()
+  console.log('whoami in header : ', whoami)
+
   const leftNav = hamburgerClick && <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' />
   </Button>

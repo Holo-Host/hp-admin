@@ -15,6 +15,8 @@ export function SideMenu ({
   avatarUrl = ''
 }) {
   const { whoami } = useWhoamiContext()
+  console.log('whoami in sidemenu : ', whoami)
+
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
