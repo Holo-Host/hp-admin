@@ -58,20 +58,6 @@ export const resolvers = {
 
     hposSettings: (_) => HposInterface.os.settings(),
 
-    hposConnection: async (_) => {
-      try {
-        await HposInterface.os.settings()
-      } catch (error) {
-        console.log('error >> ', error)
-        return {
-          connection: false
-        }
-      }
-      return {
-        connection: true
-      }
-    },
-
     hposStatus: HposInterface.os.status
   },
 
