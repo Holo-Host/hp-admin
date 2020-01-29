@@ -114,7 +114,7 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 let holochainClient
 let isInitiatingHcConnection = false
 
-async function initHolochainClient() {
+async function initHolochainClient () {
   isInitiatingHcConnection = true
   try {
     let url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
