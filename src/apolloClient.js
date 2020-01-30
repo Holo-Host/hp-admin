@@ -20,7 +20,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         return setConnection({ hposConnection: true })
       }
       console.log(`HPOS Connection Error : ${message}`)
-      return setConnection({ hposConnection: true })
+      return setConnection({ hposConnection: false })
     })
   }
 })

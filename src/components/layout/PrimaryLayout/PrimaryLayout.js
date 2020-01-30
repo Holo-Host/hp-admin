@@ -25,11 +25,13 @@ export function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { isConnected } = useConnectionContext()
 
-  console.log('isConnected :', isConnected)
+  console.log('isConnected in Primary Layout : ', isConnected)
 
   useEffect(() => {
     if (!isConnected) {
       newMessage('Your Holoport is currently unreachable.', 0)
+    } else {
+      newMessage('', 0)
     }
   }, [isConnected, newMessage])
 

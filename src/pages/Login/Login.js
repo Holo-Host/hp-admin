@@ -26,10 +26,6 @@ export default function Login ({ history: { push } }) {
     const authResult = await checkAuth()
 
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
-
-    // we call this to SET the singleton value of HpAdminKeypair
-    await getHpAdminKeypair(email, password)
-
     setIsAuthed(isAuthed)
 
     if (isAuthed) {
@@ -38,6 +34,8 @@ export default function Login ({ history: { push } }) {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     }
   }
+
+  console.log('isConnected in LOGIN PAGE : ', isConnected)
 
   return <PrimaryLayout showHeader={false} showAlphaFlag={false}>
     <div styleName='container'>
