@@ -14,14 +14,12 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 
   if (graphQLErrors) {
-    graphQLErrors.map(({ message, locations, path }) => {
-      if (message.startsWith('Authentication Error: ')) {
+    graphQLErrors.map(({ message }) => {
+      if (message.includes(401)) {
         setConnection({ hposConnection: true })
-        console.log(
-          `[GraphQL error]: >>>>> SHOULD BE AUTH ERROR :  Message : ${message}, Location: ${locations}, Path: ${path}`
-        )
+        console.log(`Authentication Error : ${message}`)
       }
-      console.log('graphQLError Message : ', message)
+      console.log(`HPOS Connection Error : ${message}`)
       return setConnection({ hposConnection: false })
     })
   }

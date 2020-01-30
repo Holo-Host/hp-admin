@@ -21,7 +21,7 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000 })
   const { newMessage } = useFlashMessageContext()
   const { isConnected } = useConnectionContext()
 
@@ -29,7 +29,7 @@ export function PrimaryLayout ({
 
   useEffect(() => {
     if (!isConnected) {
-      newMessage('Your Holoport is currently unreachable.', 30000)
+      newMessage('Your Holoport is currently unreachable.', 0)
     }
   }, [isConnected, newMessage])
 
