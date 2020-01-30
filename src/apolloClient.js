@@ -16,11 +16,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.map(({ message }) => {
       if (message.includes(401)) {
-        setConnection({ hposConnection: true })
         console.log(`Authentication Error : ${message}`)
+        return setConnection({ hposConnection: true })
       }
       console.log(`HPOS Connection Error : ${message}`)
-      return setConnection({ hposConnection: false })
+      return setConnection({ hposConnection: true })
     })
   }
 })
