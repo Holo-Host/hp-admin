@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useCallback } from 'react'
 
 export const ConnectionContext = createContext()
 
@@ -11,8 +11,7 @@ export const setConnection = ({ hposConnection = false } = {}) => {
 
 export function ConnectionProvider ({ children }) {
   const [isConnected, setIsConnected] = useState(clientHposConnection)
-  // eslint-disable-next-line
-  useEffect(() => setIsConnected(clientHposConnection),[clientHposConnection])
+  useCallback(() => setIsConnected(clientHposConnection), [])
 
   console.log('>>>>> WITHIN ConnectionProvider >>>> clientHposConnection : ', clientHposConnection)
   console.log('isConnected : ', isConnected)

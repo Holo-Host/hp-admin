@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { object } from 'prop-types'
+// import { isEmpty } from 'lodash/fp'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import ScreenWidthContext from 'contexts/screenWidth'
@@ -21,19 +22,24 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000 })
+  const { data: { code, hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000 })
   const { newMessage } = useFlashMessageContext()
-  const { isConnected } = useConnectionContext()
+  const { setIsConnected, isConnected } = useConnectionContext()
 
-  console.log('isConnected in Primary Layout : ', isConnected)
+  console.log('code in Primary Layout : ', code)
 
   useEffect(() => {
-    if (!isConnected) {
-      newMessage('Your Holoport is currently unreachable.', 0)
-    } else {
-      newMessage('', 0)
+    if (code) {
+      console.log('statusCode in useEffect:', code)
+      if (code === 401) {
+        setIsConnected(false)
+        newMessage('Your Holoport is currently unreachable.', 0)
+      } else {
+        setIsConnected(true)
+        newMessage('', 0)
+      }
     }
-  }, [isConnected, newMessage])
+  }, [code, setIsConnected, newMessage])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

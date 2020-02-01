@@ -7,19 +7,27 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import schema from 'graphql-server'
 import { setConnection } from 'contexts/useConnectionContext'
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
+const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (networkError) {
     console.log(`[Network error]: ${networkError}`)
+    response.code = '500'
     return setConnection({ hposConnection: false })
   }
 
   if (graphQLErrors) {
     graphQLErrors.map(({ message }) => {
       if (message.includes(401)) {
-        console.log(`Authentication Error : ${message}`)
+        console.log(`[Authentication Error]: ${message}`)
+        response.data.code = '401'
         return setConnection({ hposConnection: true })
       }
-      console.log(`HPOS Connection Error : ${message}`)
+      if (message.includes('Network Error')) {
+        console.log(`[Network error]: ${message}`)
+        response.data.code = '500'
+        return setConnection({ hposConnection: false })
+      }
+      console.log(`[HPOS Connection Error]: ${message}`)
+      response.data.code = '400'
       return setConnection({ hposConnection: false })
     })
   }
