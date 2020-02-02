@@ -10,7 +10,7 @@ import { setConnection } from 'contexts/useConnectionContext'
 const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (networkError) {
     console.log(`[Network error]: ${networkError}`)
-    response.code = '500'
+    response.errors.hposConnection = false
     return setConnection({ hposConnection: false })
   }
 
@@ -18,16 +18,16 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
     graphQLErrors.map(({ message }) => {
       if (message.includes(401)) {
         console.log(`[Authentication Error]: ${message}`)
-        response.data.code = '401'
+        response.errors.hposConnection = true
         return setConnection({ hposConnection: true })
       }
       if (message.includes('Network Error')) {
         console.log(`[Network error]: ${message}`)
-        response.data.code = '500'
+        response.errors.hposConnection = false
         return setConnection({ hposConnection: false })
       }
       console.log(`[HPOS Connection Error]: ${message}`)
-      response.data.code = '400'
+      response.errors.hposConnection = false
       return setConnection({ hposConnection: false })
     })
   }

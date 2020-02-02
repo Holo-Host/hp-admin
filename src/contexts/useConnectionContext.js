@@ -11,7 +11,7 @@ export const setConnection = ({ hposConnection = false } = {}) => {
 
 export function ConnectionProvider ({ children }) {
   const [isConnected, setIsConnected] = useState(clientHposConnection)
-  useCallback(() => setIsConnected(clientHposConnection), [])
+  useCallback(() => setIsConnected(clientHposConnection), [clientHposConnection])
 
   console.log('>>>>> WITHIN ConnectionProvider >>>> clientHposConnection : ', clientHposConnection)
   console.log('isConnected : ', isConnected)

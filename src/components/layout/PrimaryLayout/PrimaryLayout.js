@@ -22,24 +22,23 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
-  const { data: { code, hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000 })
+  const onError = ({ graphQLErrors, networkError, response, extraInfo }) => {
+    const hposConnection = graphQLErrors.hposConnection
+    setIsConnected(hposConnection)
+  }
+
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError })
   const { newMessage } = useFlashMessageContext()
   const { setIsConnected, isConnected } = useConnectionContext()
 
-  console.log('code in Primary Layout : ', code)
-
   useEffect(() => {
-    if (code) {
-      console.log('statusCode in useEffect:', code)
-      if (code === 401) {
-        setIsConnected(false)
-        newMessage('Your Holoport is currently unreachable.', 0)
-      } else {
-        setIsConnected(true)
-        newMessage('', 0)
-      }
+    // console.log('statusCode in useEffect:', isConnected)
+    if (!isConnected) {
+      newMessage('Your Holoport is currently unreachable.', 0)
+    } else {
+      newMessage('', 0)
     }
-  }, [code, setIsConnected, newMessage])
+  }, [isConnected, setIsConnected, newMessage])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
