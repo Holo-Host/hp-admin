@@ -9,7 +9,7 @@ import schema from 'graphql-server'
 const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (networkError) {
     console.log(`[Network error]: ${networkError}`)
-    response.errors.hposConnection = false
+    response.errors.isHposConnectionActive = false
     return response
   }
 
@@ -17,16 +17,16 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
     graphQLErrors.map(({ message }) => {
       if (message.includes(401)) {
         console.log(`[Authentication Error]: ${message}`)
-        response.errors.hposConnection = true
+        response.errors.isHposConnectionActive = true
         return response
       }
       if (message.includes('Network Error')) {
-        console.log(`[Network error]: ${message}`)
-        response.errors.hposConnection = false
+        console.log(`[HPOS Connection Error]: ${message}`)
+        response.errors.isHposConnectionActive = true
         return response
       }
       console.log(`[HPOS Connection Error]: ${message}`)
-      response.errors.hposConnection = false
+      response.errors.isHposConnectionActive = false
       return response
     })
   }

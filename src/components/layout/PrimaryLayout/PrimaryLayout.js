@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { object } from 'prop-types'
-// import { isEmpty } from 'lodash/fp'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import ScreenWidthContext from 'contexts/screenWidth'
@@ -25,12 +24,16 @@ export function PrimaryLayout ({
   const { setIsConnected, isConnected } = useConnectionContext()
 
   const onError = ({ graphQLErrors }) => {
-    const hposConnection = graphQLErrors.hposConnection
-    setIsConnected(hposConnection)
+    const { isHposConnectionActive } = graphQLErrors
+    console.log('isHposConnectionActive : ', isHposConnectionActive)
+
+    setIsConnected(isHposConnectionActive)
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError })
   const { newMessage } = useFlashMessageContext()
+
+  console.log('isConnected : ', isConnected)
 
   useEffect(() => {
     if (!isConnected) {
