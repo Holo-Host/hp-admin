@@ -22,17 +22,17 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
-  const onError = ({ graphQLErrors, networkError, response, extraInfo }) => {
+  const { setIsConnected, isConnected } = useConnectionContext()
+
+  const onError = ({ graphQLErrors }) => {
     const hposConnection = graphQLErrors.hposConnection
     setIsConnected(hposConnection)
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError })
   const { newMessage } = useFlashMessageContext()
-  const { setIsConnected, isConnected } = useConnectionContext()
 
   useEffect(() => {
-    // console.log('statusCode in useEffect:', isConnected)
     if (!isConnected) {
       newMessage('Your Holoport is currently unreachable.', 0)
     } else {

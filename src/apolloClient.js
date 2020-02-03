@@ -5,13 +5,12 @@ import { SchemaLink } from 'apollo-link-schema'
 import { onError } from 'apollo-link-error'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import schema from 'graphql-server'
-import { setConnection } from 'contexts/useConnectionContext'
 
 const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (networkError) {
     console.log(`[Network error]: ${networkError}`)
     response.errors.hposConnection = false
-    return setConnection({ hposConnection: false })
+    return response
   }
 
   if (graphQLErrors) {
@@ -19,16 +18,16 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
       if (message.includes(401)) {
         console.log(`[Authentication Error]: ${message}`)
         response.errors.hposConnection = true
-        return setConnection({ hposConnection: true })
+        return response
       }
       if (message.includes('Network Error')) {
         console.log(`[Network error]: ${message}`)
         response.errors.hposConnection = false
-        return setConnection({ hposConnection: false })
+        return response
       }
       console.log(`[HPOS Connection Error]: ${message}`)
       response.errors.hposConnection = false
-      return setConnection({ hposConnection: false })
+      return response
     })
   }
 })

@@ -35,8 +35,6 @@ export default function Login ({ history: { push } }) {
     }
   }
 
-  console.log('isConnected in LOGIN PAGE : ', isConnected)
-
   return <PrimaryLayout showHeader={false} showAlphaFlag={false}>
     <div styleName='container'>
       <div styleName='backdrop' />

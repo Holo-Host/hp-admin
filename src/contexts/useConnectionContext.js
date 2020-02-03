@@ -1,20 +1,9 @@
-import React, { createContext, useContext, useState, useCallback } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 
 export const ConnectionContext = createContext()
 
-let clientHposConnection = false
-export const setConnection = ({ hposConnection = false } = {}) => {
-  clientHposConnection = hposConnection
-  console.log('::::: clientHposConnection : ', clientHposConnection)
-  return clientHposConnection
-}
-
 export function ConnectionProvider ({ children }) {
-  const [isConnected, setIsConnected] = useState(clientHposConnection)
-  useCallback(() => setIsConnected(clientHposConnection), [clientHposConnection])
-
-  console.log('>>>>> WITHIN ConnectionProvider >>>> clientHposConnection : ', clientHposConnection)
-  console.log('isConnected : ', isConnected)
+  const [isConnected, setIsConnected] = useState(false)
 
   return <ConnectionContext.Provider value={{ isConnected, setIsConnected }}>
     {children}
