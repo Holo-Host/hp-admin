@@ -1,6 +1,6 @@
 {
   "name": "hp-admin",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "private": true,
   "scripts": {
     "start": "npm run start:mock",
@@ -44,7 +44,7 @@
     "bcryptjs": "^2.4.3",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.2.0",
-    "json-stable-stringify": "^1.0.1",
+    "fast-json-stable-stringify": "^2.1.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "namor": "^1.1.2",
