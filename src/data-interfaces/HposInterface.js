@@ -22,7 +22,7 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
     return mockCallHpos(method, apiVersion, path)
   } else {
     return async params => {
-      const fullPath = ((process.env.NODE_ENV === 'production') ? (window.location.protocol + '//' + window.location.hostname) : 'https://4vm2kplifmh90dklvmpclsfh8lkm4gs9wyjc4v6n9bmkujg3t5.holohost.net') + '/api/' + apiVersion + '/' + path //  process.env.REACT_APP_HPOS_URL
+      const fullPath = ((process.env.NODE_ENV === 'production') ? (window.location.protocol + '//' + window.location.hostname) : 'https://2us9it3zdlcvxnypu9z5n6d5brdeu7eulb87tcnsvt4vxlj6f7.holohost.net') + '/api/' + apiVersion + '/' + path //  process.env.REACT_APP_HPOS_URL
       const urlObj = new URL(fullPath)
 
       const signature = await signPayload(method, urlObj.pathname, params)

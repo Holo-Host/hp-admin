@@ -22,7 +22,7 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
       }
       if (message.includes('Network Error')) {
         console.log(`[HPOS Connection Error]: ${message}`)
-        response.errors.isHposConnectionActive = true
+        response.errors.isHposConnectionActive = false
         return response
       }
       console.log(`[HPOS Connection Error]: ${message}`)
