@@ -2,7 +2,7 @@ import React from 'react'
 import AuthRoute from 'components/AuthRoute'
 import { Route, Switch, Redirect } from 'react-router-dom'
 
-import Login from 'pages/Login'
+import Login from 'holofuel/pages/Login'
 import Home from 'holofuel/pages/Home'
 import Inbox from 'holofuel/pages/Inbox'
 import TransactionHistory from 'holofuel/pages/TransactionHistory'

@@ -1,7 +1,6 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
-import stringify from 'json-stable-stringify'
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST

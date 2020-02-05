@@ -99,7 +99,6 @@ const HposInterface = {
 
     updateSettings: async (hostPubKey, hostName, deviceName, sshAccess) => {
       const settingsResponse = await hposCall({ method: 'get', path: 'config' })()
-      const { email } = settingsResponse
 
       // Updating the config endpoint requires the hash of the current config to make sure nothing has changed.
       const headers = {

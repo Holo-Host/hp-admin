@@ -1,13 +1,10 @@
-import React, { useEffect, useCallback } from 'react' // useState,
+import React from 'react' // useState,
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
-import { isEmpty, get, uniqBy } from 'lodash/fp'
+import { isEmpty, get } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelHomeCounterpartiesQuery from 'graphql/HolofuelHomeCounterpartiesQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Loading from 'components/Loading'
@@ -20,54 +17,22 @@ import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
-const declinedTransactionNotice = 'Notice: Hey there. Looks like one or more of your initated transactions has been declined. Please visit your transaction Inbox to view and/or cancel your pending transaction.'
-
-function useTransactionsWithCounterparties () {
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { data: { holofuelHomeCounterparties = [] } = {} } = useQuery(HolofuelHomeCounterpartiesQuery)
-  const { data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery)
-
-  const updateCounterparties = (transactions, counterparties) => transactions.map(transaction => ({
-    ...transaction,
-    counterparty: counterparties.find(counterparty => counterparty.id === transaction.counterparty.id) || transaction.counterparty
-  }))
-
-  const allCounterparties = uniqBy('id', holofuelHomeCounterparties.concat([whoami]))
-
-  const updatedCompletedTransactions = updateCounterparties(holofuelCompletedTransactions, allCounterparties)
-
-  return {
-    transactions: updatedCompletedTransactions
-  }
-}
-
 const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
   if (ledgerLoading) return <>-- TF</>
   else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 
 export default function Home () {
-  const { loading: loadingTransactions, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
-  const { transactions } = useTransactionsWithCounterparties()
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
 
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
-
-  const { newMessage } = useFlashMessageContext()
-
-  const filterActionableTransactionsByStatus = useCallback(status => holofuelActionableTransactions.filter(actionableTx => actionableTx.status === status), [holofuelActionableTransactions])
-
-  useEffect(() => {
-    if (!isEmpty(filterActionableTransactionsByStatus('declined'))) {
-      newMessage(declinedTransactionNotice)
-    }
-  }, [filterActionableTransactionsByStatus, newMessage])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>
@@ -111,7 +76,7 @@ export default function Home () {
           </div>}
 
           {isTransactionsEmpty && !loadingTransactions && <div styleName='transactions-empty'>
-            You have no offers or requests
+            You have no recent transactions
           </div>}
 
           {!isTransactionsEmpty && <h2 styleName='transactions-label'>Recent Transactions</h2>}

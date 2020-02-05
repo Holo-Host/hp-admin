@@ -22,7 +22,6 @@ export default function Login ({ history: { push } }) {
     // we call this to SET the singleton value of HpAdminKeypair
     await getHpAdminKeypair(email, password)
     const authResult = await checkAuth()
-
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
 
     // we call this to SET the singleton value of HpAdminKeypair
