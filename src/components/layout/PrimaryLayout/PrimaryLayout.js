@@ -31,11 +31,11 @@ export function PrimaryLayout ({
     setIsConnected(isHposConnectionActive)
   }
 
-  const { error, data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError, notifyOnNetworkStatusChange: true })
+  const { error, data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
   const { newMessage } = useFlashMessageContext()
 
   console.log('isConnected : ', isConnected)
-  
+
   useEffect(() => {
     if (!isConnected) {
       console.log('error.include(is Error) : ', error)
