@@ -25,16 +25,11 @@ export function PrimaryLayout ({
 
   const onError = ({ graphQLErrors }) => {
     const { isHposConnectionActive } = graphQLErrors
-    console.log('isHposConnectionActive : ', isHposConnectionActive)
-    console.log('graphQLErrors message : ', graphQLErrors[0].message)
-
     setIsConnected(isHposConnectionActive)
   }
 
   const { error, data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
   const { newMessage } = useFlashMessageContext()
-
-  console.log('isConnected : ', isConnected)
 
   useEffect(() => {
     if (!isConnected) {
