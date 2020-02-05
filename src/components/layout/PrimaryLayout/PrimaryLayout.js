@@ -30,8 +30,10 @@ export function PrimaryLayout ({
     setIsConnected(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError })
+  const { error, data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError })
   const { newMessage } = useFlashMessageContext()
+
+  console.log('error : ', error)
 
   console.log('isConnected : ', isConnected)
 
