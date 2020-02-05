@@ -26,8 +26,8 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
       const fullPath = ((process.env.NODE_ENV === 'production') ? (window.location.protocol + '//' + window.location.hostname) : process.env.REACT_APP_HPOS_URL) + '/api/' + apiVersion + '/' + path
       const urlObj = new URL(fullPath)
 
-      let headers = {};
-      let bodyHash = undefined;
+      let headers = {}
+      let bodyHash
 
       if (params) {
         params = stringify(params) // replace with serialized version, to send below!
@@ -108,7 +108,7 @@ const HposInterface = {
 
       // settingsConfig must contain .admin.{email,public_key}, but may contain other arbitrary
       // data.  We must only update what we have authority over, and data supplied for.
-      let settingsConfig = {
+      const settingsConfig = {
         ...settingsResponse
       }
       if (hostPubKey !== undefined) {
