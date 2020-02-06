@@ -1,14 +1,16 @@
 import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
-import { signPayload, hashResponseBody } from 'holochainClient'
+import { signPayload, hashString } from 'holochainClient'
+import stringify from 'fast-json-stable-stringify'
+import { omitBy, isUndefined } from 'lodash/fp'
 
-const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
-const developmentMockHposConnection = false // boolean to toggle hpos mock data reference while in dev context...
-export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
-  ? preLocalHposImageIntegration
-  : process.env.NODE_ENV === 'test'
-    ? true
-    : developmentMockHposConnection
+const mockHposConnectionInDevelopment = true
+
+export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST = 'true' || process.env.NODE_ENV === 'test'
+  ? true
+  : process.env.NODE_ENV === 'production'
+    ? false
+    : mockHposConnectionInDevelopment
 
 const axiosConfig = {
   headers: {
@@ -22,16 +24,23 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
     return mockCallHpos(method, apiVersion, path)
   } else {
     return async params => {
-      const fullPath = ((process.env.NODE_ENV === 'production') ? (window.location.protocol + '//' + window.location.hostname) : 'https://2ah5s30i2dldd5wh30iq5c1jd0hmmz6hin0c2g59c5id9znawv.holohost.net') + '/api/' + apiVersion + '/' + path //  process.env.REACT_APP_HPOS_URL
+      const fullPath = ((process.env.NODE_ENV === 'production') ? (window.location.protocol + '//' + window.location.hostname) : process.env.REACT_APP_HPOS_URL) + '/api/' + apiVersion + '/' + path
       const urlObj = new URL(fullPath)
 
-      const signature = await signPayload(method, urlObj.pathname, params)
+      let bodyHash
 
-      const headers = {
+      if (params) {
+        bodyHash = await hashString(stringify(params))
+      }
+
+      const signature = await signPayload(method, urlObj.pathname, bodyHash)
+
+      const headers = omitBy(isUndefined, {
         ...axiosConfig.headers,
         ...userHeaders,
+        'X-Body-Hash': bodyHash,
         'X-Hpos-Admin-Signature': signature
-      }
+      })
 
       let data
 
@@ -40,10 +49,10 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
           ({ data } = await axios.get(fullPath, { params, headers }))
           return data
         case 'post':
-          ({ data } = await axios.post(fullPath, { params, headers }))
+          ({ data } = await axios.post(fullPath, params, { headers }))
           return data
         case 'put':
-          ({ data } = await axios.put(fullPath, { params, headers }))
+          ({ data } = await axios.put(fullPath, params, { headers }))
           return data
         default:
           throw new Error(`No case in hposCall for ${method} method`)
@@ -89,24 +98,31 @@ const HposInterface = {
     updateSettings: async (hostPubKey, hostName, deviceName, sshAccess) => {
       const settingsResponse = await hposCall({ method: 'get', path: 'config' })()
 
-      // updating the config endpoint requires a hashed version of the current config to make sure nothing has changed.
+      // Updating the config endpoint requires the hash of the current config to make sure nothing has changed.
       const headers = {
-        'x-hp-admin-cas': await hashResponseBody(settingsResponse)
+        'X-Hpos-Admin-CAS': await hashString(stringify(settingsResponse))
       }
 
+      // settingsConfig must contain .admin.{email,public_key}, but may contain other arbitrary
+      // data.  We must only update what we have authority over, and data supplied for.
       const settingsConfig = {
-        admin: {
-          name: hostName,
-          public_key: hostPubKey
-        },
-        holoportos: {
+        ...settingsResponse
+      }
+      if (hostPubKey !== undefined) {
+        settingsConfig.admin.public_key = hostPubKey
+      }
+      if (deviceName !== undefined) {
+        settingsConfig.name = deviceName
+      }
+      if (sshAccess !== undefined) {
+        settingsConfig.holoportos = {
           sshAccess: sshAccess
-        },
-        name: deviceName
+        }
       }
 
-      const result = await hposCall({ method: 'put', path: 'config', headers })(settingsConfig)
-      return presentHposSettings(result)
+      await hposCall({ method: 'put', path: 'config', headers })(settingsConfig)
+      // We don't assume the successful PUT /api/v1/config returns the current config
+      return presentHposSettings(settingsConfig)
     },
 
     // HOLOPORT_OS STATUS

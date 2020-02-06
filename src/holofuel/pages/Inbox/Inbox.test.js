@@ -5,6 +5,7 @@ import moment from 'moment'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
+import { pick } from 'lodash/fp'
 import Inbox, { TransactionRow, ConfirmationModal, DeclinedTransactionModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
 import { TYPE, STATUS } from 'models/Transaction'
@@ -428,16 +429,65 @@ describe('TransactionRow', () => {
   })
 
   describe('Accept Payment Modal', () => {
-    it('respond properly', async () => {
+    it('responds properly', async () => {
+      const transaction = { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' }, action: 'pay' }
+      const payTransaction = jest.fn(() => Promise.resolve())
       const props = {
-        transaction: { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' }, action: 'pay' },
+        transaction,
         handleClose: jest.fn(),
         declineTransaction: jest.fn(),
         refundTransaction: jest.fn(),
-        payTransaction: jest.fn(),
+        payTransaction,
         setCounterpartyNotFound: jest.fn(),
         counterpartyNotFound: false,
-        disableActionedTransaction: () => false
+        disableActionedTransaction: () => false,
+        setHasTransactionBeenActioned: () => {}
+      }
+
+      const counterpartyQueryErrorMock = {
+        request: {
+          query: HolofuelCounterpartyQuery,
+          variables: { agentId: mockAgent1.pub_sign_key }
+        },
+        result: () => {
+          props.counterpartyNotFound = true
+          return { data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, notFound: true } } }
+        }
+      }
+
+      const mocks = [
+        whoamiMock,
+        offerMock,
+        declineMock,
+        actionableTransactionsMock,
+        counterpartyQueryErrorMock,
+        ledgerMock
+      ]
+      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+        <ConfirmationModal {...props} />
+      </MockedProvider>, 0)
+
+      expect(getByText(presentAgentId('HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'), { exact: false })).toBeInTheDocument()
+      expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()
+      expect(props.counterpartyNotFound).toBe(true)
+
+      fireEvent.click(getByText('Close Modal'))
+      expect(props.handleClose).toHaveBeenCalled()
+    })
+
+    describe('with request', () => {
+      const transaction = { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' }, action: 'pay' }
+      const payTransaction = jest.fn(() => Promise.resolve())
+      const props = {
+        transaction,
+        handleClose: jest.fn(),
+        declineTransaction: jest.fn(),
+        refundTransaction: jest.fn(),
+        payTransaction,
+        setCounterpartyNotFound: jest.fn(),
+        counterpartyNotFound: false,
+        disableActionedTransaction: () => false,
+        setHasTransactionBeenActioned: () => {}
       }
 
       const counterpartyQueryErrorMock = {
@@ -460,16 +510,14 @@ describe('TransactionRow', () => {
         ledgerMock
       ]
 
-      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <ConfirmationModal {...props} />
-      </MockedProvider>, 0)
-
-      expect(getByText(presentAgentId('HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'), { exact: false })).toBeInTheDocument()
-      expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()
-      expect(props.counterpartyNotFound).toBe(true)
-
-      fireEvent.click(getByText('Close Modal'))
-      expect(props.handleClose).toHaveBeenCalled()
+      it('copies the notes field from the request to the created offer', async () => {
+        const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+          <ConfirmationModal {...props} />
+        </MockedProvider>, 0)
+        fireEvent.click(getByText('Yes'))
+        await wait(50)
+        expect(payTransaction).toHaveBeenCalledWith(pick(['id', 'amount', 'counterparty', 'notes'], transaction))
+      })
     })
   })
 

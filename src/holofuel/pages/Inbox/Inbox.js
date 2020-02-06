@@ -33,8 +33,8 @@ import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
-  return ({ id, amount, counterparty }) => offer({
-    variables: { amount, counterpartyId: counterparty.id, requestId: id },
+  return ({ id, amount, counterparty, notes }) => offer({
+    variables: { amount, counterpartyId: counterparty.id, requestId: id, notes },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },
@@ -484,7 +484,7 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
 
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound, setHasTransactionBeenActioned }) {
   const { newMessage } = useFlashMessageContext()
-  const { id, amount, type, action } = transaction
+  const { id, amount, type, action, notes } = transaction
   const { counterparty = {} } = transaction
   const { loading: loaderCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
   const { notFound } = holofuelCounterparty
@@ -510,7 +510,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     case 'pay': {
       contentLabel = 'Pay request'
       transactionDirection = DIRECTION.outgoing
-      actionParams = { id, amount, counterparty }
+      actionParams = { id, amount, counterparty, notes }
       actionHook = payTransaction
       message = <>
         Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
