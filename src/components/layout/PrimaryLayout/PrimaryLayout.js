@@ -28,12 +28,11 @@ export function PrimaryLayout ({
     setIsConnected(isHposConnectionActive)
   }
 
-  const onCompleted = (data) => {
-    console.log('data : ', data)
-    if (data) setIsConnected(true)
+  const onCompleted = ({ hposSettings }) => {
+    if (hposSettings) setIsConnected(true)
   }
 
-  const { error, data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onCompleted, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onCompleted, onError, notifyOnNetworkStatusChange: true, ssr: false })
   const { newMessage } = useFlashMessageContext()
 
   useEffect(() => {
@@ -42,7 +41,7 @@ export function PrimaryLayout ({
     } else {
       newMessage('', 0)
     }
-  }, [isConnected, setIsConnected, newMessage, error])
+  }, [isConnected, setIsConnected, newMessage])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
