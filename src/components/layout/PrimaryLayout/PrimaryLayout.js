@@ -37,7 +37,6 @@ export function PrimaryLayout ({
 
   useEffect(() => {
     if (!isConnected) {
-      console.log('error.include(is Error) : ', error)
       newMessage('Your Holoport is currently unreachable.', 0)
     } else {
       newMessage('', 0)
