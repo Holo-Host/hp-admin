@@ -28,8 +28,9 @@ export function PrimaryLayout ({
     setIsConnected(isHposConnectionActive)
   }
 
-  const onCompleted = ({ hposSettings }) => {
-    if (hposSettings) setIsConnected(true)
+  const onCompleted = ({ data }) => {
+    console.log('data : ', data)
+    if (data) setIsConnected(true)
   }
 
   const { error, data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onCompleted, onError, notifyOnNetworkStatusChange: true, ssr: false })
