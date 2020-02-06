@@ -19,6 +19,10 @@ export default function Login ({ history: { push } }) {
   const { setIsAuthed } = useAuthContext()
   const { newMessage } = useFlashMessageContext()
 
+  if (isConnected) {
+    push('/admin')
+  }
+
   const onSubmit = async ({ email, password }) => {
     eraseHpAdminKeypair()
     // we call this to SET the singleton value of HpAdminKeypair
@@ -28,7 +32,7 @@ export default function Login ({ history: { push } }) {
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
     setIsAuthed(isAuthed)
 
-    if (isConnected || isAuthed) {
+    if (isAuthed) {
       push('/admin')
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
