@@ -2,6 +2,8 @@
   top: 30%;
   background-color: white;
   position: relative;
+  padding: 50px 2rem;
+  border-radius: 1px;
   box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(27.1828px);
 }

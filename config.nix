@@ -7,12 +7,12 @@
     id = "hp-admin-agent";
     name = "HP Admin";
     keystore_file = "agent.key";
-    public_address = "HcScIio76M8cbDqhrsZKp37W8YZ4y8X9v9epzbyhRzqpjeb5sigdC4puN6b5koi";
+    public_address = "HcSCJbW65qIyJdcx5g3F3z8SPw7B4BR7cSJWaGtzBksaa95yu9Bcy5dJfYi38pi";
   }];
   agent2 =[{
     id = "hp-admin-agent-2";
     name = "HP Admin 2";
     keystore_file = "agent-2.key";
-    public_address = "HcScjSPMA9g46x6nosEih9thqwvesx53udZEkqMfqcwnbw9sZKPSyIFNvtfxrqi";
+    public_address = "HcSCjPnJbyAd7vfh94788XriOBbBUxa97dZOfs6uPr69ban9j9wMK8hAna34uez";
   }];
 }

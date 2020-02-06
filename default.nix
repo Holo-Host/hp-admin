@@ -82,6 +82,7 @@ in
 {
 
   hp-admin-ui = stdenv.mkDerivation rec {
+    inherit shell;
     name = "hp-admin-ui";
     src = gitignoreSource ./.;
 
@@ -199,7 +200,7 @@ in
       }
     ];
     network = {
-      sim2h_url = "wss://sim2h.holochain.org:9000";
+      sim2h_url = "ws://public.sim2h.net:9000";
       type = "sim2h";
     };
     logger = {
@@ -246,7 +247,7 @@ in
       }
     ];
     network = {
-      sim2h_url = "wss://sim2h.holochain.org:9000";
+      sim2h_url = "ws://public.sim2h.net:9000";
       type = "sim2h";
     };
     logger = {
