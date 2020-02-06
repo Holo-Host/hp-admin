@@ -28,7 +28,7 @@ export function PrimaryLayout ({
     setIsConnected(isHposConnectionActive)
   }
 
-  const onCompleted = ({ data }) => {
+  const onCompleted = (data) => {
     console.log('data : ', data)
     if (data) setIsConnected(true)
   }
