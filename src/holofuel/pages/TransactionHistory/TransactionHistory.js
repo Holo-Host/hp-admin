@@ -1,18 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, intersectionBy, find, reject } from 'lodash/fp'
+import { isEmpty, capitalize, intersectionBy, includes, find, reject } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import Loading from 'components/Loading'
+import Loader from 'react-loader-spinner'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
@@ -57,6 +59,18 @@ export default function TransactionsHistory ({ history: { push } }) {
   const showCancellationModal = transaction => setModalTransaction(transaction)
 
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
+
+  const [hasTransactionBeenActioned, setHasTransactionBeenActioned] = useState({})
+
+  const disableActionedTransaction = transactionId => {
+    if (hasTransactionBeenActioned.idList) {
+      return hasTransactionBeenActioned.idList.find(txid => txid === transactionId)
+    } else return false
+  }
+
+  const increaseAction = () => includes(DIRECTION.incoming, hasTransactionBeenActioned)
+  const decreseAction = () => includes(DIRECTION.outgoing, hasTransactionBeenActioned)
+  const statusQuoAction = () => includes('status-quo', hasTransactionBeenActioned)
 
   const [filter, setFilter] = useState(FILTER_TYPES[0])
 
@@ -129,13 +143,18 @@ export default function TransactionsHistory ({ history: { push } }) {
       {partitionedTransactions.map(partition =>
         <TransactionPartition key={partition.label}
           partition={partition}
+          disableActionedTransaction={disableActionedTransaction}
+          increaseAction={increaseAction}
+          decreseAction={decreseAction}
+          statusQuoAction={statusQuoAction}
           showCancellationModal={showCancellationModal} />)}
     </div>}
 
     <ConfirmCancellationModal
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
-      cancelTransaction={cancelTransaction} />
+      cancelTransaction={cancelTransaction}
+      setHasTransactionBeenActioned={setHasTransactionBeenActioned} />
   </PrimaryLayout>
 }
 
@@ -157,21 +176,24 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-function TransactionPartition ({ partition, showCancellationModal }) {
+function TransactionPartition ({ partition, disableActionedTransaction, showCancellationModal, increaseAction, decreseAction, statusQuoAction }) {
   const { label, loading, transactions } = partition
-
   return <>
     <h4 styleName='partition-label'>{label}</h4>
     {loading && <Loading styleName='partition-loading' />}
     {transactions.map((transaction, index) => <TransactionRow
       key={transaction.id}
       transaction={transaction}
+      disableActionedTransaction={disableActionedTransaction}
+      increaseAction={increaseAction}
+      decreseAction={decreseAction}
+      statusQuoAction={statusQuoAction}
       showCancellationModal={showCancellationModal}
       isFirst={index === 0} />)}
   </>
 }
 
-export function TransactionRow ({ transaction, showCancellationModal, isFirst }) {
+export function TransactionRow ({ transaction, disableActionedTransaction, showCancellationModal, isFirst, increaseAction, decreseAction, statusQuoAction }) {
   const { amount, counterparty, direction, presentBalance, notes, status } = transaction
   const pending = status === STATUS.pending
 
@@ -179,7 +201,15 @@ export function TransactionRow ({ transaction, showCancellationModal, isFirst })
     ? `+ ${presentHolofuelAmount(amount)}`
     : `- ${presentHolofuelAmount(amount)}`
 
-  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })} data-testid='transaction-row'>
+  const disabledTransaction = disableActionedTransaction(transaction.id)
+  let higlightGreen, highlightRed, highlightNeutral
+  if (disabledTransaction) {
+    higlightGreen = increaseAction()
+    highlightRed = decreseAction()
+    highlightNeutral = statusQuoAction()
+  }
+
+  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: disabledTransaction }, { higlightGreen }, { highlightRed }, { highlightNeutral })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
         <HashAvatar seed={counterparty.id} size={32} />
@@ -217,11 +247,30 @@ function CancelButton ({ showCancellationModal, transaction }) {
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
-export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction }) {
-  if (!transaction) return null
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, setHasTransactionBeenActioned }) {
+  const { newMessage } = useFlashMessageContext()
   const { id, counterparty, amount, type, direction } = transaction
+
+  useEffect(() => {
+    // eslint-disable-next-line no-useless-return
+    if (isEmpty(transaction)) return
+  }, [transaction])
+
   const onYes = () => {
-    cancelTransaction(id)
+    newMessage(<>
+      <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
+    </>, 5000)
+
+    setHasTransactionBeenActioned({
+      direction,
+      idList: [id]
+    })
+
+    cancelTransaction(id).then(() => {
+      newMessage(`${capitalize(type)} succesfully cancelled.`, 5000)
+    }).catch(() => {
+      newMessage('Sorry, something went wrong', 5000)
+    })
     handleClose()
   }
   return <Modal
