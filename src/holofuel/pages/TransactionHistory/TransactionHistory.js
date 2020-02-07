@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, capitalize, intersectionBy, includes, find, reject } from 'lodash/fp'
@@ -249,12 +249,8 @@ function CancelButton ({ showCancellationModal, transaction }) {
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
 export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, setHasTransactionBeenActioned }) {
   const { newMessage } = useFlashMessageContext()
+  if (!transaction) return null
   const { id, counterparty, amount, type, direction } = transaction
-
-  useEffect(() => {
-    // eslint-disable-next-line no-useless-return
-    if (isEmpty(transaction)) return
-  }, [transaction])
 
   const onYes = () => {
     newMessage(<>
