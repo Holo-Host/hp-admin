@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import { get } from 'lodash/fp'
@@ -18,10 +18,6 @@ export default function Login ({ history: { push } }) {
   const { isConnected } = useConnectionContext()
   const { setIsAuthed } = useAuthContext()
   const { newMessage } = useFlashMessageContext()
-
-  if (isConnected) {
-    push('/admin')
-  }
 
   const onSubmit = async ({ email, password }) => {
     eraseHpAdminKeypair()
