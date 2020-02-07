@@ -6,7 +6,7 @@ import { omitBy, isUndefined } from 'lodash/fp'
 
 const mockHposConnectionInDevelopment = true
 
-export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST = 'true' || process.env.NODE_ENV === 'test'
+export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST === 'true' || process.env.NODE_ENV === 'test'
   ? true
   : process.env.NODE_ENV === 'production'
     ? false
