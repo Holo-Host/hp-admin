@@ -321,15 +321,15 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   } else fullNotes = notes
 
   const disabledTransaction = disableActionedTransaction(transaction.id)
-  let higlightGreen, highlightRed, highlightNeutral
+  let highlightGreen, highlightRed, highlightNeutral
   if (disabledTransaction) {
-    higlightGreen = increaseAction()
+    highlightGreen = increaseAction()
     highlightRed = decreseAction()
     highlightNeutral = statusQuoAction()
   }
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { higlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { highlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />

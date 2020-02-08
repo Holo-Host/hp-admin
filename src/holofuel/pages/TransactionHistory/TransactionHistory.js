@@ -68,9 +68,8 @@ export default function TransactionsHistory ({ history: { push } }) {
     } else return false
   }
 
-  const increaseAction = () => includes(DIRECTION.incoming, hasTransactionBeenActioned)
-  const decreseAction = () => includes(DIRECTION.outgoing, hasTransactionBeenActioned)
-  const statusQuoAction = () => includes('status-quo', hasTransactionBeenActioned)
+  const canceledIncoming = () => includes(DIRECTION.incoming, hasTransactionBeenActioned)
+  const canceledOutgoing = () => includes(DIRECTION.outgoing, hasTransactionBeenActioned)
 
   const [filter, setFilter] = useState(FILTER_TYPES[0])
 
@@ -144,9 +143,8 @@ export default function TransactionsHistory ({ history: { push } }) {
         <TransactionPartition key={partition.label}
           partition={partition}
           disableActionedTransaction={disableActionedTransaction}
-          increaseAction={increaseAction}
-          decreseAction={decreseAction}
-          statusQuoAction={statusQuoAction}
+          canceledIncoming={canceledIncoming}
+          canceledOutgoing={canceledOutgoing}
           showCancellationModal={showCancellationModal} />)}
     </div>}
 
@@ -176,7 +174,7 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-function TransactionPartition ({ partition, disableActionedTransaction, showCancellationModal, increaseAction, decreseAction, statusQuoAction }) {
+function TransactionPartition ({ partition, disableActionedTransaction, showCancellationModal, canceledIncoming, canceledOutgoing }) {
   const { label, loading, transactions } = partition
   return <>
     <h4 styleName='partition-label'>{label}</h4>
@@ -185,15 +183,14 @@ function TransactionPartition ({ partition, disableActionedTransaction, showCanc
       key={transaction.id}
       transaction={transaction}
       disableActionedTransaction={disableActionedTransaction}
-      increaseAction={increaseAction}
-      decreseAction={decreseAction}
-      statusQuoAction={statusQuoAction}
+      canceledIncoming={canceledIncoming}
+      canceledOutgoing={canceledOutgoing}
       showCancellationModal={showCancellationModal}
       isFirst={index === 0} />)}
   </>
 }
 
-export function TransactionRow ({ transaction, disableActionedTransaction, showCancellationModal, isFirst, increaseAction, decreseAction, statusQuoAction }) {
+export function TransactionRow ({ transaction, disableActionedTransaction, showCancellationModal, isFirst, canceledIncoming, canceledOutgoing }) {
   const { amount, counterparty, direction, presentBalance, notes, status } = transaction
   const pending = status === STATUS.pending
 
@@ -202,14 +199,13 @@ export function TransactionRow ({ transaction, disableActionedTransaction, showC
     : `- ${presentHolofuelAmount(amount)}`
 
   const disabledTransaction = disableActionedTransaction(transaction.id)
-  let higlightGreen, highlightRed, highlightNeutral
+  let highlightGreen, highlightRed
   if (disabledTransaction) {
-    higlightGreen = increaseAction()
-    highlightRed = decreseAction()
-    highlightNeutral = statusQuoAction()
+    highlightGreen = canceledOutgoing()
+    highlightRed = canceledIncoming()
   }
 
-  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: disabledTransaction }, { higlightGreen }, { highlightRed }, { highlightNeutral })} data-testid='transaction-row'>
+  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: disabledTransaction }, { highlightGreen }, { highlightRed })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
         <HashAvatar seed={counterparty.id} size={32} />
