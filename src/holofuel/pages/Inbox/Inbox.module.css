@@ -187,7 +187,7 @@
   text-transform: none;
 }
 
-.disabled {
+.disable {
  opacity: 0.8;
  pointer-events: none;
 }

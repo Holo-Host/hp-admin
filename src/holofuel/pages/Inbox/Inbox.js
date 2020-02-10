@@ -329,7 +329,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   }
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { higlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disable: disabledTransaction }, { higlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
