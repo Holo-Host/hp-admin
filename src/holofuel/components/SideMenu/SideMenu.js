@@ -56,11 +56,11 @@ export default function SideMenu ({
               History
             </Link>
           </li>
-          <li>
-            <Link to='/makemework' styleName='nav-link'>
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li>
+            <Link to='/admin/' styleName='nav-link'>
               HP Admin
             </Link>
-          </li>
+          </li>}
         </ul>
       </nav>
 
@@ -72,7 +72,7 @@ export default function SideMenu ({
           </p>
           <p>
             Learn more about out our&nbsp;
-            <a href='https://medium.com/@H_O_L_O_/253c473381fd' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
+            <a href='https://holo.host/holo-testnet' target='_blank' rel='noopener noreferrer' styleName='alpha-link'>
               Alpha Testnet.
             </a>
           </p>

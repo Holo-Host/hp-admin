@@ -2,7 +2,7 @@ mutation HolofuelAcceptOfferMutation ($transactionId: ID) {
   holofuelAcceptOffer(transactionId: $transactionId) {
     id
     amount
-    counterparty
+    counterparty { id, nickname }
     direction
     status
     type

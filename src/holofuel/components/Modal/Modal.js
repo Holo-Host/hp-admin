@@ -16,6 +16,11 @@ const Modal = ({
       onRequestClose={handleClose}
       styleName='container'
       className={className}
+      style={{
+        overlay: {
+          backgroundColor: 'rgba(44, 64, 90, 0.3)'
+        }
+      }}
       appElement={document.getElementById('root')}
     >
       {children}

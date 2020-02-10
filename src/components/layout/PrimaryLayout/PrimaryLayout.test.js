@@ -4,6 +4,7 @@ import { renderAndWait } from 'utils/test-utils'
 import PrimaryLayout from './PrimaryLayout'
 
 jest.mock('contexts/useFlashMessageContext')
+jest.mock('contexts/useConnectionContext')
 jest.mock('contexts/useAuthContext')
 jest.mock('components/Header')
 
