@@ -115,7 +115,7 @@ async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
   let url
   try {
-    if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
+    if (process.env.REACT_APP_HOLOCHAIN_APP === 'true') {
       url = process.env.REACT_APP_DNA_INTERFACE_URL
     } else {
       url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL

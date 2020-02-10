@@ -7,7 +7,7 @@ import TransactionHistory from 'holofuel/pages/TransactionHistory'
 import CreateOfferRequest from 'holofuel/pages/CreateOfferRequest'
 
 function HFRoute (props) {
-  if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
+  if (process.env.REACT_APP_HOLOCHAIN_APP === 'true') {
     return <Route {...props} />
   } else {
     return <AuthRoute {...props} />
