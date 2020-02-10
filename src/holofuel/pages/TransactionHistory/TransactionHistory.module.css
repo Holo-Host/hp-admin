@@ -144,19 +144,6 @@
   font-style: italic;
 }
 
-.disabled {
-  opacity: 0.8;
-  pointer-events: none;
- }
- 
- .higlightGreen {
-   background-color: #CFF3EC;
- }
- 
- .highlightRed {
-   background-color: #FCE3E8;
- } 
-
 /* CancelButton */
 .cancel-button {
   color: white;
