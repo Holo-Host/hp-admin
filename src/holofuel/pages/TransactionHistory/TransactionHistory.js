@@ -229,7 +229,7 @@ export function TransactionRow ({ transaction, disableActionedTransaction, showC
         {presentHolofuelAmount(presentBalance)}
       </div>}
     </div>
-    {pending && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
+    {pending && !disabledTransaction && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
   </div>
 }
 
