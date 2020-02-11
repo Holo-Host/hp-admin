@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, intersectionBy, includes, find, reject } from 'lodash/fp'
+import { isEmpty, capitalize, intersectionBy, find, reject } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -60,16 +60,7 @@ export default function TransactionsHistory ({ history: { push } }) {
 
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 
-  const [hasTransactionBeenActioned, setHasTransactionBeenActioned] = useState({})
-
-  const disableActionedTransaction = transactionId => {
-    if (hasTransactionBeenActioned.idList) {
-      return hasTransactionBeenActioned.idList.find(txid => txid === transactionId)
-    } else return false
-  }
-
-  const canceledIncoming = () => includes(DIRECTION.incoming, hasTransactionBeenActioned)
-  const canceledOutgoing = () => includes(DIRECTION.outgoing, hasTransactionBeenActioned)
+  const [lastActionedTransactionId, setLastActionedTransactionId] = useState()
 
   const [filter, setFilter] = useState(FILTER_TYPES[0])
 
@@ -142,9 +133,7 @@ export default function TransactionsHistory ({ history: { push } }) {
       {partitionedTransactions.map(partition =>
         <TransactionPartition key={partition.label}
           partition={partition}
-          disableActionedTransaction={disableActionedTransaction}
-          canceledIncoming={canceledIncoming}
-          canceledOutgoing={canceledOutgoing}
+          lastActionedTransactionId={lastActionedTransactionId}
           showCancellationModal={showCancellationModal} />)}
     </div>}
 
@@ -152,7 +141,7 @@ export default function TransactionsHistory ({ history: { push } }) {
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       cancelTransaction={cancelTransaction}
-      setHasTransactionBeenActioned={setHasTransactionBeenActioned} />
+      setLastActionedTransactionId={setLastActionedTransactionId} />
   </PrimaryLayout>
 }
 
@@ -174,38 +163,32 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-function TransactionPartition ({ partition, disableActionedTransaction, showCancellationModal, canceledIncoming, canceledOutgoing }) {
+function TransactionPartition ({ partition, lastActionedTransactionId, showCancellationModal }) {
   const { label, loading, transactions } = partition
+
   return <>
     <h4 styleName='partition-label'>{label}</h4>
     {loading && <Loading styleName='partition-loading' />}
     {transactions.map((transaction, index) => <TransactionRow
-      key={transaction.id}
+      key={index}
       transaction={transaction}
-      disableActionedTransaction={disableActionedTransaction}
-      canceledIncoming={canceledIncoming}
-      canceledOutgoing={canceledOutgoing}
+      lastActionedTransactionId={lastActionedTransactionId}
       showCancellationModal={showCancellationModal}
       isFirst={index === 0} />)}
   </>
 }
 
-export function TransactionRow ({ transaction, disableActionedTransaction, showCancellationModal, isFirst, canceledIncoming, canceledOutgoing }) {
-  const { amount, counterparty, direction, presentBalance, notes, status } = transaction
+export function TransactionRow ({ transaction, lastActionedTransactionId, showCancellationModal, isFirst }) {
+  const { id, amount, counterparty, direction, presentBalance, notes, status } = transaction
   const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
     ? `+ ${presentHolofuelAmount(amount)}`
     : `- ${presentHolofuelAmount(amount)}`
 
-  const disabledTransaction = disableActionedTransaction(transaction.id)
-  let highlightGreen, highlightRed
-  if (disabledTransaction) {
-    highlightGreen = canceledOutgoing()
-    highlightRed = canceledIncoming()
-  }
+  const isDisabled = id === lastActionedTransactionId
 
-  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: disabledTransaction }, { highlightGreen }, { highlightRed })} data-testid='transaction-row'>
+  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: isDisabled }, { highlightRed: isDisabled })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
         <HashAvatar seed={counterparty.id} size={32} />
@@ -229,7 +212,7 @@ export function TransactionRow ({ transaction, disableActionedTransaction, showC
         {presentHolofuelAmount(presentBalance)}
       </div>}
     </div>
-    {pending && !disabledTransaction && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
+    {pending && !isDisabled && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
   </div>
 }
 
@@ -243,7 +226,7 @@ function CancelButton ({ showCancellationModal, transaction }) {
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
-export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, setHasTransactionBeenActioned }) {
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, setLastActionedTransactionId }) {
   const { newMessage } = useFlashMessageContext()
   if (!transaction) return null
   const { id, counterparty, amount, type, direction } = transaction
@@ -253,10 +236,7 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
       <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
     </>, 5000)
 
-    setHasTransactionBeenActioned({
-      direction,
-      idList: [id]
-    })
+    setLastActionedTransactionId(id)
 
     cancelTransaction(id).then(() => {
       newMessage(`${capitalize(type)} succesfully cancelled.`, 5000)
