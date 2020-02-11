@@ -335,9 +335,9 @@ describe('TransactionHistory', () => {
       const { getByText: getByTextInModal } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <ConfirmCancellationModal
           transaction={pendingRequest}
-          handleClose={jest.fn()}
+          handleClose={() => {}}
           cancelTransaction={cancelPendingRequestMock.newData}
-          setHasTransactionBeenActioned={jest.fn()} />
+          setLastActionedTransactionId={() => {}} />
       </MockedProvider>)
 
       fireEvent.click(getByTextInModal('Yes'))
@@ -374,8 +374,8 @@ describe('TransactionHistory', () => {
         <ConfirmCancellationModal
           transaction={pendingRequest}
           cancelTransaction={cancelPendingOfferMock.newData}
-          setHasTransactionBeenActioned={jest.fn()}
-          handleClose={jest.fn()} />
+          setLastActionedTransactionId={() => {}} 
+          handleClose={() => {}} />
       </MockedProvider>)
       fireEvent.click(getByTextInModal('Yes'))
       expect(cancelPendingOfferMock.newData).toHaveBeenCalled()

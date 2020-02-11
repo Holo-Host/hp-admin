@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, intersectionBy, includes, find, reject } from 'lodash/fp'
+import { isEmpty, capitalize, intersectionBy, find, reject } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
