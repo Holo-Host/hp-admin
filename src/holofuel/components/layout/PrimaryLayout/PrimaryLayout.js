@@ -48,11 +48,11 @@ export function PrimaryLayout ({
 
   const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
-  // useEffect(() => {
-  //   if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
-  //     goToInbox()
-  //   }
-  // }, [filterActionableTransactionsByStatusAndType, goToInbox])
+  useEffect(() => {
+    if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
+      goToInbox()
+    }
+  }, [filterActionableTransactionsByStatusAndType, goToInbox])
 
   const childrenWithProps = React.Children.map(children, child => {
     if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })
