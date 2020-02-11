@@ -104,11 +104,22 @@ function useCounterparty (agentId) {
   return { holofuelCounterparty, loading }
 }
 
-function useUpdatedTransactionLists () {
-  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+function useUpdatedTransactionLists (view) {
+  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {}, startPolling: startPollingActionalbe, stopPolling: stopPollingActionalbe } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {}, startPolling: startPollingNonPending, stopPolling: stopPollingNonPending } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+
+  useEffect(() => {
+    if (view === 'actionable') {
+      stopPollingNonPending()
+      startPollingActionalbe(5000)
+    } else if (view === 'recent') {
+      stopPollingActionalbe()
+      startPollingNonPending(5000)
+    }
+  }, [view, startPollingNonPending, stopPollingNonPending, startPollingActionalbe, stopPollingActionalbe])
 
   const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
+
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
@@ -135,7 +146,10 @@ const presentTruncatedAmount = (string, number = 15) => {
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { actionableTransactions, recentTransactions, declinedTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists()
+
+  const [inboxView, setInboxView] = useState(VIEW.actionable)
+  const { actionableTransactions, recentTransactions, declinedTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
+
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -164,7 +178,6 @@ export default function Inbox ({ history: { push } }) {
   const [hasTransactionBeenActioned, setHasTransactionBeenActioned] = useState({})
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
-  const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   let isDisplayLoading
   switch (inboxView) {
