@@ -114,7 +114,7 @@ export default function TransactionsHistory ({ history: { push } }) {
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='header'>
-      <h4 styleName='balance-label'>BalanceZE</h4>
+      <h4 styleName='balance-label'>Balance</h4>
       <div styleName='balance-amount'>
         <DisplayBalance
           holofuelBalance={holofuelBalance}
