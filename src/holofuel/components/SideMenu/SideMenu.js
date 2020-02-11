@@ -56,7 +56,7 @@ export default function SideMenu ({
               History
             </Link>
           </li>
-          {process.env.REACT_APP_HOLOFUEL_AS_HOLOCHAIN_APP !== 'true' && <li>
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li>
             <Link to='/admin/' styleName='nav-link'>
               HP Admin
             </Link>
