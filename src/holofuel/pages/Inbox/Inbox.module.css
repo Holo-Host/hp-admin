@@ -187,12 +187,12 @@
   text-transform: none;
 }
 
-.disable {
+.disabled {
  opacity: 0.8;
  pointer-events: none;
 }
 
-.higlightGreen {
+.highlightGreen {
   background-color: #CFF3EC;
 }
 
