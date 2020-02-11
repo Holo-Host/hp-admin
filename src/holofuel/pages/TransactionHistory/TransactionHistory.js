@@ -187,14 +187,8 @@ export function TransactionRow ({ transaction, lastActionedTransactionId, showCa
     : `- ${presentHolofuelAmount(amount)}`
 
   const isDisabled = id === lastActionedTransactionId
-  let highlightGreen, highlightRed
 
-  if (isDisabled) {
-    highlightGreen = direction === DIRECTION.outgoing
-    highlightRed = direction === DIRECTION.incoming
-  }
-
-  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} data-testid='transaction-row'>
+  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: isDisabled }, { highlightRed: isDisabled })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
         <HashAvatar seed={counterparty.id} size={32} />
