@@ -113,15 +113,20 @@ let holochainClient
 
 async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
+  let url
   try {
-    let url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
-    // Construct url with query param X-Hpos-Admin-Signature = signature
-    const urlObj = new URL(url)
-    const params = new URLSearchParams(urlObj.search.slice(1))
-    params.append('X-Hpos-Admin-Signature', await signPayload('get', urlObj.pathname))
-    params.sort()
-    urlObj.search = params.toString()
-    url = urlObj.toString()
+    if (process.env.REACT_APP_RAW_HOLOCHAIN === 'true') {
+      url = process.env.REACT_APP_DNA_INTERFACE_URL
+    } else {
+      url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
+      // Construct url with query param X-Hpos-Admin-Signature = signature
+      const urlObj = new URL(url)
+      const params = new URLSearchParams(urlObj.search.slice(1))
+      params.append('X-Hpos-Admin-Signature', await signPayload('get', urlObj.pathname))
+      params.sort()
+      urlObj.search = params.toString()
+      url = urlObj.toString()
+    }
 
     holochainClient = await hcWebClientConnect({
       url: url,
