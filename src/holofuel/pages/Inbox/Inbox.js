@@ -108,6 +108,9 @@ function useUpdatedTransactionLists (view) {
   const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {}, startPolling: startPollingActionalbe, stopPolling: stopPollingActionalbe } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {}, startPolling: startPollingNonPending, stopPolling: stopPollingNonPending } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
+  const [isActionableLoadingFirstRender, setIsActionableLoadingFirstRender] = useState(true)
+  const [isRecentLoadingFirstRender, setIsRecentLoadingFirstRender] = useState(true)
+
   useEffect(() => {
     if (view === 'actionable') {
       stopPollingNonPending()
@@ -116,7 +119,14 @@ function useUpdatedTransactionLists (view) {
       stopPollingActionalbe()
       startPollingNonPending(5000)
     }
-  }, [view, startPollingNonPending, stopPollingNonPending, startPollingActionalbe, stopPollingActionalbe])
+
+    if (!actionableLoading) {
+      setIsActionableLoadingFirstRender(false)
+    }
+    if (!recentLoading) {
+      setIsRecentLoadingFirstRender(false)
+    }
+  }, [view, startPollingNonPending, stopPollingNonPending, startPollingActionalbe, stopPollingActionalbe, actionableLoading, recentLoading])
 
   const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
 
@@ -128,8 +138,8 @@ function useUpdatedTransactionLists (view) {
     actionableTransactions: updatedActionableWOCanceledOffers,
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
-    actionableLoading,
-    recentLoading
+    actionableLoading: isActionableLoadingFirstRender,
+    recentLoading: isRecentLoadingFirstRender
   }
 }
 
