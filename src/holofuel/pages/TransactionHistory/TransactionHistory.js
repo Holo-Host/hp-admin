@@ -14,6 +14,7 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCancelMutation from 'graphql/HolofuelCancelMutation.gql'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
