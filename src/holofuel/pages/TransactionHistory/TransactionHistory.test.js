@@ -374,7 +374,7 @@ describe('TransactionHistory', () => {
         <ConfirmCancellationModal
           transaction={pendingRequest}
           cancelTransaction={cancelPendingOfferMock.newData}
-          setLastActionedTransactionId={() => {}} 
+          setLastActionedTransactionId={() => {}}
           handleClose={() => {}} />
       </MockedProvider>)
       fireEvent.click(getByTextInModal('Yes'))
