@@ -119,14 +119,7 @@ function useUpdatedTransactionLists (view) {
       stopPollingActionalbe()
       startPollingNonPending(5000)
     }
-
-    if (!actionableLoading) {
-      setIsActionableLoadingFirstRender(false)
-    }
-    if (!recentLoading) {
-      setIsRecentLoadingFirstRender(false)
-    }
-  }, [view, startPollingNonPending, stopPollingNonPending, startPollingActionalbe, stopPollingActionalbe, actionableLoading, recentLoading])
+  }, [view, startPollingNonPending, stopPollingNonPending, startPollingActionalbe, stopPollingActionalbe])
 
   const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
 
@@ -138,8 +131,8 @@ function useUpdatedTransactionLists (view) {
     actionableTransactions: updatedActionableWOCanceledOffers,
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
-    actionableLoading: isActionableLoadingFirstRender,
-    recentLoading: isRecentLoadingFirstRender
+    actionableLoading,
+    recentLoading
   }
 }
 
