@@ -461,7 +461,22 @@ describe('AmountInput', () => {
     fireEvent.click(getByText('<'))
 
     expect(getByTestId('amount').value).toEqual('0')
+  })
+
+  it("doesn't allow amount of zero to be submitted", async () => {
+    const { getByText, queryByTestId, getByTestId } = await renderAndWait(<MockedProvider mocks={[]}>
+      <CreateOfferRequest history={{ }} />
+    </MockedProvider>)
+
     fireEvent.click(getByText('Send'))
-    expect(getByText(`${presentHolofuelAmount('0')} TF`)).toBeInTheDocument()
+    expect(getByTestId('amount')).toBeInTheDocument()
+
+    fireEvent.click(getByText('Request'))
+    expect(getByTestId('amount')).toBeInTheDocument()
+
+    fireEvent.click(getByText('1'))
+
+    fireEvent.click(getByText('Send'))
+    expect(queryByTestId('amount')).not.toBeInTheDocument()
   })
 })

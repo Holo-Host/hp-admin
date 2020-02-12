@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
@@ -8,6 +8,8 @@ import SideMenu from 'components/SideMenu'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import useConnectionContext from 'contexts/useConnectionContext'
+import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -19,7 +21,27 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
+  const { setIsConnected, isConnected } = useConnectionContext()
+
+  const onError = ({ graphQLErrors }) => {
+    const { isHposConnectionActive } = graphQLErrors
+    setIsConnected(isHposConnectionActive)
+  }
+
+  const onCompleted = ({ hposSettings }) => {
+    if (hposSettings) setIsConnected(true)
+  }
+
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onCompleted, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { newMessage } = useFlashMessageContext()
+
+  useEffect(() => {
+    if (!isConnected) {
+      newMessage('Your Holoport is currently unreachable.', 0)
+    } else {
+      newMessage('', 0)
+    }
+  }, [isConnected, setIsConnected, newMessage])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -30,11 +52,11 @@ export function PrimaryLayout ({
     {showHeader && <Header
       {...headerProps}
       hamburgerClick={showSideMenu && hamburgerClick}
-      settings={settings} />}
+      settings={isConnected ? settings : {}} />}
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      settings={settings} />
+      settings={isConnected ? settings : {}} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />

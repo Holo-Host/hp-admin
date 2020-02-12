@@ -13,6 +13,7 @@ import {
 } from 'holofuel/utils/urls'
 
 jest.unmock('react-router-dom')
+jest.mock('components/AuthRoute')
 
 const makeMockHFPage = title => () => <div>
   <div data-testid='title'>{title}</div>
@@ -46,9 +47,13 @@ const testLinks = ui => {
   expect(getByText('TransactionHistory')).toBeInTheDocument()
 }
 
-// we test two cases here, urls of the form '/holofuel' and '/holofuel/'
+// we test threee cases here, urls of the form '/', '/holofuel' and '/holofuel/'
 
 describe('HFRouter', () => {
+  it('works from root url', () => {
+    testLinks(<MemoryRouter initialEntries={['/']}><HFRouter /></MemoryRouter>)
+  })
+
   it('works from /holofuel', () => {
     testLinks(<MemoryRouter initialEntries={['/holofuel']}><HFRouter /></MemoryRouter>)
   })

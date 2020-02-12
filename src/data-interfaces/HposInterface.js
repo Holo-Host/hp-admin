@@ -2,14 +2,15 @@ import axios from 'axios'
 import mockCallHpos from 'mock-dnas/mockCallHpos'
 import { signPayload, hashString } from 'holochainClient'
 import stringify from 'fast-json-stable-stringify'
+import { omitBy, isUndefined } from 'lodash/fp'
 
-const preLocalHposImageIntegration = true // TODO: Once HPOS image is included in nix setup, this should be removed, and the value returned to false, once HPOS Image is nixified and located within repo.
-const mockHposConnection = process.env.NODE_ENV !== 'production' // boolean to toggle hpos mock data reference while in dev context...
-export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
-  ? preLocalHposImageIntegration
-  : process.env.NODE_ENV === 'test'
-    ? true
-    : mockHposConnection
+const mockHposConnectionInDevelopment = true
+
+export const MOCK_HPOS_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST === 'true' || process.env.NODE_ENV === 'test'
+  ? true
+  : process.env.NODE_ENV === 'production'
+    ? false
+    : mockHposConnectionInDevelopment
 
 const axiosConfig = {
   headers: {
@@ -26,23 +27,20 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
       const fullPath = ((process.env.NODE_ENV === 'production') ? (window.location.protocol + '//' + window.location.hostname) : process.env.REACT_APP_HPOS_URL) + '/api/' + apiVersion + '/' + path
       const urlObj = new URL(fullPath)
 
-      let headers = {};
-      let bodyHash = undefined;
+      let bodyHash
 
       if (params) {
-        params = stringify(params) // replace with serialized version, to send below!
-        bodyHash = await hashString(params)
-        headers = { 'X-Body-Hash': bodyHash }
+        bodyHash = await hashString(stringify(params))
       }
 
       const signature = await signPayload(method, urlObj.pathname, bodyHash)
 
-      headers = {
+      const headers = omitBy(isUndefined, {
         ...axiosConfig.headers,
         ...userHeaders,
-        ...headers,
+        'X-Body-Hash': bodyHash,
         'X-Hpos-Admin-Signature': signature
-      }
+      })
 
       let data
 
@@ -108,7 +106,7 @@ const HposInterface = {
 
       // settingsConfig must contain .admin.{email,public_key}, but may contain other arbitrary
       // data.  We must only update what we have authority over, and data supplied for.
-      let settingsConfig = {
+      const settingsConfig = {
         ...settingsResponse
       }
       if (hostPubKey !== undefined) {

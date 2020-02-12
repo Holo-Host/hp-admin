@@ -1,18 +1,24 @@
 /* Buttons & Icons */
 
-.add-icon {
+.plus-icon {
   display: inline-flex;
   flex: 1;
-  background: #FFF;
-  width: 15px;
-  border-radius: 8px;
-  margin: 2px 8px 0px -6px;
+  width: 21px;
+  height: 21px;
+  position: relative;
+  top: 5px;
+}
+
+.plus-icon-mini {
+  composes: plus-icon;
+  margin-top: 20px;
 }
 
 .button-text {
   display: inline-flex;
   flex: 1;
-  margin: 0px;
+  font-size: 16px;
+  margin-left: 14px;
 }
 
 .new-transaction-button {
@@ -172,9 +178,30 @@
   opacity: 0.8;
 }
 
+.annulled {
+  opacity: 0.8;
+}
+
 .modal-note-text {
   composes: notes;
   text-transform: none;
+}
+
+.disabled {
+ opacity: 0.8;
+ pointer-events: none;
+}
+
+.highlightGreen {
+  background-color: #CFF3EC;
+}
+
+.highlightRed {
+  background-color: #FCE3E8;
+}
+
+.highlightNeutral {
+  background-color: #e4e6e9;
 }
 
 /* ActionsCell */
@@ -267,6 +294,11 @@
   padding: 50px 50px 25px;
 }
 
+.decline-modal-message {
+  composes: modal-message;
+  padding: 50px 25px;
+}
+
 .modal-buttons {
   margin-bottom: 34px;
 }
@@ -290,4 +322,11 @@
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   background-color: var(--color-ocean-green);
+}
+
+.modal-button-return-funds {	
+  composes: modal-button;	
+  font-size: 1rem;	
+  font-weight: bolder;
+  width: 15rem;	
 }

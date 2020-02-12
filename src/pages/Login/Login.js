@@ -7,6 +7,7 @@ import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import HoloFuelIcon from 'components/icons/HoloFuelIcon'
 import useAuthContext from 'contexts/useAuthContext'
+import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
 import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
@@ -14,6 +15,7 @@ import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
 export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
   const { register, handleSubmit, errors } = useForm()
+  const { isConnected } = useConnectionContext()
   const { setIsAuthed } = useAuthContext()
   const { newMessage } = useFlashMessageContext()
 
@@ -22,11 +24,8 @@ export default function Login ({ history: { push } }) {
     // we call this to SET the singleton value of HpAdminKeypair
     await getHpAdminKeypair(email, password)
     const authResult = await checkAuth()
+
     const isAuthed = get('data.hposCheckAuth.isAuthed', authResult)
-
-    // we call this to SET the singleton value of HpAdminKeypair
-    await getHpAdminKeypair(email, password)
-
     setIsAuthed(isAuthed)
 
     if (isAuthed) {
@@ -51,7 +50,8 @@ export default function Login ({ history: { push } }) {
             name='email'
             id='email'
             styleName='input'
-            ref={register({ required: true })} />
+            ref={register({ required: true })}
+            disabled={!isConnected} />
           {errors.email && <small styleName='field-error'>
             You need to provide a valid email address.
           </small>}
@@ -62,13 +62,14 @@ export default function Login ({ history: { push } }) {
             name='password'
             id='password'
             styleName='input'
-            ref={register({ required: true, minLength: 6 })} />
+            ref={register({ required: true, minLength: 6 })}
+            disabled={!isConnected} />
           {errors.password && <small styleName='field-error'>
             {errors.password.type === 'required' && 'Type in your password, please.'}
             {errors.password.type === 'minLength' && 'Password need to be at least 6 characters long.'}
           </small>}
         </div>
-        <Button type='submit' variant='green' wide styleName='login-button'>Login</Button>
+        <Button type='submit' variant='green' wide styleName='login-button' disabled={!isConnected}>Login</Button>
       </form>
       <div styleName='reminder-text-block'>*Remember, Holo doesn’t store your password so we can’t recover it for you. Please save your password securely!</div>
       <div styleName='reminder-text-block'>
