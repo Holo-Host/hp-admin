@@ -105,18 +105,8 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists (view) {
-  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {}, startPolling: startPollingActionalbe, stopPolling: stopPollingActionalbe } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {}, startPolling: startPollingNonPending, stopPolling: stopPollingNonPending } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-
-  useEffect(() => {
-    if (view === 'actionable') {
-      stopPollingNonPending()
-      startPollingActionalbe(5000)
-    } else if (view === 'recent') {
-      stopPollingActionalbe()
-      startPollingNonPending(5000)
-    }
-  }, [view, startPollingNonPending, stopPollingNonPending, startPollingActionalbe, stopPollingActionalbe])
+  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
 
   const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
 
