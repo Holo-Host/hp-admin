@@ -108,9 +108,6 @@ function useUpdatedTransactionLists (view) {
   const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {}, startPolling: startPollingActionalbe, stopPolling: stopPollingActionalbe } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {}, startPolling: startPollingNonPending, stopPolling: stopPollingNonPending } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
-  const [isActionableLoadingFirstRender, setIsActionableLoadingFirstRender] = useState(true)
-  const [isRecentLoadingFirstRender, setIsRecentLoadingFirstRender] = useState(true)
-
   useEffect(() => {
     if (view === 'actionable') {
       stopPollingNonPending()
