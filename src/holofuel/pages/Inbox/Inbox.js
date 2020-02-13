@@ -104,11 +104,12 @@ function useCounterparty (agentId) {
   return { holofuelCounterparty, loading }
 }
 
-function useUpdatedTransactionLists () {
-  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+function useUpdatedTransactionLists (view) {
+  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
 
   const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
+
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
@@ -135,7 +136,10 @@ const presentTruncatedAmount = (string, number = 15) => {
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { actionableTransactions, recentTransactions, declinedTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists()
+
+  const [inboxView, setInboxView] = useState(VIEW.actionable)
+  const { actionableTransactions, recentTransactions, declinedTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
+
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -164,7 +168,6 @@ export default function Inbox ({ history: { push } }) {
   const [hasTransactionBeenActioned, setHasTransactionBeenActioned] = useState({})
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
-  const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   let isDisplayLoading
   switch (inboxView) {
@@ -321,15 +324,15 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   } else fullNotes = notes
 
   const disabledTransaction = disableActionedTransaction(transaction.id)
-  let higlightGreen, highlightRed, highlightNeutral
+  let highlightGreen, highlightRed, highlightNeutral
   if (disabledTransaction) {
-    higlightGreen = increaseAction()
+    highlightGreen = increaseAction()
     highlightRed = decreseAction()
     highlightNeutral = statusQuoAction()
   }
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disable: disabledTransaction }, { higlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { highlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />

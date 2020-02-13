@@ -33,7 +33,9 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
 })
 
 let links = [new SchemaLink({ schema })]
-links = [errorLink].concat(links)
+if (process.env.REACT_APP_HOLOFUEL_APP !== 'true') {
+  links = [errorLink].concat(links)
+}
 if (process.env.NODE_ENV !== 'test') {
   links = [apolloLogger].concat(links)
 }

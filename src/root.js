@@ -15,7 +15,7 @@ import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/context
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
-  if (process.env.REACT_APP_HOLOFUEL_APP) {
+  if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
     return <HoloFuelApp />
   } else {
     return <HPAdminApp />
