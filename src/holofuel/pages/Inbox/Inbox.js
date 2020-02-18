@@ -128,6 +128,11 @@ const VIEW = {
   recent: 'recent'
 }
 
+const clear = (timeout, { successAction, errorAction }) => setTimeout(() => {
+  if (successAction) successAction([])
+  if (errorAction) errorAction([])
+}, timeout)
+
 const presentTruncatedAmount = (string, number = 15) => {
   if (string.length > number) return `${sliceHash(string, number)}...`
   return sliceHash(string, number)
@@ -165,7 +170,7 @@ export default function Inbox ({ history: { push } }) {
   }
 
   const [actionsVisibleId, setActionsVisibleId] = useState()
-  const [hasTransactionBeenActioned, setHasTransactionBeenActioned] = useState({})
+  const [hasTransactionBeenActioned, setHasTransactionBeenActioned] = useState([])
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   let displayTransactions = []
@@ -188,14 +193,9 @@ export default function Inbox ({ history: { push } }) {
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
-  const disableActionedTransaction = transactionId => {
-    if (hasTransactionBeenActioned.idList) {
-      return hasTransactionBeenActioned.idList.find(txid => txid === transactionId)
-    } else return false
-  }
-  const increaseAction = () => includes(DIRECTION.incoming, hasTransactionBeenActioned)
-  const decreseAction = () => includes(DIRECTION.outgoing, hasTransactionBeenActioned)
-  const statusQuoAction = () => includes('status-quo', hasTransactionBeenActioned)
+  const findTransactionById = (transactionId, arrayOfTransactions) => arrayOfTransactions.find(txid => txid === transactionId)
+  const [lastActionSuccess, setLastActionSuccess] = useState([])
+  const [lastActionError, setLastActionError] = useState([])
 
   return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
     <Jumbotron
@@ -252,10 +252,10 @@ export default function Inbox ({ history: { push } }) {
             view={VIEW}
             isActionable={inboxView === VIEW.actionable}
             showConfirmationModal={showConfirmationModal}
-            disableActionedTransaction={disableActionedTransaction}
-            increaseAction={increaseAction}
-            decreseAction={decreseAction}
-            statusQuoAction={statusQuoAction}
+            findTransactionById={findTransactionById}
+            hasTransactionBeenActioned={hasTransactionBeenActioned}
+            lastActionSuccess={lastActionSuccess}
+            lastActionError={lastActionError}
             key={transaction.id} />)}
         </div>
       </React.Fragment>)}
@@ -266,7 +266,9 @@ export default function Inbox ({ history: { push } }) {
       isDeclinedTransactionModalVisible={isDeclinedTransactionModalVisible}
       declinedTransactions={declinedTransactions}
       refundAllDeclinedTransactions={refundAllDeclinedTransactions}
-      setHasTransactionBeenActioned={setHasTransactionBeenActioned} />
+      setHasTransactionBeenActioned={setHasTransactionBeenActioned}
+      setLastActionSuccess={setLastActionSuccess}
+      setLastActionError={setLastActionError} />
 
     <ConfirmationModal
       handleClose={() => setModalTransaction(null)}
@@ -277,11 +279,13 @@ export default function Inbox ({ history: { push } }) {
       refundTransaction={refundTransaction}
       setCounterpartyNotFound={setCounterpartyNotFound}
       counterpartyNotFound={counterpartyNotFound}
-      setHasTransactionBeenActioned={setHasTransactionBeenActioned} />
+      setHasTransactionBeenActioned={setHasTransactionBeenActioned}
+      setLastActionSuccess={setLastActionSuccess}
+      setLastActionError={setLastActionError} />
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, showConfirmationModal, isActionable, whoami, disableActionedTransaction, increaseAction, decreseAction, statusQuoAction }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, showConfirmationModal, isActionable, whoami, findTransactionById, hasTransactionBeenActioned, lastActionSuccess, lastActionError }) {
   const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
   const agent = canceledBy || counterparty
 
@@ -323,16 +327,12 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     fullNotes = isOffer ? ` Declined Offer: ${notes}` : ` Declined Request: ${notes}`
   } else fullNotes = notes
 
-  const disabledTransaction = disableActionedTransaction(transaction.id)
-  let highlightGreen, highlightRed, highlightNeutral
-  if (disabledTransaction) {
-    highlightGreen = increaseAction()
-    highlightRed = decreseAction()
-    highlightNeutral = statusQuoAction()
-  }
+  const disabledTransaction = findTransactionById(transaction.id, hasTransactionBeenActioned)
+  const actionSuccess = findTransactionById(transaction.id, lastActionSuccess)
+  const actionError = findTransactionById(transaction.id, lastActionError)
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { highlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { highlightGreen: actionSuccess }, { highlightRed: actionError })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -440,7 +440,7 @@ function DeclineOrCancelButton ({ showConfirmationModal, transaction, isDeclined
   </Button>
 }
 
-export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions, setHasTransactionBeenActioned }) {
+export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions, setHasTransactionBeenActioned, setLastActionSuccess, setLastActionError }) {
   const { newMessage } = useFlashMessageContext()
   if (declinedTransactions.length <= 0) return null
   const totalSum = (sum, currentAmount) => sum + currentAmount
@@ -458,15 +458,16 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
     })
 
     const displayActionedTransactionsIdArray = cleanedTransactions.map(tx => tx.id)
-    setHasTransactionBeenActioned({
-      direction: DIRECTION.incoming,
-      idList: displayActionedTransactionsIdArray
-    })
+    setHasTransactionBeenActioned(displayActionedTransactionsIdArray)
 
     refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
       newMessage(`Funds succesfully returned`, 5000)
+      setLastActionSuccess(displayActionedTransactionsIdArray)
+      clear(5000, { successAction: setLastActionSuccess, errorAction: setLastActionError })
     }).catch(() => {
       newMessage('Sorry, something went wrong', 5000)
+      setLastActionError(displayActionedTransactionsIdArray)
+      clear(5000, { successAction: setLastActionSuccess, errorAction: setLastActionError })
     })
     handleClose()
   }
@@ -485,7 +486,7 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
   </Modal>
 }
 
-export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound, setHasTransactionBeenActioned }) {
+export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound, setHasTransactionBeenActioned, setLastActionSuccess, setLastActionError }) {
   const { newMessage } = useFlashMessageContext()
   const { id, amount, type, action, notes } = transaction
   const { counterparty = {} } = transaction
@@ -508,11 +509,10 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
   }, [transaction, loaderCounterparty, setCounterpartyNotFound, notFound, holofuelCounterparty, newMessage])
 
-  let message, actionHook, actionParams, contentLabel, flashMessage, transactionDirection
+  let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
     case 'pay': {
       contentLabel = 'Pay request'
-      transactionDirection = DIRECTION.outgoing
       actionParams = { id, amount, counterparty, notes }
       actionHook = payTransaction
       message = <>
@@ -523,7 +523,6 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
     case 'acceptOffer': {
       contentLabel = 'Accept offer'
-      transactionDirection = DIRECTION.incoming
       actionParams = { id }
       actionHook = acceptOffer
       message = <>
@@ -535,7 +534,6 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     case 'decline': {
       contentLabel = `Decline ${type}?`
       // TODO: Determine if we want to show a different highlight color for 'decline action' as they don't (negative / positively) affect the balance
-      transactionDirection = 'status-quo'
       actionParams = { id }
       actionHook = declineTransaction
       if (type === 'offer') {
@@ -553,7 +551,6 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     }
     case 'cancel': {
       contentLabel = `Cancel ${type}?`
-      transactionDirection = 'status-quo'
       actionParams = { id }
       actionHook = refundTransaction
       message = <>Cancel your declined {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {type === TYPE.offer ? 'to' : 'from'} <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>?<br /><br /><div styleName='modal-note-text'>Note: Canceling will credit your balance by the outstanding amount.</div></>
@@ -571,15 +568,16 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
       <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
     </>, 5000)
 
-    setHasTransactionBeenActioned({
-      direction: transactionDirection,
-      idList: [id]
-    })
+    setHasTransactionBeenActioned([id])
 
     actionHook(actionParams).then(() => {
       newMessage(flashMessage, 5000)
+      setLastActionSuccess([id])
+      clear(5000, { successAction: setLastActionSuccess, errorAction: setLastActionError })
     }).catch(() => {
       newMessage('Sorry, something went wrong', 5000)
+      setLastActionError([id])
+      clear(5000, { successAction: setLastActionSuccess, errorAction: setLastActionError })
     })
     handleClose()
   }
