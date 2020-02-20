@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import cx from 'classnames'
-import { isEmpty, pick, includes } from 'lodash/fp'
+import { isEmpty, pick } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
