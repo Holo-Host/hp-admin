@@ -1,7 +1,6 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
-import stringify from 'json-stable-stringify'
 import wait from 'waait'
 
 // This can be written as a boolean expression then it's even less readable
