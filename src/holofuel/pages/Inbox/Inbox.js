@@ -33,8 +33,8 @@ import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
-  return ({ id, amount, counterparty }) => offer({
-    variables: { amount, counterpartyId: counterparty.id, requestId: id },
+  return ({ id, amount, counterparty, notes }) => offer({
+    variables: { amount, counterpartyId: counterparty.id, requestId: id, notes },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },
@@ -104,11 +104,12 @@ function useCounterparty (agentId) {
   return { holofuelCounterparty, loading }
 }
 
-function useUpdatedTransactionLists () {
-  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+function useUpdatedTransactionLists (view) {
+  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
 
   const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
+
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
@@ -135,7 +136,10 @@ const presentTruncatedAmount = (string, number = 15) => {
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
-  const { actionableTransactions, recentTransactions, declinedTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists()
+
+  const [inboxView, setInboxView] = useState(VIEW.actionable)
+  const { actionableTransactions, recentTransactions, declinedTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
+
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -164,7 +168,6 @@ export default function Inbox ({ history: { push } }) {
   const [hasTransactionBeenActioned, setHasTransactionBeenActioned] = useState({})
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
-  const [inboxView, setInboxView] = useState(VIEW.actionable)
   let displayTransactions = []
   let isDisplayLoading
   switch (inboxView) {
@@ -321,15 +324,15 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   } else fullNotes = notes
 
   const disabledTransaction = disableActionedTransaction(transaction.id)
-  let higlightGreen, highlightRed, highlightNeutral
+  let highlightGreen, highlightRed, highlightNeutral
   if (disabledTransaction) {
-    higlightGreen = increaseAction()
+    highlightGreen = increaseAction()
     highlightRed = decreseAction()
     highlightNeutral = statusQuoAction()
   }
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disable: disabledTransaction }, { higlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { highlightGreen }, { highlightRed }, { highlightNeutral })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -484,7 +487,7 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
 
 export function ConfirmationModal ({ transaction, handleClose, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound, setHasTransactionBeenActioned }) {
   const { newMessage } = useFlashMessageContext()
-  const { id, amount, type, action } = transaction
+  const { id, amount, type, action, notes } = transaction
   const { counterparty = {} } = transaction
   const { loading: loaderCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
   const { notFound } = holofuelCounterparty
@@ -510,7 +513,7 @@ export function ConfirmationModal ({ transaction, handleClose, declineTransactio
     case 'pay': {
       contentLabel = 'Pay request'
       transactionDirection = DIRECTION.outgoing
-      actionParams = { id, amount, counterparty }
+      actionParams = { id, amount, counterparty, notes }
       actionHook = payTransaction
       message = <>
         Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?

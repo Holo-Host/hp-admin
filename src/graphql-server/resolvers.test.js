@@ -45,6 +45,15 @@ describe('resolvers', () => {
       })
     })
 
+    describe('.holofuelNewCompletedTransactions', () => {
+      it('calls HoloFuelInterface.transactions.allCompleted', async () => {
+        const since = '2019-09-01T11:45:10+00:00'
+        resolvers.Query.holofuelNewCompletedTransactions(null, { since })
+        await wait(0)
+        expect(mockHoloFuelInterface.transactions.allCompleted).toHaveBeenCalledWith(since)
+      })
+    })
+
     describe('.holofuelWaitingTransactions', () => {
       it('calls HoloFuelInterface.transactions.allWaiting', async () => {
         resolvers.Query.holofuelWaitingTransactions()

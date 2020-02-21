@@ -133,13 +133,14 @@ type Query {
   happ(id: String!): Happ
   hostPricing: HostPricing
   holofuelCompletedTransactions: [Transaction]
+  holofuelNewCompletedTransactions(since: String!): [Transaction]
   holofuelWaitingTransactions: [Transaction]
   holofuelNonPendingTransactions: [Transaction]
   holofuelActionableTransactions: [Transaction]
   holofuelEarningsTransactions: [Transaction]
   holofuelLedger: Ledger
   holofuelUser: HolofuelUser
-  holofuelCounterparty(agentId: String!): HolofuelUser
+  holofuelCounterparty(agentId: String): HolofuelUser
   holofuelHistoryCounterparties: [HolofuelUser]
   hposSettings: HposSettings
   hposStatus: HposStatus

@@ -19,7 +19,7 @@ export const MOCK_INDIVIDUAL_DNAS = {
   holofuel: true
 }
 
-export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV !== 'test'
+export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV === 'development'
 
 // Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
 const getHcPubkey = () => {
@@ -68,12 +68,12 @@ export const getHpAdminKeypair = async (email = undefined, password = undefined)
 }
 
 // Return empty string if HpAdminKeypair is still not initialized
-export const signPayload = async (method, request, body) => {
+export const signPayload = async (method, request, bodyHash) => {
   const keypair = await getHpAdminKeypair()
 
   if (keypair === null) return ''
 
-  const payload = { method: method.toLowerCase(), request, body: stringify(body) || '' }
+  const payload = { method: method.toLowerCase(), request, body: bodyHash || '' }
 
   try {
     if (HOLOCHAIN_LOGGING) {
@@ -95,8 +95,8 @@ export const signPayload = async (method, request, body) => {
   }
 }
 
-export const hashResponseBody = async (data) => {
-  const dataBytes = Buffer.from(stringify(data))
+export const hashString = async (string) => {
+  const dataBytes = Buffer.from(string)
   const hashBytes = await crypto.subtle.digest('SHA-512', dataBytes)
 
   return Buffer.from(hashBytes).toString('base64')
@@ -112,19 +112,24 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 }
 
 let holochainClient
-let hcFlag = false
+let isInitiatingHcConnection = false
 
-async function init () {
-  hcFlag = true
+async function initHolochainClient () {
+  isInitiatingHcConnection = true
+  let url
   try {
-    let url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
-    // Construct url with query param X-Hpos-Admin-Signature = signature
-    const urlObj = new URL(url)
-    const params = new URLSearchParams(urlObj.search.slice(1))
-    params.append('X-Hpos-Admin-Signature', await signPayload('get', urlObj.pathname))
-    params.sort()
-    urlObj.search = params.toString()
-    url = urlObj.toString()
+    if (process.env.REACT_APP_RAW_HOLOCHAIN === 'true') {
+      url = process.env.REACT_APP_DNA_INTERFACE_URL
+    } else {
+      url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
+      // Construct url with query param X-Hpos-Admin-Signature = signature
+      const urlObj = new URL(url)
+      const params = new URLSearchParams(urlObj.search.slice(1))
+      params.append('X-Hpos-Admin-Signature', await signPayload('get', urlObj.pathname))
+      params.sort()
+      urlObj.search = params.toString()
+      url = urlObj.toString()
+    }
 
     holochainClient = await hcWebClientConnect({
       url: url,
@@ -133,27 +138,29 @@ async function init () {
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
-    hcFlag = false
+    isInitiatingHcConnection = false
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
-    hcFlag = false
+    isInitiatingHcConnection = false
     throw (error)
   }
 }
 async function initAndGetHolochainClient () {
   let counter = 0
-  while (hcFlag) {
+  // This code is to let avoid multiple ws connections.
+  // isInitiatingHcConnection is changed in a different call of this function running in parallel
+  while (isInitiatingHcConnection) {
     counter++
     await wait(100)
     if (counter === 10) {
-      hcFlag = false
+      isInitiatingHcConnection = false
     }
   }
   if (holochainClient) return holochainClient
-  else return init()
+  else return initHolochainClient()
 }
 
 export function createZomeCall (zomeCallPath, callOpts = {}) {
