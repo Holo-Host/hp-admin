@@ -1,4 +1,4 @@
-{ pkgs ? import ./pkgs.nix {} }:
+{ pkgs ? import ./nixpkgs.nix {}, shell ? false }:
 
 with pkgs;
 
@@ -7,7 +7,10 @@ let
 in
 
 mkShell {
-  inputsFrom = lib.attrValues (import ./. { inherit pkgs; });
+  inputsFrom = lib.attrValues  (import ./. {
+    inherit pkgs;
+    shell = true;
+  });
 
   shellHook = ''
     rm -f conductor-config.toml

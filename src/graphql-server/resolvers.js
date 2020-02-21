@@ -28,22 +28,11 @@ export const resolvers = {
 
     holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
 
-    holofuelHomeCounterparties: async () => {
-      const completed = await HoloFuelDnaInterface.transactions.allCompleted()
-      return getTxCounterparties(completed)
-    },
-
     holofuelHistoryCounterparties: async () => {
       const completed = await HoloFuelDnaInterface.transactions.allCompleted()
       const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
       const historyTransactions = completed.concat(waiting)
       return getTxCounterparties(historyTransactions)
-    },
-
-    holofuelInboxCounterparties: () => {
-      const historyTransactions = HoloFuelDnaInterface.transactions.allActionable()
-      const transactionCounterparties = historyTransactions.then(getTxCounterparties)
-      return transactionCounterparties
     },
 
     holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
@@ -54,6 +43,8 @@ export const resolvers = {
     holofuelNonPendingTransactions: HoloFuelDnaInterface.transactions.allNonPending,
 
     holofuelCompletedTransactions: HoloFuelDnaInterface.transactions.allCompleted,
+
+    holofuelNewCompletedTransactions: (_, { since }) => HoloFuelDnaInterface.transactions.allCompleted(since),
 
     holofuelEarningsTransactions: HoloFuelDnaInterface.transactions.allEarnings,
 
@@ -109,6 +100,8 @@ export const resolvers = {
     holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
 
     holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
+
+    holofuelRefundDeclined: (_, { transactions }) => HoloFuelDnaInterface.transactions.refundDeclined(transactions),
 
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 

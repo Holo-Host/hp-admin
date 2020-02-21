@@ -2,12 +2,14 @@ query HolofuelActionableTransactionsQuery {
   holofuelActionableTransactions {
     id
     amount
-    counterparty { id }
+    counterparty { id, nickname }
     direction
     status
     type
     timestamp
     notes
     fees
+    isPayingARequest
+    canceledBy { id, nickname }
   }
 }

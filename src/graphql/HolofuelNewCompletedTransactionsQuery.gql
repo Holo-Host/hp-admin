@@ -1,5 +1,5 @@
-query HolofuelCompletedTransactionsQuery {
-  holofuelCompletedTransactions {
+query HolofuelNewCompletedTransactionsQuery($since: String) {
+  holofuelNewCompletedTransactions(since: $since) {
     id
     amount
     counterparty { id, nickname }

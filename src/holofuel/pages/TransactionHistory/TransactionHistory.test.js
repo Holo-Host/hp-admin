@@ -9,7 +9,6 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import TransactionHistory, { TransactionRow, ConfirmCancellationModal } from './TransactionHistory'
 import HoloFuelDnaInterface, { currentDataTimeIso } from 'data-interfaces/HoloFuelDnaInterface'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
@@ -41,23 +40,25 @@ const defaultTransaction = {
   notes: ''
 }
 
+const balance = '39085'
+const ledgerMock = {
+  request: { query: HolofuelLedgerQuery },
+  result: {
+    data: {
+      holofuelLedger: {
+        balance,
+        credit: 0,
+        payable: 0,
+        receivable: 0,
+        fees: 0
+      }
+    }
+  }
+}
+
 describe('TransactionHistory', () => {
   describe('With a balance and no transactions', () => {
-    const balance = '39085'
-    const mocks = [{
-      request: { query: HolofuelLedgerQuery },
-      result: {
-        data: {
-          holofuelLedger: {
-            balance,
-            credit: 0,
-            payable: 0,
-            receivable: 0,
-            fees: 0
-          }
-        }
-      }
-    }]
+    const mocks = [ledgerMock]
 
     it('renders the balance and the empty state', async () => {
       const push = jest.fn()
@@ -81,7 +82,8 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 1,
       counterparty: {
-        id: agent1.id
+        id: agent1.id,
+        nickname: agent1.nickname
       },
       status: STATUS.completed,
       direction: DIRECTION.outgoing,
@@ -94,7 +96,8 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 2,
       counterparty: {
-        id: agent2.id
+        id: agent2.id,
+        nickname: agent2.nickname
       },
       status: STATUS.completed,
       direction: DIRECTION.incoming,
@@ -106,7 +109,8 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 3,
       counterparty: {
-        id: agent1.id
+        id: agent1.id,
+        nickname: agent1.nickname
       },
       status: STATUS.completed,
       direction: DIRECTION.outgoing,
@@ -123,6 +127,7 @@ describe('TransactionHistory', () => {
     ]
 
     const mocks = [
+      ledgerMock,
       {
         request: {
           query: HolofuelCompletedTransactionsQuery
@@ -137,14 +142,6 @@ describe('TransactionHistory', () => {
         },
         result: {
           data: { holofuelWaitingTransactions: pendingTransactions }
-        }
-      },
-      {
-        request: {
-          query: HolofuelHistoryCounterpartiesQuery
-        },
-        result: {
-          data: { holofuelHistoryCounterparties: [agent1, agent2] }
         }
       }
     ]
@@ -289,7 +286,7 @@ describe('TransactionHistory', () => {
       result: {
         data: { holofuelCancel: mockCanceledTransaction }
       },
-      newData: jest.fn()
+      newData: jest.fn(() => Promise.resolve(true))
     }
 
     const cancelPendingOfferMock = {
@@ -305,7 +302,7 @@ describe('TransactionHistory', () => {
       result: {
         data: { holofuelCancel: mockCanceledTransaction }
       },
-      newData: jest.fn()
+      newData: jest.fn(() => Promise.resolve(true))
     }
 
     it('should open CancellationModal and trigger HolofuelCancelMutation for Pending Request', async () => {
@@ -322,6 +319,7 @@ describe('TransactionHistory', () => {
       const props = {
         transaction: waitingTransactionsQueryMock.result.data.holofuelWaitingTransactions[0],
         key: waitingTransactionsQueryMock.result.data.holofuelWaitingTransactions[0].id,
+        disableActionedTransaction: () => false,
         showCancellationModal: jest.fn(),
         pending: true
       }
@@ -337,8 +335,9 @@ describe('TransactionHistory', () => {
       const { getByText: getByTextInModal } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <ConfirmCancellationModal
           transaction={pendingRequest}
+          handleClose={() => {}}
           cancelTransaction={cancelPendingRequestMock.newData}
-          handleClose={jest.fn()} />
+          setLastActionedTransactionId={() => {}} />
       </MockedProvider>)
 
       fireEvent.click(getByTextInModal('Yes'))
@@ -359,6 +358,7 @@ describe('TransactionHistory', () => {
       const props = {
         transaction: waitingTransactionsQueryMock.result.data.holofuelWaitingTransactions[1],
         key: waitingTransactionsQueryMock.result.data.holofuelWaitingTransactions[1].id,
+        disableActionedTransaction: () => false,
         showCancellationModal: jest.fn(),
         pending: true
       }
@@ -374,7 +374,8 @@ describe('TransactionHistory', () => {
         <ConfirmCancellationModal
           transaction={pendingRequest}
           cancelTransaction={cancelPendingOfferMock.newData}
-          handleClose={jest.fn()} />
+          setLastActionedTransactionId={() => {}}
+          handleClose={() => {}} />
       </MockedProvider>)
       fireEvent.click(getByTextInModal('Yes'))
       expect(cancelPendingOfferMock.newData).toHaveBeenCalled()
@@ -387,6 +388,7 @@ describe('TransactionHistory', () => {
 
       const { getByRole } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <ConfirmCancellationModal
+          setHasTransactionBeenActioned={jest.fn()}
           transaction={pendingRequest} />
       </MockedProvider>)
 
@@ -410,6 +412,7 @@ describe('TransactionHistory', () => {
 
       const { getByRole } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <ConfirmCancellationModal
+          setHasTransactionBeenActioned={jest.fn()}
           transaction={pendingOffer} />
       </MockedProvider>)
 
