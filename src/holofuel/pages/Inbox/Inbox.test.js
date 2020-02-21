@@ -245,7 +245,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} whoami={mockWhoamiAgent} disableActionedTransaction={() => false} isActionable />
+      <TransactionRow transaction={request} whoami={mockWhoamiAgent} hasTransactionBeenActioned={false} findTransactionById={() => []} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -255,7 +255,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} disableActionedTransaction={() => false} isActionable />
+      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} hasTransactionBeenActioned={false} findTransactionById={() => []} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -265,7 +265,7 @@ describe('TransactionRow', () => {
 
   it('renders an recent request', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} disableActionedTransaction={() => false} whoami={mockWhoamiAgent} />
+      <TransactionRow transaction={request} hasTransactionBeenActioned={false} findTransactionById={() => []} whoami={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -275,7 +275,7 @@ describe('TransactionRow', () => {
 
   it('renders a recent offer', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} disableActionedTransaction={() => false} whoami={mockWhoamiAgent} />
+      <TransactionRow transaction={offer} hasTransactionBeenActioned={false} findTransactionById={() => []} whoami={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -353,7 +353,7 @@ describe('TransactionRow', () => {
   describe('Reveal actionable-buttons slider', () => {
     it('shows whenever actionable transactions are shown ', async () => {
       const { getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} disableActionedTransaction={() => false} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow transaction={offer} whoami={mockAgent1} hasTransactionBeenActioned={false} findTransactionById={() => null} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -361,7 +361,7 @@ describe('TransactionRow', () => {
 
     it('does not show whenever actionable transactions are shown ', async () => {
       const { queryByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} disableActionedTransaction={() => false} setActionsVisibleId={jest.fn()} />
+        <TransactionRow transaction={offer} whoami={mockAgent1} hasTransactionBeenActioned={false} findTransactionById={() => []} setActionsVisibleId={jest.fn()} />
       </MockedProvider>, 0)
 
       expect(queryByTestId('forward-icon')).not.toBeInTheDocument()
@@ -369,7 +369,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for requests ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={request} whoami={mockAgent1} disableActionedTransaction={() => false} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow transaction={request} whoami={mockAgent1} hasTransactionBeenActioned={false} findTransactionById={() => null} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -384,7 +384,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for offers ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} disableActionedTransaction={() => false} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow transaction={offer} whoami={mockAgent1} hasTransactionBeenActioned={false} findTransactionById={() => null} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -407,7 +407,8 @@ describe('TransactionRow', () => {
         actionsVisible: jest.fn(),
         isActionable: true,
         whoami: mockAgent1,
-        disableActionedTransaction: () => false
+        hasTransactionBeenActioned: false,
+        findTransactionById: () => null
       }
 
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
@@ -440,8 +441,9 @@ describe('TransactionRow', () => {
         payTransaction,
         setCounterpartyNotFound: jest.fn(),
         counterpartyNotFound: false,
-        disableActionedTransaction: () => false,
-        setHasTransactionBeenActioned: () => {}
+        setLastActionSuccess: () => [],
+        setLastActionError: () => [],
+        setHasTransactionBeenActioned: () => []
       }
 
       const counterpartyQueryErrorMock = {
@@ -486,7 +488,8 @@ describe('TransactionRow', () => {
         payTransaction,
         setCounterpartyNotFound: jest.fn(),
         counterpartyNotFound: false,
-        disableActionedTransaction: () => false,
+        setLastActionSuccess: () => [],
+        setLastActionError: () => [],
         setHasTransactionBeenActioned: () => {}
       }
 
@@ -530,8 +533,10 @@ describe('TransactionRow', () => {
         actionsVisible: jest.fn(),
         isActionable: true,
         whoami: mockAgent1,
-        disableActionedTransaction: () => false
+        hasTransactionBeenActioned: false,
+        findTransactionById: () => null
       }
+
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <TransactionRow {...props} />
       </MockedProvider>, 0)
@@ -583,7 +588,9 @@ describe('TransactionRow', () => {
           counterparty: { id: 'last 6', nickname: 'my name' }
         }],
         refundAllDeclinedTransactions: jest.fn().mockResolvedValue(true),
-        setHasTransactionBeenActioned: jest.fn()
+        setLastActionSuccess: () => [],
+        setLastActionError: () => [],
+        setHasTransactionBeenActioned: () => []
       }
 
       const mocks = [

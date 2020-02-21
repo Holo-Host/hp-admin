@@ -51,105 +51,105 @@ async function populateHoloFuelData () {
   }
   await createMultipleOffers(3)
 
-  // 3.) Scenario: A request from agent2 to agent1
-  console.log('\nTEST SCENARIO #3 : Agent 2 Requests hf from Agent 1')
-  const agent2InitiateRequest = await createZomeCall('holofuel', 'transactions', 'request', agent2Index)({ ...txParams, from: agent1.id, amount: '300' })
-  console.log(' >> Agent 2 Initiate Request Success Hash', agent2InitiateRequest)
+  // // 3.) Scenario: A request from agent2 to agent1
+  // console.log('\nTEST SCENARIO #3 : Agent 2 Requests hf from Agent 1')
+  // const agent2InitiateRequest = await createZomeCall('holofuel', 'transactions', 'request', agent2Index)({ ...txParams, from: agent1.id, amount: '300' })
+  // console.log(' >> Agent 2 Initiate Request Success Hash', agent2InitiateRequest)
 
-  // 4.) Scenario: An offer from agent2 to agent1
-  console.log('\nTEST SCENARIO #4 : Agent 2 Offers hf to Agent 1')
-  const agent2InitiateOffer = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, amount: '400' })
-  console.log(' >> Initiate Request Success Hash', agent2InitiateOffer)
+  // // 4.) Scenario: An offer from agent2 to agent1
+  // console.log('\nTEST SCENARIO #4 : Agent 2 Offers hf to Agent 1')
+  // const agent2InitiateOffer = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, amount: '400' })
+  // console.log(' >> Initiate Request Success Hash', agent2InitiateOffer)
 
-  // 5.) Scenario: An offer from agent1 to agent2 which agent 2 has accepted
-  // Part 1) : Agent 1 Offers HF from Agent 2
-  console.log('\nTEST SCENARIO #5 : Agent 2 accepts HF Offer by Agent 1')
-  await createZomeCall('holofuel', 'transactions', 'promise', agent1Index)({ ...txParams, to: agent2.id, amount: '500' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log('transaction originId : ', originId)
-      await wait(6000)
-      console.log('Part 2 :')
-      // // Part 2) : Agent 2 Accepts HF in response to Agent 1's Offer
-      const acceptOffer = await createZomeCall('holofuel', 'transactions', 'receive_payments_pending', agent2Index)({ promises: originId })
-      console.log(' >> Accept Offer Success Hash', acceptOffer)
-      return acceptOffer
-    })
+  // // 5.) Scenario: An offer from agent1 to agent2 which agent 2 has accepted
+  // // Part 1) : Agent 1 Offers HF from Agent 2
+  // console.log('\nTEST SCENARIO #5 : Agent 2 accepts HF Offer by Agent 1')
+  // await createZomeCall('holofuel', 'transactions', 'promise', agent1Index)({ ...txParams, to: agent2.id, amount: '500' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log('transaction originId : ', originId)
+  //     await wait(6000)
+  //     console.log('Part 2 :')
+  //     // // Part 2) : Agent 2 Accepts HF in response to Agent 1's Offer
+  //     const acceptOffer = await createZomeCall('holofuel', 'transactions', 'receive_payments_pending', agent2Index)({ promises: originId })
+  //     console.log(' >> Accept Offer Success Hash', acceptOffer)
+  //     return acceptOffer
+  //   })
 
-  // 6.) Scenario: An offer from agent1 to agent2 which agent 2 has declined
-  // Part 1) : Agent 1 Offers HF from Agent 2
-  console.log('\nTEST SCENARIO #6 : Agent 2 accepts HF Offer by Agent 1')
-  await createZomeCall('holofuel', 'transactions', 'promise', agent1Index)({ ...txParams, to: agent2.id, amount: '600' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log('transaction originId : ', originId)
-      await wait(6000)
-      console.log('Part 2 :')
-      // // Part 2) : Agent 2 Declines HF in response to Agent 1's Offer
-      const declineOffer = await createZomeCall('holofuel', 'transactions', 'decline_pending', agent2Index)({ origins: originId })
-      console.log(' >> Decline Offer Success Hash', declineOffer)
-      return declineOffer
-    })
+  // // 6.) Scenario: An offer from agent1 to agent2 which agent 2 has declined
+  // // Part 1) : Agent 1 Offers HF from Agent 2
+  // console.log('\nTEST SCENARIO #6 : Agent 2 accepts HF Offer by Agent 1')
+  // await createZomeCall('holofuel', 'transactions', 'promise', agent1Index)({ ...txParams, to: agent2.id, amount: '600' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log('transaction originId : ', originId)
+  //     await wait(6000)
+  //     console.log('Part 2 :')
+  //     // // Part 2) : Agent 2 Declines HF in response to Agent 1's Offer
+  //     const declineOffer = await createZomeCall('holofuel', 'transactions', 'decline_pending', agent2Index)({ origins: originId })
+  //     console.log(' >> Decline Offer Success Hash', declineOffer)
+  //     return declineOffer
+  //   })
 
-  // 7.) Scenario: An offer from agent1 to agent2 which agent 1 has cancelled
-  // Part 1) : Agent 1 Offers HF from Agent 2
-  console.log('\nTEST SCENARIO #7 : Agent 2 accepts HF Offer by Agent 1')
-  await createZomeCall('holofuel', 'transactions', 'promise', agent1Index)({ ...txParams, to: agent2.id, amount: '700' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log('transaction originId : ', originId)
-      await wait(6000)
-      console.log('Part 2 :')
-      // // Part 2) : Agent 1 Cancels own Offer to Agent 2
-      const cancelOffer = await createZomeCall('holofuel', 'transactions', 'cancel_transactions', agent1Index)({ origins: originId })
-      console.log(' >> Cancel Offer Success Hash', cancelOffer)
-      return cancelOffer
-    })
+  // // 7.) Scenario: An offer from agent1 to agent2 which agent 1 has cancelled
+  // // Part 1) : Agent 1 Offers HF from Agent 2
+  // console.log('\nTEST SCENARIO #7 : Agent 2 accepts HF Offer by Agent 1')
+  // await createZomeCall('holofuel', 'transactions', 'promise', agent1Index)({ ...txParams, to: agent2.id, amount: '700' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log('transaction originId : ', originId)
+  //     await wait(6000)
+  //     console.log('Part 2 :')
+  //     // // Part 2) : Agent 1 Cancels own Offer to Agent 2
+  //     const cancelOffer = await createZomeCall('holofuel', 'transactions', 'cancel_transactions', agent1Index)({ origins: originId })
+  //     console.log(' >> Cancel Offer Success Hash', cancelOffer)
+  //     return cancelOffer
+  //   })
 
-  // 8.) Scenario: An Request from agent1 to agent2 which agent 2 has paid (accepted to pay)
-  // Part 1) : Agent 1 Requests HF from Agent 2
-  console.log('\nTEST SCENARIO #8 : Agent 2 accepts HF Request by Agent 1')
-  await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '800' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log('transaction originId : ', originId)
-      await wait(6000)
-      console.log('Part 2 :')
-      // // Part 2) : Agent 2 Accepts HF in response to Agent 1's Request
-      const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, amount: '800', request: originId })
-      console.log(' >> Accept Request Success Hash', payRequest)
-      return payRequest
-    })
+  // // 8.) Scenario: An Request from agent1 to agent2 which agent 2 has paid (accepted to pay)
+  // // Part 1) : Agent 1 Requests HF from Agent 2
+  // console.log('\nTEST SCENARIO #8 : Agent 2 accepts HF Request by Agent 1')
+  // await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '800' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log('transaction originId : ', originId)
+  //     await wait(6000)
+  //     console.log('Part 2 :')
+  //     // // Part 2) : Agent 2 Accepts HF in response to Agent 1's Request
+  //     const payRequest = await createZomeCall('holofuel', 'transactions', 'promise', agent2Index)({ ...txParams, to: agent1.id, amount: '800', request: originId })
+  //     console.log(' >> Accept Request Success Hash', payRequest)
+  //     return payRequest
+  //   })
 
-  // 9.) Scenario: An Request from agent1 to agent2 which agent 2 has declined to pay
-  // Part 1) : Agent 1 Requests HF from Agent 2
-  console.log('\nTEST SCENARIO #9 : Agent 2 accepts HF Request by Agent 1')
-  await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '900' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log('transaction originId : ', originId)
-      await wait(6000)
-      console.log('Part 2 :')
-      // // Part 2) : Agent 2 Declines HF in response to Agent 1's Request
-      const declineRequest = await createZomeCall('holofuel', 'transactions', 'decline_pending', agent2Index)({ origins: originId })
-      console.log(' >> Decline Request Success Hash', declineRequest)
-      return declineRequest
-    })
+  // // 9.) Scenario: An Request from agent1 to agent2 which agent 2 has declined to pay
+  // // Part 1) : Agent 1 Requests HF from Agent 2
+  // console.log('\nTEST SCENARIO #9 : Agent 2 accepts HF Request by Agent 1')
+  // await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '900' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log('transaction originId : ', originId)
+  //     await wait(6000)
+  //     console.log('Part 2 :')
+  //     // // Part 2) : Agent 2 Declines HF in response to Agent 1's Request
+  //     const declineRequest = await createZomeCall('holofuel', 'transactions', 'decline_pending', agent2Index)({ origins: originId })
+  //     console.log(' >> Decline Request Success Hash', declineRequest)
+  //     return declineRequest
+  //   })
 
-  // 10.) Scenario: An Request from agent1 to agent2 which agent 1 has cancelled
-  // Part 1) : Agent 1 Cance;s Requests HF from Agent 2
-  console.log('\nTEST SCENARIO #10 : Agent 2 accepts HF Request by Agent 1')
-  await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '1000' })
-    .then(async (r) => {
-      const { Ok: originId } = JSON.parse(r)
-      console.log('transaction originId : ', originId)
-      await wait(6000)
-      console.log('Part 2 :')
-      // // Part 2) : Agent 1 Cancels own Request to Agent 2
-      const cancelRequest = await createZomeCall('holofuel', 'transactions', 'cancel_transactions', agent1Index)({ origins: originId })
-      console.log(' >> Cancel Request Success Hash', cancelRequest)
-      return cancelRequest
-    })
+  // // 10.) Scenario: An Request from agent1 to agent2 which agent 1 has cancelled
+  // // Part 1) : Agent 1 Cance;s Requests HF from Agent 2
+  // console.log('\nTEST SCENARIO #10 : Agent 2 accepts HF Request by Agent 1')
+  // await createZomeCall('holofuel', 'transactions', 'request', agent1Index)({ ...txParams, from: agent2.id, amount: '1000' })
+  //   .then(async (r) => {
+  //     const { Ok: originId } = JSON.parse(r)
+  //     console.log('transaction originId : ', originId)
+  //     await wait(6000)
+  //     console.log('Part 2 :')
+  //     // // Part 2) : Agent 1 Cancels own Request to Agent 2
+  //     const cancelRequest = await createZomeCall('holofuel', 'transactions', 'cancel_transactions', agent1Index)({ origins: originId })
+  //     console.log(' >> Cancel Request Success Hash', cancelRequest)
+  //     return cancelRequest
+  //   })
 
   // // 11.) Scenario: A request from agent1 to agent2, which agent 2 has paid and agent1 Accepts:
   // // Part 1) : Agent 1 accpets requested HF from Agent 2
@@ -221,10 +221,10 @@ const populateHpAdminData = async () => {
 
 populateHoloFuelData()
   .then(() => console.log('Finished loading HoloFuel data...'))
-  .then(() => populateHpAdminData())
-  .then(() => console.log('Finished loading HPAdmin data...'))
-  .then(() => snapshotStrorage())
-  .then(() => console.log('Loaded Snapshot Storage'))
+  // .then(() => populateHpAdminData())
+  // .then(() => console.log('Finished loading HPAdmin data...'))
+  // .then(() => snapshotStrorage())
+  // .then(() => console.log('Loaded Snapshot Storage'))
   .then(() => process.exit())
   .catch(e => {
     console.log('error', e)
