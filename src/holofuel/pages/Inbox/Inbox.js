@@ -444,8 +444,8 @@ export function DeclinedTransactionModal ({ handleClose, isDeclinedTransactionMo
   const { newMessage } = useFlashMessageContext()
   if (declinedTransactions.length <= 0) return null
   const totalSum = (sum, currentAmount) => sum + currentAmount
-  const declinedTransactionSum = declinedTransactions.map(({ amount, fees }) => amount + fees).reduce(totalSum, 0)
-
+  // NOTE: Currently we are ignoring fees. Destructure 'fees' from each transaction in `declinedTransactions` and add to the amount again once fees are no longer set to 0%.
+  const declinedTransactionSum = declinedTransactions.map(({ amount }) => amount).reduce(totalSum, 0)
   const returnAndClose = () => {
     newMessage(<>
       <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
