@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { isEmpty, pick } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -138,45 +138,31 @@ export default function Inbox ({ history: { push } }) {
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
-  const { actionableTransactions, recentTransactions, declinedTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
+  const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
 
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
   const refundTransaction = useRefund()
-  const refundAllDeclinedTransactions = useRefundAllDeclinedTransactions()
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
-  const [isDeclinedTransactionModalVisible, setIsDeclinedTransactionModalVisible] = useState(false)
-  const [confirmationModalProperties, setConfirmationModalProperties] = useState({
-    shouldDisplay: false,
-    transactions: [],
-    action: '',
-    hasConfirmed: false
-  })
 
-  const resetDefaultModalTransaction = () => {
-    setConfirmationModalProperties({
-      shouldDisplay: false,
-      transactions: [],
-      action: '',
-      hasConfirmed: false
-    })
+  const defaultConfirmationModalProperties = {
+    shouldDisplay: false,
+    transaction: {},
+    action: '',
+    hasConfirmed: false,
+    onConfirm: () => {}
   }
+
+  const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
+
+  const resetDefaultModalTransaction = () =>
+    setConfirmationModalProperties(defaultConfirmationModalProperties)
 
   const setNewModalTransactionProperties = (newProperties = {}) => {
     if (isEmpty(newProperties)) resetDefaultModalTransaction()
     else setConfirmationModalProperties(newProperties)
   }
-
-  const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
-
-  const shouldShowDeclinedTransactionModal = !isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))
-
-  useEffect(() => {
-    if (shouldShowDeclinedTransactionModal) {
-      setIsDeclinedTransactionModalVisible(true)
-    }
-  }, [shouldShowDeclinedTransactionModal, setIsDeclinedTransactionModalVisible])
 
   const [actionsVisibleId, setActionsVisibleId] = useState()
 
@@ -256,18 +242,10 @@ export default function Inbox ({ history: { push } }) {
             view={VIEW}
             isActionable={inboxView === VIEW.actionable}
             setConfirmationModalProperties={setConfirmationModalProperties}
-            confirmationModalProperties={confirmationModalProperties}
             key={transaction.id} />)}
         </div>
       </React.Fragment>)}
     </div>}
-
-    <DeclinedTransactionModal
-      isDeclinedTransactionModalVisible={isDeclinedTransactionModalVisible}
-      handleClose={() => setIsDeclinedTransactionModalVisible(false)}
-      setNewModalTransactionProperties={setNewModalTransactionProperties}
-      declinedTransactions={declinedTransactions}
-      refundAllDeclinedTransactions={refundAllDeclinedTransactions} />
 
     <ConfirmationModal
       setNewModalTransactionProperties={setNewModalTransactionProperties}
@@ -281,7 +259,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, confirmationModalProperties: { transactions: modalActionedTransaction, action: modalActionedAction, hasConfirmed: modalActionConfirmed }, isActionable, whoami }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, isActionable, whoami }) {
   const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
   const agent = canceledBy || counterparty
 
@@ -323,19 +301,45 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     fullNotes = isOffer ? ` Declined Offer: ${notes}` : ` Declined Request: ${notes}`
   } else fullNotes = notes
 
-  const findTransactionById = (transactionId, arrayOfTransactions) => arrayOfTransactions.find(tx => tx.id === transactionId)
+  const [highlightGreen, setHighlightGreen] = useState(false)
+  const [highlightRed, setHighlightRed] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
-  // NB: once modalActionedTransaction no longer has an array or transactions, we can update to:  disabledTransaction = transaction.id === modalActionedTransaction.transaction.id
-  const disabledTransaction = findTransactionById(transaction.id, modalActionedTransaction)
-  let actionAccept, actionDecline, actionRefund
-  if (disabledTransaction && modalActionConfirmed) {
-    actionAccept = disabledTransaction && (modalActionedAction === 'pay' || modalActionedAction === 'acceptOffer')
-    actionDecline = disabledTransaction && (modalActionedAction === 'cancel' || modalActionedAction === 'decline')
-    actionRefund = disabledTransaction && modalActionedAction === 'refund'
+  if (!isVisible) return null
+
+  const onConfirmGreen = () => {
+    setHighlightGreen(true)
+    setIsDisabled(true)
+    setTimeout(() => {
+      setHighlightGreen(false)
+      setIsVisible(false)
+    }, 5000)
   }
 
+  const onConfirmRed = () => {
+    setHighlightRed(true)
+    setIsDisabled(true)
+    setTimeout(() => {
+      setHighlightRed(false)
+      setIsVisible(false)
+    }, 5000)
+  }
+
+  const showAcceptModal = () =>
+    setConfirmationModalProperties({ shouldDisplay: true, transaction, action: 'acceptOffer', onConfirm: onConfirmGreen })
+
+  const showPayModal = () =>
+    setConfirmationModalProperties({ shouldDisplay: true, transaction, action: 'pay', onConfirm: onConfirmGreen })
+
+  const showDeclineModal = () =>
+    setConfirmationModalProperties({ shouldDisplay: true, transaction, action: 'decline', onConfirm: onConfirmRed })
+
+  const showCancelModal = () =>
+    setConfirmationModalProperties({ shouldDisplay: true, transaction, action: 'cancel', onConfirm: onConfirmRed })
+
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { highlightGreen: actionAccept || actionRefund }, { highlightRed: actionDecline })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -365,7 +369,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
       {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
     </div>
 
-    {isActionable && !disabledTransaction && <>
+    {isActionable && !isDisabled && <>
       <RevealActionsButton
         actionsVisibleId={actionsVisibleId}
         visible={drawerIsOpen}
@@ -377,7 +381,10 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}
-        setConfirmationModalProperties={setConfirmationModalProperties}
+        showAcceptModal={showAcceptModal}
+        showPayModal={showPayModal}
+        showDeclineModal={showDeclineModal}
+        showCancelModal={showCancelModal}
         isDeclined={isDeclined}
         isCanceled={isCanceled}
       />
@@ -391,12 +398,12 @@ function RevealActionsButton ({ actionsClick, handleClose, actionsVisibleId, vis
   </div>
 }
 
-function ActionOptions ({ isOffer, isRequest, transaction, setConfirmationModalProperties, actionsVisibleId, isCanceled, isDeclined }) {
+function ActionOptions ({ isOffer, isRequest, transaction, showAcceptModal, showPayModal, showDeclineModal, showCancelModal, actionsVisibleId, isCanceled, isDeclined }) {
   return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisibleId && transaction.id === actionsVisibleId) })}>
     <div styleName='actions'>
-      <DeclineOrCancelButton isDeclined={isDeclined} transaction={transaction} setConfirmationModalProperties={setConfirmationModalProperties} />
-      {!isDeclined && !isCanceled && isOffer && <AcceptButton transaction={transaction} setConfirmationModalProperties={setConfirmationModalProperties} />}
-      {!isDeclined && !isCanceled && isRequest && <PayButton transaction={transaction} setConfirmationModalProperties={setConfirmationModalProperties} />}
+      <DeclineOrCancelButton isDeclined={isDeclined} transaction={transaction} showDeclineModal={showDeclineModal} showCancelModal={showCancelModal} />
+      {!isDeclined && !isCanceled && isOffer && <AcceptButton transaction={transaction} showAcceptModal={showAcceptModal} />}
+      {!isDeclined && !isCanceled && isRequest && <PayButton transaction={transaction} showPayModal={showPayModal} />}
     </div>
   </aside>
 }
@@ -415,76 +422,34 @@ function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isC
   </div>
 }
 
-function AcceptButton ({ setConfirmationModalProperties, transaction }) {
+function AcceptButton ({ showAcceptModal }) {
   return <Button
-    onClick={() => setConfirmationModalProperties({ shouldDisplay: true, transactions: [transaction], action: 'acceptOffer', hasConfirmed: false })}
+    onClick={showAcceptModal}
     styleName='accept-button'>
     <p>Accept</p>
   </Button>
 }
 
-function PayButton ({ setConfirmationModalProperties, transaction }) {
+function PayButton ({ showPayModal }) {
   return <Button
-    onClick={() => setConfirmationModalProperties({ shouldDisplay: true, transactions: [transaction], action: 'pay', hasConfirmed: false })}
+    onClick={showPayModal}
     styleName='accept-button'>
     {/* NB: Not a typo. This is to 'Accept Request for Payment' */}
     <p>Accept</p>
   </Button>
 }
 
-function DeclineOrCancelButton ({ setConfirmationModalProperties, transaction, isDeclined }) {
-  const action = isDeclined ? 'cancel' : 'decline'
+function DeclineOrCancelButton ({ showCancelModal, showDeclineModal, isDeclined }) {
   return <Button
-    onClick={() => setConfirmationModalProperties({ shouldDisplay: true, transactions: [transaction], action, hasConfirmed: false })}
+    onClick={isDeclined ? showCancelModal : showDeclineModal}
     styleName='reject-button'>
     <p>{isDeclined ? 'Cancel' : 'Decline'}</p>
   </Button>
 }
 
-export function DeclinedTransactionModal ({ setNewModalTransactionProperties, clearHighlightedTransaction, handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
+export function ConfirmationModal ({ confirmationModalProperties, setNewModalTransactionProperties, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
   const { newMessage } = useFlashMessageContext()
-  if (declinedTransactions.length <= 0) return null
-  const totalSum = (sum, currentAmount) => sum + currentAmount
-  const declinedTransactionSum = declinedTransactions.map(({ amount, fees }) => amount + fees).reduce(totalSum, 0)
-
-  const returnAndClose = () => {
-    newMessage(<>
-      <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
-    </>, 5000)
-
-    const cleanedTransactions = declinedTransactions.map(tx => {
-      const cleanedObj = pick(['id', 'amount', 'counterparty', 'direction', 'status', 'type', 'timestamp', 'fees', 'notes'], tx)
-      const cleanedCounterparty = pick(['id', 'nickname'], cleanedObj.counterparty)
-      return { ...cleanedObj, counterparty: cleanedCounterparty }
-    })
-
-    refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
-      newMessage(`Funds succesfully returned`, 5000)
-      setNewModalTransactionProperties({ transactions: cleanedTransactions, action: 'refund', shouldDisplay: false, hasConfirmed: true })
-    }).catch(() => {
-      newMessage('Sorry, something went wrong', 5000)
-      handleClose()
-    })
-  }
-
-  return <Modal
-    contentLabel={'Restore funds from declined offer.'}
-    isOpen={isDeclinedTransactionModalVisible}
-    handleClose={returnAndClose}
-    styleName='modal'>
-    <div styleName='decline-modal-message'> {declinedTransactions.length} of your offers {declinedTransactions.length === 1 ? 'was' : 'were'} declined. {declinedTransactionSum} TF will be returned to your available balance.</div>
-    <Button
-      onClick={returnAndClose}
-      styleName='modal-button-return-funds'>
-      Return all funds
-    </Button>
-  </Modal>
-}
-
-export function ConfirmationModal ({ confirmationModalProperties, setNewModalTransactionProperties, clearHighlightedTransaction, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
-  const { newMessage } = useFlashMessageContext()
-  const { transactions, action, shouldDisplay } = confirmationModalProperties
-  const transaction = transactions[0] || {}
+  const { transaction, action, shouldDisplay, onConfirm } = confirmationModalProperties
 
   const { id, amount, type, notes } = transaction
   const { counterparty = {} } = transaction
@@ -567,6 +532,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setNewModalTra
 
     actionHook(actionParams)
       .then(() => {
+        onConfirm()
         newMessage(flashMessage, 5000)
       })
       .catch(() => {
