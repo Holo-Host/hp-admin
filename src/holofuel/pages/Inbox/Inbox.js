@@ -575,8 +575,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setNewModalTra
       })
       .catch(() => {
         newMessage('Sorry, something went wrong', 5000)
-        setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false, hasConfirmed: true })
-        clearHighlightedTransaction(5000)
+        setNewModalTransactionProperties()
       })
   }
 

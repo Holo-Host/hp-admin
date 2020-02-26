@@ -41,7 +41,7 @@ export function PrimaryLayout ({
   // eslint-disable-next-line
   const goToInbox = useCallback(() => {
     if (!hasCalledReroute) {
-      push(INBOX_PATH)
+      // push(INBOX_PATH)
       setHasCalledReroute(true)
     }
   })
