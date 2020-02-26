@@ -483,7 +483,7 @@ export function DeclinedTransactionModal ({ setNewModalTransactionProperties, cl
   </Modal>
 }
 
-export function ConfirmationModal ({ confirmationModalProperties, clearHighlightedTransaction, setNewModalTransactionProperties, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
+export function ConfirmationModal ({ confirmationModalProperties, setNewModalTransactionProperties, clearHighlightedTransaction, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
   const { newMessage } = useFlashMessageContext()
   const { transactions, action, shouldDisplay } = confirmationModalProperties
   const transaction = transactions[0] || {}

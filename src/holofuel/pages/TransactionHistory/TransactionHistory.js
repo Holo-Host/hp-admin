@@ -248,6 +248,11 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
 
     setLastActionedTransactionId(id)
 
+    const clear = timeout => setTimeout(() => {
+      setLastActionSuccess(null)
+      setLastActionError(null)
+    }, timeout)
+
     cancelTransaction(id).then(() => {
       newMessage(`${capitalize(type)} succesfully cancelled.`, 5000)
       setLastActionSuccess(id)
@@ -257,11 +262,6 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
       setLastActionError(id)
       clear(5000)
     })
-
-    const clear = timeout => setTimeout(() => {
-      setLastActionSuccess(null)
-      setLastActionError(null)
-    }, timeout)
 
     handleClose()
   }
