@@ -168,7 +168,7 @@ export default function Inbox ({ history: { push } }) {
     else setConfirmationModalProperties(newProperties)
   }
 
-  const clearHighlightedTransaction = timeout => setTimeout(() => resetDefaultModalTransaction(), timeout)
+  const clearHighlightedTransaction = (timeout = 0) => setTimeout(() => resetDefaultModalTransaction(), timeout)
 
   const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
@@ -462,7 +462,7 @@ export function DeclinedTransactionModal ({ setNewModalTransactionProperties, cl
     refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
       newMessage(`Funds succesfully returned`, 5000)
       setNewModalTransactionProperties({ transactions: cleanedTransactions, action: 'refund', shouldDisplay: false, hasConfirmed: true })
-      clearHighlightedTransaction(5000)
+      clearHighlightedTransaction(10000)
     }).catch(() => {
       newMessage('Sorry, something went wrong', 5000)
       handleClose()
@@ -571,12 +571,14 @@ export function ConfirmationModal ({ confirmationModalProperties, setNewModalTra
       .then(() => {
         newMessage(flashMessage, 5000)
         setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false, hasConfirmed: true })
-        clearHighlightedTransaction(5000)
+        clearHighlightedTransaction(10000)
       })
       .catch(() => {
         newMessage('Sorry, something went wrong', 5000)
         setNewModalTransactionProperties()
       })
+
+    setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false })
   }
 
   return <Modal

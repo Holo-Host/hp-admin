@@ -244,18 +244,21 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
 
     setLastActionedTransactionId(id)
 
-    const clear = timeout => setTimeout(() => {
-      setLastActionCancelled(null)
-      setLastActionedTransactionId(null)
+    const clear = (timeout, { actionSuccess }) => setTimeout(() => {
+      if (actionSuccess) {
+        setLastActionCancelled(null)
+      } else {
+        setLastActionedTransactionId(null)
+      }
     }, timeout)
 
     cancelTransaction(id).then(() => {
       newMessage(`${capitalize(type)} succesfully cancelled.`, 5000)
       setLastActionCancelled(id)
-      clear(5000)
+      clear(5000, { actionSuccess: true })
     }).catch(() => {
       newMessage('Sorry, something went wrong', 5000)
-      clear(5000)
+      clear(5000, { actionSuccess: false })
     })
 
     handleClose()
