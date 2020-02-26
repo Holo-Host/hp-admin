@@ -147,7 +147,7 @@ export default function Inbox ({ history: { push } }) {
   const refundAllDeclinedTransactions = useRefundAllDeclinedTransactions()
   const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
   const [isDeclinedTransactionModalVisible, setIsDeclinedTransactionModalVisible] = useState(false)
-  const [modalTransaction, setModalTransaction] = useState({
+  const [confirmationModalProperties, setConfirmationModalProperties] = useState({
     shouldDisplay: false,
     transactions: [],
     action: '',
@@ -155,7 +155,7 @@ export default function Inbox ({ history: { push } }) {
   })
 
   const resetDefaultModalTransaction = () => {
-    setModalTransaction({
+    setConfirmationModalProperties({
       shouldDisplay: false,
       transactions: [],
       action: '',
@@ -163,9 +163,9 @@ export default function Inbox ({ history: { push } }) {
     })
   }
 
-  const setNewModalTransactionValues = (newValues = {}) => {
-    if (isEmpty(newValues)) resetDefaultModalTransaction()
-    else setModalTransaction(newValues)
+  const setNewModalTransactionProperties = (newProperties = {}) => {
+    if (isEmpty(newProperties)) resetDefaultModalTransaction()
+    else setConfirmationModalProperties(newProperties)
   }
 
   const clearHighlightedTransaction = timeout => setTimeout(() => resetDefaultModalTransaction(), timeout)
@@ -257,8 +257,8 @@ export default function Inbox ({ history: { push } }) {
             role='list'
             view={VIEW}
             isActionable={inboxView === VIEW.actionable}
-            setModalTransaction={setModalTransaction}
-            modalTransaction={modalTransaction}
+            setConfirmationModalProperties={setConfirmationModalProperties}
+            confirmationModalProperties={confirmationModalProperties}
             key={transaction.id} />)}
         </div>
       </React.Fragment>)}
@@ -267,14 +267,14 @@ export default function Inbox ({ history: { push } }) {
     <DeclinedTransactionModal
       isDeclinedTransactionModalVisible={isDeclinedTransactionModalVisible}
       handleClose={() => setIsDeclinedTransactionModalVisible(false)}
-      setNewModalTransactionValues={setNewModalTransactionValues}
+      setNewModalTransactionProperties={setNewModalTransactionProperties}
       clearHighlightedTransaction={clearHighlightedTransaction}
       declinedTransactions={declinedTransactions}
       refundAllDeclinedTransactions={refundAllDeclinedTransactions} />
 
     <ConfirmationModal
-      setNewModalTransactionValues={setNewModalTransactionValues}
-      modalTransaction={modalTransaction || {}}
+      setNewModalTransactionProperties={setNewModalTransactionProperties}
+      confirmationModalProperties={confirmationModalProperties || {}}
       clearHighlightedTransaction={clearHighlightedTransaction}
       payTransaction={payTransaction}
       acceptOffer={acceptOffer}
@@ -285,7 +285,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setModalTransaction, modalTransaction: { transactions: modalActionedTransaction, action: modalActionedAction }, isActionable, whoami }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, confirmationModalProperties: { transactions: modalActionedTransaction, action: modalActionedAction }, isActionable, whoami }) {
   const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
   const agent = canceledBy || counterparty
 
@@ -378,7 +378,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}
-        setModalTransaction={setModalTransaction}
+        setConfirmationModalProperties={setConfirmationModalProperties}
         isDeclined={isDeclined}
         isCanceled={isCanceled}
       />
@@ -392,12 +392,12 @@ function RevealActionsButton ({ actionsClick, handleClose, actionsVisibleId, vis
   </div>
 }
 
-function ActionOptions ({ isOffer, isRequest, transaction, setModalTransaction, actionsVisibleId, isCanceled, isDeclined }) {
+function ActionOptions ({ isOffer, isRequest, transaction, setConfirmationModalProperties, actionsVisibleId, isCanceled, isDeclined }) {
   return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisibleId && transaction.id === actionsVisibleId) })}>
     <div styleName='actions'>
-      <DeclineOrCancelButton isDeclined={isDeclined} transaction={transaction} setModalTransaction={setModalTransaction} />
-      {!isDeclined && !isCanceled && isOffer && <AcceptButton transaction={transaction} setModalTransaction={setModalTransaction} />}
-      {!isDeclined && !isCanceled && isRequest && <PayButton transaction={transaction} setModalTransaction={setModalTransaction} />}
+      <DeclineOrCancelButton isDeclined={isDeclined} transaction={transaction} setConfirmationModalProperties={setConfirmationModalProperties} />
+      {!isDeclined && !isCanceled && isOffer && <AcceptButton transaction={transaction} setConfirmationModalProperties={setConfirmationModalProperties} />}
+      {!isDeclined && !isCanceled && isRequest && <PayButton transaction={transaction} setConfirmationModalProperties={setConfirmationModalProperties} />}
     </div>
   </aside>
 }
@@ -416,33 +416,33 @@ function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isC
   </div>
 }
 
-function AcceptButton ({ setModalTransaction, transaction }) {
+function AcceptButton ({ setConfirmationModalProperties, transaction }) {
   return <Button
-    onClick={() => setModalTransaction({ shouldDisplay: true, transactions: [transaction], action: 'acceptOffer', hasConfirmed: false })}
+    onClick={() => setConfirmationModalProperties({ shouldDisplay: true, transactions: [transaction], action: 'acceptOffer', hasConfirmed: false })}
     styleName='accept-button'>
     <p>Accept</p>
   </Button>
 }
 
-function PayButton ({ setModalTransaction, transaction }) {
+function PayButton ({ setConfirmationModalProperties, transaction }) {
   return <Button
-    onClick={() => setModalTransaction({ shouldDisplay: true, transactions: [transaction], action: 'pay', hasConfirmed: false })}
+    onClick={() => setConfirmationModalProperties({ shouldDisplay: true, transactions: [transaction], action: 'pay', hasConfirmed: false })}
     styleName='accept-button'>
     {/* NB: Not a typo. This is to 'Accept Request for Payment' */}
     <p>Accept</p>
   </Button>
 }
 
-function DeclineOrCancelButton ({ setModalTransaction, transaction, isDeclined }) {
+function DeclineOrCancelButton ({ setConfirmationModalProperties, transaction, isDeclined }) {
   const action = isDeclined ? 'cancel' : 'decline'
   return <Button
-    onClick={() => setModalTransaction({ shouldDisplay: true, transactions: [transaction], action, hasConfirmed: false })}
+    onClick={() => setConfirmationModalProperties({ shouldDisplay: true, transactions: [transaction], action, hasConfirmed: false })}
     styleName='reject-button'>
     <p>{isDeclined ? 'Cancel' : 'Decline'}</p>
   </Button>
 }
 
-export function DeclinedTransactionModal ({ setNewModalTransactionValues, clearHighlightedTransaction, handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
+export function DeclinedTransactionModal ({ setNewModalTransactionProperties, clearHighlightedTransaction, handleClose, isDeclinedTransactionModalVisible, declinedTransactions, refundAllDeclinedTransactions }) {
   const { newMessage } = useFlashMessageContext()
   if (declinedTransactions.length <= 0) return null
   const totalSum = (sum, currentAmount) => sum + currentAmount
@@ -461,7 +461,7 @@ export function DeclinedTransactionModal ({ setNewModalTransactionValues, clearH
 
     refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
       newMessage(`Funds succesfully returned`, 5000)
-      setNewModalTransactionValues({ transactions: cleanedTransactions, action: 'refund', shouldDisplay: false, hasConfirmed: true })
+      setNewModalTransactionProperties({ transactions: cleanedTransactions, action: 'refund', shouldDisplay: false, hasConfirmed: true })
       clearHighlightedTransaction(5000)
     }).catch(() => {
       newMessage('Sorry, something went wrong', 5000)
@@ -483,9 +483,9 @@ export function DeclinedTransactionModal ({ setNewModalTransactionValues, clearH
   </Modal>
 }
 
-export function ConfirmationModal ({ modalTransaction, clearHighlightedTransaction, setNewModalTransactionValues, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
+export function ConfirmationModal ({ confirmationModalProperties, clearHighlightedTransaction, setNewModalTransactionProperties, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
   const { newMessage } = useFlashMessageContext()
-  const { transactions, action, shouldDisplay } = modalTransaction
+  const { transactions, action, shouldDisplay } = confirmationModalProperties
   const transaction = transactions[0] || {}
 
   const { id, amount, type, notes } = transaction
@@ -570,12 +570,12 @@ export function ConfirmationModal ({ modalTransaction, clearHighlightedTransacti
     actionHook(actionParams)
       .then(() => {
         newMessage(flashMessage, 5000)
-        setNewModalTransactionValues({ ...modalTransaction, shouldDisplay: false, hasConfirmed: true })
+        setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false, hasConfirmed: true })
         clearHighlightedTransaction(5000)
       })
       .catch(() => {
         newMessage('Sorry, something went wrong', 5000)
-        setNewModalTransactionValues({ ...modalTransaction, shouldDisplay: false, hasConfirmed: true })
+        setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false, hasConfirmed: true })
         clearHighlightedTransaction(5000)
       })
   }
@@ -583,12 +583,12 @@ export function ConfirmationModal ({ modalTransaction, clearHighlightedTransacti
   return <Modal
     contentLabel={contentLabel}
     isOpen={!isEmpty(transaction) && shouldDisplay && action !== 'refund'}
-    handleClose={() => setNewModalTransactionValues()}
+    handleClose={() => setNewModalTransactionProperties()}
     styleName='modal'>
     <div styleName='modal-message'>{message}</div>
     <div styleName='modal-buttons'>
       <Button
-        onClick={() => setNewModalTransactionValues()}
+        onClick={() => setNewModalTransactionProperties()}
         styleName='modal-button-no'>
         No
       </Button>
