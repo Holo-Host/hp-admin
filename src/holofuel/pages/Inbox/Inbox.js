@@ -168,8 +168,6 @@ export default function Inbox ({ history: { push } }) {
     else setConfirmationModalProperties(newProperties)
   }
 
-  const clearHighlightedTransaction = (timeout = 0) => setTimeout(() => resetDefaultModalTransaction(), timeout)
-
   const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
 
   const shouldShowDeclinedTransactionModal = !isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))
@@ -268,14 +266,12 @@ export default function Inbox ({ history: { push } }) {
       isDeclinedTransactionModalVisible={isDeclinedTransactionModalVisible}
       handleClose={() => setIsDeclinedTransactionModalVisible(false)}
       setNewModalTransactionProperties={setNewModalTransactionProperties}
-      clearHighlightedTransaction={clearHighlightedTransaction}
       declinedTransactions={declinedTransactions}
       refundAllDeclinedTransactions={refundAllDeclinedTransactions} />
 
     <ConfirmationModal
       setNewModalTransactionProperties={setNewModalTransactionProperties}
       confirmationModalProperties={confirmationModalProperties || {}}
-      clearHighlightedTransaction={clearHighlightedTransaction}
       payTransaction={payTransaction}
       acceptOffer={acceptOffer}
       declineTransaction={declineTransaction}
@@ -285,7 +281,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, confirmationModalProperties: { transactions: modalActionedTransaction, action: modalActionedAction }, isActionable, whoami }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, confirmationModalProperties: { transactions: modalActionedTransaction, action: modalActionedAction, hasConfirmed: modalActionConfirmed }, isActionable, whoami }) {
   const { counterparty, presentBalance, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
   const agent = canceledBy || counterparty
 
@@ -331,9 +327,12 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
 
   // NB: once modalActionedTransaction no longer has an array or transactions, we can update to:  disabledTransaction = transaction.id === modalActionedTransaction.transaction.id
   const disabledTransaction = findTransactionById(transaction.id, modalActionedTransaction)
-  const actionAccept = disabledTransaction && (modalActionedAction === 'pay' || modalActionedAction === 'acceptOffer')
-  const actionDecline = disabledTransaction && (modalActionedAction === 'cancel' || modalActionedAction === 'decline')
-  const actionRefund = disabledTransaction && modalActionedAction === 'refund'
+  let actionAccept, actionDecline, actionRefund
+  if (disabledTransaction && modalActionConfirmed) {
+    actionAccept = disabledTransaction && (modalActionedAction === 'pay' || modalActionedAction === 'acceptOffer')
+    actionDecline = disabledTransaction && (modalActionedAction === 'cancel' || modalActionedAction === 'decline')
+    actionRefund = disabledTransaction && modalActionedAction === 'refund'
+  }
 
   /* eslint-disable-next-line quote-props */
   return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: disabledTransaction }, { highlightGreen: actionAccept || actionRefund }, { highlightRed: actionDecline })} role='listitem'>
@@ -462,7 +461,6 @@ export function DeclinedTransactionModal ({ setNewModalTransactionProperties, cl
     refundAllDeclinedTransactions({ cleanedTransactions }).then(() => {
       newMessage(`Funds succesfully returned`, 5000)
       setNewModalTransactionProperties({ transactions: cleanedTransactions, action: 'refund', shouldDisplay: false, hasConfirmed: true })
-      clearHighlightedTransaction(10000)
     }).catch(() => {
       newMessage('Sorry, something went wrong', 5000)
       handleClose()
@@ -570,15 +568,12 @@ export function ConfirmationModal ({ confirmationModalProperties, setNewModalTra
     actionHook(actionParams)
       .then(() => {
         newMessage(flashMessage, 5000)
-        setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false, hasConfirmed: true })
-        clearHighlightedTransaction(10000)
       })
       .catch(() => {
         newMessage('Sorry, something went wrong', 5000)
-        setNewModalTransactionProperties()
       })
 
-    setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false })
+    setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false, hasConfirmed: true })
   }
 
   return <Modal
