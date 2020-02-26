@@ -8,8 +8,7 @@ function PageDivider ({
   wide = false,
   className,
   title,
-  dataTestId,
-  loading
+  dataTestId
 }) {
   const classes = cx('divider', { wide })
 
@@ -20,7 +19,6 @@ function PageDivider ({
       data-testid={dataTestId}
     >
       {title}
-      {loading && <Loading styleName='loading' height={16} width={16} />}
     </div>
   )
 }
