@@ -222,7 +222,7 @@ export default function Inbox ({ history: { push } }) {
       </div>
     </Jumbotron>
 
-    {isDisplayLoading && <>
+    {isDisplayTransactionsEmpty && isDisplayLoading && <>
       <Loading styleName='display-loading' />
     </>}
 
@@ -240,8 +240,8 @@ export default function Inbox ({ history: { push } }) {
     </>}
 
     {!isDisplayTransactionsEmpty && <div className='transaction-by-date-list'>
-      {partitionedTransactions.map(({ label: dateLabel, transactions }) => <React.Fragment key={dateLabel}>
-        <PageDivider title={dateLabel} />
+      {partitionedTransactions.map(({ label: dateLabel, transactions }, i) => <React.Fragment key={dateLabel}>
+        <PageDivider title={dateLabel} loading={i === 0 && isDisplayLoading} />
         <div styleName='transaction-list'>
           {transactions.map(transaction => <TransactionRow
             whoami={whoami}
