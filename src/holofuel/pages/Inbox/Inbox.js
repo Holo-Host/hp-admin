@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
-import { isEmpty, pick } from 'lodash/fp'
+import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -11,7 +11,6 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelRecoverFundsMutation from 'graphql/HolofuelRecoverFundsMutation.gql'
-import holofuelRefundDeclinedMutation from 'graphql/HolofuelRefundDeclinedMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
@@ -84,19 +83,6 @@ function useRefund () {
   })
 }
 
-function useRefundAllDeclinedTransactions () {
-  const [refundAllDeclined] = useMutation(holofuelRefundDeclinedMutation)
-  return ({ cleanedTransactions }) => refundAllDeclined({
-    variables: { transactions: cleanedTransactions },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    },
-    {
-      query: HolofuelLedgerQuery
-    }]
-  })
-}
-
 function useCounterparty (agentId) {
   const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
@@ -150,7 +136,6 @@ export default function Inbox ({ history: { push } }) {
     shouldDisplay: false,
     transaction: {},
     action: '',
-    hasConfirmed: false,
     onConfirm: () => {}
   }
 
@@ -539,7 +524,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setNewModalTra
         newMessage('Sorry, something went wrong', 5000)
       })
 
-    setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false, hasConfirmed: true })
+    setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false })
   }
 
   return <Modal

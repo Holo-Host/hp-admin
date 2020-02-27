@@ -6,7 +6,7 @@ import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
 import { pick } from 'lodash/fp'
-import Inbox, { TransactionRow, ConfirmationModal, DeclinedTransactionModal } from './Inbox'
+import Inbox, { TransactionRow, ConfirmationModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
 import { TYPE, STATUS } from 'models/Transaction'
 import { presentHolofuelAmount, getDateLabel } from 'utils'
@@ -17,7 +17,6 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-import holofuelRefundDeclinedMutation from 'graphql/HolofuelRefundDeclinedMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import { presentAgentId } from '../../../utils'
@@ -247,7 +246,7 @@ describe('TransactionRow', () => {
     shouldDisplay: false,
     transactions: [],
     action: '',
-    hasConfirmed: false
+    onConfirm: jest.fn()
   }
 
   it('renders an actionable request', async () => {
@@ -441,7 +440,7 @@ describe('TransactionRow', () => {
       const payTransaction = jest.fn(() => Promise.resolve())
 
       const props = {
-        confirmationModalProperties: { ...confirmationModalProperties, transactions: [transaction], action: 'pay', shouldDisplay: true },
+        confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay' },
         setNewModalTransactionProperties: jest.fn(),
         clearHighlightedTransaction: () => setTimeout(() => confirmationModalProperties, 5000),
         payTransaction,
@@ -551,63 +550,6 @@ describe('TransactionRow', () => {
 
       fireEvent.click(getByText('Decline'))
       expect(props.setConfirmationModalProperties).toHaveBeenCalledWith({ shouldDisplay: true, transactions: [offer], action: 'decline', hasConfirmed: false })
-    })
-  })
-
-  describe('Cancel Declined Offer Modal', () => {
-    it('responds properly', async () => {
-      const mockCanceledTransaction = {
-        ...offer,
-        status: STATUS.canceled
-      }
-
-      const refundAllDeclinedMock = {
-        request: {
-          query: holofuelRefundDeclinedMutation,
-          variables: { transactions: [{
-            ...offer,
-            status: STATUS.declined
-          }] },
-          refetchQueries: [{
-            query: ledgerMock
-          }, {
-            query: actionableTransactionsMock
-          }]
-        },
-        result: {
-          data: { holofuelRefundDeclined: mockCanceledTransaction }
-        }
-      }
-
-      const props = {
-        setNewModalTransactionProperties: jest.fn(),
-        clearHighlightedTransaction: () => setTimeout(() => jest.fn(), 5000),
-        handleClose: jest.fn(),
-        isDeclinedTransactionModalVisible: true,
-        declinedTransactions: [{ ...offer,
-          status: STATUS.declined,
-          counterparty: { id: 'last 6', nickname: 'my name' }
-        }],
-        refundAllDeclinedTransactions: jest.fn().mockResolvedValue(true)
-      }
-
-      const mocks = [
-        whoamiMock,
-        offerMock,
-        actionableTransactionsMock,
-        refundAllDeclinedMock
-      ]
-
-      const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <DeclinedTransactionModal {...props} />
-      </MockedProvider>, 0)
-
-      expect(getByText('Return all funds')).toBeInTheDocument()
-      await act(async () => {
-        fireEvent.click(getByText('Return all funds'))
-        await wait(0)
-      })
-      expect(props.setNewModalTransactionProperties).toHaveBeenCalledWith({ transactions: props.declinedTransactions, action: 'refund', shouldDisplay: false, hasConfirmed: true })
     })
   })
 })
