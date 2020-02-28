@@ -222,7 +222,7 @@ export default function Inbox ({ history: { push } }) {
       </div>
     </Jumbotron>
 
-    {isDisplayLoading && <>
+    {isDisplayTransactionsEmpty && isDisplayLoading && <>
       <Loading styleName='display-loading' />
     </>}
 
