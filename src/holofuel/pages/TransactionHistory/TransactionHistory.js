@@ -222,8 +222,6 @@ function CancelButton ({ showCancellationModal, transaction }) {
     onClick={() => showCancellationModal(transaction)}
     styleName='cancel-button disabled-cancel'
     data-testid='cancel-button'
-    role='button'
-    tabIndex={0}
     disabled>
     -
   </button>
