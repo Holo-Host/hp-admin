@@ -173,14 +173,6 @@
   cursor: pointer
 }
 
-.disabled-cancel {
-  background-color: grey !important;
-  font: 600 13px "Circular";
-  color: #c1bcbc;
-  opacity: 0.6;
-  cursor: default;
-}
-
 /* Modal */
 .modal {
   display: flex;

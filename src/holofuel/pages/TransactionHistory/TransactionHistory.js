@@ -213,18 +213,18 @@ export function TransactionRow ({ transaction, lastActionedTransactionId, showCa
         {presentHolofuelAmount(presentBalance)}
       </div>} */}
     </div>
-    {pending && !isDisabled && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
+    {/* NB: Intentionally skipped all Cancellation funcationality until DNA/Core cancellation bug is resolved. */}
+    {false && pending && !isDisabled && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
   </div>
 }
 
 function CancelButton ({ showCancellationModal, transaction }) {
-  return <button
+  return <div
     onClick={() => showCancellationModal(transaction)}
-    styleName='cancel-button disabled-cancel'
-    data-testid='cancel-button'
-    disabled>
+    styleName='cancel-button'
+    data-testid='cancel-button'>
     -
-  </button>
+  </div>
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
