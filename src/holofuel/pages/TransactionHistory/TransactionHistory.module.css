@@ -87,6 +87,7 @@
   padding: 0 24px;
   align-items: center;
   height: 60px;
+  cursor: default;
 }
 
 .not-first-row {
@@ -162,12 +163,22 @@
   color: white;
   border-radius: 50%;
   background-color: var(--color-amaranth);
-  font-weight: bold;
+  font-weight: bold ;
   width: 22px;
   height: 20px;
   padding-bottom: 2px;
   text-align: center;
   margin-left: 10px;
+  border: none;
+  cursor: pointer
+}
+
+.disabled-cancel {
+  background-color: grey !important;
+  font: 600 13px "Circular";
+  color: #c1bcbc;
+  opacity: 0.6;
+  cursor: default;
 }
 
 /* Modal */

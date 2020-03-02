@@ -179,7 +179,7 @@ function TransactionPartition ({ partition, lastActionedTransactionId, showCance
 }
 
 export function TransactionRow ({ transaction, lastActionedTransactionId, showCancellationModal, isFirst }) {
-  const { id, amount, counterparty, direction, presentBalance, notes, status } = transaction
+  const { id, amount, counterparty, direction, notes, status } = transaction // presentBalance,
   const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
@@ -208,21 +208,25 @@ export function TransactionRow ({ transaction, lastActionedTransactionId, showCa
       <div styleName={cx('amount', { 'pending-style': pending })}>
         {presentedAmount}
       </div>
-      {presentBalance && <div styleName='transaction-balance'>
+      {/* NB: Intentionally commented out until DNA balance bug is resolved. */}
+      {/* {presentBalance && <div styleName='transaction-balance'>
         {presentHolofuelAmount(presentBalance)}
-      </div>}
+      </div>} */}
     </div>
     {pending && !isDisabled && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
   </div>
 }
 
 function CancelButton ({ showCancellationModal, transaction }) {
-  return <div
+  return <button
     onClick={() => showCancellationModal(transaction)}
-    styleName='cancel-button'
-    data-testid='cancel-button'>
+    styleName='cancel-button disabled-cancel'
+    data-testid='cancel-button'
+    role='button'
+    tabIndex={0}
+    disabled>
     -
-  </div>
+  </button>
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
