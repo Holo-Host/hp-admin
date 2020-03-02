@@ -72,6 +72,7 @@ export function Settings ({ history: { push } }) {
 
   const title = (settings.hostName ? `${settings.hostName}'s` : 'Your') + ' HoloPort'
 
+  // eslint-disable-next-line no-unused-vars
   const ports = (() => {
     const portsObject = (omit('__typename', get('ports', status)) || {})
     const allKeys = keys(portsObject)
@@ -130,12 +131,13 @@ export function Settings ({ history: { push } }) {
         bottomStyle
         dataTestId='network-type'
         value={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : 'Not Available'} />
-      <div styleName='settings-header'>Access Port Numbers</div>
+      {/* NB: Intentionally commented out for now. Defer to Holo Central. */}
+      {/* <div styleName='settings-header'>Access Port Numbers</div>
       {ports.map(({ label, value }, i) => <SettingsRow
         key={label}
         label={label}
         value={value}
-        bottomStyle={i === ports.length - 1} />)}
+        bottomStyle={i === ports.length - 1} />)} */}
       <div styleName='settings-header'>&nbsp;</div>
       <SettingsRow
         label={<a href='https://holo.host/holoport-reset' target='_blank' rel='noopener noreferrer' styleName='reset-link'>
