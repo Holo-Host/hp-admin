@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -17,7 +17,6 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
-import Loader from 'react-loader-spinner'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
@@ -91,8 +90,8 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
-  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 500000 })
+  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 500000 })
 
   const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
 
@@ -126,12 +125,6 @@ export default function Inbox ({ history: { push } }) {
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
 
-  const payTransaction = useOffer()
-  const acceptOffer = useAcceptOffer()
-  const declineTransaction = useDecline()
-  const refundTransaction = useRefund()
-  const [counterpartyNotFound, setCounterpartyNotFound] = useState(true)
-
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
     transaction: {},
@@ -140,14 +133,6 @@ export default function Inbox ({ history: { push } }) {
   }
 
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
-
-  const resetDefaultModalTransaction = () =>
-    setConfirmationModalProperties(defaultConfirmationModalProperties)
-
-  const setNewModalTransactionProperties = (newProperties = {}) => {
-    if (isEmpty(newProperties)) resetDefaultModalTransaction()
-    else setConfirmationModalProperties(newProperties)
-  }
 
   const [actionsVisibleId, setActionsVisibleId] = useState()
 
@@ -233,14 +218,9 @@ export default function Inbox ({ history: { push } }) {
     </div>}
 
     <ConfirmationModal
-      setNewModalTransactionProperties={setNewModalTransactionProperties}
+      setConfirmationModalProperties={setConfirmationModalProperties}
       confirmationModalProperties={confirmationModalProperties || {}}
-      payTransaction={payTransaction}
-      acceptOffer={acceptOffer}
-      declineTransaction={declineTransaction}
-      refundTransaction={refundTransaction}
-      setCounterpartyNotFound={setCounterpartyNotFound}
-      counterpartyNotFound={counterpartyNotFound} />
+    />
   </PrimaryLayout>
 }
 
@@ -290,6 +270,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   const [highlightRed, setHighlightRed] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
   if (!isVisible) return null
 
@@ -311,17 +292,23 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     }, 5000)
   }
 
+  const commonModalProperties = {
+    shouldDisplay: true,
+    transaction,
+    setIsLoading
+  }
+
   const showAcceptModal = () =>
-    setConfirmationModalProperties({ shouldDisplay: true, transaction, action: 'acceptOffer', onConfirm: onConfirmGreen })
+    setConfirmationModalProperties({ ...commonModalProperties, action: 'acceptOffer', onConfirm: onConfirmGreen })
 
   const showPayModal = () =>
-    setConfirmationModalProperties({ shouldDisplay: true, transaction, action: 'pay', onConfirm: onConfirmGreen })
+    setConfirmationModalProperties({ ...commonModalProperties, action: 'pay', onConfirm: onConfirmGreen })
 
   const showDeclineModal = () =>
-    setConfirmationModalProperties({ shouldDisplay: true, transaction, action: 'decline', onConfirm: onConfirmRed })
+    setConfirmationModalProperties({ ...commonModalProperties, action: 'decline', onConfirm: onConfirmRed })
 
   const showCancelModal = () =>
-    setConfirmationModalProperties({ shouldDisplay: true, transaction, action: 'cancel', onConfirm: onConfirmRed })
+    setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
   return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
@@ -354,7 +341,9 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
       {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>}
     </div>
 
-    {isActionable && !isDisabled && <>
+    {isLoading && <Loading styleName='transaction-row-loading' width={20} height={20} />}
+
+    {isActionable && !isLoading && !isDisabled && <>
       <RevealActionsButton
         actionsVisibleId={actionsVisibleId}
         visible={drawerIsOpen}
@@ -432,30 +421,24 @@ function DeclineOrCancelButton ({ showCancelModal, showDeclineModal, isDeclined 
   </Button>
 }
 
-export function ConfirmationModal ({ confirmationModalProperties, setNewModalTransactionProperties, declineTransaction, refundTransaction, payTransaction, acceptOffer, setCounterpartyNotFound, counterpartyNotFound }) {
-  const { newMessage } = useFlashMessageContext()
-  const { transaction, action, shouldDisplay, onConfirm } = confirmationModalProperties
+export function ConfirmationModal ({ confirmationModalProperties, setConfirmationModalProperties }) {
+  const payTransaction = useOffer()
+  const acceptOffer = useAcceptOffer()
+  const declineTransaction = useDecline()
+  const refundTransaction = useRefund()
 
-  const { id, amount, type, notes } = transaction
-  const { counterparty = {} } = transaction
-  const { loading: loaderCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
+  const { newMessage } = useFlashMessageContext()
+  const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
+
+  const { id, amount, type, notes, counterparty = {} } = transaction
+  const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
   const { notFound } = holofuelCounterparty
 
-  useEffect(() => {
-    if (isEmpty(transaction)) return
-
-    if (loaderCounterparty) {
-      setCounterpartyNotFound(true)
-      newMessage('Verifying your counterparty is online.', 5000)
-    } else if (!isEmpty(holofuelCounterparty)) {
-      if (notFound) {
-        setCounterpartyNotFound(true)
-        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please confirm your HoloFuel Peer is online, and try again after a few minutes.')
-      } else {
-        setCounterpartyNotFound(false)
-      }
-    }
-  }, [transaction, loaderCounterparty, setCounterpartyNotFound, notFound, holofuelCounterparty, newMessage])
+  const counterpartyMessage = loadingCounterparty
+    ? <div styleName='counterparty-message'>Verifying your counterparty is online <Loading styleName='counterparty-loading' width={15} height={15} /></div>
+    : notFound
+      ? <div styleName='counterparty-message'>Your counterparty can't be located on the network. Please confirm that your counterparty is online, and try again in a few minutes.</div>
+      : null
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
@@ -504,45 +487,52 @@ export function ConfirmationModal ({ confirmationModalProperties, setNewModalTra
       flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully cancelled`
       break
     }
+    // NB: action === undefined when first loading page && no transaction is yet passed in
+    case undefined:
+    case '':
+    case 'refund':
+      break
     default:
-      // NB: action === undefined when first loading page && no transaction is yet passed in
-      if (action === undefined || action === '' || action === 'refund') break
-      else throw new Error('Error: Transaction action was not matched with a valid modal action. Current transaction action : ', action)
+      throw new Error(`Modal doesn't recognize action: ${action}`)
+  }
+
+  const hideModal = () => {
+    setConfirmationModalProperties({ ...confirmationModalProperties, shouldDisplay: false })
   }
 
   const onYes = () => {
-    newMessage(<>
-      <Loader type='Circles' color='#FFF' height={30} width={30} timeout={5000}>Sending...</Loader>
-    </>, 5000)
+    setIsLoading(true)
+
+    hideModal()
 
     actionHook(actionParams)
       .then(() => {
         onConfirm()
         newMessage(flashMessage, 5000)
+        setIsLoading(false)
       })
       .catch(() => {
         newMessage('Sorry, something went wrong', 5000)
       })
-
-    setNewModalTransactionProperties({ ...confirmationModalProperties, shouldDisplay: false })
   }
 
   return <Modal
     contentLabel={contentLabel}
-    isOpen={!isEmpty(transaction) && shouldDisplay && action !== 'refund'}
-    handleClose={() => setNewModalTransactionProperties()}
+    isOpen={shouldDisplay}
+    handleClose={() => hideModal()}
     styleName='modal'>
     <div styleName='modal-message'>{message}</div>
+    {counterpartyMessage}
     <div styleName='modal-buttons'>
       <Button
-        onClick={() => setNewModalTransactionProperties()}
+        onClick={() => hideModal()}
         styleName='modal-button-no'>
         No
       </Button>
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
-        disabled={counterpartyNotFound}>
+        disabled={loadingCounterparty || notFound}>
         Yes
       </Button>
     </div>
