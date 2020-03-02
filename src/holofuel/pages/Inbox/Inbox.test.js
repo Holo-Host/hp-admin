@@ -5,7 +5,6 @@ import moment from 'moment'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
-import { pick } from 'lodash/fp'
 import Inbox, { TransactionRow, ConfirmationModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
 import { TYPE, STATUS } from 'models/Transaction'
@@ -243,10 +242,11 @@ describe('TransactionRow', () => {
   }
 
   const confirmationModalProperties = {
-    shouldDisplay: false,
-    transactions: [],
+    shouldDisplay: true,
+    transaction: {},
     action: '',
-    onConfirm: jest.fn()
+    onConfirm: () => {},
+    setIsLoading: () => {}
   }
 
   it('renders an actionable request', async () => {
@@ -427,10 +427,18 @@ describe('TransactionRow', () => {
       })
 
       fireEvent.click(getByText('Accept'))
-      expect(props.setConfirmationModalProperties).toHaveBeenCalledWith({ shouldDisplay: true, transactions: [request], action: 'pay', hasConfirmed: false })
+      expect(props.setConfirmationModalProperties).toHaveBeenCalledWith(expect.objectContaining({
+        shouldDisplay: true,
+        transaction: request,
+        action: 'pay'
+      }))
 
       fireEvent.click(getByText('Decline'))
-      expect(props.setConfirmationModalProperties).toHaveBeenCalledWith({ shouldDisplay: true, transactions: [request], action: 'decline', hasConfirmed: false })
+      expect(props.setConfirmationModalProperties).toHaveBeenCalledWith(expect.objectContaining({
+        shouldDisplay: true,
+        transaction: request,
+        action: 'decline'
+      }))
     })
   })
 
@@ -441,7 +449,7 @@ describe('TransactionRow', () => {
 
       const props = {
         confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay' },
-        setNewModalTransactionProperties: jest.fn(),
+        setConfirmationModalProperties: jest.fn(),
         clearHighlightedTransaction: () => setTimeout(() => confirmationModalProperties, 5000),
         payTransaction,
         setCounterpartyNotFound: jest.fn(),
@@ -476,39 +484,45 @@ describe('TransactionRow', () => {
       expect(props.counterpartyNotFound).toBe(true)
 
       fireEvent.click(getByText('Close Modal'))
-      expect(props.setNewModalTransactionProperties).toHaveBeenCalled()
+      expect(props.setConfirmationModalProperties).toHaveBeenCalled()
     })
 
     describe('with request', () => {
       const transaction = { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' } }
-      const payTransaction = jest.fn(() => Promise.resolve())
 
       const props = {
-        confirmationModalProperties: { ...confirmationModalProperties, transactions: [transaction], action: 'pay', shouldDisplay: true },
-        setNewModalTransactionProperties: jest.fn(),
+        confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay', shouldDisplay: true },
+        setConfirmationModalProperties: jest.fn(),
         clearHighlightedTransaction: () => setTimeout(() => confirmationModalProperties, 5000),
-        payTransaction,
         setCounterpartyNotFound: jest.fn(),
         counterpartyNotFound: false
       }
 
-      const counterpartyQueryErrorMock = {
+      const counterpartyQuery = {
         request: {
           query: HolofuelCounterpartyQuery,
-          variables: { agentId: mockAgent1.pub_sign_key }
+          variables: { agentId: transaction.counterparty.id }
         },
-        result: () => {
-          props.counterpartyNotFound = true
-          return { data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, notFound: true } } }
-        }
+        result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, notFound: false } } })
+      }
+
+      const localOfferMock = {
+        request: {
+          query: HolofuelOfferMutation,
+          variables: { amount: transaction.amount, counterpartyId: transaction.counterparty.id, requestId: transaction.id, notes: transaction.notes }
+        },
+        result: {
+          data: { holofuelOffer: mockTransaction }
+        },
+        newData: jest.fn()
       }
 
       const mocks = [
         whoamiMock,
-        offerMock,
+        localOfferMock,
         declineMock,
         actionableTransactionsMock,
-        counterpartyQueryErrorMock,
+        counterpartyQuery,
         ledgerMock
       ]
 
@@ -518,7 +532,7 @@ describe('TransactionRow', () => {
         </MockedProvider>, 0)
         fireEvent.click(getByText('Yes'))
         await wait(50)
-        expect(payTransaction).toHaveBeenCalledWith(pick(['id', 'amount', 'counterparty', 'notes'], transaction))
+        expect(localOfferMock.newData).toHaveBeenCalled()
       })
     })
   })
@@ -546,10 +560,18 @@ describe('TransactionRow', () => {
       })
 
       fireEvent.click(getByText('Accept'))
-      expect(props.setConfirmationModalProperties).toHaveBeenCalledWith({ shouldDisplay: true, transactions: [offer], action: 'acceptOffer', hasConfirmed: false })
+      expect(props.setConfirmationModalProperties).toHaveBeenCalledWith(expect.objectContaining({
+        shouldDisplay: true,
+        transaction: offer,
+        action: 'acceptOffer'
+      }))
 
       fireEvent.click(getByText('Decline'))
-      expect(props.setConfirmationModalProperties).toHaveBeenCalledWith({ shouldDisplay: true, transactions: [offer], action: 'decline', hasConfirmed: false })
+      expect(props.setConfirmationModalProperties).toHaveBeenCalledWith(expect.objectContaining({
+        shouldDisplay: true,
+        transaction: offer,
+        action: 'decline'
+      }))
     })
   })
 })
