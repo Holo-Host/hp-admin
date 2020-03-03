@@ -306,7 +306,7 @@ describe('TransactionHistory', () => {
       newData: jest.fn(() => Promise.resolve(true))
     }
 
-    // NB: Intentionally skipped all Cancellation funcationality until DNA/Core cancellation bug is resolved.
+    // CANCEL-BUG: Intentionally skipped all Cancellation funcationality until DNA/Core cancellation bug is resolved.
     it.skip('should open CancellationModal and trigger HolofuelCancelMutation for Pending Request', async () => {
       afterEach(() => {
         jest.clearAllMocks()
@@ -346,7 +346,7 @@ describe('TransactionHistory', () => {
       expect(cancelPendingRequestMock.newData).toHaveBeenCalled()
     })
 
-    // NB: Intentionally skipped all Cancellation funcationality until DNA/Core cancellation bug is resolved.
+    // CANCEL-BUG: Intentionally skipped all Cancellation funcationality until DNA/Core cancellation bug is resolved.
     it.skip('should open CancellationModal and trigger HolofuelCancelMutation for Pending Offer', async () => {
       afterEach(() => {
         jest.clearAllMocks()

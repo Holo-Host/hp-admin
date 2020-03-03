@@ -208,12 +208,12 @@ export function TransactionRow ({ transaction, lastActionedTransactionId, showCa
       <div styleName={cx('amount', { 'pending-style': pending })}>
         {presentedAmount}
       </div>
-      {/* NB: Intentionally commented out until DNA balance bug is resolved. */}
+      {/* BALANCE-BUG: Intentionally commented out until DNA balance bug is resolved. */}
       {/* {presentBalance && <div styleName='transaction-balance'>
         {presentHolofuelAmount(presentBalance)}
       </div>} */}
     </div>
-    {/* NB: Intentionally skipped all Cancellation funcationality until DNA/Core cancellation bug is resolved. */}
+    {/* CANCEL-BUG: Intentionally skipped all Cancellation funcationality until DNA/Core cancellation bug is resolved. */}
     {false && pending && !isDisabled && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
   </div>
 }
