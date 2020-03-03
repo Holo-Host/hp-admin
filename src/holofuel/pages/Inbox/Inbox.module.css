@@ -95,6 +95,22 @@
   padding-right: 0px;
 }
 
+.balance {
+  text-align: right;
+  margin-left: auto;
+  margin-right: 10px;
+  color: var(--color-gray);
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.transaction-row-loading {
+  margin-right: 6px;
+  margin-left: 6px;  
+}
+
 /* Avatar and Description Cells */
 
 .avatar {
@@ -151,17 +167,6 @@
   line-height: 19px;
   word-break: keep-all;
   color: rgba(44, 64, 90, 0.8)
-}
-
-.balance {
-  text-align: right;
-  margin-left: auto;
-  margin-right: 10px;
-  color: var(--color-gray);
-  font-size: 10px;
-  line-height: 13px;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
 }
 
 .credit {
@@ -275,8 +280,29 @@
 
 /* ConfirmationModal */
 
-.modal-amount {
+.counterparty-message {
+  font-family: "Circular";
+  font-size: 14px;
+  line-height: 24px;
+  text-align: center;
+  color: var(--color-rhino-60);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
 
+.counterparty-loading {
+  margin-left: 10px;
+  margin-top: 8px;
+}
+
+.modal-amount {
+  font-family: "Circular";
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+  color: var(--color-rhino-60);
+  padding: 50px 50px 25px;
 }
 
 .modal {

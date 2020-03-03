@@ -61,6 +61,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 
   const [lastActionedTransactionId, setLastActionedTransactionId] = useState()
+  const [lastActionCancelled, setLastActionCancelled] = useState([])
 
   const [filter, setFilter] = useState(FILTER_TYPES[0])
 
@@ -134,6 +135,7 @@ export default function TransactionsHistory ({ history: { push } }) {
         <TransactionPartition key={partition.label}
           partition={partition}
           lastActionedTransactionId={lastActionedTransactionId}
+          lastActionCancelled={lastActionCancelled}
           showCancellationModal={showCancellationModal} />)}
     </div>}
 
@@ -141,7 +143,8 @@ export default function TransactionsHistory ({ history: { push } }) {
       handleClose={() => setModalTransaction(null)}
       transaction={modalTransaction}
       cancelTransaction={cancelTransaction}
-      setLastActionedTransactionId={setLastActionedTransactionId} />
+      setLastActionedTransactionId={setLastActionedTransactionId}
+      setLastActionCancelled={setLastActionCancelled} />
   </PrimaryLayout>
 }
 
@@ -163,7 +166,7 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-function TransactionPartition ({ partition, lastActionedTransactionId, showCancellationModal }) {
+function TransactionPartition ({ partition, lastActionedTransactionId, showCancellationModal, lastActionCancelled, lastActionError }) {
   const { label, loading, transactions } = partition
 
   return <>
@@ -173,6 +176,8 @@ function TransactionPartition ({ partition, lastActionedTransactionId, showCance
       key={index}
       transaction={transaction}
       lastActionedTransactionId={lastActionedTransactionId}
+      lastActionCancelled={lastActionCancelled}
+      lastActionError={lastActionError}
       showCancellationModal={showCancellationModal}
       isFirst={index === 0} />)}
   </>
@@ -180,6 +185,7 @@ function TransactionPartition ({ partition, lastActionedTransactionId, showCance
 
 export function TransactionRow ({ transaction, lastActionedTransactionId, showCancellationModal, isFirst }) {
   const { id, amount, counterparty, direction, notes, status } = transaction // presentBalance,
+
   const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
@@ -187,8 +193,9 @@ export function TransactionRow ({ transaction, lastActionedTransactionId, showCa
     : `- ${presentHolofuelAmount(amount)}`
 
   const isDisabled = id === lastActionedTransactionId
+  const actionCancelled = id === lastActionCancelled
 
-  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: isDisabled }, { highlightRed: isDisabled })} data-testid='transaction-row'>
+  return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst }, { disabled: isDisabled }, { highlightRed: actionCancelled })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
         <HashAvatar seed={counterparty.id} size={32} />
@@ -228,7 +235,7 @@ function CancelButton ({ showCancellationModal, transaction }) {
 }
 
 // NOTE: Check to see if/agree as to whether we can abstract out the below modal component
-export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, setLastActionedTransactionId }) {
+export function ConfirmCancellationModal ({ transaction, handleClose, cancelTransaction, setLastActionedTransactionId, setLastActionCancelled, setLastActionError }) {
   const { newMessage } = useFlashMessageContext()
   if (!transaction) return null
   const { id, counterparty, amount, type, direction } = transaction
@@ -240,11 +247,23 @@ export function ConfirmCancellationModal ({ transaction, handleClose, cancelTran
 
     setLastActionedTransactionId(id)
 
+    const clear = (timeout, { actionSuccess }) => setTimeout(() => {
+      if (actionSuccess) {
+        setLastActionCancelled(null)
+      } else {
+        setLastActionedTransactionId(null)
+      }
+    }, timeout)
+
     cancelTransaction(id).then(() => {
       newMessage(`${capitalize(type)} succesfully cancelled.`, 5000)
+      setLastActionCancelled(id)
+      clear(5000, { actionSuccess: true })
     }).catch(() => {
       newMessage('Sorry, something went wrong', 5000)
+      clear(5000, { actionSuccess: false })
     })
+
     handleClose()
   }
   return <Modal
