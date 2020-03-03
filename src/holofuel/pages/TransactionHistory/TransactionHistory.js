@@ -166,7 +166,7 @@ function FilterButtons ({ filter, setFilter }) {
   </div>
 }
 
-function TransactionPartition ({ partition, lastActionedTransactionId, showCancellationModal, lastActionCancelled, lastActionError }) {
+function TransactionPartition ({ partition, lastActionedTransactionId, showCancellationModal, lastActionCancelled }) {
   const { label, loading, transactions } = partition
 
   return <>
@@ -177,13 +177,12 @@ function TransactionPartition ({ partition, lastActionedTransactionId, showCance
       transaction={transaction}
       lastActionedTransactionId={lastActionedTransactionId}
       lastActionCancelled={lastActionCancelled}
-      lastActionError={lastActionError}
       showCancellationModal={showCancellationModal}
       isFirst={index === 0} />)}
   </>
 }
 
-export function TransactionRow ({ transaction, lastActionedTransactionId, showCancellationModal, isFirst }) {
+export function TransactionRow ({ transaction, lastActionedTransactionId, showCancellationModal, lastActionCancelled, isFirst }) {
   const { id, amount, counterparty, direction, notes, status } = transaction // presentBalance,
 
   const pending = status === STATUS.pending

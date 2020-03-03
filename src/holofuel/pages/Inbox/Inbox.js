@@ -10,7 +10,6 @@ import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTrans
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-import HolofuelRecoverFundsMutation from 'graphql/HolofuelRecoverFundsMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
@@ -61,20 +60,6 @@ function useDecline () {
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
-    },
-    {
-      query: HolofuelLedgerQuery
-    }]
-  })
-}
-
-function useRefund () {
-  const [recoverFunds] = useMutation(HolofuelRecoverFundsMutation)
-  return ({ id }) => recoverFunds({
-    variables: { transactionId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery,
-      fetchPolicy: 'cache-and-network'
     },
     {
       query: HolofuelLedgerQuery
@@ -426,7 +411,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
-  const refundTransaction = useRefund()
 
   const { newMessage } = useFlashMessageContext()
   const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
@@ -478,14 +462,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       }
       flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`
 
-      break
-    }
-    case 'cancel': {
-      contentLabel = `Cancel ${type}?`
-      actionParams = { id }
-      actionHook = refundTransaction
-      message = <>Cancel your declined {type} of <span styleName='modal-amount'>{presentHolofuelAmount(amount)} HF</span> {type === TYPE.offer ? 'to' : 'from'} <span styleName='counterparty'> {counterparty.nickname || presentAgentId(counterparty.id)}</span>?<br /><br /><div styleName='modal-note-text'>Note: Canceling will credit your balance by the outstanding amount.</div></>
-      flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully cancelled`
       break
     }
     // NB: action === undefined when first loading page && no transaction is yet passed in
