@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, capitalize, intersectionBy, find, reject } from 'lodash/fp'
+import { isEmpty, capitalize, intersectionBy, find, reject, isNil } from 'lodash/fp'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -46,13 +46,6 @@ export default function TransactionsHistory ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-
-  const [hasloadedFirstLedger, setHasloadedFirstLedger] = useState()
-  useEffect(() => {
-    if (holofuelBalance) {
-      setHasloadedFirstLedger(true)
-    }
-  }, [holofuelBalance, setHasloadedFirstLedger])
 
   const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
   const pollingResult = usePollCompletedTransactions({ since })
@@ -125,7 +118,7 @@ export default function TransactionsHistory ({ history: { push } }) {
       <div styleName='balance-amount'>
         <DisplayBalance
           holofuelBalance={holofuelBalance}
-          ledgerLoading={!hasloadedFirstLedger && ledgerLoading} />
+          ledgerLoading={isNil(holofuelBalance) && ledgerLoading} />
       </div>
 
       <FilterButtons filter={filter} setFilter={setFilter} />
