@@ -166,7 +166,7 @@ describe('TransactionHistory', () => {
       expect(queryByText(pendingOutgoingAmount)).not.toBeInTheDocument()
 
       expect(getByText(completedOutgoing.notes)).toBeInTheDocument()
-      //  NB: Intentionally commented out until DNA balance bug is resolved
+      //  BALANCE-BUG: Intentionally commented out until DNA balance bug is resolved
       // expect(getByText(presentHolofuelAmount(completedOutgoing.presentBalance))).toBeInTheDocument()
       expect(getByText(agent1.nickname)).toBeInTheDocument()
 
