@@ -9,6 +9,7 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
@@ -34,14 +35,20 @@ const FormValidationSchema = yup.object().shape({
 function useOfferMutation () {
   const [offer] = useMutation(HolofuelOfferMutation)
   return (amount, counterpartyId, notes) => offer({
-    variables: { amount, counterpartyId, notes }
+    variables: { amount, counterpartyId, notes },
+    refetchQueries: [{
+      query: HolofuelLedgerQuery
+    }]
   })
 }
 
 function useRequestMutation () {
   const [offer] = useMutation(HolofuelRequestMutation)
   return (amount, counterpartyId, notes) => offer({
-    variables: { amount, counterpartyId, notes }
+    variables: { amount, counterpartyId, notes },
+    refetchQueries: [{
+      query: HolofuelLedgerQuery
+    }]
   })
 }
 
@@ -100,12 +107,18 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
       case OFFER_MODE:
-        createOffer(amount, counterpartyId, notes)
-        newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        createOffer(amount, counterpartyId, notes).then(() => {
+          newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        }).catch(() => {
+          newMessage('Sorry, something went wrong', 5000)
+        })
         break
       case REQUEST_MODE:
-        createRequest(amount, counterpartyId, notes)
-        newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        createRequest(amount, counterpartyId, notes).then(() => {
+          newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        }).catch(() => {
+          newMessage('Sorry, something went wrong', 5000)
+        })
         break
       default:
         throw new Error(`Unknown mode: '${mode}' in CreateOfferRequest`)

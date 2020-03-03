@@ -10,6 +10,7 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
@@ -25,10 +26,29 @@ const counterparty = {
 const amount = 35674
 const notes = 'Hi there'
 
+const balance = '39085'
+const ledgerMock = {
+  request: { query: HolofuelLedgerQuery },
+  result: {
+    data: {
+      holofuelLedger: {
+        balance,
+        credit: 0,
+        payable: 0,
+        receivable: 0,
+        fees: 0
+      }
+    }
+  }
+}
+
 const offerMock = {
   request: {
     query: HolofuelOfferMutation,
-    variables: { amount, counterpartyId: counterparty.id, notes }
+    variables: { amount, counterpartyId: counterparty.id, notes },
+    refetchQueries: [{
+      query: HolofuelLedgerQuery
+    }]
   },
   result: {
     data: {
@@ -82,6 +102,7 @@ const whoamiMock = {
 }
 
 const mocks = [
+  ledgerMock,
   offerMock,
   counterpartyQueryMock,
   whoamiMock
@@ -348,7 +369,10 @@ describe('CreateOfferRequest', () => {
     const requestMock = {
       request: {
         query: HolofuelRequestMutation,
-        variables: { amount, counterpartyId: counterparty.id, notes }
+        variables: { amount, counterpartyId: counterparty.id, notes },
+        refetchQueries: [{
+          query: HolofuelLedgerQuery
+        }]
       },
       result: {
         data: {
@@ -367,6 +391,7 @@ describe('CreateOfferRequest', () => {
     }
 
     const mocks = [
+      ledgerMock,
       requestMock,
       counterpartyQueryMock,
       whoamiMock
