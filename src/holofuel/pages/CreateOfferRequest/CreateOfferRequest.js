@@ -9,7 +9,6 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
-import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
@@ -35,20 +34,14 @@ const FormValidationSchema = yup.object().shape({
 function useOfferMutation () {
   const [offer] = useMutation(HolofuelOfferMutation)
   return (amount, counterpartyId, notes) => offer({
-    variables: { amount, counterpartyId, notes },
-    refetchQueries: [{
-      query: HolofuelLedgerQuery
-    }]
+    variables: { amount, counterpartyId, notes }
   })
 }
 
 function useRequestMutation () {
   const [offer] = useMutation(HolofuelRequestMutation)
   return (amount, counterpartyId, notes) => offer({
-    variables: { amount, counterpartyId, notes },
-    refetchQueries: [{
-      query: HolofuelLedgerQuery
-    }]
+    variables: { amount, counterpartyId, notes }
   })
 }
 
