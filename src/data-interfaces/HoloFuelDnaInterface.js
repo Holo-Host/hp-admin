@@ -358,7 +358,8 @@ const HoloFuelDnaInterface = {
         status: STATUS.canceled
       }
     },
-    refundDeclined: async (transactions) => {
+
+    refundTransactions: async (transactions) => {
       const listOfTransactionIds = transactions.map(({ id }) => id)
       const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
       if (!canceledProof) {

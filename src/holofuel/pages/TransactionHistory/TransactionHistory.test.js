@@ -337,7 +337,9 @@ describe('TransactionHistory', () => {
           transaction={pendingRequest}
           handleClose={() => {}}
           cancelTransaction={cancelPendingRequestMock.newData}
-          setLastActionedTransactionId={() => {}} />
+          setLastActionedTransactionId={() => {}}
+          setLastActionError={() => []}
+          setLastActionSuccess={() => []} />
       </MockedProvider>)
 
       fireEvent.click(getByTextInModal('Yes'))
@@ -374,8 +376,10 @@ describe('TransactionHistory', () => {
         <ConfirmCancellationModal
           transaction={pendingRequest}
           cancelTransaction={cancelPendingOfferMock.newData}
+          handleClose={() => {}}
           setLastActionedTransactionId={() => {}}
-          handleClose={() => {}} />
+          setLastActionError={() => []}
+          setLastActionSuccess={() => []} />
       </MockedProvider>)
       fireEvent.click(getByTextInModal('Yes'))
       expect(cancelPendingOfferMock.newData).toHaveBeenCalled()
