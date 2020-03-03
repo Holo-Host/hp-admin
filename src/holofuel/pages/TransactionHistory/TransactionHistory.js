@@ -179,7 +179,7 @@ function TransactionPartition ({ partition, lastActionedTransactionId, showCance
 }
 
 export function TransactionRow ({ transaction, lastActionedTransactionId, showCancellationModal, isFirst }) {
-  const { id, amount, counterparty, direction, presentBalance, notes, status } = transaction
+  const { id, amount, counterparty, direction, notes, status } = transaction // presentBalance,
   const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
@@ -208,11 +208,13 @@ export function TransactionRow ({ transaction, lastActionedTransactionId, showCa
       <div styleName={cx('amount', { 'pending-style': pending })}>
         {presentedAmount}
       </div>
-      {presentBalance && <div styleName='transaction-balance'>
+      {/* BALANCE-BUG: Intentionally commented out until DNA balance bug is resolved. */}
+      {/* {presentBalance && <div styleName='transaction-balance'>
         {presentHolofuelAmount(presentBalance)}
-      </div>}
+      </div>} */}
     </div>
-    {pending && !isDisabled && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
+    {/* CANCEL-BUG: Intentionally skipped all Cancellation funcationality until DNA/Core cancellation bug is resolved. */}
+    {false && pending && !isDisabled && <CancelButton transaction={transaction} showCancellationModal={showCancellationModal} />}
   </div>
 }
 

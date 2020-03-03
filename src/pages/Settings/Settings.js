@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { isEmpty, get, keys, omit, pick } from 'lodash/fp'
+import { isEmpty, get, pick } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import './Settings.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
@@ -75,15 +75,6 @@ export function Settings () {
 
   const title = (settings.hostName ? `${settings.hostName}'s` : 'Your') + ' HoloPort'
 
-  const ports = (() => {
-    const portsObject = (omit('__typename', get('ports', status)) || {})
-    const allKeys = keys(portsObject)
-    return allKeys.map(key => ({
-      label: getLabelFromPortName(key),
-      value: portsObject[key]
-    }))
-  })()
-
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
     <div styleName='avatar'>
       <CopyAgentId agent={{ id: settings.hostPubKey }} isMe>
@@ -133,12 +124,6 @@ export function Settings () {
         bottomStyle
         dataTestId='network-type'
         value={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : 'Not Available'} />
-      <div styleName='settings-header'>Access Port Numbers</div>
-      {ports.map(({ label, value }, i) => <SettingsRow
-        key={label}
-        label={label}
-        value={value}
-        bottomStyle={i === ports.length - 1} />)}
       <div styleName='settings-header'>&nbsp;</div>
       <SettingsRow
         label={<a href='https://holo.host/holoport-reset' target='_blank' rel='noopener noreferrer' styleName='reset-link'>
