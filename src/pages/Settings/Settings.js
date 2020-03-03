@@ -48,9 +48,12 @@ export function Settings ({ history: { push } }) {
       variables: {
         ...settings,
         deviceName: editedDeviceName
-      }
+      },
+      refetchQueries: [{
+        query: HposSettingsQuery	    
+      }]
+
     })
-    setEditedDeviceName('')
     setIsEditingDeviceName(false)
   }
 
@@ -105,7 +108,7 @@ export function Settings ({ history: { push } }) {
         onClick={editDeviceName}
         value={!isEmpty(settings) && settings.deviceName
           ? <div styleName='device-name-button'>
-            <span styleName='settings-value'>{settings.deviceName}</span>
+            <span styleName='settings-value'>{editedDeviceName || settings.deviceName}</span>
             <div styleName='arrow-wrapper'>
               <ArrowRightIcon color={rhino} opacity={0.8} />
             </div>
