@@ -71,7 +71,8 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>
 
-    <Card title='Community' linkTo={'/community/'} subtitle='Connect with your peers' />
+    {/* NB: Comment back in once community app is released. */}
+    {/* <Card title='Community' linkTo={'/community/'} subtitle='Connect with your peers' /> */}
   </PrimaryLayout>
 }
 
