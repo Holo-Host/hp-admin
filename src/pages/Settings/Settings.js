@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { isEmpty, get, keys, omit } from 'lodash/fp'
+import { isEmpty, get, keys, omit, pick } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import './Settings.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
@@ -28,7 +28,7 @@ function useUpdateVersion () {
   })
 }
 
-export function Settings ({ history: { push } }) {
+export function Settings () {
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
 
   const { data: { hposStatus: status = {} } = {} } = useQuery(HposStatusQuery)
@@ -46,11 +46,11 @@ export function Settings ({ history: { push } }) {
   const saveDeviceName = () => {
     updateSettings({
       variables: {
-        ...settings,
+        ...pick(['hostPubKey', 'hostName', 'sshAccess'], settings),
         deviceName: editedDeviceName
       },
       refetchQueries: [{
-        query: HposSettingsQuery	    
+        query: HposSettingsQuery
       }]
 
     })
