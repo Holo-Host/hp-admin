@@ -23,7 +23,7 @@ const hposSettings = {
   deviceName
 }
 
-describe('Settings', () => {  
+describe('Settings', () => {
   const hposSettingsMock = {
     request: {
       query: HposSettingsQuery
