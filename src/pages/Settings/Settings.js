@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { isEmpty, get } from 'lodash/fp'
+import { isEmpty, get, pick } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import './Settings.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
@@ -28,7 +28,7 @@ function useUpdateVersion () {
   })
 }
 
-export function Settings ({ history: { push } }) {
+export function Settings () {
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
 
   const { data: { hposStatus: status = {} } = {} } = useQuery(HposStatusQuery)
@@ -46,11 +46,14 @@ export function Settings ({ history: { push } }) {
   const saveDeviceName = () => {
     updateSettings({
       variables: {
-        ...settings,
+        ...pick(['hostPubKey', 'hostName', 'sshAccess'], settings),
         deviceName: editedDeviceName
-      }
+      },
+      refetchQueries: [{
+        query: HposSettingsQuery
+      }]
+
     })
-    setEditedDeviceName('')
     setIsEditingDeviceName(false)
   }
 
@@ -96,7 +99,7 @@ export function Settings ({ history: { push } }) {
         onClick={editDeviceName}
         value={!isEmpty(settings) && settings.deviceName
           ? <div styleName='device-name-button'>
-            <span styleName='settings-value'>{settings.deviceName}</span>
+            <span styleName='settings-value'>{editedDeviceName || settings.deviceName}</span>
             <div styleName='arrow-wrapper'>
               <ArrowRightIcon color={rhino} opacity={0.8} />
             </div>
