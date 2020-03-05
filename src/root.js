@@ -6,6 +6,7 @@ import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
 import HFRouter from './holofuel/HFRouter'
+import RefundDeclinedOffers from './holofuel/RefundDeclinedOffers'
 import ScreenWidthContext from 'contexts/screenWidth'
 import { ConnectionProvider } from 'contexts/useConnectionContext'
 import { AuthProvider } from 'contexts/useAuthContext'
@@ -27,7 +28,9 @@ function HoloFuelAppCore () {
 
   return <HFScreenWidthContext.Provider value={isWide}>
     <HFFlashMessageProvider>
-      <HFRouter />
+      <RefundDeclinedOffers>
+        <HFRouter />
+      </RefundDeclinedOffers>
     </HFFlashMessageProvider>
   </HFScreenWidthContext.Provider>
 }
