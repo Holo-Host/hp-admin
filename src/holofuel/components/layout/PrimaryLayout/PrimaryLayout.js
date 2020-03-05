@@ -57,12 +57,16 @@ function PrimaryLayout ({
   const refundTransactions = useRefundTransactions()
   const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
 
+  // I hate this
+  const [hasCalledRefundTransactions, setHasCalledRefundTransactions] = useState(false)
+
   useEffect(() => {
     console.log('')
     console.log('*********** useEffect fired **********')
-    if (!isEmpty(declinedOffers)) {
-      console.log('declinedOffers not empty')
+    if (!isEmpty(declinedOffers) && !hasCalledRefundTransactions) {
+      console.log('~~~~~~~~declinedOffers not empty~~~~~~~~~~~~~')
       refundTransactions(declinedOffers)
+      setHasCalledRefundTransactions(true)
     }
   }, [refundTransactions, declinedOffers])
 
