@@ -26,10 +26,10 @@ function useRefundTransactions () {
     }))
 
     refundTransactions({
-      variables: { transactions: transactionInputs },
-      refetchQueries: [{
-        query: HolofuelLedgerQuery
-      }]
+      variables: { transactions: transactionInputs }
+      // refetchQueries: [{
+      //   query: HolofuelLedgerQuery
+      // }]
     })
   }
 }
@@ -57,11 +57,22 @@ function PrimaryLayout ({
   const refundTransactions = useRefundTransactions()
   const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
 
-  // useEffect(() => {
-  //   if (!isEmpty(declinedOffers)) {
-  //     refundTransactions(declinedOffers)
-  //   }
-  // }, [refundTransactions, declinedOffers])
+  useEffect(() => {
+    console.log('')
+    console.log('*********** useEffect fired **********')
+    if (!isEmpty(declinedOffers)) {
+      console.log('declinedOffers not empty')
+      refundTransactions(declinedOffers)
+    }
+  }, [refundTransactions, declinedOffers])
+
+  useEffect(() => {
+    console.log('refundTransactions changed')
+  }, [refundTransactions])
+
+  useEffect(() => {
+    console.log('declinedOffers changed')
+  }, [declinedOffers])
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
