@@ -26,10 +26,10 @@ function useRefundTransactions () {
     }))
 
     refundTransactions({
-      variables: { transactions: transactionInputs },
-      refetchQueries: [{
-        query: HolofuelLedgerQuery
-      }]
+      variables: { transactions: transactionInputs }
+    //   refetchQueries: [{
+    //     query: HolofuelLedgerQuery
+    //   }]
     })
   }
 }
@@ -54,14 +54,8 @@ function PrimaryLayout ({
     if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })
   })
 
-  const refundTransactions = useRefundTransactions()
-  const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
-
-  useEffect(() => {
-    if (!isEmpty(declinedOffers)) {
-      refundTransactions(declinedOffers)
-    }
-  }, [refundTransactions, declinedOffers])
+  // const refundTransactions = useRefundTransactions()
+  // const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
