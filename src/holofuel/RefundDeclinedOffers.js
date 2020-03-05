@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty, pick } from 'lodash/fp'
+import { isEmpty, pick, difference } from 'lodash/fp'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelRefundTransactionsMutation from 'graphql/HolofuelRefundTransactionsMutation.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -32,15 +32,17 @@ function RefundDeclinedOffers ({
   const refundTransactions = useRefundTransactions()
   const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
 
-  // // I hate this
-  const [hasCalledRefundTransactions, setHasCalledRefundTransactions] = useState(false)
+  const [refundedTransactionIds, setRefundedTransactionIds] = useState(false)
+  const toBeRefundedIds = difference(declinedOffers.map(offer => offer.id), refundedTransactionIds)
 
   useEffect(() => {
-    if (!isEmpty(declinedOffers) && !hasCalledRefundTransactions) {
-      refundTransactions(declinedOffers)
-      setHasCalledRefundTransactions(true)
+    if (!isEmpty(toBeRefundedIds)) {
+      refundTransactions(toBeRefundedIds)
+        .then(() => {
+          setRefundedTransactionIds(refundedTransactionIds => refundedTransactionIds.concat(toBeRefundedIds))
+        })
     }
-  }, [refundTransactions, declinedOffers, setHasCalledRefundTransactions, hasCalledRefundTransactions])
+  }, [refundTransactions, declinedOffers, setRefundedTransactionIds, toBeRefundedIds])
 
   return <>{children}</>
 }
