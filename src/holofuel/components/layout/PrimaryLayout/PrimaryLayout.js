@@ -57,11 +57,11 @@ function PrimaryLayout ({
   const refundTransactions = useRefundTransactions()
   const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
 
-  useEffect(() => {
-    if (!isEmpty(declinedOffers)) {
-      refundTransactions(declinedOffers)
-    }
-  }, [refundTransactions, declinedOffers])
+  // useEffect(() => {
+  //   if (!isEmpty(declinedOffers)) {
+  //     refundTransactions(declinedOffers)
+  //   }
+  // }, [refundTransactions, declinedOffers])
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />

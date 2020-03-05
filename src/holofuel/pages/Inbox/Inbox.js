@@ -93,7 +93,7 @@ function useUpdatedTransactionLists () {
   const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
 
-  const updatedActionableWOCanceledOffers = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request)))
+  const updatedActionableWOCanceled = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && actionableTx.status !== STATUS.declined)
 
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
@@ -101,7 +101,7 @@ function useUpdatedTransactionLists () {
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
 
   return {
-    actionableTransactions: updatedActionableWOCanceledOffers,
+    actionableTransactions: updatedActionableWOCanceled,
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
     actionableLoading,
@@ -183,7 +183,7 @@ export default function Inbox ({ history: { push } }) {
       </div>
     </Jumbotron>
 
-    {isDisplayLoading && <>
+    {isDisplayLoading && isDisplayTransactionsEmpty && <>
       <Loading styleName='display-loading' />
     </>}
 
