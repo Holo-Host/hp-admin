@@ -26,10 +26,10 @@ function useRefundTransactions () {
     }))
 
     refundTransactions({
-      variables: { transactions: transactionInputs }
-      // refetchQueries: [{
-      //   query: HolofuelLedgerQuery
-      // }]
+      variables: { transactions: transactionInputs },
+      refetchQueries: [{
+        query: HolofuelLedgerQuery
+      }]
     })
   }
 }
