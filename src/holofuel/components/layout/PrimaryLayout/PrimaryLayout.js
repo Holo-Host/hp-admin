@@ -54,29 +54,11 @@ function PrimaryLayout ({
     if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })
   })
 
-  const refundTransactions = useRefundTransactions()
-  const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
+  // const refundTransactions = useRefundTransactions()
+  // const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
 
-  // I hate this
-  const [hasCalledRefundTransactions, setHasCalledRefundTransactions] = useState(false)
-
-  useEffect(() => {
-    console.log('')
-    console.log('*********** useEffect fired **********')
-    if (!isEmpty(declinedOffers) && !hasCalledRefundTransactions) {
-      console.log('~~~~~~~~declinedOffers not empty~~~~~~~~~~~~~')
-      refundTransactions(declinedOffers)
-      setHasCalledRefundTransactions(true)
-    }
-  }, [refundTransactions, declinedOffers])
-
-  useEffect(() => {
-    console.log('refundTransactions changed')
-  }, [refundTransactions])
-
-  useEffect(() => {
-    console.log('declinedOffers changed')
-  }, [declinedOffers])
+  // // I hate this
+  // const [hasCalledRefundTransactions, setHasCalledRefundTransactions] = useState(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
