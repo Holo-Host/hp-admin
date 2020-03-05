@@ -3,7 +3,7 @@ import { isFunction } from 'lodash/fp'
 import wait from 'waait'
 
 // this should be false on develop
-const SIMULATE_DNA_LAG = true
+const SIMULATE_DNA_LAG = false
 
 export default function mockCallZome (instanceId, zome, zomeFunc) {
   return async function (args) {
