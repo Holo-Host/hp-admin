@@ -32,18 +32,19 @@ function RefundDeclinedOffers ({
   const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
 
   // // I hate this
-  const [hasCalledRefundTransactions, setHasCalledRefundTransactions] = useState(false)
+  // const [hasCalledRefundTransactions, setHasCalledRefundTransactions] = useState(false)
 
   useEffect(() => {
     console.log('')
     console.log('*********** useEffect fired **********')
-    if (!isEmpty(declinedOffers) && !hasCalledRefundTransactions) {
-    // if (!isEmpty(declinedOffers)) {
+    // if (!isEmpty(declinedOffers) && !hasCalledRefundTransactions) {
+    if (!isEmpty(declinedOffers)) {
       console.log('~~~~~~~~declinedOffers not empty~~~~~~~~~~~~~')
       refundTransactions(declinedOffers)
-      setHasCalledRefundTransactions(true)
+      // setHasCalledRefundTransactions(true)
     }
-  }, [refundTransactions, declinedOffers, setHasCalledRefundTransactions, hasCalledRefundTransactions])
+  // }, [refundTransactions, declinedOffers, setHasCalledRefundTransactions, hasCalledRefundTransactions])
+  }, [refundTransactions, declinedOffers])  
 
   useEffect(() => {
     console.log('refundTransactions changed')
