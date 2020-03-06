@@ -1,7 +1,7 @@
 import React from 'react' // useState,
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
-import { isEmpty, get } from 'lodash/fp'
+import { isEmpty, get, isNil } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -23,8 +23,8 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 }
 
 export default function Home () {
-  const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
@@ -54,7 +54,7 @@ export default function Home () {
               <div styleName='balance-padding' />
               <div styleName='balance-amount'>
                 <DisplayBalance
-                  ledgerLoading={ledgerLoading}
+                  ledgerLoading={isNil(holofuelBalance) && ledgerLoading}
                   holofuelBalance={holofuelBalance} />
               </div>
               <div styleName='balance-arrow-wrapper'>
