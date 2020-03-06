@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { isEmpty } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -74,9 +74,28 @@ function useCounterparty (agentId) {
   return { holofuelCounterparty, loading }
 }
 
+function useLoadingFirstTime (loading) {
+  const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(false)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+
+  useEffect(() => {
+    if (hasLoadedOnce) return
+
+    if (!isLoadingFirstTime && loading) {
+      setIsLoadingFirstTime(true)
+    }
+
+    if (isLoadingFirstTime && !loading) {
+      setHasLoadedOnce(true)
+    }
+  }, [loading, isLoadingFirstTime, setIsLoadingFirstTime, hasLoadedOnce, setHasLoadedOnce])
+
+  return !hasLoadedOnce && loading
+}
+
 function useUpdatedTransactionLists () {
-  const { loading: actionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 20000 })
-  const { loading: recentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 20000 })
+  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
 
   const updatedActionableWOCanceled = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && actionableTx.status !== STATUS.declined)
 
@@ -85,12 +104,15 @@ function useUpdatedTransactionLists () {
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined && actionableTx.type === TYPE.request)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
 
+  const actionableLoadingFirstTime = useLoadingFirstTime(allActionableLoading)
+  const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
+
   return {
     actionableTransactions: updatedActionableWOCanceled,
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
-    actionableLoading,
-    recentLoading
+    actionableLoading: actionableLoadingFirstTime,
+    recentLoading: recentLoadingFirstTime
   }
 }
 
