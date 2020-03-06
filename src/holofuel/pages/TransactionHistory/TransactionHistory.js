@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty, intersectionBy, find, reject, isNil } from 'lodash/fp'
@@ -28,7 +28,7 @@ const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
 export default function TransactionsHistory ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 20000 })
   const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
@@ -41,6 +41,13 @@ export default function TransactionsHistory ({ history: { push } }) {
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 
   const [filter, setFilter] = useState(FILTER_TYPES[0])
+
+  const [firstLoadWaitingTransactionsComplete, setFirstLoadWaitingTransactionsComplete] = useState(false)
+  useEffect(() => {
+    if (!loadingPendingTransactions) {
+      setFirstLoadWaitingTransactionsComplete(true)
+    }
+  }, [loadingPendingTransactions])
 
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []
@@ -87,7 +94,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   const partitionedTransactions = ([{
     label: 'Pending',
     transactions: filteredPendingTransactions,
-    loading: loadingPendingTransactions
+    loading: !firstLoadWaitingTransactionsComplete && loadingPendingTransactions
   }]).concat(completedPartitionedTransactions).filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>

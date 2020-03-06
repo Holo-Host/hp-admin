@@ -1,4 +1,4 @@
-import React from 'react' // useState,
+import React, { useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
@@ -33,6 +33,13 @@ export default function Home () {
 
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
+
+  const [firstLoadTransactionsComplete, setFirstLoadTransactionsComplete] = useState(false)
+  useEffect(() => {
+    if (!loadingTransactions) {
+      setFirstLoadTransactionsComplete(true)
+    }
+  }, [loadingTransactions])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>
@@ -71,11 +78,11 @@ export default function Home () {
 
         <div styleName='transactions'>
 
-          {loadingTransactions && <div styleName='transactions-empty'>
+          {!firstLoadTransactionsComplete && loadingTransactions && <div styleName='transactions-empty'>
             <Loading />
           </div>}
 
-          {isTransactionsEmpty && !loadingTransactions && <div styleName='transactions-empty'>
+          {firstLoadTransactionsComplete && isTransactionsEmpty && <div styleName='transactions-empty'>
             You have no recent transactions
           </div>}
 
