@@ -1,3 +1,4 @@
+// CANCEL_BUG This component is not currently in the app but we're keeping it around for when cancel bug is fixed
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, pick, difference } from 'lodash/fp'

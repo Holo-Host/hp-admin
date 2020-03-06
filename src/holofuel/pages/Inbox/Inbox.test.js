@@ -18,13 +18,13 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
-import { presentAgentId } from '../../../utils'
+import { presentAgentId, promiseMap } from '../../../utils'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
-const actionableTransactions = pendingList.requests.concat(pendingList.promises).concat(pendingList.declined).map(item => {
+const actionableTransactions = pendingList.requests.concat(pendingList.promises).map(item => {
   if (item.event) {
     if (item.event[2].Request) {
       return {
@@ -74,20 +74,20 @@ const { ledger } = transactionList
 
 describe('Inbox Connected (with Agent Nicknames)', () => {
   it('renders', async () => {
-    const { getAllByRole, getByText, debug } = await renderAndWait(<ApolloProvider client={apolloClient}>
+    const { getAllByRole, getByText } = await renderAndWait(<ApolloProvider client={apolloClient}>
       <Inbox history={{}} />
-    </ApolloProvider>, 15)
-
-    debug()
+    </ApolloProvider>, 1500)
 
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
+
+    console.log('actionableTransactions.length', actionableTransactions.length)
 
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(3)
 
     const getByTextParent = getByText
 
-    listItems.forEach(async (item, index) => {
+    promiseMap(listItems, async (item, index) => {
       const { getByText } = within(item)
 
       const transaction = actionableTransactions[index]
