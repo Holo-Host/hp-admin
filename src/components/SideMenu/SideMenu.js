@@ -17,7 +17,7 @@ export function SideMenu ({
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <CopyAgentId agent={{ id: settings.hostPubKey }} isMe>
+        <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
           <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} size={48} styleName='avatar' />
         </CopyAgentId>
         <h2 styleName='host-name'>
