@@ -100,12 +100,18 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const onSubmit = ({ counterpartyId, notes }) => {
     switch (mode) {
       case OFFER_MODE:
-        createOffer(amount, counterpartyId, notes)
-        newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        createOffer(amount, counterpartyId, notes).then(() => {
+          newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        }).catch(() => {
+          newMessage('Sorry, something went wrong', 5000)
+        })
         break
       case REQUEST_MODE:
-        createRequest(amount, counterpartyId, notes)
-        newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        createRequest(amount, counterpartyId, notes).then(() => {
+          newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+        }).catch(() => {
+          newMessage('Sorry, something went wrong', 5000)
+        })
         break
       default:
         throw new Error(`Unknown mode: '${mode}' in CreateOfferRequest`)

@@ -32,7 +32,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='avatar'>
-      <CopyAgentId agent={{ id: settings.hostPubKey }} isMe>
+      <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
         <HashIcon hash={settings.hostPubKey} size={42} />
       </CopyAgentId>
     </div>
