@@ -1,5 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useContext, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import { object } from 'prop-types'
@@ -12,13 +11,12 @@ import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
-import { TYPE, STATUS } from 'models/Transaction'
-import { INBOX_PATH } from 'holofuel/utils/urls'
+import { STATUS } from 'models/Transaction'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 
-export function PrimaryLayout ({
+function PrimaryLayout ({
   children,
   headerProps = {},
   showAlphaFlag = true
@@ -27,32 +25,12 @@ export function PrimaryLayout ({
   const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
-  const [hasCalledReroute, setHasCalledReroute] = useState(false)
-
-  const inboxCount = actionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && !((actionableTx.status === STATUS.declined) && (actionableTx.type === TYPE.request))).length
+  const inboxCount = actionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && (actionableTx.status !== STATUS.declined)).length
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
-
-  const { push } = useHistory()
-  // TODO: research a better way of informing state & update/render logic
-  // eslint-disable-next-line
-  const goToInbox = useCallback(() => {
-    if (!hasCalledReroute) {
-      push(INBOX_PATH)
-      setHasCalledReroute(true)
-    }
-  })
-
-  const filterActionableTransactionsByStatusAndType = useCallback((status, type) => actionableTransactions.filter(actionableTx => ((actionableTx.status === status) && (actionableTx.type === type))), [actionableTransactions])
-
-  useEffect(() => {
-    if (!isEmpty(filterActionableTransactionsByStatusAndType(STATUS.declined, TYPE.offer))) {
-      goToInbox()
-    }
-  }, [filterActionableTransactionsByStatusAndType, goToInbox])
 
   const childrenWithProps = React.Children.map(children, child => {
     if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })

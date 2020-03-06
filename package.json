@@ -21,7 +21,7 @@
     "test:lint": "standard",
     "test:unit": "node scripts/test.js --config=./jest.unit.config.js",
     "test": "npm run test:lint && npm run test:unit",
-    "test:ci": "CI=1 npm run test",
+    "test:ci": "CI=1 npm run test:unit",
     "test:wait-for-conductor": "node scripts/wait-for-conductor.js",
     "preseed:holofuel": "node scripts/prepareHoloFuelData/index.js",
     "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",

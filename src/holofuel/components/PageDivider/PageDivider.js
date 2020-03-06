@@ -1,7 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
-// not importing styles here breaks tests. This is a hack.
-import styles from './PageDivider.module.css' // eslint-disable-line no-unused-vars
+import './PageDivider.module.css'
 
 function PageDivider ({
   wide = false,

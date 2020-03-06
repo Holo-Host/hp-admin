@@ -1,6 +1,7 @@
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
+import wait from 'waait'
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -110,9 +111,10 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 }
 
 let holochainClient
+let isInitiatingHcConnection = false
 
-async function initAndGetHolochainClient () {
-  if (holochainClient) return holochainClient
+async function initHolochainClient () {
+  isInitiatingHcConnection = true
   let url
   try {
     if (process.env.REACT_APP_RAW_HOLOCHAIN === 'true') {
@@ -135,13 +137,29 @@ async function initAndGetHolochainClient () {
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
+    isInitiatingHcConnection = false
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
+    isInitiatingHcConnection = false
     throw (error)
   }
+}
+async function initAndGetHolochainClient () {
+  let counter = 0
+  // This code is to let avoid multiple ws connections.
+  // isInitiatingHcConnection is changed in a different call of this function running in parallel
+  while (isInitiatingHcConnection) {
+    counter++
+    await wait(100)
+    if (counter === 10) {
+      isInitiatingHcConnection = false
+    }
+  }
+  if (holochainClient) return holochainClient
+  else return initHolochainClient()
 }
 
 export function createZomeCall (zomeCallPath, callOpts = {}) {

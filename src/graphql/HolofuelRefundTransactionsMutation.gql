@@ -1,5 +1,5 @@
-mutation holofuelRefundDeclined ($transactions:[TransactionInput]) {
-  holofuelRefundDeclined (transactions: $transactions) {
+mutation holofuelRefundTransactions ($transactions:[TransactionInput]) {
+  holofuelRefundTransactions (transactions: $transactions) {
     id
     amount
     counterparty { id, nickname }
