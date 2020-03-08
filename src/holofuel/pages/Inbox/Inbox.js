@@ -195,7 +195,6 @@ export default function Inbox ({ history: { push } }) {
     </>}
 
     {isDisplayTransactionsEmpty && !isDisplayLoading && <>
-      <PageDivider title='Today' />
       <NullStateMessage
         styleName='null-state-message'
         message={inboxView === VIEW.actionable
