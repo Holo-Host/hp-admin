@@ -42,12 +42,24 @@ export default function TransactionsHistory ({ history: { push } }) {
 
   const [filter, setFilter] = useState(FILTER_TYPES[0])
 
-  const [firstLoadWaitingTransactionsComplete, setFirstLoadWaitingTransactionsComplete] = useState(false)
-  useEffect(() => {
-    if (!loadingPendingTransactions) {
-      setFirstLoadWaitingTransactionsComplete(true)
-    }
-  }, [loadingPendingTransactions])
+  function useLoadingFirstTime (loading) {
+    const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(false)
+    const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+
+    useEffect(() => {
+      if (hasLoadedOnce) return
+
+      if (!isLoadingFirstTime && loading) {
+        setIsLoadingFirstTime(true)
+      }
+
+      if (isLoadingFirstTime && !loading) {
+        setHasLoadedOnce(true)
+      }
+    }, [loading, isLoadingFirstTime, setIsLoadingFirstTime, hasLoadedOnce, setHasLoadedOnce])
+
+    return !hasLoadedOnce && loading
+  }
 
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []
@@ -94,7 +106,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   const partitionedTransactions = ([{
     label: 'Pending',
     transactions: filteredPendingTransactions,
-    loading: !firstLoadWaitingTransactionsComplete && loadingPendingTransactions
+    loading: useLoadingFirstTime(loadingPendingTransactions)
   }]).concat(completedPartitionedTransactions).filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
