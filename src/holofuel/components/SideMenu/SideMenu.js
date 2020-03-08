@@ -83,7 +83,7 @@ export default function SideMenu ({
             <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
           </li>
           <li styleName='footer-list-item'>
-            <Link to='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</Link>
+            <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</a>
           </li>
         </ul>
       </footer>
