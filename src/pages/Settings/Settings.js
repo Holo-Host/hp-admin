@@ -77,7 +77,7 @@ export function Settings () {
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
     <div styleName='avatar'>
-      <CopyAgentId agent={{ id: settings.hostPubKey }} isMe>
+      <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
         <HashIcon hash={settings.hostPubKey} size={42} />
       </CopyAgentId>
     </div>
