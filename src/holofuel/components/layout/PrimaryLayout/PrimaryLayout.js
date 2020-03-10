@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import { object } from 'prop-types'
@@ -7,6 +7,7 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import ScreenWidthContext from 'holofuel/contexts/screenWidth'
+import useCounterpartyListContext from 'contexts/useCounterpartyListContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
@@ -31,6 +32,14 @@ function PrimaryLayout ({
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
+
+  const { setCounterpartyList } = useCounterpartyListContext()
+
+  useEffect(() => {
+    if (!isEmpty(actionableTransactions)) {
+      setCounterpartyList(actionableTransactions)
+    }
+  }, [setCounterpartyList, actionableTransactions])
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
