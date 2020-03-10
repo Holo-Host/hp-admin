@@ -29,9 +29,9 @@ export const resolvers = {
     holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
 
     holofuelHistoryCounterparties: async () => {
-      const completed = await HoloFuelDnaInterface.transactions.allCompleted()
-      const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
-      const historyTransactions = completed.concat(waiting)
+      const nonPending = await HoloFuelDnaInterface.transactions.allNonPending()
+      const pending = await HoloFuelDnaInterface.transactions.allActionable()
+      const historyTransactions = nonPending.concat(pending)
       return getTxCounterparties(historyTransactions)
     },
 
