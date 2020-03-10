@@ -7,7 +7,7 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import ScreenWidthContext from 'holofuel/contexts/screenWidth'
-import useCounterpartyListContext from 'contexts/useCounterpartyListContext'
+import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
