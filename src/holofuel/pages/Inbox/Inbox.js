@@ -94,8 +94,8 @@ function useLoadingFirstTime (loading) {
 }
 
 function useUpdatedTransactionLists () {
-  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
 
   const updatedActionableWOCanceledAndDeclined = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && actionableTx.status !== STATUS.declined)
 
@@ -127,7 +127,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
