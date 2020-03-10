@@ -13,6 +13,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { STATUS } from 'models/Transaction'
+import { getTxCounterparties, findNewCounterpartyTransactions } from 'data-interfaces/HoloFuelDnaInterface'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -33,13 +34,19 @@ function PrimaryLayout ({
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
 
-  const { setCounterpartyList } = useCounterpartyListContext()
+  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
 
   useEffect(() => {
     if (!isEmpty(actionableTransactions)) {
-      setCounterpartyList(actionableTransactions)
+      const newCounterpartyTransactions = findNewCounterpartyTransactions(actionableTransactions)
+      console.log('newCounterpartyTransactions : ', newCounterpartyTransactions)
+
+      if (!isEmpty(newCounterpartyTransactions)) {
+        const newCounterpartyDetials = getTxCounterparties(newCounterpartyTransactions)
+        setCounterpartyList(...counterpartyList, newCounterpartyDetials)
+      }
     }
-  }, [setCounterpartyList, actionableTransactions])
+  }, [counterpartyList, setCounterpartyList, actionableTransactions, getTxCounterparties, findNewCounterpartyTransactions])
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />

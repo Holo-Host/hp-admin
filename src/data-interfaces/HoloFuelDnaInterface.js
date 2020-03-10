@@ -12,8 +12,21 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
+/* Creates an array of all transactions that inlcude new counterparties for a provided transaction list and counterparty list */
+export const findNewCounterpartyTransactions = (transactionTransactions = [], counterpartyList = []) => {
+  transactionTransactions.filter(transactionTransaction => {
+    const { counterparty } = transactionTransaction
+    const existingCounterparty = _.intersectionBy(counterparty, counterpartyList, 'id')
+    console.log('existingCounterparty : ', existingCounterparty)
+
+    if (!existingCounterparty) {
+      return transactionTransactions
+    }
+  })
+}
+
 /* Creates an array of all counterparties for a provided transaction list */
-export async function getTxCounterparties (transactionList) {
+export async function getTxCounterparties (transactionList = []) {
   const counterpartyList = transactionList.map(({ counterparty }) => counterparty.id)
   const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
   const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
