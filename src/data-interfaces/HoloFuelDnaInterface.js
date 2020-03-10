@@ -14,6 +14,7 @@ const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
 /* Creates an array of all transactions that inlcude new counterparties for a provided transaction list and counterparty list */
 export const findNewCounterpartyTransactions = (transactionTransactions = [], counterpartyList = []) => {
+  // eslint-disable-next-line array-callback-return
   transactionTransactions.filter(transactionTransaction => {
     const { counterparty } = transactionTransaction
     const existingCounterparty = _.intersectionBy(counterparty, counterpartyList, 'id')

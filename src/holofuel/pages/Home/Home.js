@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
+import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import { getTxCounterparties, findNewCounterpartyTransactions } from 'data-interfaces/HoloFuelDnaInterface'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Loading from 'components/Loading'
@@ -35,11 +37,24 @@ export default function Home () {
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
   const [firstLoadTransactionsComplete, setFirstLoadTransactionsComplete] = useState(false)
+  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
+
   useEffect(() => {
     if (!loadingTransactions) {
       setFirstLoadTransactionsComplete(true)
     }
-  }, [loadingTransactions])
+    console.log('!!!!!!!! !isEmpty(transactions) : ', !isEmpty(transactions))
+
+    if (!isEmpty(transactions)) {
+      const newCounterpartyTransactions = findNewCounterpartyTransactions(transactions)
+      console.log('newCounterpartyTransactions : ', newCounterpartyTransactions)
+
+      if (!isEmpty(newCounterpartyTransactions)) {
+        const newCounterpartyDetials = getTxCounterparties(newCounterpartyTransactions)
+        setCounterpartyList(...counterpartyList, newCounterpartyDetials)
+      }
+    }
+  }, [loadingTransactions, counterpartyList, setCounterpartyList, transactions])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>

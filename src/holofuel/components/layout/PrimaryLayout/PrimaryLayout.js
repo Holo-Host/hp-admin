@@ -46,7 +46,7 @@ function PrimaryLayout ({
         setCounterpartyList(...counterpartyList, newCounterpartyDetials)
       }
     }
-  }, [counterpartyList, setCounterpartyList, actionableTransactions, getTxCounterparties, findNewCounterpartyTransactions])
+  }, [counterpartyList, setCounterpartyList, actionableTransactions])
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
