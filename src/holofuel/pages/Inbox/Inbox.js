@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -23,7 +23,7 @@ import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } from 'utils'
+import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
@@ -72,25 +72,6 @@ function useCounterparty (agentId) {
     variables: { agentId }
   })
   return { holofuelCounterparty, loading }
-}
-
-function useLoadingFirstTime (loading) {
-  const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(false)
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
-
-  useEffect(() => {
-    if (hasLoadedOnce) return
-
-    if (!isLoadingFirstTime && loading) {
-      setIsLoadingFirstTime(true)
-    }
-
-    if (isLoadingFirstTime && !loading) {
-      setHasLoadedOnce(true)
-    }
-  }, [loading, isLoadingFirstTime, setIsLoadingFirstTime, hasLoadedOnce, setHasLoadedOnce])
-
-  return !hasLoadedOnce && loading
 }
 
 function useUpdatedTransactionLists () {
