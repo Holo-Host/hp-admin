@@ -8,7 +8,7 @@ export default function FourOhFour () {
     <div styleName='card'>
       <div styleName='fourohfour'>404</div>
       <div styleName='message'>We couldn't find that page. Please check the URL and try again.</div>
-      <Link to='/admin/dashboard' styleName='dashboard-link'>Back to Dashboard</Link>      
+      <Link to='/admin/dashboard' styleName='dashboard-link'>Back to Dashboard</Link>
     </div>
   </PrimaryLayout>
 }
