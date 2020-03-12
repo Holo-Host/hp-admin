@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
@@ -49,8 +49,10 @@ export function HPAdminApp () {
         <ConnectionProvider>
           <AuthProvider>
             <FlashMessageProvider>
-              <HPAdminRouter />
-              <Route path='/holofuel' component={HoloFuelAppCore} />
+              <Switch>
+                <Route path='/holofuel' component={HoloFuelAppCore} />
+                <HPAdminRouter />
+              </Switch>
             </FlashMessageProvider>
           </AuthProvider>
         </ConnectionProvider>
