@@ -1,0 +1,31 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: black;
+  background-color: white;
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.1);
+  border-radius: 4px;
+  padding: 16px 24px;
+  margin-top: 100px;
+  margin-bottom: 20px;
+}
+
+.fourohfour {
+  text-align: center;
+  font-size: 32px;
+  color: var(--color-rhino-35);
+  font-family: "Circular";
+  margin-bottom: 10px;
+}
+
+.message {
+  font-family: "Circular";
+  color: var(--color-rhino-80);
+  margin-bottom: 20px;
+}
+
+.dashboard-link {
+  text-align: center;
+  color: var(--color-caribbean-green);
+}
