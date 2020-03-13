@@ -38,9 +38,7 @@ export function SideMenu ({
             </Link>
           </li>
           <li>
-            <Link to='/holofuel/' styleName='nav-link'>
-              HoloFuel
-            </Link>
+            <a href='http://holofuel/' target='_blank' rel='noopener noreferrer' styleName='nav-link'>HoloFuel</a>
           </li>
         </ul>
       </nav>

@@ -85,8 +85,6 @@ describe('Dashboard', () => {
 
     const holofuel = getByText('You have no TestFuel')
     expect(holofuel).toBeInTheDocument()
-    fireEvent.click(holofuel)
-    expect(mockNavigateTo).toHaveBeenCalledWith('/holofuel/')
   })
 
   it.skip('renders empty states including earnings and hosting', async () => {

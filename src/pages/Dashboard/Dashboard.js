@@ -60,7 +60,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    <Card title='HoloFuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
+    <Card title='HoloFuel' subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Balance
