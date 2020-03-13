@@ -1,6 +1,6 @@
 {
   "name": "hp-admin",
-  "version": "0.10.0",
+  "version": "0.10.0-alpha2",
   "private": true,
   "scripts": {
     "start": "npm run start:mock",
