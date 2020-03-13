@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -23,7 +23,7 @@ import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount, sliceHash, partitionByDate } from 'utils'
+import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
@@ -74,41 +74,22 @@ function useCounterparty (agentId) {
   return { holofuelCounterparty, loading }
 }
 
-function useLoadingFirstTime (loading) {
-  const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(false)
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
-
-  useEffect(() => {
-    if (hasLoadedOnce) return
-
-    if (!isLoadingFirstTime && loading) {
-      setIsLoadingFirstTime(true)
-    }
-
-    if (isLoadingFirstTime && !loading) {
-      setHasLoadedOnce(true)
-    }
-  }, [loading, isLoadingFirstTime, setIsLoadingFirstTime, hasLoadedOnce, setHasLoadedOnce])
-
-  return !hasLoadedOnce && loading
-}
-
 function useUpdatedTransactionLists () {
-  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
 
-  const updatedActionableWOCanceled = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && actionableTx.status !== STATUS.declined)
+  const updatedActionableWOCanceledAndDeclined = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && actionableTx.status !== STATUS.declined)
 
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
-  const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined && actionableTx.type === TYPE.request)
+  const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
 
   const actionableLoadingFirstTime = useLoadingFirstTime(allActionableLoading)
   const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
 
   return {
-    actionableTransactions: updatedActionableWOCanceled,
+    actionableTransactions: updatedActionableWOCanceledAndDeclined,
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
     actionableLoading: actionableLoadingFirstTime,
@@ -127,7 +108,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
   const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
@@ -160,7 +141,7 @@ export default function Inbox ({ history: { push } }) {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
-  const displayBalance = ledgerLoading ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+  const displayBalance = (isNil(holofuelBalance) && ledgerLoading) ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
@@ -195,7 +176,6 @@ export default function Inbox ({ history: { push } }) {
     </>}
 
     {isDisplayTransactionsEmpty && !isDisplayLoading && <>
-      <PageDivider title='Today' />
       <NullStateMessage
         styleName='null-state-message'
         message={inboxView === VIEW.actionable

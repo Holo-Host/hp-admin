@@ -5,6 +5,7 @@ import Home from 'holofuel/pages/Home'
 import Inbox from 'holofuel/pages/Inbox'
 import TransactionHistory from 'holofuel/pages/TransactionHistory'
 import CreateOfferRequest from 'holofuel/pages/CreateOfferRequest'
+import FourOhFour from 'holofuel/pages/FourOhFour'
 
 function HFRoute (props) {
   if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
@@ -22,5 +23,6 @@ export default function HFRouter () {
     <HFRoute path='/holofuel/offer-request' exact component={CreateOfferRequest} />
     <HFRoute path='/holofuel' exact component={() => <Redirect to='/holofuel/' />} />
     <HFRoute path='/' exact component={() => <Redirect to='/holofuel/' />} />
+    <HFRoute component={FourOhFour} />
   </Switch>
 }

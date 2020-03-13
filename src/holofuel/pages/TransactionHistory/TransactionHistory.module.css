@@ -57,6 +57,7 @@
   letter-spacing: -0.4px;
   color: var(--color-rhino-50);
   padding-bottom: 7px;
+  cursor: pointer;
 }
 
 .selected {

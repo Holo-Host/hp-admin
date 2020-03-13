@@ -108,7 +108,7 @@ describe('TransactionHistory', () => {
         id: agent1.id,
         nickname: agent1.nickname
       },
-      status: STATUS.completed,
+      status: STATUS.pending,
       direction: DIRECTION.outgoing,
       amount: '39872',
       notes: 'Good stuff'

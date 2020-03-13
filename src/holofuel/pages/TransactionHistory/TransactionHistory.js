@@ -10,33 +10,32 @@ import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransaction
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
+import { presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
 import HashAvatar from '../../../components/HashAvatar/HashAvatar'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
-// Data - Mutation hooks with refetch:
-
 function usePollCompletedTransactions ({ since }) {
-  const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000, variables: { since } })
+  const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000, variables: { since } })
   return holofuelNewCompletedTransactions
 }
 
 const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
 export default function TransactionsHistory ({ history: { push } }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
+  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
   const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''
   const pollingResult = usePollCompletedTransactions({ since })
 
-  const completedTransactions = holofuelCompletedTransactions.concat(pollingResult)
-  const filteredTransactionById = intersectionBy('id', completedTransactions, holofuelWaitingTransactions)
-  const pendingTransactions = reject(({ id }) => find({ id }, filteredTransactionById), holofuelWaitingTransactions)
+  const filteredTransactionById = intersectionBy('id', holofuelCompletedTransactions, pollingResult)
+  const filteredPollingResult = reject(({ id }) => find({ id }, filteredTransactionById), pollingResult)
+  const completedTransactions = holofuelCompletedTransactions.concat(filteredPollingResult)
+  const pendingTransactions = holofuelWaitingTransactions.filter(pendingTx => pendingTx.status !== STATUS.completed)
 
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 
@@ -66,10 +65,13 @@ export default function TransactionsHistory ({ history: { push } }) {
       throw new Error(`unrecognized filter type: "${filter}"`)
   }
 
+  const isLoadingFirstPendingTransactions = useLoadingFirstTime(loadingPendingTransactions)
+  const isLoadingFirstCompletedTransactions = useLoadingFirstTime(loadingCompletedTransactions)
+
   const noVisibleTransactions = isEmpty(filteredPendingTransactions) &&
     isEmpty(filteredCompletedTransactions) &&
-    !loadingPendingTransactions &&
-    !loadingCompletedTransactions
+    !isLoadingFirstPendingTransactions &&
+    !isLoadingFirstCompletedTransactions
 
   const completedTransactionsPartitionedByDate = partitionByDate(filteredCompletedTransactions)
 
@@ -81,13 +83,13 @@ export default function TransactionsHistory ({ history: { push } }) {
   const completedPartitionedTransactions = [{
     label: firstCompletedLabel || 'Completed',
     transactions: firstCompletedTransaction || [],
-    loading: loadingCompletedTransactions
+    loading: isLoadingFirstCompletedTransactions
   }].concat(completedTransactionsPartitionedByDate.slice(1))
 
   const partitionedTransactions = ([{
     label: 'Pending',
     transactions: filteredPendingTransactions,
-    loading: loadingPendingTransactions
+    loading: isLoadingFirstPendingTransactions
   }]).concat(completedPartitionedTransactions).filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
