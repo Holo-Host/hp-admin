@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { isEmpty } from 'lodash/fp'
+import { isEmpty, difference } from 'lodash/fp'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -27,13 +27,18 @@ function AcceptRequestedOffers ({
   const requestPayments = actionableTransactions.filter(transaction => transaction.isPayingARequest)
   const acceptOffer = useAcceptOffer()
 
+  const [acceptedPaymentIds, setAcceptedPaymentIds] = useState([])
+
+  const unAcceptedPaymentIds = difference(requestPayments.map(transaction => transaction.id), acceptedPaymentIds)
+
   useEffect(() => {
-    if (!isEmpty(requestPayments)) {
-      requestPayments.forEach(offer => {
-        acceptOffer(offer)
+    if (!isEmpty(unAcceptedPaymentIds)) {
+      unAcceptedPaymentIds.forEach(transaction => {
+        acceptOffer(transaction)
       })
+      setAcceptedPaymentIds(acceptedPaymentIds => acceptedPaymentIds.concat(unAcceptedPaymentIds))
     }
-  }, [requestPayments, acceptOffer])
+  }, [unAcceptedPaymentIds, acceptOffer, setAcceptedPaymentIds])
 
   return <>{children}</>
 }
