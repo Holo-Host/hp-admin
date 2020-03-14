@@ -33,8 +33,9 @@ function AcceptRequestedOffers ({
 
   useEffect(() => {
     if (!isEmpty(unAcceptedPaymentIds)) {
-      unAcceptedPaymentIds.forEach(transaction => {
-        acceptOffer(transaction)
+      unAcceptedPaymentIds.forEach(id => {
+        console.log('ONE!', id)
+        acceptOffer({ id })
       })
       setAcceptedPaymentIds(acceptedPaymentIds => acceptedPaymentIds.concat(unAcceptedPaymentIds))
     }

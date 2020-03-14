@@ -27,7 +27,7 @@ function HoloFuelAppCore () {
   const isWide = useMediaPredicate('(min-width: 550px)')
 
   return <HFScreenWidthContext.Provider value={isWide}>
-    <HFFlashMessageProvider>      
+    <HFFlashMessageProvider>
       <AcceptRequestedOffers>
         <HFRouter />
       </AcceptRequestedOffers>
