@@ -40,7 +40,7 @@ function AcceptRequestedOffers ({
     }
   }, [unAcceptedPaymentIds, acceptOffer, setAcceptedPaymentIds])
 
-  return <React.Fragment data-testid='accept-requested-offers-wrapper'>{children}</React.Fragment>
+  return <>{children}</>
 }
 
 export default AcceptRequestedOffers
