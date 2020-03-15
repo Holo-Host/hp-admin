@@ -12,6 +12,7 @@ import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
+import AcceptRequestedOffers from './holofuel/AcceptRequestedOffers'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
@@ -27,7 +28,9 @@ function HoloFuelAppCore () {
 
   return <HFScreenWidthContext.Provider value={isWide}>
     <HFFlashMessageProvider>
-      <HFRouter />
+      <AcceptRequestedOffers>
+        <HFRouter />
+      </AcceptRequestedOffers>
     </HFFlashMessageProvider>
   </HFScreenWidthContext.Provider>
 }

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import './FourOhFour.module.css'
 
 export default function FourOhFour () {
-  return <PrimaryLayout>
+  return <PrimaryLayout headerProps={{ title: 'HP Admin' }} >
     <div styleName='card'>
       <div styleName='fourohfour'>404</div>
       <div styleName='message'>We couldn't find that page. Please check the URL and try again.</div>
