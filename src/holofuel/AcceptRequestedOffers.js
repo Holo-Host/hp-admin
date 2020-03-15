@@ -34,14 +34,13 @@ function AcceptRequestedOffers ({
   useEffect(() => {
     if (!isEmpty(unAcceptedPaymentIds)) {
       unAcceptedPaymentIds.forEach(id => {
-        console.log('ONE!', id)
         acceptOffer({ id })
       })
       setAcceptedPaymentIds(acceptedPaymentIds => acceptedPaymentIds.concat(unAcceptedPaymentIds))
     }
   }, [unAcceptedPaymentIds, acceptOffer, setAcceptedPaymentIds])
 
-  return <>{children}</>
+  return <React.Fragment data-testid='accept-requested-offers-wrapper'>{children}</React.Fragment>
 }
 
 export default AcceptRequestedOffers
