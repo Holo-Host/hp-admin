@@ -200,7 +200,7 @@ in
       }
     ];
     network = {
-      sim2h_url = "ws://public.sim2h.net:9000";
+      sim2h_url = "ws://sim2h-test.holo.host:9003";
       type = "sim2h";
     };
     logger = {
@@ -247,7 +247,7 @@ in
       }
     ];
     network = {
-      sim2h_url = "ws://public.sim2h.net:9000";
+      sim2h_url = "ws://sim2h-test.holo.host:9003";
       type = "sim2h";
     };
     logger = {
