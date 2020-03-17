@@ -109,7 +109,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { data: { holofuelUser: myProfile = {} } = {} } = useQuery(HolofuelUserQuery)
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
@@ -192,7 +192,7 @@ export default function Inbox ({ history: { push } }) {
         <PageDivider title={dateLabel} />
         <div styleName='transaction-list'>
           {transactions.map(transaction => <TransactionRow
-            whoami={whoami}
+            myProfile={myProfile}
             transaction={transaction}
             actionsVisibleId={actionsVisibleId}
             setActionsVisibleId={setActionsVisibleId}
@@ -212,7 +212,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, isActionable, whoami }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, isActionable, myProfile }) {
   const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction // presentBalance,
   const agent = canceledBy || counterparty
 
@@ -247,7 +247,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   let fullNotes
   if (isCanceled) {
     if (canceledBy) {
-      story = isOffer ? ` Canceled an Offer to ${counterparty.id === whoami.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === whoami.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+      story = isOffer ? ` Canceled an Offer to ${counterparty.id === myProfile.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === myProfile.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
     }
     fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
   } else if (isDeclined) {
@@ -309,7 +309,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {(agent.id === whoami.id ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
+          {(agent.id === myProfile.id ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>

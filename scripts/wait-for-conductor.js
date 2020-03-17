@@ -28,7 +28,7 @@ async function waitForConductor (interval = 10000) {
       // Verify that conductor is up && the dna instance is live
       // const agent1 = getAgent(0)
       const agentId = process.env.REACT_APP_AGENT_ID
-      const result = await axios.post(`http://localhost:3300/${agentId}::<happ_id>-holofuel/transactions/whoami`, {})
+      const result = await axios.post(`http://localhost:3300/${agentId}::<happ_id>-holofuel/profile/get_my_profile`, {})
       if (result.status !== 200 && result.data.error) throw new Error(result.data.error.message)
       else if (result.status === 200) isUp = true
       else return result.status

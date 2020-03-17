@@ -197,26 +197,29 @@ function presentTransaction (transaction) {
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
-      const result = await createZomeCall('transactions/whoami')()
-      if (result.Err) throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.Err)
-
+      const myProfile = await createZomeCall('profile/get_my_profile')()
+      if (myProfile === 'Err') throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', myProfile)
       return {
-        id: result.agent_id.pub_sign_key,
-        nickname: result.agent_id.nick
+        id: myProfile.agent_address,
+        avatarUrl: myProfile.avatar_url,
+        nickname: myProfile.nickname
       }
     },
     getCounterparty: async ({ agentId }) => {
-      const result = await createZomeCall('transactions/whois')({ agents: agentId })
-      if (result.Err || !result[0].Ok) {
+      const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agents: agentId })
+      if (counterpartyProfileArray === 'Err' || !counterpartyProfileArray[0]) {
         return {
           id: agentId,
+          avatarUrl: '',
+          nickname: '',
           notFound: true
         }
       }
 
       return {
-        id: result[0].Ok.agent_id.pub_sign_key,
-        nickname: result[0].Ok.agent_id.nick
+        id: counterpartyProfileArray[0].agent_address,
+        avatarUrl: counterpartyProfileArray[0].avatar_url,
+        nickname: counterpartyProfileArray[0].nickname
       }
     }
   },
@@ -286,7 +289,8 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
-      const whoami = await HoloFuelDnaInterface.user.get()
+      const myProfile = await HoloFuelDnaInterface.user.get()
+      const whoami = myProfile.id
 
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')

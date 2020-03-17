@@ -417,28 +417,16 @@ export const pendingList = {
 }
 
 const agentArray = [{
-  Ok: {
-    agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
-    agent_id: {
-      nick: 'Perry',
-      pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
-    },
-    dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
-    dna_name: 'Holo Fuel Transactor'
-  }
+  agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nickname: 'Perry',
+  avatar_url: 'https://cdn.pixabay.com/photo/2012/04/13/13/50/man-32481_960_720.png'
 }, {
-  Ok: {
-    agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
-    agent_id: {
-      nick: 'Sam',
-      pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
-    },
-    dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
-    dna_name: 'Holo Fuel Transactor'
-  }
+  agent_address: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+  nickname: 'Sam',
+  avatar_url: 'https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png'
 }]
 
-const whois = agentId => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
+const getProfile = agentId => agentArray.find(agent => agent.agent_address === agentId) || 'Err'
 
 function listPending ({ origins }) {
   if (!origins) return pendingList
@@ -465,11 +453,13 @@ function receivedPaymentsHashMap (promiseArr) {
 
 const NUM_SALT_ROUNDS = 10
 const holofuel = {
+  profile: {
+    // get_my_profile is only for discovering current / personal agent
+    get_my_profile: () => agentArray[0],
+    // get_profile is for discovering all other agents
+    get_profile: ({ agents }) => typeof agents === 'string' ? Array.of(getProfile(agents)) : Array.of(agents.map(agent => getProfile(agent)))
+  },
   transactions: {
-    // whomai is only for discovering current / personal agent
-    whoami: () => agentArray[0].Ok,
-    // whois is for discovering all other agents
-    whois: ({ agents }) => typeof agents === 'string' ? Array.of(whois(agents)) : Array.of(agents.map(agent => whois(agent))),
     ledger_state: () => transactionList.ledger,
     list_transactions: () => transactionList,
     list_pending: listPending,

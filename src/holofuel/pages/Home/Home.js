@@ -28,6 +28,8 @@ export default function Home () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
 
+  console.log('holofuelUser : ', holofuelUser)
+
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
 
