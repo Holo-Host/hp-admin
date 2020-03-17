@@ -202,7 +202,8 @@ const HoloFuelDnaInterface = {
 
       return {
         id: result.agent_id.pub_sign_key,
-        nickname: result.agent_id.nick
+        nickname: result.agent_id.nick,
+        imageUrl: result.agent_id.image_url
       }
     },
     getCounterparty: async ({ agentId }) => {
@@ -216,8 +217,13 @@ const HoloFuelDnaInterface = {
 
       return {
         id: result[0].Ok.agent_id.pub_sign_key,
-        nickname: result[0].Ok.agent_id.nick
+        nickname: result[0].Ok.agent_id.nick,
+        imageUrl: result[0].Ok.agent_id.image_url
       }
+    },
+    update: async (nickname, imageUrl) => {
+      const user = await createZomeCall('transactions/updateMe')({ nickname, imageUrl })
+      return user
     }
   },
   ledger: {

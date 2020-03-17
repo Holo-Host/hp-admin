@@ -416,12 +416,13 @@ export const pendingList = {
   canceled: []
 }
 
-const agentArray = [{
+const agents = [{
   Ok: {
     agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
     agent_id: {
       nick: 'Perry',
-      pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+      pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+      image_url: 'image.url'
     },
     dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
     dna_name: 'Holo Fuel Transactor'
@@ -431,14 +432,15 @@ const agentArray = [{
     agent_address: 'HcSCJeQZHvEikzse4z9Zv7UoibXQ66au5uGZ4w6dOoV9vgo495GqKO3DjUOsbni',
     agent_id: {
       nick: 'Sam',
-      pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi'
+      pub_sign_key: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+      image_url: 'image.url'
     },
     dna_address: 'QmcnYu8B54tFnJUv68aB3imPRwLxqJH2DQzjkX9Dvxmsf9',
     dna_name: 'Holo Fuel Transactor'
   }
 }]
 
-const whois = agentId => agentArray.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
+const whois = agentId => agents.find(agent => agent.Ok.agent_id.pub_sign_key === agentId) || { Err: 'No agent was found by this id.' }
 
 function listPending ({ origins }) {
   if (!origins) return pendingList
@@ -467,7 +469,8 @@ const NUM_SALT_ROUNDS = 10
 const holofuel = {
   transactions: {
     // whomai is only for discovering current / personal agent
-    whoami: () => agentArray[0].Ok,
+    whoami: () => agents[0].Ok,
+    updateMe: ({ nickname, imageUrl }) => ({ id: agents[0].Ok.agent_id.pub_sign_key, nickname, imageUrl }),
     // whois is for discovering all other agents
     whois: ({ agents }) => typeof agents === 'string' ? Array.of(whois(agents)) : Array.of(agents.map(agent => whois(agent))),
     ledger_state: () => transactionList.ledger,

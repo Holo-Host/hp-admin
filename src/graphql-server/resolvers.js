@@ -103,6 +103,8 @@ export const resolvers = {
 
     holofuelRefundTransactions: (_, { transactions }) => HoloFuelDnaInterface.transactions.refundTransactions(transactions),
 
+    holofuelUpdateUser: (_, { nickname, imageUrl }) => HoloFuelDnaInterface.user.update(nickname, imageUrl),
+
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 
     hposUpdateVersion: () => HposInterface.os.updateVersion(),

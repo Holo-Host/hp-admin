@@ -1,0 +1,23 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding-top: 100px;
+  height: 100%;
+}
+
+.label {
+
+}
+
+.input {
+
+}
+
+.field-error {
+
+}
+
+.update-button {
+  
+}
