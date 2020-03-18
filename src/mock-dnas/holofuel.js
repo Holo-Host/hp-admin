@@ -457,7 +457,8 @@ const holofuel = {
     // get_my_profile is only for discovering current / personal agent
     get_my_profile: () => agentArray[0],
     // get_profile is for discovering all other agents
-    get_profile: ({ agents }) => typeof agents === 'string' ? Array.of(getProfile(agents)) : Array.of(agents.map(agent => getProfile(agent)))
+    get_profile: ({ agent_address: agents }) => typeof agents === 'string' ? Array.of(getProfile(agents)) : Array.of(agents.map(agent => getProfile(agent))),
+    update_profile: ({  }) => 
   },
   transactions: {
     ledger_state: () => transactionList.ledger,

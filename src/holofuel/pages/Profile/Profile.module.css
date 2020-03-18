@@ -1,0 +1,48 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .avatar-image {
+    display: block;
+    margin: 20px auto 30px;
+  }
+  
+  .field {
+    display: flex;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: .5em 0;
+    line-height: 1.5;
+    flex-wrap: wrap;
+  }
+  
+  .field-name {
+    box-sizing: border-box;
+    padding-right: 3%;
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1 1 30%;
+    text-align: right;
+    height: 1.5em;
+    align-self: center;
+  }
+  
+  .field-input {
+    flex: 1 1 70%;
+  }
+  
+  .field-error {
+    flex-basis: 100%;
+    text-align: center;
+    font-size: .8em;
+    font-weight: 500;
+    color: #a00;
+    margin: .3em 0 .0;
+  }
+  
+  .save-button {
+    margin-top: auto;
+  }

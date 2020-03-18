@@ -206,7 +206,7 @@ const HoloFuelDnaInterface = {
       }
     },
     getCounterparty: async ({ agentId }) => {
-      const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agents: agentId })
+      const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agent_address: agentId })
       if (counterpartyProfileArray === 'Err' || !counterpartyProfileArray[0]) {
         return {
           id: agentId,
@@ -215,11 +215,21 @@ const HoloFuelDnaInterface = {
           notFound: true
         }
       }
-
       return {
         id: counterpartyProfileArray[0].agent_address,
         avatarUrl: counterpartyProfileArray[0].avatar_url,
         nickname: counterpartyProfileArray[0].nickname
+      }
+    },
+    update: async (nickname, avatarUrl) => {
+      const params = avatarUrl ? { nickname, avatar_url: avatarUrl } : { nickname }
+
+      const myProfile = await createZomeCall('profile/update_my_profile')(params)
+      if (myProfile === 'Err') throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', myProfile)
+      return {
+        id: myProfile.agent_address,
+        avatarUrl: myProfile.avatar_url,
+        nickname: myProfile.nickname
       }
     }
   },
