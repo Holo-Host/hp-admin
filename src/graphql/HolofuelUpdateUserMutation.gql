@@ -1,0 +1,7 @@
+mutation HolofuelUpdateUser ($nickname: String!, $avatarUrl: String) {
+  holofuelUpdateUser(nickname: $nickname, avatarUrl: $avatarUrl) {
+    id
+    nickname
+    avatarUrl
+  }
+}
