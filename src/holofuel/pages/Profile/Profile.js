@@ -19,15 +19,15 @@ function Card ({ title, subtitle, children }) {
 }
 
 export default function Profile () {
-  const { loading, data: { holofuelUser: { id, nickname, avatarUrl } = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { loading, data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery)
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
 
   const { register, handleSubmit, reset, errors } = useForm()
-  const onSubmit = ({ nickname, avatarUrl }) => {
+  const onSubmit = ({ nickname }) => {
     updateUser({
-      variables: { nickname, avatarUrl }
+      variables: { nickname }
     })
-    reset({ nickname: '', avatarUrl: '' })
+    reset({ nickname: '' })
   }
 
   return <PrimaryLayout headerProps={{ title: 'Profile' }}>
@@ -35,29 +35,15 @@ export default function Profile () {
     {loading && <Loading />}
     <Card title='Update Profile' subtitle='Manage your account nickname and avatar.'>
       <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
-        <HashAvatar avatarUrl={avatarUrl} seed={id} styleName='avatar-image' data-testid='host-avatar' />
+        <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
         <h3 styleName='nickname-display'>{nickname || 'Your Nickname'}</h3>
-        <label styleName='field'>
-          <span styleName='field-name'>Avatar URL</span>
-          <Input
-            name='avatarUrl'
-            defaultValue={avatarUrl}
-            placeholder='eg. https://example.com/avatar.jpg'
-            ref={register}
-            styleName='field-input'
-          />
-          {errors.avatar && <small styleName='field-error'>
-            Avatar needs to be a valid URL.
-          </small>}
-        </label>
-
         <label styleName='field'>
           <span styleName='field-name'>Nickname</span>
           <Input
             name='nickname'
             defaultValue={nickname}
             placeholder='eg. HoloNaut'
-            ref={register({ required: true, minLength: 5, maxLength: 20 })}
+            ref={register({ minLength: 5, maxLength: 20 })}
             styleName='field-input'
           />
           {errors.name && <small styleName='field-error'>

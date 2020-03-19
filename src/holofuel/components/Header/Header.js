@@ -27,7 +27,7 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
       </div>
       <div>
         <Link to={PROFILE_PATH}>
-          <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={32} dataTestId='hash-icon' />
+          <HashAvatar seed={agent.id} size={32} dataTestId='hash-icon' />
         </Link>
       </div>
     </section>

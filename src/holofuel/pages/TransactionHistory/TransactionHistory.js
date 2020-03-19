@@ -162,7 +162,7 @@ export function TransactionRow ({ transaction, isFirst }) {
   return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
-        <HashAvatar avatarUrl={counterparty.avatarUrl || ''} seed={counterparty.id} size={32} />
+        <HashAvatar seed={counterparty.id} size={32} />
       </CopyAgentId>
     </div>
     <div styleName='name-and-notes'>

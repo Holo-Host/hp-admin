@@ -303,7 +303,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
-        <HashAvatar avatarUrl={agent.id === myProfile.id ? myProfile.avatarUrl : agent.avatarUrl || ''} seed={agent.id} size={32} data-testid='hash-icon' />
+        <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
       </CopyAgentId>
     </div>
 
