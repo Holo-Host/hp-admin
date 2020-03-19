@@ -66,8 +66,6 @@ export const resolvers = {
 
     registerHostingUser: HhaDnaInterface.currentUser.create,
 
-    holofuelUpdateUser: (_, { nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(nickname, avatarUrl),
-
     enableHapp: async (_, { appId }) => {
       const success = await EnvoyInterface.happs.install(appId)
       if (!success) throw new Error('Failed to install app in Envoy')
@@ -89,6 +87,8 @@ export const resolvers = {
       return getHappDetails(happ)
     },
 
+    holofuelUpdateUser: (_, { nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(nickname, avatarUrl),
+
     updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit),
 
     holofuelRequest: (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
@@ -104,8 +104,6 @@ export const resolvers = {
     holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
 
     holofuelRefundTransactions: (_, { transactions }) => HoloFuelDnaInterface.transactions.refundTransactions(transactions),
-
-    holofuelUpdateUser: (_, { nickname, imageUrl }) => HoloFuelDnaInterface.user.update(nickname, imageUrl),
 
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 
