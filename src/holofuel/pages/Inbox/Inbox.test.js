@@ -83,7 +83,7 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
     console.log('actionableTransactions.length', actionableTransactions.length)
 
     const listItems = getAllByRole('listitem')
-    expect(listItems).toHaveLength(3)
+    expect(listItems).toHaveLength(2)
 
     const getByTextParent = getByText
 
@@ -176,7 +176,6 @@ describe('Ledger Jumbotron', () => {
 
     const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} TF`
 
-    // expect(getAllByText('Balance')[0]).toBeInTheDocument()
     expect(getByText(presentedBalance)).toBeInTheDocument()
     expect(getAllByText('New Transaction')[0]).toBeInTheDocument()
   })
