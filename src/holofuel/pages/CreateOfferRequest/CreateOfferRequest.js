@@ -77,14 +77,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
-    console.log('counterpartyId === myProfile.id : ', counterpartyId === myProfile.id)
+    // console.log('counterpartyId === myProfile.id : ', counterpartyId === myProfile.id)
 
     if (counterpartyId === myProfile.id) {
-      console.log('counterpartyId : ', counterpartyId)
-      console.log('myProfile : ', myProfile)
       newMessage('You cannot send yourself TestFuel.', 5000)
     }
-  }, [myProfile.id, counterpartyId, newMessage])
+  }, [myProfile, counterpartyId, newMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 

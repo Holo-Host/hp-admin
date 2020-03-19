@@ -51,7 +51,7 @@ const offerMock = {
 const mockAgent1 = {
   agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
-  avatarUrl: '',
+  avatar_url: '',
   notFound: false
 }
 
@@ -177,7 +177,7 @@ describe('CreateOfferRequest', () => {
 
       await act(async () => {
         fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
-        await wait(0)
+        await wait(50)
       })
 
       expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send yourself TestFuel.`, 5000)
@@ -219,7 +219,7 @@ describe('CreateOfferRequest', () => {
       const mockAgent1 = {
         agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
         nickname: 'Perry',
-        avatarUrl: '',
+        avatar_url: '',
         notFound: false
       }
 

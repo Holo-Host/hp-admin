@@ -11,7 +11,8 @@ import AcceptRequestedOffers from './AcceptRequestedOffers'
 describe('AcceptRequestedOffers', () => {
   const counterparty = {
     id: 101,
-    nickname: 'bill'
+    nickname: 'bill',
+    avatarUrl: ''
   }
 
   const offer = {
