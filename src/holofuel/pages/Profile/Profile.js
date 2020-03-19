@@ -46,7 +46,7 @@ export default function Profile () {
             ref={register({ minLength: 5, maxLength: 20 })}
             styleName='field-input'
           />
-          {errors.name && <small styleName='field-error'>
+          {errors.nickname && <small styleName='field-error'>
             Nickname must be between 5 and 20 characters.
           </small>}
         </label>
