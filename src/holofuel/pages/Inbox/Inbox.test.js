@@ -80,8 +80,6 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
 
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
 
-    console.log('actionableTransactions.length', actionableTransactions.length)
-
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(3)
 
@@ -156,7 +154,9 @@ const ledgerMock = {
 
 const mockWhoamiAgent = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry'
+  nickname: 'Perry',
+  avatarUrl: '',
+  notFound: false
 }
 
 const whoamiMock = {
@@ -329,12 +329,14 @@ describe('TransactionRow', () => {
 
   const mockAgent1 = {
     pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-    nick: 'Perry'
+    nick: 'Perry',
+    avatarUrl: ''
   }
 
   const mockWhoIsAgent1 = {
     id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry',
+    avatarUrl: '',
     notFound: false
   }
 
@@ -413,7 +415,7 @@ describe('TransactionRow', () => {
         setActionsVisibleId: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true,
-        whoami: mockAgent1,
+        myProfile: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties
       }
@@ -546,7 +548,7 @@ describe('TransactionRow', () => {
         setActionsVisibleId: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true,
-        whoami: mockAgent1,
+        myProfile: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties
       }

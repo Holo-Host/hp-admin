@@ -37,7 +37,7 @@ export default function Profile () {
     <Card title='Update Profile' subtitle='Manage your account nickname and avatar.'>
       <form styleName='form' onSubmit={handleSubmit(onSubmit)}>
         <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
-        <h3 styleName='nickname-display'>{nickname || 'Your Nickname'}</h3>
+        <h3 styleName='nickname-display' data-testid='profile-nickname'>{nickname || 'Your Nickname'}</h3>
         <label styleName='field'>
           <span styleName='field-name'>Nickname</span>
           <Input
