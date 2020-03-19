@@ -150,6 +150,9 @@ function TransactionPartition ({ partition }) {
 
 export function TransactionRow ({ transaction, isFirst }) {
   const { amount, counterparty, direction, notes, status } = transaction // presentBalance,
+
+  console.log('COUNTERPARTY : ', counterparty);
+  
   const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
@@ -159,7 +162,7 @@ export function TransactionRow ({ transaction, isFirst }) {
   return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
-        <HashAvatar seed={counterparty.id} size={32} />
+        <HashAvatar avatarUrl={counterparty.avatarUrl || ''} seed={counterparty.id} size={32} />
       </CopyAgentId>
     </div>
     <div styleName='name-and-notes'>

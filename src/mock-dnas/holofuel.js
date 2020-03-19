@@ -418,8 +418,7 @@ export const pendingList = {
 
 const agentArray = [{
   agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: '',
-  // nickname: 'Perry',
+  nickname: 'Perry',
   avatar_url: ''
   // avatar_url: 'https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png'
 }, {

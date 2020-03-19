@@ -33,11 +33,12 @@ function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
+    <Header {...headerProps} agent={holofuelUser} avatarUrl={holofuelUser.avatarUrl} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
       agent={holofuelUser}
+      avatarUrl={holofuelUser.avatarUrl}
       agentLoading={holofuelUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
