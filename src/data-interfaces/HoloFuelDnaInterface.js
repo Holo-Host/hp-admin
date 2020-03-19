@@ -21,7 +21,7 @@ export async function getTxCounterparties (transactionList) {
 }
 
 const addFullCounterpartyToTx = async (tx) => {
-  const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })
+  const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })  
   return { ...tx, counterparty: fullCounterparty }
 }
 
@@ -198,7 +198,7 @@ const HoloFuelDnaInterface = {
   user: {
     get: async () => {
       const myProfile = await createZomeCall('profile/get_my_profile')()
-      if (myProfile === 'Err') throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', myProfile)
+      if (myProfile === 'Err') throw new Error('There was an error locating the current holofuel agent profile. ERROR: ', myProfile)
       return {
         id: myProfile.agent_address,
         avatarUrl: myProfile.avatar_url,
@@ -224,7 +224,7 @@ const HoloFuelDnaInterface = {
     update: async (nickname, avatarUrl) => {
       const params = avatarUrl ? { nickname, avatar_url: avatarUrl } : { nickname }
       const myProfile = await createZomeCall('profile/update_my_profile')(params)
-      console.log('MyProfile in interface : ', myProfile)
+      if (myProfile === 'Err') throw new Error('There was an error udpating the current holofuel agent profile. ERROR: ', myProfile)
       return {
         id: myProfile.agent_address,
         avatarUrl: myProfile.avatar_url,
@@ -252,7 +252,7 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
-
+      
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {

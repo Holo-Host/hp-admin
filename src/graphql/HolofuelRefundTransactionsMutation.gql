@@ -2,7 +2,7 @@ mutation holofuelRefundTransactions ($transactions:[TransactionInput]) {
   holofuelRefundTransactions (transactions: $transactions) {
     id
     amount
-    counterparty { id, nickname }
+    counterparty { id, nickname, avatarUrl }
     direction
     status
     type

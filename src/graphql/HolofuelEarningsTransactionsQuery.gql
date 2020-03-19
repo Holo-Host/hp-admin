@@ -4,6 +4,6 @@ query HolofuelEarningsTransactionsQuery {
     amount
     timestamp
     happName
-    counterparty { id, nickname }
+    counterparty { id, nickname, avatarUrl }
   }
 }
