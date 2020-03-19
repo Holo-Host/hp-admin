@@ -17,6 +17,7 @@ import 'holofuel/global-styles/index.css'
 
 function PrimaryLayout ({
   children,
+  color,
   headerProps = {},
   showAlphaFlag = true
 }) {
@@ -44,7 +45,7 @@ function PrimaryLayout ({
       isWide={isWide}
     />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName='styles.content'>
+    <div styleName={cx('styles.content', { 'styles.iceburg': (color === 'iceburg') })}>
       <FlashMessage />
       {children}
     </div>

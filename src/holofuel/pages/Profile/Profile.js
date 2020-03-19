@@ -3,35 +3,46 @@ import { useQuery, useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelUpdateUserMutation from 'graphql/HolofuelUpdateUserMutation.gql'
-import PrimaryLayout from 'components/layout/PrimaryLayout'
-import Button from 'components/Button'
+import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import Button from 'holofuel/components/Button'
 import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
 import Loading from 'components/Loading'
-import './MyProfile.module.css'
+import './Profile.module.css'
+
+function Card ({ title, subtitle, children }) {
+  return <div styleName='card'>
+    <h1 styleName='card-title'>{title}</h1>
+    <h3 styleName='card-subtitle'>{subtitle}</h3>
+    {children}
+  </div>
+}
 
 export default function Profile () {
   const { loading, data: { holofuelUser: { id, nickname, avatarUrl } = {} } = {} } = useQuery(HolofuelUserQuery)
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
 
-  const { register, handleSubmit, errors } = useForm()
+  const { register, handleSubmit, reset, errors } = useForm()
   const onSubmit = ({ nickname, avatarUrl }) => {
     updateUser({
       variables: { nickname, avatarUrl }
     })
+    reset({ nickname: '', avatarUrl: '' })
   }
 
-  return <PrimaryLayout headerProps={{ title: 'Profile' }}>
-    <div>
-      {loading && <Loading />}
+  return <PrimaryLayout color='iceburg' headerProps={{ title: 'Profile' }}>
+    <div styleName='backdrop' />
+    {loading && <Loading />}
+    <Card title='Update Profile' subtitle='Manage your account nickname and avatar.'>
       <form onSubmit={handleSubmit(onSubmit)} styleName='form'>
         <HashAvatar avatarUrl={avatarUrl} seed={id} styleName='avatar-image' data-testid='host-avatar' />
+        <h3 styleName='nickname-display'>{nickname || 'Your Nickname'}</h3>
         <label styleName='field'>
           <span styleName='field-name'>Avatar URL</span>
           <Input
-            name='avatar'
-            placeholder='eg. https://example.com/avatar.jpg'
+            name='avatarUrl'
             defaultValue={avatarUrl}
+            placeholder='eg. https://example.com/avatar.jpg'
             ref={register}
             styleName='field-input'
           />
@@ -58,6 +69,6 @@ export default function Profile () {
           Save Changes
         </Button>
       </form>
-    </div>
+    </Card>
   </PrimaryLayout>
 }

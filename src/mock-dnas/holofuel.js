@@ -418,12 +418,14 @@ export const pendingList = {
 
 const agentArray = [{
   agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry',
-  avatar_url: 'https://cdn.pixabay.com/photo/2012/04/13/13/50/man-32481_960_720.png'
+  nickname: '',
+  // nickname: 'Perry',
+  avatar_url: ''
+  // avatar_url: 'https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png'
 }, {
   agent_address: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
   nickname: 'Sam',
-  avatar_url: 'https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png'
+  avatar_url: 'https://cdn.pixabay.com/photo/2012/04/13/13/50/man-32481_960_720.png'
 }]
 
 const getProfile = agentId => agentArray.find(agent => agent.agent_address === agentId) || 'Err'
@@ -458,7 +460,10 @@ const holofuel = {
     get_my_profile: () => agentArray[0],
     // get_profile is for discovering all other agents
     get_profile: ({ agent_address: agents }) => typeof agents === 'string' ? Array.of(getProfile(agents)) : Array.of(agents.map(agent => getProfile(agent))),
-    update_profile: ({  }) => 
+    update_my_profile: ({ nickname, avatar_url: avatarUrl }) => {
+      const profile = agentArray[0]
+      return { ...profile, nickname, avatar_url: avatarUrl }
+    }
   },
   transactions: {
     ledger_state: () => transactionList.ledger,

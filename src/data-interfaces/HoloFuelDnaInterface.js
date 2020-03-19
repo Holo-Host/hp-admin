@@ -223,9 +223,8 @@ const HoloFuelDnaInterface = {
     },
     update: async (nickname, avatarUrl) => {
       const params = avatarUrl ? { nickname, avatar_url: avatarUrl } : { nickname }
-
       const myProfile = await createZomeCall('profile/update_my_profile')(params)
-      if (myProfile === 'Err') throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', myProfile)
+      console.log('MyProfile in interface : ', myProfile)
       return {
         id: myProfile.agent_address,
         avatarUrl: myProfile.avatar_url,

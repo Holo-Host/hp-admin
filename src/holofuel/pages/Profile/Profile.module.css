@@ -1,12 +1,26 @@
+.backdrop {
+  background-color: var(--color-iceberg);
+  height: 324px;
+  right: 0;
+  top: 0;
+  left: 0;
+  position: absolute;
+}
 .form {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-  }
+  } 
   
   .avatar-image {
     display: block;
     margin: 20px auto 30px;
+  }
+
+  .nickname-display {
+    color: var(--color-limed-spruce);
+    margin-top: -20px;
+    margin-bottom: 30px;
   }
   
   .field {
@@ -24,7 +38,6 @@
     padding-right: 3%;
     font-size: 14px;
     font-weight: 600;
-    flex: 1 1 30%;
     text-align: right;
     height: 1.5em;
     align-self: center;
@@ -46,3 +59,32 @@
   .save-button {
     margin-top: auto;
   }
+
+
+/* Card */
+
+.card {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: black;
+  background-color: white;
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.1);
+  border-radius: 4px;
+  padding: 16px 24px;
+  margin: 10vh 16px;
+  margin-bottom: 20px;
+  padding: 50px;
+  z-index: 1
+}
+
+.card-title {
+  color: var(--color-limed-spruce);
+  margin-bottom: 0px;
+}
+
+.card-subtitle {
+  color: var(--color-rhino-35);
+  margin-bottom: 20px;
+}
+
