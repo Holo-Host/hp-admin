@@ -21,7 +21,7 @@ export async function getTxCounterparties (transactionList) {
 }
 
 const addFullCounterpartyToTx = async (tx) => {
-  const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })  
+  const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })
   return { ...tx, counterparty: fullCounterparty }
 }
 
@@ -252,7 +252,6 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
-      
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {

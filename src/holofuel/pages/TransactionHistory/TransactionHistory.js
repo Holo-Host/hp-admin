@@ -150,9 +150,6 @@ function TransactionPartition ({ partition }) {
 
 export function TransactionRow ({ transaction, isFirst }) {
   const { amount, counterparty, direction, notes, status } = transaction // presentBalance,
-
-  console.log('>>>>>>>>> COUNTERPARTY : ', counterparty);
-  
   const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
