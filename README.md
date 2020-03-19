@@ -7,8 +7,8 @@
 
 3. Decide which Root you'd like to run and follow the respective steps below.
     > Roots:
-    >- HP Admin [calls HHA (host's side), HAS, and Holo Community DNA endpoints]
-    >- HoloFuel (solely calls holofuel DNA endpoints)
+    >- HP Admin [calls HHA (host's side), HAS, and Holo Community DNA endpoints].
+    >- HoloFuel (solely calls holofuel DNA endpoints).
 
 ### HP Admin:
 
@@ -39,7 +39,7 @@ If referencing **Live** Data :
 **NOTE: Please reference version v0.12.2 of the holofuel dna to test with the UI.**
 - Open 2 terminals.
 ##### Start the Conductors:
-- In one of the termainals, open nix-shell by typing `nix-shell` (after this happens your terminal line should become neon green)
+- In one of the terminals, open nix-shell by typing `nix-shell` (after this happens your terminal line should become neon green)
 - Inside this nix-shell terminal, start the conductor for HoloFuel, by typing in the command: `npm run hc:start-manual`
 ##### Open the UI
 - In the remaining terminals, open the UI for HoloFuel, by typing in the command: `npm run start:holofuel-agent-1`

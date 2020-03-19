@@ -1,7 +1,7 @@
-mutation HolofuelUpdateUser ($nickname: String, $imageUrl: String) {
-  holofuelUpdateUser(nickname: $nickname, imageUrl: $imageUrl) {
+mutation HolofuelUpdateUser ($nickname: String!, $avatarUrl: String) {
+  holofuelUpdateUser(nickname: $nickname, avatarUrl: $avatarUrl) {
     id
     nickname
-    imageUrl
+    avatarUrl
   }
 }

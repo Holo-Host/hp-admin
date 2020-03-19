@@ -66,6 +66,8 @@ export const resolvers = {
 
     registerHostingUser: HhaDnaInterface.currentUser.create,
 
+    holofuelUpdateUser: (_, { nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(nickname, avatarUrl),
+
     enableHapp: async (_, { appId }) => {
       const success = await EnvoyInterface.happs.install(appId)
       if (!success) throw new Error('Failed to install app in Envoy')

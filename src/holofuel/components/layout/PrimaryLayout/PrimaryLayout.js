@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
-import { isEmpty } from 'lodash/fp'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -18,6 +17,7 @@ import 'holofuel/global-styles/index.css'
 
 function PrimaryLayout ({
   children,
+  color,
   headerProps = {},
   showAlphaFlag = true
 }) {
@@ -32,10 +32,6 @@ function PrimaryLayout ({
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
 
-  const childrenWithProps = React.Children.map(children, child => {
-    if (!isEmpty(child)) return React.cloneElement(child, { whoami: holofuelUser })
-  })
-
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
@@ -49,9 +45,9 @@ function PrimaryLayout ({
       isWide={isWide}
     />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName='styles.content'>
+    <div styleName={cx('styles.content')}>
       <FlashMessage />
-      {childrenWithProps}
+      {children}
     </div>
   </div>
 }

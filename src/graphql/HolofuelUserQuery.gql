@@ -2,6 +2,7 @@ query HolofuelUser {
   holofuelUser {
     id
     nickname
-    imageUrl
+    avatarUrl
+    notFound
   }
 }

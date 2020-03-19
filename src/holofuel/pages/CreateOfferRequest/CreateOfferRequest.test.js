@@ -67,24 +67,24 @@ const counterpartyQueryMock = {
   }
 }
 
-const mockWhoamiAgent = {
+const mockMyProfileAgent = {
   id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
   nickname: 'Sam'
 }
 
-const whoamiMock = {
+const myProfileMock = {
   request: {
     query: HolofuelUserQuery
   },
   result: {
-    data: { holofuelUser: mockWhoamiAgent }
+    data: { holofuelUser: mockMyProfileAgent }
   }
 }
 
 const mocks = [
   offerMock,
   counterpartyQueryMock,
-  whoamiMock
+  myProfileMock
 ]
 
 const enterAmountAndMode = async ({ amount, modeLabel, getByTestId, getByText }) => {
@@ -140,23 +140,23 @@ describe('CreateOfferRequest', () => {
         jest.clearAllMocks()
       })
 
-      const mockWhoamiAgent = {
+      const mockMyProfileAgent = {
         id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
         nickname: 'Perry'
       }
 
-      const whoamiMock = {
+      const myProfileMock = {
         request: {
           query: HolofuelUserQuery
         },
         result: {
-          data: { holofuelUser: mockWhoamiAgent }
+          data: { holofuelUser: mockMyProfileAgent }
         }
       }
 
       const mocks = [
         counterpartyQueryMock,
-        whoamiMock
+        myProfileMock
       ]
 
       const push = jest.fn()
@@ -369,7 +369,7 @@ describe('CreateOfferRequest', () => {
     const mocks = [
       requestMock,
       counterpartyQueryMock,
-      whoamiMock
+      myProfileMock
     ]
 
     it('renders a form that can be filled out and submitted', async () => {
