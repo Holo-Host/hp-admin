@@ -170,11 +170,9 @@ const whoamiMock = {
 
 describe('Ledger Jumbotron', () => {
   it('renders the balance and the empty state', async () => {
-    const { getByText, getAllByText, debug } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
+    const { getByText, getAllByText } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
       <Inbox history={{}} />
     </MockedProvider>)
-
-    debug()
 
     const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} TF`
 
