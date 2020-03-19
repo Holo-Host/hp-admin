@@ -30,7 +30,7 @@ export default function Profile () {
     reset({ nickname: '', avatarUrl: '' })
   }
 
-  return <PrimaryLayout color='iceburg' headerProps={{ title: 'Profile' }}>
+  return <PrimaryLayout headerProps={{ title: 'Profile' }}>
     <div styleName='backdrop' />
     {loading && <Loading />}
     <Card title='Update Profile' subtitle='Manage your account nickname and avatar.'>

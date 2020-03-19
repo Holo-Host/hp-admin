@@ -20,7 +20,6 @@ function UpdateHolofuelUser ({
 
   useEffect(() => {
     if (hasReceivedNotice) return
-    // console.log('pathname === /holofuel/${PROFILE_PATH}', pathname === `/holofuel/${PROFILE_PATH}`)
     if (pathname === `/holofuel/${PROFILE_PATH}`) {
       newMessage('', 0)
     } else if (!isEmpty(id) && isEmpty(nickname)) {
