@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { pickBy } from 'lodash/fp'
+import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -198,7 +198,7 @@ const HoloFuelDnaInterface = {
   user: {
     get: async () => {
       const myProfile = await createZomeCall('profile/get_my_profile')()
-      if (myProfile === 'Err') throw new Error('There was an error locating the current holofuel agent profile. ERROR: ', myProfile)
+      if (myProfile.Err) throw new Error('There was an error locating the current holofuel agent profile. ERROR: ', myProfile.Err)
       return {
         id: myProfile.agent_address,
         avatarUrl: myProfile.avatar_url,
@@ -221,12 +221,13 @@ const HoloFuelDnaInterface = {
         nickname: counterpartyProfileArray[0].nickname
       }
     },
-    update: async (id, nickname, avatarUrl) => {
-      const params = avatarUrl ? { nickname, avatar_url: avatarUrl } : { nickname }
+    update: async (nickname, avatarUrl) => {
+      const { id } = await HoloFuelDnaInterface.user.get()
+      const params = omitBy(param => param === undefined, { nickname, avatarUrl })
       const myProfile = await createZomeCall('profile/update_my_profile')(params)
-      if (myProfile === 'Err') throw new Error('There was an error udpating the current holofuel agent profile. ERROR: ', myProfile)
+      if (myProfile.Err) throw new Error('There was an error udpating the current holofuel agent profile. ERROR: ', myProfile.Err)
       return {
-        id: id,
+        id,
         avatarUrl,
         nickname
       }
@@ -298,11 +299,10 @@ const HoloFuelDnaInterface = {
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
       const myProfile = await HoloFuelDnaInterface.user.get()
-      const whoami = myProfile.id
 
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')
-        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
+        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: myProfile } : { ...tx, canceledBy: null })
 
       const presentedNonActionableTransactions = await getTxWithCounterparties(nonActionableTransactionsWithCancelByKey)
 

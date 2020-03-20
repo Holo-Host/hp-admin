@@ -5,17 +5,13 @@ export const FlashMessageContext = createContext()
 export function FlashMessageProvider ({ children }) {
   const [message, setMessage] = useState('')
   const [time, setTime] = useState()
-  const [linkText, setLinkText] = useState('')
-  const [link, setLink] = useState()
 
-  const newMessage = useCallback((message, time, linkText, link) => {
+  const newMessage = useCallback((message, time) => {
     setMessage(message)
     setTime(time)
-    setLinkText(linkText)
-    setLink(link)
   }, [setMessage, setTime])
 
-  return <FlashMessageContext.Provider value={{ message, time, newMessage, linkText, link }}>
+  return <FlashMessageContext.Provider value={{ message, time, newMessage }}>
     {children}
   </FlashMessageContext.Provider>
 }

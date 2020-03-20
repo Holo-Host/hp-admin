@@ -418,7 +418,7 @@ export const pendingList = {
 
 const agentArray = [{
   agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry',
+  nickname: '',
   avatar_url: ''
   // avatar_url: 'https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png'
 }, {
@@ -427,7 +427,7 @@ const agentArray = [{
   avatar_url: 'https://cdn.pixabay.com/photo/2012/04/13/13/50/man-32481_960_720.png'
 }]
 
-const getProfile = agentId => agentArray.find(agent => agent.agent_address === agentId) || 'Err'
+const getProfile = agentId => agentArray.find(agent => agent.agent_address === agentId) || { Err: `Error locating profile for ${agentId}.` }
 
 function listPending ({ origins }) {
   if (!origins) return pendingList

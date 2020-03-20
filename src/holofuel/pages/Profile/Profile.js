@@ -26,7 +26,7 @@ export default function Profile () {
 
   const onSubmit = ({ nickname }) => {
     updateUser({
-      variables: { id, nickname },
+      variables: { nickname },
       refetchQueries: [{
         query: HolofuelUserQuery
       }]
@@ -37,7 +37,7 @@ export default function Profile () {
   return <PrimaryLayout headerProps={{ title: 'Profile' }}>
     <div styleName='backdrop' />
     {loading && <Loading />}
-    <Card title='Update Profile' subtitle='Manage your account nickname and avatar.'>
+    <Card title='Update Profile' subtitle='Manage your account nickname.'>
       <form styleName='form' onSubmit={handleSubmit(onSubmit)}>
         <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
         <h3 styleName='nickname-display' data-testid='profile-nickname'>{nickname || 'Your Nickname'}</h3>

@@ -17,7 +17,6 @@ import 'holofuel/global-styles/index.css'
 
 function PrimaryLayout ({
   children,
-  color,
   headerProps = {},
   showAlphaFlag = true
 }) {
