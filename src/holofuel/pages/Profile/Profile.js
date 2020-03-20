@@ -6,6 +6,7 @@ import Button from 'holofuel/components/Button'
 import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
 import Loading from 'components/Loading'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelUpdateUserMutation from 'graphql/HolofuelUpdateUserMutation.gql'
 import './Profile.module.css'
@@ -22,7 +23,7 @@ export default function Profile () {
   const { loading, data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
 
-  const { register, handleSubmit, reset, errors } = useForm()
+  const { register, handleSubmit, triggerValidation, reset, errors } = useForm({ mode: 'onChange' })
 
   const onSubmit = ({ nickname }) => {
     updateUser({
@@ -39,15 +40,19 @@ export default function Profile () {
     {loading && <Loading />}
     <Card title='Update Profile' subtitle='Manage your account nickname.'>
       <form styleName='form' onSubmit={handleSubmit(onSubmit)}>
-        <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
+        <CopyAgentId agent={{ id }} isMe>
+          <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
+        </CopyAgentId>
         <h3 styleName='nickname-display' data-testid='profile-nickname'>{nickname || 'Your Nickname'}</h3>
         <label styleName='field'>
-          <span styleName='field-name'>Nickname</span>
+          <h3 styleName='field-name'>Nickname</h3>
           <Input
             name='nickname'
+            className='input-centered'
             defaultValue={nickname}
             placeholder='eg. HoloNaut'
-            ref={register({ required: true, minLength: 5, maxLength: 20 })} />
+            ref={register({ required: true, minLength: 5, maxLength: 20 })}
+            onKeyUp={() => triggerValidation('nickname')} />
           {errors.nickname && <small styleName='field-error'>
             Name must be between 5 and 20 characters.
           </small>}
