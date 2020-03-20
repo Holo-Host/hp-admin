@@ -26,7 +26,7 @@ import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -78,7 +78,7 @@ function useUpdatedTransactionLists () {
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
 
-  const updatedActionableWOCanceledAndDeclined = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && actionableTx.status !== STATUS.declined)
+  const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
 
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
@@ -89,7 +89,7 @@ function useUpdatedTransactionLists () {
   const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
 
   return {
-    actionableTransactions: updatedActionableWOCanceledAndDeclined,
+    actionableTransactions: updatedDisplayableActionable,
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
     actionableLoading: actionableLoadingFirstTime,

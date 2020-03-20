@@ -10,7 +10,7 @@ import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
-import { STATUS } from 'models/Transaction'
+import { shouldShowTransactionInInbox } from 'models/Transaction'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -24,7 +24,7 @@ function PrimaryLayout ({
   const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
-  const inboxCount = actionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && (actionableTx.status !== STATUS.declined)).length
+  const inboxCount = actionableTransactions.filter(shouldShowTransactionInInbox).length
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
