@@ -7,7 +7,7 @@ import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow, ConfirmationModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
-import { TYPE, STATUS } from 'models/Transaction'
+import { TYPE, STATUS, shouldShowTransactionInInbox } from 'models/Transaction'
 import { presentHolofuelAmount, getDateLabel } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -68,7 +68,9 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
   } else {
     throw new Error('unrecognized transaction type', item.toString())
   }
-}).sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+})
+  .filter(shouldShowTransactionInInbox)
+  .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
 
 const { ledger } = transactionList
 
@@ -80,10 +82,8 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
 
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
 
-    console.log('actionableTransactions.length', actionableTransactions.length)
-
     const listItems = getAllByRole('listitem')
-    expect(listItems).toHaveLength(3)
+    expect(listItems).toHaveLength(2)
 
     const getByTextParent = getByText
 
@@ -176,7 +176,6 @@ describe('Ledger Jumbotron', () => {
 
     const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} TF`
 
-    // expect(getAllByText('Balance')[0]).toBeInTheDocument()
     expect(getByText(presentedBalance)).toBeInTheDocument()
     expect(getAllByText('New Transaction')[0]).toBeInTheDocument()
   })
