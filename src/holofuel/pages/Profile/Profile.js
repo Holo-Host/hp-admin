@@ -25,6 +25,8 @@ export default function Profile () {
 
   const { register, handleSubmit, triggerValidation, reset, errors } = useForm({ mode: 'onChange' })
 
+  console.log('!!errors.nickname : ', !!errors.nickname)
+
   const onSubmit = ({ nickname }) => {
     updateUser({
       variables: { nickname },
