@@ -24,7 +24,7 @@
   }
   
   .field {
-    display: flex;
+    /* display: flex; */
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
@@ -44,7 +44,7 @@
   }
   
   .field-input {
-    /* flex: 1 1 70%; */
+    flex: 1 1 70%;
   }
   
   .field-error {
