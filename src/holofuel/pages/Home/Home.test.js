@@ -32,7 +32,8 @@ describe('Home', () => {
             holofuelUser: {
               id: '1',
               nickname,
-              avatarUrl: ''
+              avatarUrl: '',
+              notFound: false
             }
           }
         }
