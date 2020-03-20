@@ -26,7 +26,10 @@ export default function Profile () {
 
   const onSubmit = ({ nickname }) => {
     updateUser({
-      variables: { nickname }
+      variables: { id, nickname },
+      refetchQueries: [{
+        query: HolofuelUserQuery
+      }]
     })
     reset({ nickname: '' })
   }

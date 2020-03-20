@@ -221,14 +221,14 @@ const HoloFuelDnaInterface = {
         nickname: counterpartyProfileArray[0].nickname
       }
     },
-    update: async (nickname, avatarUrl) => {
+    update: async (id, nickname, avatarUrl) => {
       const params = avatarUrl ? { nickname, avatar_url: avatarUrl } : { nickname }
       const myProfile = await createZomeCall('profile/update_my_profile')(params)
       if (myProfile === 'Err') throw new Error('There was an error udpating the current holofuel agent profile. ERROR: ', myProfile)
       return {
-        id: myProfile.agent_address,
-        avatarUrl: myProfile.avatar_url,
-        nickname: myProfile.nickname
+        id: id,
+        avatarUrl,
+        nickname
       }
     }
   },

@@ -87,9 +87,9 @@ export const resolvers = {
       return getHappDetails(happ)
     },
 
-    holofuelUpdateUser: (_, { nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(nickname, avatarUrl),
-
     updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit),
+
+    holofuelUpdateUser: (_, { id, nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(id, nickname, avatarUrl),
 
     holofuelRequest: (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
 
