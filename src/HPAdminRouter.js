@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import AuthRoute from 'components/AuthRoute'
 import Dashboard from 'pages/Dashboard'
 import MainMenu from 'pages/MainMenu'
@@ -8,6 +8,7 @@ import Tos from 'pages/Tos'
 import BrowseHapps from 'pages/BrowseHapps'
 import ManagePricing from 'pages/ManagePricing'
 import HostingEarnings from 'pages/HostingEarnings'
+import FourOhFour from 'pages/FourOhFour'
 import StyleDemo from 'pages/StyleDemo'
 import Login from 'pages/Login'
 import FactoryResetInstructions from 'pages/FactoryResetInstructions'
@@ -22,7 +23,7 @@ function HPAdminRoute (props) {
 }
 
 export default function HPAdminRouter () {
-  return <>
+  return <Switch>
     <Route path='(|/|/admin/login)' component={Login} exact />
     <HPAdminRoute path='(/admin|/admin/|/admin/dashboard)' exact component={Dashboard} />
     <HPAdminRoute path='/admin/menu' component={MainMenu} />
@@ -33,5 +34,6 @@ export default function HPAdminRouter () {
     <HPAdminRoute path='/admin/earnings' component={HostingEarnings} />
     <HPAdminRoute path='/admin/factory-reset' component={FactoryResetInstructions} />
     <HPAdminRoute path='/admin/style-demo' component={StyleDemo} />
-  </>
+    <Route component={FourOhFour} />
+  </Switch>
 }

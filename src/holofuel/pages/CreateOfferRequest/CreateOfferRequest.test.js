@@ -20,7 +20,9 @@ jest.mock('holofuel/contexts/useFlashMessageContext')
 
 const counterparty = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry'
+  nickname: 'Perry',
+  avatarUrl: '',
+  notFound: false
 }
 const amount = 35674
 const notes = 'Hi there'
@@ -47,44 +49,49 @@ const offerMock = {
 }
 
 const mockAgent1 = {
-  pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nick: 'Perry'
+  agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nickname: 'Perry',
+  avatar_url: '',
+  notFound: false
 }
 
 const mockWhoIsAgent1 = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
+  avatarUrl: '',
   notFound: false
 }
 
 const counterpartyQueryMock = {
   request: {
     query: HolofuelCounterpartyQuery,
-    variables: { agentId: mockAgent1.pub_sign_key }
+    variables: { agentId: mockAgent1.agent_address }
   },
   result: {
     data: { holofuelCounterparty: mockWhoIsAgent1 }
   }
 }
 
-const mockWhoamiAgent = {
+const mockProfile = {
   id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-  nickname: 'Sam'
+  nickname: 'Sam',
+  avatarUrl: '',
+  notFound: false
 }
 
-const whoamiMock = {
+const myProfileQueryMock = {
   request: {
     query: HolofuelUserQuery
   },
   result: {
-    data: { holofuelUser: mockWhoamiAgent }
+    data: { holofuelUser: mockProfile }
   }
 }
 
 const mocks = [
   offerMock,
   counterpartyQueryMock,
-  whoamiMock
+  myProfileQueryMock
 ]
 
 const enterAmountAndMode = async ({ amount, modeLabel, getByTestId, getByText }) => {
@@ -140,23 +147,25 @@ describe('CreateOfferRequest', () => {
         jest.clearAllMocks()
       })
 
-      const mockWhoamiAgent = {
+      const mockProfile = {
         id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nickname: 'Perry'
+        nickname: 'Perry',
+        avatarUrl: '',
+        notFound: false
       }
 
-      const whoamiMock = {
+      const myProfileQueryMock = {
         request: {
           query: HolofuelUserQuery
         },
         result: {
-          data: { holofuelUser: mockWhoamiAgent }
+          data: { holofuelUser: mockProfile }
         }
       }
 
       const mocks = [
         counterpartyQueryMock,
-        whoamiMock
+        myProfileQueryMock
       ]
 
       const push = jest.fn()
@@ -168,8 +177,8 @@ describe('CreateOfferRequest', () => {
       await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
 
       await act(async () => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.pub_sign_key } })
-        await wait(0)
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
+        await wait(50)
       })
 
       expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send yourself TestFuel.`, 5000)
@@ -195,7 +204,7 @@ describe('CreateOfferRequest', () => {
       expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
       await act(async () => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.pub_sign_key } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
         await wait(0)
       })
 
@@ -209,17 +218,18 @@ describe('CreateOfferRequest', () => {
       })
 
       const mockAgent1 = {
-        pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nick: 'Perry',
+        agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+        nickname: 'Perry',
+        avatar_url: '',
         notFound: false
       }
 
       const counterpartyQueryMockError = {
         request: {
           query: HolofuelCounterpartyQuery,
-          variables: { agentId: mockAgent1.pub_sign_key }
+          variables: { agentId: mockAgent1.agent_address }
         },
-        error: new Error('ERROR! : <Error Message>')
+        error: new Error('ERR')
       }
 
       const mocks = [
@@ -237,7 +247,7 @@ describe('CreateOfferRequest', () => {
       expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
       await act(async () => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.pub_sign_key } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
         await wait(0)
       })
 
@@ -251,16 +261,18 @@ describe('CreateOfferRequest', () => {
       })
 
       const mockAgent1 = {
-        pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nick: 'Perry'
+        agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+        nickname: 'Perry',
+        avatarUrl: '',
+        notFound: false
       }
 
       const counterpartyQueryMockError = {
         request: {
           query: HolofuelCounterpartyQuery,
-          variables: { agentId: mockAgent1.pub_sign_key }
+          variables: { agentId: mockAgent1.agent_address }
         },
-        error: new Error('ERROR! : <Error Message>')
+        error: new Error('ERR')
       }
 
       const mocks = [
@@ -278,7 +290,7 @@ describe('CreateOfferRequest', () => {
       expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
 
       act(() => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.pub_sign_key } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
       })
 
       expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
@@ -288,12 +300,14 @@ describe('CreateOfferRequest', () => {
     it('renders a clickable list of recent counterparties', async () => {
       const agent1 = {
         id: 'fkljd',
-        nickname: 'Jo'
+        nickname: 'Jo',
+        avatarUrl: ''
       }
 
       const agent2 = {
         id: 'dskajln',
-        nickname: 'Bob'
+        nickname: 'Bob',
+        avatarUrl: ''
       }
 
       const mocks = [
@@ -369,7 +383,7 @@ describe('CreateOfferRequest', () => {
     const mocks = [
       requestMock,
       counterpartyQueryMock,
-      whoamiMock
+      myProfileQueryMock
     ]
 
     it('renders a form that can be filled out and submitted', async () => {

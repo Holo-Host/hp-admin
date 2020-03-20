@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
@@ -15,7 +15,7 @@ import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HashAvatar from 'components/HashAvatar'
 import './Home.module.css'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
@@ -36,15 +36,10 @@ export default function Home () {
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
-  const [firstLoadTransactionsComplete, setFirstLoadTransactionsComplete] = useState(false)
+  const isLoadingFirstPendingTransactions = useLoadingFirstTime(loadingTransactions)
+
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
-
   useEffect(() => {
-    if (!loadingTransactions) {
-      setFirstLoadTransactionsComplete(true)
-    }
-    console.log('!!!!!!!! !isEmpty(transactions) : ', !isEmpty(transactions))
-
     if (!isEmpty(transactions)) {
       const newCounterpartyTransactions = findNewCounterpartyTransactions(transactions)
       console.log('newCounterpartyTransactions : ', newCounterpartyTransactions)
@@ -93,11 +88,11 @@ export default function Home () {
 
         <div styleName='transactions'>
 
-          {!firstLoadTransactionsComplete && loadingTransactions && <div styleName='transactions-empty'>
+          {isLoadingFirstPendingTransactions && <div styleName='transactions-empty'>
             <Loading />
           </div>}
 
-          {firstLoadTransactionsComplete && isTransactionsEmpty && <div styleName='transactions-empty'>
+          {!isLoadingFirstPendingTransactions && isTransactionsEmpty && <div styleName='transactions-empty'>
             You have no recent transactions
           </div>}
 

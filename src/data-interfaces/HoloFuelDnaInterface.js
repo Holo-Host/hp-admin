@@ -211,26 +211,38 @@ function presentTransaction (transaction) {
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
-      const result = await createZomeCall('transactions/whoami')()
-      if (result.Err) throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.Err)
-
+      const myProfile = await createZomeCall('profile/get_my_profile')()
+      if (myProfile === 'Err') throw new Error('There was an error locating the current holofuel agent profile. ERROR: ', myProfile)
       return {
-        id: result.agent_id.pub_sign_key,
-        nickname: result.agent_id.nick
+        id: myProfile.agent_address,
+        avatarUrl: myProfile.avatar_url,
+        nickname: myProfile.nickname
       }
     },
     getCounterparty: async ({ agentId }) => {
-      const result = await createZomeCall('transactions/whois')({ agents: agentId })
-      if (result.Err || !result[0].Ok) {
+      const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agent_address: agentId })
+      if (counterpartyProfileArray === 'Err' || !counterpartyProfileArray[0]) {
         return {
           id: agentId,
+          avatarUrl: '',
+          nickname: '',
           notFound: true
         }
       }
-
       return {
-        id: result[0].Ok.agent_id.pub_sign_key,
-        nickname: result[0].Ok.agent_id.nick
+        id: counterpartyProfileArray[0].agent_address,
+        avatarUrl: counterpartyProfileArray[0].avatar_url,
+        nickname: counterpartyProfileArray[0].nickname
+      }
+    },
+    update: async (id, nickname, avatarUrl) => {
+      const params = avatarUrl ? { nickname, avatar_url: avatarUrl } : { nickname }
+      const myProfile = await createZomeCall('profile/update_my_profile')(params)
+      if (myProfile === 'Err') throw new Error('There was an error udpating the current holofuel agent profile. ERROR: ', myProfile)
+      return {
+        id: id,
+        avatarUrl,
+        nickname
       }
     }
   },
@@ -254,7 +266,6 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
-
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
@@ -300,7 +311,8 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
-      const whoami = await HoloFuelDnaInterface.user.get()
+      const myProfile = await HoloFuelDnaInterface.user.get()
+      const whoami = myProfile.id
 
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')

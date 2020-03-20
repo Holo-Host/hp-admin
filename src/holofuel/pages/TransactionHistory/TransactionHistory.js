@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty, intersectionBy, find, reject, isNil } from 'lodash/fp'
@@ -10,11 +10,11 @@ import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransaction
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentAgentId, presentHolofuelAmount, partitionByDate } from 'utils'
+import { presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
-import HashAvatar from '../../../components/HashAvatar/HashAvatar'
+import HashAvatar from 'components/HashAvatar'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 function usePollCompletedTransactions ({ since }) {
@@ -40,25 +40,6 @@ export default function TransactionsHistory ({ history: { push } }) {
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 
   const [filter, setFilter] = useState(FILTER_TYPES[0])
-
-  function useLoadingFirstTime (loading) {
-    const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(false)
-    const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
-
-    useEffect(() => {
-      if (hasLoadedOnce) return
-
-      if (!isLoadingFirstTime && loading) {
-        setIsLoadingFirstTime(true)
-      }
-
-      if (isLoadingFirstTime && !loading) {
-        setHasLoadedOnce(true)
-      }
-    }, [loading, isLoadingFirstTime, setIsLoadingFirstTime, hasLoadedOnce, setHasLoadedOnce])
-
-    return !hasLoadedOnce && loading
-  }
 
   let filteredPendingTransactions = []
   let filteredCompletedTransactions = []

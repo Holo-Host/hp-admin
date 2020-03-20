@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
@@ -13,6 +13,8 @@ import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import { CounterpartyListProvider as HFCounterpartyListProvider } from 'holofuel/contexts/useCounterpartyListContext'
+import AcceptRequestedOffers from './holofuel/AcceptRequestedOffers'
+import UpdateHolofuelUserPrompt from './holofuel/UpdateHolofuelUserPromptPrompt'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
@@ -24,12 +26,16 @@ export function App () {
 }
 
 function HoloFuelAppCore () {
-  const isWide = useMediaPredicate('(min-width: 550px)')
+  const isWide = useMediaPredicate('(min-widt h: 550px)')
 
   return <HFScreenWidthContext.Provider value={isWide}>
     <HFFlashMessageProvider>
       <HFCounterpartyListProvider>
-        <HFRouter />
+        <AcceptRequestedOffers>
+          <UpdateHolofuelUserPrompt>
+            <HFRouter />
+          </UpdateHolofuelUserPrompt>
+        </AcceptRequestedOffers>
       </HFCounterpartyListProvider>
     </HFFlashMessageProvider>
   </HFScreenWidthContext.Provider>
@@ -52,8 +58,10 @@ export function HPAdminApp () {
         <ConnectionProvider>
           <AuthProvider>
             <FlashMessageProvider>
-              <HPAdminRouter />
-              <Route path='/holofuel' component={HoloFuelAppCore} />
+              <Switch>
+                <Route path='/holofuel' component={HoloFuelAppCore} />
+                <HPAdminRouter />
+              </Switch>
             </FlashMessageProvider>
           </AuthProvider>
         </ConnectionProvider>

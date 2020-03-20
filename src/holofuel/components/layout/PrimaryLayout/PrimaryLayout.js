@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
-import { isEmpty } from 'lodash/fp'
 import { object } from 'prop-types'
+import { isEmpty } from 'lodash/fp'
 import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -61,7 +61,7 @@ function PrimaryLayout ({
       isWide={isWide}
     />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName='styles.content'>
+    <div styleName={cx('styles.content')}>
       <FlashMessage />
       {children}
     </div>
