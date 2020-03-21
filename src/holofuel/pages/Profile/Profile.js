@@ -47,6 +47,7 @@ export default function Profile () {
         <label styleName='field'>
           <h3 styleName='field-name'>Nickname</h3>
           <Input
+
             name='nickname'
             className='input-centered'
             defaultValue={nickname}

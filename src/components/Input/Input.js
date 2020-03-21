@@ -13,6 +13,7 @@ export default React.forwardRef(({
     'input-box': (!['checkbox', 'radio', 'submit'].includes(type)),
     'input-big': (variant === 'big'),
     'input-number': (type === 'number'),
+    'input-centered': (!['checkbox', 'radio', 'submit'].includes(type)),
     disabled
   })
 
