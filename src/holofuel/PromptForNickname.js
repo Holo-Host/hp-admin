@@ -9,7 +9,7 @@ import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 
 function UserPromptMessage ({ newMessage }) {
-  const handleResetFlashMessage = useCallback(
+  const resetFlashMessage = useCallback(
     () => newMessage('', 0),
     [newMessage])
 
@@ -18,11 +18,11 @@ function UserPromptMessage ({ newMessage }) {
   return <>
     <div className='message'>{userMessage}</div>
     <br />
-    <Link to={PROFILE_PATH} onClick={handleResetFlashMessage}>{linkMessage}</Link>
+    <Link to={PROFILE_PATH} onClick={resetFlashMessage}>{linkMessage}</Link>
   </>
 }
 
-function UpdateHolofuelUserPrompt ({
+function PromptForNickname ({
   children
 }) {
   const { data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery)
@@ -45,4 +45,4 @@ function UpdateHolofuelUserPrompt ({
   return <>{children}</>
 }
 
-export default UpdateHolofuelUserPrompt
+export default PromptForNickname
