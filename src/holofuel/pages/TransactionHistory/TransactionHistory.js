@@ -14,7 +14,7 @@ import { presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirst
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
-import HashAvatar from '../../../components/HashAvatar/HashAvatar'
+import HashAvatar from 'components/HashAvatar'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 function usePollCompletedTransactions ({ since }) {

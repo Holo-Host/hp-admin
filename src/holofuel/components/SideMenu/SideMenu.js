@@ -8,7 +8,8 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import {
   HOME_PATH,
   INBOX_PATH,
-  HISTORY_PATH
+  HISTORY_PATH,
+  PROFILE_PATH
 } from 'holofuel/utils/urls'
 
 import './SideMenu.module.css'
@@ -54,6 +55,11 @@ export default function SideMenu ({
           <li>
             <Link to={HISTORY_PATH} styleName='nav-link'>
               History
+            </Link>
+          </li>
+          <li>
+            <Link to={PROFILE_PATH} styleName='nav-link'>
+              Profile
             </Link>
           </li>
           {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li>

@@ -2,7 +2,7 @@ mutation HolofuelCancelMutation ($transactionId: ID) {
   holofuelCancel(transactionId: $transactionId) {
     id
     amount
-    counterparty { id, nickname }
+    counterparty { id, nickname, avatarUrl }
     direction
     status
     type

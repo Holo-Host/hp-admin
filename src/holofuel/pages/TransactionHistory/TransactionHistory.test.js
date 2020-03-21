@@ -79,7 +79,8 @@ describe('TransactionHistory', () => {
       id: 1,
       counterparty: {
         id: agent1.id,
-        nickname: agent1.nickname
+        nickname: agent1.nickname,
+        avatarUrl: ''
       },
       status: STATUS.completed,
       direction: DIRECTION.outgoing,
@@ -93,7 +94,8 @@ describe('TransactionHistory', () => {
       id: 2,
       counterparty: {
         id: agent2.id,
-        nickname: agent2.nickname
+        nickname: agent2.nickname,
+        avatarUrl: ''
       },
       status: STATUS.completed,
       direction: DIRECTION.incoming,
@@ -106,7 +108,8 @@ describe('TransactionHistory', () => {
       id: 3,
       counterparty: {
         id: agent1.id,
-        nickname: agent1.nickname
+        nickname: agent1.nickname,
+        avatarUrl: ''
       },
       status: STATUS.pending,
       direction: DIRECTION.outgoing,
