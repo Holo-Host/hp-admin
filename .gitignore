@@ -35,5 +35,5 @@ conductor.log
 conductor-1.log
 conductor-2.log
 conductor.pid
-conductor-config.toml
-conductor-config-extra.toml
+conductor-config-1.toml
+conductor-config-2.toml

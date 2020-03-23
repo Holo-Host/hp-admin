@@ -73,8 +73,8 @@ let
     else [x];
 
   dnas = with dnaPackages; [
-    happ-store
-    holo-hosting-app
+#    happ-store
+#    holo-hosting-app
     holofuel
   ];
 in
@@ -174,7 +174,7 @@ in
     meta.platforms = stdenv.lib.platforms.linux;
   };
 
-  hp-admin-conductor-config = writeTOML {
+  hp-admin-conductor-config-1 = writeTOML {
     bridges = [];
     persistence_dir = ".holochain/holo";
     agents = map agentConfig config.agent1;
@@ -200,7 +200,7 @@ in
       }
     ];
     network = {
-      sim2h_url = "ws://sim2h-test.holo.host:9003";
+      sim2h_url = "ws://localhost:9000";
       type = "sim2h";
     };
     logger = {
@@ -221,7 +221,7 @@ in
   };
 
 
-  hp-admin-extra-conductor-config = writeTOML {
+  hp-admin-conductor-config-2 = writeTOML {
     bridges = [];
     persistence_dir = ".holochain/holo";
     agents = map agentConfig config.agent2;
@@ -247,7 +247,7 @@ in
       }
     ];
     network = {
-      sim2h_url = "ws://sim2h-test.holo.host:9003";
+      sim2h_url = "ws://localhost:9000";
       type = "sim2h";
     };
     logger = {
