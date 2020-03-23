@@ -36,7 +36,6 @@ type HolofuelUser {
   id: ID
   nickname: String
   avatarUrl: String
-  notFound: Boolean
 }
 
 enum TransactionType {

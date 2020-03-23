@@ -66,8 +66,7 @@ describe('Save Profile Updates', () => {
   const mockProfile = {
     id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry',
-    avatarUrl: '',
-    notFound: false
+    avatarUrl: ''
   }
 
   const mockNickname = 'The HoloNaut'

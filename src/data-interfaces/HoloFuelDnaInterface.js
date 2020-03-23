@@ -197,24 +197,17 @@ function presentTransaction (transaction) {
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
-      const myProfile = await createZomeCall('profile/get_my_profile')()
-      if (myProfile.Err) throw new Error(`There was an error locating the current holofuel agent profile. ERROR: ${myProfile.Err}.`)
+      const { agent_address: id, avatar_url: avatarUrl, nickname, Err } = await createZomeCall('profile/get_my_profile')()
+      if (Err) throw new Error(`There was an locating your holofuel agent ID. ERROR: ${Err}.`)
       return {
-        id: myProfile.agent_address,
-        avatarUrl: myProfile.avatar_url,
-        nickname: myProfile.nickname
+        id,
+        avatarUrl,
+        nickname
       }
     },
     getCounterparty: async ({ agentId }) => {
       const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agent_address: agentId })
-      if (counterpartyProfileArray === 'Err' || !counterpartyProfileArray[0]) {
-        return {
-          id: agentId,
-          avatarUrl: '',
-          nickname: '',
-          notFound: true
-        }
-      }
+      if (counterpartyProfileArray.Err || !counterpartyProfileArray[0]) throw new Error(`There was an locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfileArray.Err}. `)
       return {
         id: counterpartyProfileArray[0].agent_address,
         avatarUrl: counterpartyProfileArray[0].avatar_url,
@@ -222,14 +215,13 @@ const HoloFuelDnaInterface = {
       }
     },
     update: async (nickname, avatarUrl) => {
-      const { id } = await HoloFuelDnaInterface.user.get()
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
-      const myProfile = await createZomeCall('profile/update_my_profile')(params)
-      if (myProfile.Err) throw new Error(`There was an error udpating the current holofuel agent profile. ERROR: ${myProfile.Err}. `)
+      const { agent_address: id, avatar_url: newAvatarUrl, nickname: newNickname, Err } = await createZomeCall('profile/update_my_profile')(params)
+      if (Err) throw new Error(`There was an error udpating the current holofuel agent profile. ERROR: ${Err}. `)
       return {
         id,
-        avatarUrl,
-        nickname
+        avatarUrl: newAvatarUrl,
+        nickname: newNickname
       }
     }
   },
