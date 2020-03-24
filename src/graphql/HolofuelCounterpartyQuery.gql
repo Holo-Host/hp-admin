@@ -3,6 +3,5 @@ query HolofuelCounterparty ($agentId: String!) {
     id
     nickname
     avatarUrl
-    notFound
   }
 }

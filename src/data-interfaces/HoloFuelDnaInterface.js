@@ -197,39 +197,38 @@ function presentTransaction (transaction) {
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
-      const myProfile = await createZomeCall('profile/get_my_profile')()
-      if (myProfile.Err) throw new Error(`There was an error locating the current holofuel agent profile. ERROR: ${myProfile.Err}.`)
-      return {
-        id: myProfile.agent_address,
-        avatarUrl: myProfile.avatar_url,
-        nickname: myProfile.nickname
-      }
-    },
-    getCounterparty: async ({ agentId }) => {
-      const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agent_address: agentId })
-      if (counterpartyProfileArray === 'Err' || !counterpartyProfileArray[0]) {
-        return {
-          id: agentId,
-          avatarUrl: '',
-          nickname: '',
-          notFound: true
-        }
-      }
-      return {
-        id: counterpartyProfileArray[0].agent_address,
-        avatarUrl: counterpartyProfileArray[0].avatar_url,
-        nickname: counterpartyProfileArray[0].nickname
-      }
-    },
-    update: async (nickname, avatarUrl) => {
-      const { id } = await HoloFuelDnaInterface.user.get()
-      const params = omitBy(param => param === undefined, { nickname, avatarUrl })
-      const myProfile = await createZomeCall('profile/update_my_profile')(params)
-      if (myProfile.Err) throw new Error(`There was an error udpating the current holofuel agent profile. ERROR: ${myProfile.Err}. `)
+      const { agent_address: id, avatar_url: avatarUrl, nickname, Err } = await createZomeCall('profile/get_my_profile')()
+      if (Err) throw new Error(`There was an error locating your holofuel agent ID. ERROR: ${Err}.`)
       return {
         id,
         avatarUrl,
         nickname
+      }
+    },
+    getCounterparty: async ({ agentId }) => {
+      const counterpartyProfile = await createZomeCall('profile/get_profile')({ agent_address: agentId })
+      if (counterpartyProfile.Err) {
+        console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfile.Err}. `)
+        return {
+          id: null,
+          avatarUrl: null,
+          nickname: null
+        }
+      }
+      return {
+        id: counterpartyProfile.agent_address,
+        avatarUrl: counterpartyProfile.avatar_url,
+        nickname: counterpartyProfile.nickname
+      }
+    },
+    update: async (nickname, avatarUrl) => {
+      const params = omitBy(param => param === undefined, { nickname, avatarUrl })
+      const { agent_address: id, avatar_url: newAvatarUrl, nickname: newNickname, Err } = await createZomeCall('profile/update_my_profile')(params)
+      if (Err) throw new Error(`There was an error udpating the current holofuel agent profile. ERROR: ${Err}. `)
+      return {
+        id,
+        avatarUrl: newAvatarUrl,
+        nickname: newNickname
       }
     }
   },

@@ -21,8 +21,7 @@ jest.mock('holofuel/contexts/useFlashMessageContext')
 const counterparty = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
-  avatarUrl: '',
-  notFound: false
+  avatarUrl: ''
 }
 const amount = 35674
 const notes = 'Hi there'
@@ -51,15 +50,13 @@ const offerMock = {
 const mockAgent1 = {
   agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
-  avatar_url: '',
-  notFound: false
+  avatar_url: ''
 }
 
 const mockWhoIsAgent1 = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
-  avatarUrl: '',
-  notFound: false
+  avatarUrl: ''
 }
 
 const counterpartyQueryMock = {
@@ -75,8 +72,7 @@ const counterpartyQueryMock = {
 const mockProfile = {
   id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
   nickname: 'Sam',
-  avatarUrl: '',
-  notFound: false
+  avatarUrl: ''
 }
 
 const myProfileQueryMock = {
@@ -150,8 +146,7 @@ describe('CreateOfferRequest', () => {
       const mockProfile = {
         id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
         nickname: 'Perry',
-        avatarUrl: '',
-        notFound: false
+        avatarUrl: ''
       }
 
       const myProfileQueryMock = {
@@ -220,8 +215,7 @@ describe('CreateOfferRequest', () => {
       const mockAgent1 = {
         agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
         nickname: 'Perry',
-        avatar_url: '',
-        notFound: false
+        avatar_url: ''
       }
 
       const counterpartyQueryMockError = {
@@ -263,8 +257,7 @@ describe('CreateOfferRequest', () => {
       const mockAgent1 = {
         agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
         nickname: 'Perry',
-        avatarUrl: '',
-        notFound: false
+        avatarUrl: ''
       }
 
       const counterpartyQueryMockError = {
