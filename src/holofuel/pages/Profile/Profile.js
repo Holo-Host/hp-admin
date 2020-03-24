@@ -26,8 +26,6 @@ export default function Profile () {
   // FIXME: this is a temporary hack until we can debug the underlying issue in the DNA
   const [hasRefetched, setHasRefetched] = useState(false)
 
-  console.log('optimisticNickname', optimisticNickname)
-
   useEffect(() => {
     if (optimisticNickname && !hasRefetched) {
       refetchHolofuelUser()
