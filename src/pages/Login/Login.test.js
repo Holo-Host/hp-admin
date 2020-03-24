@@ -19,7 +19,7 @@ describe('Login', () => {
     expect(queryByTestId('menu-button')).not.toBeInTheDocument()
   })
 
-  it('has a UI version and renders it ', () => {
+  it('renders UI Version number', () => {
     const { getByText } = render(<MockedProvider><Login history={{}} /></MockedProvider>)
     const versionText = `UI v${process.env.REACT_APP_VERSION}`
     expect(getByText(versionText)).toBeInTheDocument()
