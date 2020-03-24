@@ -45,7 +45,7 @@ export default function Profile () {
         <CopyAgentId agent={{ id }} isMe>
           <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
         </CopyAgentId>
-        <h3 styleName='nickname-display' data-testid='profile-nickname'>{nickname || optimisitcNickname || 'Your Nickname'}</h3>
+        <h3 styleName='nickname-display' data-testid='profile-nickname'>{optimisitcNickname || nickname || 'Your Nickname'}</h3>
         <label styleName='field'>
           <h3 styleName='field-name'>Nickname</h3>
           <Input
