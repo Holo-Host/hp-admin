@@ -35,15 +35,15 @@ export default function Profile () {
 
   const { register, handleSubmit, triggerValidation, reset, errors } = useForm({ mode: 'onChange' })
 
-  const onSubmit = ({ nickname: newNickname }) => {
+  const onSubmit = ({ nickname }) => {
     updateUser({
-      variables: { nickname: newNickname },
+      variables: { nickname },
       refetchQueries: [{
         query: HolofuelUserQuery
       }]
     })
-      .catch(() => setOptimisticNickname(nickname))
-    setOptimisticNickname(newNickname)
+      .catch(() => setOptimisticNickname())
+    setOptimisticNickname(nickname)
     setHasRefetched(false)
     reset({ nickname: '' })
   }
