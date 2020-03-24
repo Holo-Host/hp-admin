@@ -16,3 +16,9 @@
 .input-big {
   font-size: 22px;
 }
+
+.input-centered {
+  width: 80%;
+  min-width: 280px;
+  margin: 0 auto;
+}

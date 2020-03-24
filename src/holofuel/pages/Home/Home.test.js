@@ -31,7 +31,8 @@ describe('Home', () => {
           data: {
             holofuelUser: {
               id: '1',
-              nickname
+              nickname,
+              avatarUrl: ''
             }
           }
         }
@@ -85,7 +86,8 @@ describe('Home', () => {
       id: 1,
       counterparty: {
         id: '1',
-        nickname: 'Joe'
+        nickname: 'Joe',
+        avatarUrl: ''
       },
       amount: '212',
       notes: 'hey chief',
@@ -96,7 +98,8 @@ describe('Home', () => {
       id: 2,
       counterparty: {
         id: '2',
-        nickname: 'Sue'
+        nickname: 'Sue',
+        avatarUrl: ''
       },
       amount: '543.4098',
       notes: 'monies',
@@ -115,14 +118,16 @@ describe('Home', () => {
                 ...transactions[0],
                 counterparty: {
                   id: transactions[0].counterparty.id,
-                  nickname: transactions[0].counterparty.nickname
+                  nickname: transactions[0].counterparty.nickname,
+                  avatarUrl: ''
                 }
               },
               {
                 ...transactions[1],
                 counterparty: {
                   id: transactions[1].counterparty.id,
-                  nickname: transactions[1].counterparty.nickname
+                  nickname: transactions[1].counterparty.nickname,
+                  avatarUrl: ''
                 }
               }
             ]

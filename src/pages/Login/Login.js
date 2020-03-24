@@ -75,6 +75,7 @@ export default function Login ({ history: { push } }) {
       <div styleName='reminder-text-block'>
         <a styleName='reminder-text' href='https://holo.host/control-your-data' target='_blank' rel='noopener noreferrer'>Learn more</a> about controlling your own data.
       </div>
+      <div styleName='version-info'>UI v{process.env.REACT_APP_VERSION}</div>
     </div>
   </PrimaryLayout>
 }

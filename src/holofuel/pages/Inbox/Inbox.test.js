@@ -7,7 +7,7 @@ import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow, ConfirmationModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
-import { TYPE, STATUS } from 'models/Transaction'
+import { TYPE, STATUS, shouldShowTransactionInInbox } from 'models/Transaction'
 import { presentHolofuelAmount, getDateLabel } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -68,11 +68,13 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
   } else {
     throw new Error('unrecognized transaction type', item.toString())
   }
-}).sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+})
+  .filter(shouldShowTransactionInInbox)
+  .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
 
 const { ledger } = transactionList
 
-describe('Inbox Connected (with Agent Nicknames)', () => {
+describe('Inbox connected (with Agent Nicknames)', () => {
   it('renders', async () => {
     const { getAllByRole, getByText } = await renderAndWait(<ApolloProvider client={apolloClient}>
       <Inbox history={{}} />
@@ -80,10 +82,8 @@ describe('Inbox Connected (with Agent Nicknames)', () => {
 
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
 
-    console.log('actionableTransactions.length', actionableTransactions.length)
-
     const listItems = getAllByRole('listitem')
-    expect(listItems).toHaveLength(3)
+    expect(listItems).toHaveLength(2)
 
     const getByTextParent = getByText
 
@@ -156,7 +156,8 @@ const ledgerMock = {
 
 const mockWhoamiAgent = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry'
+  nickname: 'Perry',
+  avatarUrl: null
 }
 
 const whoamiMock = {
@@ -176,7 +177,6 @@ describe('Ledger Jumbotron', () => {
 
     const presentedBalance = `${presentHolofuelAmount(ledgerMock.result.data.holofuelLedger.balance)} TF`
 
-    // expect(getAllByText('Balance')[0]).toBeInTheDocument()
     expect(getByText(presentedBalance)).toBeInTheDocument()
     expect(getAllByText('New Transaction')[0]).toBeInTheDocument()
   })
@@ -253,7 +253,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} whoami={mockWhoamiAgent} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={request} myProfile={mockWhoamiAgent} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -263,7 +263,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} whoami={mockWhoamiAgent} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={offer} myProfile={mockWhoamiAgent} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -273,7 +273,7 @@ describe('TransactionRow', () => {
 
   it('renders an recent request', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} whoami={mockWhoamiAgent} />
+      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} myProfile={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -283,7 +283,7 @@ describe('TransactionRow', () => {
 
   it('renders a recent offer', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} whoami={mockWhoamiAgent} />
+      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} myProfile={mockWhoamiAgent} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -328,20 +328,21 @@ describe('TransactionRow', () => {
   }
 
   const mockAgent1 = {
-    pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-    nick: 'Perry'
+    agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+    nickname: 'Perry',
+    avatar_url: ''
   }
 
   const mockWhoIsAgent1 = {
     id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry',
-    notFound: false
+    avatarUrl: null
   }
 
   const counterpartyQueryMock = {
     request: {
       query: HolofuelCounterpartyQuery,
-      variables: { agentId: mockAgent1.pub_sign_key }
+      variables: { agentId: mockAgent1.agent_address }
     },
     result: {
       data: { holofuelCounterparty: mockWhoIsAgent1 }
@@ -361,7 +362,7 @@ describe('TransactionRow', () => {
   describe('Reveal actionable-buttons slider', () => {
     it('shows whenever actionable transactions are shown ', async () => {
       const { getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+        <TransactionRow transaction={offer} myProfile={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -369,7 +370,7 @@ describe('TransactionRow', () => {
 
     it('does not show whenever actionable transactions are not shown ', async () => {
       const { queryByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} />
+        <TransactionRow transaction={offer} myProfile={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} />
       </MockedProvider>, 0)
 
       expect(queryByTestId('forward-icon')).not.toBeInTheDocument()
@@ -377,7 +378,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for requests ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={request} whoami={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow transaction={request} myProfile={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -392,7 +393,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for offers ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} whoami={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow transaction={offer} myProfile={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -413,7 +414,7 @@ describe('TransactionRow', () => {
         setActionsVisibleId: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true,
-        whoami: mockAgent1,
+        myProfile: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties
       }
@@ -447,15 +448,10 @@ describe('TransactionRow', () => {
   describe('Accept Payment Modal', () => {
     it('responds properly', async () => {
       const transaction = { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' } }
-      const payTransaction = jest.fn(() => Promise.resolve())
 
       const props = {
         confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay' },
-        setConfirmationModalProperties: jest.fn(),
-        clearHighlightedTransaction: () => setTimeout(() => confirmationModalProperties, 5000),
-        payTransaction,
-        setCounterpartyNotFound: jest.fn(),
-        counterpartyNotFound: false
+        setConfirmationModalProperties: jest.fn()
       }
 
       const counterpartyQueryErrorMock = {
@@ -463,9 +459,8 @@ describe('TransactionRow', () => {
           query: HolofuelCounterpartyQuery,
           variables: { agentId: mockAgent1.pub_sign_key }
         },
-        result: () => {
-          props.counterpartyNotFound = true
-          return { data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, notFound: true } } }
+        result: {
+          data: { holofuelCounterparty: { Err: 'Agent ID not located in DNA dht.' } }
         }
       }
 
@@ -483,7 +478,6 @@ describe('TransactionRow', () => {
 
       expect(getByText(presentAgentId('HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'), { exact: false })).toBeInTheDocument()
       expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()
-      expect(props.counterpartyNotFound).toBe(true)
 
       fireEvent.click(getByText('Close Modal'))
       expect(props.setConfirmationModalProperties).toHaveBeenCalled()
@@ -494,10 +488,7 @@ describe('TransactionRow', () => {
 
       const props = {
         confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay', shouldDisplay: true },
-        setConfirmationModalProperties: jest.fn(),
-        clearHighlightedTransaction: () => setTimeout(() => confirmationModalProperties, 5000),
-        setCounterpartyNotFound: jest.fn(),
-        counterpartyNotFound: false
+        setConfirmationModalProperties: jest.fn()
       }
 
       const counterpartyQuery = {
@@ -505,7 +496,7 @@ describe('TransactionRow', () => {
           query: HolofuelCounterpartyQuery,
           variables: { agentId: transaction.counterparty.id }
         },
-        result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, notFound: false } } })
+        result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, avatarUrl: null } } })
       }
 
       const localOfferMock = {
@@ -546,7 +537,7 @@ describe('TransactionRow', () => {
         setActionsVisibleId: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true,
-        whoami: mockAgent1,
+        myProfile: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties
       }

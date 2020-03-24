@@ -62,9 +62,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
 
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { data: { holofuelUser: myProfile = {} } = {} } = useQuery(HolofuelUserQuery)
   const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== whoami.id)
+  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== myProfile.id)
 
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
@@ -77,10 +77,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
-    if (counterpartyId === whoami.id) {
+
+    if (counterpartyId === myProfile.id) {
       newMessage('You cannot send yourself TestFuel.', 5000)
     }
-  }, [whoami.id, counterpartyId, newMessage])
+  }, [myProfile.id, counterpartyId, newMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
@@ -125,7 +126,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
     !isCounterpartyFound ||
-    counterpartyId === whoami.id ||
+    counterpartyId === myProfile.id ||
     amount < 0
 
   if (numpadVisible) {
@@ -222,28 +223,30 @@ export default function CreateOfferRequest ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage, whoami }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  const { nickname, notFound, id } = holofuelCounterparty
+  const { id, nickname } = holofuelCounterparty
   useEffect(() => {
-    setCounterpartyNick(nickname)
+    if (!isEmpty(nickname)) {
+      setCounterpartyNick(nickname)
+    }
   }, [setCounterpartyNick, nickname])
 
   useEffect(() => {
     if (!loading) {
-      if (notFound) {
+      if (!id) {
         setCounterpartyFound(false)
-        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
+        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash of your HoloFuel Peer and try again.')
       } else {
         setCounterpartyFound(true)
       }
     } else {
       setCounterpartyFound(false)
     }
-  }, [setCounterpartyFound, loading, notFound, newMessage, id])
+  }, [setCounterpartyFound, loading, newMessage, id])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.

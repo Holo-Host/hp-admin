@@ -175,6 +175,14 @@
   color: var(--color-caribbean-green);
 }
 
+.version-info {
+  font-family: 'Circular';
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  color: var(--color-rhino-50);
+}
+
 /* InboxBadge */
 
 .inbox-badge {

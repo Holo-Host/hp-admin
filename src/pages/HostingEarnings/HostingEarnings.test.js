@@ -17,7 +17,8 @@ const transactions = [{
   happName: 'HoloFuel',
   counterparty: {
     id: 1,
-    nickname: 'Perry'
+    nickname: 'Perry',
+    avatarUrl: ''
   }
 },
 {
@@ -27,7 +28,8 @@ const transactions = [{
   happName: 'HoloFuel',
   counterparty: {
     id: 1,
-    nickname: 'Perry'
+    nickname: 'Perry',
+    avatarUrl: ''
   }
 },
 {
@@ -37,7 +39,8 @@ const transactions = [{
   happName: 'HoloFuel',
   counterparty: {
     id: 1,
-    nickname: 'Perry'
+    nickname: 'Perry',
+    avatarUrl: ''
   }
 }]
 

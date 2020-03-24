@@ -26,7 +26,7 @@ import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -69,6 +69,7 @@ function useDecline () {
 
 function useCounterparty (agentId) {
   const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
+    fetchPolicy: 'cache-and-network',
     variables: { agentId }
   })
   return { holofuelCounterparty, loading }
@@ -78,7 +79,7 @@ function useUpdatedTransactionLists () {
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
 
-  const updatedActionableWOCanceledAndDeclined = holofuelActionableTransactions.filter(actionableTx => actionableTx.status !== STATUS.canceled && actionableTx.status !== STATUS.declined)
+  const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
 
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
@@ -89,7 +90,7 @@ function useUpdatedTransactionLists () {
   const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
 
   return {
-    actionableTransactions: updatedActionableWOCanceledAndDeclined,
+    actionableTransactions: updatedDisplayableActionable,
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
     actionableLoading: actionableLoadingFirstTime,
@@ -109,7 +110,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
-  const { data: { holofuelUser: whoami = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { data: { holofuelUser: myProfile = {} } = {} } = useQuery(HolofuelUserQuery)
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
@@ -192,7 +193,7 @@ export default function Inbox ({ history: { push } }) {
         <PageDivider title={dateLabel} />
         <div styleName='transaction-list'>
           {transactions.map(transaction => <TransactionRow
-            whoami={whoami}
+            myProfile={myProfile}
             transaction={transaction}
             actionsVisibleId={actionsVisibleId}
             setActionsVisibleId={setActionsVisibleId}
@@ -212,7 +213,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, isActionable, whoami }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, isActionable, myProfile }) {
   const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction // presentBalance,
   const agent = canceledBy || counterparty
 
@@ -247,7 +248,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   let fullNotes
   if (isCanceled) {
     if (canceledBy) {
-      story = isOffer ? ` Canceled an Offer to ${counterparty.id === whoami.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === whoami.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+      story = isOffer ? ` Canceled an Offer to ${counterparty.id === myProfile.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === myProfile.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
     }
     fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
   } else if (isDeclined) {
@@ -261,6 +262,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   const [isLoading, setIsLoading] = useState(false)
 
   if (!isVisible) return null
+  if (agent.id === null) return null
 
   const onConfirmGreen = () => {
     setHighlightGreen(true)
@@ -309,7 +311,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {(agent.id === whoami.id ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
+          {(agent.id === myProfile.id ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
@@ -419,12 +421,12 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
 
   const { id, amount, type, notes, counterparty = {} } = transaction
   const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
-  const { notFound } = holofuelCounterparty
+  const { id: activeCounterpartyId } = holofuelCounterparty
 
   const counterpartyMessage = loadingCounterparty
-    ? <div styleName='counterparty-message'>Verifying your counterparty is online <Loading styleName='counterparty-loading' width={15} height={15} /></div>
-    : notFound
-      ? <div styleName='counterparty-message'>Your counterparty can't be located on the network. Please confirm that your counterparty is online, and try again in a few minutes.</div>
+    ? <div styleName='counterparty-message'>Verifying active status of your counterparty...<Loading styleName='counterparty-loading' width={15} height={15} /></div>
+    : !activeCounterpartyId
+      ? <div styleName='counterparty-message'>Your counterparty can't be located on the network. If this error persists, please contact your Peer and confirm the Profile ID referenced is still active.</div>
       : null
 
   let message, actionHook, actionParams, contentLabel, flashMessage
@@ -511,7 +513,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
-        disabled={loadingCounterparty || notFound}>
+        disabled={loadingCounterparty || !activeCounterpartyId}>
         Yes
       </Button>
     </div>
