@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -20,9 +20,15 @@ function Card ({ title, subtitle, children }) {
 }
 
 export default function Profile () {
-  const { loading, data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading, data: { holofuelUser: { id, nickname } = {} } = {}, refetch: refetchHolofuelUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
   const [optimisitcNickname, setOptimisitcNickname] = useState('')
+
+  useEffect(() => {
+    if (optimisitcNickname && !nickname) {
+      refetchHolofuelUser()
+    }
+  }, [optimisitcNickname, nickname, refetchHolofuelUser])
 
   const { register, handleSubmit, triggerValidation, reset, errors } = useForm({ mode: 'onChange' })
 
