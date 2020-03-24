@@ -22,24 +22,31 @@ function Card ({ title, subtitle, children }) {
 export default function Profile () {
   const { loading, data: { holofuelUser: { id, nickname } = {} } = {}, refetch: refetchHolofuelUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
-  const [optimisitcNickname, setOptimisitcNickname] = useState('')
+  const [optimisticNickname, setOptimisticNickname] = useState()
+  // FIXME: this is a temporary hack until we can debug the underlying issue in the DNA
+  const [hasRefetched, setHasRefetched] = useState(false)
+
+  console.log('optimisticNickname', optimisticNickname)
 
   useEffect(() => {
-    if (optimisitcNickname && !nickname) {
+    if (optimisticNickname && !hasRefetched) {
       refetchHolofuelUser()
+      setHasRefetched(true)
     }
-  }, [optimisitcNickname, nickname, refetchHolofuelUser])
+  }, [optimisticNickname, hasRefetched, refetchHolofuelUser])
 
   const { register, handleSubmit, triggerValidation, reset, errors } = useForm({ mode: 'onChange' })
 
-  const onSubmit = ({ nickname }) => {
+  const onSubmit = ({ nickname: newNickname }) => {
     updateUser({
-      variables: { nickname },
+      variables: { nickname: newNickname },
       refetchQueries: [{
         query: HolofuelUserQuery
       }]
     })
-    setOptimisitcNickname(nickname)
+      .catch(() => setOptimisticNickname(nickname))
+    setOptimisticNickname(newNickname)
+    setHasRefetched(false)
     reset({ nickname: '' })
   }
 
@@ -51,7 +58,7 @@ export default function Profile () {
         <CopyAgentId agent={{ id }} isMe>
           <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
         </CopyAgentId>
-        <h3 styleName='nickname-display' data-testid='profile-nickname'>{optimisitcNickname || nickname || 'Your Nickname'}</h3>
+        <h3 styleName='nickname-display' data-testid='profile-nickname'>{optimisticNickname || nickname || 'Your Nickname'}</h3>
         <label styleName='field'>
           <h3 styleName='field-name'>Nickname</h3>
           <Input
