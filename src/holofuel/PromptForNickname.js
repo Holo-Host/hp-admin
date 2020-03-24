@@ -37,9 +37,9 @@ function PromptForNickname ({
       newMessage('', 0)
     }
 
-    if (hasReceivedNotice) {
-      newMessage('', 0)
-    } else if (!isEmpty(id) && isEmpty(nickname)) {
+    // eslint-disable-next-line no-useless-return
+    if (hasReceivedNotice) return
+    else if (!isEmpty(id) && isEmpty(nickname)) {
       newMessage(<UserPromptMessage newMessage={newMessage} />, 0)
       setHasReceivedNotice(true)
     }
