@@ -112,7 +112,7 @@ in
     '';
 
     buildPhase = ''
-      npm run build
+      REACT_APP_VERSION=$npm_package_version npm run build
       cp -r build/ hp-admin/
     '';
 
@@ -158,7 +158,7 @@ in
     '';
 
     buildPhase = ''
-      npm run build:holofuel
+      REACT_APP_VERSION=$npm_package_version npm run build:holofuel
       cp -r build/ holofuel/
     '';
 
