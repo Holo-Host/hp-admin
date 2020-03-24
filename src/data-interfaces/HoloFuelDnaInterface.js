@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { omitBy, pickBy } from 'lodash/fp'
+import { omitBy, pickBy, isEmpty } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -201,17 +201,17 @@ const HoloFuelDnaInterface = {
       if (Err) throw new Error(`There was an locating your holofuel agent ID. ERROR: ${Err}.`)
       return {
         id,
-        avatarUrl,
-        nickname
+        avatarUrl: avatarUrl,
+        nickname: nickname
       }
     },
     getCounterparty: async ({ agentId }) => {
       const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agent_address: agentId })
-      if (counterpartyProfileArray.Err || !counterpartyProfileArray[0]) throw new Error(`There was an locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfileArray.Err}. `)
+      if (counterpartyProfileArray.Err) throw new Error(`There was an locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfileArray.Err}. `)
       return {
-        id: counterpartyProfileArray[0].agent_address,
-        avatarUrl: counterpartyProfileArray[0].avatar_url,
-        nickname: counterpartyProfileArray[0].nickname
+        id: counterpartyProfileArray.agent_address,
+        avatarUrl: counterpartyProfileArray.avatar_url,
+        nickname: counterpartyProfileArray.nickname
       }
     },
     update: async (nickname, avatarUrl) => {

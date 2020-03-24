@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -22,6 +22,7 @@ function Card ({ title, subtitle, children }) {
 export default function Profile () {
   const { loading, data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
+  const [optimisitcNickname, setOptimisitcNickname] = useState('')
 
   const { register, handleSubmit, triggerValidation, reset, errors } = useForm({ mode: 'onChange' })
 
@@ -32,6 +33,7 @@ export default function Profile () {
         query: HolofuelUserQuery
       }]
     })
+    setOptimisitcNickname(nickname)
     reset({ nickname: '' })
   }
 
@@ -43,7 +45,7 @@ export default function Profile () {
         <CopyAgentId agent={{ id }} isMe>
           <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
         </CopyAgentId>
-        <h3 styleName='nickname-display' data-testid='profile-nickname'>{nickname || 'Your Nickname'}</h3>
+        <h3 styleName='nickname-display' data-testid='profile-nickname'>{nickname || optimisitcNickname || 'Your Nickname'}</h3>
         <label styleName='field'>
           <h3 styleName='field-name'>Nickname</h3>
           <Input

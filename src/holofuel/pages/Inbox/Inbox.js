@@ -69,6 +69,7 @@ function useDecline () {
 
 function useCounterparty (agentId) {
   const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
+    fetchPolicy: 'cache-and-network',
     variables: { agentId }
   })
   return { holofuelCounterparty, loading }

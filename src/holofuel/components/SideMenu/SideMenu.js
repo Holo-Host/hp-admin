@@ -3,7 +3,7 @@ import cx from 'classnames'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
-import { presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount, presentAgentId } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import {
   HOME_PATH,
@@ -31,7 +31,7 @@ export default function SideMenu ({
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={48} styleName='avatar' />
         </CopyAgentId>
         <h3 styleName='nickname'>
-          {agent.nickname || (agentLoading && <>Loading...</>)}
+          {(agentLoading && <>Loading...</>) || agent.nickname || presentAgentId(agent.id)}
         </h3>
 
         <h1 styleName='balance'><DisplayBalance

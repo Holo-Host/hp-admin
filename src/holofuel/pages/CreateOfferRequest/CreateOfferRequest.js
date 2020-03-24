@@ -230,7 +230,9 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
 
   const { id, nickname } = holofuelCounterparty
   useEffect(() => {
-    setCounterpartyNick(nickname)
+    if (!isEmpty(nickname)) {
+      setCounterpartyNick(nickname)
+    }
   }, [setCounterpartyNick, nickname])
 
   useEffect(() => {
