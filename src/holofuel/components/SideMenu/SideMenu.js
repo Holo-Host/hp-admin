@@ -92,6 +92,7 @@ export default function SideMenu ({
             <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</a>
           </li>
         </ul>
+        <div styleName='version-info'>UI v{process.env.REACT_APP_VERSION}</div>
       </footer>
 
     </div>

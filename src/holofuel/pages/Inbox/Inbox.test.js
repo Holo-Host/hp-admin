@@ -157,7 +157,7 @@ const ledgerMock = {
 const mockWhoamiAgent = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
-  avatarUrl: ''
+  avatarUrl: null
 }
 
 const whoamiMock = {
@@ -328,21 +328,21 @@ describe('TransactionRow', () => {
   }
 
   const mockAgent1 = {
-    pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-    nick: 'Perry',
-    avatarUrl: ''
+    agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+    nickname: 'Perry',
+    avatar_url: ''
   }
 
   const mockWhoIsAgent1 = {
     id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry',
-    avatarUrl: ''
+    avatarUrl: null
   }
 
   const counterpartyQueryMock = {
     request: {
       query: HolofuelCounterpartyQuery,
-      variables: { agentId: mockAgent1.pub_sign_key }
+      variables: { agentId: mockAgent1.agent_address }
     },
     result: {
       data: { holofuelCounterparty: mockWhoIsAgent1 }
@@ -496,7 +496,7 @@ describe('TransactionRow', () => {
           query: HolofuelCounterpartyQuery,
           variables: { agentId: transaction.counterparty.id }
         },
-        result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null } } })
+        result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, avatarUrl: null } } })
       }
 
       const localOfferMock = {
