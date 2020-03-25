@@ -208,7 +208,11 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
 
+  console.log('hiddenTransactionIds', hiddenTransactionIds)
+
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
+
+  console.log('still rendering the partition')
 
   return <React.Fragment>
     <PageDivider title={dateLabel} />
@@ -226,10 +230,16 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 }
 
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction }) {
-  const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction // presentBalance,
+  const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
+
   const agent = canceledBy || counterparty
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpenRaw] = useState(false)
+
+  const setIsDrawerOpen = state => {
+    console.log('setting transaction', transaction.id, 'isDrawerOpen to', state)
+    setIsDrawerOpenRaw(state)
+  }
 
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request

@@ -19,6 +19,7 @@ import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import { presentAgentId, promiseMap } from '../../../utils'
+import { DIRECTION } from '../../../models/Transaction'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
@@ -169,6 +170,87 @@ const whoamiMock = {
     data: { holofuelUser: mockWhoamiAgent }
   }
 }
+
+describe('Inbox', () => {
+  // const timestamp = moment().set({ year: 2013, month: 3, day: 3 })
+  const timestamp = moment('2013-02-04')
+
+  const counterparty = { id: 'last 6', nickname: null, avatarUrl: null }
+  const canceledBy = null //, { id: null, nickname: null, avatarUrl: null }
+
+  const offer1 = {
+    id: '1',
+    counterparty,
+    canceledBy,
+    amount: 100,
+    timestamp,
+    type: TYPE.offer,
+    notes: 'Here\'s your money',
+    direction: DIRECTION.incoming,
+    status: STATUS.pending,
+    fees: 0,
+    isPayingARequest: false
+  }
+
+  const offer2 = {
+    id: '2',
+    counterparty,
+    canceledBy,
+    amount: 100,
+    timestamp,
+    type: TYPE.offer,
+    notes: 'Here\'s more of your money',
+    direction: DIRECTION.incoming,
+    status: STATUS.pending,
+    fees: 0,
+    isPayingARequest: false
+  }
+
+  const actionableTransactionsMock = {
+    request: {
+      query: HolofuelActionableTransactionsQuery
+    },
+    result: {
+      data: {
+        holofuelActionableTransactions: [offer1, offer2]
+      }
+    }
+  }
+
+  it('hides a partition when there are no more transactions in that partition', async () => {
+    const { debug, getByText, getAllByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={[ledgerMock, actionableTransactionsMock]} addTypename={false}>
+      <Inbox history={{}} />
+    </MockedProvider>)
+
+    expect(getByText('February 4th')).toBeInTheDocument()
+    const buttons = getAllByTestId('reveal-actions-button')
+
+    await act(async () => {
+      fireEvent.click(buttons[0])
+      wait(1000)
+    })
+
+    await act(async () => {
+      fireEvent.click(getAllByText('Accept')[0])
+    })
+
+    expect(getByText('February 4th')).toBeInTheDocument()
+
+    await act(async () => {
+      fireEvent.click(buttons[1])
+      wait(1000)
+    })
+
+    await act(async () => {
+      fireEvent.click(getAllByText('Accept')[1])
+      wait(6000)
+    })
+
+    debug()
+
+    expect(getByText('February 4th')).not.toBeInTheDocument()
+  })
+})
 
 describe('Ledger Jumbotron', () => {
   it('renders the balance and the empty state', async () => {
