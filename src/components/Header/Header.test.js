@@ -23,5 +23,5 @@ it('should render the title and a menu icon', async () => {
   expect(hamburgerClick).toHaveBeenCalled()
 
   fireEvent.click(getByTestId('avatar-link'))
-  expect(mockNavigateTo).toHaveBeenCalledWith('/settings')
+  expect(mockNavigateTo).toHaveBeenCalledWith('/admin/settings')
 })

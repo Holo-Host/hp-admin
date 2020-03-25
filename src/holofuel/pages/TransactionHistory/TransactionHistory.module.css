@@ -57,6 +57,7 @@
   letter-spacing: -0.4px;
   color: var(--color-rhino-50);
   padding-bottom: 7px;
+  cursor: pointer;
 }
 
 .selected {
@@ -87,6 +88,7 @@
   padding: 0 24px;
   align-items: center;
   height: 60px;
+  cursor: default;
 }
 
 .not-first-row {
@@ -144,17 +146,32 @@
   font-style: italic;
 }
 
+.disabled {
+  opacity: 0.8;
+  pointer-events: none;
+ }
+ 
+ .highlightGreen {
+   background-color: #CFF3EC;
+ }
+ 
+ .highlightRed {
+   background-color: #FCE3E8;
+ } 
+
 /* CancelButton */
 .cancel-button {
   color: white;
   border-radius: 50%;
   background-color: var(--color-amaranth);
-  font-weight: bold;
+  font-weight: bold ;
   width: 22px;
   height: 20px;
   padding-bottom: 2px;
   text-align: center;
   margin-left: 10px;
+  border: none;
+  cursor: pointer
 }
 
 /* Modal */

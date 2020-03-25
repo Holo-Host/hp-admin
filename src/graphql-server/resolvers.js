@@ -58,20 +58,6 @@ export const resolvers = {
 
     hposSettings: (_) => HposInterface.os.settings(),
 
-    hposConnection: async (_) => {
-      try {
-        await HposInterface.os.settings()
-      } catch (error) {
-        console.log('error >> ', error)
-        return {
-          connection: false
-        }
-      }
-      return {
-        connection: true
-      }
-    },
-
     hposStatus: HposInterface.os.status
   },
 
@@ -103,6 +89,8 @@ export const resolvers = {
 
     updateHostPricing: (_, { units, pricePerUnit }) => HhaDnaInterface.hostPricing.update(units, pricePerUnit),
 
+    holofuelUpdateUser: (_, { nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(nickname, avatarUrl),
+
     holofuelRequest: (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
 
     holofuelOffer: (_, { counterpartyId, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterpartyId, amount, notes, requestId),
@@ -115,7 +103,7 @@ export const resolvers = {
 
     holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
 
-    holofuelRefundDeclined: (_, { transactions }) => HoloFuelDnaInterface.transactions.refundDeclined(transactions),
+    holofuelRefundTransactions: (_, { transactions }) => HoloFuelDnaInterface.transactions.refundTransactions(transactions),
 
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 

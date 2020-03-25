@@ -1,5 +1,6 @@
-import moment from 'moment'
+import { useState, useEffect } from 'react'
 import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
+import moment from 'moment'
 
 export function bgImageStyle (url) {
   if (!url) return {}
@@ -21,6 +22,25 @@ export function sliceHash (hashString = '', desiredLength = 6) {
 
 export function presentAgentId (agentId) {
   return sliceHash(agentId, 6)
+}
+
+export function useLoadingFirstTime (loading) {
+  const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(false)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
+
+  useEffect(() => {
+    if (hasLoadedOnce) return
+
+    if (!isLoadingFirstTime && loading) {
+      setIsLoadingFirstTime(true)
+    }
+
+    if (isLoadingFirstTime && !loading) {
+      setHasLoadedOnce(true)
+    }
+  }, [loading, isLoadingFirstTime, setIsLoadingFirstTime, hasLoadedOnce, setHasLoadedOnce])
+
+  return !hasLoadedOnce && loading
 }
 
 export function presentHolofuelAmount (amount) {

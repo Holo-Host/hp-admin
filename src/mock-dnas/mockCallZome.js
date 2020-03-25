@@ -10,7 +10,7 @@ export default function mockCallZome (instanceId, zome, zomeFunc) {
     const funcOrResult = mockData[instanceId][zome][zomeFunc]
     const result = isFunction(funcOrResult) ? funcOrResult(args) : funcOrResult
     if (SIMULATE_DNA_LAG) {
-      await wait(2000 + (8000 * Math.random()))
+      await wait(1500 + (1000 * Math.random()))
     }
     return JSON.stringify({ Ok: result })
   }

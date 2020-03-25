@@ -109,6 +109,12 @@
   padding-left: 12px;
 }
 
+
+.null-state-loading {
+  margin-right: 6px;
+  margin-left: 6px;  
+}
+
 .transactions {
   padding: 25px;
   background-color: white;

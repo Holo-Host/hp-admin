@@ -35,7 +35,7 @@ type HostPricing {
 type HolofuelUser {
   id: ID
   nickname: String
-  notFound: Boolean
+  avatarUrl: String
 }
 
 enum TransactionType {
@@ -109,10 +109,6 @@ type HposAuth {
   hostSettings: HposSettings
 }
 
-type HposConnection {
-  connection: Boolean
-}
-
 input HolofuelUserInput {
   id: ID
   nickname: String
@@ -149,7 +145,6 @@ type Query {
   holofuelHistoryCounterparties: [HolofuelUser]
   hposSettings: HposSettings
   hposStatus: HposStatus
-  hposConnection: HposConnection
 }
 
 type Mutation {
@@ -158,13 +153,14 @@ type Mutation {
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
+  holofuelUpdateUser(nickname: String!, avatarUrl: String): HolofuelUser
   holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
   holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
   holofuelRecoverFunds(transactionId: ID): Transaction
-  holofuelRefundDeclined(transactions: [TransactionInput]): [Transaction]
+  holofuelRefundTransactions(transactions: [TransactionInput]): [Transaction]
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings
   hposUpdateVersion: HposStatus
   hposCheckAuth: HposAuth

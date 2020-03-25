@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { useMediaPredicate } from 'react-media-hook'
 import apolloClient from 'apolloClient'
 import ReactModal from 'react-modal'
@@ -14,10 +14,12 @@ import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import { WhoamiProvider as HFWhoamiProvider } from 'holofuel/contexts/useWhoamiContext'
+import AcceptRequestedOffers from './holofuel/AcceptRequestedOffers'
+import PromptForNickname from './holofuel/PromptForNickname'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
-  if (process.env.REACT_APP_HOLOFUEL_APP) {
+  if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
     return <HoloFuelApp />
   } else {
     return <HPAdminApp />
@@ -30,7 +32,11 @@ function HoloFuelAppCore () {
   return <HFScreenWidthContext.Provider value={isWide}>
     <HFWhoamiProvider>
       <HFFlashMessageProvider>
-        <HFRouter />
+        <AcceptRequestedOffers>
+          <PromptForNickname>
+            <HFRouter />
+          </PromptForNickname>
+        </AcceptRequestedOffers>
       </HFFlashMessageProvider>
     </HFWhoamiProvider>
   </HFScreenWidthContext.Provider>
@@ -54,8 +60,10 @@ export function HPAdminApp () {
           <AuthProvider>
             <WhoamiProvider>
               <FlashMessageProvider>
-                <HPAdminRouter />
-                <Route path='/holofuel' component={HoloFuelAppCore} />
+                <Switch>
+                  <Route path='/holofuel' component={HoloFuelAppCore} />
+                  <HPAdminRouter />
+                </Switch>
               </FlashMessageProvider>
             </WhoamiProvider>
           </AuthProvider>

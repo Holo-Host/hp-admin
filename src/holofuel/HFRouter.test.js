@@ -13,6 +13,7 @@ import {
 } from 'holofuel/utils/urls'
 
 jest.unmock('react-router-dom')
+jest.mock('components/AuthRoute')
 
 const makeMockHFPage = title => () => <div>
   <div data-testid='title'>{title}</div>

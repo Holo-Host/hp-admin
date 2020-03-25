@@ -20,7 +20,7 @@ export default function FlashMessage () {
   if (isEmpty(message)) return null
 
   return <div styleName='flash-message'>
-    <div styleName='message'>{message}</div>
+    <div styleName='flash-body'>{message}</div>
     <button styleName='close-button' onClick={clearMessage}>x</button>
   </div>
 }

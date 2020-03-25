@@ -20,7 +20,7 @@ export function SideMenu ({
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <CopyAgentId agent={{ id: whoami.hostPubKey }} isMe>
+        <CopyAgentId agent={{ id: whoami.hostPubKey }} hpAdmin isMe>
           <HashAvatar avatarUrl={avatarUrl} seed={whoami.hostPubKey} size={48} styleName='avatar' />
         </CopyAgentId>
         <h2 styleName='host-name'>
@@ -67,7 +67,7 @@ export function SideMenu ({
             <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='footer-link'>Help</a>
           </li>
           <li styleName='footer-list-item'>
-            <Link to='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</Link>
+            <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='footer-link'>View Terms of Service</a>
           </li>
         </ul>
       </footer>

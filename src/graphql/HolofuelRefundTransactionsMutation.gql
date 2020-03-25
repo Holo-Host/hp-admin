@@ -1,0 +1,14 @@
+mutation holofuelRefundTransactions ($transactions:[TransactionInput]) {
+  holofuelRefundTransactions (transactions: $transactions) {
+    id
+    amount
+    counterparty { id, nickname, avatarUrl }
+    direction
+    status
+    type
+    timestamp
+    fees 
+    presentBalance
+    notes
+  }
+}

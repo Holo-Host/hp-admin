@@ -17,7 +17,7 @@ export default function Header ({ title, hamburgerClick }) {
   return <div styleName='header'>
     <div styleName='left-nav'>{leftNav}</div>
     <h2 styleName='title'>{title}</h2>
-    <Link to='/settings' styleName='avatar-link' data-testid='avatar-link'>
+    <Link to='/admin/settings' styleName='avatar-link' data-testid='avatar-link'>
       <HashAvatar seed={whoami.hostPubKey} size={32} />
     </Link>
   </div>

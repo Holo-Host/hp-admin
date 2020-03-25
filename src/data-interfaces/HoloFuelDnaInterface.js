@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { pickBy } from 'lodash/fp'
+import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -63,7 +63,7 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
 
 const presentAcceptedPayment = async (acceptedPayment) => {
   const acceptedPaymentHash = acceptedPayment[1]
-  if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPaymentHash.Err)
+  if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
 
   const transactionId = acceptedPayment[0]
   const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
@@ -115,7 +115,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 }
 
 const presentDeclinedTransaction = declinedTx => {
-  if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
+  if (!declinedTx[2]) throw new Error(`The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : `, declinedTx)
   const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
   return {
     ...transaction,
@@ -124,7 +124,7 @@ const presentDeclinedTransaction = declinedTx => {
 }
 
 const presentIncomingCanceledTransaction = canceledTx => {
-  if (!canceledTx.event[2].Cancel.entry) throw new Error('The Canceled Transaction Entry (canceledTx.event[2].Cancel.entry) is UNDEFINED : ', canceledTx)
+  if (!canceledTx.event[2].Cancel.entry) throw new Error(`The Canceled Transaction Entry (canceledTx.event[2].Cancel.entry) is UNDEFINED : ${canceledTx}.`)
   let { event, provenance } = canceledTx
   event = [event[0], event[1], event[2].Cancel.entry]
   canceledTx = { ...canceledTx, event }
@@ -172,13 +172,13 @@ function presentTransaction (transaction) {
     case 'completed': {
       if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
       if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
-      throw new Error('Completed event did not have a Receipt or Cheque event')
+      throw new Error(`Completed event did not have a Receipt or Cheque event`)
     }
 
     case 'canceled': {
       if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
       if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
-      throw new Error('Canceled event did not have a Request or Promise event')
+      throw new Error(`Canceled event did not have a Request or Promise event`)
     }
     /* **************************  NOTE: ********************************** */
     /* The below two cases are 'waitingTransaction' cases. */
@@ -190,33 +190,38 @@ function presentTransaction (transaction) {
       return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
     default:
-      throw new Error('Error: No transaction stateStage was matched. Current transaction stateStage : ', stateStage)
+      throw new Error(`Error: No transaction stateStage was matched. Current transaction stateStage : ${stateStage}.`)
   }
 }
 
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
-      const result = await createZomeCall('transactions/whoami')()
-      if (result.Err) throw new Error('There was an error locating the current holofuel agent nickname. ERROR: ', result.Err)
-
+      const { agent_address: id, avatar_url: avatarUrl, nickname, Err } = await createZomeCall('profile/get_my_profile')()
+      if (Err) throw new Error(`There was an locating your holofuel agent ID. ERROR: ${Err}.`)
       return {
-        id: result.agent_id.pub_sign_key,
-        nickname: result.agent_id.nick
+        id,
+        avatarUrl: avatarUrl,
+        nickname: nickname
       }
     },
     getCounterparty: async ({ agentId }) => {
-      const result = await createZomeCall('transactions/whois')({ agents: agentId })
-      if (result.Err || !result[0].Ok) {
-        return {
-          id: agentId,
-          notFound: true
-        }
-      }
-
+      const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agent_address: agentId })
+      if (counterpartyProfileArray.Err) throw new Error(`There was an locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfileArray.Err}. `)
       return {
-        id: result[0].Ok.agent_id.pub_sign_key,
-        nickname: result[0].Ok.agent_id.nick
+        id: counterpartyProfileArray.agent_address,
+        avatarUrl: counterpartyProfileArray.avatar_url,
+        nickname: counterpartyProfileArray.nickname
+      }
+    },
+    update: async (nickname, avatarUrl) => {
+      const params = omitBy(param => param === undefined, { nickname, avatarUrl })
+      const { agent_address: id, avatar_url: newAvatarUrl, nickname: newNickname, Err } = await createZomeCall('profile/update_my_profile')(params)
+      if (Err) throw new Error(`There was an error udpating the current holofuel agent profile. ERROR: ${Err}. `)
+      return {
+        id,
+        avatarUrl: newAvatarUrl,
+        nickname: newNickname
       }
     }
   },
@@ -240,7 +245,6 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
-
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
@@ -286,11 +290,11 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
-      const whoami = await HoloFuelDnaInterface.user.get()
+      const myProfile = await HoloFuelDnaInterface.user.get()
 
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')
-        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
+        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: myProfile } : { ...tx, canceledBy: null })
 
       const presentedNonActionableTransactions = await getTxWithCounterparties(nonActionableTransactionsWithCancelByKey)
 
@@ -300,7 +304,7 @@ const HoloFuelDnaInterface = {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
       const transactionArray = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p)))
       if (transactionArray.length === 0) {
-        throw new Error(`no pending transaction with id ${transactionId} found.`)
+        throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
         return addFullCounterpartyToTx(transactionArray[0])
       }
@@ -311,7 +315,7 @@ const HoloFuelDnaInterface = {
       const transactionArray = declinedResult.map(presentDeclinedTransaction)
 
       if (transactionArray.length === 0) {
-        throw new Error(`no pending transaction with id ${transactionId} found.`)
+        throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else if (raw) {
         return {
           rawTransaction: declinedResult[0][2],
@@ -325,7 +329,7 @@ const HoloFuelDnaInterface = {
     decline: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId })
-      if (!declinedProof) throw new Error('Decline Error.', declinedProof)
+      if (!declinedProof) throw new Error(`Decline Error: ${declinedProof}.`)
       return {
         ...transaction,
         id: transactionId
@@ -336,7 +340,7 @@ const HoloFuelDnaInterface = {
       const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'])
       const transaction = authoredRequests.find(authoredRequest => authoredRequest.id === transactionId)
       const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: transactionId })
-      if (!canceledProof) throw new Error('Cancel Error.', canceledProof)
+      if (!canceledProof) throw new Error(`Cancel Error: ${canceledProof}.`)
 
       return {
         ...transaction,
@@ -349,7 +353,7 @@ const HoloFuelDnaInterface = {
       const { rawTransaction, transaction } = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId, { raw: true })
       const canceledProof = await createZomeCall('transactions/cancel')({ entry: rawTransaction })
       if (!canceledProof) {
-        throw new Error(`Recover Funds Error.  Couldn'\t find a transaction with id ${transactionId}`)
+        throw new Error(`Recover Funds Error.  Couldn'\t find a transaction with id ${transactionId}.`)
       }
 
       return {
@@ -358,11 +362,12 @@ const HoloFuelDnaInterface = {
         status: STATUS.canceled
       }
     },
-    refundDeclined: async (transactions) => {
+
+    refundTransactions: async (transactions) => {
       const listOfTransactionIds = transactions.map(({ id }) => id)
       const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
       if (!canceledProof) {
-        throw new Error(`Recover Funds Error.  Couldn'\t find a transactions with ids ${transactions}`)
+        throw new Error(`Recover Funds Error.  Couldn'\t find a transactions with ids ${transactions}.`)
       }
 
       const canceledDeclined = transactions.map(transaction => {
@@ -415,7 +420,7 @@ const HoloFuelDnaInterface = {
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
-      if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR: ', acceptedPaymentHash.Err)
+      if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
 
       return {
         ...transaction,
