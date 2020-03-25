@@ -58,11 +58,13 @@ export function PrimaryLayout ({
     {showHeader && <Header
       {...headerProps}
       hamburgerClick={showSideMenu && hamburgerClick}
-      settings={isConnected ? settings : {}} />}
+      settings={isConnected ? settings : {}}
+    />}
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      settings={isConnected ? settings : {}} />
+      settings={isConnected ? settings : {}}
+    />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />

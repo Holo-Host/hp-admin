@@ -15,6 +15,7 @@ export default function Loading ({
       type={type}
       color={color}
       height={height}
-      width={width} />
+      width={width}
+    />
   </div>
 }

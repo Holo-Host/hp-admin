@@ -14,8 +14,8 @@ function UserPromptMessage ({ newMessage }) {
     () => newMessage('', 0),
     [newMessage])
 
-  const userMessage = `It looks like you don't yet have a Holofuel Account Nickname. Visit your profile page to personalize your nickname so your peers can easily recognize you.`
-  const linkMessage = `Click here to visit your profile.`
+  const userMessage = 'It looks like you don\'t yet have a Holofuel Account Nickname. Visit your profile page to personalize your nickname so your peers can easily recognize you.'
+  const linkMessage = 'Click here to visit your profile.'
   return <>
     <div className='message'>{userMessage}</div>
     <br />
@@ -35,13 +35,13 @@ function PromptForNickname ({
   const history = useHistory()
   const pathname = history.location.pathname
 
-useEffect(() => {
-  setIsLoading(loading)
+  useEffect(() => {
+    setIsLoading(loading)
 
-  if (!isEmpty(id)) {
-    setWhoami({ id, nickname })
-  }
-}, [id, nickname, setWhoami, loading, setIsLoading])
+    if (!isEmpty(id)) {
+      setWhoami({ id, nickname })
+    }
+  }, [id, nickname, setWhoami, loading, setIsLoading])
 
   useEffect(() => {
     if (pathname === `/holofuel/${PROFILE_PATH}`) {

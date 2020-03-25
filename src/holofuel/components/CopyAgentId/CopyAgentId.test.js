@@ -23,7 +23,7 @@ it('render CopyToClipboard with "Your" in message when isMe', () => {
   }
 
   render(<CopyAgentId {...props}>
-    { children }
+    {children}
   </CopyAgentId>)
 
   expect(CopyToClipboard).toHaveBeenCalledWith(
@@ -48,7 +48,7 @@ it('render CopyToClipboard with nickname in message when nickname is available',
   }
 
   render(<CopyAgentId {...props}>
-    { children }
+    {children}
   </CopyAgentId>)
 
   expect(CopyToClipboard).toHaveBeenCalledWith(
@@ -72,7 +72,7 @@ it('render CopyToClipboard with last 6 of id in message when nickname is NOT ava
   }
 
   render(<CopyAgentId {...props}>
-    { children }
+    {children}
   </CopyAgentId>)
 
   expect(CopyToClipboard).toHaveBeenCalledWith(

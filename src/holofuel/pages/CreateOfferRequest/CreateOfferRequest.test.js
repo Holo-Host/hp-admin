@@ -144,7 +144,7 @@ describe('CreateOfferRequest', () => {
         await wait(50)
       })
 
-      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send yourself TestFuel.`, 5000)
+      expect(mockNewMessage).toHaveBeenCalledWith('You cannot send yourself TestFuel.', 5000)
     })
 
     it('renders the counterparty nickname upon *successful* fetch', async () => {

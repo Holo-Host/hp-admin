@@ -500,7 +500,7 @@ describe('TransactionRow', () => {
         newData: jest.fn()
       }
 
-      const mocks = [  
+      const mocks = [
         localOfferMock,
         declineMock,
         actionableTransactionsMock,

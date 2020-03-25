@@ -58,7 +58,8 @@ export default function Login ({ history: { push } }) {
             id='email'
             styleName='input'
             ref={register({ required: true })}
-            disabled={!isConnected} />
+            disabled={!isConnected}
+          />
           {errors.email && <small styleName='field-error'>
             You need to provide a valid email address.
           </small>}
@@ -70,7 +71,8 @@ export default function Login ({ history: { push } }) {
             id='password'
             styleName='input'
             ref={register({ required: true, minLength: 6 })}
-            disabled={!isConnected} />
+            disabled={!isConnected}
+          />
           {errors.password && <small styleName='field-error'>
             {errors.password.type === 'required' && 'Type in your password, please.'}
             {errors.password.type === 'minLength' && 'Password need to be at least 6 characters long.'}

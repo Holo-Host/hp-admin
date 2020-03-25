@@ -36,7 +36,8 @@ export default function SideMenu ({
 
         <h1 styleName='balance'><DisplayBalance
           holofuelBalance={holofuelBalance}
-          ledgerLoading={ledgerLoading} />
+          ledgerLoading={ledgerLoading}
+        />
         </h1>
       </header>
 

@@ -13,7 +13,8 @@ export default function HashIcon ({
       seed={hash}
       size={size}
       className={className}
-      circle />
+      circle
+    />
   </div>
 }
 

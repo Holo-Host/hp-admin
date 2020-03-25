@@ -58,7 +58,8 @@ export default function Home () {
               <div styleName='balance-amount'>
                 <DisplayBalance
                   ledgerLoading={isNil(holofuelBalance) && ledgerLoading}
-                  holofuelBalance={holofuelBalance} />
+                  holofuelBalance={holofuelBalance}
+                />
               </div>
               <div styleName='balance-arrow-wrapper'>
                 <ArrowRightIcon color='white' styleName='balance-arrow' />
@@ -87,7 +88,8 @@ export default function Home () {
           {!isTransactionsEmpty && <div styleName='transaction-list'>
             {firstSixTransactions.map(transaction => <TransactionRow
               transaction={transaction}
-              key={transaction.id} />)}
+              key={transaction.id}
+            />)}
           </div>}
         </div>
       </div>
