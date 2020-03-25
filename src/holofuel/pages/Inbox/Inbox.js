@@ -419,13 +419,9 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const { newMessage } = useFlashMessageContext()
   const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
 
-  console.log('confirmationModalProperties : ', confirmationModalProperties)
-
   const { id, amount, type, notes, counterparty = {} } = transaction
   const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
   const { id: activeCounterpartyId } = holofuelCounterparty
-
-  console.log('holofuelCounterparty : ', holofuelCounterparty)
 
   const counterpartyMessage = loadingCounterparty
     ? <div styleName='counterparty-message'>Verifying active status of your counterparty...<Loading styleName='counterparty-loading' width={15} height={15} /></div>

@@ -32,12 +32,10 @@ export default function Login ({ history: { push } }) {
     if (isAuthed) {
       push('/admin')
       const hostSettings = get('data.hposCheckAuth.hostSettings', authResult)
-      console.log('hostSettings : ', hostSettings)
       const hostWhoami = {
         hostPubKey: hostSettings.hostPubKey,
         hostName: hostSettings.hostName || ''
       }
-      console.log('hostWhoami : ', hostWhoami)
       setWhoami(hostWhoami)
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
