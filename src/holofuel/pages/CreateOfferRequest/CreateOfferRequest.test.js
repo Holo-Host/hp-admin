@@ -8,7 +8,6 @@ import { TYPE } from 'models/Transaction'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { presentHolofuelAmount } from 'utils'
@@ -17,6 +16,7 @@ import { HISTORY_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useWhoamiContext')
 
 const counterparty = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
@@ -69,25 +69,9 @@ const counterpartyQueryMock = {
   }
 }
 
-const mockProfile = {
-  id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-  nickname: 'Sam',
-  avatarUrl: ''
-}
-
-const myProfileQueryMock = {
-  request: {
-    query: HolofuelUserQuery
-  },
-  result: {
-    data: { holofuelUser: mockProfile }
-  }
-}
-
 const mocks = [
   offerMock,
   counterpartyQueryMock,
-  myProfileQueryMock
 ]
 
 const enterAmountAndMode = async ({ amount, modeLabel, getByTestId, getByText }) => {
@@ -143,24 +127,8 @@ describe('CreateOfferRequest', () => {
         jest.clearAllMocks()
       })
 
-      const mockProfile = {
-        id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nickname: 'Perry',
-        avatarUrl: ''
-      }
-
-      const myProfileQueryMock = {
-        request: {
-          query: HolofuelUserQuery
-        },
-        result: {
-          data: { holofuelUser: mockProfile }
-        }
-      }
-
       const mocks = [
-        counterpartyQueryMock,
-        myProfileQueryMock
+        counterpartyQueryMock
       ]
 
       const push = jest.fn()

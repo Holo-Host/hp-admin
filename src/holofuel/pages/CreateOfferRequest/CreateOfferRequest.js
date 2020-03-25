@@ -6,7 +6,6 @@ import * as yup from 'yup'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -15,6 +14,7 @@ import Button from 'components/UIButton'
 import Loading from 'components/Loading'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
+import useWhoamiContext from 'holofuel/contexts/useWhoamiContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
@@ -62,7 +62,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
 
-  const { data: { holofuelUser: myProfile = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { whoami: myProfile } = useWhoamiContext()
+
   const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
   const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== myProfile.id)
 

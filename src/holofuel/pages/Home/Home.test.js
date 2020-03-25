@@ -5,7 +5,6 @@ import Home from './Home'
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
@@ -16,6 +15,7 @@ import { history } from 'react-router-dom'
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useWhoamiContext')
 
 describe('Home', () => {
   describe('with no transactions', () => {
@@ -23,20 +23,6 @@ describe('Home', () => {
     const balance = '1234.56'
 
     const mocks = [
-      {
-        request: {
-          query: HolofuelUserQuery
-        },
-        result: {
-          data: {
-            holofuelUser: {
-              id: '1',
-              nickname,
-              avatarUrl: ''
-            }
-          }
-        }
-      },
       {
         request: {
           query: HolofuelLedgerQuery

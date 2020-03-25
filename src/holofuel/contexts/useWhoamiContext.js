@@ -4,8 +4,9 @@ export const WhoamiContext = createContext()
 
 export function WhoamiProvider ({ children }) {
   const [whoami, setWhoami] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
 
-  return <WhoamiContext.Provider value={{ whoami, setWhoami }}>
+  return <WhoamiContext.Provider value={{ whoami, setWhoami, isLoading, setIsLoading }}>
     {children}
   </WhoamiContext.Provider>
 }

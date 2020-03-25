@@ -26,17 +26,21 @@ function UserPromptMessage ({ newMessage }) {
 function PromptForNickname ({
   children
 }) {
-  const { data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { loading, data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery)
   
-  const { whoami, setWhoami} = useWhoamiContext
-  // // setWhoami({ id, nickname })
-  console.log('setWhoami : ', setWhoami)
-  console.log('whoami : ', whoami)
+  const { setWhoami, setIsLoading } = useWhoamiContext()
+  const { newMessage } = useFlashMessageContext()
   
   const [hasReceivedNotice, setHasReceivedNotice] = useState(false)
-  const { newMessage } = useFlashMessageContext()
   const history = useHistory()
   const pathname = history.location.pathname
+
+useEffect(() => {
+  if(!isEmpty(id)){
+    setWhoami({ id, nickname })
+  }
+  setIsLoading(loading)
+}, [id, nickname, setWhoami, loading, setIsLoading])
 
   useEffect(() => {
     if (pathname === `/holofuel/${PROFILE_PATH}`) {

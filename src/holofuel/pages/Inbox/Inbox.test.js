@@ -17,12 +17,12 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import { presentAgentId, promiseMap } from '../../../utils'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useWhoamiContext')
 
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).map(item => {
   if (item.event) {
@@ -154,21 +154,6 @@ const ledgerMock = {
   }
 }
 
-const mockWhoamiAgent = {
-  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry',
-  avatarUrl: null
-}
-
-const whoamiMock = {
-  request: {
-    query: HolofuelUserQuery
-  },
-  result: {
-    data: { holofuelUser: mockWhoamiAgent }
-  }
-}
-
 describe('Ledger Jumbotron', () => {
   it('renders the balance and the empty state', async () => {
     const { getByText, getAllByText } = await renderAndWait(<MockedProvider mocks={[ledgerMock]} addTypename={false}>
@@ -190,7 +175,6 @@ describe('Inbox Null States', () => {
   const mocks = [
     actionableTransactionsMock,
     nonPendingTransactionsMock,
-    whoamiMock,
     ledgerMock
   ]
 
@@ -350,7 +334,6 @@ describe('TransactionRow', () => {
   }
 
   const mocks = [
-    whoamiMock,
     offerMock,
     acceptOfferMock,
     declineMock,
@@ -465,7 +448,7 @@ describe('TransactionRow', () => {
       }
 
       const mocks = [
-        whoamiMock,
+  
         offerMock,
         declineMock,
         actionableTransactionsMock,
@@ -511,7 +494,7 @@ describe('TransactionRow', () => {
       }
 
       const mocks = [
-        whoamiMock,
+  
         localOfferMock,
         declineMock,
         actionableTransactionsMock,

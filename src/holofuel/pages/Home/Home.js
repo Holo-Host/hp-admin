@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import useWhoamiContext from 'holofuel/contexts/useWhoamiContext'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -25,9 +25,10 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 export default function Home () {
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
+  
+  const { whoami: holofuelUser } = useWhoamiContext()
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
-
+  
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
 
