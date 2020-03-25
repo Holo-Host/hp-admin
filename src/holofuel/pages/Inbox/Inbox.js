@@ -69,6 +69,7 @@ function useDecline () {
 
 function useCounterparty (agentId) {
   const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
+    fetchPolicy: 'cache-and-network',
     variables: { agentId }
   })
   return { holofuelCounterparty, loading }
@@ -435,12 +436,12 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
 
   const { id, amount, type, notes, counterparty = {} } = transaction
   const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
-  const { notFound } = holofuelCounterparty
+  const { id: activeCounterpartyId } = holofuelCounterparty
 
   const counterpartyMessage = loadingCounterparty
-    ? <div styleName='counterparty-message'>Verifying your counterparty is online <Loading styleName='counterparty-loading' width={15} height={15} /></div>
-    : notFound
-      ? <div styleName='counterparty-message'>Your counterparty can't be located on the network. Please confirm that your counterparty is online, and try again in a few minutes.</div>
+    ? <div styleName='counterparty-message'>Verifying active status of your counterparty...<Loading styleName='counterparty-loading' width={15} height={15} /></div>
+    : !activeCounterpartyId
+      ? <div styleName='counterparty-message'>Your counterparty can't be located on the network. If this error persists, please contact your Peer and confirm the Profile ID referenced is still active.</div>
       : null
 
   let message, actionHook, actionParams, contentLabel, flashMessage
@@ -528,7 +529,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
-        disabled={loadingCounterparty || notFound}>
+        disabled={loadingCounterparty || !activeCounterpartyId}>
         Yes
       </Button>
     </div>

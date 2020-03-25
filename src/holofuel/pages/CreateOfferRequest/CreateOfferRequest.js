@@ -223,28 +223,30 @@ export default function CreateOfferRequest ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage, myProfile }) {
+export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
     variables: { agentId }
   })
 
-  const { nickname, notFound, id } = holofuelCounterparty
+  const { id, nickname } = holofuelCounterparty
   useEffect(() => {
-    setCounterpartyNick(nickname)
+    if (!isEmpty(nickname)) {
+      setCounterpartyNick(nickname)
+    }
   }, [setCounterpartyNick, nickname])
 
   useEffect(() => {
     if (!loading) {
-      if (notFound) {
+      if (!id) {
         setCounterpartyFound(false)
-        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash, ensure your HoloFuel Peer is online, and try again after a few minutes.')
+        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash of your HoloFuel Peer and try again.')
       } else {
         setCounterpartyFound(true)
       }
     } else {
       setCounterpartyFound(false)
     }
-  }, [setCounterpartyFound, loading, notFound, newMessage, id])
+  }, [setCounterpartyFound, loading, newMessage, id])
 
   if (loading) {
     // TODO: Unsubscribe from Loader to avoid any potential mem leak.

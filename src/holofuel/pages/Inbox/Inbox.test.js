@@ -75,7 +75,7 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
 
 const { ledger } = transactionList
 
-describe('Inbox Connected (with Agent Nicknames)', () => {
+describe('Inbox connected (with Agent Nicknames)', () => {
   it('renders', async () => {
     const { getAllByRole, getByText } = await renderAndWait(<ApolloProvider client={apolloClient}>
       <Inbox history={{}} />
@@ -158,8 +158,7 @@ const ledgerMock = {
 const mockWhoamiAgent = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
-  avatarUrl: '',
-  notFound: false
+  avatarUrl: null
 }
 
 const whoamiMock = {
@@ -430,22 +429,21 @@ describe('TransactionRow', () => {
   }
 
   const mockAgent1 = {
-    pub_sign_key: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-    nick: 'Perry',
-    avatarUrl: ''
+    agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+    nickname: 'Perry',
+    avatar_url: ''
   }
 
   const mockWhoIsAgent1 = {
     id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry',
-    avatarUrl: '',
-    notFound: false
+    avatarUrl: null
   }
 
   const counterpartyQueryMock = {
     request: {
       query: HolofuelCounterpartyQuery,
-      variables: { agentId: mockAgent1.pub_sign_key }
+      variables: { agentId: mockAgent1.agent_address }
     },
     result: {
       data: { holofuelCounterparty: mockWhoIsAgent1 }
@@ -551,15 +549,10 @@ describe('TransactionRow', () => {
   describe('Accept Payment Modal', () => {
     it('responds properly', async () => {
       const transaction = { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' } }
-      const payTransaction = jest.fn(() => Promise.resolve())
 
       const props = {
         confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay' },
-        setConfirmationModalProperties: jest.fn(),
-        clearHighlightedTransaction: () => setTimeout(() => confirmationModalProperties, 5000),
-        payTransaction,
-        setCounterpartyNotFound: jest.fn(),
-        counterpartyNotFound: false
+        setConfirmationModalProperties: jest.fn()
       }
 
       const counterpartyQueryErrorMock = {
@@ -567,9 +560,8 @@ describe('TransactionRow', () => {
           query: HolofuelCounterpartyQuery,
           variables: { agentId: mockAgent1.pub_sign_key }
         },
-        result: () => {
-          props.counterpartyNotFound = true
-          return { data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, notFound: true } } }
+        result: {
+          data: { holofuelCounterparty: { Err: 'Agent ID not located in DNA dht.' } }
         }
       }
 
@@ -587,7 +579,6 @@ describe('TransactionRow', () => {
 
       expect(getByText(presentAgentId('HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'), { exact: false })).toBeInTheDocument()
       expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()
-      expect(props.counterpartyNotFound).toBe(true)
 
       fireEvent.click(getByText('Close Modal'))
       expect(props.setConfirmationModalProperties).toHaveBeenCalled()
@@ -598,10 +589,7 @@ describe('TransactionRow', () => {
 
       const props = {
         confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay', shouldDisplay: true },
-        setConfirmationModalProperties: jest.fn(),
-        clearHighlightedTransaction: () => setTimeout(() => confirmationModalProperties, 5000),
-        setCounterpartyNotFound: jest.fn(),
-        counterpartyNotFound: false
+        setConfirmationModalProperties: jest.fn()
       }
 
       const counterpartyQuery = {
@@ -609,7 +597,7 @@ describe('TransactionRow', () => {
           query: HolofuelCounterpartyQuery,
           variables: { agentId: transaction.counterparty.id }
         },
-        result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, notFound: false } } })
+        result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, avatarUrl: null } } })
       }
 
       const localOfferMock = {

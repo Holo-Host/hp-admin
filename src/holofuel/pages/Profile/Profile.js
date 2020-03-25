@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -20,8 +20,18 @@ function Card ({ title, subtitle, children }) {
 }
 
 export default function Profile () {
-  const { loading, data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading, data: { holofuelUser: { id, nickname } = {} } = {}, refetch: refetchHolofuelUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
+  const [optimisticNickname, setOptimisticNickname] = useState()
+  // FIXME: this is a temporary hack until we can debug the underlying issue in the DNA
+  const [hasRefetched, setHasRefetched] = useState(false)
+
+  useEffect(() => {
+    if (optimisticNickname && !hasRefetched) {
+      refetchHolofuelUser()
+      setHasRefetched(true)
+    }
+  }, [optimisticNickname, hasRefetched, refetchHolofuelUser])
 
   const { register, handleSubmit, triggerValidation, reset, errors } = useForm({ mode: 'onChange' })
 
@@ -32,6 +42,9 @@ export default function Profile () {
         query: HolofuelUserQuery
       }]
     })
+      .catch(() => setOptimisticNickname())
+    setOptimisticNickname(nickname)
+    setHasRefetched(false)
     reset({ nickname: '' })
   }
 
@@ -43,7 +56,7 @@ export default function Profile () {
         <CopyAgentId agent={{ id }} isMe>
           <HashAvatar seed={id} styleName='avatar-image' data-testid='host-avatar' />
         </CopyAgentId>
-        <h3 styleName='nickname-display' data-testid='profile-nickname'>{nickname || 'Your Nickname'}</h3>
+        <h3 styleName='nickname-display' data-testid='profile-nickname'>{optimisticNickname || nickname || 'Your Nickname'}</h3>
         <label styleName='field'>
           <h3 styleName='field-name'>Nickname</h3>
           <Input
