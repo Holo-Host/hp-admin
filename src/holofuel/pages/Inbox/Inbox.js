@@ -123,8 +123,6 @@ export default function Inbox ({ history: { push } }) {
 
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
 
-  const [actionsVisibleId, setActionsVisibleId] = useState()
-
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   let displayTransactions = []
   let isDisplayLoading
@@ -188,21 +186,13 @@ export default function Inbox ({ history: { push } }) {
     </>}
 
     {!isDisplayTransactionsEmpty && <div className='transaction-by-date-list'>
-      {partitionedTransactions.map(({ label: dateLabel, transactions }) => <React.Fragment key={dateLabel}>
-        <PageDivider title={dateLabel} />
-        <div styleName='transaction-list'>
-          {transactions.map(transaction => <TransactionRow
-            myProfile={myProfile}
-            transaction={transaction}
-            actionsVisibleId={actionsVisibleId}
-            setActionsVisibleId={setActionsVisibleId}
-            role='list'
-            view={VIEW}
-            isActionable={inboxView === VIEW.actionable}
-            setConfirmationModalProperties={setConfirmationModalProperties}
-            key={transaction.id} />)}
-        </div>
-      </React.Fragment>)}
+      {partitionedTransactions.map(({ label: dateLabel, transactions }) => <Partition
+        key={dateLabel}
+        dateLabel={dateLabel}
+        transactions={transactions}
+        userId={myProfile.id}
+        isActionable={inboxView === VIEW.actionable}
+        setConfirmationModalProperties={setConfirmationModalProperties} />)}
     </div>}
 
     <ConfirmationModal
@@ -212,16 +202,26 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, isActionable, myProfile }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable }) {
+  return <React.Fragment>
+    <PageDivider title={dateLabel} />
+    <div styleName='transaction-list'>
+      {transactions.map(transaction => <TransactionRow
+        userId={userId}
+        transaction={transaction}
+        role='list'
+        isActionable={isActionable}
+        setConfirmationModalProperties={setConfirmationModalProperties}
+        key={transaction.id} />)}
+    </div>
+  </React.Fragment>
+}
+
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId }) {
   const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction // presentBalance,
   const agent = canceledBy || counterparty
 
-  const drawerIsOpen = transaction.id === actionsVisibleId
-
-  const handleCloseReveal = () => {
-    if (!isEmpty(actionsVisibleId) && actionsVisibleId !== transaction.id) return setActionsVisibleId(transaction.id)
-    else return setActionsVisibleId(null)
-  }
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request
@@ -247,7 +247,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   let fullNotes
   if (isCanceled) {
     if (canceledBy) {
-      story = isOffer ? ` Canceled an Offer to ${counterparty.id === myProfile.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === myProfile.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+      story = isOffer ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
     }
     fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
   } else if (isDeclined) {
@@ -300,7 +300,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': drawerIsOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -310,7 +310,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {(agent.id === myProfile.id ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
+          {(agent.id === userId ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
@@ -335,13 +335,11 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
 
     {isActionable && !isLoading && !isDisabled && <>
       <RevealActionsButton
-        actionsVisibleId={actionsVisibleId}
-        visible={drawerIsOpen}
-        actionsClick={() => setActionsVisibleId(transaction.id)}
-        handleClose={handleCloseReveal}
+        isDrawerOpen={isDrawerOpen}
+        openDrawer={() => setIsDrawerOpen(true)}
+        closeDrawer={() => setIsDrawerOpen(false)}
       />
       {!isCanceled && <ActionOptions
-        actionsVisibleId={actionsVisibleId}
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}
@@ -350,19 +348,20 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
         showDeclineModal={showDeclineModal}
         showCancelModal={showCancelModal}
         isDeclined={isDeclined}
+        isDrawerOpen={isDrawerOpen}
       />}
     </>}
   </div>
 }
 
-function RevealActionsButton ({ actionsClick, handleClose, actionsVisibleId, visible }) {
-  return <div onClick={actionsVisibleId ? handleClose : actionsClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !(actionsVisibleId && visible) })} data-testid='reveal-actions-button'>
+function RevealActionsButton ({ openDrawer, closeDrawer, isDrawerOpen }) {
+  return <div onClick={isDrawerOpen ? closeDrawer : openDrawer} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !isDrawerOpen })} data-testid='reveal-actions-button'>
     <ForwardIcon styleName='forward-icon' color='#2c405a4d' dataTestId='forward-icon' />
   </div>
 }
 
-function ActionOptions ({ isOffer, isRequest, transaction, showAcceptModal, showPayModal, showDeclineModal, actionsVisibleId, isDeclined }) {
-  return <aside styleName={cx('drawer', { 'drawer-close': !(actionsVisibleId && transaction.id === actionsVisibleId) })}>
+function ActionOptions ({ isOffer, isRequest, transaction, showAcceptModal, showPayModal, showDeclineModal, isDeclined, isDrawerOpen }) {
+  return <aside styleName={cx('drawer', { 'drawer-close': !isDrawerOpen })}>
     <div styleName='actions'>
       <DeclineButton isDeclined={isDeclined} transaction={transaction} showDeclineModal={showDeclineModal} />
       {!isDeclined && isOffer && <AcceptButton transaction={transaction} showAcceptModal={showAcceptModal} />}
