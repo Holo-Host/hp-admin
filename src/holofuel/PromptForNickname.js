@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/react-hooks'
 import { isEmpty } from 'lodash/fp'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useWhoamiContext from 'holofuel/contexts/useWhoamiContext'
 import { PROFILE_PATH } from 'holofuel/utils/urls'
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -26,8 +27,12 @@ function PromptForNickname ({
   children
 }) {
   const { data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery)
+  
+  const { whoami, setWhoami} = useWhoamiContext
+  setWhoami({ id, nickname })
+  console.log('whoami : ', whoami)
+  
   const [hasReceivedNotice, setHasReceivedNotice] = useState(false)
-
   const { newMessage } = useFlashMessageContext()
   const history = useHistory()
   const pathname = history.location.pathname
