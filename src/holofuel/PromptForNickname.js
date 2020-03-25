@@ -38,10 +38,13 @@ function PromptForNickname ({
   const pathname = history.location.pathname
 
   useEffect(() => {
-    if (hasReceivedNotice) return
     if (pathname === `/holofuel/${PROFILE_PATH}`) {
       newMessage('', 0)
-    } else if (!isEmpty(id) && isEmpty(nickname)) {
+    }
+
+    // eslint-disable-next-line no-useless-return
+    if (hasReceivedNotice) return
+    else if (!isEmpty(id) && isEmpty(nickname)) {
       newMessage(<UserPromptMessage newMessage={newMessage} />, 0)
       setHasReceivedNotice(true)
     }

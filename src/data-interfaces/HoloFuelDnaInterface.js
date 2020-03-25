@@ -198,20 +198,27 @@ const HoloFuelDnaInterface = {
   user: {
     get: async () => {
       const { agent_address: id, avatar_url: avatarUrl, nickname, Err } = await createZomeCall('profile/get_my_profile')()
-      if (Err) throw new Error(`There was an locating your holofuel agent ID. ERROR: ${Err}.`)
+      if (Err) throw new Error(`There was an error locating your holofuel agent ID. ERROR: ${Err}.`)
       return {
         id,
-        avatarUrl: avatarUrl,
-        nickname: nickname
+        avatarUrl,
+        nickname
       }
     },
     getCounterparty: async ({ agentId }) => {
-      const counterpartyProfileArray = await createZomeCall('profile/get_profile')({ agent_address: agentId })
-      if (counterpartyProfileArray.Err) throw new Error(`There was an locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfileArray.Err}. `)
+      const counterpartyProfile = await createZomeCall('profile/get_profile')({ agent_address: agentId })
+      if (counterpartyProfile.Err) {
+        console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfile.Err}. `)
+        return {
+          id: null,
+          avatarUrl: null,
+          nickname: null
+        }
+      }
       return {
-        id: counterpartyProfileArray.agent_address,
-        avatarUrl: counterpartyProfileArray.avatar_url,
-        nickname: counterpartyProfileArray.nickname
+        id: counterpartyProfile.agent_address,
+        avatarUrl: counterpartyProfile.avatar_url,
+        nickname: counterpartyProfile.nickname
       }
     },
     update: async (nickname, avatarUrl) => {

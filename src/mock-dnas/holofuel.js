@@ -458,7 +458,7 @@ const holofuel = {
     // get_my_profile is only for discovering current / personal agent
     get_my_profile: () => agentArray[0],
     // get_profile is for discovering all other agents
-    get_profile: ({ agent_address: agents }) => typeof agents === 'string' ? Array.of(getProfile(agents)) : Array.of(agents.map(agent => getProfile(agent))),
+    get_profile: ({ agent_address: agentId }) => getProfile(agentId),
     update_my_profile: ({ nickname, avatar_url: avatarUrl }) => {
       const profile = agentArray[0]
       return { ...profile, nickname, avatar_url: avatarUrl }
