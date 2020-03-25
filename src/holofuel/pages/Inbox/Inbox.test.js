@@ -226,10 +226,50 @@ describe('Inbox', () => {
     }
   }
 
+  const acceptOffer1Mock = {
+    request: {
+      query: HolofuelAcceptOfferMutation,
+      variables: { transactionId: offer1.id }
+    },
+    newData: jest.fn(() => ({
+      data: {
+        holofuelAcceptOffer: offer1
+      }
+    }))
+  }
+
+  const acceptOffer2Mock = {
+    request: {
+      query: HolofuelAcceptOfferMutation,
+      variables: { transactionId: offer2.id }
+    },
+    newData: jest.fn(() => ({
+      data: {
+        holofuelAcceptOffer: offer2
+      }
+    }))
+  }
+
   it('hides a partition when there are no more transactions in that partition', async () => {
-    const { debug, getByText, getAllByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={[ledgerMock, actionableTransactionsMock, counterpartyMock, counterpartyMock, counterpartyMock]} addTypename={false}>
+    const mocks = [
+      ledgerMock,
+      ledgerMock,
+      ledgerMock,
+      actionableTransactionsMock,
+      actionableTransactionsMock,
+      actionableTransactionsMock,
+      acceptOffer1Mock,
+      acceptOffer2Mock,
+      counterpartyMock,
+      counterpartyMock,
+      counterpartyMock
+    ]
+
+    const { debug, getByText, getAllByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <Inbox history={{}} />
     </MockedProvider>)
+
+    jest.useFakeTimers()
 
     expect(getByText('February 4th')).toBeInTheDocument()
     const buttons = getAllByTestId('reveal-actions-button')
@@ -245,8 +285,10 @@ describe('Inbox', () => {
 
     await act(async () => {
       fireEvent.click(getByText('Yes'))
-      wait(1000)
+      jest.runAllTimers()
     })
+
+    jest.useFakeTimers()
 
     expect(getByText('February 4th')).toBeInTheDocument()
 
@@ -256,12 +298,16 @@ describe('Inbox', () => {
     })
 
     await act(async () => {
-      fireEvent.click(getAllByText('Accept')[0])
+      fireEvent.click(getByText('Accept'))
     })
 
     await act(async () => {
       fireEvent.click(getByText('Yes'))
-      wait(6000)
+      jest.runAllTimers()
+    })
+
+    await act(async () => {
+      wait(5000)
     })
 
     debug()

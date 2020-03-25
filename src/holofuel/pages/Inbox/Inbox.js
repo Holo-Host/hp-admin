@@ -43,15 +43,18 @@ function useOffer () {
 
 function useAcceptOffer () {
   const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)
-  return ({ id }) => acceptOffer({
-    variables: { transactionId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    },
-    {
-      query: HolofuelLedgerQuery
-    }]
-  })
+  return ({ id }) => {
+    console.log('calling acceptOffer mutation with id', id)
+    return acceptOffer({
+      variables: { transactionId: id },
+      refetchQueries: [{
+        query: HolofuelActionableTransactionsQuery
+      },
+      {
+        query: HolofuelLedgerQuery
+      }]
+    })
+  }
 }
 
 function useDecline () {
@@ -213,7 +216,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
 
-  console.log('still rendering the partition')
+  console.log('still rendering Partition')
 
   return <React.Fragment>
     <PageDivider title={dateLabel} />
@@ -235,12 +238,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
   const agent = canceledBy || counterparty
 
-  const [isDrawerOpen, setIsDrawerOpenRaw] = useState(false)
-
-  const setIsDrawerOpen = state => {
-    console.log('setting transaction', transaction.id, 'isDrawerOpen to', state)
-    setIsDrawerOpenRaw(state)
-  }
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request
@@ -283,12 +281,16 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const onConfirmGreen = () => {
     console.log('onConfirmGreen is called!')
     setHighlightGreen(true)
+    console.log('step 1')
     setIsDisabled(true)
+    console.log('step 2')
     setTimeout(() => {
+      console.log('step 3')
       setHighlightGreen(false)
-      console.log('timeout is called, hiding transaction!')
+      console.log('step 4')
       hideTransaction()
     }, 1000)
+    console.log('step 5')
   }
 
   const onConfirmRed = () => {
@@ -459,7 +461,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       break
     }
     case 'acceptOffer': {
-      console.log('rendering modal for accepting offer with id', id)
       contentLabel = 'Accept offer'
       actionParams = { id }
       actionHook = acceptOffer
@@ -502,19 +503,12 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const onYes = () => {
     console.log('modal onYes is called')
 
-    console.log('step 1')
-
     setIsLoading(true)
-
-    console.log('step 2')
 
     hideModal()
 
-    console.log('step 3')
-
     actionHook(actionParams)
       .then(() => {
-        console.log('step 4')
         onConfirm()
         newMessage(flashMessage, 5000)
         setIsLoading(false)
@@ -522,8 +516,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       .catch(() => {
         newMessage('Sorry, something went wrong', 5000)
       })
-
-    console.log('step 5')
   }
 
   return <Modal
