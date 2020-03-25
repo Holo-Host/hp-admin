@@ -29,7 +29,8 @@ function PromptForNickname ({
   const { data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery)
   
   const { whoami, setWhoami} = useWhoamiContext
-  setWhoami({ id, nickname })
+  // // setWhoami({ id, nickname })
+  console.log('setWhoami : ', setWhoami)
   console.log('whoami : ', whoami)
   
   const [hasReceivedNotice, setHasReceivedNotice] = useState(false)

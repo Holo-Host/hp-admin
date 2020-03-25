@@ -12,6 +12,9 @@ export default function Header ({ title, hamburgerClick }) {
     <MenuIcon styleName='menu-icon' />
   </Button>
 
+  console.log('whoami in header: ', whoami)
+  
+
   return <div styleName='header'>
     <div styleName='left-nav'>{leftNav}</div>
     <h2 styleName='title'>{title}</h2>
