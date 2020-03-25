@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, isNil } from 'lodash/fp'
+import { isEmpty, isNil, isEqual } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -203,21 +203,29 @@ export default function Inbox ({ history: { push } }) {
 }
 
 export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable }) {
+  const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
+
+  const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
+  const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
+
+  if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
+
   return <React.Fragment>
     <PageDivider title={dateLabel} />
     <div styleName='transaction-list'>
-      {transactions.map(transaction => <TransactionRow
-        userId={userId}
+      {transactions.map(transaction => transactionIsVisible(transaction.id) && <TransactionRow
         transaction={transaction}
-        role='list'
-        isActionable={isActionable}
         setConfirmationModalProperties={setConfirmationModalProperties}
+        isActionable={isActionable}
+        userId={userId}
+        hideTransaction={() => hideTransactionWithId(transaction.id)}
+        role='list'
         key={transaction.id} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction }) {
   const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction // presentBalance,
   const agent = canceledBy || counterparty
 
@@ -257,10 +265,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [highlightGreen, setHighlightGreen] = useState(false)
   const [highlightRed, setHighlightRed] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
-  const [isVisible, setIsVisible] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
 
-  if (!isVisible) return null
   if (agent.id === null) return null
 
   const onConfirmGreen = () => {
@@ -268,7 +274,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setIsDisabled(true)
     setTimeout(() => {
       setHighlightGreen(false)
-      setIsVisible(false)
+      hideTransaction()
     }, 5000)
   }
 
@@ -277,7 +283,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setIsDisabled(true)
     setTimeout(() => {
       setHighlightRed(false)
-      setIsVisible(false)
+      hideTransaction()
     }, 5000)
   }
 
