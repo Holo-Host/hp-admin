@@ -281,12 +281,14 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   if (agent.id === null) return null
 
   const onConfirmGreen = () => {
+    console.log('onConfirmGreen is called!')
     setHighlightGreen(true)
     setIsDisabled(true)
     setTimeout(() => {
       setHighlightGreen(false)
+      console.log('timeout is called, hiding transaction!')
       hideTransaction()
-    }, 5000)
+    }, 1000)
   }
 
   const onConfirmRed = () => {
@@ -498,12 +500,21 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   }
 
   const onYes = () => {
+    console.log('modal onYes is called')
+
+    console.log('step 1')
+
     setIsLoading(true)
+
+    console.log('step 2')
 
     hideModal()
 
+    console.log('step 3')
+
     actionHook(actionParams)
       .then(() => {
+        console.log('step 4')
         onConfirm()
         newMessage(flashMessage, 5000)
         setIsLoading(false)
@@ -511,6 +522,8 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       .catch(() => {
         newMessage('Sorry, something went wrong', 5000)
       })
+
+    console.log('step 5')
   }
 
   return <Modal

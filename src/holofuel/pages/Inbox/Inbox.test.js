@@ -171,11 +171,10 @@ const whoamiMock = {
 }
 
 describe('Inbox', () => {
-  // const timestamp = moment().set({ year: 2013, month: 3, day: 3 })
   const timestamp = moment('2013-02-04')
 
   const counterparty = { id: 'last 6', nickname: null, avatarUrl: null }
-  const canceledBy = null //, { id: null, nickname: null, avatarUrl: null }
+  const canceledBy = null
 
   const offer1 = {
     id: '1',
@@ -246,6 +245,7 @@ describe('Inbox', () => {
 
     await act(async () => {
       fireEvent.click(getByText('Yes'))
+      wait(1000)
     })
 
     expect(getByText('February 4th')).toBeInTheDocument()
