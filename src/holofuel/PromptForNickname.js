@@ -27,19 +27,20 @@ function PromptForNickname ({
   children
 }) {
   const { loading, data: { holofuelUser: { id, nickname } = {} } = {} } = useQuery(HolofuelUserQuery)
-  
+
   const { setWhoami, setIsLoading } = useWhoamiContext()
   const { newMessage } = useFlashMessageContext()
-  
+
   const [hasReceivedNotice, setHasReceivedNotice] = useState(false)
   const history = useHistory()
   const pathname = history.location.pathname
 
 useEffect(() => {
-  if(!isEmpty(id)){
+  setIsLoading(loading)
+
+  if (!isEmpty(id)) {
     setWhoami({ id, nickname })
   }
-  setIsLoading(loading)
 }, [id, nickname, setWhoami, loading, setIsLoading])
 
   useEffect(() => {

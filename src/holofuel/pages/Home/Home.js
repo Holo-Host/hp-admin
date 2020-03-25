@@ -25,10 +25,10 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 export default function Home () {
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  
+
   const { whoami: holofuelUser } = useWhoamiContext()
   const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
-  
+
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
 

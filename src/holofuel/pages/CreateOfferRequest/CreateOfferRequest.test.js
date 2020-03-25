@@ -71,7 +71,7 @@ const counterpartyQueryMock = {
 
 const mocks = [
   offerMock,
-  counterpartyQueryMock,
+  counterpartyQueryMock
 ]
 
 const enterAmountAndMode = async ({ amount, modeLabel, getByTestId, getByText }) => {
@@ -343,8 +343,7 @@ describe('CreateOfferRequest', () => {
 
     const mocks = [
       requestMock,
-      counterpartyQueryMock,
-      myProfileQueryMock
+      counterpartyQueryMock
     ]
 
     it('renders a form that can be filled out and submitted', async () => {

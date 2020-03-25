@@ -24,6 +24,7 @@ jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('holofuel/contexts/useWhoamiContext')
 
+// eslint-disable-next-line array-callback-return
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).map(item => {
   if (item.event) {
     if (item.event[2].Request) {
@@ -152,6 +153,12 @@ const ledgerMock = {
       }
     }
   }
+}
+
+const mockWhoamiAgent = {
+  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  nickname: 'Perry',
+  avatarUrl: null
 }
 
 describe('Ledger Jumbotron', () => {
@@ -448,7 +455,7 @@ describe('TransactionRow', () => {
       }
 
       const mocks = [
-  
+
         offerMock,
         declineMock,
         actionableTransactionsMock,
@@ -493,8 +500,7 @@ describe('TransactionRow', () => {
         newData: jest.fn()
       }
 
-      const mocks = [
-  
+      const mocks = [  
         localOfferMock,
         declineMock,
         actionableTransactionsMock,
