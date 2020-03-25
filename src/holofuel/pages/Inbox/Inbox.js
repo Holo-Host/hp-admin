@@ -456,6 +456,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       break
     }
     case 'acceptOffer': {
+      console.log('rendering modal for accepting offer with id', id)
       contentLabel = 'Accept offer'
       actionParams = { id }
       actionHook = acceptOffer

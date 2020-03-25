@@ -217,8 +217,19 @@ describe('Inbox', () => {
     }
   }
 
+  const counterpartyMock = {
+    request: {
+      query: HolofuelCounterpartyQuery
+    },
+    result: {
+      data: {
+        holofuelCounterparty: counterparty
+      }
+    }
+  }
+
   it('hides a partition when there are no more transactions in that partition', async () => {
-    const { debug, getByText, getAllByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={[ledgerMock, actionableTransactionsMock]} addTypename={false}>
+    const { debug, getByText, getAllByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={[ledgerMock, actionableTransactionsMock, counterpartyMock, counterpartyMock, counterpartyMock]} addTypename={false}>
       <Inbox history={{}} />
     </MockedProvider>)
 
@@ -234,6 +245,10 @@ describe('Inbox', () => {
       fireEvent.click(getAllByText('Accept')[0])
     })
 
+    await act(async () => {
+      fireEvent.click(getByText('Yes'))
+    })
+
     expect(getByText('February 4th')).toBeInTheDocument()
 
     await act(async () => {
@@ -242,7 +257,11 @@ describe('Inbox', () => {
     })
 
     await act(async () => {
-      fireEvent.click(getAllByText('Accept')[1])
+      fireEvent.click(getAllByText('Accept')[0])
+    })
+
+    await act(async () => {
+      fireEvent.click(getByText('Yes'))
       wait(6000)
     })
 
