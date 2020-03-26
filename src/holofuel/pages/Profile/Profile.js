@@ -77,7 +77,8 @@ export default function Profile () {
             defaultValue={nickname}
             placeholder='eg. HoloNaut'
             ref={register({ required: true, minLength: 5, maxLength: 20 })}
-            onKeyUp={() => triggerValidation('nickname')} />
+            onKeyUp={() => triggerValidation('nickname')}
+          />
           {errors.nickname && <small styleName='field-error'>
             Name must be between 5 and 20 characters.
           </small>}

@@ -161,10 +161,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
     <div styleName='mode-toggle'>
       {[OFFER_MODE, REQUEST_MODE].map((buttonMode, i) =>
-        <Button styleName={cx('mode-toggle-button', { 'left-button': i === 0, 'right-button': i === 1, selected: buttonMode === mode })}
+        <Button
+          styleName={cx('mode-toggle-button', { 'left-button': i === 0, 'right-button': i === 1, selected: buttonMode === mode })}
           variant='white'
           onClick={() => setMode(buttonMode)}
-          key={buttonMode}>
+          key={buttonMode}
+        >
           {modeVerbs[buttonMode]}
         </Button>)}
     </div>
@@ -179,7 +181,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
             styleName='form-input'
             placeholder='Who is this for?'
             ref={register}
-            onChange={({ target: { value } }) => setCounterpartyId(value)} />
+            onChange={({ target: { value } }) => setCounterpartyId(value)}
+          />
           <div styleName='hash-and-nick'>
             {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
             {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname' styleName='nickname'>
@@ -188,7 +191,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
                 setCounterpartyNick={setCounterpartyNick}
                 counterpartyNick={counterpartyNick}
                 setCounterpartyFound={setCounterpartyFound}
-                newMessage={newMessage} />
+                newMessage={newMessage}
+              />
             </h4>}
           </div>
         </div>
@@ -200,7 +204,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
           id='notes'
           styleName='form-input'
           placeholder='What is this for?'
-          ref={register} />
+          ref={register}
+        />
         <div />
       </div>
 
@@ -211,7 +216,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
         dataTestId='submit-button'
         variant='green'
         styleName={cx('send-button', { disabled: disableSubmit })}
-        disabled={disableSubmit}>{title}</Button>
+        disabled={disableSubmit}
+      >{title}
+      </Button>
     </form>
 
     <RecentCounterparties
@@ -219,7 +226,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
       agents={recentCounterpartiesWithoutMe}
       selectedAgentId={counterpartyId}
       selectAgent={selectAgent}
-      loading={loadingRecentCounterparties} />
+      loading={loadingRecentCounterparties}
+    />
   </PrimaryLayout>
 }
 
@@ -255,7 +263,8 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
         dataTestId='counterparty-loading'
         type='ThreeDots'
         height={30}
-        width={30} />
+        width={30}
+      />
     </>
   }
 

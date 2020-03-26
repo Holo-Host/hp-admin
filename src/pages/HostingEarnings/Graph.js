@@ -55,7 +55,8 @@ export default function Graph ({ transactions, days }) {
   }
 
   return <div styleName='graph'>
-    <VictoryChart height={400}
+    <VictoryChart
+      height={400}
       domainPadding={{ x: 25, y: [0, 20] }}
       scale={{ x: 'time' }}
       theme={chartTheme}

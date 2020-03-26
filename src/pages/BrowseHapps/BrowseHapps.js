@@ -34,7 +34,8 @@ export default function BrowseHapps ({ history: { push } }) {
           happ={happ}
           enableHapp={enableHapp}
           disableHapp={disableHapp}
-          key={happ.id} />)}
+          key={happ.id}
+        />)}
     </div>}
   </PrimaryLayout>
 }
@@ -49,7 +50,8 @@ export function HappRow ({ happ, enableHapp, disableHapp }) {
       <HostButton
         isEnabled={isEnabled}
         enableHapp={() => enableHapp(id)}
-        disableHapp={() => disableHapp(id)} />
+        disableHapp={() => disableHapp(id)}
+      />
     </div>
   </div>
 }
@@ -65,6 +67,6 @@ function HostButton ({ isEnabled, enableHapp, disableHapp }) {
     action()
   }
   return <Button onClick={onClick} variant={isEnabled ? 'green' : 'white'} styleName='host-button'>
-    {isEnabled ? 'Unhost' : 'Host' }
+    {isEnabled ? 'Unhost' : 'Host'}
   </Button>
 }

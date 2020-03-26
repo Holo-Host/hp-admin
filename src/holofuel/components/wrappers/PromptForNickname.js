@@ -14,7 +14,7 @@ function UserPromptMessage ({ newMessage }) {
 
   return <>
     <div className='message'>
-      It looks like you don't yet have a Holofuel Account Nickname. Visit your profile page to personalize your nickname so your peers can easily recognize you.
+      It looks like you don\'t yet have a Holofuel Account Nickname. Visit your profile page to personalize your nickname so your peers can easily recognize you.
     </div>
     <br />
     <Link to={PROFILE_PATH} onClick={resetFlashMessage}>
@@ -27,14 +27,16 @@ function PromptForNickname ({
   children
 }) {
   const { currentUser: { id, nickname } } = useCurrentUserContext()
-  const [hasReceivedNotice, setHasReceivedNotice] = useState(false)
-
   const { newMessage } = useFlashMessageContext()
+
+  const [hasReceivedNotice, setHasReceivedNotice] = useState(false)
   const history = useHistory()
   const pathname = history.location.pathname
 
   useEffect(() => {
-    if (pathname === `/holofuel/${PROFILE_PATH}`) return
+    if (pathname === `/holofuel/${PROFILE_PATH}`) {
+      newMessage('', 0)
+    }
 
     if (hasReceivedNotice) return
 
