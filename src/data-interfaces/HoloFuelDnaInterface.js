@@ -248,7 +248,7 @@ const HoloFuelDnaInterface = {
       const params = since ? { since } : {}
 
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
-      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error));
+      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
@@ -262,7 +262,7 @@ const HoloFuelDnaInterface = {
     },
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
-      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error));
+      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
       const noDuplicateIdsWaitingList = _.uniqBy(nonActionableTransactions, 'id')
       const transactionIds = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
@@ -281,7 +281,7 @@ const HoloFuelDnaInterface = {
     allEarnings: () => mockEarningsData,
     allNonActionableByState: async (transactionId, stateFilter = []) => {
       const { transactions } = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
-      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error));
+      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const cleanedList = _.uniqBy(nonActionableTransactions, 'id')
 
       if (cleanedList.length === 0) {
@@ -293,7 +293,7 @@ const HoloFuelDnaInterface = {
     /* NOTE: allNonPending will include Declined and Canceled Transactions:  */
     allNonPending: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
-      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error));
+      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
       const myProfile = await HoloFuelDnaInterface.user.get()
