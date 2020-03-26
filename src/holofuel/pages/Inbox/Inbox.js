@@ -43,18 +43,15 @@ function useOffer () {
 
 function useAcceptOffer () {
   const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)
-  return ({ id }) => {
-    console.log('calling acceptOffer mutation with id', id)
-    return acceptOffer({
-      variables: { transactionId: id },
-      refetchQueries: [{
-        query: HolofuelActionableTransactionsQuery
-      },
-      {
-        query: HolofuelLedgerQuery
-      }]
-    })
-  }
+  return ({ id }) => acceptOffer({
+    variables: { transactionId: id },
+    refetchQueries: [{
+      query: HolofuelActionableTransactionsQuery
+    },
+    {
+      query: HolofuelLedgerQuery
+    }]
+  })
 }
 
 function useDecline () {
@@ -212,11 +209,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
 
-  console.log('hiddenTransactionIds', hiddenTransactionIds)
-
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
-
-  console.log('still rendering Partition')
 
   return <React.Fragment>
     <PageDivider title={dateLabel} />
@@ -279,18 +272,12 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   if (agent.id === null) return null
 
   const onConfirmGreen = () => {
-    console.log('onConfirmGreen is called!')
     setHighlightGreen(true)
-    console.log('step 1')
     setIsDisabled(true)
-    console.log('step 2')
     setTimeout(() => {
-      console.log('step 3')
       setHighlightGreen(false)
-      console.log('step 4')
       hideTransaction()
     }, 1000)
-    console.log('step 5')
   }
 
   const onConfirmRed = () => {
@@ -501,8 +488,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   }
 
   const onYes = () => {
-    console.log('modal onYes is called')
-
     setIsLoading(true)
 
     hideModal()
