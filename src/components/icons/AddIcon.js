@@ -11,7 +11,7 @@ export default function AddIcon ({ className, color = '#000000' }) {
     color={color}
     title={title}
     className={className}
-         >
+  >
     <path d={path} />
   </Icon>
 }

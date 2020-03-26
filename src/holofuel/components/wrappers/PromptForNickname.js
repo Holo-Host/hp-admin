@@ -34,7 +34,7 @@ function PromptForNickname ({
   const pathname = history.location.pathname
 
   useEffect(() => {
-    if (pathname === `/holofuel/${PROFILE_PATH}`)  {
+    if (pathname === `/holofuel/${PROFILE_PATH}`) {
       newMessage('', 0)
     }
 

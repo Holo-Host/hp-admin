@@ -12,7 +12,7 @@ export default function ForwardIcon ({ className, color = '#000000', dataTestId 
     title={title}
     className={className}
     dataTestId={dataTestId}
-         >
+  >
     <path d={path} />
   </Icon>
 }
