@@ -1,100 +1,32 @@
 import React from 'react'
 import { MockedProvider } from '@apollo/react-testing'
-import wait from 'waait'
-import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
-import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import { renderAndWait } from 'utils/test-utils'
-import { DIRECTION, STATUS, TYPE } from 'models/Transaction'
-import AcceptRequestedOffers from './AcceptRequestedOffers'
+import LoadCurrentUser from './LoadCurrentUser'
 
-describe('AcceptRequestedOffers', () => {
-  const counterparty = {
-    id: 101,
-    nickname: 'bill'
-  }
-
-  const offer = {
-    id: 1,
-    amount: '222',
-    counterparty,
-    direction: DIRECTION.incoming,
-    status: STATUS.pending,
-    type: TYPE.offer,
-    timestamp: '123',
-    notes: '',
-    fees: '',
-    isPayingARequest: false,
-    canceledBy: {
-      id: null,
-      nickname: null
-    }
-  }
-
-  const offerPayingRequest = {
-    ...offer,
-    id: 2,
-    isPayingARequest: true
-  }
-
-  const ledgerMock = {
+describe('LoadCurrentUser', () => {
+  const holofuelUserMock = {
     request: {
-      query: HolofuelLedgerQuery
+      query: HolofuelUserQuery
     },
     result: {
       data: {
-        holofuelLedger: {
-          balance: '1110000',
-          credit: 0,
-          payable: 0,
-          receivable: 0,
-          fees: 0
+        holofuelUser: {
+          id: 1,
+          nickname: 'Alice',
+          avatarUrl: ''
         }
       }
     }
   }
 
-  const actionableTransactionsMock = {
-    request: {
-      query: HolofuelActionableTransactionsQuery
-    },
-    result: {
-      data: {
-        holofuelActionableTransactions: [offer, offerPayingRequest]
-      }
-    },
-    newData: jest.fn(() => ({
-      data: {
-        holofuelActionableTransactions: [offer]
-      }
-    }))
-  }
-
-  const acceptOfferMock = {
-    request: {
-      query: HolofuelAcceptOfferMutation,
-      variables: { transactionId: offerPayingRequest.id }
-    },
-    newData: jest.fn(() => ({
-      data: {
-        holofuelAcceptOffer: offerPayingRequest
-      }
-    }))
-  }
-
   const mocks = [
-    actionableTransactionsMock,
-    acceptOfferMock,
-    ledgerMock
+    holofuelUserMock
   ]
 
-  it.skip('calls acceptOfferMutation with incoming payments for requests', async () => {
+  it.skip('sets CurrentUserContext with the Holofuel User', async () => {
     await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-      <AcceptRequestedOffers />
+      <LoadCurrentUser />
     </MockedProvider>)
-
-    await wait(4000)
-
-    expect(acceptOfferMock.newData).toHaveBeenCalled()
   })
 })

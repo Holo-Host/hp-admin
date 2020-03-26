@@ -14,17 +14,13 @@ function LoadCurrentUser ({
   const { setCurrentUser, setCurrentUserLoading, currentUserLoading } = useCurrentUserContext()
 
   useEffect(() => {
-    console.log('running currentUser effect')
     if (!isEmpty(holofuelUser)) {
-      console.log('updating currentUser', holofuelUser)
       setCurrentUser(holofuelUser)
     }
   }, [holofuelUser, setCurrentUser])
 
   useEffect(() => {
-    console.log('running LOADING effect')
     if (loadingFirstTime !== currentUserLoading) {
-      console.log('updating LOADING', loadingFirstTime)
       setCurrentUserLoading(loadingFirstTime)
     }
   }, [loadingFirstTime, currentUserLoading, setCurrentUserLoading])
