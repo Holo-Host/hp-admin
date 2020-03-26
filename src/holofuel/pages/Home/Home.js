@@ -3,7 +3,6 @@ import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -12,6 +11,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HashAvatar from 'components/HashAvatar'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
@@ -25,8 +25,10 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 export default function Home () {
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
-  const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
+
+  const { currentUser } = useCurrentUserContext()
+
+  const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
@@ -40,8 +42,8 @@ export default function Home () {
     <div styleName='container'>
       <div styleName='backdrop' />
       <div styleName='avatar'>
-        <CopyAgentId agent={holofuelUser} isMe>
-          <HashAvatar seed={holofuelUser.id} size={48} />
+        <CopyAgentId agent={currentUser} isMe>
+          <HashAvatar seed={currentUser.id} size={48} />
         </CopyAgentId>
       </div>
       <h2 styleName='greeting'>{greeting}</h2>

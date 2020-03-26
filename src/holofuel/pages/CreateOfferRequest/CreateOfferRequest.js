@@ -6,7 +6,6 @@ import * as yup from 'yup'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -16,6 +15,7 @@ import Loading from 'components/Loading'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
@@ -62,9 +62,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
 
-  const { data: { holofuelUser: myProfile = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { currentUser } = useCurrentUserContext()
   const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== myProfile.id)
+  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== currentUser.id)
 
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
@@ -78,10 +78,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
 
-    if (counterpartyId === myProfile.id) {
+    if (counterpartyId === currentUser.id) {
       newMessage('You cannot send yourself TestFuel.', 5000)
     }
-  }, [myProfile.id, counterpartyId, newMessage])
+  }, [currentUser.id, counterpartyId, newMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
@@ -126,7 +126,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
     !isCounterpartyFound ||
-    counterpartyId === myProfile.id ||
+    counterpartyId === currentUser.id ||
     amount < 0
 
   if (numpadVisible) {
