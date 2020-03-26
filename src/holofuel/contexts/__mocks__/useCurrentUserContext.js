@@ -7,11 +7,11 @@ export const currentUser = {
 const currentUserLoading = false
 
 export const setCurrentUser = jest.fn()
-export const setCurrentLoading = jest.fn()
+export const setCurrentUserLoading = jest.fn()
 
 export default () => ({
   currentUser,
   currentUserLoading,
   setCurrentUser,
-  setCurrentLoading
+  setCurrentUserLoading
 })
