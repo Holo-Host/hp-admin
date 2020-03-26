@@ -3,7 +3,6 @@ import cx from 'classnames'
 import { isEmpty, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
@@ -22,6 +21,7 @@ import HashAvatar from 'components/HashAvatar'
 import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
@@ -110,7 +110,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
-  const { data: { holofuelUser: myProfile = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { currentUser } = useCurrentUserContext()
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
@@ -193,7 +193,7 @@ export default function Inbox ({ history: { push } }) {
         <PageDivider title={dateLabel} />
         <div styleName='transaction-list'>
           {transactions.map(transaction => <TransactionRow
-            myProfile={myProfile}
+            currentUser={currentUser}
             transaction={transaction}
             actionsVisibleId={actionsVisibleId}
             setActionsVisibleId={setActionsVisibleId}
@@ -213,7 +213,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, isActionable, myProfile }) {
+export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisibleId, setConfirmationModalProperties, isActionable, currentUser }) {
   const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction // presentBalance,
   const agent = canceledBy || counterparty
 
@@ -248,7 +248,9 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
   let fullNotes
   if (isCanceled) {
     if (canceledBy) {
-      story = isOffer ? ` Canceled an Offer to ${counterparty.id === myProfile.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === myProfile.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+      story = isOffer
+        ? ` Canceled an Offer to ${counterparty.id === currentUser.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+        : ` Canceled a Request from ${counterparty.id === currentUser.id ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
     }
     fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
   } else if (isDeclined) {
@@ -311,7 +313,7 @@ export function TransactionRow ({ transaction, setActionsVisibleId, actionsVisib
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {(agent.id === myProfile.id ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
+          {(agent.id === currentUser.id ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
