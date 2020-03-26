@@ -8,7 +8,7 @@ import ReactModal from 'react-modal'
 import HFRouter from './holofuel/HFRouter'
 import ScreenWidthContext from 'contexts/screenWidth'
 import { ConnectionProvider } from 'contexts/useConnectionContext'
-import { WhoamiProvider } from 'contexts/useWhoamiContext'
+import { CurrentUserProvider } from 'contexts/useCurrentUserContext'
 import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
@@ -61,14 +61,14 @@ export function HPAdminApp () {
       <ScreenWidthContext.Provider value={isWide}>
         <ConnectionProvider>
           <AuthProvider>
-            <WhoamiProvider>
+            <CurrentUserProvider>
               <FlashMessageProvider>
                 <Switch>
                   <Route path='/holofuel' component={HoloFuelAppCore} />
                   <HPAdminRouter />
                 </Switch>
               </FlashMessageProvider>
-            </WhoamiProvider>
+            </CurrentUserProvider>
           </AuthProvider>
         </ConnectionProvider>
       </ScreenWidthContext.Provider>

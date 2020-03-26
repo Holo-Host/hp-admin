@@ -4,7 +4,7 @@ import { mockNavigateTo } from 'react-router-dom'
 import Header from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
 
-jest.mock('contexts/useWhoamiContext')
+jest.mock('contexts/useCurrentUserContext')
 
 it('should render the title and a menu icon', async () => {
   const hamburgerClick = jest.fn()

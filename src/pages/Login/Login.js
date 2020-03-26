@@ -8,7 +8,7 @@ import Button from 'components/UIButton'
 import HoloFuelIcon from 'components/icons/HoloFuelIcon'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useAuthContext from 'contexts/useAuthContext'
-import useWhoamiContext from 'contexts/useWhoamiContext'
+import useCurrentUserContext from 'contexts/useCurrentUserContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
 import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
@@ -18,7 +18,7 @@ export default function Login ({ history: { push } }) {
   const { register, handleSubmit, errors } = useForm()
   const { isConnected } = useConnectionContext()
   const { setIsAuthed } = useAuthContext()
-  const { setWhoami } = useWhoamiContext()
+  const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
 
   const onSubmit = async ({ email, password }) => {
@@ -32,11 +32,11 @@ export default function Login ({ history: { push } }) {
     if (isAuthed) {
       push('/admin')
       const hostSettings = get('data.hposCheckAuth.hostSettings', authResult)
-      const hostWhoami = {
+      const hostCurrentUser = {
         hostPubKey: hostSettings.hostPubKey,
         hostName: hostSettings.hostName || ''
       }
-      setWhoami(hostWhoami)
+      setCurrentUser(hostCurrentUser)
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     }

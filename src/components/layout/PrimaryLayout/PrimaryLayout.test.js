@@ -6,7 +6,7 @@ import PrimaryLayout from './PrimaryLayout'
 jest.mock('contexts/useFlashMessageContext')
 jest.mock('contexts/useConnectionContext')
 jest.mock('contexts/useAuthContext')
-jest.mock('contexts/useWhoamiContext')
+jest.mock('contexts/useCurrentUserContext')
 jest.mock('components/Header')
 
 it('should render the header and children', async () => {
