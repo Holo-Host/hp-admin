@@ -5,23 +5,25 @@ import HashAvatar from 'components/HashAvatar'
 import CopyAgentId from 'components/CopyAgentId'
 import GearIcon from 'components/icons/GearIcon'
 import AlphaFlag from 'components/AlphaFlag'
+import useWhoamiContext from 'contexts/useWhoamiContext'
 import { presentAgentId } from 'utils'
 import './SideMenu.module.css'
 
 export function SideMenu ({
   isOpen,
   handleClose,
-  avatarUrl = '',
-  settings
+  avatarUrl = ''
 }) {
+  const { whoami } = useWhoamiContext()
+
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
-          <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} size={48} styleName='avatar' />
+        <CopyAgentId agent={{ id: whoami.hostPubKey }} hpAdmin isMe>
+          <HashAvatar avatarUrl={avatarUrl} seed={whoami.hostPubKey} size={48} styleName='avatar' />
         </CopyAgentId>
         <h2 styleName='host-name'>
-          {settings.hostName || presentAgentId(settings.hostPubKey)}
+          {whoami.hostName || presentAgentId(whoami.hostPubKey)}
         </h2>
 
         <Link to='/admin/settings' styleName='settings-link'>

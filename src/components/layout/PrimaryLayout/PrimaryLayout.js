@@ -10,6 +10,7 @@ import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
+import useWhoamiContext from 'contexts/useWhoamiContext'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -22,6 +23,7 @@ export function PrimaryLayout ({
   showAlphaFlag = true
 }) {
   const { setIsConnected, isConnected } = useConnectionContext()
+  const { setWhoami } = useWhoamiContext()
 
   const onError = ({ graphQLErrors }) => {
     const { isHposConnectionActive } = graphQLErrors
@@ -40,8 +42,12 @@ export function PrimaryLayout ({
       newMessage('Your Holoport is currently unreachable.', 0)
     } else {
       newMessage('', 0)
+      setWhoami({
+        hostPubKey: settings.hostPubKey,
+        hostName: settings.hostName || ''
+      })
     }
-  }, [isConnected, setIsConnected, newMessage])
+  }, [isConnected, setIsConnected, newMessage, setWhoami, settings.hostPubKey, settings.hostName])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -52,11 +58,13 @@ export function PrimaryLayout ({
     {showHeader && <Header
       {...headerProps}
       hamburgerClick={showSideMenu && hamburgerClick}
-      settings={isConnected ? settings : {}} />}
+      settings={isConnected ? settings : {}}
+    />}
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      settings={isConnected ? settings : {}} />
+      settings={isConnected ? settings : {}}
+    />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />

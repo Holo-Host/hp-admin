@@ -27,10 +27,12 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
 
   return <PrimaryLayout showAlphaFlag={false}>
     <div styleName='amount-input-container'>
-      <input styleName='amount-input-amount'
+      <input
+        styleName='amount-input-amount'
         data-testid='amount'
         onChange={e => setInputValue(e.target.value)}
-        value={`${presentHolofuelString(inputValue)}`} />
+        value={`${presentHolofuelString(inputValue)}`}
+      />
       <div styleName='numpad'>
         {[1, 4, 7].map(rowStart => <div styleName='numpad-row' key={rowStart}>
           {[0, 1, 2].map(offset => <button styleName='numpad-button' onClick={addDigit(rowStart + offset)} key={offset}>

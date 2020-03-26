@@ -115,7 +115,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 }
 
 const presentDeclinedTransaction = declinedTx => {
-  if (!declinedTx[2]) throw new Error(`The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : `, declinedTx)
+  if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
   const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
   return {
     ...transaction,
@@ -172,13 +172,13 @@ function presentTransaction (transaction) {
     case 'completed': {
       if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
       if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
-      throw new Error(`Completed event did not have a Receipt or Cheque event`)
+      throw new Error('Completed event did not have a Receipt or Cheque event')
     }
 
     case 'canceled': {
       if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
       if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
-      throw new Error(`Canceled event did not have a Request or Promise event`)
+      throw new Error('Canceled event did not have a Request or Promise event')
     }
     /* **************************  NOTE: ********************************** */
     /* The below two cases are 'waitingTransaction' cases. */
