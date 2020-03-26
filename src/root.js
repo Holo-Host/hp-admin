@@ -12,7 +12,10 @@ import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
-import AcceptRequestedOffers from './holofuel/AcceptRequestedOffers'
+import { CurrentUserProvider as HFCurrentUserProvider } from 'holofuel/contexts/useCurrentUserContext'
+import AcceptRequestedOffers from 'holofuel/components/wrappers/AcceptRequestedOffers'
+import LoadCurrentUser from 'holofuel/components/wrappers/LoadCurrentUser'
+
 import PromptForNickname from './holofuel/PromptForNickname'
 import HPAdminRouter from './HPAdminRouter'
 
@@ -29,11 +32,15 @@ function HoloFuelAppCore () {
 
   return <HFScreenWidthContext.Provider value={isWide}>
     <HFFlashMessageProvider>
-      <AcceptRequestedOffers>
-        <PromptForNickname>
-          <HFRouter />
-        </PromptForNickname>
-      </AcceptRequestedOffers>
+      <HFCurrentUserProvider>
+        <LoadCurrentUser>
+          <AcceptRequestedOffers>
+            <PromptForNickname>
+              <HFRouter />
+            </PromptForNickname>
+          </AcceptRequestedOffers>
+        </LoadCurrentUser>
+      </HFCurrentUserProvider>
     </HFFlashMessageProvider>
   </HFScreenWidthContext.Provider>
 }

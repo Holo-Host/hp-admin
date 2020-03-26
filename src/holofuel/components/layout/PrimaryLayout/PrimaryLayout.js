@@ -3,9 +3,9 @@ import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import ScreenWidthContext from 'holofuel/contexts/screenWidth'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
@@ -21,8 +21,9 @@ function PrimaryLayout ({
   showAlphaFlag = true
 }) {
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 20000 })
-  const { loading: holofuelUserLoading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
+
+  const { currentUser, currentUserLoading } = useCurrentUserContext()
 
   const inboxCount = actionableTransactions.filter(shouldShowTransactionInInbox).length
 
@@ -32,12 +33,12 @@ function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
+    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      agent={holofuelUser}
-      agentLoading={holofuelUserLoading}
+      agent={currentUser}
+      agentLoading={currentUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
       ledgerLoading={ledgerLoading}
