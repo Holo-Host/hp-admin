@@ -15,8 +15,7 @@ import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/context
 import { CurrentUserProvider as HFCurrentUserProvider } from 'holofuel/contexts/useCurrentUserContext'
 import AcceptRequestedOffers from 'holofuel/components/wrappers/AcceptRequestedOffers'
 import LoadCurrentUser from 'holofuel/components/wrappers/LoadCurrentUser'
-
-import PromptForNickname from './holofuel/PromptForNickname'
+import PromptForNickname from 'holofuel/components/wrappers/PromptForNickname'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {
