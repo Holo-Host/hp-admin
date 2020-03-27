@@ -498,8 +498,8 @@ describe('TransactionRow', () => {
       setConfirmationModalProperties: () => {},
       confirmationModalProperties,
       isActionable: true,
-      openDrawerTransactionId: null,
-      setOpenDrawerTransactionId: () => {}
+      openDrawerId: null,
+      setOpenDrawerId: () => {}
     }
 
     it('shows whenever actionable transactions are shown ', async () => {
@@ -567,7 +567,7 @@ describe('TransactionRow', () => {
         currentUser: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties,
-        setOpenDrawerTransactionId: () => {}
+        setOpenDrawerId: () => {}
       }
 
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
@@ -687,7 +687,7 @@ describe('TransactionRow', () => {
         currentUser: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties,
-        setOpenDrawerTransactionId: () => {}
+        setOpenDrawerId: () => {}
       }
 
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>

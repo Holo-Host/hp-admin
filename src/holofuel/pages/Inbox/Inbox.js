@@ -124,7 +124,7 @@ export default function Inbox ({ history: { push } }) {
 
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
 
-  const [openDrawerTransactionId, setOpenDrawerTransactionId] = useState()
+  const [openDrawerId, setOpenDrawerId] = useState()
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   let displayTransactions = []
@@ -196,8 +196,8 @@ export default function Inbox ({ history: { push } }) {
         userId={currentUser.id}
         isActionable={inboxView === VIEW.actionable}
         setConfirmationModalProperties={setConfirmationModalProperties}
-        openDrawerTransactionId={openDrawerTransactionId}
-        setOpenDrawerTransactionId={setOpenDrawerTransactionId} />)}
+        openDrawerId={openDrawerId}
+        setOpenDrawerId={setOpenDrawerId} />)}
     </div>}
 
     <ConfirmationModal
@@ -207,7 +207,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerTransactionId, setOpenDrawerTransactionId }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
   const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
@@ -224,19 +224,19 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         isActionable={isActionable}
         userId={userId}
         hideTransaction={() => hideTransactionWithId(transaction.id)}
-        openDrawerTransactionId={openDrawerTransactionId}
-        setOpenDrawerTransactionId={setOpenDrawerTransactionId}
+        openDrawerId={openDrawerId}
+        setOpenDrawerId={setOpenDrawerId}
         role='list'
         key={transaction.id} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, openDrawerTransactionId, setOpenDrawerTransactionId }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, openDrawerId, setOpenDrawerId }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
 
-  const isDrawerOpen = id === openDrawerTransactionId
-  const setIsDrawerOpen = state => state ? setOpenDrawerTransactionId(id) : setOpenDrawerTransactionId(null)
+  const isDrawerOpen = id === openDrawerId
+  const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
 
   const agent = canceledBy || counterparty
 
