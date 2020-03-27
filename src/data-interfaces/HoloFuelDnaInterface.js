@@ -18,12 +18,11 @@ export const findNewCounterpartyTransactions = (transactionTransactions = [], co
   transactionTransactions.filter(transactionTransaction => {
     const { counterparty } = transactionTransaction
     const existingCounterparty = _.intersectionBy(counterparty, counterpartyList, 'id')
-    console.log('existingCounterparty : ', existingCounterparty)
-
     if (!existingCounterparty) {
-      return transactionTransactions
+      return transactionTransaction
     }
   })
+  return transactionTransactions
 }
 
 /* Creates an array of all counterparties for a provided transaction list */
@@ -39,7 +38,7 @@ const addFullCounterpartyToTx = async (tx) => {
   return { ...tx, counterparty: fullCounterparty }
 }
 
-const getTxWithCounterparties = transactionList => promiseMap(transactionList, addFullCounterpartyToTx)
+export const getTxWithCounterparties = (transactionList, fn) => promiseMap(transactionList, fn)
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
   return {
@@ -264,16 +263,14 @@ const HoloFuelDnaInterface = {
 
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
       const nonActionableTransactions = transactions.map(presentTransaction)
-      const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
-      const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds.filter(tx => tx.status === 'completed'))
-      return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      const noDuplicateCompletedTransactions = _.uniqBy(nonActionableTransactions, 'id').filter(tx => tx.status === 'completed')
+      // const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds)
+      return noDuplicateCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
       const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentIncomingCanceledTransaction))
-      const presentedActionableTransactions = await getTxWithCounterparties(actionableTransactions)
-
-      return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return actionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
@@ -282,10 +279,8 @@ const HoloFuelDnaInterface = {
       const noDuplicateIdsWaitingList = _.uniqBy(nonActionableTransactions, 'id')
       const transactionIds = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
       // Filter out transactions that share a TX ID with a Declined or Cancelled Transaction
-      const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(noDuplicateIdsWaitingList, transactionIds, 'id')
-      const presentedWaitingTransactions = await getTxWithCounterparties(uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending'))
-
-      return presentedWaitingTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(noDuplicateIdsWaitingList, transactionIds, 'id').filter(tx => tx.status === 'pending')
+      return uniqueListWithOutDeclinedOrCanceled.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
       const declinedResult = await createZomeCall('transactions/list_pending_declined')()
@@ -317,10 +312,7 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')
         .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
-
-      const presentedNonActionableTransactions = await getTxWithCounterparties(nonActionableTransactionsWithCancelByKey)
-
-      return presentedNonActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return nonActionableTransactionsWithCancelByKey.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })

@@ -39,11 +39,12 @@ function PrimaryLayout ({
   useEffect(() => {
     if (!isEmpty(actionableTransactions)) {
       const newCounterpartyTransactions = findNewCounterpartyTransactions(actionableTransactions)
-      console.log('newCounterpartyTransactions : ', newCounterpartyTransactions)
-
       if (!isEmpty(newCounterpartyTransactions)) {
-        const newCounterpartyDetials = getTxCounterparties(newCounterpartyTransactions)
-        setCounterpartyList(...counterpartyList, newCounterpartyDetials)
+        getTxCounterparties(newCounterpartyTransactions)
+        .then((newCounterpartyDetials) =>{
+          setCounterpartyList(counterpartyList, ...newCounterpartyDetials)
+        })
+        .then(() => console.log('counterpartyList : ', counterpartyList))
       }
     }
   }, [counterpartyList, setCounterpartyList, actionableTransactions])

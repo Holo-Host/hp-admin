@@ -42,14 +42,14 @@ export default function Home () {
   useEffect(() => {
     if (!isEmpty(transactions)) {
       const newCounterpartyTransactions = findNewCounterpartyTransactions(transactions)
-      console.log('newCounterpartyTransactions : ', newCounterpartyTransactions)
-
       if (!isEmpty(newCounterpartyTransactions)) {
-        const newCounterpartyDetials = getTxCounterparties(newCounterpartyTransactions)
-        setCounterpartyList(...counterpartyList, newCounterpartyDetials)
+        getTxCounterparties(newCounterpartyTransactions)
+        .then((newCounterpartyDetials) => {
+          setCounterpartyList(counterpartyList, ...newCounterpartyDetials)
+        })
       }
     }
-  }, [loadingTransactions, counterpartyList, setCounterpartyList, transactions])
+  }, [counterpartyList, setCounterpartyList, transactions])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>

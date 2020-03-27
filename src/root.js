@@ -14,7 +14,7 @@ import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import { CounterpartyListProvider as HFCounterpartyListProvider } from 'holofuel/contexts/useCounterpartyListContext'
 import AcceptRequestedOffers from './holofuel/AcceptRequestedOffers'
-import UpdateHolofuelUserPrompt from './holofuel/UpdateHolofuelUserPromptPrompt'
+import UpdateHolofuelUserPrompt from './holofuel/UpdateHolofuelUserPrompt'
 import HPAdminRouter from './HPAdminRouter'
 
 export function App () {

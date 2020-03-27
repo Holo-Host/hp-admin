@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty, intersectionBy, find, reject, isNil } from 'lodash/fp'
@@ -11,6 +11,8 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
+import { getTxCounterparties, findNewCounterpartyTransactions } from 'data-interfaces/HoloFuelDnaInterface'
+import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
@@ -36,6 +38,19 @@ export default function TransactionsHistory ({ history: { push } }) {
   const filteredPollingResult = reject(({ id }) => find({ id }, filteredTransactionById), pollingResult)
   const completedTransactions = holofuelCompletedTransactions.concat(filteredPollingResult)
   const pendingTransactions = holofuelWaitingTransactions.filter(pendingTx => pendingTx.status !== STATUS.completed)
+
+  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
+  useEffect(() => {
+    if (!isEmpty(holofuelWaitingTransactions)) {
+      const newCounterpartyTransactions = findNewCounterpartyTransactions(holofuelWaitingTransactions)
+      if (!isEmpty(newCounterpartyTransactions)) {
+        getTxCounterparties(newCounterpartyTransactions)
+        .then((newCounterpartyDetails) => {
+          setCounterpartyList(counterpartyList, ...newCounterpartyDetails)
+        })
+      }
+    }
+  }, [counterpartyList, setCounterpartyList, holofuelWaitingTransactions])
 
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 

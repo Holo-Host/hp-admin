@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -24,6 +24,8 @@ import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
+import { getTxCounterparties, findNewCounterpartyTransactions } from 'data-interfaces/HoloFuelDnaInterface'
+import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
@@ -113,6 +115,19 @@ export default function Inbox ({ history: { push } }) {
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
+
+  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
+  useEffect(() => {
+    if (!isEmpty(recentTransactions)) {
+      const newCounterpartyTransactions = findNewCounterpartyTransactions(recentTransactions)
+      if (!isEmpty(newCounterpartyTransactions)) {
+        getTxCounterparties(newCounterpartyTransactions)
+        .then((newCounterpartyDetials) => {
+          setCounterpartyList(counterpartyList, ...newCounterpartyDetials)
+        })
+      }
+    }
+  }, [counterpartyList, setCounterpartyList, recentTransactions])
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
