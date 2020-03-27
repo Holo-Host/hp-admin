@@ -11,6 +11,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { shouldShowTransactionInInbox } from 'models/Transaction'
+
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -42,8 +43,7 @@ function PrimaryLayout ({
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
       ledgerLoading={ledgerLoading}
-      isWide={isWide}
-    />
+      isWide={isWide} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName={cx('styles.content')}>
       <FlashMessage />

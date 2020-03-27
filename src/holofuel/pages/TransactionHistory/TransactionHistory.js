@@ -98,7 +98,8 @@ export default function TransactionsHistory ({ history: { push } }) {
       <div styleName='balance-amount'>
         <DisplayBalance
           holofuelBalance={holofuelBalance}
-          ledgerLoading={isNil(holofuelBalance) && ledgerLoading} />
+          ledgerLoading={isNil(holofuelBalance) && ledgerLoading}
+        />
       </div>
 
       <FilterButtons filter={filter} setFilter={setFilter} />
@@ -111,8 +112,10 @@ export default function TransactionsHistory ({ history: { push } }) {
 
     {!noVisibleTransactions && <div styleName='transactions'>
       {partitionedTransactions.map(partition =>
-        <TransactionPartition key={partition.label}
-          partition={partition} />)}
+        <TransactionPartition
+          key={partition.label}
+          partition={partition}
+        />)}
     </div>}
   </PrimaryLayout>
 }
@@ -129,7 +132,8 @@ function FilterButtons ({ filter, setFilter }) {
     {FILTER_TYPES.map(type => <div
       styleName={cx('filter-button', { selected: type === filter })}
       onClick={() => setFilter(type)}
-      key={type}>
+      key={type}
+    >
       {capitalizeFirstLetter(type)}
     </div>)}
   </div>

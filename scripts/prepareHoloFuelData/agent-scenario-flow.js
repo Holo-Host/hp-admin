@@ -53,7 +53,7 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
   const arraySecondHalf = (array) => array.slice(halfArrayLength(array))
   const halfRequestsLength = halfArrayLength(CURRENT_AGENT_LEDGER.requests)
   const forthRequestsLength = Math.ceil((halfRequestsLength) / 2)
-  const halfInitiatingOffersLength = halfArrayLength(CURRENT_AGENT_LEDGER.offers.initated)
+  const halfInitiatingOffersLength = halfArrayLength(CURRENT_AGENT_LEDGER.offers.initiated)
 
   // CASE 1 : Current Agent initiates 1/2 of total REQUESTS, counterparty pays, and current agent Accepts (full-tx-cycle requests)
   const fullRequestCycle = async () => {
@@ -129,8 +129,8 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
   // CASE 4 : Current Agent initiates 1/2 of total PROMISES & counterparty Accepts them (full-tx-cycle offers)
   const fullOfferCycle = async () => {
     console.log(' \n\n ================================== CASE 4 : Full Offer Cycle =========================================== ')
-    console.log(' Length of all Initiated Promises: ', CURRENT_AGENT_LEDGER.offers.initated.length)
-    const array = CURRENT_AGENT_LEDGER.offers.initated.length <= 1 ? CURRENT_AGENT_LEDGER.offers.initated : arrayFirstHalf(CURRENT_AGENT_LEDGER.offers.initated)
+    console.log(' Length of all Initiated Promises: ', CURRENT_AGENT_LEDGER.offers.initiated.length)
+    const array = CURRENT_AGENT_LEDGER.offers.initiated.length <= 1 ? CURRENT_AGENT_LEDGER.offers.initiated : arrayFirstHalf(CURRENT_AGENT_LEDGER.offers.initiated)
     console.log(' Length of this cycle: ', array.length)
     for (let i = 0; i < array.length; i++) {
       await new Promise(resolve => {
@@ -150,11 +150,11 @@ const agentScenarioFlow = async (agentTransactionLedger) => {
   // CASE 5 : Current Agent initiates 1/2 of total PROMISES & promises remain pending (1/2 tx-cycle offers)
   const halfOfferCycle = async () => {
     console.log(' \n\n ================================== CASE 5 : Half Offer Cycle =========================================== ')
-    console.log(' Length of all Initiated Promises: ', CURRENT_AGENT_LEDGER.offers.initated.length)
-    if (CURRENT_AGENT_LEDGER.offers.initated.length <= 1) { console.log('The OFFER / PROMISE array has less than 2 entries, this case is being skipped...'); process.exit() }
+    console.log(' Length of all Initiated Promises: ', CURRENT_AGENT_LEDGER.offers.initiated.length)
+    if (CURRENT_AGENT_LEDGER.offers.initiated.length <= 1) { console.log('The OFFER / PROMISE array has less than 2 entries, this case is being skipped...'); process.exit() }
 
-    console.log(' Length of this cycle: ', arraySecondHalf(CURRENT_AGENT_LEDGER.offers.initated).length)
-    for (let i = 0; i < arraySecondHalf(CURRENT_AGENT_LEDGER.offers.initated).length; i++) {
+    console.log(' Length of this cycle: ', arraySecondHalf(CURRENT_AGENT_LEDGER.offers.initiated).length)
+    for (let i = 0; i < arraySecondHalf(CURRENT_AGENT_LEDGER.offers.initiated).length; i++) {
       await new Promise(resolve => {
         const index = i + halfInitiatingOffersLength
         console.log('\n Full Offer Array Iteration Number (index) : ', index)

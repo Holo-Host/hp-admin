@@ -153,10 +153,12 @@ export default function Inbox ({ history: { push } }) {
       title={displayBalance}
       titleSuperscript='Balance'
     >
-      <Button styleName='new-transaction-button'
+      <Button
+        styleName='new-transaction-button'
         variant='green'
-        onClick={() => push(OFFER_REQUEST_PATH)}>
-        <PlusInDiscIcon styleName='plus-in-disc' color={caribbeanGreen} backgroundColor={'white'} />
+        onClick={() => push(OFFER_REQUEST_PATH)}
+      >
+        <PlusInDiscIcon styleName='plus-in-disc' color={caribbeanGreen} backgroundColor='white' />
         <div styleName='button-text'>New Transaction</div>
       </Button>
 
@@ -166,7 +168,8 @@ export default function Inbox ({ history: { push } }) {
             styleName={button.view === inboxView ? 'view-button-selected' : 'view-button'}
             onClick={() => setInboxView(VIEW[button.view])}
             dataTestId={`${button.view}-transactions`}
-            key={button.view}>
+            key={button.view}
+          >
             {button.label}
           </Button>)}
       </div>
@@ -181,7 +184,8 @@ export default function Inbox ({ history: { push } }) {
         styleName='null-state-message'
         message={inboxView === VIEW.actionable
           ? 'You have no pending offers or requests'
-          : 'You have no recent activity'}>
+          : 'You have no recent activity'}
+      >
         <div onClick={() => push(OFFER_REQUEST_PATH)}>
           <PlusInDiscIcon styleName='null-add-icon' backgroundColor={caribbeanGreen} />
         </div>
@@ -202,8 +206,7 @@ export default function Inbox ({ history: { push } }) {
 
     <ConfirmationModal
       setConfirmationModalProperties={setConfirmationModalProperties}
-      confirmationModalProperties={confirmationModalProperties || {}}
-    />
+      confirmationModalProperties={confirmationModalProperties || {}} />
   </PrimaryLayout>
 }
 
@@ -404,7 +407,8 @@ function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isC
 function AcceptButton ({ showAcceptModal }) {
   return <Button
     onClick={showAcceptModal}
-    styleName='accept-button'>
+    styleName='accept-button'
+  >
     <p>Accept</p>
   </Button>
 }
@@ -412,7 +416,8 @@ function AcceptButton ({ showAcceptModal }) {
 function PayButton ({ showPayModal }) {
   return <Button
     onClick={showPayModal}
-    styleName='accept-button'>
+    styleName='accept-button'
+  >
     {/* NB: Not a typo. This is to 'Accept Request for Payment' */}
     <p>Accept</p>
   </Button>
@@ -421,7 +426,8 @@ function PayButton ({ showPayModal }) {
 function DeclineButton ({ showDeclineModal }) {
   return <Button
     onClick={showDeclineModal}
-    styleName='reject-button'>
+    styleName='reject-button'
+  >
     <p>Decline</p>
   </Button>
 }
@@ -516,19 +522,22 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     contentLabel={contentLabel}
     isOpen={shouldDisplay}
     handleClose={() => hideModal()}
-    styleName='modal'>
+    styleName='modal'
+  >
     <div styleName='modal-message'>{message}</div>
     {counterpartyMessage}
     <div styleName='modal-buttons'>
       <Button
         onClick={() => hideModal()}
-        styleName='modal-button-no'>
+        styleName='modal-button-no'
+      >
         No
       </Button>
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
-        disabled={loadingCounterparty || !activeCounterpartyId}>
+        disabled={loadingCounterparty || !activeCounterpartyId}
+      >
         Yes
       </Button>
     </div>

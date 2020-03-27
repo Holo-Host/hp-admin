@@ -20,8 +20,7 @@ export default function RecentCounterparties ({ agents = [], selectedAgentId, se
       agent={agent}
       selected={agent.id === selectedAgentId}
       selectThisAgent={() => selectAgent(agent.id)}
-      key={agent.id}
-    />)}
+      key={agent.id} />)}
   </div>
 }
 

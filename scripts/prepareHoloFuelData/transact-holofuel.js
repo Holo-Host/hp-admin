@@ -5,7 +5,7 @@ const holochainZomeCall = require('../invoke-holochain-zome-call.js')
 
 // Transaction Types :
 const REQUEST = 'requests'
-const OFFER = 'offers.initated'
+const OFFER = 'offers.initiated'
 const PAY = 'offers.responding'
 const ACCEPT = 'offers.accepted'
 
@@ -20,7 +20,7 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
     currentAgent = 1
   }
 
-  const txType = type === OFFER ? agentTransactionLedger[`offers`][`initated`] : agentTransactionLedger[type]
+  const txType = type === OFFER ? agentTransactionLedger.offers.initiated : agentTransactionLedger[type]
   let origininatingTx = null
   if (transactionTrace || transactionTrace === 0) {
     // For payment of a request :
@@ -37,7 +37,8 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
         'holofuel',
         'transactions',
         'request',
-        { from: counterparty,
+        {
+          from: counterparty,
           amount: txType[index].amount,
           notes: txType[index].notes,
           deadline: txType[index].deadline
@@ -53,7 +54,8 @@ const transactHoloFuel = (agentTransactionLedger, type, { index, transactionTrac
         'holofuel',
         'transactions',
         'promise',
-        { to: counterparty,
+        {
+          to: counterparty,
           amount: txType[index].amount,
           notes: txType[index].notes,
           deadline: txType[index].deadline

@@ -10,7 +10,7 @@ const startTestConductor = async (waiting = false) => {
     })
     .catch(e => {
       if (waiting) return { errCode: e.code, err: e }
-      else throw new Error(` \n \n >>>>>>>>>>>>>>>>>>> NO HC Conductor Found. <<<<<<<<<<<<<<<  \n \n`)
+      else throw new Error(' \n \n >>>>>>>>>>>>>>>>>>> NO HC Conductor Found. <<<<<<<<<<<<<<<  \n \n')
     })
 }
 

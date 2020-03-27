@@ -91,7 +91,8 @@ export function Settings () {
       <SettingsRow
         label={presentAgentId(currentVersion)}
         value={updateAvailable ? <VersionUpdateButton updateVersion={updateVersionWithMessage} /> : 'Your software is up to date.'}
-        bottomStyle />
+        bottomStyle
+      />
       <div styleName='settings-header'>About this HoloPort</div>
       {!isEditingDeviceName && <SettingsRow
         label='Device Name'
@@ -104,7 +105,8 @@ export function Settings () {
               <ArrowRightIcon color={rhino} opacity={0.8} />
             </div>
           </div>
-          : 'Not Available'} />}
+          : 'Not Available'}
+      />}
       {isEditingDeviceName && <div>
         <SettingsRow
           label='Device Name'
@@ -113,7 +115,9 @@ export function Settings () {
           value={<input
             styleName='device-name-input'
             value={editedDeviceName}
-            onChange={e => setEditedDeviceName(e.target.value)} />} />
+            onChange={e => setEditedDeviceName(e.target.value)}
+          />}
+        />
         <div styleName='device-edit-buttons'>
           <Button onClick={cancelDeviceName} variant='red-on-white' styleName='device-edit-button'>Cancel</Button>
           <Button onClick={saveDeviceName} variant='white' styleName='device-edit-button'>Save</Button>
@@ -123,7 +127,8 @@ export function Settings () {
         label='Network'
         bottomStyle
         dataTestId='network-type'
-        value={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : 'Not Available'} />
+        value={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : 'Not Available'}
+      />
       <div styleName='settings-header'>&nbsp;</div>
       <SettingsRow
         label={<a href='https://holo.host/holoport-reset' target='_blank' rel='noopener noreferrer' styleName='reset-link'>
@@ -134,8 +139,10 @@ export function Settings () {
             <a href='https://holo.host/holoport-reset' target='_blank' rel='noopener noreferrer' styleName='reset-link'>
               <ArrowRightIcon color={rhino} opacity={0.8} />
             </a>
-          </div>}
-        bottomStyle />
+          </div>
+        }
+        bottomStyle
+      />
     </section>
   </PrimaryLayout>
 }
@@ -155,7 +162,8 @@ function VersionUpdateButton ({ updateVersion }) {
   return <Button
     variant='white'
     onClick={updateVersion}
-    styleName='version-update-button'>
+    styleName='version-update-button'
+  >
     Update Software
   </Button>
 }

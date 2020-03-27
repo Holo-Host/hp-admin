@@ -56,7 +56,8 @@ export default function HostingEarnings () {
           onClick={() => setDays(DAYS[button])}
           styleName='day-button'
           variant={button === days ? 'green' : 'white'}
-          key={button}>
+          key={button}
+        >
           {labels[button].button}
         </Button>)}
     </div>
@@ -75,7 +76,8 @@ export default function HostingEarnings () {
         {transactions.map(transaction =>
           <TransactionRow
             transaction={transaction}
-            key={transaction.id} />)}
+            key={transaction.id}
+          />)}
       </tbody>
     </table>}
   </PrimaryLayout>
