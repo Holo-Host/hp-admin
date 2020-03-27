@@ -7,7 +7,7 @@ import { MockedProvider } from '@apollo/react-testing'
 import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow, ConfirmationModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
-import { TYPE, STATUS, shouldShowTransactionInInbox } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
 import { presentHolofuelAmount, getDateLabel } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -19,7 +19,6 @@ import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import { presentAgentId, promiseMap } from '../../../utils'
-import { DIRECTION } from '../../../models/Transaction'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')

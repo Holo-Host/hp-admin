@@ -277,7 +277,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setTimeout(() => {
       setHighlightGreen(false)
       hideTransaction()
-    }, 1000)
+    }, 5000)
   }
 
   const onConfirmRed = () => {
