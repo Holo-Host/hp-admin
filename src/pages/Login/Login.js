@@ -32,11 +32,11 @@ export default function Login ({ history: { push } }) {
     if (isAuthed) {
       push('/admin')
       const hostSettings = get('data.hposCheckAuth.hostSettings', authResult)
-      const hostCurrentUser  = {
+      const hostCurrentUser = {
         hostPubKey: hostSettings.hostPubKey,
         hostName: hostSettings.hostName || ''
       }
-      setCurrentUser(hostCurrentUser  )
+      setCurrentUser(hostCurrentUser)
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     }
