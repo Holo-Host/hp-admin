@@ -8,7 +8,6 @@ import LaptopIcon from 'components/icons/LaptopIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
-import HappsQuery from 'graphql/HappsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
 import cx from 'classnames'
@@ -20,8 +19,8 @@ export const mockEarnings = 4984
 export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
 
-  const { data: { happs = [] } = {} } = useQuery(HappsQuery)
-  const noInstalledHapps = happs.reduce((total, happ) => happ.isEnabled ? total + 1 : total, 0)
+  // placeholder as we're not currently calling hha
+  const noInstalledHapps = 0
 
   const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
