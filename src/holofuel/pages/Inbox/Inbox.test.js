@@ -492,25 +492,45 @@ describe('TransactionRow', () => {
   ]
 
   describe('Reveal actionable-buttons slider', () => {
+    const defaultProps = {
+      transaction: offer,
+      currentUser: mockAgent1,
+      setConfirmationModalProperties: () => {},
+      confirmationModalProperties,
+      isActionable: true,
+      openDrawerTransactionId: null,
+      setOpenDrawerTransactionId: () => {}
+    }
+
     it('shows whenever actionable transactions are shown ', async () => {
       const { getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} currentUser={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+        <TransactionRow {...defaultProps} />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
     })
 
     it('does not show whenever actionable transactions are not shown ', async () => {
+      const props = {
+        ...defaultProps,
+        isActionable: false
+      }
+
       const { queryByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} currentUser={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} />
+        <TransactionRow {...props} />
       </MockedProvider>, 0)
 
       expect(queryByTestId('forward-icon')).not.toBeInTheDocument()
     })
 
     it('shows the correct buttons for requests ', async () => {
+      const props = {
+        ...defaultProps,
+        transaction: request
+      }
+
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={request} currentUser={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow {...props} />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -525,7 +545,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for offers ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} currentUser={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow {...defaultProps} />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -543,12 +563,11 @@ describe('TransactionRow', () => {
     it('respond properly', async () => {
       const props = {
         transaction: request,
-        setActionsVisibleId: jest.fn(),
-        actionsVisible: jest.fn(),
         isActionable: true,
         currentUser: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
-        confirmationModalProperties: confirmationModalProperties
+        confirmationModalProperties: confirmationModalProperties,
+        setOpenDrawerTransactionId: () => {}
       }
 
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
@@ -664,12 +683,11 @@ describe('TransactionRow', () => {
     it('responds properly', async () => {
       const props = {
         transaction: offer,
-        setActionsVisibleId: jest.fn(),
-        actionsVisible: jest.fn(),
         isActionable: true,
         currentUser: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
-        confirmationModalProperties: confirmationModalProperties
+        confirmationModalProperties: confirmationModalProperties,
+        setOpenDrawerTransactionId: () => {}
       }
 
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
