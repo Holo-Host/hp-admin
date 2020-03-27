@@ -148,8 +148,7 @@ function TransactionPartition ({ partition }) {
     {transactions.map((transaction, index) => <TransactionRow
       key={index}
       transaction={transaction}
-      isFirst={index === 0}
-    />)}
+      isFirst={index === 0} />)}
   </>
 }
 

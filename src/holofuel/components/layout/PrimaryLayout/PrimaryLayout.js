@@ -43,8 +43,7 @@ function PrimaryLayout ({
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
       ledgerLoading={ledgerLoading}
-      isWide={isWide}
-    />
+      isWide={isWide} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName={cx('styles.content')}>
       <FlashMessage />

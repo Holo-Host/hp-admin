@@ -226,8 +226,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       agents={recentCounterpartiesWithoutMe}
       selectedAgentId={counterpartyId}
       selectAgent={selectAgent}
-      loading={loadingRecentCounterparties}
-    />
+      loading={loadingRecentCounterparties} />
   </PrimaryLayout>
 }
 

@@ -213,8 +213,7 @@ export default function Inbox ({ history: { push } }) {
 
     <ConfirmationModal
       setConfirmationModalProperties={setConfirmationModalProperties}
-      confirmationModalProperties={confirmationModalProperties || {}}
-    />
+      confirmationModalProperties={confirmationModalProperties || {}} />
   </PrimaryLayout>
 }
 
