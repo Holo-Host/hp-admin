@@ -120,7 +120,7 @@ export const resolvers = {
       }
       return {
         isAuthed: true,
-        hostSettings: settings
+        hposSettings: settings
       }
     }
   }

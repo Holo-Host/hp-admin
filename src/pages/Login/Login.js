@@ -31,10 +31,10 @@ export default function Login ({ history: { push } }) {
 
     if (isAuthed) {
       push('/admin')
-      const hostSettings = get('data.hposCheckAuth.hostSettings', authResult)
+      const hposSettings = get('data.hposCheckAuth.hposSettings', authResult)
       const hostCurrentUser = {
-        hostPubKey: hostSettings.hostPubKey,
-        hostName: hostSettings.hostName || ''
+        hostPubKey: hposSettings.hostPubKey,
+        hostName: hposSettings.hostName || ''
       }
       setCurrentUser(hostCurrentUser)
     } else {

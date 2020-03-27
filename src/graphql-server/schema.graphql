@@ -89,11 +89,6 @@ type HposSettings {
   deviceName: String
 }
 
-type HostSettings {
-  hostPubKey: String
-  hostName: String
-}
-
 type HposVersion {
   availableVersion: String
   currentVersion: String
@@ -111,7 +106,7 @@ type HposStatus {
 
 type HposAuth {
   isAuthed: Boolean
-  hostSettings: HostSettings
+  hposSettings: HposSettings
 }
 
 input HolofuelUserInput {
