@@ -3,7 +3,6 @@ import cx from 'classnames'
 import { isEmpty, isNil, isEqual } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
@@ -22,6 +21,7 @@ import HashAvatar from 'components/HashAvatar'
 import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
@@ -110,7 +110,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
-  const { data: { holofuelUser: myProfile = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { currentUser } = useCurrentUserContext()
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
@@ -191,7 +191,7 @@ export default function Inbox ({ history: { push } }) {
         key={dateLabel}
         dateLabel={dateLabel}
         transactions={transactions}
-        userId={myProfile.id}
+        userId={currentUser.id}
         isActionable={inboxView === VIEW.actionable}
         setConfirmationModalProperties={setConfirmationModalProperties} />)}
     </div>}
@@ -257,7 +257,9 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   let fullNotes
   if (isCanceled) {
     if (canceledBy) {
-      story = isOffer ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}` : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+      story = isOffer
+        ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+        : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
     }
     fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
   } else if (isDeclined) {

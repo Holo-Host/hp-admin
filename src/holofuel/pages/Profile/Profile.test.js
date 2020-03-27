@@ -11,6 +11,7 @@ import { renderAndWait } from 'utils/test-utils'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useCurrentUserContext')
 
 describe('Rendering', () => {
   it('should render the Nickname input', async () => {

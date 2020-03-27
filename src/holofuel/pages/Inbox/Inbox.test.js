@@ -17,12 +17,12 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import { presentAgentId, promiseMap } from '../../../utils'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useCurrentUserContext')
 
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).map(item => {
   if (item.event) {
@@ -154,19 +154,10 @@ const ledgerMock = {
   }
 }
 
-const mockWhoamiAgent = {
+const holofuelUser = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
   avatarUrl: null
-}
-
-const whoamiMock = {
-  request: {
-    query: HolofuelUserQuery
-  },
-  result: {
-    data: { holofuelUser: mockWhoamiAgent }
-  }
 }
 
 describe('Inbox', () => {
@@ -333,7 +324,6 @@ describe('Inbox Null States', () => {
   const mocks = [
     actionableTransactionsMock,
     nonPendingTransactionsMock,
-    whoamiMock,
     ledgerMock
   ]
 
@@ -396,7 +386,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} myProfile={mockWhoamiAgent} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={request} currentUser={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -406,7 +396,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} myProfile={mockWhoamiAgent} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={offer} currentUser={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -416,7 +406,7 @@ describe('TransactionRow', () => {
 
   it('renders an recent request', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} myProfile={mockWhoamiAgent} />
+      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} currentUser={holofuelUser} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -426,7 +416,7 @@ describe('TransactionRow', () => {
 
   it('renders a recent offer', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} myProfile={mockWhoamiAgent} />
+      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} currentUser={holofuelUser} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -493,7 +483,6 @@ describe('TransactionRow', () => {
   }
 
   const mocks = [
-    whoamiMock,
     offerMock,
     acceptOfferMock,
     declineMock,
@@ -505,7 +494,7 @@ describe('TransactionRow', () => {
   describe('Reveal actionable-buttons slider', () => {
     it('shows whenever actionable transactions are shown ', async () => {
       const { getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} myProfile={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+        <TransactionRow transaction={offer} currentUser={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -513,7 +502,7 @@ describe('TransactionRow', () => {
 
     it('does not show whenever actionable transactions are not shown ', async () => {
       const { queryByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} myProfile={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} />
+        <TransactionRow transaction={offer} currentUser={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} />
       </MockedProvider>, 0)
 
       expect(queryByTestId('forward-icon')).not.toBeInTheDocument()
@@ -521,7 +510,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for requests ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={request} myProfile={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow transaction={request} currentUser={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -536,7 +525,7 @@ describe('TransactionRow', () => {
 
     it('shows the correct buttons for offers ', async () => {
       const { getByText, getByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
-        <TransactionRow transaction={offer} myProfile={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
+        <TransactionRow transaction={offer} currentUser={mockAgent1} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} setActionsVisibleId={jest.fn()} isActionable />
       </MockedProvider>, 0)
 
       expect(getByTestId('forward-icon')).toBeInTheDocument()
@@ -557,7 +546,7 @@ describe('TransactionRow', () => {
         setActionsVisibleId: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true,
-        myProfile: mockAgent1,
+        currentUser: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties
       }
@@ -608,7 +597,6 @@ describe('TransactionRow', () => {
       }
 
       const mocks = [
-        whoamiMock,
         offerMock,
         declineMock,
         actionableTransactionsMock,
@@ -654,7 +642,6 @@ describe('TransactionRow', () => {
       }
 
       const mocks = [
-        whoamiMock,
         localOfferMock,
         declineMock,
         actionableTransactionsMock,
@@ -680,7 +667,7 @@ describe('TransactionRow', () => {
         setActionsVisibleId: jest.fn(),
         actionsVisible: jest.fn(),
         isActionable: true,
-        myProfile: mockAgent1,
+        currentUser: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties
       }
