@@ -6,10 +6,12 @@ const path = 'M11.5 0c6.347 0 11.5 5.153 11.5 11.5s-5.153 11.5-11.5 11.5-11.5-5.
 const viewBox = '0 0 512 512'
 
 export default function AddIcon ({ className, color = '#000000' }) {
-  return <Icon viewBox={viewBox}
+  return <Icon
+    viewBox={viewBox}
     color={color}
     title={title}
-    className={className} >
+    className={className}
+  >
     <path d={path} />
   </Icon>
 }

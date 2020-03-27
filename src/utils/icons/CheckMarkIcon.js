@@ -11,7 +11,8 @@ export default function CheckMarkIcon ({
     width={width}
     height={height}
     src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMCAxMWMyLjc2MS41NzUgNi4zMTIgMS42ODggOSAzLjQzOCAzLjE1Ny00LjIzIDguODI4LTguMTg3IDE1LTExLjQzOC01Ljg2MSA1Ljc3NS0xMC43MTEgMTIuMzI4LTE0IDE4LjkxNy0yLjY1MS0zLjc2Ni01LjU0Ny03LjI3MS0xMC0xMC45MTd6Ii8+PC9zdmc+'
-    alt='Close Icon' />
+    alt='Close Icon'
+  />
 }
 
 CheckMarkIcon.propTypes = {

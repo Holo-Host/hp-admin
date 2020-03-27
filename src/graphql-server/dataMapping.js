@@ -28,7 +28,7 @@ export const createDataRemapper = initialDataMap => (type, data) => {
   const dataMapForType = type in initialDataMap
     ? initialDataMap[type]
     : {}
-  const dataMap = Object.assign({}, initialDataMap['global'], dataMapForType)
+  const dataMap = Object.assign({}, initialDataMap.global, dataMapForType)
   const remappedData = {}
 
   for (const key in data) {

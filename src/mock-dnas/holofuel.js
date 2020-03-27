@@ -27,7 +27,7 @@ export const transactionList = {
     total: 5
   },
   transactions: [
-    // Agent Perry cancelled own/initated transaction, Perry sees cancelled outgoing transaction
+    // Agent Perry cancelled own/initiated transaction, Perry sees cancelled outgoing transaction
     {
       index: 9,
       state: 'outgoing/canceled',

@@ -115,7 +115,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 }
 
 const presentDeclinedTransaction = declinedTx => {
-  if (!declinedTx[2]) throw new Error(`The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : `, declinedTx)
+  if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
   const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
   return {
     ...transaction,

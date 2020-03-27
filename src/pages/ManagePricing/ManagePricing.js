@@ -25,10 +25,10 @@ export default function ManagePricing () {
   }, [hostPricing])
 
   const dropdownOptions = [
-    { value: UNITS.cpu, label: `CPU (MS)` },
-    { value: UNITS.bandwidth, label: `Bandwidth (MB)` },
-    { value: UNITS.storage, label: `Storage (MB)` },
-    { value: UNITS.ram, label: `RAM (MB)` }
+    { value: UNITS.cpu, label: 'CPU (MS)' },
+    { value: UNITS.bandwidth, label: 'Bandwidth (MB)' },
+    { value: UNITS.storage, label: 'Storage (MB)' },
+    { value: UNITS.ram, label: 'RAM (MB)' }
   ]
 
   const onFuelInputChange = ({ target: { value } }) => {
@@ -58,10 +58,12 @@ export default function ManagePricing () {
     <div styleName='inputs'>
       <Input type='number' value={pricePerUnit} onChange={onFuelInputChange} styleName='price-input' data-testid='price-input' />
       <span styleName='connecting-label'>HoloFuel per</span>
-      <select styleName='units-dropdown'
+      <select
+        styleName='units-dropdown'
         value={units}
         onChange={onUnitsChange}
-        data-testid='units-dropdown'>
+        data-testid='units-dropdown'
+      >
         {dropdownOptions.map(({ value, label }) =>
           <option value={value} key={value}>
             {label}
