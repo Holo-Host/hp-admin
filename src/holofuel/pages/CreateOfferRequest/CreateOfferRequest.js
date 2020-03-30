@@ -58,6 +58,11 @@ const modePrepositions = {
   [REQUEST_MODE]: 'From'
 }
 
+const modeRelations = {
+  [OFFER_MODE]: 'for',
+  [REQUEST_MODE]: 'from'
+}
+
 export default function CreateOfferRequest ({ history: { push } }) {
   const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
@@ -179,7 +184,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
             name='counterpartyId'
             id='counterpartyId'
             styleName='form-input'
-            placeholder='Who is this for?'
+            placeholder={`Who is this ${modeRelations[mode]}?`}
             ref={register}
             onChange={({ target: { value } }) => setCounterpartyId(value)}
           />
