@@ -267,6 +267,7 @@
   font-size: 10px;
   text-align: center;
   text-transform: capitalize;
+  word-break: keep-all;
 }
 
 .accept-button {
