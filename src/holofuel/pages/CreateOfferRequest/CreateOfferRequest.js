@@ -59,7 +59,7 @@ const modePrepositions = {
 }
 
 const modeRelations = {
-  [OFFER_MODE]: 'for',
+  [OFFER_MODE]: 'to',
   [REQUEST_MODE]: 'from'
 }
 
