@@ -1,8 +1,8 @@
 const fs = require('fs')
 const toml = require('toml')
 
-const config1 = toml.parse(fs.readFileSync('./conductor-config.toml', 'utf-8'))
-const config2 = toml.parse(fs.readFileSync('./conductor-config-extra.toml', 'utf-8'))
+const config1 = toml.parse(fs.readFileSync('./conductor-config-1.toml', 'utf-8'))
+const config2 = toml.parse(fs.readFileSync('./conductor-config-2.toml', 'utf-8'))
 const Agent1 = {
   id: config1.agents[0].public_address || 'ERROR: No Agent Pub Key Found',
   nick: config1.agents[0].id
