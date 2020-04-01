@@ -12,17 +12,18 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
+const contrastByCountpartyId = (counterparty, transaction) => {
+  console.log('counterparty : ', counterparty)
+  console.log('transaction', transaction)
+  return (counterparty.id !== transaction.counterparty.id)
+}
+
 /* Creates an array of all transactions that inlcude new counterparties for a provided transaction list and counterparty list */
-export const findNewCounterpartyTransactions = (transactionTransactions = [], counterpartyList = []) => {
-  // eslint-disable-next-line array-callback-return
-  transactionTransactions.filter(transactionTransaction => {
-    const { counterparty } = transactionTransaction
-    const existingCounterparty = _.intersectionBy(counterparty, counterpartyList, 'id')
-    if (!existingCounterparty) {
-      return transactionTransaction
-    }
-  })
-  return transactionTransactions
+export const findNewCounterpartyTransactions = (transactionList = [], counterpartyList = []) => {
+  console.log('.>>>>  internal transactionList : ', transactionList)
+  const newCounterparty = _.differenceWith(counterpartyList, transactionList, contrastByCountpartyId)
+  console.log('newCounterparty : ', newCounterparty)
+  return newCounterparty
 }
 
 /* Creates an array of all counterparties for a provided transaction list */

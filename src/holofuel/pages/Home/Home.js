@@ -45,7 +45,7 @@ export default function Home () {
       if (!isEmpty(newCounterpartyTransactions)) {
         getTxCounterparties(newCounterpartyTransactions)
         .then((newCounterpartyDetials) => {
-          setCounterpartyList(counterpartyList, ...newCounterpartyDetials)
+          setCounterpartyList([...counterpartyList, newCounterpartyDetials])
         })
       }
     }

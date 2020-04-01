@@ -46,7 +46,7 @@ export default function TransactionsHistory ({ history: { push } }) {
       if (!isEmpty(newCounterpartyTransactions)) {
         getTxCounterparties(newCounterpartyTransactions)
         .then((newCounterpartyDetails) => {
-          setCounterpartyList(counterpartyList, ...newCounterpartyDetails)
+          setCounterpartyList([...counterpartyList, newCounterpartyDetails])
         })
       }
     }

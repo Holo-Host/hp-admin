@@ -38,16 +38,18 @@ function PrimaryLayout ({
 
   useEffect(() => {
     if (!isEmpty(actionableTransactions)) {
-      const newCounterpartyTransactions = findNewCounterpartyTransactions(actionableTransactions)
+      const newCounterpartyTransactions = findNewCounterpartyTransactions(actionableTransactions, counterpartyList)
+      console.log('newCounterpartyTransactions : ', newCounterpartyTransactions)
+
       if (!isEmpty(newCounterpartyTransactions)) {
         getTxCounterparties(newCounterpartyTransactions)
-        .then((newCounterpartyDetials) =>{
-          setCounterpartyList(counterpartyList, ...newCounterpartyDetials)
+        .then((newCounterpartyDetials) => {
+          setCounterpartyList([...counterpartyList, newCounterpartyDetials])
+            console.log('counterpartyList : ', counterpartyList)
         })
-        .then(() => console.log('counterpartyList : ', counterpartyList))
       }
     }
-  }, [counterpartyList, setCounterpartyList, actionableTransactions])
+  }, [setCounterpartyList, actionableTransactions])
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
