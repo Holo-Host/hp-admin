@@ -418,8 +418,7 @@ function PayButton ({ showPayModal }) {
     onClick={showPayModal}
     styleName='accept-button'
   >
-    {/* NB: Not a typo. This is to 'Accept Request for Payment' */}
-    <p>Accept</p>
+    <p>Pay</p>
   </Button>
 }
 
@@ -457,7 +456,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionParams = { id, amount, counterparty, notes }
       actionHook = payTransaction
       message = <>
-        Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        Agree to pay {presentHolofuelAmount(amount)} TF to {counterparty.nickname || presentAgentId(counterparty.id)}?
       </>
       flashMessage = 'Payment sent succesfully'
       break
@@ -478,11 +477,11 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionHook = declineTransaction
       if (type === 'offer') {
         message = <>
-          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
         </>
       } else {
         message = <>
-          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
         </>
       }
       flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`
