@@ -129,7 +129,7 @@ async function initHolochainClient () {
       urlObj.search = params.toString()
       url = urlObj.toString()
     }
-    
+
     holochainClient = await hcWebClientConnect({
       url: url,
       wsClient: { max_reconnects: 1 }
