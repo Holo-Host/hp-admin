@@ -12,7 +12,7 @@ import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposCheckAuthMutation from 'graphql/HposCheckAuthMutation.gql'
 import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
 
-export default function Login ({ history }) {
+export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
   const { register, handleSubmit, errors } = useForm()
   const { isConnected } = useConnectionContext()
@@ -29,7 +29,7 @@ export default function Login ({ history }) {
     setIsAuthed(isAuthed)
 
     if (isAuthed) {
-      history.push('/admin')
+      push('/admin')
     } else {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     }

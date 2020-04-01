@@ -182,7 +182,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()
-        const dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId);
+        const dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
         zomeCall = holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
       }
 
