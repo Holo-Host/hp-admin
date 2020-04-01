@@ -42,17 +42,12 @@ function PrimaryLayout ({
     else if (!isEmpty(actionableTransactions)) {
       findnewCounterpartiesFromList(actionableTransactions, counterpartyList)
       .then(newCounterparties => {
-        console.log('!!!!!!! 1 : counterpartyList : ', counterpartyList)
-        console.log('>>>>>: newCounterparties : ', newCounterparties)
-
         setCounterpartyList([...counterpartyList, ...newCounterparties])
         setHasUpdatedCounterpartyList(true)
       })
     }
   }, [counterpartyList, setCounterpartyList, actionableTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
-  
-  console.log('counterpartyList : ', counterpartyList)
-  
+    
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu

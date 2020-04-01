@@ -24,7 +24,7 @@ import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
-import { getTxCounterparties, findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
+import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
@@ -116,18 +116,19 @@ export default function Inbox ({ history: { push } }) {
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
 
+  const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
+
   useEffect(() => {
-    if (!isEmpty(recentTransactions)) {
-      const newCounterpartyTransactions = findnewCounterpartiesFromList(recentTransactions)
-      if (!isEmpty(newCounterpartyTransactions)) {
-        getTxCounterparties(newCounterpartyTransactions)
-        .then((newCounterpartyDetials) => {
-          setCounterpartyList([...counterpartyList, newCounterpartyDetials])
-        })
-      }
+    if (hasUpdatedCounterpartyList) return
+    else if (!isEmpty(actionableTransactions)) {
+      findnewCounterpartiesFromList(actionableTransactions, counterpartyList)
+      .then(newCounterparties => {
+        setCounterpartyList([...counterpartyList, ...newCounterparties])
+        setHasUpdatedCounterpartyList(true)
+      })
     }
-  }, [counterpartyList, setCounterpartyList, recentTransactions])
+  }, [counterpartyList, setCounterpartyList, actionableTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
@@ -6,7 +6,7 @@ import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListCon
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { getTxCounterparties, findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
+import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Loading from 'components/Loading'
@@ -15,7 +15,7 @@ import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HashAvatar from 'components/HashAvatar'
 import './Home.module.css'
-import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime } from 'utils'
+import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime, updateCounterpartyWithDetails } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
@@ -38,18 +38,19 @@ export default function Home () {
 
   const isLoadingFirstPendingTransactions = useLoadingFirstTime(loadingTransactions)
 
-  // const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
-  // useEffect(() => {
-  //   if (!isEmpty(transactions)) {
-  //     const newCounterpartyTransactions = findnewCounterpartiesFromList(transactions)
-  //     if (!isEmpty(newCounterpartyTransactions)) {
-  //       getTxCounterparties(newCounterpartyTransactions)
-  //       .then((newCounterpartyDetials) => {
-  //         setCounterpartyList([...counterpartyList, newCounterpartyDetials])
-  //       })
-  //     }
-  //   }
-  // }, [setCounterpartyList, transactions])
+  const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
+  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
+
+  useEffect(() => {
+    if (hasUpdatedCounterpartyList) return
+    else if (!isEmpty(transactions)) {
+      findnewCounterpartiesFromList(transactions, counterpartyList)
+      .then(newCounterparties => {
+        setCounterpartyList([...counterpartyList, ...newCounterparties])
+        setHasUpdatedCounterpartyList(true)
+      })
+    }
+  }, [counterpartyList, setCounterpartyList, transactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>
@@ -112,6 +113,13 @@ export default function Home () {
 export function TransactionRow ({ transaction }) {
   const { counterparty, amount, notes, direction } = transaction
 
+  const { counterpartyList } = useCounterpartyListContext()
+  const counterpartyDetails = updateCounterpartyWithDetails(counterparty.id, counterpartyList)
+  console.log('updateCounterpartyWithDetails(counterparty.id, counterpartyList) : ', updateCounterpartyWithDetails(counterparty.id, counterpartyList))
+ 
+  console.log('counterpartyList : ', counterpartyList)
+  console.log('outside counterpartyDetails : ', counterpartyDetails)
+
   const presentedAmount = direction === DIRECTION.incoming
     ? `${presentHolofuelAmount(amount)}`
     : `- ${presentHolofuelAmount(amount)}`
@@ -119,8 +127,8 @@ export function TransactionRow ({ transaction }) {
   return <div styleName='transaction-row' role='listitem'>
     <div styleName='counterparty-amount-row'>
       <div styleName='counterparty'>
-        <CopyAgentId agent={counterparty}>
-          {counterparty.nickname || presentAgentId(counterparty.id)}
+        <CopyAgentId agent={counterpartyDetails || counterparty}>
+          {counterpartyDetails ? counterpartyDetails.nickname : presentAgentId(counterparty.id)}
         </CopyAgentId>
       </div>
       <div styleName='amount'>

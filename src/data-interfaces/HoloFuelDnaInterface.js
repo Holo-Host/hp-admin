@@ -13,14 +13,14 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
 /* Creates an array of all transactions that inlcude new counterparties for a provided transaction list and counterparty list */
-export const findnewCounterpartiesFromList = async (transactionList = [], counterpartyList = []) => {
+export const findnewCounterpartiesFromList = (transactionList = [], counterpartyList = []) => {
   // eslint-disable-next-line array-callback-return
-  transactionList.filter(({ counterparty }) => {    
+  const newCouterpartyList = transactionList.filter(({ counterparty }) => {    
     if (isEmpty(counterpartyList)) return counterparty
     const existingCounterparty = counterpartyList.find(counterpartyInList => counterpartyInList.id === counterparty.id)
     if (!existingCounterparty) return counterparty
   })
-  const uniqueNewCounterpartyTransactions = _.uniqBy(transactionList, 'counterparty')
+  const uniqueNewCounterpartyTransactions = _.uniqBy(newCouterpartyList, 'counterparty')
   return getTxCounterparties(uniqueNewCounterpartyTransactions)
 }
 

@@ -24,6 +24,11 @@ export function presentAgentId (agentId) {
   return sliceHash(agentId, 6)
 }
 
+export const updateCounterpartyWithDetails = (counterpartyId, counterpartyList) => {
+  if (!counterpartyList) return
+  else return counterpartyList.find(({ id }) => id === counterpartyId)
+}
+
 export function useLoadingFirstTime (loading) {
   const [isLoadingFirstTime, setIsLoadingFirstTime] = useState(false)
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)

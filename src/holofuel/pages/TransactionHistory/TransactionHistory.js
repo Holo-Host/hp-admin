@@ -11,7 +11,7 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
-import { getTxCounterparties, findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
+import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
@@ -39,18 +39,19 @@ export default function TransactionsHistory ({ history: { push } }) {
   const completedTransactions = holofuelCompletedTransactions.concat(filteredPollingResult)
   const pendingTransactions = holofuelWaitingTransactions.filter(pendingTx => pendingTx.status !== STATUS.completed)
 
+  const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
+
   useEffect(() => {
-    if (!isEmpty(holofuelWaitingTransactions)) {
-      const newCounterpartyTransactions = findnewCounterpartiesFromList(holofuelWaitingTransactions)
-      if (!isEmpty(newCounterpartyTransactions)) {
-        getTxCounterparties(newCounterpartyTransactions)
-        .then((newCounterpartyDetails) => {
-          setCounterpartyList([...counterpartyList, newCounterpartyDetails])
-        })
-      }
+    if (hasUpdatedCounterpartyList) return
+    else if (!isEmpty(holofuelWaitingTransactions)) {
+      findnewCounterpartiesFromList(holofuelWaitingTransactions, counterpartyList)
+      .then(newCounterparties => {
+        setCounterpartyList([...counterpartyList, ...newCounterparties])
+        setHasUpdatedCounterpartyList(true)
+      })
     }
-  }, [counterpartyList, setCounterpartyList, holofuelWaitingTransactions])
+  }, [counterpartyList, setCounterpartyList, holofuelWaitingTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
 
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 
