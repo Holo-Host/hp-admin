@@ -24,7 +24,7 @@ import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
-import { getTxCounterparties, findNewCounterpartyTransactions } from 'data-interfaces/HoloFuelDnaInterface'
+import { getTxCounterparties, findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
@@ -119,7 +119,7 @@ export default function Inbox ({ history: { push } }) {
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
   useEffect(() => {
     if (!isEmpty(recentTransactions)) {
-      const newCounterpartyTransactions = findNewCounterpartyTransactions(recentTransactions)
+      const newCounterpartyTransactions = findnewCounterpartiesFromList(recentTransactions)
       if (!isEmpty(newCounterpartyTransactions)) {
         getTxCounterparties(newCounterpartyTransactions)
         .then((newCounterpartyDetials) => {

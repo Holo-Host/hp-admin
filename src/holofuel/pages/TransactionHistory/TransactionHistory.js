@@ -11,7 +11,7 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
-import { getTxCounterparties, findNewCounterpartyTransactions } from 'data-interfaces/HoloFuelDnaInterface'
+import { getTxCounterparties, findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
@@ -42,7 +42,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
   useEffect(() => {
     if (!isEmpty(holofuelWaitingTransactions)) {
-      const newCounterpartyTransactions = findNewCounterpartyTransactions(holofuelWaitingTransactions)
+      const newCounterpartyTransactions = findnewCounterpartiesFromList(holofuelWaitingTransactions)
       if (!isEmpty(newCounterpartyTransactions)) {
         getTxCounterparties(newCounterpartyTransactions)
         .then((newCounterpartyDetails) => {

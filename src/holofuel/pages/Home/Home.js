@@ -6,7 +6,7 @@ import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListCon
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { getTxCounterparties, findNewCounterpartyTransactions } from 'data-interfaces/HoloFuelDnaInterface'
+import { getTxCounterparties, findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Loading from 'components/Loading'
@@ -38,18 +38,18 @@ export default function Home () {
 
   const isLoadingFirstPendingTransactions = useLoadingFirstTime(loadingTransactions)
 
-  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
-  useEffect(() => {
-    if (!isEmpty(transactions)) {
-      const newCounterpartyTransactions = findNewCounterpartyTransactions(transactions)
-      if (!isEmpty(newCounterpartyTransactions)) {
-        getTxCounterparties(newCounterpartyTransactions)
-        .then((newCounterpartyDetials) => {
-          setCounterpartyList([...counterpartyList, newCounterpartyDetials])
-        })
-      }
-    }
-  }, [setCounterpartyList, transactions])
+  // const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
+  // useEffect(() => {
+  //   if (!isEmpty(transactions)) {
+  //     const newCounterpartyTransactions = findnewCounterpartiesFromList(transactions)
+  //     if (!isEmpty(newCounterpartyTransactions)) {
+  //       getTxCounterparties(newCounterpartyTransactions)
+  //       .then((newCounterpartyDetials) => {
+  //         setCounterpartyList([...counterpartyList, newCounterpartyDetials])
+  //       })
+  //     }
+  //   }
+  // }, [setCounterpartyList, transactions])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>

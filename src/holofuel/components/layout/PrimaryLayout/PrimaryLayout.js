@@ -13,7 +13,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { STATUS } from 'models/Transaction'
-import { getTxCounterparties, findNewCounterpartyTransactions } from 'data-interfaces/HoloFuelDnaInterface'
+import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -34,23 +34,25 @@ function PrimaryLayout ({
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
 
+  const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
 
   useEffect(() => {
-    if (!isEmpty(actionableTransactions)) {
-      const newCounterpartyTransactions = findNewCounterpartyTransactions(actionableTransactions, counterpartyList)
-      console.log('newCounterpartyTransactions : ', newCounterpartyTransactions)
+    if (hasUpdatedCounterpartyList) return
+    else if (!isEmpty(actionableTransactions)) {
+      findnewCounterpartiesFromList(actionableTransactions, counterpartyList)
+      .then(newCounterparties => {
+        console.log('!!!!!!! 1 : counterpartyList : ', counterpartyList)
+        console.log('>>>>>: newCounterparties : ', newCounterparties)
 
-      if (!isEmpty(newCounterpartyTransactions)) {
-        getTxCounterparties(newCounterpartyTransactions)
-        .then((newCounterpartyDetials) => {
-          setCounterpartyList([...counterpartyList, ...newCounterpartyDetials])
-            console.log('counterpartyList : ', counterpartyList)
-        })
-      }
+        setCounterpartyList([...counterpartyList, ...newCounterparties])
+        setHasUpdatedCounterpartyList(true)
+      })
     }
-  }, [setCounterpartyList, actionableTransactions])
-
+  }, [counterpartyList, setCounterpartyList, actionableTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
+  
+  console.log('counterpartyList : ', counterpartyList)
+  
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu

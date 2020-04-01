@@ -13,23 +13,15 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
 /* Creates an array of all transactions that inlcude new counterparties for a provided transaction list and counterparty list */
-export const findNewCounterpartyTransactions = (transactionList = [], counterpartyList = []) => {
-  console.log('transactionList : ', transactionList)
-  const noDuplicateTransactions = _.uniqBy(transactionList, 'id')
-  // console.log('noDuplicateTransactions : ', noDuplicateTransactions)
-  
+export const findnewCounterpartiesFromList = async (transactionList = [], counterpartyList = []) => {
   // eslint-disable-next-line array-callback-return
-  noDuplicateTransactions.filter(transaction => {
-    if (isEmpty(counterpartyList)) return transaction
-
-    const { counterparty } = transaction
+  transactionList.filter(({ counterparty }) => {    
+    if (isEmpty(counterpartyList)) return counterparty
     const existingCounterparty = counterpartyList.find(counterpartyInList => counterpartyInList.id === counterparty.id)
-    if (!existingCounterparty) return transaction
+    if (!existingCounterparty) return counterparty
   })
-
-  console.log('noDuplicateTransactions : ', noDuplicateTransactions)
-  const newCounterpartyTransactions = _.uniqBy(noDuplicateTransactions, 'counterparty')
-  return newCounterpartyTransactions
+  const uniqueNewCounterpartyTransactions = _.uniqBy(transactionList, 'counterparty')
+  return getTxCounterparties(uniqueNewCounterpartyTransactions)
 }
 
 /* Creates an array of all counterparties for a provided transaction list */
@@ -45,7 +37,7 @@ const addFullCounterpartyToTx = async (tx) => {
   return { ...tx, counterparty: fullCounterparty }
 }
 
-export const getTxWithCounterparties = (transactionList, fn) => promiseMap(transactionList, fn)
+// export const getTxWithCounterparties = (transactionList, fn) => promiseMap(transactionList, fn)
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
   return {
@@ -271,7 +263,6 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
       const nonActionableTransactions = transactions.map(presentTransaction)
       const noDuplicateCompletedTransactions = _.uniqBy(nonActionableTransactions, 'id').filter(tx => tx.status === 'completed')
-      // const presentedCompletedTransactions = await getTxWithCounterparties(noDuplicateIds)
       return noDuplicateCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
