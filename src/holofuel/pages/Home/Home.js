@@ -49,7 +49,7 @@ export default function Home () {
         })
       }
     }
-  }, [counterpartyList, setCounterpartyList, transactions])
+  }, [setCounterpartyList, transactions])
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>

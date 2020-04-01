@@ -44,7 +44,7 @@ function PrimaryLayout ({
       if (!isEmpty(newCounterpartyTransactions)) {
         getTxCounterparties(newCounterpartyTransactions)
         .then((newCounterpartyDetials) => {
-          setCounterpartyList([...counterpartyList, newCounterpartyDetials])
+          setCounterpartyList([...counterpartyList, ...newCounterpartyDetials])
             console.log('counterpartyList : ', counterpartyList)
         })
       }

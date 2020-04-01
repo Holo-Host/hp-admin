@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { pickBy } from 'lodash/fp'
+import { pickBy, isEmpty } from 'lodash/fp'
 import { instanceCreateZomeCall } from '../holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -12,18 +12,24 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
-const contrastByCountpartyId = (counterparty, transaction) => {
-  console.log('counterparty : ', counterparty)
-  console.log('transaction', transaction)
-  return (counterparty.id !== transaction.counterparty.id)
-}
-
 /* Creates an array of all transactions that inlcude new counterparties for a provided transaction list and counterparty list */
 export const findNewCounterpartyTransactions = (transactionList = [], counterpartyList = []) => {
-  console.log('.>>>>  internal transactionList : ', transactionList)
-  const newCounterparty = _.differenceWith(counterpartyList, transactionList, contrastByCountpartyId)
-  console.log('newCounterparty : ', newCounterparty)
-  return newCounterparty
+  console.log('transactionList : ', transactionList)
+  const noDuplicateTransactions = _.uniqBy(transactionList, 'id')
+  // console.log('noDuplicateTransactions : ', noDuplicateTransactions)
+  
+  // eslint-disable-next-line array-callback-return
+  noDuplicateTransactions.filter(transaction => {
+    if (isEmpty(counterpartyList)) return transaction
+
+    const { counterparty } = transaction
+    const existingCounterparty = counterpartyList.find(counterpartyInList => counterpartyInList.id === counterparty.id)
+    if (!existingCounterparty) return transaction
+  })
+
+  console.log('noDuplicateTransactions : ', noDuplicateTransactions)
+  const newCounterpartyTransactions = _.uniqBy(noDuplicateTransactions, 'counterparty')
+  return newCounterpartyTransactions
 }
 
 /* Creates an array of all counterparties for a provided transaction list */
