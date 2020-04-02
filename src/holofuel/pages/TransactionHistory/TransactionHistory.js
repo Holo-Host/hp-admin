@@ -43,13 +43,14 @@ export default function TransactionsHistory ({ history: { push } }) {
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
 
   useEffect(() => {
+    // eslint-disable-next-line
     if (hasUpdatedCounterpartyList) return
     else if (!isEmpty(holofuelWaitingTransactions)) {
       findnewCounterpartiesFromList(holofuelWaitingTransactions, counterpartyList)
-      .then(newCounterparties => {
-        setCounterpartyList([...counterpartyList, ...newCounterparties])
-        setHasUpdatedCounterpartyList(true)
-      })
+        .then(newCounterparties => {
+          setCounterpartyList([...counterpartyList, ...newCounterparties])
+          setHasUpdatedCounterpartyList(true)
+        })
     }
   }, [counterpartyList, setCounterpartyList, holofuelWaitingTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
 

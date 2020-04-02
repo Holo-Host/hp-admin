@@ -38,16 +38,17 @@ function PrimaryLayout ({
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
 
   useEffect(() => {
+    // eslint-disable-next-line
     if (hasUpdatedCounterpartyList) return
     else if (!isEmpty(actionableTransactions)) {
       findnewCounterpartiesFromList(actionableTransactions, counterpartyList)
-      .then(newCounterparties => {
-        setCounterpartyList([...counterpartyList, ...newCounterparties])
-        setHasUpdatedCounterpartyList(true)
-      })
+        .then(newCounterparties => {
+          setCounterpartyList([...counterpartyList, ...newCounterparties])
+          setHasUpdatedCounterpartyList(true)
+        })
     }
   }, [counterpartyList, setCounterpartyList, actionableTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
-    
+
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={holofuelUser} agentLoading={holofuelUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu

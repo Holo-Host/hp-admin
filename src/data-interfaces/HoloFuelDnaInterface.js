@@ -15,7 +15,7 @@ const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 /* Creates an array of all transactions that inlcude new counterparties for a provided transaction list and counterparty list */
 export const findnewCounterpartiesFromList = (transactionList = [], counterpartyList = []) => {
   // eslint-disable-next-line array-callback-return
-  const newCouterpartyList = transactionList.filter(({ counterparty }) => {    
+  const newCouterpartyList = transactionList.filter(({ counterparty }) => {
     if (isEmpty(counterpartyList)) return counterparty
     const existingCounterparty = counterpartyList.find(counterpartyInList => counterpartyInList.id === counterparty.id)
     if (!existingCounterparty) return counterparty
@@ -36,8 +36,6 @@ const addFullCounterpartyToTx = async (tx) => {
   const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })
   return { ...tx, counterparty: fullCounterparty }
 }
-
-// export const getTxWithCounterparties = (transactionList, fn) => promiseMap(transactionList, fn)
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
   return {

@@ -25,6 +25,7 @@ export function presentAgentId (agentId) {
 }
 
 export const updateCounterpartyWithDetails = (counterpartyId, counterpartyList) => {
+  // eslint-disable-next-line
   if (!counterpartyList) return
   else return counterpartyList.find(({ id }) => id === counterpartyId)
 }

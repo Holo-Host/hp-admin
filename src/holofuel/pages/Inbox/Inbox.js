@@ -121,13 +121,14 @@ export default function Inbox ({ history: { push } }) {
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
 
   useEffect(() => {
+    // eslint-disable-next-line
     if (hasUpdatedCounterpartyList) return
     else if (!isEmpty(actionableTransactions)) {
       findnewCounterpartiesFromList(actionableTransactions, counterpartyList)
-      .then(newCounterparties => {
-        setCounterpartyList([...counterpartyList, ...newCounterparties])
-        setHasUpdatedCounterpartyList(true)
-      })
+        .then(newCounterparties => {
+          setCounterpartyList([...counterpartyList, ...newCounterparties])
+          setHasUpdatedCounterpartyList(true)
+        })
     }
   }, [counterpartyList, setCounterpartyList, actionableTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
 

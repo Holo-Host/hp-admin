@@ -42,13 +42,14 @@ export default function Home () {
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
 
   useEffect(() => {
+    // eslint-disable-next-line
     if (hasUpdatedCounterpartyList) return
     else if (!isEmpty(transactions)) {
       findnewCounterpartiesFromList(transactions, counterpartyList)
-      .then(newCounterparties => {
-        setCounterpartyList([...counterpartyList, ...newCounterparties])
-        setHasUpdatedCounterpartyList(true)
-      })
+        .then(newCounterparties => {
+          setCounterpartyList([...counterpartyList, ...newCounterparties])
+          setHasUpdatedCounterpartyList(true)
+        })
     }
   }, [counterpartyList, setCounterpartyList, transactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
 
@@ -116,7 +117,7 @@ export function TransactionRow ({ transaction }) {
   const { counterpartyList } = useCounterpartyListContext()
   const counterpartyDetails = updateCounterpartyWithDetails(counterparty.id, counterpartyList)
   console.log('updateCounterpartyWithDetails(counterparty.id, counterpartyList) : ', updateCounterpartyWithDetails(counterparty.id, counterpartyList))
- 
+
   console.log('counterpartyList : ', counterpartyList)
   console.log('outside counterpartyDetails : ', counterpartyDetails)
 
