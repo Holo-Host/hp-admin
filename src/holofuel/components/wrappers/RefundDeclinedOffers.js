@@ -36,6 +36,9 @@ function RefundDeclinedOffers ({
   const [refundedTransactionIds, setRefundedTransactionIds] = useState([])
   const toBeRefundedIds = difference(declinedOffers.map(declinedOffer => declinedOffer.id), refundedTransactionIds)
 
+  console.log('actionableTransactions in refundDeclineOffers', actionableTransactions)
+  
+
   useEffect(() => {
     if (!isEmpty(toBeRefundedIds)) {
       refundTransactions(declinedOffers)
