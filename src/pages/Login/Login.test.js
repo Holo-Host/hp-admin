@@ -7,6 +7,7 @@ import Login from './Login'
 jest.mock('components/layout/PrimaryLayout')
 jest.mock('contexts/useConnectionContext')
 jest.mock('contexts/useAuthContext')
+jest.mock('contexts/useCurrentUserContext')
 jest.mock('contexts/useFlashMessageContext')
 
 describe('Login', () => {

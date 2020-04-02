@@ -9,6 +9,7 @@ import Loading from 'components/Loading'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelUpdateUserMutation from 'graphql/HolofuelUpdateUserMutation.gql'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Profile.module.css'
 
 function Card ({ title, subtitle, children }) {
@@ -20,8 +21,9 @@ function Card ({ title, subtitle, children }) {
 }
 
 export default function Profile () {
-  const { loading, data: { holofuelUser: { id, nickname } = {} } = {}, refetch: refetchHolofuelUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading, data: { holofuelUser, holofuelUser: { id, nickname } = {} } = {}, refetch: refetchHolofuelUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
+  const { setCurrentUser } = useCurrentUserContext()
   const [optimisticNickname, setOptimisticNickname] = useState()
   // FIXME: this is a temporary hack until we can debug the underlying issue in the DNA
   const [hasRefetched, setHasRefetched] = useState(false)
@@ -42,8 +44,17 @@ export default function Profile () {
         query: HolofuelUserQuery
       }]
     })
-      .catch(() => setOptimisticNickname())
+      .catch(() => {
+        // if updateUser throws an error we roll back our optimistic updates
+        setOptimisticNickname()
+        setCurrentUser(holofuelUser)
+      })
+
     setOptimisticNickname(nickname)
+    setCurrentUser({
+      ...holofuelUser,
+      nickname
+    })
     setHasRefetched(false)
     reset({ nickname: '' })
   }
@@ -66,7 +77,8 @@ export default function Profile () {
             defaultValue={nickname}
             placeholder='eg. HoloNaut'
             ref={register({ required: true, minLength: 5, maxLength: 20 })}
-            onKeyUp={() => triggerValidation('nickname')} />
+            onKeyUp={() => triggerValidation('nickname')}
+          />
           {errors.nickname && <small styleName='field-error'>
             Name must be between 5 and 20 characters.
           </small>}

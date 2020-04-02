@@ -1,5 +1,6 @@
 mutation HposCheckAuth {
   hposCheckAuth {
     isAuthed
+    hposSettings { hostPubKey, hostName, registrationEmail, networkStatus, sshAccess, deviceName }
   }
 }

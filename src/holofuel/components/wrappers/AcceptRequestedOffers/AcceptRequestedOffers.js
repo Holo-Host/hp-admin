@@ -4,8 +4,6 @@ import { isEmpty, difference } from 'lodash/fp'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import 'holofuel/global-styles/colors.css'
-import 'holofuel/global-styles/index.css'
 
 function useAcceptOffer () {
   const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)

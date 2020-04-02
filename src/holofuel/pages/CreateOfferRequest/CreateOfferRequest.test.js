@@ -8,15 +8,16 @@ import { TYPE } from 'models/Transaction'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
+import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useCurrentUserContext')
 
 const counterparty = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
@@ -69,25 +70,9 @@ const counterpartyQueryMock = {
   }
 }
 
-const mockProfile = {
-  id: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
-  nickname: 'Sam',
-  avatarUrl: ''
-}
-
-const myProfileQueryMock = {
-  request: {
-    query: HolofuelUserQuery
-  },
-  result: {
-    data: { holofuelUser: mockProfile }
-  }
-}
-
 const mocks = [
   offerMock,
-  counterpartyQueryMock,
-  myProfileQueryMock
+  counterpartyQueryMock
 ]
 
 const enterAmountAndMode = async ({ amount, modeLabel, getByTestId, getByText }) => {
@@ -143,24 +128,8 @@ describe('CreateOfferRequest', () => {
         jest.clearAllMocks()
       })
 
-      const mockProfile = {
-        id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nickname: 'Perry',
-        avatarUrl: ''
-      }
-
-      const myProfileQueryMock = {
-        request: {
-          query: HolofuelUserQuery
-        },
-        result: {
-          data: { holofuelUser: mockProfile }
-        }
-      }
-
       const mocks = [
-        counterpartyQueryMock,
-        myProfileQueryMock
+        counterpartyQueryMock
       ]
 
       const push = jest.fn()
@@ -172,11 +141,11 @@ describe('CreateOfferRequest', () => {
       await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
 
       await act(async () => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: mockCurrentUser.id } })
         await wait(50)
       })
 
-      expect(mockNewMessage).toHaveBeenCalledWith(`You cannot send yourself TestFuel.`, 5000)
+      expect(mockNewMessage).toHaveBeenCalledWith('You cannot send yourself TestFuel.', 5000)
     })
 
     it('renders the counterparty nickname upon *successful* fetch', async () => {
@@ -375,8 +344,7 @@ describe('CreateOfferRequest', () => {
 
     const mocks = [
       requestMock,
-      counterpartyQueryMock,
-      myProfileQueryMock
+      counterpartyQueryMock
     ]
 
     it('renders a form that can be filled out and submitted', async () => {

@@ -6,7 +6,6 @@ import * as yup from 'yup'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -16,6 +15,7 @@ import Loading from 'components/Loading'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
@@ -58,13 +58,18 @@ const modePrepositions = {
   [REQUEST_MODE]: 'From'
 }
 
+const modeRelations = {
+  [OFFER_MODE]: 'to',
+  [REQUEST_MODE]: 'from'
+}
+
 export default function CreateOfferRequest ({ history: { push } }) {
   const [numpadVisible, setNumpadVisible] = useState(true)
   const [mode, setMode] = useState(OFFER_MODE)
 
-  const { data: { holofuelUser: myProfile = {} } = {} } = useQuery(HolofuelUserQuery)
+  const { currentUser } = useCurrentUserContext()
   const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
-  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== myProfile.id)
+  const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== currentUser.id)
 
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
@@ -78,10 +83,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
 
-    if (counterpartyId === myProfile.id) {
+    if (counterpartyId === currentUser.id) {
       newMessage('You cannot send yourself TestFuel.', 5000)
     }
-  }, [myProfile.id, counterpartyId, newMessage])
+  }, [currentUser.id, counterpartyId, newMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
@@ -126,7 +131,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
     !isCounterpartyFound ||
-    counterpartyId === myProfile.id ||
+    counterpartyId === currentUser.id ||
     amount < 0
 
   if (numpadVisible) {
@@ -161,10 +166,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
     <div styleName='mode-toggle'>
       {[OFFER_MODE, REQUEST_MODE].map((buttonMode, i) =>
-        <Button styleName={cx('mode-toggle-button', { 'left-button': i === 0, 'right-button': i === 1, selected: buttonMode === mode })}
+        <Button
+          styleName={cx('mode-toggle-button', { 'left-button': i === 0, 'right-button': i === 1, selected: buttonMode === mode })}
           variant='white'
           onClick={() => setMode(buttonMode)}
-          key={buttonMode}>
+          key={buttonMode}
+        >
           {modeVerbs[buttonMode]}
         </Button>)}
     </div>
@@ -177,9 +184,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
             name='counterpartyId'
             id='counterpartyId'
             styleName='form-input'
-            placeholder='Who is this for?'
+            placeholder={`Who is this ${modeRelations[mode]}?`}
             ref={register}
-            onChange={({ target: { value } }) => setCounterpartyId(value)} />
+            onChange={({ target: { value } }) => setCounterpartyId(value)}
+          />
           <div styleName='hash-and-nick'>
             {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
             {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname' styleName='nickname'>
@@ -188,7 +196,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
                 setCounterpartyNick={setCounterpartyNick}
                 counterpartyNick={counterpartyNick}
                 setCounterpartyFound={setCounterpartyFound}
-                newMessage={newMessage} />
+                newMessage={newMessage}
+              />
             </h4>}
           </div>
         </div>
@@ -200,7 +209,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
           id='notes'
           styleName='form-input'
           placeholder='What is this for?'
-          ref={register} />
+          ref={register}
+        />
         <div />
       </div>
 
@@ -211,7 +221,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
         dataTestId='submit-button'
         variant='green'
         styleName={cx('send-button', { disabled: disableSubmit })}
-        disabled={disableSubmit}>{title}</Button>
+        disabled={disableSubmit}
+      >{title}
+      </Button>
     </form>
 
     <RecentCounterparties
@@ -255,7 +267,8 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
         dataTestId='counterparty-loading'
         type='ThreeDots'
         height={30}
-        width={30} />
+        width={30}
+      />
     </>
   }
 

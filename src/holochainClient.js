@@ -132,7 +132,7 @@ async function initHolochainClient () {
 
     holochainClient = await hcWebClientConnect({
       url: url,
-      wsClient: { max_reconnects: 0 }
+      wsClient: { max_reconnects: 1 }
     })
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
