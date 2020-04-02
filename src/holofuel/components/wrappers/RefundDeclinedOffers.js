@@ -34,7 +34,7 @@ function RefundDeclinedOffers ({
   const declinedOffers = actionableTransactions.filter(transaction => ((transaction.status === STATUS.declined) && (transaction.type === TYPE.offer)))
 
   const [refundedTransactionIds, setRefundedTransactionIds] = useState([])
-  const toBeRefundedIds = difference(declinedOffers.map(declinedOffer => declinedOffer.id), refundedTransactionIds)  
+  const toBeRefundedIds = difference(declinedOffers.map(declinedOffer => declinedOffer.id), refundedTransactionIds)
 
   useEffect(() => {
     if (!isEmpty(toBeRefundedIds)) {

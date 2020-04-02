@@ -25,14 +25,14 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 
 export default function Home () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
-  
+
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  
+
   const { setCurrentUser, currentUser } = useCurrentUserContext()
 
   useEffect(() => {
-    if(!isEmpty(holofuelUser)) {
+    if (!isEmpty(holofuelUser)) {
       setCurrentUser(holofuelUser)
     }
   }, [holofuelUser, setCurrentUser])
