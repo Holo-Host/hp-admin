@@ -36,7 +36,6 @@ type HolofuelUser {
   id: ID
   nickname: String
   avatarUrl: String
-  notFound: Boolean
 }
 
 enum TransactionType {
@@ -153,7 +152,7 @@ type Mutation {
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
-  holofuelUpdateUser(id: String, nickname: String!, avatarUrl: String): HolofuelUser
+  holofuelUpdateUser(nickname: String!, avatarUrl: String): HolofuelUser
   holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
   holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction

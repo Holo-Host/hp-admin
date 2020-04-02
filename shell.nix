@@ -13,10 +13,10 @@ mkShell {
   });
 
   shellHook = ''
-    rm -f conductor-config.toml
-    rm -f conductor-config-extra.toml
-    ln -s ${project.hp-admin-conductor-config} conductor-config.toml
-    ln -s ${project.hp-admin-extra-conductor-config} conductor-config-extra.toml
+    rm -f conductor-config-1.toml
+    rm -f conductor-config-2.toml
+    ln -s ${project.hp-admin-conductor-config-1} conductor-config-1.toml
+    ln -s ${project.hp-admin-conductor-config-2} conductor-config-2.toml
     trap cleanup EXIT
   '';
 }

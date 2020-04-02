@@ -418,7 +418,7 @@ export const pendingList = {
 
 const agentArray = [{
   agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry',
+  nickname: '', // Perry
   avatar_url: ''
   // avatar_url: 'https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png'
 }, {
@@ -427,7 +427,7 @@ const agentArray = [{
   avatar_url: 'https://cdn.pixabay.com/photo/2012/04/13/13/50/man-32481_960_720.png'
 }]
 
-const getProfile = agentId => agentArray.find(agent => agent.agent_address === agentId) || 'Err'
+const getProfile = agentId => agentArray.find(agent => agent.agent_address === agentId) || { Err: `Error locating profile for ${agentId}.` }
 
 function listPending ({ origins }) {
   if (!origins) return pendingList
@@ -458,7 +458,7 @@ const holofuel = {
     // get_my_profile is only for discovering current / personal agent
     get_my_profile: () => agentArray[0],
     // get_profile is for discovering all other agents
-    get_profile: ({ agent_address: agents }) => typeof agents === 'string' ? Array.of(getProfile(agents)) : Array.of(agents.map(agent => getProfile(agent))),
+    get_profile: ({ agent_address: agentId }) => getProfile(agentId),
     update_my_profile: ({ nickname, avatar_url: avatarUrl }) => {
       const profile = agentArray[0]
       return { ...profile, nickname, avatar_url: avatarUrl }
