@@ -165,7 +165,7 @@ describe('Home', () => {
         expect(getByText(presentedAmount)).toBeInTheDocument()
         // tests that context is set with correct data
         // expect(setCounterpartyListSpy).toHaveBeenCalledWith(holofuelCounterparty1)
-        
+
         // tests that shows, whenever nickname is not returned from context
         expect(getByText(presentAgentId(counterparty.id))).toBeInTheDocument()
       })

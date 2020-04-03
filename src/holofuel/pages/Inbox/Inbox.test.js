@@ -25,7 +25,6 @@ jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('holofuel/contexts/useCounterpartyListContext')
 
-
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).map(item => {
   if (item.event) {
     if (item.event[2].Request) {
