@@ -10,6 +10,7 @@ import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
+import useCurrentUserContext from 'contexts/useCurrentUserContext'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -22,6 +23,7 @@ export function PrimaryLayout ({
   showAlphaFlag = true
 }) {
   const { setIsConnected, isConnected } = useConnectionContext()
+  const { setCurrentUser } = useCurrentUserContext()
 
   const onError = ({ graphQLErrors }) => {
     const { isHposConnectionActive } = graphQLErrors
@@ -40,8 +42,12 @@ export function PrimaryLayout ({
       newMessage('Your Holoport is currently unreachable.', 0)
     } else {
       newMessage('', 0)
+      setCurrentUser({
+        hostPubKey: settings.hostPubKey,
+        hostName: settings.hostName || ''
+      })
     }
-  }, [isConnected, setIsConnected, newMessage])
+  }, [isConnected, setIsConnected, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

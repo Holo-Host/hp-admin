@@ -5,10 +5,10 @@ import Home from './Home'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
+import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
 
 // this is importing from the mocked version of this module
 import { history } from 'react-router-dom'
@@ -16,16 +16,20 @@ import { history } from 'react-router-dom'
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+<<<<<<< HEAD
 jest.mock('holofuel/contexts/useCounterpartyListContext')
+=======
+jest.mock('holofuel/contexts/useCurrentUserContext')
+>>>>>>> develop
 
 describe('Home', () => {
   describe('with no transactions', () => {
-    const nickname = 'Julio'
     const balance = '1234.56'
 
     const mocks = [
       {
         request: {
+<<<<<<< HEAD
           query: HolofuelUserQuery
         },
         result: {
@@ -40,6 +44,8 @@ describe('Home', () => {
       },
       {
         request: {
+=======
+>>>>>>> develop
           query: HolofuelLedgerQuery
         },
         result: {
@@ -61,7 +67,7 @@ describe('Home', () => {
         <Home />
       </MockedProvider>)
 
-      expect(getByText(`Hi ${nickname}!`)).toBeInTheDocument()
+      expect(getByText(`Hi ${mockCurrentUser.nickname}!`)).toBeInTheDocument()
 
       history.push.mockReset()
       fireEvent.click(getByText('New Transaction'))

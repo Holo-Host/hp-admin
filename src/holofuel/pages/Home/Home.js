@@ -4,9 +4,9 @@ import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
 import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Loading from 'components/Loading'
@@ -14,6 +14,7 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HashAvatar from 'components/HashAvatar'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime, updateCounterpartyWithDetails } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
@@ -25,10 +26,20 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 }
 
 export default function Home () {
+  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
-  const greeting = !isEmpty(get('nickname', holofuelUser)) ? `Hi ${holofuelUser.nickname}!` : 'Hi!'
+
+  const { setCurrentUser, currentUser } = useCurrentUserContext()
+
+  useEffect(() => {
+    if (!isEmpty(holofuelUser)) {
+      setCurrentUser(holofuelUser)
+    }
+  }, [holofuelUser, setCurrentUser])
+
+  const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
   const isTransactionsEmpty = isEmpty(transactions)
   const firstSixTransactions = transactions.slice(0, 6)
@@ -57,8 +68,8 @@ export default function Home () {
     <div styleName='container'>
       <div styleName='backdrop' />
       <div styleName='avatar'>
-        <CopyAgentId agent={holofuelUser} isMe>
-          <HashAvatar seed={holofuelUser.id} size={48} />
+        <CopyAgentId agent={currentUser} isMe>
+          <HashAvatar seed={currentUser.id} size={48} />
         </CopyAgentId>
       </div>
       <h2 styleName='greeting'>{greeting}</h2>
@@ -74,7 +85,8 @@ export default function Home () {
               <div styleName='balance-amount'>
                 <DisplayBalance
                   ledgerLoading={isNil(holofuelBalance) && ledgerLoading}
-                  holofuelBalance={holofuelBalance} />
+                  holofuelBalance={holofuelBalance}
+                />
               </div>
               <div styleName='balance-arrow-wrapper'>
                 <ArrowRightIcon color='white' styleName='balance-arrow' />
@@ -103,7 +115,8 @@ export default function Home () {
           {!isTransactionsEmpty && <div styleName='transaction-list'>
             {firstSixTransactions.map(transaction => <TransactionRow
               transaction={transaction}
-              key={transaction.id} />)}
+              key={transaction.id}
+            />)}
           </div>}
         </div>
       </div>

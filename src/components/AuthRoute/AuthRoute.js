@@ -17,7 +17,6 @@ export default function AuthRoute (props) {
       to={{
         pathname: '/admin/login',
         state: { from: location }
-      }}
-    />}
+      }} />}
   />
 }

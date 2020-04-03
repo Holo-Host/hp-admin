@@ -5,23 +5,25 @@ import HashAvatar from 'components/HashAvatar'
 import CopyAgentId from 'components/CopyAgentId'
 import GearIcon from 'components/icons/GearIcon'
 import AlphaFlag from 'components/AlphaFlag'
+import useCurrentUserContext from 'contexts/useCurrentUserContext'
 import { presentAgentId } from 'utils'
 import './SideMenu.module.css'
 
 export function SideMenu ({
   isOpen,
   handleClose,
-  avatarUrl = '',
-  settings
+  avatarUrl = ''
 }) {
+  const { currentUser } = useCurrentUserContext()
+
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
-        <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
-          <HashAvatar avatarUrl={avatarUrl} seed={settings.hostPubKey} size={48} styleName='avatar' />
+        <CopyAgentId agent={{ id: currentUser.hostPubKey }} hpAdmin isMe>
+          <HashAvatar avatarUrl={avatarUrl} seed={currentUser.hostPubKey} size={48} styleName='avatar' />
         </CopyAgentId>
         <h2 styleName='host-name'>
-          {settings.hostName || presentAgentId(settings.hostPubKey)}
+          {currentUser.hostName || presentAgentId(currentUser.hostPubKey)}
         </h2>
 
         <Link to='/admin/settings' styleName='settings-link'>

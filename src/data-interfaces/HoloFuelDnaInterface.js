@@ -125,7 +125,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 }
 
 const presentDeclinedTransaction = declinedTx => {
-  if (!declinedTx[2]) throw new Error(`The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : `, declinedTx)
+  if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
   const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
   return {
     ...transaction,
@@ -182,13 +182,13 @@ function presentTransaction (transaction) {
     case 'completed': {
       if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
       if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
-      throw new Error(`Completed event did not have a Receipt or Cheque event`)
+      return new Error(`Completed event did not have a Receipt or Cheque event`)
     }
 
     case 'canceled': {
       if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
       if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
-      throw new Error(`Canceled event did not have a Request or Promise event`)
+      return new Error(`Canceled event did not have a Request or Promise event`)
     }
     /* **************************  NOTE: ********************************** */
     /* The below two cases are 'waitingTransaction' cases. */
@@ -199,8 +199,7 @@ function presentTransaction (transaction) {
     case 'approved': {
       return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
     }
-    default:
-      throw new Error(`Error: No transaction stateStage was matched. Current transaction stateStage : ${stateStage}.`)
+    default: return new Error(`Error: No transaction stateStage was matched. Current transaction stateStage : ${stateStage}.`)
   }
 }
 
@@ -259,7 +258,7 @@ const HoloFuelDnaInterface = {
       const params = since ? { since } : {}
 
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
-      const nonActionableTransactions = transactions.map(presentTransaction)
+      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const noDuplicateCompletedTransactions = _.uniqBy(nonActionableTransactions, 'id').filter(tx => tx.status === 'completed')
       return noDuplicateCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
@@ -270,7 +269,7 @@ const HoloFuelDnaInterface = {
     },
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
-      const nonActionableTransactions = transactions.map(presentTransaction)
+      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
       const noDuplicateIdsWaitingList = _.uniqBy(nonActionableTransactions, 'id')
       const transactionIds = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
@@ -287,7 +286,7 @@ const HoloFuelDnaInterface = {
     allEarnings: () => mockEarningsData,
     allNonActionableByState: async (transactionId, stateFilter = []) => {
       const { transactions } = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
-      const nonActionableTransactions = transactions.map(presentTransaction)
+      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const cleanedList = _.uniqBy(nonActionableTransactions, 'id')
 
       if (cleanedList.length === 0) {
@@ -299,7 +298,7 @@ const HoloFuelDnaInterface = {
     /* NOTE: allNonPending will include Declined and Canceled Transactions:  */
     allNonPending: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
-      const nonActionableTransactions = transactions.map(presentTransaction)
+      const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
       const whoami = await HoloFuelDnaInterface.user.get()

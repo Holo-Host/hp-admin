@@ -21,7 +21,7 @@ it('should copy the copyContent to clipboard and display flash message feedback'
   }
 
   const { getByText } = await renderAndWait(<CopyToClipboard {...props}>
-    { childContent }
+    {childContent}
   </CopyToClipboard>)
 
   await act(async () => {
