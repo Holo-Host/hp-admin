@@ -130,27 +130,27 @@ describe('Home', () => {
 
     it('renders the transactions', async () => {
       // const mockUpdateCounterpartyWithDetails = jest.fn()
-      
+
       const { getAllByRole, queryByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <Home />
       </MockedProvider>)
 
-expect(queryByText('You have no offers or requests')).not.toBeInTheDocument()
+      expect(queryByText('You have no offers or requests')).not.toBeInTheDocument()
 
-const listItems = getAllByRole('listitem')
-expect(listItems).toHaveLength(2)
+      const listItems = getAllByRole('listitem')
+      expect(listItems).toHaveLength(2)
 
-listItems.forEach((item, index) => {
-  const { getByText } = within(item)
-  const { notes, direction, amount, counterparty } = transactions[index]
-  const counterpartyDetails = { ...counterparty, nickname: 'Sam' }
+      listItems.forEach((item, index) => {
+        const { getByText } = within(item)
+        const { notes, direction, amount, counterparty } = transactions[index]
+        // const counterpartyDetails = { ...counterparty, nickname: 'Sam' }
 
-  expect(getByText(notes)).toBeInTheDocument()
-  
-  const presentedAmount = direction === DIRECTION.incoming
-  ? `${presentHolofuelAmount(amount)} TF`
-  : `- ${presentHolofuelAmount(amount)} TF`
-  
+        expect(getByText(notes)).toBeInTheDocument()
+
+        const presentedAmount = direction === DIRECTION.incoming
+          ? `${presentHolofuelAmount(amount)} TF`
+          : `- ${presentHolofuelAmount(amount)} TF`
+
         expect(getByText(presentedAmount)).toBeInTheDocument()
 
         // FIXME: update spy and context reference

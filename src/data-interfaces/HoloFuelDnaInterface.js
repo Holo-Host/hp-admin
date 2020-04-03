@@ -13,21 +13,20 @@ const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
 
 /* Creates an array of all transactions that inlcude new counterparties for a provided transaction list and counterparty list */
-export const findnewCounterpartiesFromList = (transactionList = [], counterpartyList = []) => {
+export const findnewCounterpartiesFromList = (transactions = [], counterparties = []) => {
   // eslint-disable-next-line array-callback-return
-  const newCouterpartyList = transactionList.filter(({ counterparty }) => {
-    if (isEmpty(counterpartyList)) return counterparty
-    const existingCounterparty = counterpartyList.find(counterpartyInList => counterpartyInList.id === counterparty.id)
-    if (!existingCounterparty) return counterparty
+  const newCounterpartyTransactions = transactions.filter(({ transactionCounterparty }) => {
+    if (isEmpty(counterparties)) return true
+    const existingCounterparty = counterparties.find(counterparty => counterparty.id === transactionCounterparty.id)
+    if (!existingCounterparty) return true
   })
-  const uniqueNewCounterpartyTransactions = _.uniqBy(newCouterpartyList, 'counterparty')
-  return getTxCounterparties(uniqueNewCounterpartyTransactions)
+  return getTxCounterparties(newCounterpartyTransactions)
 }
 
 /* Creates an array of all counterparties for a provided transaction list */
-export async function getTxCounterparties (transactionList = []) {
-  const counterpartyList = transactionList.map(({ counterparty }) => counterparty.id)
-  const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
+export async function getTxCounterparties (transactions = []) {
+  const counterparties = transactions.map(({ counterparty }) => counterparty.id)
+  const agentDetailsList = await promiseMap(counterparties, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
   const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
   return noDuplicatesAgentList
 }
@@ -259,8 +258,8 @@ const HoloFuelDnaInterface = {
 
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
-      const noDuplicateCompletedTransactions = _.uniqBy(nonActionableTransactions, 'id').filter(tx => tx.status === 'completed')
-      return noDuplicateCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      const uniqueCompletedTransactions = _.uniqBy(nonActionableTransactions, 'id').filter(tx => tx.status === 'completed')
+      return uniqueCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
@@ -301,11 +300,11 @@ const HoloFuelDnaInterface = {
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const noDuplicateIds = _.uniqBy(nonActionableTransactions, 'id')
 
-      const whoami = await HoloFuelDnaInterface.user.get()
+      const currentUser = await HoloFuelDnaInterface.user.get()
 
       const nonActionableTransactionsWithCancelByKey = noDuplicateIds
         .filter(tx => tx.status !== 'pending')
-        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: whoami } : { ...tx, canceledBy: null })
+        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: currentUser } : { ...tx, canceledBy: null })
       return nonActionableTransactionsWithCancelByKey.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {

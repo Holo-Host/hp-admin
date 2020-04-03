@@ -1,20 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
-import { isEmpty } from 'lodash/fp'
 import cx from 'classnames'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import ScreenWidthContext from 'holofuel/contexts/screenWidth'
-import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
-import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 import { shouldShowTransactionInInbox } from 'models/Transaction'
-
+import { useUpdateCounterpartyList } from 'utils'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -36,20 +33,7 @@ function PrimaryLayout ({
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
 
-  const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
-  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
-
-  useEffect(() => {
-    // eslint-disable-next-line
-    if (hasUpdatedCounterpartyList) return
-    else if (!isEmpty(actionableTransactions)) {
-      findnewCounterpartiesFromList(actionableTransactions, counterpartyList)
-        .then(newCounterparties => {
-          setCounterpartyList([...counterpartyList, ...newCounterparties])
-          setHasUpdatedCounterpartyList(true)
-        })
-    }
-  }, [counterpartyList, setCounterpartyList, actionableTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
+  useUpdateCounterpartyList(actionableTransactions)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />

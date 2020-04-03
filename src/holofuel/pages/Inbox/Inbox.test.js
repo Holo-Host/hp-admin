@@ -17,7 +17,7 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import { counterpartyList as mockCounterpartyList }  from 'holofuel/contexts/useCounterpartyListContext'
+// import { counterpartyList as mockCounterpartyList } from 'holofuel/contexts/useCounterpartyListContext'
 import { presentAgentId, promiseMap } from '../../../utils'
 
 jest.mock('data-interfaces/EnvoyInterface')
@@ -645,7 +645,7 @@ describe('TransactionRow', () => {
       // FIXME: update spy and context reference
       // expect(mockUpdateCounterpartyWithDetails).toHaveBeenCalledWith(holofuelCounterparty1.id, mockCounterpartyList)
       // expect(getByText(presentAgentId(counterpartyDetails.nickname), { exact: false })).toBeInTheDocument()
-      
+
       // tests that id shows, whenever nickname is not returned from context
       expect(getByText(presentAgentId(holofuelCounterparty1.id), { exact: false })).toBeInTheDocument()
       expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()

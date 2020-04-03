@@ -178,7 +178,7 @@ describe('TransactionHistory', () => {
       // FIXME: update spy and context reference
       // expect(mockUpdateCounterpartyWithDetails).toHaveBeenCalledWith(agent1.id, mockCounterpartyList)
       // expect(getByText(counterpartyDetails.nickname)).toBeInTheDocument()
-      
+
       // tests that id shows, whenever nickname is not returned from context
       expect(getByText(presentAgentId(agent1.id))).toBeInTheDocument()
 
