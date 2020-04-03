@@ -8,6 +8,7 @@ import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransac
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { DIRECTION } from 'models/Transaction'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
+// import { counterpartyList as mockCounterpartyList }  from 'holofuel/contexts/useCounterpartyListContext'
 import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
 
 // this is importing from the mocked version of this module
@@ -128,31 +129,35 @@ describe('Home', () => {
     ]
 
     it('renders the transactions', async () => {
-      // const setCounterpartyListSpy = jest.fn()
+      // const mockUpdateCounterpartyWithDetails = jest.fn()
+      
       const { getAllByRole, queryByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <Home />
       </MockedProvider>)
 
-      expect(queryByText('You have no offers or requests')).not.toBeInTheDocument()
+expect(queryByText('You have no offers or requests')).not.toBeInTheDocument()
 
-      const listItems = getAllByRole('listitem')
-      expect(listItems).toHaveLength(2)
+const listItems = getAllByRole('listitem')
+expect(listItems).toHaveLength(2)
 
-      listItems.forEach((item, index) => {
-        const { getByText } = within(item)
-        const { notes, direction, amount, counterparty } = transactions[index]
+listItems.forEach((item, index) => {
+  const { getByText } = within(item)
+  const { notes, direction, amount, counterparty } = transactions[index]
+  const counterpartyDetails = { ...counterparty, nickname: 'Sam' }
 
-        expect(getByText(notes)).toBeInTheDocument()
-
-        const presentedAmount = direction === DIRECTION.incoming
-          ? `${presentHolofuelAmount(amount)} TF`
-          : `- ${presentHolofuelAmount(amount)} TF`
-
+  expect(getByText(notes)).toBeInTheDocument()
+  
+  const presentedAmount = direction === DIRECTION.incoming
+  ? `${presentHolofuelAmount(amount)} TF`
+  : `- ${presentHolofuelAmount(amount)} TF`
+  
         expect(getByText(presentedAmount)).toBeInTheDocument()
-        // tests that context is set with correct data
-        // expect(setCounterpartyListSpy).toHaveBeenCalledWith(holofuelCounterparty1)
 
-        // tests that shows, whenever nickname is not returned from context
+        // FIXME: update spy and context reference
+        // expect(mockUpdateCounterpartyWithDetails).toHaveBeenCalledWith(counterparty.id, mockCounterpartyList)
+        // expect(getByText(counterpartyDetails.nickname)).toBeInTheDocument()
+
+        // tests that id shows, whenever nickname is not returned from context
         expect(getByText(presentAgentId(counterparty.id))).toBeInTheDocument()
       })
     })

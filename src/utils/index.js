@@ -32,6 +32,18 @@ export const updateCounterpartyWithDetails = (counterpartyId, counterpartyList) 
   else return counterpartyList.find(({ id }) => id === counterpartyId)
 }
 
+export const updateCounterpartyListWithDetials = (transactionList, counterpartyList) => {
+  // eslint-disable-next-line
+  if (!counterpartyList) return
+
+  const transactionListWithCounterpartyDetails = transactionList.map(transaction => {
+    const { counterparty } = transaction
+    const counterpartyDetails = updateCounterpartyWithDetails(counterparty.id, counterpartyList)
+    return { ...transaction, counterparty: counterpartyDetails }
+  })
+  return transactionListWithCounterpartyDetails
+}
+
 export function useUpdateCounterpartyList (transactionList) {
   const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
   const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()

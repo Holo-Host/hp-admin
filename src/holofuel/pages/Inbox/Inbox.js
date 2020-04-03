@@ -111,10 +111,10 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
-  
+
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
-  
+
   const { currentUser } = useCurrentUserContext()
   useUpdateCounterpartyList(actionableTransactions)
 
@@ -466,7 +466,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionParams = { id, amount, counterparty, notes }
       actionHook = payTransaction
       message = <>
-        Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterpartyDetails.nickname || presentAgentId(counterparty.id)}?
+        Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterpartyDetails ? counterpartyDetails.nickname : presentAgentId(counterparty.id)}?
       </>
       flashMessage = 'Payment sent succesfully'
       break

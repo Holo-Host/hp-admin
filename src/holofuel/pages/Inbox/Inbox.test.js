@@ -17,6 +17,7 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import { counterpartyList as mockCounterpartyList }  from 'holofuel/contexts/useCounterpartyListContext'
 import { presentAgentId, promiseMap } from '../../../utils'
 
 jest.mock('data-interfaces/EnvoyInterface')
@@ -599,8 +600,21 @@ describe('TransactionRow', () => {
   })
 
   describe('Accept Payment Modal', () => {
+    const holofuelCounterparty1 = {
+      id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+      nickname: '',
+      avatarUrl: ''
+    }
+
+    // const mockUpdateCounterpartyWithDetails = jest.fn()
+    // const counterpartyDetails = {
+    //   ...holofuelCounterparty1,
+    //   nickname: 'Sam',
+    //   avatarUrl: ''
+    // }
+
     it('responds properly', async () => {
-      const transaction = { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' } }
+      const transaction = { ...request, counterparty: holofuelCounterparty1 }
 
       const props = {
         confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay' },
@@ -628,7 +642,12 @@ describe('TransactionRow', () => {
         <ConfirmationModal {...props} />
       </MockedProvider>, 0)
 
-      expect(getByText(presentAgentId('HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'), { exact: false })).toBeInTheDocument()
+      // FIXME: update spy and context reference
+      // expect(mockUpdateCounterpartyWithDetails).toHaveBeenCalledWith(holofuelCounterparty1.id, mockCounterpartyList)
+      // expect(getByText(presentAgentId(counterpartyDetails.nickname), { exact: false })).toBeInTheDocument()
+      
+      // tests that id shows, whenever nickname is not returned from context
+      expect(getByText(presentAgentId(holofuelCounterparty1.id), { exact: false })).toBeInTheDocument()
       expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()
 
       fireEvent.click(getByText('Close Modal'))
