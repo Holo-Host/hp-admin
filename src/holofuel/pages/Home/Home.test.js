@@ -16,11 +16,8 @@ import { history } from 'react-router-dom'
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
-<<<<<<< HEAD
 jest.mock('holofuel/contexts/useCounterpartyListContext')
-=======
 jest.mock('holofuel/contexts/useCurrentUserContext')
->>>>>>> develop
 
 describe('Home', () => {
   describe('with no transactions', () => {
@@ -29,23 +26,6 @@ describe('Home', () => {
     const mocks = [
       {
         request: {
-<<<<<<< HEAD
-          query: HolofuelUserQuery
-        },
-        result: {
-          data: {
-            holofuelUser: {
-              id: 'agent1ID',
-              nickname,
-              avatarUrl: ''
-            }
-          }
-        }
-      },
-      {
-        request: {
-=======
->>>>>>> develop
           query: HolofuelLedgerQuery
         },
         result: {
