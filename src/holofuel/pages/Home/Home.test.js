@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, within } from '@testing-library/react'
 import { MockedProvider } from '@apollo/react-testing'
 import Home from './Home'
-import { presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -16,6 +16,7 @@ import { history } from 'react-router-dom'
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useCounterpartyListContext')
 
 describe('Home', () => {
   describe('with no transactions', () => {
@@ -30,7 +31,7 @@ describe('Home', () => {
         result: {
           data: {
             holofuelUser: {
-              id: '1',
+              id: 'agent1ID',
               nickname,
               avatarUrl: ''
             }
@@ -81,14 +82,22 @@ describe('Home', () => {
       presentBalance: ''
     }
 
+    const holofuelCounterparty1 = {
+      id: 'agent1ID',
+      nickname: 'Joe',
+      avatarUrl: ''
+    }
+
+    const holofuelCounterparty2 = {
+      id: 'agent2ID',
+      nickname: 'Sue',
+      avatarUrl: ''
+    }
+
     const transactions = [{
       ...transactionDefaults,
       id: 1,
-      counterparty: {
-        id: '1',
-        nickname: 'Joe',
-        avatarUrl: ''
-      },
+      counterparty: holofuelCounterparty1,
       amount: '212',
       notes: 'hey chief',
       direction: DIRECTION.incoming
@@ -96,11 +105,7 @@ describe('Home', () => {
     {
       ...transactionDefaults,
       id: 2,
-      counterparty: {
-        id: '2',
-        nickname: 'Sue',
-        avatarUrl: ''
-      },
+      counterparty: holofuelCounterparty2,
       amount: '543.4098',
       notes: 'monies',
       direction: DIRECTION.outgoing
@@ -137,6 +142,7 @@ describe('Home', () => {
     ]
 
     it('renders the transactions', async () => {
+      // const setCounterpartyListSpy = jest.fn()
       const { getAllByRole, queryByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <Home />
       </MockedProvider>)
@@ -157,7 +163,11 @@ describe('Home', () => {
           : `- ${presentHolofuelAmount(amount)} TF`
 
         expect(getByText(presentedAmount)).toBeInTheDocument()
-        expect(getByText(counterparty.nickname)).toBeInTheDocument()
+        // tests that context is set with correct data
+        // expect(setCounterpartyListSpy).toHaveBeenCalledWith(holofuelCounterparty1)
+        
+        // tests that shows, whenever nickname is not returned from context
+        expect(getByText(presentAgentId(counterparty.id))).toBeInTheDocument()
       })
     })
   })

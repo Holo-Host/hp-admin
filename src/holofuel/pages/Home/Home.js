@@ -120,6 +120,7 @@ export function TransactionRow ({ transaction }) {
 
   console.log('counterpartyList : ', counterpartyList)
   console.log('outside counterpartyDetails : ', counterpartyDetails)
+  console.log('counterparty : ', counterparty)
 
   const presentedAmount = direction === DIRECTION.incoming
     ? `${presentHolofuelAmount(amount)}`
