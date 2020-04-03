@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import { DIRECTION } from 'models/Transaction'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Loading from 'components/Loading'
@@ -23,10 +24,18 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 }
 
 export default function Home () {
+  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
 
-  const { currentUser } = useCurrentUserContext()
+  const { setCurrentUser, currentUser } = useCurrentUserContext()
+
+  useEffect(() => {
+    if (!isEmpty(holofuelUser)) {
+      setCurrentUser(holofuelUser)
+    }
+  }, [holofuelUser, setCurrentUser])
 
   const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
