@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty, intersectionBy, find, reject, isNil } from 'lodash/fp'
@@ -10,8 +10,7 @@ import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransaction
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
-import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
+import { presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime, useUpdateCounterpartyList, updateCounterpartyWithDetails } from 'utils'
 import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
@@ -39,20 +38,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   const completedTransactions = holofuelCompletedTransactions.concat(filteredPollingResult)
   const pendingTransactions = holofuelWaitingTransactions.filter(pendingTx => pendingTx.status !== STATUS.completed)
 
-  const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
-  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
-
-  useEffect(() => {
-    // eslint-disable-next-line
-    if (hasUpdatedCounterpartyList) return
-    else if (!isEmpty(holofuelWaitingTransactions)) {
-      findnewCounterpartiesFromList(holofuelWaitingTransactions, counterpartyList)
-        .then(newCounterparties => {
-          setCounterpartyList([...counterpartyList, ...newCounterparties])
-          setHasUpdatedCounterpartyList(true)
-        })
-    }
-  }, [counterpartyList, setCounterpartyList, holofuelWaitingTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
+  useUpdateCounterpartyList(holofuelWaitingTransactions)
 
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 
@@ -171,6 +157,10 @@ function TransactionPartition ({ partition }) {
 
 export function TransactionRow ({ transaction, isFirst }) {
   const { amount, counterparty, direction, notes, status } = transaction // presentBalance,
+
+  const { counterpartyList } = useCounterpartyListContext()
+  const counterpartyDetails = updateCounterpartyWithDetails(counterparty.id, counterpartyList)
+
   const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
@@ -179,14 +169,14 @@ export function TransactionRow ({ transaction, isFirst }) {
 
   return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })} data-testid='transaction-row'>
     <div styleName='avatar'>
-      <CopyAgentId agent={counterparty}>
+      <CopyAgentId agent={counterpartyDetails || counterparty}>
         <HashAvatar seed={counterparty.id} size={32} />
       </CopyAgentId>
     </div>
     <div styleName='name-and-notes'>
       <div styleName={cx('name', { 'pending-style': pending })}>
-        <CopyAgentId agent={counterparty}>
-          {counterparty.nickname || presentAgentId(counterparty.id)}
+        <CopyAgentId agent={counterpartyDetails || counterparty}>
+          {counterpartyDetails ? counterpartyDetails.nickname : presentAgentId(counterparty.id)}
         </CopyAgentId>
       </div>
       <div styleName='notes'>

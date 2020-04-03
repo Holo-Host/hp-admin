@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil, isEqual } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -23,8 +23,7 @@ import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
-import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
+import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate, updateCounterpartyWithDetails, useUpdateCounterpartyList } from 'utils'
 import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
@@ -112,25 +111,12 @@ const presentTruncatedAmount = (string, number = 15) => {
 
 export default function Inbox ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
-  const { currentUser } = useCurrentUserContext()
-
+  
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
-
-  const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
-  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
-
-  useEffect(() => {
-    // eslint-disable-next-line
-    if (hasUpdatedCounterpartyList) return
-    else if (!isEmpty(actionableTransactions)) {
-      findnewCounterpartiesFromList(actionableTransactions, counterpartyList)
-        .then(newCounterparties => {
-          setCounterpartyList([...counterpartyList, ...newCounterparties])
-          setHasUpdatedCounterpartyList(true)
-        })
-    }
-  }, [counterpartyList, setCounterpartyList, actionableTransactions, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
+  
+  const { currentUser } = useCurrentUserContext()
+  useUpdateCounterpartyList(actionableTransactions)
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
@@ -255,10 +241,13 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, openDrawerId, setOpenDrawerId }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
 
+  const { counterpartyList } = useCounterpartyListContext()
+  const counterpartyDetails = updateCounterpartyWithDetails(counterparty.id, counterpartyList)
+
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
 
-  const agent = canceledBy || counterparty
+  const agent = canceledBy || counterpartyDetails || counterparty
 
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request
@@ -285,8 +274,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   if (isCanceled) {
     if (canceledBy) {
       story = isOffer
-        ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
-        : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+        ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterpartyDetails.nickname || presentAgentId(counterparty.id))}`
+        : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterpartyDetails.nickname || presentAgentId(counterparty.id))}`
     }
     fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
   } else if (isDeclined) {
@@ -461,6 +450,9 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
   const { id: activeCounterpartyId } = holofuelCounterparty
 
+  const { counterpartyList } = useCounterpartyListContext()
+  const counterpartyDetails = updateCounterpartyWithDetails(counterparty.id, counterpartyList)
+
   const counterpartyMessage = loadingCounterparty
     ? <div styleName='counterparty-message'>Verifying active status of your counterparty...<Loading styleName='counterparty-loading' width={15} height={15} /></div>
     : !activeCounterpartyId
@@ -474,7 +466,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionParams = { id, amount, counterparty, notes }
       actionHook = payTransaction
       message = <>
-        Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterpartyDetails.nickname || presentAgentId(counterparty.id)}?
       </>
       flashMessage = 'Payment sent succesfully'
       break
@@ -484,7 +476,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionParams = { id }
       actionHook = acceptOffer
       message = <>
-        Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        Accept offer of {presentHolofuelAmount(amount)} TF from {counterpartyDetails.nickname || presentAgentId(counterparty.id)}?
       </>
       flashMessage = 'Offer Accepted succesfully'
       break
@@ -495,11 +487,11 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionHook = declineTransaction
       if (type === 'offer') {
         message = <>
-          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterpartyDetails.nickname || presentAgentId(counterparty.id)}?
         </>
       } else {
         message = <>
-          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline offer of {presentHolofuelAmount(amount)} TF from {counterpartyDetails.nickname || presentAgentId(counterparty.id)}?
         </>
       }
       flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
-import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
+import { flow, groupBy, keys, sortBy, reverse, isEmpty } from 'lodash/fp'
 import moment from 'moment'
+import useCounterpartyListContext from 'holofuel/contexts/useCounterpartyListContext'
+import { findnewCounterpartiesFromList } from 'data-interfaces/HoloFuelDnaInterface'
 
 export function bgImageStyle (url) {
   if (!url) return {}
@@ -28,6 +30,24 @@ export const updateCounterpartyWithDetails = (counterpartyId, counterpartyList) 
   // eslint-disable-next-line
   if (!counterpartyList) return
   else return counterpartyList.find(({ id }) => id === counterpartyId)
+}
+
+export function useUpdateCounterpartyList (transactionList) {
+  const [hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList] = useState(false)
+  const { counterpartyList, setCounterpartyList } = useCounterpartyListContext()
+  useEffect(() => {
+    // eslint-disable-next-line
+    if (hasUpdatedCounterpartyList) return
+    else if (!isEmpty(transactionList)) {
+      findnewCounterpartiesFromList(transactionList, counterpartyList)
+        .then(newCounterparties => {
+          setCounterpartyList([...counterpartyList, ...newCounterparties])
+          setHasUpdatedCounterpartyList(true)
+        })
+    }
+  }, [counterpartyList, setCounterpartyList, transactionList, hasUpdatedCounterpartyList, setHasUpdatedCounterpartyList])
+
+  return counterpartyList
 }
 
 export function useLoadingFirstTime (loading) {
