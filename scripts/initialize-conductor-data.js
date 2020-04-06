@@ -4,8 +4,6 @@ const moment = require('moment')
 const util = require('util')
 const ncp = util.promisify(require('ncp').ncp)
 const wait = require('waait')
-const { promiseMap, createAndRegister, happConfigKeys } = require('./prepareHpAdminData')
-const { providerShims, HAPP_STORE_DNA_INSTANCE, HHA_DNA_INSTANCE } = require('./prepareHpAdminData/provider-shims.js')
 require('dotenv').config()
 
 const txParams = {
@@ -204,25 +202,8 @@ async function populateHoloFuelData () {
   return wait(0)
 }
 
-const populateHpAdminData = async () => {
-  console.log('\n ************************************************************* ')
-  console.log(' HAPP_STORE_DNA_INSTANCE : ', HAPP_STORE_DNA_INSTANCE)
-  console.log(' HHA_DNA_INSTANCE : ', HHA_DNA_INSTANCE)
-  console.log(' ************************************************************* \n')
-
-  const registerProvider = new Promise((resolve) => resolve(providerShims.registerAsProvider()))
-  const fillHappStore = () => promiseMap(happConfigKeys, happId => createAndRegister(happId))
-
-  return registerProvider
-    .then(_ => fillHappStore())
-    .then(_ => providerShims.addHolofuelAccount())
-    .catch(e => console.log('Error when registering Provider. >> ERROR : ', e))
-}
-
 populateHoloFuelData()
   .then(() => console.log('Finished loading HoloFuel data...'))
-  .then(() => populateHpAdminData())
-  .then(() => console.log('Finished loading HPAdmin data...'))
   .then(() => snapshotStrorage())
   .then(() => console.log('Loaded Snapshot Storage'))
   .then(() => process.exit())
