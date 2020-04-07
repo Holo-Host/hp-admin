@@ -193,6 +193,9 @@ function presentTransaction (transaction) {
   }
 }
 
+// a hack while we clean up the apollo counterparties implementation
+const cachedCounterparties = {}
+
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
@@ -205,6 +208,9 @@ const HoloFuelDnaInterface = {
       }
     },
     getCounterparty: async ({ agentId }) => {
+      const cachedCounterparty = cachedCounterparties[agentId]
+      if (cachedCounterparty) return cachedCounterparty
+
       const counterpartyProfile = await createZomeCall('profile/get_profile')({ agent_address: agentId })
       if (counterpartyProfile.Err) {
         console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfile.Err}. `)
@@ -214,11 +220,16 @@ const HoloFuelDnaInterface = {
           nickname: null
         }
       }
-      return {
+
+      const presentedCounterparty = {
         id: counterpartyProfile.agent_address,
         avatarUrl: counterpartyProfile.avatar_url,
         nickname: counterpartyProfile.nickname
       }
+
+      cachedCounterparties[agentId] = presentedCounterparty
+
+      return presentedCounterparty
     },
     update: async (nickname, avatarUrl) => {
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
