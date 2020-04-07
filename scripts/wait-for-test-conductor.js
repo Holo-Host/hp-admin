@@ -1,7 +1,10 @@
 const axios = require('axios')
 const wait = require('waait')
+const { httpPort } = require('./read-test-conductor')
 
 async function waitForConductor (interval = 10000) {
+  if (!httpPort) throw new Error('No http interface port specificed in test conductor')
+
   console.log('Waiting for conductor to boot up')
   let isUp = false
 
@@ -9,7 +12,7 @@ async function waitForConductor (interval = 10000) {
     try {
       console.log('Checking if conductor is up')
       // Verify that conductor is up && the dna instance is live
-      const result = await axios.post(`http://localhost:3300/`, {
+      const result = await axios.post(`http://localhost:${httpPort}/`, {
         jsonrpc: '2.0',
         id: '0',
         method: 'admin/instance/running'

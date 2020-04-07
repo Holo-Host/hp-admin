@@ -59,12 +59,12 @@ export default function runConductorWithFixtures (testFn) {
     await manageStorageFiles()
 
     // hc:start
-    exec('holochain -c ./conductor-config.toml &> conductor.log &')
+    exec('npm run test:start-test-conductor')
 
     const waitConductor = async () => {
       // eslint-disable-next-line no-unused-vars
-      const { _, stderr } = await exec('npm run test:wait-for-conductor')
-      if (stderr) console.error('wait-for-conductor error:', stderr)
+      const { _, stderr } = await exec('npm run test:wait-for-test-conductor')
+      if (stderr) console.error('wait-for-test-conductor error:', stderr)
     }
 
     return waitConductor()

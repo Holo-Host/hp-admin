@@ -1,18 +1,14 @@
 const { connect: hcWebClientConnect } = require('@holochain/hc-web-client')
+const { websocketPort } = require('./read-test-conductor')
 require('dotenv').config()
 
 const HOLOCHAIN_LOGGING = true
 let holochainClient
 
-async function initAndGetHolochainClient (agentIndex = 0) {
+async function initAndGetHolochainClient () {
   if (holochainClient) return holochainClient
-  let url
   try {
-    if (agentIndex === 0) {
-      url = 'ws://localhost:3400'
-    } else if (agentIndex === 1) {
-      url = 'ws://localhost:3401'
-    }
+    const url = `ws://localhost:${websocketPort}`
     const holochainClient = await hcWebClientConnect({
       url,
       wsClient: { max_reconnects: 0 }
