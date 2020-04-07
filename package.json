@@ -25,10 +25,10 @@
     "test:wait-for-test-conductor": "node scripts/wait-for-test-conductor.js",
     "preseed:holofuel": "node scripts/prepareHoloFuelData/index.js",
     "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",
-    "test:preseed-data": "npm run test:start-test-conductor && npm run test:wait-for-test-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data",
+    "test:preseed-data": "npm run test:start-test-conductor && npm run test:wait-for-test-conductor && NODE_ENV=test babel-node scripts/initialize-test-data",
     "test:integration": "nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "test:integration-with-setup": "npm run test:preseed-data && npm run test:integration",
-    "test:start-test-conductor": "holochain -c ./conductor-config-test.toml &> conductor-test.log &"
+    "test:start-test-conductor": "holochain -c ./conductor-config-test.toml &> test-conductor.log &"
   },
   "dependencies": {
     "@apollo/react-hoc": "^3.1.3",

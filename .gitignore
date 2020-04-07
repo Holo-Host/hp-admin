@@ -34,7 +34,7 @@ yarn.lock
 conductor.log
 conductor-1.log
 conductor-2.log
-conductor-test.log
+test-conductor.log
 conductor.pid
 conductor-config-1.toml
 conductor-config-2.toml

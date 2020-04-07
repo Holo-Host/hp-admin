@@ -29,7 +29,9 @@ async function populateHoloFuelData () {
       console.log('\n')
     }
   }
-  await createMultipleRequests(5)
+  await createMultipleRequests(1)
+
+  return 
 
   // 2.) Scenario: An offer from agent1 to agent2
   console.log('\nTEST SCENARIO #2 : Agent 1 Offers hf to Agent 2')
@@ -200,7 +202,7 @@ async function populateHoloFuelData () {
 populateHoloFuelData()
   .then(() => console.log('Finished loading HoloFuel data...'))
   .then(() => snapshotStrorage())
-  .then(() => console.log('Loaded Snapshot Storage'))
+  .then(() => console.log('Saved Snapshot Storage'))
   .then(() => process.exit())
   .catch(e => {
     console.log('error', e)
