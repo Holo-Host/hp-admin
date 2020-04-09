@@ -61,7 +61,7 @@ export default function Home () {
         <Link to={HISTORY_PATH} styleName='balance-link'>
           <div styleName='balance'>
             <h4 styleName='balance-label'>
-              Balance
+              Current Balance
             </h4>
             <div styleName='balance-row'>
               <div styleName='balance-padding' />
