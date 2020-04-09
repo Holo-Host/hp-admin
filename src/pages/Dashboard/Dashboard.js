@@ -29,7 +29,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
 
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
 
-  return <PrimaryLayout headerProps={{ title: 'Home' }}>
+  return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     <div styleName='avatar'>
       <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
         <HashIcon hash={settings.hostPubKey} size={42} />
