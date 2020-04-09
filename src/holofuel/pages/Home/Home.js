@@ -47,7 +47,7 @@ export default function Home () {
 
   const isLoadingFirstPendingTransactions = useLoadingFirstTime(loadingTransactions)
 
-  return <PrimaryLayout headerProps={{ title: 'Home' }}>
+  return <PrimaryLayout headerProps={{ title: 'Holofuel Home' }}>
     <div styleName='container'>
       <div styleName='backdrop' />
       <div styleName='avatar'>
