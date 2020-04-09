@@ -31,6 +31,8 @@ async function populateHoloFuelData () {
   }
   await createMultipleRequests(1)
 
+  return
+
   // 2.) Scenario: An offer from agent1 to agent2
   console.log('\nTEST SCENARIO #2 : Agent 1 Offers hf to Agent 2')
   const createMultipleOffers = async (volumeOfTransactions = 1, amount = 200) => {
@@ -68,8 +70,6 @@ async function populateHoloFuelData () {
       console.log(' >> Accept Offer Success Hash', acceptOffer)
       return acceptOffer
     })
-
-  return
 
   // 6.) Scenario: An offer from agent1 to agent2 which agent 2 has declined
   // Part 1) : Agent 1 Offers HF from Agent 2
