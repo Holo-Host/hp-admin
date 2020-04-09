@@ -18,7 +18,7 @@ function snapshotStrorage () {
 
 async function populateHoloFuelData () {
   // Seed Data:
-  // 1.) Scenario: A request from agent1 to agent2
+  // 1.) Scenario: Some requests from agent1 to agent2
   console.log('\nTEST SCENARIO #1 : Agent 1 sends Request to Agent 2')
   const createMultipleRequests = async (volumeOfTransactions = 1, amount = 100) => {
     console.log('volume of transactions : ', volumeOfTransactions)
@@ -31,8 +31,6 @@ async function populateHoloFuelData () {
   }
   await createMultipleRequests(1)
 
-  return 
-
   // 2.) Scenario: An offer from agent1 to agent2
   console.log('\nTEST SCENARIO #2 : Agent 1 Offers hf to Agent 2')
   const createMultipleOffers = async (volumeOfTransactions = 1, amount = 200) => {
@@ -44,7 +42,7 @@ async function populateHoloFuelData () {
       console.log('\n')
     }
   }
-  await createMultipleOffers(3)
+  await createMultipleOffers(1)
 
   // 3.) Scenario: A request from agent2 to agent1
   console.log('\nTEST SCENARIO #3 : Agent 2 Requests hf from Agent 1')
@@ -56,7 +54,7 @@ async function populateHoloFuelData () {
   const agent2InitiateOffer = await createZomeCall('holofuel-2', 'transactions', 'promise')({ ...txParams, to: agent1.id, amount: '400' })
   console.log(' >> Initiate Request Success Hash', agent2InitiateOffer)
 
-  // 5.) Scenario: An offer from agent1 to agent2 which agent 2 has accepted
+  // 5.) Scenario: An offer from agent1 to agent2 which agent 2 accepts
   // Part 1) : Agent 1 Offers HF from Agent 2
   console.log('\nTEST SCENARIO #5 : Agent 2 accepts HF Offer by Agent 1')
   await createZomeCall('holofuel', 'transactions', 'promise')({ ...txParams, to: agent2.id, amount: '500' })
@@ -70,6 +68,8 @@ async function populateHoloFuelData () {
       console.log(' >> Accept Offer Success Hash', acceptOffer)
       return acceptOffer
     })
+
+  return
 
   // 6.) Scenario: An offer from agent1 to agent2 which agent 2 has declined
   // Part 1) : Agent 1 Offers HF from Agent 2
