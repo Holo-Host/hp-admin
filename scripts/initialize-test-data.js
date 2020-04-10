@@ -12,7 +12,7 @@ const txParams = {
   deadline: moment().subtract(10, 'days').toISOString()
 }
 
-function snapshotStrorage () {
+function snapshotStorage () {
   return ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT)
 }
 
@@ -29,9 +29,7 @@ async function populateHoloFuelData () {
       console.log('\n')
     }
   }
-  await createMultipleRequests(1)
-
-  return
+  await createMultipleRequests(5)
 
   // 2.) Scenario: An offer from agent1 to agent2
   console.log('\nTEST SCENARIO #2 : Agent 1 Offers hf to Agent 2')
@@ -44,7 +42,7 @@ async function populateHoloFuelData () {
       console.log('\n')
     }
   }
-  await createMultipleOffers(1)
+  await createMultipleOffers(3)
 
   // 3.) Scenario: A request from agent2 to agent1
   console.log('\nTEST SCENARIO #3 : Agent 2 Requests hf from Agent 1')
@@ -201,7 +199,7 @@ async function populateHoloFuelData () {
 
 populateHoloFuelData()
   .then(() => console.log('Finished loading HoloFuel data...'))
-  .then(() => snapshotStrorage())
+  .then(() => snapshotStorage())
   .then(() => console.log('Saved Snapshot Storage'))
   .then(() => process.exit())
   .catch(e => {
