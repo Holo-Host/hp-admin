@@ -23,7 +23,7 @@ export const login = async (queries, email = 'test@123.com', password = 'MyHostp
   })
 }
 
-describe('HP Admin : Login', () => {
+describe.skip('Login', () => {
   it('User navigates to Settings Page, updates software, reviews factory reset instructions', runHposApi(async () => {
     const hposSettings = await HposInterface.os.settings()
 

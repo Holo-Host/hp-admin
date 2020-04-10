@@ -34,7 +34,7 @@ jest.unmock('react-router-dom')
 //   happName: 'MinerSweeper'
 // }]
 
-describe.skip('HP Admin : HostedEarnings', () => {
+describe.skip('HostedEarnings', () => {
   it('User navigates to Earnings Page, toggles between 1, 7, & 30 day views', runConductor(async () => {
     const queries = await renderAndWait(<HPAdminApp />)
     const { getByTestId, getAllByTestId, getByText } = queries

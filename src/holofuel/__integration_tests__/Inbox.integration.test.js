@@ -11,7 +11,7 @@ jest.unmock('react-router-dom')
 
 // NB : REJECTION && CANCELLATION CASES STILL NEED TO BE HANDLED / TESTED....
 
-describe('HOLOFUEL : Inbox', () => {
+describe.skip('Inbox', () => {
   it('A request is displayed', runConductor(async () => {
     const { getByTestId, getByText, getAllByRole } = await renderAndWait(<HoloFuelApp />) // debug,
     fireEvent.click(getByTestId('menu-button'))

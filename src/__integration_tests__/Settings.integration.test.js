@@ -15,7 +15,7 @@ jest.unmock('react-router-dom')
 // TODO: Look into setting-up mock api data in HPOS API such that software update is needed...
 // TODO: Create method to reference MOCK HPOS API data while we await the HPOS API to be completed and integrated into our nix setup
 
-describe('HP Admin : Settings', () => {
+describe.skip('Settings', () => {
   it('User navigates to Settings Page, updates software, reviews factory reset instructions', runHposApi(async () => {
     const hposSettings = await HposInterface.os.settings()
     const hposStatus = await HposInterface.os.status()
