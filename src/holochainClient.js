@@ -110,11 +110,11 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
   }[instanceId]
 }
 
-let holochainClient
-let isInitiatingHcConnection = false
+// let holochainClient
+// let isInitiatingHcConnection = false
 
 async function initHolochainClient () {
-  isInitiatingHcConnection = true
+  // isInitiatingHcConnection = true
   let url
   try {
     if (process.env.REACT_APP_RAW_HOLOCHAIN === 'true') {
@@ -130,37 +130,37 @@ async function initHolochainClient () {
       url = urlObj.toString()
     }
 
-    holochainClient = await hcWebClientConnect({
+    let holochainClient = await hcWebClientConnect({
       url: url,
       wsClient: { max_reconnects: 1 }
     })
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
-    isInitiatingHcConnection = false
+    // isInitiatingHcConnection = false
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
-    isInitiatingHcConnection = false
+    // isInitiatingHcConnection = false
     throw (error)
   }
 }
-async function initAndGetHolochainClient () {
-  let counter = 0
-  // This code is to let avoid multiple ws connections.
-  // isInitiatingHcConnection is changed in a different call of this function running in parallel
-  while (isInitiatingHcConnection) {
-    counter++
-    await wait(100)
-    if (counter === 10) {
-      isInitiatingHcConnection = false
-    }
-  }
-  if (holochainClient) return holochainClient
-  else return initHolochainClient()
-}
+// async function initAndGetHolochainClient () {
+//   let counter = 0
+//   // This code is to let avoid multiple ws connections.
+//   // isInitiatingHcConnection is changed in a different call of this function running in parallel
+//   while (isInitiatingHcConnection) {
+//     counter++
+//     await wait(100)
+//     if (counter === 10) {
+//       isInitiatingHcConnection = false
+//     }
+//   }
+//   if (holochainClient) return holochainClient
+//   else return initHolochainClient()
+// }
 
 export function createZomeCall (zomeCallPath, callOpts = {}) {
   const DEFAULT_OPTS = {
@@ -181,9 +181,10 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       if (MOCK_DNA_CONNECTION && MOCK_INDIVIDUAL_DNAS[instanceId]) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
-        await initAndGetHolochainClient()
+        let holochainClient = await initHolochainClient()
         const dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
-        zomeCall = holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
+        zomeCall = await holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
+        // await holochainClient.close()
       }
 
       const rawResult = await zomeCall(args)
