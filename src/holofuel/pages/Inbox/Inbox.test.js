@@ -628,7 +628,7 @@ describe('TransactionRow', () => {
       </MockedProvider>, 0)
 
       expect(getByText(presentAgentId('HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'), { exact: false })).toBeInTheDocument()
-      expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()
+      expect(getByText('Accept the request and send', { exact: false })).toBeInTheDocument()
 
       fireEvent.click(getByText('Close Modal'))
       expect(props.setConfirmationModalProperties).toHaveBeenCalled()
