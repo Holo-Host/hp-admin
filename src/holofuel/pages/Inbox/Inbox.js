@@ -151,7 +151,7 @@ export default function Inbox ({ history: { push } }) {
     <Jumbotron
       className='inbox-header'
       title={displayBalance}
-      titleSuperscript='Balance'
+      titleSuperscript='Current balance'
     >
       <Button
         styleName='new-transaction-button'
