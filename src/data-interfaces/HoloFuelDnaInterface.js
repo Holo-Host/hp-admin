@@ -285,7 +285,7 @@ const HoloFuelDnaInterface = {
       return presentedWaitingTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
-      const declinedTransactions = await createZomeCall('transactions/list_pending_declined')()      
+      const declinedTransactions = await createZomeCall('transactions/list_pending_declined')()
       const presentedDeclinedTransactions = declinedTransactions.map(presentDeclinedTransaction)
       const uniqueDeclinedTransactions = _.uniqBy(presentedDeclinedTransactions, 'id')
 

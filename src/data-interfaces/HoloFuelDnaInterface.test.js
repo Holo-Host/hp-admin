@@ -1,5 +1,5 @@
 import { uniq } from 'lodash/fp'
-import { setMockZomeCallResults, instanceCreateZomeCall } from 'holochainClient'
+import { setMockZomeCallResults } from 'holochainClient'
 import HoloFuelDnaInterface from 'data-interfaces/HoloFuelDnaInterface'
 
 jest.mock('holochainClient')
