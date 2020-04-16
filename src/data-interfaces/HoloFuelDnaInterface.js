@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { omitBy, pickBy } from 'lodash/fp'
-import { instanceCreateZomeCall } from '../holochainClient'
+import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
@@ -260,15 +260,15 @@ const HoloFuelDnaInterface = {
 
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
-      const dedupedNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
-      const presentedCompletedTransactions = await getTxWithCounterparties(dedupedNonActionableTransactions.filter(tx => tx.status === 'completed'))
+      const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
+      const presentedCompletedTransactions = await getTxWithCounterparties(uniqueNonActionableTransactions.filter(tx => tx.status === 'completed'))
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
       const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentIncomingCanceledTransaction))
-      const dedupedActionableTransactions = _.uniqBy(actionableTransactions, 'id')
-      const presentedActionableTransactions = await getTxWithCounterparties(dedupedActionableTransactions)
+      const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
+      const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
 
       return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
@@ -276,20 +276,20 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
-      const dedupedNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
+      const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
       const declinedTransactions = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
       // Filter out transactions that share a TX ID with a Declined or Cancelled Transaction
-      const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(dedupedNonActionableTransactions, declinedTransactions, 'id')
+      const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(uniqueNonActionableTransactions, declinedTransactions, 'id')
       const presentedWaitingTransactions = await getTxWithCounterparties(uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending'))
 
       return presentedWaitingTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
-      const declinedTransactions = await createZomeCall('transactions/list_pending_declined')()
-      const dedupedDeclinedTransactions = _.uniqBy(declinedTransactions, 'id')
-      const presentedDeclinedTransactions = dedupedDeclinedTransactions.map(presentDeclinedTransaction)
+      const declinedTransactions = await createZomeCall('transactions/list_pending_declined')()      
+      const presentedDeclinedTransactions = declinedTransactions.map(presentDeclinedTransaction)
+      const uniqueDeclinedTransactions = _.uniqBy(presentedDeclinedTransactions, 'id')
 
-      return presentedDeclinedTransactions
+      return uniqueDeclinedTransactions
     },
     allEarnings: () => mockEarningsData,
     allNonActionableByState: async (transactionId, stateFilter = []) => {
@@ -307,11 +307,11 @@ const HoloFuelDnaInterface = {
     allNonPending: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
-      const dedupedNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
+      const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
 
       const myProfile = await HoloFuelDnaInterface.user.get()
 
-      const nonActionableTransactionsWithCancelByKey = dedupedNonActionableTransactions
+      const nonActionableTransactionsWithCancelByKey = uniqueNonActionableTransactions
         .filter(tx => tx.status !== 'pending')
         .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: myProfile } : { ...tx, canceledBy: null })
 
