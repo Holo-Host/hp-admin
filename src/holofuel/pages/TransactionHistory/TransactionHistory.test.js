@@ -13,6 +13,7 @@ import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.unmock('holochainClient')
 
 const agent1 = {
   id: '1',

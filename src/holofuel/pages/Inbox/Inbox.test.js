@@ -23,6 +23,7 @@ jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('holofuel/contexts/useCurrentUserContext')
+jest.unmock('holochainClient')
 
 // eslint-disable-next-line array-callback-return
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).map(item => {
