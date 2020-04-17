@@ -294,7 +294,7 @@ in
     };
   };
 
-  hp-admin-conductor-config-test = writeTOML {
+  hp-admin-test-conductor-config = writeTOML {
     bridges = [];
     persistence_dir = ".holochain/holo";
     agents = map agentConfig [config.agent1 config.agent2];
