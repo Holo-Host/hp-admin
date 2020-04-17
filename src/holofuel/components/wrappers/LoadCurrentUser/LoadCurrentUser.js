@@ -8,9 +8,9 @@ import { useLoadingFirstTime } from 'utils'
 function LoadCurrentUser ({
   children
 }) {
-  const { loading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery)
-  const loadingFirstTime = useLoadingFirstTime(loading)
+  const { loading, data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
 
+  const loadingFirstTime = useLoadingFirstTime(loading)
   const { setCurrentUser, setCurrentUserLoading, currentUserLoading } = useCurrentUserContext()
 
   useEffect(() => {

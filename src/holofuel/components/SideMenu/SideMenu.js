@@ -31,7 +31,7 @@ export default function SideMenu ({
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={48} styleName='avatar' />
         </CopyAgentId>
         <h3 styleName='nickname'>
-          {(agentLoading && <>Loading...</>) || agent.nickname || presentAgentId(agent.id)}
+          {agent.nickname || (agentLoading && <>Loading...</>) || presentAgentId(agent.id)}
         </h3>
 
         <h1 styleName='balance'><DisplayBalance
