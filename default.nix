@@ -47,15 +47,15 @@ let
       path = ".holochain/holo/storage/${agent.id}/${dna.name}";
       type = "file";
     };
-  }) config.agent1;
+  }) [config.agent1];
 
   multiInterfaceInstanceConfig = dna: map (agent: {
     id = dna.name;
-  }) config.agent1;
+  }) [config.agent1];
 
   multiInterfaceInstanceConfig2 = dna: map (agent: {
     id = dna.name;
-  }) config.agent2;
+  }) [config.agent2];
 
   multiInstanceConfig2 = dna: map (agent: {
     agent = agent.id;
@@ -65,7 +65,34 @@ let
       path = ".holochain/holo/storage/${agent.id}/${dna.name}";
       type = "file";
     };
-  }) config.agent2;
+  }) [config.agent2];
+
+  multiInterfaceInstanceConfigTest = dna: [{
+    id = dna.name;
+  }
+  {
+    id = dna.name+"-2";
+  }
+  ];
+  multiInstanceConfigTest = dna: [{
+    agent = config.agent1.id;
+    dna = dna.name+"-dna";
+    id = dna.name;
+    storage = {
+      path = ".holochain/holo/storage/${config.agent2.id}/${dna.name}";
+      type = "file";
+    };
+  }
+  {
+    agent = config.agent2.id;
+    dna = dna.name+"-dna";
+    id = dna.name+"-2";
+    storage = {
+      path = ".holochain/holo/storage/${config.agent2.id}/${dna.name}";
+      type = "file";
+    };
+  }
+  ];
 
   flatten = x:
     if builtins.isList x
@@ -177,7 +204,7 @@ in
   hp-admin-conductor-config-1 = writeTOML {
     bridges = [];
     persistence_dir = ".holochain/holo";
-    agents = map agentConfig config.agent1;
+    agents = map agentConfig [config.agent1];
     dnas = map dnaConfig dnas;
     instances = flatten(map multiInstanceConfig dnas);
     interfaces = [
@@ -224,7 +251,7 @@ in
   hp-admin-conductor-config-2 = writeTOML {
     bridges = [];
     persistence_dir = ".holochain/holo";
-    agents = map agentConfig config.agent2;
+    agents = map agentConfig [config.agent2];
     dnas = map dnaConfig dnas;
     instances = flatten(map multiInstanceConfig2 dnas);
     interfaces = [
@@ -266,4 +293,51 @@ in
       ];
     };
   };
+
+  hp-admin-conductor-config-test = writeTOML {
+    bridges = [];
+    persistence_dir = ".holochain/holo";
+    agents = map agentConfig [config.agent1 config.agent2];
+    dnas = map dnaConfig dnas;
+    instances = flatten(map multiInstanceConfigTest dnas);
+    interfaces = [
+      {
+        id = "websocket-interface";
+        driver = {
+          port = 3401;
+          type = "websocket";
+        };
+        instances = flatten(map multiInterfaceInstanceConfigTest dnas);
+      }
+      {
+        id = "http-interface";
+        admin = true;
+        driver = {
+          port = 3301;
+          type = "http";
+        };
+        instances = flatten(map multiInterfaceInstanceConfigTest dnas);
+      }
+    ];
+    network = {
+      sim2h_url = "ws://localhost:9000";
+      type = "sim2h";
+    };
+    logger = {
+      type = "debug";
+      rules.rules = [
+        {
+          color = "red";
+          exclude = false;
+          pattern = "^err/";
+        }
+        {
+          color = "white";
+          exclude = false;
+          pattern = "^debug/dna";
+        }
+      ];
+    };
+  };
+
 }
