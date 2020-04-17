@@ -38,5 +38,5 @@ test-conductor.log
 conductor.pid
 conductor-config-1.toml
 conductor-config-2.toml
-conductor-config-test.toml
+test-conductor-config.toml
 sim2h.log
