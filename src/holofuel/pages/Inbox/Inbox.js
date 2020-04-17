@@ -151,7 +151,7 @@ export default function Inbox ({ history: { push } }) {
     <Jumbotron
       className='inbox-header'
       title={displayBalance}
-      titleSuperscript='Balance'
+      titleSuperscript='Current balance'
     >
       <Button
         styleName='new-transaction-button'
@@ -457,7 +457,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionParams = { id, amount, counterparty, notes }
       actionHook = payTransaction
       message = <>
-        Accept request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        Accept the request and send {counterparty.nickname || presentAgentId(counterparty.id)} {presentHolofuelAmount(amount)} TF?
       </>
       flashMessage = 'Payment sent succesfully'
       break

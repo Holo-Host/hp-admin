@@ -14,7 +14,7 @@ function UserPromptMessage ({ newMessage }) {
 
   return <>
     <div className='message'>
-      It looks like you don\'t yet have a Holofuel Account Nickname. Visit your profile page to personalize your nickname so your peers can easily recognize you.
+      It looks like you don't yet have a Holofuel Account Nickname. Visit your profile page to personalize your nickname so your peers can easily recognize you.
     </div>
     <br />
     <Link to={PROFILE_PATH} onClick={resetFlashMessage}>

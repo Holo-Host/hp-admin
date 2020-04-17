@@ -23,6 +23,7 @@ jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('holofuel/contexts/useCurrentUserContext')
+jest.unmock('holochainClient')
 
 // eslint-disable-next-line array-callback-return
 const actionableTransactions = pendingList.requests.concat(pendingList.promises).map(item => {
@@ -628,7 +629,7 @@ describe('TransactionRow', () => {
       </MockedProvider>, 0)
 
       expect(getByText(presentAgentId('HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'), { exact: false })).toBeInTheDocument()
-      expect(getByText('Accept request for payment of', { exact: false })).toBeInTheDocument()
+      expect(getByText('Accept the request and send', { exact: false })).toBeInTheDocument()
 
       fireEvent.click(getByText('Close Modal'))
       expect(props.setConfirmationModalProperties).toHaveBeenCalled()

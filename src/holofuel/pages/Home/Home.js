@@ -47,7 +47,7 @@ export default function Home () {
 
   const isLoadingFirstPendingTransactions = useLoadingFirstTime(loadingTransactions)
 
-  return <PrimaryLayout headerProps={{ title: 'Home' }}>
+  return <PrimaryLayout headerProps={{ title: 'Holofuel Home' }}>
     <div styleName='container'>
       <div styleName='backdrop' />
       <div styleName='avatar'>
@@ -61,7 +61,7 @@ export default function Home () {
         <Link to={HISTORY_PATH} styleName='balance-link'>
           <div styleName='balance'>
             <h4 styleName='balance-label'>
-              Balance
+              Current Balance
             </h4>
             <div styleName='balance-row'>
               <div styleName='balance-padding' />

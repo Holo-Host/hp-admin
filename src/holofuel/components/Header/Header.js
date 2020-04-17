@@ -21,7 +21,7 @@ export function Header ({ title, agent, agentLoading, avatarUrl, history: { push
       </div>
       <div styleName='center-nav'>
         {title && <div styleName='page-header'>
-          <div styleName='page-title'>{title}</div>
+          <h1 styleName='page-title'>{title}</h1>
         </div>}
       </div>
       <div>

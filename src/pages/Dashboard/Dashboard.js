@@ -29,7 +29,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
 
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
 
-  return <PrimaryLayout headerProps={{ title: 'Home' }}>
+  return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     <div styleName='avatar'>
       <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
         <HashIcon hash={settings.hostPubKey} size={42} />
@@ -62,7 +62,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
     <Card title='HoloFuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
-          Balance
+          Current Balance
         </h4>
         <div styleName='balance-body' data-testid='holofuel-balance'>
           {isBalanceZero ? 'You have no TestFuel' : `${presentHolofuelAmount(balance)} TF`}
