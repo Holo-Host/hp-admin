@@ -42,7 +42,8 @@ export default function runConductorWithFixtures (testFn) {
                     resolve(storageDir)
                   } else {
                     console.log('Deleted residual Default Storage dir.')
-                    await exec(`rm -rf ${process.env.REACT_APP_DEFAULT_STORAGE} && mkdir ${process.env.REACT_APP_DEFAULT_STORAGE}`, { maxBuffer: 1024 * 3000 })
+                    await exec(`rm -rf ${process.env.REACT_APP_DEFAULT_STORAGE}`)
+                    await exec(`mkdir ${process.env.REACT_APP_DEFAULT_STORAGE}`)
                     await ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT, e => { throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ') })
                     console.log('Copied Snapshot Storage into Default Storage!')
                     storageDir = 'Snapshot Storage Directory'
@@ -58,12 +59,12 @@ export default function runConductorWithFixtures (testFn) {
     await manageStorageFiles()
 
     // hc:start
-    exec('holochain -c ./conductor-config.toml &> conductor.log &')
+    exec('npm run test:start-test-conductor')
 
     const waitConductor = async () => {
       // eslint-disable-next-line no-unused-vars
-      const { _, stderr } = await exec('npm run test:wait-for-conductor')
-      if (stderr) console.error('wait-for-conductor error:', stderr)
+      const { _, stderr } = await exec('npm run test:wait-for-test-conductor')
+      if (stderr) console.error('wait-for-test-conductor error:', stderr)
     }
 
     return waitConductor()

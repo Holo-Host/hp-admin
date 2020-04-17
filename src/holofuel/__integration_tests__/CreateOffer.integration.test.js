@@ -12,7 +12,7 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-describe('HOLOFUEL : CreateOffer', () => {
+describe.skip('CreateOffer', () => {
   const agentId = agent1.id
   const amount = 123
   const notes = 'Testing 123'

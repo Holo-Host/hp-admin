@@ -9,7 +9,7 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-describe('HOLOFUEL : Transaction History', () => {
+describe.skip('Transaction History', () => {
   it('A request is displayed', runConductor(async () => {
     const { getByTestId, getByText } = await renderAndWait(<HoloFuelApp />)
     await act(async () => {
