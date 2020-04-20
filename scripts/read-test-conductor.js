@@ -1,7 +1,7 @@
 const fs = require('fs')
 const toml = require('toml')
 
-const config = toml.parse(fs.readFileSync('./conductor-config-test.toml', 'utf-8'))
+const config = toml.parse(fs.readFileSync('./test-conductor-config.toml', 'utf-8'))
 
 const agent1 = {
   id: config.agents[0].public_address || 'ERROR: No Agent Pub Key Found',
