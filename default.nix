@@ -304,7 +304,7 @@ in
       {
         id = "websocket-interface";
         driver = {
-          port = 3401;
+          port = 3400;
           type = "websocket";
         };
         instances = flatten(map multiInterfaceInstanceConfigTest dnas);
@@ -313,7 +313,7 @@ in
         id = "http-interface";
         admin = true;
         driver = {
-          port = 3301;
+          port = 3300;
           type = "http";
         };
         instances = flatten(map multiInterfaceInstanceConfigTest dnas);
