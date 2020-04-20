@@ -79,7 +79,7 @@ let
     dna = dna.name+"-dna";
     id = dna.name;
     storage = {
-      path = ".holochain/holo/storage/${config.agent2.id}/${dna.name}";
+      path = ".holochain/holo/storage/${config.agent1.id}/${dna.name}";
       type = "file";
     };
   }
