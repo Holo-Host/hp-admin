@@ -4,6 +4,7 @@ const exec = util.promisify(require('child_process').exec)
 const rimraf = require('rimraf')
 const wait = require('waait')
 const ncp = util.promisify(require('ncp').ncp)
+import { DEFAULT_HOLOCHAIN_STORAGE, SNAPSHOT_HOLOCHAIN_STORAGE } from '../../../scripts/initialize-test-data'
 
 export default function runConductorWithFixtures (testFn) {
   return async function () {
@@ -21,19 +22,19 @@ export default function runConductorWithFixtures (testFn) {
       return new Promise(resolve => {
         console.log('Searching for Data Storage Files...')
         let storageDir
-        fs.access(process.env.REACT_APP_DEFAULT_STORAGE, fs.constants.F_OK, async (e) => {
+        fs.access(DEFAULT_HOLOCHAIN_STORAGE, fs.constants.F_OK, async (e) => {
           if (e) {
             console.error('Error locating Default Storage dir')
             console.log('Defaulting to Nix Auto-Generated Storage Directory. \n')
             storageDir = 'Nix Auto-Generated Storage Directory'
             resolve(storageDir)
           } else {
-            rimraf(process.env.REACT_APP_DEFAULT_STORAGE, async (e) => {
+            rimraf(DEFAULT_HOLOCHAIN_STORAGE, async (e) => {
               if (e) {
                 console.error(e)
                 throw new Error('Error deleting residual Default Storage dir: ')
               } else {
-                fs.access(process.env.REACT_APP_STORAGE_SNAPSHOT, fs.constants.F_OK, async (e) => {
+                fs.access(SNAPSHOT_HOLOCHAIN_STORAGE, fs.constants.F_OK, async (e) => {
                   if (e) {
                     if (e.code === 'ENOENT') console.error('Error locating Storage Snapshot dir : ENOENT: no such file or directory')
                     else console.error('Error locating Storage Snapshot dir : ', e)
@@ -42,9 +43,9 @@ export default function runConductorWithFixtures (testFn) {
                     resolve(storageDir)
                   } else {
                     console.log('Deleted residual Default Storage dir.')
-                    await exec(`rm -rf ${process.env.REACT_APP_DEFAULT_STORAGE}`)
-                    await exec(`mkdir ${process.env.REACT_APP_DEFAULT_STORAGE}`)
-                    await ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT, e => { throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ') })
+                    await exec(`rm -rf ${DEFAULT_HOLOCHAIN_STORAGE}`)
+                    await exec(`mkdir ${DEFAULT_HOLOCHAIN_STORAGE}`)
+                    await ncp(DEFAULT_HOLOCHAIN_STORAGE, SNAPSHOT_HOLOCHAIN_STORAGE, e => { throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ') })
                     console.log('Copied Snapshot Storage into Default Storage!')
                     storageDir = 'Snapshot Storage Directory'
                     resolve(storageDir)

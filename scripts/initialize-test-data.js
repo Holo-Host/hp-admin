@@ -6,6 +6,9 @@ const ncp = util.promisify(require('ncp').ncp)
 const wait = require('waait')
 require('dotenv').config()
 
+export const DEFAULT_HOLOCHAIN_STORAGE = './.holochain/holo/storage'
+export const SNAPSHOT_HOLOCHAIN_STORAGE = './.holochain/holo/storageSnapshot'
+
 const txParams = {
   amount: '100',
   notes: 'Pre-Seed Data',
@@ -13,7 +16,7 @@ const txParams = {
 }
 
 function snapshotStorage () {
-  return ncp(process.env.REACT_APP_DEFAULT_STORAGE, process.env.REACT_APP_STORAGE_SNAPSHOT)
+  return ncp(DEFAULT_HOLOCHAIN_STORAGE, SNAPSHOT_HOLOCHAIN_STORAGE)
 }
 
 async function populateHoloFuelData () {

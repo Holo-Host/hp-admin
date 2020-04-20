@@ -10,7 +10,7 @@
     "start:holofuel-agent-2": "PORT=3101 REACT_APP_DNA_INTERFACE_URL=ws://localhost:3401 npm run start:holofuel-live",
     "start:holofuel-mock": "REACT_APP_HOLOFUEL_APP=true REACT_APP_RAW_HOLOCHAIN=true npm run start:mock",
     "start:holofuel-live": "REACT_APP_HOLOFUEL_APP=true REACT_APP_RAW_HOLOCHAIN=true npm run start:live",
-    "start:sim2h-server": "sim2h_server -p 9000",
+    "start:sim2h-server": "sim2h_server -p 9000 &> sim2h.log",
     "build": "REACT_APP_VERSION=$npm_package_version node scripts/build.js",
     "build:holofuel": "REACT_APP_VERSION=$npm_package_version REACT_APP_HOLOFUEL_APP=true REACT_APP_RAW_HOLOCHAIN=true node scripts/build.js",
     "hc:start-manual-1": "HC_IGNORE_SIM2H_URL_PROPERTY=true holochain -c conductor-config-1.toml",
@@ -23,7 +23,7 @@
     "test": "npm run test:lint && npm run test:unit",
     "test:ci": "CI=1 npm run test:unit",
     "test:wait-for-test-conductor": "node scripts/wait-for-test-conductor.js",
-    "test:initialize-test-data": "npm run test:start-test-conductor && npm run test:wait-for-test-conductor && NODE_ENV=test babel-node scripts/initialize-test-data",
+    "test:initialize-test-data": "npm run start:sim2h-server && npm run test:start-test-conductor && npm run test:wait-for-test-conductor && NODE_ENV=test babel-node scripts/initialize-test-data",
     "test:integration": "nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "test:integration-with-setup": "npm run test:initialize-test-data && npm run test:integration",
     "test:start-test-conductor": "HC_IGNORE_SIM2H_URL_PROPERTY=true holochain -c ./test-conductor-config.toml &> test-conductor.log &"
