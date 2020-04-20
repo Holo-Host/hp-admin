@@ -1,10 +1,10 @@
+import { DEFAULT_HOLOCHAIN_STORAGE, SNAPSHOT_HOLOCHAIN_STORAGE } from '../../../scripts/initialize-test-data'
 const fs = require('fs')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const rimraf = require('rimraf')
 const wait = require('waait')
 const ncp = util.promisify(require('ncp').ncp)
-import { DEFAULT_HOLOCHAIN_STORAGE, SNAPSHOT_HOLOCHAIN_STORAGE } from '../../../scripts/initialize-test-data'
 
 export default function runConductorWithFixtures (testFn) {
   return async function () {

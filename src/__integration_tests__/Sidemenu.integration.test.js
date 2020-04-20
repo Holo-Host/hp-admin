@@ -9,7 +9,7 @@ jest.mock('react-media-hook')
 jest.mock('react-identicon-variety-pack')
 jest.unmock('react-router-dom')
 
-describe('HP Admin : Sidemenu', () => {
+describe.skip('HP Admin : Sidemenu', () => {
   it('Contains the host HPOS API PubKey and Name', runHposApi(async () => {
     const hposSettings = await HposInterface.os.settings()
 
@@ -18,9 +18,9 @@ describe('HP Admin : Sidemenu', () => {
     debug()
 
     const menuButton = getByTestId('menu-button')
-    // fireEvent.click(menuButton)
+    fireEvent.click(menuButton)
 
-    // await wait(() => getByText('HP Admin'))
-    // await wait(() => getByText(hposSettings.hostName))
+    await wait(() => getByText('HP Admin'))
+    await wait(() => getByText(hposSettings.hostName))
   }), 150000)
 })
