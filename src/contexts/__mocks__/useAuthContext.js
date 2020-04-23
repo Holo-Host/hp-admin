@@ -1,4 +1,4 @@
-const isAuthed = false
+const isAuthed = true
 const setIsAuthed = jest.fn()
 
 export default () => ({

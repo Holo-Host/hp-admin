@@ -37,6 +37,8 @@ export default function TransactionsHistory ({ history: { push } }) {
   const completedTransactions = holofuelCompletedTransactions.concat(filteredPollingResult)
   const pendingTransactions = holofuelWaitingTransactions.filter(pendingTx => pendingTx.status !== STATUS.completed)
 
+  console.log('TRANSACTION HISTORY PENDING TRANSACTIONS', pendingTransactions)
+
   const goToCreateTransaction = () => push(OFFER_REQUEST_PATH)
 
   const [filter, setFilter] = useState(FILTER_TYPES[0])

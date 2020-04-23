@@ -2,7 +2,7 @@ const { connect: hcWebClientConnect } = require('@holochain/hc-web-client')
 const { websocketPort } = require('./read-test-conductor')
 require('dotenv').config()
 
-const HOLOCHAIN_LOGGING = true
+export const HOLOCHAIN_LOGGING = true && process.env.NODE_ENV === 'development'
 let holochainClient
 
 async function initAndGetHolochainClient () {
@@ -14,7 +14,7 @@ async function initAndGetHolochainClient () {
       wsClient: { max_reconnects: 0 }
     })
     if (HOLOCHAIN_LOGGING) {
-      console.log('🎉 Successfully connected to Holochain!')
+      console.log('🎉 Successfully connected to Holochain')
     }
     return holochainClient
   } catch (error) {

@@ -134,6 +134,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
     counterpartyId === currentUser.id ||
     amount < 0
 
+  console.log('isCounterpartyFound', isCounterpartyFound)
+
+  console.log('!!!! submit is disabled', disableSubmit)
+
   if (numpadVisible) {
     const chooseSend = () => {
       setMode(OFFER_MODE)
