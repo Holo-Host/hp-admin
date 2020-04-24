@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { omitBy, pickBy } from 'lodash/fp'
+import { omitBy, pickBy, pull, isEqual } from 'lodash/fp'
 import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -195,6 +195,18 @@ function presentTransaction (transaction) {
 
 // a hack while we clean up the apollo counterparties implementation
 const cachedCounterparties = {}
+const cachedInProcessCallStack = []
+const formCacheZomeCall = (call = '', args = {}) => ({ call, args })
+const updateInProcessCallStackCache = zomeCall => {
+  cachedInProcessCallStack.push(zomeCall)
+  return cachedInProcessCallStack
+}
+const isCallInCache = ({ call, args }) => {
+  for(let cacheZomeCall of cachedInProcessCallStack){   
+    if (cacheZomeCall.call === call && (isEqual(cacheZomeCall.args, args))) return true     
+  }
+  return false
+}
 
 const HoloFuelDnaInterface = {
   user: {
@@ -209,16 +221,24 @@ const HoloFuelDnaInterface = {
     },
     getCounterparty: async ({ agentId }) => {
       const cachedCounterparty = cachedCounterparties[agentId]
+      const getCounterpartyCacheCall = formCacheZomeCall('profile/get_profile', { agentId })
+      
+      const defaultAgent = {
+        id: agentId,
+        avatarUrl: null,
+        nickname: null
+      }
+
       if (cachedCounterparty) return cachedCounterparty
+      else if (isCallInCache(getCounterpartyCacheCall)) return defaultAgent
+      else {
+        updateInProcessCallStackCache(getCounterpartyCacheCall)
+      }
 
       const counterpartyProfile = await createZomeCall('profile/get_profile')({ agent_address: agentId })
       if (counterpartyProfile.Err) {
         console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfile.Err}. `)
-        return {
-          id: null,
-          avatarUrl: null,
-          nickname: null
-        }
+        return defaultAgent
       }
 
       const presentedCounterparty = {
@@ -228,6 +248,7 @@ const HoloFuelDnaInterface = {
       }
 
       cachedCounterparties[agentId] = presentedCounterparty
+      pull(getCounterpartyCacheCall, cachedInProcessCallStack)
 
       return presentedCounterparty
     },
@@ -464,3 +485,17 @@ const HoloFuelDnaInterface = {
 }
 
 export default HoloFuelDnaInterface
+
+//// sanity check : 
+// const agentId = "QmAGentID4r43ad6rer321f56a7l8ksdf8"
+// const cachedInProcessCallStack = []
+// const formCacheZomeCall = (call = '', args = {}) => ({ call, args })
+// const updateInProcessCallStackCache = (zomeCall) => {
+//   cachedInProcessCallStack.push(zomeCall)
+//   return cachedInProcessCallStack
+// }
+// const getCounterpartyCacheCall = formCacheZomeCall('profile/get_profile', { agentId })
+// console.log(cachedInProcessCallStack.includes(getCounterpartyCacheCall))
+
+// updateInProcessCallStackCache(getCounterpartyCacheCall)
+// console.log(cachedInProcessCallStack.includes(getCounterpartyCacheCall))
