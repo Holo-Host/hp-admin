@@ -7,9 +7,9 @@ export const REMOVE_CALL = 'remove'
 export const formCachedApiAddress = (dnaInstance = '', zome = '', zomeFn = '') => (dnaInstance + '/' + zome + '/' + zomeFn)
 export const formCachedZomeCall = (call = '', args = {}) => ({ call, args })
 export const updateInProcessCallStackCache = (zomeCall, updateFn) => {
-  if(updateFn === 'add') {
+  if(updateFn === ADD_CALL) {
     cachedInProcessCallStack.push(zomeCall)
-  } else if (updateFn === 'remove') {
+  } else if (updateFn === REMOVE_CALL) {
     pull(zomeCall, cachedInProcessCallStack)
   }
   return cachedInProcessCallStack
