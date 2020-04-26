@@ -2,6 +2,7 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
+import { isEqual, pull } from 'lodash/fp'
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -162,14 +163,33 @@ async function initAndGetHolochainClient () {
   else return initHolochainClient()
 }
 
+const cachedInProcessCallStack = []
+const formCachedApiAddres = (dnaInstance = '', zome = '', zomeFn = '') => (dnaInstance + '/' + zome + '/' + zomeFn)
+const formCachedZomeCall = (call = '', args = {}) => ({ call, args })
+const updateInProcessCallStackCache = zomeCall => {
+  console.log('>>> ADDING call to stack')
+  console.log('zomeCall : ', zomeCall)
+  cachedInProcessCallStack.push(zomeCall)
+  console.log('AFTERWARD >> cachedInProcessCallStack : ', cachedInProcessCallStack)
+  return cachedInProcessCallStack
+}
+const isCallInCache = ({ call, args }) => {
+  for(let cacheZomeCall of cachedInProcessCallStack){   
+    console.log('isEqual(cacheZomeCall.call, call) && (isEqual(cacheZomeCall.args, args)) : ', isEqual(cacheZomeCall.call, call) && (isEqual(cacheZomeCall.args, args)))
+    if (isEqual(cacheZomeCall.call, call) && (isEqual(cacheZomeCall.args, args))) return true     
+  }
+  return false
+}
+
 export function createZomeCall (zomeCallPath, callOpts = {}) {
+  const { cacheCallOpts, ...zomeCallOpts } = callOpts
   const DEFAULT_OPTS = {
     logging: HOLOCHAIN_LOGGING,
     resultParser: null
   }
   const opts = {
     ...DEFAULT_OPTS,
-    ...callOpts
+    ...zomeCallOpts
   }
 
   const prevErr = []
@@ -177,13 +197,25 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   return async function (args = {}) {
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
-      let zomeCall
+      let zomeCall, dnaAliasInstanceId
       if (MOCK_DNA_CONNECTION && MOCK_INDIVIDUAL_DNAS[instanceId]) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()
-        const dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
+        dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
         zomeCall = holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
+      }
+
+      // call-stack caching
+      const { forceCall }  = cacheCallOpts
+      const cachedApiAddress = formCachedApiAddres(dnaAliasInstanceId, zome, zomeFunc)
+      const cachedApiCall = formCachedZomeCall(cachedApiAddress, args)
+      
+      if (!forceCall && isCallInCache(cachedApiCall)) {
+        console.log(`Zome Call to ${cachedApiAddress} in process ...`)
+        return { callStackCache: { inProcess: true, message: 'Call in process.' }}
+      } else if (!forceCall) {
+        updateInProcessCallStackCache(cachedApiCall)
       }
 
       const rawResult = await zomeCall(args)
@@ -192,6 +224,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       const rawOk = get('Ok', jsonResult)
 
       if (error) throw (error)
+      pull(cachedApiCall, cachedInProcessCallStack)
 
       const result = opts.resultParser ? opts.resultParser(rawOk) : rawOk
 
@@ -235,7 +268,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
 }
 
 export function instanceCreateZomeCall (instanceId) {
-  return (partialZomeCallPath, callOpts = {}) => {
+  return (partialZomeCallPath, callOpts = { cacheCallOpts : {} }) => {
     // regex removes leading slash
     const zomeCallPath = `${instanceId}/${partialZomeCallPath.replace(/^\/+/, '')}`
     return createZomeCall(zomeCallPath, callOpts)
