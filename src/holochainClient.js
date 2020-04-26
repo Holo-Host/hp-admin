@@ -202,7 +202,6 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       const cachedApiCall = formCachedZomeCall(cachedApiAddress, args)
 
       if (!forceCall && isCallInCache(cachedApiCall)) {
-        console.log(`Zome Call to ${cachedApiAddress} in process ...`)
         const inProcess = true
         return callStackCacheResponse(inProcess)
       } else if (!forceCall) {
