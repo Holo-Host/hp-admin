@@ -2,7 +2,7 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
-import { 
+import {
   ADD_CALL,
   REMOVE_CALL,
   formCachedApiAddress,
@@ -199,13 +199,13 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       }
 
       // call-stack caching
-      const { forceCall }  = callStackCacheOpts
+      const { forceCall } = callStackCacheOpts
       const cachedApiAddress = formCachedApiAddress(dnaAliasInstanceId, zome, zomeFunc)
       const cachedApiCall = formCachedZomeCall(cachedApiAddress, args)
 
       if (!forceCall && isCallInCache(cachedApiCall)) {
         const inProcess = true
-        const callStackCache = setCallInProcessResult(inProcess)                
+        const callStackCache = setCallInProcessResult(inProcess)
         return { callStackCache }
       } else if (!forceCall) {
         updateInProcessCallStackCache(cachedApiCall, ADD_CALL)
@@ -263,7 +263,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
 }
 
 export function instanceCreateZomeCall (instanceId) {
-  return (partialZomeCallPath, callOpts = { callStackCacheOpts : {} }) => {
+  return (partialZomeCallPath, callOpts = { callStackCacheOpts: {} }) => {
     // regex removes leading slash
     const zomeCallPath = `${instanceId}/${partialZomeCallPath.replace(/^\/+/, '')}`
     return createZomeCall(zomeCallPath, callOpts)

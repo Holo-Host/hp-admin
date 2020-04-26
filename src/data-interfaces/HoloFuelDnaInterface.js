@@ -212,8 +212,8 @@ const HoloFuelDnaInterface = {
     getCounterparty: async ({ agentId }) => {
       const cachedCounterparty = cachedCounterparties[agentId]
       if (cachedCounterparty) return cachedCounterparty
-      
-      const defaultCounterparty =  {
+
+      const defaultCounterparty = {
         id: agentId,
         avatarUrl: null,
         nickname: null
@@ -225,8 +225,8 @@ const HoloFuelDnaInterface = {
       } else if (Err) {
         console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${Err}. `)
         return defaultCounterparty
-      }      
-      
+      }
+
       const presentedCounterparty = {
         id,
         avatarUrl,
@@ -281,7 +281,7 @@ const HoloFuelDnaInterface = {
       return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
-      const { transactions } = await createZomeCall('transactions/list_transactions',FORCE_CALL)()
+      const { transactions } = await createZomeCall('transactions/list_transactions', FORCE_CALL)()
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
