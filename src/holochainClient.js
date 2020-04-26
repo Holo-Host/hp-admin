@@ -198,17 +198,22 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         zomeCall = holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
       }
 
-      // call-stack caching
-      const { forceCall } = callStackCacheOpts
-      const cachedApiAddress = formCachedApiAddress(dnaAliasInstanceId, zome, zomeFunc)
-      const cachedApiCall = formCachedZomeCall(cachedApiAddress, args)
+      const holofuelInstance = dnaAliasInstanceId === 'holofuel'
+      let cachedApiCall
+      // call-stack caching (currenty only implemented for Holofuel)
+      if (holofuelInstance) {
+        const { forceCall } = callStackCacheOpts
+        console.log(' forceCall >>>>', forceCall)
+        const cachedApiAddress = formCachedApiAddress(dnaAliasInstanceId, zome, zomeFunc)
+        cachedApiCall = formCachedZomeCall(cachedApiAddress, args)
 
-      if (!forceCall && isCallInCache(cachedApiCall)) {
-        const inProcess = true
-        const callStackCache = setCallInProcessResult(inProcess)
-        return { callStackCache }
-      } else if (!forceCall) {
-        updateInProcessCallStackCache(cachedApiCall, ADD_CALL)
+        if (!forceCall && isCallInCache(cachedApiCall)) {
+          const inProcess = true
+          const callStackCache = setCallInProcessResult(inProcess)
+          return { callStackCache }
+        } else if (!forceCall) {
+          updateInProcessCallStackCache(cachedApiCall, ADD_CALL)
+        }
       }
 
       const rawResult = await zomeCall(args)
@@ -217,7 +222,9 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       const rawOk = get('Ok', jsonResult)
 
       if (error) throw (error)
-      updateInProcessCallStackCache(cachedApiCall, REMOVE_CALL)
+      if (holofuelInstance) {
+        updateInProcessCallStackCache(cachedApiCall, REMOVE_CALL)
+      }
       const result = opts.resultParser ? opts.resultParser(rawOk) : rawOk
       const inProcess = false
       const callStackCache = setCallInProcessResult(inProcess)
@@ -238,7 +245,8 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         console.groupEnd()
         console.groupEnd()
       }
-      return resultWithCallStackResult
+      const zomeCallResult = holofuelInstance ? resultWithCallStackResult : result
+      return zomeCallResult
     } catch (error) {
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
       if (repeatingError) return null
