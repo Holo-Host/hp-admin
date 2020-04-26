@@ -202,8 +202,8 @@ const updateInProcessCallStackCache = zomeCall => {
   return cachedInProcessCallStack
 }
 const isCallInCache = ({ call, args }) => {
-  for(let cacheZomeCall of cachedInProcessCallStack){   
-    if (cacheZomeCall.call === call && (isEqual(cacheZomeCall.args, args))) return true     
+  for (const cacheZomeCall of cachedInProcessCallStack) {
+    if (cacheZomeCall.call === call && (isEqual(cacheZomeCall.args, args))) return true
   }
   return false
 }
@@ -222,7 +222,7 @@ const HoloFuelDnaInterface = {
     getCounterparty: async ({ agentId }) => {
       const cachedCounterparty = cachedCounterparties[agentId]
       const getCounterpartyCacheCall = formCacheZomeCall('profile/get_profile', { agentId })
-      
+
       const defaultAgent = {
         id: agentId,
         avatarUrl: null,
