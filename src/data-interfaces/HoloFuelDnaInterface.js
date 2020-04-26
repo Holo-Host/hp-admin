@@ -485,17 +485,3 @@ const HoloFuelDnaInterface = {
 }
 
 export default HoloFuelDnaInterface
-
-//// sanity check : 
-// const agentId = "QmAGentID4r43ad6rer321f56a7l8ksdf8"
-// const cachedInProcessCallStack = []
-// const formCacheZomeCall = (call = '', args = {}) => ({ call, args })
-// const updateInProcessCallStackCache = (zomeCall) => {
-//   cachedInProcessCallStack.push(zomeCall)
-//   return cachedInProcessCallStack
-// }
-// const getCounterpartyCacheCall = formCacheZomeCall('profile/get_profile', { agentId })
-// console.log(cachedInProcessCallStack.includes(getCounterpartyCacheCall))
-
-// updateInProcessCallStackCache(getCounterpartyCacheCall)
-// console.log(cachedInProcessCallStack.includes(getCounterpartyCacheCall))
