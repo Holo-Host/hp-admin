@@ -223,11 +223,7 @@ const HoloFuelDnaInterface = {
       }
 
       const { agent_address: id, avatar_url: avatarUrl, nickname, callStackCache, Err } = await createZomeCall('profile/get_profile')({ agent_address: agentId })
-      if (callStackCache.inProcess && cachedCounterparty) {
-        console.log('in process / NO COUNTERPARTY CACHED : ', cachedCounterparty)
-        return cachedCounterparty
-      } else if (callStackCache.inProcess && !cachedCounterparty) {
-        console.log('in process / cached counterparty EXISTS: ', cachedCounterparty)
+      if (callStackCache && callStackCache.inProcess) {
         return defaultCounterparty
       } else if (Err) {
         console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${Err}. `)
@@ -246,10 +242,8 @@ const HoloFuelDnaInterface = {
     },
     update: async (nickname, avatarUrl) => {
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
-      const { agent_address: id, avatar_url: newAvatarUrl, nickname: newNickname, callStackCache, Err } = await createZomeCall('profile/update_my_profile', forceCall)(params)
-      if (callStackCache.inProcess) {
-        console.log('in process') // return myAgent Cache
-      } else if (Err) {
+      const { agent_address: id, avatar_url: newAvatarUrl, nickname: newNickname, Err } = await createZomeCall('profile/update_my_profile', forceCall)(params)
+      if (Err) {
         throw new Error(`There was an error udpating the current holofuel agent profile. ERROR: ${Err}. `)
       }
       return {
@@ -275,10 +269,7 @@ const HoloFuelDnaInterface = {
     allCompleted: async (since) => {
       const params = since ? { since } : {}
 
-      const { transactions, callStackCache } = await createZomeCall('transactions/list_transactions', forceCall)(params)
-      if (callStackCache.inProcess) {
-        console.log('in process') // return transactions cache
-      }
+      const { transactions } = await createZomeCall('transactions/list_transactions', forceCall)(params)
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = await getTxWithCounterparties(uniqueNonActionableTransactions.filter(tx => tx.status === 'completed'))
