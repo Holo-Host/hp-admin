@@ -4,6 +4,7 @@ import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
+import { FORCE_CALL } from 'utils/callStackCacheMod/index.js'
 
 export const currentDataTimeIso = () => new Date().toISOString()
 
@@ -193,17 +194,13 @@ function presentTransaction (transaction) {
   }
 }
 
-
 // a hack while we clean up the apollo counterparties implementation
 const cachedCounterparties = {}
-
-// options for call stack cache
-const forceCall = { cacheCallOpts: { forceCall: true }}
 
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
-      const { agent_address: id, avatar_url: avatarUrl, nickname, Err } = await createZomeCall('profile/get_my_profile', forceCall)()
+      const { agent_address: id, avatar_url: avatarUrl, nickname, Err } = await createZomeCall('profile/get_my_profile', FORCE_CALL)()
       if (Err) throw new Error(`There was an error locating your holofuel agent ID. ERROR: ${Err}.`)
 
       return {
@@ -215,7 +212,7 @@ const HoloFuelDnaInterface = {
     getCounterparty: async ({ agentId }) => {
       const cachedCounterparty = cachedCounterparties[agentId]
       if (cachedCounterparty) return cachedCounterparty
-
+      
       const defaultCounterparty =  {
         id: agentId,
         avatarUrl: null,
@@ -228,8 +225,8 @@ const HoloFuelDnaInterface = {
       } else if (Err) {
         console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${Err}. `)
         return defaultCounterparty
-      }
-
+      }      
+      
       const presentedCounterparty = {
         id,
         avatarUrl,
@@ -242,7 +239,7 @@ const HoloFuelDnaInterface = {
     },
     update: async (nickname, avatarUrl) => {
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
-      const { agent_address: id, avatar_url: newAvatarUrl, nickname: newNickname, Err } = await createZomeCall('profile/update_my_profile', forceCall)(params)
+      const { agent_address: id, avatar_url: newAvatarUrl, nickname: newNickname, Err } = await createZomeCall('profile/update_my_profile', FORCE_CALL)(params)
       if (Err) {
         throw new Error(`There was an error udpating the current holofuel agent profile. ERROR: ${Err}. `)
       }
@@ -255,7 +252,7 @@ const HoloFuelDnaInterface = {
   },
   ledger: {
     get: async () => {
-      const { balance, credit, payable, receivable, fees } = await createZomeCall('transactions/ledger_state', forceCall)()
+      const { balance, credit, payable, receivable, fees } = await createZomeCall('transactions/ledger_state', FORCE_CALL)()
       return {
         balance,
         credit,
@@ -269,14 +266,14 @@ const HoloFuelDnaInterface = {
     allCompleted: async (since) => {
       const params = since ? { since } : {}
 
-      const { transactions } = await createZomeCall('transactions/list_transactions', forceCall)(params)
+      const { transactions } = await createZomeCall('transactions/list_transactions', FORCE_CALL)(params)
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = await getTxWithCounterparties(uniqueNonActionableTransactions.filter(tx => tx.status === 'completed'))
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
-      const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending', forceCall)()
+      const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending', FORCE_CALL)()
       const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentIncomingCanceledTransaction))
       const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
@@ -284,7 +281,7 @@ const HoloFuelDnaInterface = {
       return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
-      const { transactions } = await createZomeCall('transactions/list_transactions',forceCall)()
+      const { transactions } = await createZomeCall('transactions/list_transactions',FORCE_CALL)()
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       /* NOTE: Filtering out duplicate IDs should prevent an already completed tranaction from displaying as a pending tranaction if any lag occurs in data update layer.  */
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
@@ -296,7 +293,7 @@ const HoloFuelDnaInterface = {
       return presentedWaitingTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
-      const declinedTransactions = await createZomeCall('transactions/list_pending_declined', forceCall)()
+      const declinedTransactions = await createZomeCall('transactions/list_pending_declined', FORCE_CALL)()
       const presentedDeclinedTransactions = declinedTransactions.map(presentDeclinedTransaction)
       const uniqueDeclinedTransactions = _.uniqBy(presentedDeclinedTransactions, 'id')
 
@@ -304,7 +301,7 @@ const HoloFuelDnaInterface = {
     },
     allEarnings: () => mockEarningsData,
     allNonActionableByState: async (transactionId, stateFilter = []) => {
-      const { transactions } = await createZomeCall('transactions/list_transactions', forceCall)({ state: stateFilter })
+      const { transactions } = await createZomeCall('transactions/list_transactions', FORCE_CALL)({ state: stateFilter })
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const cleanedList = _.uniqBy(nonActionableTransactions, 'id')
 
@@ -316,7 +313,7 @@ const HoloFuelDnaInterface = {
     },
     /* NOTE: allNonPending will include Declined and Canceled Transactions:  */
     allNonPending: async () => {
-      const { transactions } = await createZomeCall('transactions/list_transactions', forceCall)()
+      const { transactions } = await createZomeCall('transactions/list_transactions', FORCE_CALL)()
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
 
@@ -331,7 +328,7 @@ const HoloFuelDnaInterface = {
       return presentedNonActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
-      const { requests, promises } = await createZomeCall('transactions/list_pending', forceCall)({ origins: transactionId })
+      const { requests, promises } = await createZomeCall('transactions/list_pending', FORCE_CALL)({ origins: transactionId })
       const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p)))
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
@@ -341,7 +338,7 @@ const HoloFuelDnaInterface = {
     },
     /* NOTE: This is to allow handling of the other side of the transaction that was declined.  */
     getPendingDeclined: async (transactionId, { raw = false }) => {
-      const declinedTransactions = await createZomeCall('transactions/list_pending_declined', forceCall)({ origins: transactionId })
+      const declinedTransactions = await createZomeCall('transactions/list_pending_declined', FORCE_CALL)({ origins: transactionId })
 
       if (declinedTransactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
@@ -357,7 +354,7 @@ const HoloFuelDnaInterface = {
     /* NOTE: decline ACTIONABLE TRANSACTION (NB: pending transaction proposed by another agent) >> ONLY for on asynchronous transactions. */
     decline: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      const declinedProof = await createZomeCall('transactions/decline_pending', forceCall)({ origins: transactionId })
+      const declinedProof = await createZomeCall('transactions/decline_pending', FORCE_CALL)({ origins: transactionId })
       if (!declinedProof) throw new Error(`Decline Error: ${declinedProof}.`)
       return {
         ...transaction,
@@ -368,7 +365,7 @@ const HoloFuelDnaInterface = {
     cancel: async (transactionId) => {
       const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'])
       const transaction = authoredRequests.find(authoredRequest => authoredRequest.id === transactionId)
-      const canceledProof = await createZomeCall('transactions/cancel_transactions', forceCall)({ origins: transactionId })
+      const canceledProof = await createZomeCall('transactions/cancel_transactions', FORCE_CALL)({ origins: transactionId })
       if (!canceledProof) throw new Error(`Cancel Error: ${canceledProof}.`)
 
       return {
@@ -380,7 +377,7 @@ const HoloFuelDnaInterface = {
     recoverFunds: async (transactionId) => {
       // const TX_DECLINED = 'declined-transaction'
       const { rawTransaction, transaction } = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId, { raw: true })
-      const canceledProof = await createZomeCall('transactions/cancel', forceCall)({ entry: rawTransaction })
+      const canceledProof = await createZomeCall('transactions/cancel', FORCE_CALL)({ entry: rawTransaction })
       if (!canceledProof) {
         throw new Error(`Recover Funds Error.  Couldn'\t find a transaction with id ${transactionId}.`)
       }
@@ -394,7 +391,7 @@ const HoloFuelDnaInterface = {
 
     refundTransactions: async (transactions) => {
       const listOfTransactionIds = transactions.map(({ id }) => id)
-      const canceledProof = await createZomeCall('transactions/cancel_transactions', forceCall)({ origins: listOfTransactionIds })
+      const canceledProof = await createZomeCall('transactions/cancel_transactions', FORCE_CALL)({ origins: listOfTransactionIds })
       if (!canceledProof) {
         throw new Error(`Recover Funds Error.  Couldn'\t find a transactions with ids ${transactions}.`)
       }
@@ -411,7 +408,7 @@ const HoloFuelDnaInterface = {
   },
   requests: {
     create: async (counterpartyId, amount, notes) => {
-      const origin = await createZomeCall('transactions/request', forceCall)({ from: counterpartyId, amount: amount.toString(), deadline: MOCK_DEADLINE, notes })
+      const origin = await createZomeCall('transactions/request', FORCE_CALL)({ from: counterpartyId, amount: amount.toString(), deadline: MOCK_DEADLINE, notes })
       return {
         id: origin,
         amount,
@@ -428,7 +425,7 @@ const HoloFuelDnaInterface = {
   },
   offers: {
     create: async (counterpartyId, amount, notes, requestId) => {
-      const origin = await createZomeCall('transactions/promise', forceCall)(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: MOCK_DEADLINE, notes, request: requestId }))
+      const origin = await createZomeCall('transactions/promise', FORCE_CALL)(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: MOCK_DEADLINE, notes, request: requestId }))
 
       return {
         id: requestId || origin, // NB: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
@@ -446,7 +443,7 @@ const HoloFuelDnaInterface = {
 
     accept: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      const result = await createZomeCall('transactions/receive_payments_pending', forceCall)({ promises: transactionId })
+      const result = await createZomeCall('transactions/receive_payments_pending', FORCE_CALL)({ promises: transactionId })
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
@@ -461,13 +458,13 @@ const HoloFuelDnaInterface = {
     },
 
     acceptMany: async (transactionIdArray) => {
-      const result = await createZomeCall('transactions/receive_payments_pending', forceCall)({ promises: transactionIdArray })
+      const result = await createZomeCall('transactions/receive_payments_pending', FORCE_CALL)({ promises: transactionIdArray })
       const transactionArray = Object.entries(result).map(presentAcceptedPayment)
       return transactionArray.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
 
     acceptAll: async () => {
-      const result = await createZomeCall('transactions/receive_payments_pending', forceCall)({})
+      const result = await createZomeCall('transactions/receive_payments_pending', FORCE_CALL)({})
       const transactionArray = Object.entries(result).map(presentAcceptedPayment)
       return transactionArray.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     }

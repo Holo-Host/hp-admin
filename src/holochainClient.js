@@ -9,7 +9,7 @@ import {
   formCachedZomeCall,
   updateInProcessCallStackCache,
   isCallInCache,
-  callStackCacheResponse
+  setCallInProcessResult
 } from 'utils/callStackCacheMod/index.js'
 
 // This can be written as a boolean expression then it's even less readable
@@ -172,14 +172,16 @@ async function initAndGetHolochainClient () {
 }
 
 export function createZomeCall (zomeCallPath, callOpts = {}) {
-  const { cacheCallOpts, ...zomeCallOpts } = callOpts
+  const { callStackCacheOpts } = callOpts
+  // console.log('callStackCacheOpts : ', callStackCacheOpts)
+
   const DEFAULT_OPTS = {
     logging: HOLOCHAIN_LOGGING,
     resultParser: null
   }
   const opts = {
     ...DEFAULT_OPTS,
-    ...zomeCallOpts
+    ...callOpts
   }
 
   const prevErr = []
@@ -197,13 +199,14 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       }
 
       // call-stack caching
-      const { forceCall }  = cacheCallOpts
+      const { forceCall }  = callStackCacheOpts
       const cachedApiAddress = formCachedApiAddress(dnaAliasInstanceId, zome, zomeFunc)
       const cachedApiCall = formCachedZomeCall(cachedApiAddress, args)
 
       if (!forceCall && isCallInCache(cachedApiCall)) {
         const inProcess = true
-        return callStackCacheResponse(inProcess)
+        const callStackCache = setCallInProcessResult(inProcess)                
+        return { callStackCache }
       } else if (!forceCall) {
         updateInProcessCallStackCache(cachedApiCall, ADD_CALL)
       }
@@ -215,8 +218,10 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
 
       if (error) throw (error)
       updateInProcessCallStackCache(cachedApiCall, REMOVE_CALL)
-
       const result = opts.resultParser ? opts.resultParser(rawOk) : rawOk
+      const inProcess = false
+      const callStackCache = setCallInProcessResult(inProcess)
+      const resultWithCallStackResult = { ...result, callStackCache }
 
       if (opts.logging) {
         const detailsFormat = 'font-weight: bold; color: rgb(220, 208, 120)'
@@ -233,7 +238,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         console.groupEnd()
         console.groupEnd()
       }
-      return result
+      return resultWithCallStackResult
     } catch (error) {
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
       if (repeatingError) return null
@@ -258,7 +263,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
 }
 
 export function instanceCreateZomeCall (instanceId) {
-  return (partialZomeCallPath, callOpts = { cacheCallOpts : {} }) => {
+  return (partialZomeCallPath, callOpts = { callStackCacheOpts : {} }) => {
     // regex removes leading slash
     const zomeCallPath = `${instanceId}/${partialZomeCallPath.replace(/^\/+/, '')}`
     return createZomeCall(zomeCallPath, callOpts)

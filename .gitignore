@@ -31,6 +31,7 @@ yarn-debug.log*
 yarn-error.log*
 yarn.lock
 .holochain
+sim2h.log
 conductor.log
 conductor-1.log
 conductor-2.log
