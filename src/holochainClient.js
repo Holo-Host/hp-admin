@@ -189,22 +189,22 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   return async function (args = {}) {
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
-      let zomeCall, dnaAliasInstanceId
+      let zomeCall, zomeCallInstanceId
       if (MOCK_DNA_CONNECTION && MOCK_INDIVIDUAL_DNAS[instanceId]) {
-        zomeCall = mockCallZome(instanceId, zome, zomeFunc)
+        zomeCallInstanceId = instanceId
+        zomeCall = mockCallZome(zomeCallInstanceId, zome, zomeFunc)
       } else {
         await initAndGetHolochainClient()
-        dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
-        zomeCall = holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
+        zomeCallInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
+        zomeCall = holochainClient.callZome(zomeCallInstanceId, zome, zomeFunc)
       }
 
-      const holofuelInstance = dnaAliasInstanceId === 'holofuel'
+      const holofuelInstance = zomeCallInstanceId === 'holofuel'
       let cachedApiCall
       // call-stack caching (currenty only implemented for Holofuel)
       if (holofuelInstance) {
         const { forceCall } = callStackCacheOpts
-        console.log(' forceCall >>>>', forceCall)
-        const cachedApiAddress = formCachedApiAddress(dnaAliasInstanceId, zome, zomeFunc)
+        const cachedApiAddress = formCachedApiAddress(zomeCallInstanceId, zome, zomeFunc)
         cachedApiCall = formCachedZomeCall(cachedApiAddress, args)
 
         if (!forceCall && isCallInCache(cachedApiCall)) {
