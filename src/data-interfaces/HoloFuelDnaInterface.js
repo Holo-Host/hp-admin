@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { omitBy, pickBy, pull, isEqual } from 'lodash/fp'
+import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
 import { promiseMap } from 'utils'
@@ -22,7 +22,6 @@ export async function getTxCounterparties (transactionList) {
 
 const addFullCounterpartyToTx = async (tx) => {
   const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })
-  console.log('agentId', tx.counterparty.id, 'fullCounterparty', fullCounterparty)
   return { ...tx, counterparty: fullCounterparty }
 }
 
