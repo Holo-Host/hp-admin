@@ -194,7 +194,8 @@ function presentTransaction (transaction) {
 }
 
 // a hack while we clean up the apollo counterparties implementation
-const cachedCounterparties = {}
+// AND create a more generalized data loading system
+const cachedGetProfileCalls = {}
 
 const HoloFuelDnaInterface = {
   user: {
@@ -208,28 +209,31 @@ const HoloFuelDnaInterface = {
       }
     },
     getCounterparty: async ({ agentId }) => {
-      const cachedCounterparty = cachedCounterparties[agentId]
-      if (cachedCounterparty) return cachedCounterparty
+      const presentCounterparty = counterparty => ({
+        id: counterparty.agent_address,
+        avatarUrl: counterparty.avatar_url,
+        nickname: counterparty.nickname
+      })
 
-      const counterpartyProfile = await createZomeCall('profile/get_profile')({ agent_address: agentId })
-      if (counterpartyProfile.Err) {
-        console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfile.Err}. `)
-        return {
-          id: null,
-          avatarUrl: null,
-          nickname: null
+      if (cachedGetProfileCalls[agentId]) {
+        if (typeof cachedGetProfileCalls[agentId].then === 'function') {
+          return presentCounterparty(await cachedGetProfileCalls[agentId])
+        } else {
+          return cachedGetProfileCalls[agentId]
         }
       }
 
-      const presentedCounterparty = {
-        id: counterpartyProfile.agent_address,
-        avatarUrl: counterpartyProfile.avatar_url,
-        nickname: counterpartyProfile.nickname
+      cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
+
+      const counterparty = await cachedGetProfileCalls[agentId]
+
+      if (counterparty.Err) {
+        throw new Error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${counterparty.Err}. `)
       }
 
-      cachedCounterparties[agentId] = presentedCounterparty
+      cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
 
-      return presentedCounterparty
+      return presentCounterparty(counterparty)
     },
     update: async (nickname, avatarUrl) => {
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
