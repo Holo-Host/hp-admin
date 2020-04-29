@@ -18,7 +18,7 @@ export const MOCK_INDIVIDUAL_DNAS = {
   holofuel: true
 }
 
-export const HOLOCHAIN_LOGGING = process.env.NODE_ENV === 'development'
+export const HOLOCHAIN_LOGGING = process.env.NODE_ENV !== 'test'
 
 // Parse window.location to retrieve holoPort's HC public key (3rd level subdomain in URL)
 const getHcPubkey = () => {
