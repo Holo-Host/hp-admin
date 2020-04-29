@@ -285,7 +285,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [highlightGreen, setHighlightGreen] = useState(false)
   const [highlightRed, setHighlightRed] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
-  const [isLoading, setIsLoadingRaw] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   if (agent.id === null) return null
 
@@ -307,15 +307,15 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
-  const setIsLoading = isLoading => {
-    setIsLoadingRaw(isLoading)
-    setAreActionsPaused(isLoading)
+  const setIsLoadingAndPaused = state => {
+    setIsLoading(state)
+    setAreActionsPaused(state)
   }
 
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading
+    setIsLoading: setIsLoadingAndPaused
   }
 
   const showAcceptModal = () =>
