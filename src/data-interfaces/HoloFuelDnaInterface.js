@@ -123,20 +123,6 @@ const presentDeclinedTransaction = declinedTx => {
   }
 }
 
-const presentIncomingCanceledTransaction = canceledTx => {
-  if (!canceledTx.event[2].Cancel.entry) throw new Error(`The Canceled Transaction Entry (canceledTx.event[2].Cancel.entry) is UNDEFINED : ${canceledTx}.`)
-  let { event, provenance } = canceledTx
-  event = [event[0], event[1], event[2].Cancel.entry]
-  canceledTx = { ...canceledTx, event }
-  const transaction = canceledTx.event[2].Request ? presentPendingRequest(canceledTx, true) : presentPendingOffer(canceledTx, true)
-
-  return {
-    ...transaction,
-    status: STATUS.canceled,
-    canceledBy: { id: provenance[0] }
-  }
-}
-
 function presentPendingRequest (transaction, annuled = false) {
   const { event, provenance } = transaction
   const origin = event[0]
@@ -269,8 +255,8 @@ const HoloFuelDnaInterface = {
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
-      const { requests, promises, declined, canceled } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction)).concat(canceled.map(presentIncomingCanceledTransaction))
+      const { requests, promises, declined } = await createZomeCall('transactions/list_pending')()
+      const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction))
       const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
 
