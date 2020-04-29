@@ -61,22 +61,6 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
   }
 }
 
-const presentAcceptedPayment = async (acceptedPayment) => {
-  const acceptedPaymentHash = acceptedPayment[1]
-  if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
-
-  const transactionId = acceptedPayment[0]
-  const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-
-  return {
-    ...transaction,
-    id: transactionId,
-    direction: DIRECTION.incoming, // this indicates the hf recipient
-    status: STATUS.completed,
-    type: TYPE.offer
-  }
-}
-
 const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const counterpartyId = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
   return {
@@ -437,18 +421,6 @@ const HoloFuelDnaInterface = {
         status: STATUS.completed,
         type: TYPE.offer
       }
-    },
-
-    acceptMany: async (transactionIdArray) => {
-      const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionIdArray })
-      const transactionArray = Object.entries(result).map(presentAcceptedPayment)
-      return transactionArray.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
-    },
-
-    acceptAll: async () => {
-      const result = await createZomeCall('transactions/receive_payments_pending')({})
-      const transactionArray = Object.entries(result).map(presentAcceptedPayment)
-      return transactionArray.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     }
   }
 }
