@@ -36,7 +36,7 @@ let links = [new SchemaLink({ schema })]
 if (process.env.REACT_APP_HOLOFUEL_APP !== 'true') {
   links = [errorLink].concat(links)
 }
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'test') {
   links = [apolloLogger].concat(links)
 }
 
