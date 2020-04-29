@@ -396,7 +396,7 @@ function RevealActionsButton ({ openDrawer, closeDrawer, isDrawerOpen, areAction
 
   const iconColor = areActionsPaused ? '#ced5de' : '#2c405a'
   return <div onClick={onClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !isDrawerOpen })} data-testid='reveal-actions-button'>
-    <ForwardIcon styleName='forward-icon' color={iconColor} dataTestId='forward-icon' />
+    <ForwardIcon styleName={cx('forward-icon', { 'forward-icon-paused': areActionsPaused })} color={iconColor} dataTestId='forward-icon' />
   </div>
 }
 
