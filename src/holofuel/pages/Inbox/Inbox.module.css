@@ -233,6 +233,10 @@
   opacity: 1;
 }
 
+.forward-icon-paused:hover {
+  opacity: 0.5;
+}
+
 .actions {
   display: flex;
   flex-direction: row nowrap;
