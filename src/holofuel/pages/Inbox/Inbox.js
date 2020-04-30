@@ -147,6 +147,8 @@ export default function Inbox ({ history: { push } }) {
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
+  const [areActionsPaused, setAreActionsPaused] = useState(false)
+
   return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
     <Jumbotron
       className='inbox-header'
@@ -201,7 +203,9 @@ export default function Inbox ({ history: { push } }) {
         isActionable={inboxView === VIEW.actionable}
         setConfirmationModalProperties={setConfirmationModalProperties}
         openDrawerId={openDrawerId}
-        setOpenDrawerId={setOpenDrawerId} />)}
+        setOpenDrawerId={setOpenDrawerId}
+        areActionsPaused={areActionsPaused}
+        setAreActionsPaused={setAreActionsPaused} />)}
     </div>}
 
     <ConfirmationModal
@@ -210,7 +214,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
   const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
@@ -229,13 +233,15 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         hideTransaction={() => hideTransactionWithId(transaction.id)}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
+        areActionsPaused={areActionsPaused}
+        setAreActionsPaused={setAreActionsPaused}
         role='list'
         key={transaction.id} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, openDrawerId, setOpenDrawerId }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
 
   const isDrawerOpen = id === openDrawerId
@@ -301,10 +307,15 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
+  const setIsLoadingAndPaused = state => {
+    setIsLoading(state)
+    setAreActionsPaused(state)
+  }
+
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading
+    setIsLoading: setIsLoadingAndPaused
   }
 
   const showAcceptModal = () =>
@@ -358,6 +369,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
         closeDrawer={() => setIsDrawerOpen(false)}
+        areActionsPaused={areActionsPaused}
       />
       {!isCanceled && <ActionOptions
         isOffer={isOffer}
@@ -369,14 +381,22 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
         showCancelModal={showCancelModal}
         isDeclined={isDeclined}
         isDrawerOpen={isDrawerOpen}
+        areActionsPaused={areActionsPaused}
       />}
     </>}
   </div>
 }
 
-function RevealActionsButton ({ openDrawer, closeDrawer, isDrawerOpen }) {
-  return <div onClick={isDrawerOpen ? closeDrawer : openDrawer} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !isDrawerOpen })} data-testid='reveal-actions-button'>
-    <ForwardIcon styleName='forward-icon' color='#2c405a4d' dataTestId='forward-icon' />
+function RevealActionsButton ({ openDrawer, closeDrawer, isDrawerOpen, areActionsPaused }) {
+  const onClick = isDrawerOpen
+    ? closeDrawer
+    : areActionsPaused
+      ? () => {}
+      : openDrawer
+
+  const iconColor = areActionsPaused ? '#ced5de' : '#2c405a'
+  return <div onClick={onClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !isDrawerOpen })} data-testid='reveal-actions-button'>
+    <ForwardIcon styleName={cx('forward-icon', { 'forward-icon-paused': areActionsPaused })} color={iconColor} dataTestId='forward-icon' />
   </div>
 }
 
