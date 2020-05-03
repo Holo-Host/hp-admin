@@ -1,12 +1,18 @@
 import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
-import { WebSocketLink } from "apollo-link-ws"
-import { SubscriptionClient } from "subscriptions-transport-ws"
+import { RetryLink } from 'apollo-link-retry'
+// NOTE: CANNOT USE THE SHIPPED WebSocketLink by "apollo-link-ws" module,
+// as the "subscriptions-transport-ws" requires that the server be a GraphQL server>>
+//   for more info : https://github.com/apollographql/subscriptions-transport-ws/blob/master/src/client.ts#L657
+// import { WebSocketLink } from "apollo-link-ws"
+// import { SubscriptionClient } from "subscriptions-transport-ws"
+import { connect } from '@holochain/hc-web-client'
 import { SchemaLink } from 'apollo-link-schema'
 import schema from 'graphql-server'
 import apolloLogger from 'apollo-link-logger'
 import { onError } from 'apollo-link-error'
 import { InMemoryCache } from 'apollo-cache-inmemory'
+// import { signPayload } from "./holochainClient"
 
 const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (networkError) {
@@ -27,9 +33,44 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
         response.errors.isHposConnectionActive = false
         return response
       }
-      console.log(`[GraphQL Error Message]]: ${message}`)
+
+      console.log(`[GraphQL Error Message]: ${message}`)
       return response
     })
+  }
+})
+
+// const getSignedPayload = async(urlObj) => {
+//   const signedPayload = await signPayload('get', urlObj.pathname)
+//   console.log('SIGNED PAYLOAD >>> Inside getSignedPayload : ', signedPayload)
+//   return signedPayload
+// }
+
+const hcWsLink = hcWebClientParams => new ApolloLink(async(operation) => {
+  console.log("is operation hpos api? ", hcWebClientParams)
+  console.log(' operation : ', operation)
+
+    // If no 401 error (ie: signed in), do the following:
+      // const urlObj = new URL(hcWebClientParams.url)
+      // const params = new URLSearchParams(urlObj.search.slice(1))
+      // const signedPayload = getSignedPayload(urlObj)
+      // console.log('signedPayload : ', signedPayload)
+      // params.append('X-Hpos-Admin-Signature', signedPayload)
+      // params.sort()
+      // urlObj.search = params.toString()
+      // const SIGNED_HPOS_SERVER_URL = urlObj.toString()
+      // console.log('WS SIGNED_HPOS_SERVER_URL : ', SIGNED_HPOS_SERVER_URL)
+      // hcWebClientParams.url = SIGNED_HPOS_SERVER_URL
+
+
+  let hcWebClient
+  try {
+    hcWebClient = await connect(hcWebClientParams)
+    const observer = await hcWebClient.callZome('holofuel', 'transactions', 'ledger_state')(operation.variables)
+    console.log(' HOLOCHAIN WEBSOCKET Link Observer : ', observer)
+    return observer
+  } catch (error) {
+    console.error('Error when creating connection with hc client', error)
   }
 })
 
@@ -48,21 +89,35 @@ let links = [
 if (process.env.REACT_APP_HOLOFUEL_APP !== 'true') {
   links = [errorLink].concat(links)
 } else if (process.env.REACT_APP_HOLOFUEL_APP === 'true' && process.env.NODE_ENV !== 'test') {
-  const HC_CONDUCTOR = process.env.REACT_APP_DNA_INTERFACE_URL
-  console.log('WS HC_CONDUCTOR : ', HC_CONDUCTOR)
-  const client = new SubscriptionClient(HC_CONDUCTOR, {
-    reconnect: true
-  })
-links = [WebSocketLink(client)].concat(links)
+  const HC_CONDUCTOR_URL = process.env.REACT_APP_DNA_INTERFACE_URL
+  console.log('WS HC_CONDUCTOR_URL : ', HC_CONDUCTOR_URL)
+  const hcWebClient = {
+    url: HC_CONDUCTOR_URL,
+    timeout: 1000,
+    wsClient: { max_reconnects: 0 }
+  }
+  links = [hcWsLink(hcWebClient)].concat(links)
 }
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_RAW_HOLOCHAIN !== 'true') {
     const HPOS_SERVER = 'wss://' + window.location.hostname + '/api/v1/ws/'
     console.log('HPOS SERVER : ', HPOS_SERVER)
-    const client = new SubscriptionClient(HPOS_SERVER, {
-      reconnect: true
-    })
-  links = [WebSocketLink(client)].concat(links)
+
+    const hcWebClient = {
+      url: HPOS_SERVER,
+      timeout: 1000,
+      wsClient: { max_reconnects: 0 }
+    }
+
+    const newLink = new RetryLink().split(
+      operation => {
+        const hposCall = /(Hpos)/g
+        console.log('! hpos match ? : ', !hposCall.test(operation.operationName))
+        return !hposCall.test(operation.operationName)
+      },
+      hcWsLink(hcWebClient)
+    )
+    links = [newLink].concat(links)
 }
 
 if (process.env.NODE_ENV !== 'test') {

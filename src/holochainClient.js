@@ -68,9 +68,12 @@ export const getHpAdminKeypair = async (email = undefined, password = undefined)
 
 // Return empty string if HpAdminKeypair is still not initialized
 export const signPayload = async (method, request, bodyHash) => {
+  console.log('sign Payload >>  method, request, bodyHash: ', method, request, bodyHash)
   const keypair = await getHpAdminKeypair()
 
   if (keypair === null) return ''
+  console.log('keypair ', keypair)
+
 
   const payload = { method: method.toLowerCase(), request, body: bodyHash || '' }
 
@@ -132,6 +135,7 @@ async function initHolochainClient () {
 
     holochainClient = await hcWebClientConnect({
       url: url,
+      // timeout: 5000, // In the module, this is set to a default of 50000 ms (https://github.com/holochain/hc-web-client/blob/master/src/index.ts#L6)
       wsClient: { max_reconnects: 1 }
     })
     if (HOLOCHAIN_LOGGING) {
