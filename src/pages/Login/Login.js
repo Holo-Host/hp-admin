@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import { get } from 'lodash/fp'
@@ -16,19 +16,10 @@ import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
 export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
   const { register, handleSubmit, errors } = useForm()
-  const { isConnected, setIsConnected } = useConnectionContext()
+  const { isConnected } = useConnectionContext()
   const { setIsAuthed } = useAuthContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
-
-  const [hasRefreshed, setHasRefreshed] = useState(false)
-
-  useEffect(() => {
-    if(hasRefreshed && isConnected){
-      setIsConnected(false)
-    }
-  }, [isConnected, setIsConnected, hasRefreshed, setHasRefreshed])
-  
 
   const onSubmit = async ({ email, password }) => {
     eraseHpAdminKeypair()

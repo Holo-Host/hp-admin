@@ -11,6 +11,7 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
+import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -27,7 +28,7 @@ export function PrimaryLayout ({
 
   const onError = ({ graphQLErrors }) => {
     const { isHposConnectionActive } = graphQLErrors
-    setIsConnected(isHposConnectionActive)
+    setIsConnected(isHposConnectionActive && wsConnection)
   }
 
   const onCompleted = ({ hposSettings }) => {
@@ -38,6 +39,7 @@ export function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
 
   useEffect(() => {
+    setIsConnected(wsConnection)
     if (!isConnected) {
       newMessage('Your Holoport is currently unreachable.', 0)
     } else {

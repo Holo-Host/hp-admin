@@ -3,6 +3,9 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
+// hack for updating the isConnected variable in primary layout upon ws connection error catch
+export let wsConnection = true
+
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
@@ -140,6 +143,7 @@ async function initHolochainClient () {
       console.log('🎉 Successfully connected to Holochain!')
     }
     isInitiatingHcConnection = false
+    wsConnection = true
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
@@ -222,6 +226,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         if (wsTimeoutErrorVolume >= 3) {
           window.history.go(-(window.history.length - 1))
           eraseHpAdminKeypair()
+          wsConnection = false
         }       
       }
 
