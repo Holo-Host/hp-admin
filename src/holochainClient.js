@@ -227,7 +227,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
           window.history.go(-(window.history.length - 1))
           eraseHpAdminKeypair()
           wsConnection = false
-        }       
+        }
       }
 
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
