@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
+import { useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
 import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
@@ -25,6 +26,9 @@ export function PrimaryLayout ({
 }) {
   const { setIsConnected, isConnected } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
+  const { push } = useHistory()
+
+  setIsConnected(wsConnection)
 
   const onError = ({ graphQLErrors }) => {
     const { isHposConnectionActive } = graphQLErrors
@@ -32,16 +36,21 @@ export function PrimaryLayout ({
   }
 
   const onCompleted = ({ hposSettings }) => {
-    if (hposSettings) setIsConnected(true)
+    if (hposSettings) {
+      const isHposConnectionActive = true
+      setIsConnected(isHposConnectionActive && wsConnection)
+    }
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onCompleted, onError, notifyOnNetworkStatusChange: true, ssr: false })
   const { newMessage } = useFlashMessageContext()
-
+  
   useEffect(() => {
-    setIsConnected(wsConnection)
     if (!isConnected) {
       newMessage('Your Holoport is currently unreachable.', 0)
+      if(window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+        push('/')
+      }
     } else {
       newMessage('', 0)
       setCurrentUser({
@@ -49,7 +58,7 @@ export function PrimaryLayout ({
         hostName: settings.hostName || ''
       })
     }
-  }, [isConnected, setIsConnected, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName])
+  }, [isConnected, setIsConnected, push, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

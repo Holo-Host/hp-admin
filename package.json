@@ -1,6 +1,6 @@
 {
   "name": "hp-admin",
-  "version": "0.11.6",
+  "version": "0.11.6-alpha8",
   "private": true,
   "scripts": {
     "start": "REACT_APP_VERSION=$npm_package_version npm run start:mock",
@@ -41,9 +41,7 @@
     "apollo-client": "^2.6.4",
     "apollo-link-error": "^1.1.12",
     "apollo-link-logger": "^1.2.3",
-    "apollo-link-retry": "^2.2.16",
     "apollo-link-schema": "^1.2.3",
-    "apollo-link-ws": "^1.0.20",
     "babel-node": "0.0.1-security",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.2.6",
@@ -69,7 +67,6 @@
     "react-tooltip": "^3.10.0",
     "regenerator-runtime": "^0.13.3",
     "rpc-websockets": "^4.5.1",
-    "subscriptions-transport-ws": "^0.9.16",
     "toml": "^3.0.0",
     "toml-loader": "^1.0.0",
     "victory": "^33.1.3",

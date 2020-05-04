@@ -3,7 +3,9 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
-// hack for updating the isConnected variable in primary layout upon ws connection error catch
+// var for updating the isConnected variable in primary layout upon ws connection error catch
+// NB: Currently this must start as true, as no hc zome call are made on hp-admin,
+// thus this boolean would be false and set isConnected to false
 export let wsConnection = true
 
 // This can be written as a boolean expression then it's even less readable
@@ -218,13 +220,13 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       }
       return result
     } catch (error) {
-      // if ws timeout, redirect to login page and reset ws connection
+      // if ws timeout, redirect to login page and relay connection error
       const timeout = /(timeout)/gi
       const ws = /(ws)/gi
       if (timeout.test(error) && ws.test(error)) {
         wsTimeoutErrorVolume++
         if (wsTimeoutErrorVolume >= 3) {
-          window.history.go(-(window.history.length - 1))
+          // window.history.go(window.history.length - 1))
           eraseHpAdminKeypair()
           wsConnection = false
         }
