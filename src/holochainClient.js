@@ -214,17 +214,14 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       }
       return result
     } catch (error) {
-   
       // if ws timeout, redirect to login page and reset ws connection
       const timeout = /(timeout)/gi
       const ws = /(ws)/gi
       if (timeout.test(error) && ws.test(error)) {
         wsTimeoutErrorVolume++
         if (wsTimeoutErrorVolume >= 3) {
-          // console.log('About to REFRESH: wsTimeoutErrorVolume >= 3 : ', wsTimeoutErrorVolume)
           window.history.go(-(window.history.length - 1))
-          // eraseHpAdminKeypair()
-          // return { error: 'Websocket connection error.' }
+          eraseHpAdminKeypair()
         }       
       }
 
