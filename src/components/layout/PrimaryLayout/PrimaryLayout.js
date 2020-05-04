@@ -47,10 +47,10 @@ export function PrimaryLayout ({
   
   useEffect(() => {
     if (!isConnected) {
-      newMessage('Your Holoport is currently unreachable.', 0)
       if(window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
       }
+      newMessage('Your Holoport is currently unreachable.', 0)
     } else {
       newMessage('', 0)
       setCurrentUser({

@@ -13,10 +13,10 @@ import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HashAvatar from 'components/HashAvatar'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
-import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime } from 'utils'
-import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
-import { caribbeanGreen } from 'utils/colors'
 import './Home.module.css'
+import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime } from 'utils'
+import { caribbeanGreen } from 'utils/colors'
+import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
 const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
   if (ledgerLoading) return <>-- TF</>
