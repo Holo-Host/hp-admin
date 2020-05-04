@@ -68,12 +68,9 @@ export const getHpAdminKeypair = async (email = undefined, password = undefined)
 
 // Return empty string if HpAdminKeypair is still not initialized
 export const signPayload = async (method, request, bodyHash) => {
-  console.log('sign Payload >>  method, request, bodyHash: ', method, request, bodyHash)
   const keypair = await getHpAdminKeypair()
 
   if (keypair === null) return ''
-  console.log('keypair ', keypair)
-
 
   const payload = { method: method.toLowerCase(), request, body: bodyHash || '' }
 
@@ -115,6 +112,7 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 
 let holochainClient
 let isInitiatingHcConnection = false
+let wsTimeoutErrorVolume = 0
 
 async function initHolochainClient () {
   isInitiatingHcConnection = true
@@ -135,8 +133,8 @@ async function initHolochainClient () {
 
     holochainClient = await hcWebClientConnect({
       url: url,
-      // timeout: 5000, // In the module, this is set to a default of 50000 ms (https://github.com/holochain/hc-web-client/blob/master/src/index.ts#L6)
-      wsClient: { max_reconnects: 1 }
+      timeout: 5000, // In the hc-web-client module, this is set to a default of 50000 ms (https://github.com/holochain/hc-web-client/blob/master/src/index.ts#L6)
+      wsClient: { max_reconnects: 2 }
     })
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
@@ -216,6 +214,20 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       }
       return result
     } catch (error) {
+   
+      // if ws timeout, redirect to login page and reset ws connection
+      const timeout = /(timeout)/gi
+      const ws = /(ws)/gi
+      if (timeout.test(error) && ws.test(error)) {
+        wsTimeoutErrorVolume++
+        if (wsTimeoutErrorVolume >= 3) {
+          // console.log('About to REFRESH: wsTimeoutErrorVolume >= 3 : ', wsTimeoutErrorVolume)
+          window.history.go(-(window.history.length - 1))
+          // eraseHpAdminKeypair()
+          // return { error: 'Websocket connection error.' }
+        }       
+      }
+
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
       if (repeatingError) return null
       else if (process.env.REACT_APP_INTEGRATION_TEST) {
