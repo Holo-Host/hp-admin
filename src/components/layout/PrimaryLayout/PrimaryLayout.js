@@ -24,33 +24,30 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
+  const [isHposConnectionAlive, setIsHposConnectionAlive] = useState()
   const { setIsConnected, isConnected } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
+  const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
-
-  setIsConnected(wsConnection)
-
+  
   const onError = ({ graphQLErrors }) => {
     const { isHposConnectionActive } = graphQLErrors
-    setIsConnected(isHposConnectionActive && wsConnection)
-  }
-
-  const onCompleted = ({ hposSettings }) => {
-    if (hposSettings) {
-      const isHposConnectionActive = true
-      setIsConnected(isHposConnectionActive && wsConnection)
+    if (!isHposConnectionActive) {
+      setIsHposConnectionAlive(false)
+    } else {
+      setIsHposConnectionAlive(isHposConnectionActive)
     }
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onCompleted, onError, notifyOnNetworkStatusChange: true, ssr: false })
-  const { newMessage } = useFlashMessageContext()
-  
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+
   useEffect(() => {
-    if (!isConnected) {
-      if(window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+    setIsConnected(isHposConnectionAlive && wsConnection)
+    if (isConnected === false) {
+      newMessage('Your Holoport is currently unreachable.', 0)
+      if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
       }
-      newMessage('Your Holoport is currently unreachable.', 0)
     } else {
       newMessage('', 0)
       setCurrentUser({
@@ -58,7 +55,7 @@ export function PrimaryLayout ({
         hostName: settings.hostName || ''
       })
     }
-  }, [isConnected, setIsConnected, push, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName])
+  }, [isConnected, setIsConnected, push, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName, isHposConnectionAlive])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

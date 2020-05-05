@@ -37,7 +37,7 @@ function PrimaryLayout ({
   useEffect(() => {
     if (!isConnected) {
       let connectionErrorMessage, defaultPath
-      if(process.env.REACT_APP_HOLOFUEL_APP === 'true') {
+      if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
         connectionErrorMessage = 'Your Conductor is currently unreachable.'
         defaultPath = HOME_PATH
       } else {
@@ -45,7 +45,7 @@ function PrimaryLayout ({
         defaultPath = HP_ADMIN_LOGIN_PATH
       }
       newMessage(connectionErrorMessage, 0)
-      if(window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
+      if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
         push('/')
       }
     } else {
