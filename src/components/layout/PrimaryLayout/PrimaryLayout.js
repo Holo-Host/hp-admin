@@ -29,7 +29,7 @@ export function PrimaryLayout ({
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
-  
+
   const onError = ({ graphQLErrors }) => {
     const { isHposConnectionActive } = graphQLErrors
     if (!isHposConnectionActive) {
