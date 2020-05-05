@@ -3,6 +3,11 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
+// var for updating the isConnected variable in primary layout upon ws connection error catch
+// NB: Currently this must start as true, as no hc zome call are made on hp-admin,
+// thus this boolean would be false and set isConnected to false
+export let wsConnection = true
+
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
@@ -112,6 +117,7 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 
 let holochainClient
 let isInitiatingHcConnection = false
+let wsTimeoutErrorVolume = 0
 
 async function initHolochainClient () {
   isInitiatingHcConnection = true
@@ -132,12 +138,14 @@ async function initHolochainClient () {
 
     holochainClient = await hcWebClientConnect({
       url: url,
-      wsClient: { max_reconnects: 1 }
+      timeout: 5000, // In the hc-web-client module, this is set to a default of 50000 ms (https://github.com/holochain/hc-web-client/blob/master/src/index.ts#L6)
+      wsClient: { max_reconnects: 2 }
     })
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
     isInitiatingHcConnection = false
+    wsConnection = true
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
@@ -212,6 +220,17 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       }
       return result
     } catch (error) {
+      // if ws timeout, redirect to login page and relay connection error
+      const timeout = /(timeout)/gi
+      const ws = /(ws)/gi
+      if (timeout.test(error) && ws.test(error)) {
+        wsTimeoutErrorVolume++
+        if (wsTimeoutErrorVolume >= 3) {
+          eraseHpAdminKeypair()
+          wsConnection = false
+        }
+      }
+
       const repeatingError = prevErr.find(e => e.path === zomeCallPath && e.error === error)
       if (repeatingError) return null
       else if (process.env.REACT_APP_INTEGRATION_TEST) {

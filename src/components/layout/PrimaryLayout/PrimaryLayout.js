@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
+import { useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
 import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
@@ -11,6 +12,7 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
+import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -22,24 +24,30 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
+  const [isHposConnectionAlive, setIsHposConnectionAlive] = useState()
   const { setIsConnected, isConnected } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
+  const { newMessage } = useFlashMessageContext()
+  const { push } = useHistory()
 
   const onError = ({ graphQLErrors }) => {
     const { isHposConnectionActive } = graphQLErrors
-    setIsConnected(isHposConnectionActive)
+    if (!isHposConnectionActive) {
+      setIsHposConnectionAlive(false)
+    } else {
+      setIsHposConnectionAlive(isHposConnectionActive)
+    }
   }
 
-  const onCompleted = ({ hposSettings }) => {
-    if (hposSettings) setIsConnected(true)
-  }
-
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onCompleted, onError, notifyOnNetworkStatusChange: true, ssr: false })
-  const { newMessage } = useFlashMessageContext()
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useEffect(() => {
-    if (!isConnected) {
+    setIsConnected(isHposConnectionAlive && wsConnection)
+    if (isConnected === false) {
       newMessage('Your Holoport is currently unreachable.', 0)
+      if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+        push('/')
+      }
     } else {
       newMessage('', 0)
       setCurrentUser({
@@ -47,7 +55,7 @@ export function PrimaryLayout ({
         hostName: settings.hostName || ''
       })
     }
-  }, [isConnected, setIsConnected, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName])
+  }, [isConnected, setIsConnected, push, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName, isHposConnectionAlive])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

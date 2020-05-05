@@ -1,18 +1,12 @@
 import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
-import apolloLogger from 'apollo-link-logger'
 import { SchemaLink } from 'apollo-link-schema'
+import schema from 'graphql-server'
+import apolloLogger from 'apollo-link-logger'
 import { onError } from 'apollo-link-error'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import schema from 'graphql-server'
 
-const errorLink = onError(({ graphQLErrors, networkError, response }) => {
-  if (networkError) {
-    console.log(`[Network error]: ${networkError}`)
-    response.errors.isHposConnectionActive = false
-    return response
-  }
-
+const errorLink = onError(({ graphQLErrors, response }) => {
   if (graphQLErrors) {
     graphQLErrors.map(({ message }) => {
       if (message.includes(401)) {
@@ -25,17 +19,19 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
         response.errors.isHposConnectionActive = false
         return response
       }
-      console.log(`[HPOS Connection Error]: ${message}`)
-      response.errors.isHposConnectionActive = false
       return response
     })
   }
 })
 
-let links = [new SchemaLink({ schema })]
+let links = [
+  new SchemaLink({ schema })
+]
+
 if (process.env.REACT_APP_HOLOFUEL_APP !== 'true') {
   links = [errorLink].concat(links)
 }
+
 if (process.env.NODE_ENV !== 'test') {
   links = [apolloLogger].concat(links)
 }
