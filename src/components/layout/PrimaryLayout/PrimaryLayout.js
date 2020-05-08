@@ -24,38 +24,37 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
-  const [isHposConnectionAlive, setIsHposConnectionAlive] = useState()
+  const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
   const { setIsConnected, isConnected } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
 
-  const onError = ({ graphQLErrors }) => {
-    const { isHposConnectionActive } = graphQLErrors
-    if (!isHposConnectionActive) {
-      setIsHposConnectionAlive(false)
-    } else {
-      setIsHposConnectionAlive(isHposConnectionActive)
-    }
+  const onError = ({ graphQLErrors: { isHposConnectionActive } }) => {
+    setIsHposConnectionAlive(isHposConnectionActive)
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useEffect(() => {
     setIsConnected(isHposConnectionAlive && wsConnection)
-    if (isConnected === false) {
-      newMessage('Your Holoport is currently unreachable.', 0)
-      if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
-        push('/')
-      }
-    } else {
+  }, [setIsConnected, isHposConnectionAlive])
+
+  useEffect(() => {
+    if (isConnected) {
       newMessage('', 0)
       setCurrentUser({
         hostPubKey: settings.hostPubKey,
         hostName: settings.hostName || ''
       })
+    } else {
+      console.log('whatsup?')
+      newMessage('Your Holoport is currently unreachable.', 0)
+      if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+        push('/')
+      }
     }
-  }, [isConnected, setIsConnected, push, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName, isHposConnectionAlive])
+  }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
