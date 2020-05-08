@@ -117,7 +117,7 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
 
 let holochainClient
 let isInitiatingHcConnection = false
-let wsTimeoutErrorVolume = 0
+let wsTimeoutErrorCount = 0
 
 async function initHolochainClient () {
   isInitiatingHcConnection = true
@@ -224,11 +224,11 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       const timeout = /(timeout)/gi
       const ws = /(ws)/gi
       if (timeout.test(error) && ws.test(error)) {
-        wsTimeoutErrorVolume++
-        if (wsTimeoutErrorVolume >= 3) {
+        wsTimeoutErrorCount++
+        if (wsTimeoutErrorCount >= 3) {
           eraseHpAdminKeypair()
           wsConnection = false
-          wsTimeoutErrorVolume = 0
+          wsTimeoutErrorCount = 0
         }
       }
 
