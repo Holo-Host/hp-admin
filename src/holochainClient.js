@@ -228,7 +228,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         if (wsTimeoutErrorVolume >= 3) {
           eraseHpAdminKeypair()
           wsConnection = false
-          // wsTimeoutErrorVolume = 0
+          wsTimeoutErrorVolume = 0
         }
       }
 
