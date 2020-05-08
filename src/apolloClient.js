@@ -10,10 +10,12 @@ const errorLink = onError(({ graphQLErrors, response }) => {
   if (graphQLErrors) {
     graphQLErrors.map(({ message }) => {
       if (message.includes(401)) {
+        console.log(`[Authentication Error]: ${message}`)
         response.errors.isHposConnectionActive = true
         return response
       }
       if (message.includes('Network Error')) {
+        console.log(`[HPOS Connection Error]: ${message}`)
         response.errors.isHposConnectionActive = false
         return response
       }
