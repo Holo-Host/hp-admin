@@ -7,18 +7,13 @@ import { onError } from 'apollo-link-error'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 
 const errorLink = onError(({ graphQLErrors, response }) => {
-  console.log('errorLink')
   if (graphQLErrors) {
-    console.log('graphQLErrors')
     graphQLErrors.map(({ message }) => {
-      console.log('gql error', message)
       if (message.includes(401)) {
-        console.log(`[Authentication Error]: ${message}`)
         response.errors.isHposConnectionActive = true
         return response
       }
       if (message.includes('Network Error')) {
-        console.log(`[HPOS Connection Error]: ${message}`)
         response.errors.isHposConnectionActive = false
         return response
       }

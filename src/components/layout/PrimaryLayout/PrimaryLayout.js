@@ -48,7 +48,6 @@ export function PrimaryLayout ({
         hostName: settings.hostName || ''
       })
     } else {
-      console.log('whatsup?')
       newMessage('Your Holoport is currently unreachable.', 0)
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
