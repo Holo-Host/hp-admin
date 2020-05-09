@@ -251,7 +251,7 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
     if (!loading) {
       if (!id) {
         setCounterpartyFound(false)
-        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash of your HoloFuel Peer and try again.')
+        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the address of your HoloFuel Peer and try again.')
       } else {
         setCounterpartyFound(true)
       }
