@@ -38,10 +38,8 @@ export function PrimaryLayout ({
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
-    console.log('isHposConnectionAlive in useInterval', isHposConnectionAlive)
-    console.log('wsConnection in useInterval', wsConnection)
     setIsConnected(isHposConnectionAlive && wsConnection)
-  }, 1500)
+  }, 5000)
 
   useEffect(() => {
     if (isConnected) {

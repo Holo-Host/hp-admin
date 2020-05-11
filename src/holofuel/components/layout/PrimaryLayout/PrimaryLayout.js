@@ -34,9 +34,8 @@ function PrimaryLayout ({
   const { push } = useHistory()
 
   useInterval(() => {
-    console.log('wsConnection in useInterval', wsConnection)
     setIsConnected(wsConnection)
-  }, 1500)
+  }, 5000)
 
   useEffect(() => {
     if (!isConnected) {
