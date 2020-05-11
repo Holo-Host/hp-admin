@@ -32,11 +32,16 @@ function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
 
+  setInterval(() => {
+    console.log('wsConnection outside of use effect', wsConnection)
+    setIsConnected(wsConnection)
+  }, 2000)
+
   useEffect(() => {
     const interval = setInterval(() => {
       console.log('wsConnection', wsConnection)
       setIsConnected(wsConnection)
-    }, 1000)
+    }, 2500)
     return () => clearInterval(interval)
   }, [setIsConnected])
 
