@@ -19,6 +19,7 @@ import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
+import { useInterval } from '../../../../utils'
 
 function PrimaryLayout ({
   children,
@@ -31,6 +32,11 @@ function PrimaryLayout ({
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
+
+  useInterval(() => {
+    console.log('wsConnection in useInterval', wsConnection)
+    setIsConnected(wsConnection)
+  }, 1500)
 
   setInterval(() => {
     console.log('wsConnection outside of use effect', wsConnection)
