@@ -12,6 +12,7 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
+import { useInterval } from 'utils'
 import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
@@ -24,38 +25,36 @@ export function PrimaryLayout ({
   showSideMenu = true,
   showAlphaFlag = true
 }) {
-  const [isHposConnectionAlive, setIsHposConnectionAlive] = useState()
+  const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
   const { setIsConnected, isConnected } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
 
-  const onError = ({ graphQLErrors }) => {
-    const { isHposConnectionActive } = graphQLErrors
-    if (!isHposConnectionActive) {
-      setIsHposConnectionAlive(false)
-    } else {
-      setIsHposConnectionAlive(isHposConnectionActive)
-    }
+  const onError = ({ graphQLErrors: { isHposConnectionActive } }) => {
+    setIsHposConnectionAlive(isHposConnectionActive)
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
-  useEffect(() => {
+  useInterval(() => {
     setIsConnected(isHposConnectionAlive && wsConnection)
-    if (isConnected === false) {
-      newMessage('Your Holoport is currently unreachable.', 0)
-      if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
-        push('/')
-      }
-    } else {
+  }, 5000)
+
+  useEffect(() => {
+    if (isConnected) {
       newMessage('', 0)
       setCurrentUser({
         hostPubKey: settings.hostPubKey,
         hostName: settings.hostName || ''
       })
+    } else {
+      newMessage('Your Holoport is currently unreachable.', 0)
+      if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+        push('/')
+      }
     }
-  }, [isConnected, setIsConnected, push, newMessage, setCurrentUser, settings.hostPubKey, settings.hostName, isHposConnectionAlive])
+  }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

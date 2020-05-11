@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
 import moment from 'moment'
 
@@ -116,4 +116,24 @@ function formatDateTime (isoDate) { // eslint-disable-line no-unused-vars
     }
     // Throw Error, iso-timedate cannot be parsed into valid format
   } else throw new Error('Iso timedate is unable to be parsed.', isoDate)
+}
+
+export function useInterval (callback, delay) {
+  const savedCallback = useRef()
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback
+  }, [callback])
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick () {
+      savedCallback.current()
+    }
+    if (delay !== null) {
+      const id = setInterval(tick, delay)
+      return () => clearInterval(id)
+    }
+  }, [delay])
 }
