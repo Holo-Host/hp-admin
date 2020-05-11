@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import { get } from 'lodash/fp'
@@ -41,6 +41,14 @@ export default function Login ({ history: { push } }) {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     }
   }
+
+  useEffect(() => {
+    if (!isConnected) {
+      newMessage('Your Holoport is currently unreachable.', 0)
+    } else {
+      newMessage('', 0)
+    }
+  }, [isConnected, newMessage])
 
   return <PrimaryLayout showHeader={false} showAlphaFlag={false}>
     <div styleName='container'>
