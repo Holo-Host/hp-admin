@@ -38,18 +38,18 @@ function PrimaryLayout ({
     setIsConnected(wsConnection)
   }, 1500)
 
-  setInterval(() => {
-    console.log('wsConnection outside of use effect', wsConnection)
-    setIsConnected(wsConnection)
-  }, 2000)
+  // setInterval(() => {
+  //   console.log('wsConnection outside of use effect', wsConnection)
+  //   setIsConnected(wsConnection)
+  // }, 2000)
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('wsConnection', wsConnection)
-      setIsConnected(wsConnection)
-    }, 2500)
-    return () => clearInterval(interval)
-  }, [setIsConnected])
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     console.log('wsConnection', wsConnection)
+  //     setIsConnected(wsConnection)
+  //   }, 2500)
+  //   return () => clearInterval(interval)
+  // }, [setIsConnected])
 
   useEffect(() => {
     if (!isConnected) {
