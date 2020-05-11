@@ -12,6 +12,7 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
+import { useInterval } from 'utils'
 import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
@@ -36,9 +37,11 @@ export function PrimaryLayout ({
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
-  useEffect(() => {
+  useInterval(() => {
+    console.log('isHposConnectionAlive in useInterval', isHposConnectionAlive)
+    console.log('wsConnection in useInterval', wsConnection)
     setIsConnected(isHposConnectionAlive && wsConnection)
-  }, [setIsConnected, isHposConnectionAlive])
+  }, 1500)
 
   useEffect(() => {
     if (isConnected) {
