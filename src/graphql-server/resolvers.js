@@ -26,7 +26,14 @@ export const resolvers = {
 
     holofuelUser: HoloFuelDnaInterface.user.get,
 
-    holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
+    holofuelCounterparty: (_, { agentId }) => {
+      return {
+        id: agentId,
+        nickname: 'jon',
+        avatarUrl: 'what'
+      }
+      // HoloFuelDnaInterface.user.getCounterparty({ agentId })
+    },
 
     holofuelHistoryCounterparties: async () => {
       const completed = await HoloFuelDnaInterface.transactions.allCompleted()

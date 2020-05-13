@@ -254,14 +254,19 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
   }, [setCounterpartyNick, nickname])
 
   useEffect(() => {
+    console.log('######### RenderNickname useEffect')
     if (!loading) {
+      console.log('Not laoding')
       if (!id) {
+        console.log('no id')
         setCounterpartyFound(false)
         newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash of your HoloFuel Peer and try again.')
       } else {
+        console.log('id found', id)
         setCounterpartyFound(true)
       }
     } else {
+      console.log('loading')
       setCounterpartyFound(false)
     }
   }, [setCounterpartyFound, loading, newMessage, id])
