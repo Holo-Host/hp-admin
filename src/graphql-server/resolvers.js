@@ -27,12 +27,12 @@ export const resolvers = {
     holofuelUser: HoloFuelDnaInterface.user.get,
 
     holofuelCounterparty: (_, { agentId }) => {
-      return {
-        id: agentId,
-        nickname: 'jon',
-        avatarUrl: 'what'
-      }
-      // HoloFuelDnaInterface.user.getCounterparty({ agentId })
+      // return {
+      //   id: agentId,
+      //   nickname: 'jon',
+      //   avatarUrl: 'what'
+      // }
+      return HoloFuelDnaInterface.user.getCounterparty({ agentId })
     },
 
     holofuelHistoryCounterparties: async () => {
