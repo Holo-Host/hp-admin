@@ -24,7 +24,7 @@
     "test": "npm run test:lint && npm run test:unit",
     "test:ci": "CI=1 npm run test:unit",
     "test:wait-for-test-conductor": "node scripts/wait-for-test-conductor.js",
-    "test:initialize-test-data": "npm run hc:stop-hide-errors && npm run hc:clean-storage && npm run start:sim2h-server &&  npm run test:start-test-conductor && npm run test:wait-for-test-conductor && NODE_ENV=test babel-node scripts/initialize-test-data",
+    "test:initialize-test-data": "npm run hc:stop-hide-errors && npm run hc:clean-storage && npm run start:sim2h-server && npm run test:start-test-conductor && npm run test:wait-for-test-conductor && NODE_ENV=test babel-node scripts/initialize-test-data",
     "test:integration": "nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "test:integration-with-setup": "npm run test:initialize-test-data && npm run test:integration",
     "test:start-test-conductor": "HC_IGNORE_SIM2H_URL_PROPERTY=true holochain -c ./test-conductor-config.toml &> test-conductor.log &"

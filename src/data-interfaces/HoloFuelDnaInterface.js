@@ -208,20 +208,13 @@ const HoloFuelDnaInterface = {
       }
     },
     getCounterparty: async ({ agentId }) => {
-      console.log('calling getCounterparty', agentId)
       const cachedCounterparty = cachedCounterparties[agentId]
-      console.log('is cached', cachedCounterparty)
 
       if (cachedCounterparty) return cachedCounterparty
 
-      console.log('calling get_profile')
-
       const counterpartyProfile = await createZomeCall('profile/get_profile')({ agent_address: agentId })
 
-      console.log('returned from get_profile with ', counterpartyProfile)
-
       if (counterpartyProfile.Err) {
-        console.error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${counterpartyProfile.Err}. `)
         return {
           id: null,
           avatarUrl: null,
@@ -234,8 +227,6 @@ const HoloFuelDnaInterface = {
         avatarUrl: counterpartyProfile.avatar_url,
         nickname: counterpartyProfile.nickname
       }
-
-      console.log('presentedCounterparty', presentedCounterparty)
 
       cachedCounterparties[agentId] = presentedCounterparty
 

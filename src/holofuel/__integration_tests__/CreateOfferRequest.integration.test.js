@@ -1,11 +1,9 @@
 import React from 'react'
-import waait from 'waait'
-import { fireEvent, within, act, wait } from '@testing-library/react'
-import { renderAndWait } from 'utils/test-utils'
-// import { mockNavigateTo } from 'react-router-dom'
+import wait from 'waait'
+import { fireEvent, act } from '@testing-library/react'
+import { renderAndWait, hackyWaitForElement } from 'utils/test-utils'
 import { HoloFuelApp } from 'root'
-import { presentHolofuelAmount, presentAgentId } from 'utils'
-import { agent1 } from 'utils/const'
+import { agent2 } from 'utils/const'
 import runConductor from 'utils/integration-testing/runConductorWithFixtures'
 
 jest.mock('react-media-hook')
@@ -14,57 +12,41 @@ jest.unmock('react-router-dom')
 jest.mock('contexts/useAuthContext')
 
 describe('CreateOfferRequest', () => {
-  it('allows you to create an offer', async () => {
+  it('allows you to create an offer', () => {
     jest.setTimeout(60000)
+    return runConductor(async () => {
+      const { queryByText, getByText, getByLabelText, getByTestId } = await renderAndWait(<HoloFuelApp />)
 
-    const { debug, getByText, getByLabelText, getByTestId, findByText } = await renderAndWait(<HoloFuelApp />)
+      const agentId = agent2.id
+      const amountText = '- 123'
+      const notes = 'Testing 123'
 
-    const agentId = agent1.id
-    const amount = '123'
-    const notes = 'Testing 123'
-
-    // act(() => {
       fireEvent.click(getByText('New Transaction'))
-    // })
 
-    // act(() => {
       fireEvent.click(getByText('1'))
       fireEvent.click(getByText('2'))
       fireEvent.click(getByText('3'))
       fireEvent.click(getByText('Send'))
-    // })
 
-    // act(() => {
       fireEvent.change(getByLabelText('To', { exact: false }), { target: { value: agentId } })
-    // })
 
-    // act(() => {
       fireEvent.change(getByLabelText('For:'), { target: { value: notes } })
-    // })
 
-    var submitButton = getByTestId('submit-button')
+      var submitButton = getByTestId('submit-button')
 
-    while (submitButton.disabled) {
-      console.log('still disabled')
-      submitButton = getByTestId('submit-button')
-      await waait(1000)
-    }
+      while (submitButton.disabled) {
+        submitButton = getByTestId('submit-button')
+        await wait(1000)
+      }
 
-    console.log('submitButton.disabled', submitButton.disabled)
+      act(() => {
+        fireEvent.click(getByTestId('submit-button'))
+      })
 
-    console.log('clicking submit!')
-    fireEvent.click(getByTestId('submit-button'))
+      const amountField = await hackyWaitForElement(() => queryByText(amountText))
 
-    // await waait(55000)
-
-
-
-    // debug()
-
-    const amountField = await findByText(amount)
-
-    expect(getByText(getByText(amount))).toBeInTheDocument()
-
-    // debug()
+      expect(amountField).toBeInTheDocument()
+      expect(getByText(notes)).toBeInTheDocument()
+    })()
   })
 })

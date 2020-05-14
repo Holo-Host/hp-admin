@@ -1,4 +1,5 @@
-import { DEFAULT_HOLOCHAIN_STORAGE, SNAPSHOT_HOLOCHAIN_STORAGE } from '../../../scripts/initialize-test-data'
+import { DEFAULT_HOLOCHAIN_STORAGE, SNAPSHOT_HOLOCHAIN_STORAGE } from '../../../scripts/consts'
+
 const fs = require('fs')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
@@ -42,10 +43,10 @@ export default function runConductorWithFixtures (testFn) {
                     storageDir = 'New Nix Auto-Generated Storage Directory'
                     resolve(storageDir)
                   } else {
-                    console.log('Deleted residual Default Storage dir.')
                     await exec(`rm -rf ${DEFAULT_HOLOCHAIN_STORAGE}`)
-                    await exec(`mkdir ${DEFAULT_HOLOCHAIN_STORAGE}`)
-                    await ncp(DEFAULT_HOLOCHAIN_STORAGE, SNAPSHOT_HOLOCHAIN_STORAGE, e => { throw new Error('Error coping Snapshot Storage dir into Default Storage dir: ') })
+                    console.log('Deleted residual Default Storage dir.')
+                    await exec(`mkdir –m777 ${DEFAULT_HOLOCHAIN_STORAGE}`)
+                    await ncp(SNAPSHOT_HOLOCHAIN_STORAGE, DEFAULT_HOLOCHAIN_STORAGE, e => { throw new Error('Error copying Snapshot Storage dir into Default Storage dir: ') })
                     console.log('Copied Snapshot Storage into Default Storage!')
                     storageDir = 'Snapshot Storage Directory'
                     resolve(storageDir)
@@ -57,6 +58,7 @@ export default function runConductorWithFixtures (testFn) {
         })
       })
     }
+
     await manageStorageFiles()
 
     // hc:start

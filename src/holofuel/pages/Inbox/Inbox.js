@@ -319,8 +319,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const showCancelModal = () =>
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
-  /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { annulled: isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem' data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -518,6 +517,8 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       })
   }
 
+  console.log('isModal open', shouldDisplay)
+
   return <Modal
     contentLabel={contentLabel}
     isOpen={shouldDisplay}
@@ -537,9 +538,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
         onClick={onYes}
         styleName='modal-button-yes'
         disabled={loadingCounterparty || !activeCounterpartyId}
-      >
-        Yes
-      </Button>
+      >Yes</Button>
     </div>
   </Modal>
 }

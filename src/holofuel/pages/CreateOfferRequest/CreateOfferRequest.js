@@ -134,12 +134,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
     counterpartyId === currentUser.id ||
     amount < 0
 
-  console.log('counterpartyId.length !== AGENT_ID_LENGTH', counterpartyId.length !== AGENT_ID_LENGTH)
-  console.log('!isCounterpartyFound', !isCounterpartyFound)
-  console.log('counterpartyId === currentUser.id', counterpartyId === currentUser.id)
-  console.log('amount < 0', amount < 0)
-  console.log('and so -> submit is disabled', disableSubmit)
-
   if (numpadVisible) {
     const chooseSend = () => {
       setMode(OFFER_MODE)
@@ -254,19 +248,14 @@ export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyF
   }, [setCounterpartyNick, nickname])
 
   useEffect(() => {
-    console.log('######### RenderNickname useEffect')
     if (!loading) {
-      console.log('Not laoding')
       if (!id) {
-        console.log('no id')
         setCounterpartyFound(false)
         newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash of your HoloFuel Peer and try again.')
       } else {
-        console.log('id found', id)
         setCounterpartyFound(true)
       }
     } else {
-      console.log('loading')
       setCounterpartyFound(false)
     }
   }, [setCounterpartyFound, loading, newMessage, id])

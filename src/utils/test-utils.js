@@ -13,9 +13,21 @@ export async function renderAndWait (ui, ms = 0, options = {}) {
   return queries
 }
 
+export async function hackyWaitForElement (query) {
+  var element
+
+  while (!element) {
+    element = query()
+    await wait(1000)
+  }
+
+  return element
+}
+
 // *************************************************************************
 // Shared Functions :
 export function setupModal (renderQueries) {
   Modal.setAppElement(renderQueries.container)
   return renderQueries
 }
+
