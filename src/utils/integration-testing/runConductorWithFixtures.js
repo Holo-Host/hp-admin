@@ -45,7 +45,7 @@ export default function runConductorWithFixtures (testFn) {
                   } else {
                     await exec(`rm -rf ${DEFAULT_HOLOCHAIN_STORAGE}`)
                     console.log('Deleted residual Default Storage dir.')
-                    await exec(`mkdir –m777 ${DEFAULT_HOLOCHAIN_STORAGE}`)
+                    await exec(`mkdir ${DEFAULT_HOLOCHAIN_STORAGE}`)
                     await ncp(SNAPSHOT_HOLOCHAIN_STORAGE, DEFAULT_HOLOCHAIN_STORAGE, e => { throw new Error('Error copying Snapshot Storage dir into Default Storage dir: ') })
                     console.log('Copied Snapshot Storage into Default Storage!')
                     storageDir = 'Snapshot Storage Directory'
