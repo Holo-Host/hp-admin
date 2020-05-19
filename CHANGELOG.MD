@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## unreleased
+### Added
+- Inbox: DO allow user to action an additional transaction while waiting for an action to complete
+### Fixed
+- create a different deadline for each transaction to avoid duplications in the DNA
 
 ## [0.11.7] - 2020-04-30
 ### Fixed
