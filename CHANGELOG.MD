@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## unreleased
 
+## [0.11.8] - 2020-05-19
+### Added
+- Inbox: DO allow user to action an additional transaction while waiting for an action to complete
+### Fixed
+- create a different deadline for each transaction to avoid duplications in the DNA
+
 ## [0.11.7] - 2020-04-30
 ### Fixed
 - Detects hpos/conductor connection error using websocket timeouts.

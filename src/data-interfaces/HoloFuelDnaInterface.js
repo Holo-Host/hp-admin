@@ -10,7 +10,11 @@ export const currentDataTimeIso = () => new Date().toISOString()
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
 
-const MOCK_DEADLINE = '4019-01-02T03:04:05.678901234+00:00'
+const mockDeadline = () => {
+  const date = new Date()
+  date.setDate(date.getDate() + 30)
+  return date.toISOString()
+}
 
 /* Creates an array of all counterparties for a provided transaction list */
 export async function getTxCounterparties (transactionList) {
@@ -371,7 +375,7 @@ const HoloFuelDnaInterface = {
   },
   requests: {
     create: async (counterpartyId, amount, notes) => {
-      const origin = await createZomeCall('transactions/request')({ from: counterpartyId, amount: amount.toString(), deadline: MOCK_DEADLINE, notes })
+      const origin = await createZomeCall('transactions/request')({ from: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes })
       return {
         id: origin,
         amount,
@@ -388,7 +392,7 @@ const HoloFuelDnaInterface = {
   },
   offers: {
     create: async (counterpartyId, amount, notes, requestId) => {
-      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: MOCK_DEADLINE, notes, request: requestId }))
+      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
 
       return {
         id: requestId || origin, // NB: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
