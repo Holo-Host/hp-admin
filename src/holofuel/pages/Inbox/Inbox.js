@@ -241,11 +241,15 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused }) {
+  const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
 
-  const isDrawerOpen = id === openDrawerId
-  const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
+  // leaving this here because we'll be going back to this solution very soon.
+
+  // const isDrawerOpen = id === openDrawerId
+  // const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const agent = canceledBy || counterparty
 
