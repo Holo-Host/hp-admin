@@ -147,7 +147,11 @@ export default function Inbox ({ history: { push } }) {
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
-  const [areActionsPaused, setAreActionsPaused] = useState(false)
+  // leaving this here and stubbing these out because we are likely to come back to them soon.
+  // const [areActionsPaused, setAreActionsPaused] = useState(false)
+
+  const areActionsPaused = false
+  const setAreActionsPaused = () => {}
 
   return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
     <Jumbotron
@@ -241,15 +245,11 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused }) {
-  const { counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
 
-  // leaving this here because we'll be going back to this solution very soon.
-
-  // const isDrawerOpen = id === openDrawerId
-  // const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const isDrawerOpen = id === openDrawerId
+  const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
 
   const agent = canceledBy || counterparty
 
@@ -400,7 +400,7 @@ function RevealActionsButton ({ openDrawer, closeDrawer, isDrawerOpen, areAction
 
   const iconColor = areActionsPaused ? '#ced5de' : '#2c405a'
   return <div onClick={onClick} styleName={cx('reveal-actions-button', 'drawer', { 'drawer-close': !isDrawerOpen })} data-testid='reveal-actions-button'>
-    <ForwardIcon styleName={cx('forward-icon', { 'forward-icon-paused': areActionsPaused })} color={iconColor} dataTestId='forward-icon' />
+    <ForwardIcon styleName={cx('forward-icon')} color={iconColor} dataTestId='forward-icon' />
   </div>
 }
 
