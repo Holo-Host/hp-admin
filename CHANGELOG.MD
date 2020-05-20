@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## unreleased
 
+## [0.11.9] - 2020-05-20
+### Fixed
+- Missing style bug causing crash after accepting a transaction
+- Inbox Dont allow multiple transaction drawers to be open at once, but allow actioning a transaction while another is in process
+
 ## [0.11.8] - 2020-05-19
 ### Added
 - Inbox: DO allow user to action an additional transaction while waiting for an action to complete
