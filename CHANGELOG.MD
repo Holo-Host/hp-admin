@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Missing style bug causing crash after accepting a transaction
 - Inbox Dont allow multiple transaction drawers to be open at once, but allow actioning a transaction while another is in process
 
+## [0.11.10] - 2020-05-22
+### Fixed
+-- Running holofuel ui outside of hp-admin ui throws an error
+
 ## [0.11.9] - 2020-05-20
 ### Fixed
 - Missing style bug causing crash after accepting a transaction
