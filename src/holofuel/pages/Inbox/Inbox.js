@@ -147,11 +147,7 @@ export default function Inbox ({ history: { push } }) {
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
-  // leaving this here and stubbing these out because we are likely to come back to them soon.
-  // const [areActionsPaused, setAreActionsPaused] = useState(false)
-
-  const areActionsPaused = false
-  const setAreActionsPaused = () => {}
+  const [areActionsPaused, setAreActionsPaused] = useState(false)
 
   return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
     <Jumbotron
