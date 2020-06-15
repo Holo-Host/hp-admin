@@ -254,6 +254,47 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   }
 }
 
+export async function onSignal (
+  signalCallback,
+  opts = { logging: HOLOCHAIN_LOGGING }
+) {
+
+  if (!holochainClient) {
+    initHolochainClient()
+  }
+
+  holochainClient.onSignal(message => {
+    const { signal: { name, arguments: args } } = message
+    const parsedArgs = JSON.parse(args)
+
+    if (opts.logging) {
+      const detailsFormat = 'font-weight: bold; color: rgb(220, 208, 120)'
+
+      console.groupCollapsed(
+        `📣 ${name}%c signal received`,
+        'font-weight: normal; color: rgb(160, 160, 160)'
+      )
+      console.groupCollapsed('%cArguments', detailsFormat)
+      console.log(parsedArgs)
+      console.groupEnd()
+      console.groupCollapsed('%cRaw Message', detailsFormat)
+      console.log(message)
+      console.groupEnd()
+      console.groupEnd()
+    }
+
+    return signalCallback({ name, args: parsedArgs })
+  })
+}
+
+export function registerHolochainSignals (signalHandlers = {}) {
+  onSignal(signal => {
+    const signalHandler = get(signal.name, signalHandlers)
+
+    if (signalHandler) signalHandler(signal)
+  })
+}
+
 export function instanceCreateZomeCall (instanceId) {
   return (partialZomeCallPath, callOpts = {}) => {
     // regex removes leading slash

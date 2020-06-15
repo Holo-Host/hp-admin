@@ -6,6 +6,7 @@ import Inbox from 'holofuel/pages/Inbox'
 import TransactionHistory from 'holofuel/pages/TransactionHistory'
 import CreateOfferRequest from 'holofuel/pages/CreateOfferRequest'
 import Profile from 'holofuel/pages/Profile'
+import HolochainSignalSubscriber from 'holofuel/components/HolochainSignalSubscriber'
 import FourOhFour from 'holofuel/pages/FourOhFour'
 
 function HFRoute (props) {
@@ -26,5 +27,6 @@ export default function HFRouter () {
     <HFRoute path='/holofuel' exact component={() => <Redirect to='/holofuel/' />} />
     <HFRoute path='/' exact component={() => <Redirect to='/holofuel/' />} />
     <HFRoute component={FourOhFour} />
+    <HolochainSignalSubscriber />
   </Switch>
 }
