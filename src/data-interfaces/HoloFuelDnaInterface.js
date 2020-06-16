@@ -125,13 +125,21 @@ function presentPendingRequest (transaction, annuled = false) {
 }
 
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
+  const receipt = invoicedOffers.find(io => io.Receipt)
+  console.log('========== > receipt : ', receipt)
+  if(receipt) return null
+  const handleEvent = () => HoloFuelDnaInterface.offers.accept(transaction.event[0])
   const findEvent = () => {
-    const result = invoicedOffers.find(io => io.Invoice)
-    console.log('invoicedOffers result : ', result)
-    if(result) return true
-    else return false
-  }
+    const invoice = invoicedOffers.find(io => io.Invoice)
+    if(invoice) {
+     const result = handleEvent()
+     console.log('result ', result)
 
+     return true
+    } else{
+      return false
+    }
+  }
   const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil, isEqual } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -27,6 +27,10 @@ import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, 
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+import { get } from 'lodash'
+
+// TODO: Consult C for UX / copy for this
+const offerInProcessMessage = 'acceptance pending'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -242,7 +246,9 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 }
 
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess } = transaction
+  
+  console.log('inProcess ? ', inProcess)
 
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
@@ -331,7 +337,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled || inProcess }, { highlightGreen }, { highlightRed })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -362,16 +368,18 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       {/* {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>} */}
     </div>
 
-    {isLoading && <Loading styleName='transaction-row-loading' width={20} height={20} />}
+    {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
+    
+    {inProcess && <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>}
 
-    {isActionable && !isLoading && !isDisabled && <>
+    {isActionable && !isLoading && !isDisabled && !inProcess && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
         closeDrawer={() => setIsDrawerOpen(false)}
         areActionsPaused={areActionsPaused}
       />
-      {!isCanceled && <ActionOptions
+      {!isCanceled && !inProcess && <ActionOptions
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}

@@ -11,5 +11,6 @@ query HolofuelNonPendingTransactionsQuery {
     presentBalance
     notes
     canceledBy  { id, nickname, avatarUrl }
+    inProcess
   }
 }
