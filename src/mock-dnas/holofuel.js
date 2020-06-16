@@ -346,7 +346,7 @@ export const pendingList = {
     }
   ],
   promises: [
-    {
+    [{
       event: [
         'QmYNt6DYMiymJtf8oeZ4qn86yWANurFEuAzKuzMQGhsnDd',
         '2019-09-01T11:45:10+00:00',
@@ -369,8 +369,25 @@ export const pendingList = {
         'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
         '3+BrqUuu3sC4bZmub4qGvkmfeKnkJfkm5qZGOM88uompxM0/gE2KNpvTyxpGg44MCbNMB8i8vHBmhTIDMjFwAQ=='
       ]
-    },
-    {
+    }, {
+      Invoice: {
+        promise: {
+          tx: {
+            to: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+            from: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+            amount: '2000',
+            fee: '0',
+            deadline: '2020-01-22T00:00:00-02:00',
+            notes: 'lyft ride',
+            synchronous: null
+          },
+          request: null
+        },
+        promise_sig: 'gcAT6bIvN5wd11OS3gxd1mmimtf/5c9niLhL7eWruG1Kd3kg+CfclsbI/dG69NSXBQbvhwj1u4DLhdSMHutRAQ==',
+        promise_commit: 'QmXTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6MCGes'
+      }
+    }], 
+    [{
       event: [
         'QmYNt6DYMiymJtf8oeZ4qn86yWANurFEuAzKuzMQGhsnsj',
         '2020-01-05T11:45:10+00:00',
@@ -393,7 +410,7 @@ export const pendingList = {
         'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
         '3+BrqUuu3sC4bZmub4qGvkmfeKnkJfkm5qZGOM88uompxM0/gE2KNpvTyxpGg44MCbNMB8i8vHBmhTIDMjFwAQ=='
       ]
-    }
+    },[]]
   ],
   declined: [[
     'QmcH3rDq94ENu5gkZHHMTiNG2ocF6qns3NdQBwU7ZeN3pW',

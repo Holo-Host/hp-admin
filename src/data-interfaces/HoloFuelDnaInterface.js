@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _, { isEmpty } from 'lodash'
 import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
@@ -48,7 +48,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false, inProcess }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -61,7 +61,8 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
     fees,
-    isPayingARequest
+    isPayingARequest,
+    inProcess
   }
 }
 
@@ -104,7 +105,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, null, true)
   return {
     ...transaction,
     status: STATUS.declined
@@ -123,7 +124,16 @@ function presentPendingRequest (transaction, annuled = false) {
   return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
-function presentPendingOffer (transaction, annuled = false) {
+function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
+  const findEvent = () => {
+    const result = invoicedOffers.find(io => io.Invoice)
+    console.log('invoicedOffers result : ', result)
+    if(result) return true
+    else return false
+  }
+
+  console.log('invoicedOffers :', invoicedOffers)
+
   const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)
@@ -133,7 +143,8 @@ function presentPendingOffer (transaction, annuled = false) {
   const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest })
+  const inProcess = isEmpty(invoicedOffers) ? false : findEvent()
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, inProcess })
 }
 
 function presentTransaction (transaction) {
@@ -241,7 +252,9 @@ const HoloFuelDnaInterface = {
     },
     allActionable: async () => {
       const { requests, promises, declined } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction))
+      const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => {
+        console.log('promise : ', promise)
+        presentPendingOffer(promise[0], promise[1])})).concat(declined.map(presentDeclinedTransaction))
       const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
 
@@ -296,7 +309,7 @@ const HoloFuelDnaInterface = {
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
-      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p)))
+      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1])))
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {

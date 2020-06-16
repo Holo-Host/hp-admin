@@ -68,8 +68,9 @@ type Transaction {
   presentBalance: Float
   notes: String
   happName: String
-  isPayingARequest: Boolean
   canceledBy: HolofuelUser
+  isPayingARequest: Boolean
+  inProcess: Boolean
 }
 
 type Ledger {
