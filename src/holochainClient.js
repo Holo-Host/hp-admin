@@ -254,16 +254,11 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   }
 }
 
-export async function onSignal (
-  signalCallback,
-  opts = { logging: HOLOCHAIN_LOGGING }
-) {
-
-  if (!holochainClient) {
-    initHolochainClient()
-  }
-
+export async function onSignal ( signalCallback, opts = { logging: HOLOCHAIN_LOGGING }) {
+  await initHolochainClient()
   holochainClient.onSignal(message => {
+    console.log('>>>>>>>>>>>>>> ON SIGNAL MESSAGE : ', message)
+
     const { signal: { name, arguments: args } } = message
     const parsedArgs = JSON.parse(args)
 
@@ -288,9 +283,10 @@ export async function onSignal (
 }
 
 export function registerHolochainSignals (signalHandlers = {}) {
+  console.log('>>>>>>>>>>>>>> inside registerHolochainSignals... | signalHandlers', signalHandlers)
   onSignal(signal => {
+    console.log('>>>>>>>>>>>>>> onSignal CALLBACK : signal, signalHandlers >> ', signal, signalHandlers)
     const signalHandler = get(signal.name, signalHandlers)
-
     if (signalHandler) signalHandler(signal)
   })
 }
@@ -305,6 +301,5 @@ export function instanceCreateZomeCall (instanceId) {
 
 export function parseZomeCallPath (zomeCallPath) {
   const [zomeFunc, zome, instanceId] = zomeCallPath.split('/').reverse()
-
   return { instanceId, zome, zomeFunc }
 }

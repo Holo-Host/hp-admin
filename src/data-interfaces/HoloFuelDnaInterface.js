@@ -409,21 +409,88 @@ const HoloFuelDnaInterface = {
     },
 
     accept: async (transactionId) => {
-      const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
-      const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
-
-      const acceptedPaymentHash = Object.entries(result)[0][1]
-      if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
-
-      return {
-        ...transaction,
-        id: transactionId, // should always match `Object.entries(result)[0][0]`
-        direction: DIRECTION.incoming, // this indicates the hf recipient
-        status: STATUS.completed,
-        type: TYPE.offer
+      let transactionIds
+      // if transactionId arg is a single ID, turn it into an array with a single entry
+      // else the transactionId arg is already an transactionId array
+      if (typeof transactionId === 'string') {
+        transactionIds = [transactionId]
+        console.log('transactionIds ', transactionIds)
+      } else {
+        transactionIds = transactionId
       }
+    
+      const acceptedOffers = await transactionIds.map(async (transactionId) => {
+        const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
+        const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
+    
+        const acceptedPaymentHash = Object.entries(result)[0][1]
+        if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
+    
+        return {
+          ...transaction,
+          id: transactionId, // should always match `Object.entries(result)[0][0]`
+          direction: DIRECTION.incoming, // this indicates the hf recipient
+          status: STATUS.completed,
+          type: TYPE.offer
+        }
+      })
+    
+      console.log('!.!.!.!.!.!.!.!. accepted offers : ', acceptedOffers)
+    
+      if(acceptedOffers.length === 1) return acceptedOffers[0]
+      else return acceptedOffers
     }
   }
 }
 
 export default HoloFuelDnaInterface
+
+// accept: async (transactionId) => {
+//   const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
+//   const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
+
+//   const acceptedPaymentHash = Object.entries(result)[0][1]
+//   if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
+
+//   return {
+//     ...transaction,
+//     id: transactionId, // should always match `Object.entries(result)[0][0]`
+//     direction: DIRECTION.incoming, // this indicates the hf recipient
+//     status: STATUS.completed,
+//     type: TYPE.offer
+//   }
+// }
+
+// accept: async (transactionIds) => {
+//   let transactionIds
+  
+//   // if transactionId arg is a single ID, turn it into an array with a single entry
+//   // else the transactionId arg is already an transactionId array
+//   if (typeof transactionId === 'string') {
+//     transactionIds = [transactionId]
+//     console.log('transactionIds ', transactionIds)
+//   } else {
+//     transactionIds = transactionId
+//   }
+
+//   const acceptedOffers = await transactionIds.map(async (transactionId) => {
+//     const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
+//     const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
+
+//     const acceptedPaymentHash = Object.entries(result)[0][1]
+//     if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
+
+//     return {
+//       ...transaction,
+//       id: transactionId, // should always match `Object.entries(result)[0][0]`
+//       direction: DIRECTION.incoming, // this indicates the hf recipient
+//       status: STATUS.completed,
+//       type: TYPE.offer
+//     }
+//   })
+
+//   console.log('!.!.!.!.!.!.!.!. accepted offers : ', acceptedOffers)
+
+//   if(acceptedOffers.length === 1) return acceptedOffers[0]
+//   else return acceptedOffers
+// }
