@@ -105,7 +105,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, null, true)
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, null, true).filter(tx => !(tx instanceof Error))
   return {
     ...transaction,
     status: STATUS.declined
@@ -127,14 +127,13 @@ function presentPendingRequest (transaction, annuled = false) {
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
   const receipt = invoicedOffers.find(io => io.Receipt)
   console.log('========== > receipt : ', receipt)
-  if(receipt) return null
+  if(receipt) return new Error(`Error: Receipt found: ${receipt}.`)
+
   const handleEvent = () => HoloFuelDnaInterface.offers.accept(transaction.event[0])
   const findEvent = () => {
     const invoice = invoicedOffers.find(io => io.Invoice)
     if(invoice) {
-     const result = handleEvent()
-     console.log('result ', result)
-
+     handleEvent()
      return true
     } else{
       return false
@@ -258,7 +257,7 @@ const HoloFuelDnaInterface = {
     },
     allActionable: async () => {
       const { requests, promises, declined } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction))
+      const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
       const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
             
@@ -313,7 +312,7 @@ const HoloFuelDnaInterface = {
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
-      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1])))
+      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1]))).filter(tx => !(tx instanceof Error))
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -430,7 +429,7 @@ const HoloFuelDnaInterface = {
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
-      if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
+      if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR:', acceptedPaymentHash.Err)
 
       return {
         ...transaction,
