@@ -254,6 +254,8 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   }
 }
 
+export const registeredSignals = {}
+
 export async function onSignal ( signalCallback, opts = { logging: HOLOCHAIN_LOGGING }) {
   await initAndGetHolochainClient()
   holochainClient.onSignal(message => {
@@ -284,6 +286,13 @@ export async function onSignal ( signalCallback, opts = { logging: HOLOCHAIN_LOG
 
 export function registerHolochainSignals (signalHandlers = {}) {
   console.log('>>>>>>>>>>>>>> inside registerHolochainSignals... | signalHandlers', signalHandlers)
+  for (let [signalName, signalCallback] of Object.entries(signalHandlers)) {
+    if(!registeredSignals.signalName){
+      registeredSignals[signalName] = signalCallback
+    }
+  }
+  console.log('>>>>>>> registeredSignals : ', registeredSignals)
+
   onSignal(signal => {
     console.log('>>>>>>>>>>>>>> onSignal CALLBACK : signal, signalHandlers >> ', signal, signalHandlers)
     const signalHandler = get(signal.name, signalHandlers)
