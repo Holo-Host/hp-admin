@@ -49,7 +49,7 @@ function PrimaryLayout ({
       }
       newMessage(connectionErrorMessage, 0)
       if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
-        push('/')
+        push(defaultPath)
       }
     } else {
       newMessage('', 0)
