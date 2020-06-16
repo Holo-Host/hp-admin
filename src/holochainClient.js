@@ -255,7 +255,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
 }
 
 export async function onSignal ( signalCallback, opts = { logging: HOLOCHAIN_LOGGING }) {
-  await initHolochainClient()
+  await initAndGetHolochainClient()
   holochainClient.onSignal(message => {
     console.log('>>>>>>>>>>>>>> ON SIGNAL MESSAGE : ', message)
 

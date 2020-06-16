@@ -1,4 +1,4 @@
-mutation HolofuelAcceptOfferMutation ($transactionId: ID) {
+mutation HolofuelAcceptOfferMutation ($transactionId: [ID]) {
   holofuelAcceptOffer(transactionId: $transactionId) {
     id
     amount

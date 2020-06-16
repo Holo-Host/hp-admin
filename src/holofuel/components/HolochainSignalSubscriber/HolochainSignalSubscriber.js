@@ -27,15 +27,13 @@ export default function HolochainSignalSubscriber () {
       registerHolochainSignals({
         'request_retry_approval': signal => {
           console.log('request_retry_approval signal:', signal)
-          
+
           // Trigger a call to receive_payments_pending zome call
           // with the returned vector of transaction ids.
-          // const { args: transactionIds } = signal
-          // if (!isEmpty(transactionIds)) {
-          //   transactionIds.forEach(transactionId => {
-          //     acceptOffer({ transactionId })
-          //   })
-          // }
+          const { args: transactionId } = signal
+          if (!isEmpty(transactionId)) {
+              acceptOffer({ transactionId: transactionId.addresses })
+          }
         }
       })
     })()

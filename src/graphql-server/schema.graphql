@@ -156,7 +156,7 @@ type Mutation {
   holofuelUpdateUser(nickname: String!, avatarUrl: String): HolofuelUser
   holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
   holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
-  holofuelAcceptOffer(transactionId: ID): Transaction
+  holofuelAcceptOffer(transactionId: [ID]): Transaction
   holofuelDecline(transactionId: ID): Transaction
   holofuelCancel(transactionId: ID): Transaction
   holofuelRecoverFunds(transactionId: ID): Transaction

@@ -484,7 +484,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     }
     case 'acceptOffer': {
       contentLabel = 'Accept offer'
-      actionParams = { id }
+      actionParams = { id: [id] }
       actionHook = acceptOffer
       message = <>
         Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
