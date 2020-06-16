@@ -132,8 +132,6 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
     else return false
   }
 
-  console.log('invoicedOffers :', invoicedOffers)
-
   const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)
@@ -252,12 +250,10 @@ const HoloFuelDnaInterface = {
     },
     allActionable: async () => {
       const { requests, promises, declined } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => {
-        console.log('promise : ', promise)
-        presentPendingOffer(promise[0], promise[1])})).concat(declined.map(presentDeclinedTransaction))
+      const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction))
       const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
-
+            
       return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
