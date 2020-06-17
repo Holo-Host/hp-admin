@@ -436,7 +436,7 @@ const HoloFuelDnaInterface = {
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) {
         if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
-          userNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
+        userNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
           return {
             ...transaction,
             id: transactionId, // should always match `Object.entries(result)[0][0]`
