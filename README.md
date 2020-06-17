@@ -61,4 +61,14 @@ If referencing **Live** Data :
 
 ---
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### HoloFuel UI deploy process:
+
+To deploy a build to https://holo-host.github.io/holofuel-static-ui/
+
+Add the repo as a remote:
+
+`$ git add remote static https://github.com/Holo-Host/holofuel-static-ui.git`
+
+Then `npm run deploy`
+
+If you want to deploy it somewhere else, you'll have to update "homepage" and "predeploy" in package.json to reflect the new url
