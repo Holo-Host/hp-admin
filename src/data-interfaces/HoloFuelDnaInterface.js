@@ -440,7 +440,7 @@ const HoloFuelDnaInterface = {
           return {
             ...transaction,
             id: transactionId, // should always match `Object.entries(result)[0][0]`
-            direction: DIRECTION.outgoing, // this indicates the hf recipient
+            direction: DIRECTION.incoming, // this indicates the hf recipient
             status: STATUS.pending,
             type: TYPE.offer
           } 
