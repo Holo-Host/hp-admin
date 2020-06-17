@@ -435,6 +435,7 @@ const HoloFuelDnaInterface = {
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) {
+<<<<<<< HEAD
         if (acceptedPaymentHash.Err.Internal) {
           console.log('+++++ acceptedPaymentHash.Err.Internal : ', acceptedPaymentHash.Err.Internal)
           console.log('????? JSON.parse(acceptedPaymentHash.Err.Internal) : ', JSON.parse(acceptedPaymentHash.Err.Internal))
@@ -458,6 +459,16 @@ const HoloFuelDnaInterface = {
                 type: TYPE.offer
               }
             }
+=======
+        if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
+        userNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
+          return {
+            ...transaction,
+            id: transactionId, // should always match `Object.entries(result)[0][0]`
+            direction: DIRECTION.incoming, // this indicates the hf recipient
+            status: STATUS.pending,
+            type: TYPE.offer
+>>>>>>> 6bf4304fc45fdf4b01464448b3172346ad344360
           }
         } else {
           throw new Error(acceptedPaymentHash.Err)

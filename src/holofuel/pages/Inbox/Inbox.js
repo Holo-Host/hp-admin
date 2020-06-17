@@ -325,6 +325,14 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
+  const onTimeout = () => {
+    setHighlightRed(true)
+    setIsDisabled(true)
+    setTimeout(() => {
+      setHighlightRed(false)
+    }, 5000)
+  }
+
   const setIsLoadingAndPaused = state => {
     setIsLoading(state)
     setAreActionsPaused(state)
@@ -333,7 +341,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused
+    setIsLoading: setIsLoadingAndPaused,
+    onTimeout
   }
 
   const showAcceptModal = () =>
@@ -478,7 +487,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const declineTransaction = useDecline()
 
   const { newMessage } = useFlashMessageContext()
-  const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
+  const { transaction, action, shouldDisplay, onConfirm, setIsLoading, onTimeout } = confirmationModalProperties
 
   const { id, amount, type, notes, counterparty = {} } = transaction
   const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
@@ -548,9 +557,15 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     hideModal()
 
     actionHook(actionParams)
-      .then(() => {
-        onConfirm()
-        newMessage(flashMessage, 5000)
+      .then(({data: { holofuelAcceptOffer: result }}) => {
+        if(result.type === TYPE.offer && result.status === STATUS.pending) {
+          const timeoutNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
+          onTimeout()
+          newMessage(timeoutNotification, 5000)
+        } else {
+          onConfirm()
+          newMessage(flashMessage, 5000)
+        }
         setIsLoading(false)
       })
       .catch(() => {
