@@ -106,7 +106,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, [], true)
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, null, true).filter(tx => !(tx instanceof Error))
   return {
     ...transaction,
     status: STATUS.declined
@@ -438,7 +438,6 @@ const HoloFuelDnaInterface = {
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) {
         if (acceptedPaymentHash.Err.Internal) {
-          console.log('+++++ acceptedPaymentHash.Err.Internal : ', acceptedPaymentHash.Err.Internal)
           const spenderValidationError = /(Spender chain invalid)/g
           if (typeof acceptedPaymentHash.Err.Internal === 'string' && spenderValidationError.test(acceptedPaymentHash.Err.Internal)) {
             userNotification = 'Transaction could not be validated and will never pass. Transaction is now stale.'

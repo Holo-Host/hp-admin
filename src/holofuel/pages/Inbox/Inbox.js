@@ -557,8 +557,8 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     hideModal()
 
     actionHook(actionParams)
-      .then(({data: { holofuelAcceptOffer: result }}) => {
-        if(result.type === TYPE.offer && result.status === STATUS.pending) {
+      .then(({ data: { holofuelAcceptOffer: result } }) => {
+        if (result.type === TYPE.offer && result.status === STATUS.pending) {
           const timeoutNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
           onTimeout()
           newMessage(timeoutNotification, 5000)
