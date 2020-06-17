@@ -435,14 +435,29 @@ const HoloFuelDnaInterface = {
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) {
-        if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
-          userNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
-          return {
-            ...transaction,
-            id: transactionId, // should always match `Object.entries(result)[0][0]`
-            direction: DIRECTION.incoming, // this indicates the hf recipient
-            status: STATUS.pending,
-            type: TYPE.offer
+        if (acceptedPaymentHash.Err.Internal) {
+          console.log('+++++ acceptedPaymentHash.Err.Internal : ', acceptedPaymentHash.Err.Internal)
+          console.log('????? JSON.parse(acceptedPaymentHash.Err.Internal) : ', JSON.parse(acceptedPaymentHash.Err.Internal))
+          if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
+            userNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
+            return {
+              ...transaction,
+              id: transactionId, // should always match `Object.entries(result)[0][0]`
+              direction: DIRECTION.incoming, // this indicates the hf recipient
+              status: STATUS.pending,
+              type: TYPE.offer
+            }
+          } else {
+            if (JSON.parse(acceptedPaymentHash.Err.Internal)) {
+              userNotification = 'Transaction could not be validated and will never pass. Transaction is now stale.'
+              return {
+                ...transaction,
+                id: transactionId, // should always match `Object.entries(result)[0][0]`
+                direction: DIRECTION.incoming, // this indicates the hf recipient
+                status: STATUS.pending,
+                type: TYPE.offer
+              }
+            }
           }
         } else {
           throw new Error(acceptedPaymentHash.Err)
