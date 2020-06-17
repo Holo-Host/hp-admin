@@ -37,16 +37,7 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
         status: STATUS.pending,
         isPayingARequest: false
       }
-    } else if (item.event[2].Promise) {
-      return {
-        type: 'offer',
-        ...item.event[2].Promise.tx,
-        counterparty: item.event[2].Promise.tx.from,
-        timestamp: item.event[1],
-        status: STATUS.pending,
-        isPayingARequest: !!item.event[2].Promise.request
-      }
-    }
+    } 
   } else if (item[2]) {
     if (item[2].Request) {
       return {
@@ -67,6 +58,17 @@ const actionableTransactions = pendingList.requests.concat(pendingList.promises)
         isPayingARequest: false
       }
     }
+  } else if (item[0].event) {
+    if (item[0].event[2].Promise) {
+      return {
+        type: 'offer',
+        ...item[0].event[2].Promise.tx,
+        counterparty: item[0].event[2].Promise.tx.from,
+        timestamp: item[0].event[1],
+        status: STATUS.pending,
+        isPayingARequest: !!item[0].event[2].Promise.request
+      }
+    }
   } else {
     throw new Error('unrecognized transaction type', item.toString())
   }
@@ -83,6 +85,8 @@ describe('Inbox connected (with Agent Nicknames)', () => {
     </ApolloProvider>, 1500)
 
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
+
+    console.log('actionableTransactions : ', actionableTransactions)
 
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)

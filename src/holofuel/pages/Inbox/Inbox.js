@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil, isEqual } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -122,7 +122,7 @@ export default function Inbox ({ history: { push } }) {
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
   const showUserMessage = () => {
-    if(userNotification !== userMessage) {
+    if (userNotification !== userMessage) {
       newMessage(userNotification, 0)
       setUserMessage(userNotification)
     }
@@ -257,8 +257,8 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess } = transaction
-  
-  if(inProcess){
+
+  if (inProcess) {
     showUserMessage()
   }
 
@@ -381,7 +381,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     </div>
 
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
-    
+
     {inProcess && <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>}
 
     {isActionable && !isLoading && !isDisabled && !inProcess && <>

@@ -386,7 +386,7 @@ export const pendingList = {
         promise_sig: 'gcAT6bIvN5wd11OS3gxd1mmimtf/5c9niLhL7eWruG1Kd3kg+CfclsbI/dG69NSXBQbvhwj1u4DLhdSMHutRAQ==',
         promise_commit: 'QmXTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6MCGes'
       }
-    }], 
+    }],
     [{
       event: [
         'QmYNt6DYMiymJtf8oeZ4qn86yWANurFEuAzKuzMQGhsnsj',
@@ -410,7 +410,7 @@ export const pendingList = {
         'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
         '3+BrqUuu3sC4bZmub4qGvkmfeKnkJfkm5qZGOM88uompxM0/gE2KNpvTyxpGg44MCbNMB8i8vHBmhTIDMjFwAQ=='
       ]
-    },[]]
+    }, []]
   ],
   declined: [[
     'QmcH3rDq94ENu5gkZHHMTiNG2ocF6qns3NdQBwU7ZeN3pW',
@@ -428,9 +428,7 @@ export const pendingList = {
         }
       }
     }
-  ]],
-  // NOTE: This is to allow Spender Refunds >> Recipient must accept proposed cancelation of a completed Transfer, in order for the Spender to be refunded.
-  canceled: []
+  ]]
 }
 
 const agentArray = [{
