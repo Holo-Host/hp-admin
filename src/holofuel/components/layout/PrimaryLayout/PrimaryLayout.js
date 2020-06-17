@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -26,7 +26,7 @@ function PrimaryLayout ({
   headerProps = {},
   showAlphaFlag = true
 }) {
-  const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 20000 })
+  const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions  } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
@@ -43,6 +43,7 @@ function PrimaryLayout ({
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
         connectionErrorMessage = 'Your Conductor is currently unreachable.'
         defaultPath = HOME_PATH
+        stopPollingActionableTransactions()
       } else {
         connectionErrorMessage = 'Your Holoport is currently unreachable.'
         defaultPath = HP_ADMIN_LOGIN_PATH
@@ -50,11 +51,13 @@ function PrimaryLayout ({
       newMessage(connectionErrorMessage, 0)
       if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
         push(defaultPath)
+        stopPollingActionableTransactions()
       }
     } else {
       newMessage('', 0)
+      startPollingActionableTransactions(20000)
     }
-  }, [isConnected, setIsConnected, push, newMessage])
+  }, [isConnected, setIsConnected, push, newMessage, stopPollingActionableTransactions, startPollingActionableTransactions])
 
   const inboxCount = actionableTransactions.filter(shouldShowTransactionInInbox).length
   const isWide = useContext(ScreenWidthContext)
