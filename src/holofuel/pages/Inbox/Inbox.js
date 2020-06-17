@@ -27,7 +27,7 @@ import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, 
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
-import { get } from 'lodash'
+import { userNotification } from 'data-interfaces/HoloFuelDnaInterface'
 
 // TODO: Consult C for UX / copy for this
 const offerInProcessMessage = 'acceptance pending'
@@ -119,13 +119,21 @@ export default function Inbox ({ history: { push } }) {
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
 
+  const [userMessage, setUserMessage] = useState('')
+  const { newMessage } = useFlashMessageContext()
+  const showUserMessage = () => {
+    if(userNotification !== userMessage) {
+      newMessage(userNotification, 0)
+      setUserMessage(userNotification)
+    }
+  }
+
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
     transaction: {},
     action: '',
     onConfirm: () => {}
   }
-
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
 
   const [openDrawerId, setOpenDrawerId] = useState()
@@ -209,7 +217,8 @@ export default function Inbox ({ history: { push } }) {
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
-        setAreActionsPaused={setAreActionsPaused} />)}
+        setAreActionsPaused={setAreActionsPaused}
+        showUserMessage={showUserMessage} />)}
     </div>}
 
     <ConfirmationModal
@@ -218,7 +227,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, showUserMessage }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
   const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
@@ -240,15 +249,18 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
         role='list'
-        key={transaction.id} />)}
+        key={transaction.id}
+        showUserMessage={showUserMessage} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess } = transaction
   
-  console.log('inProcess ? ', inProcess)
+  if(inProcess){
+    showUserMessage()
+  }
 
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)

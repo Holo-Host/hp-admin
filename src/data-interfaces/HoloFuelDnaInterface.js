@@ -6,6 +6,7 @@ import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
 
 export const currentDataTimeIso = () => new Date().toISOString()
+export let userNotification
 
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
@@ -123,21 +124,25 @@ function presentPendingRequest (transaction, annuled = false) {
   const { amount, notes, fee } = event[2].Request
   return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
-
+let counter = 0
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
-  const receipt = invoicedOffers.find(io => io.Receipt)
-  console.log('========== > receipt : ', receipt)
-  if(receipt) return new Error(`Error: Receipt found: ${receipt}.`)
+  const invalidEvent = invoicedOffers.find(io => !io.Invoice  )
+  if(invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
 
   const handleEvent = () => HoloFuelDnaInterface.offers.accept(transaction.event[0])
   const findEvent = () => {
     const invoice = invoicedOffers.find(io => io.Invoice)
+    console.log("---- >>",counter);
+    counter++ 
     if(invoice) {
-     handleEvent()
-     return true
-    } else{
-      return false
+      if (counter > 10){
+        counter = 0
+        userNotification = ''
+        handleEvent()
+      }
+      return true
     }
+   return false
   }
   const { event, provenance } = transaction
   const origin = event[0]
@@ -186,7 +191,6 @@ function presentTransaction (transaction) {
 // a hack while we clean up the apollo counterparties implementation
 // AND create a more generalized data loading system
 const cachedGetProfileCalls = {}
-
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
@@ -429,8 +433,22 @@ const HoloFuelDnaInterface = {
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
-      if (acceptedPaymentHash.Err) throw new Error('There was an error accepting the payment for the referenced transaction. ERROR:', acceptedPaymentHash.Err)
-
+      if (acceptedPaymentHash.Err) {
+        
+        if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout){
+          userNotification = "Timed out waiting for transaction confirmation from counterparty, will retry later"
+          return {
+            ...transaction,
+            id: transactionId, // should always match `Object.entries(result)[0][0]`
+            direction: DIRECTION.outgoing, // this indicates the hf recipient
+            status: STATUS.pending,
+            type: TYPE.offer
+          } 
+        }
+        else {
+          throw new Error(acceptedPaymentHash.Err)
+        }
+      }
       return {
         ...transaction,
         id: transactionId, // should always match `Object.entries(result)[0][0]`
