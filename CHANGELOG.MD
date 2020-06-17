@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## unreleased
+### Added
+- Github Pages deploy process
 ### Fixed
 - Missing style bug causing crash after accepting a transaction
 - Inbox Dont allow multiple transaction drawers to be open at once, but allow actioning a transaction while another is in process
