@@ -32,7 +32,7 @@ import { userNotification } from 'data-interfaces/HoloFuelDnaInterface'
 
 // TODO: Consult C for UX / copy for this
 const offerInProcessMessage = 'acceptance pending'
-const timeoutErrorMessage =  'Timed out waiting for transaction confirmation from counterparty, will retry later'
+const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -137,7 +137,7 @@ export default function Inbox ({ history: { push } }) {
     onConfirm: () => {}
   }
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
-  
+
   const [openDrawerId, setOpenDrawerId] = useState()
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
@@ -257,15 +257,12 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage, inProcess }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
-  let { inProcess } = transaction
-  inProcess = true
 
   if (inProcess && userNotification) {
     showUserMessage()
   }
-  console.log('in process : ', inProcess);
 
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
@@ -380,7 +377,6 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       <div styleName='notes'>{fullNotes}</div>
     </div>
 
-
     <div styleName='amount-cell'>
       <AmountCell
         amount={amount}
@@ -396,11 +392,10 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     </div>
 
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
-    
+
     <ToolTip toolTipText={timeoutErrorMessage}>
       <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>
     </ToolTip>
-
 
     {isActionable && !isLoading && !isDisabled && !inProcess && <>
       <RevealActionsButton
