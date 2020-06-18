@@ -257,8 +257,8 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage, inProcess }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess } = transaction
 
   if (inProcess && userNotification) {
     showUserMessage()
@@ -360,7 +360,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled || inProcess }, { highlightGreen }, { highlightRed })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -393,9 +393,9 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    <ToolTip toolTipText={timeoutErrorMessage}>
+    {inProcess && <ToolTip toolTipText={timeoutErrorMessage}>
       <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>
-    </ToolTip>
+    </ToolTip>}
 
     {isActionable && !isLoading && !isDisabled && !inProcess && <>
       <RevealActionsButton
