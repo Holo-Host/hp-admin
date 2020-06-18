@@ -11,13 +11,14 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
-import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
+import ToolTip from 'holofuel/components/ToolTip'
 import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
@@ -31,6 +32,7 @@ import { userNotification } from 'data-interfaces/HoloFuelDnaInterface'
 
 // TODO: Consult C for UX / copy for this
 const offerInProcessMessage = 'acceptance pending'
+const timeoutErrorMessage =  'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -135,7 +137,7 @@ export default function Inbox ({ history: { push } }) {
     onConfirm: () => {}
   }
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
-
+  
   const [openDrawerId, setOpenDrawerId] = useState()
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
@@ -256,11 +258,14 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 }
 
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess } = transaction
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
+  let { inProcess } = transaction
+  inProcess = true
 
-  if (inProcess) {
+  if (inProcess && userNotification) {
     showUserMessage()
   }
+  console.log('in process : ', inProcess);
 
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
@@ -375,6 +380,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       <div styleName='notes'>{fullNotes}</div>
     </div>
 
+
     <div styleName='amount-cell'>
       <AmountCell
         amount={amount}
@@ -390,8 +396,11 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     </div>
 
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
+    
+    <ToolTip toolTipText={timeoutErrorMessage}>
+      <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>
+    </ToolTip>
 
-    {inProcess && <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>}
 
     {isActionable && !isLoading && !isDisabled && !inProcess && <>
       <RevealActionsButton
@@ -560,9 +569,8 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       .then(result => {
         const { data } = result
         if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
-          const timeoutNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
           onTimeout()
-          newMessage(timeoutNotification, 5000)
+          newMessage(timeoutErrorMessage, 5000)
         } else {
           onConfirm()
           newMessage(flashMessage, 5000)

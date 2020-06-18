@@ -106,7 +106,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, null, true).filter(tx => !(tx instanceof Error))
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, [], true)
   return {
     ...transaction,
     status: STATUS.declined
@@ -129,9 +129,6 @@ let counter = 0
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
   const invalidEvent = invoicedOffers.find(io => !io.Invoice)
   if (invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
-
-  console.log('invoiced Offers', invoicedOffers)
-
   const handleEvent = () => HoloFuelDnaInterface.offers.accept(transaction.event[0])
   const findEvent = () => {
     const invoice = invoicedOffers.find(io => io.Invoice)
@@ -449,7 +446,6 @@ const HoloFuelDnaInterface = {
               type: TYPE.offer
             }
           } else if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
-            userNotification = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
             return {
               ...transaction,
               id: transactionId, // should always match `Object.entries(result)[0][0]`
