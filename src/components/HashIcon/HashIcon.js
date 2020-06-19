@@ -15,14 +15,14 @@ export default function HashIcon ({
   hash,
   size = 64,
   className
-}) {  
+}) {
   return <div data-testid='hash-icon'>
     {hash ? <Identicon
       seed={hash}
       size={size}
       className={className}
       circle />
-    : <DefaultIdenticon 
+      : <DefaultIdenticon
         size={size}
         className={className} />}
   </div>

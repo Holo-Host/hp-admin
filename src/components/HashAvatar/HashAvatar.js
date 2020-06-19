@@ -11,8 +11,8 @@ const HashAvatar = ({ avatarUrl, seed, size = 96, className }) => avatarUrl
     style={{ width: size, height: size }}
   />
   : <HashIcon
-      hash={seed}
-      size={size}
-      className={className} />
+    hash={seed}
+    size={size}
+    className={className} />
 
 export default HashAvatar

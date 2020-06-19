@@ -16,16 +16,13 @@ export default function HashIcon ({
   size = 64,
   className
 }) {
-
-  console.log('hash inside of Hash Icon : ', hash)
-  
   return <div data-testid='hash-icon'>
     {hash ? <Identicon
       seed={hash}
       size={size}
       className={className}
       circle />
-    : <DefaultIdenticon 
+      : <DefaultIdenticon
         size={size}
         className={className} />}
   </div>
