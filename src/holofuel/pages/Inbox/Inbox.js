@@ -11,13 +11,14 @@ import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
-import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
+import ToolTip from 'holofuel/components/ToolTip'
 import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
@@ -27,6 +28,11 @@ import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, 
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+import { userNotification } from 'data-interfaces/HoloFuelDnaInterface'
+
+// TODO: Consult C for UX / copy for this
+const offerInProcessMessage = 'acceptance pending'
+const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -115,13 +121,21 @@ export default function Inbox ({ history: { push } }) {
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
 
+  const [userMessage, setUserMessage] = useState('')
+  const { newMessage } = useFlashMessageContext()
+  const showUserMessage = () => {
+    if (userNotification !== userMessage) {
+      newMessage(userNotification, 0)
+      setUserMessage(userNotification)
+    }
+  }
+
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
     transaction: {},
     action: '',
     onConfirm: () => {}
   }
-
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
 
   const [openDrawerId, setOpenDrawerId] = useState()
@@ -205,7 +219,8 @@ export default function Inbox ({ history: { push } }) {
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
-        setAreActionsPaused={setAreActionsPaused} />)}
+        setAreActionsPaused={setAreActionsPaused}
+        showUserMessage={showUserMessage} />)}
     </div>}
 
     <ConfirmationModal
@@ -214,7 +229,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, showUserMessage }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
   const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
@@ -236,13 +251,18 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
         role='list'
-        key={transaction.id} />)}
+        key={transaction.id}
+        showUserMessage={showUserMessage} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess } = transaction
+
+  if (inProcess && userNotification) {
+    showUserMessage()
+  }
 
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
@@ -307,6 +327,14 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
+  const onTimeout = () => {
+    setHighlightRed(true)
+    setIsDisabled(true)
+    setTimeout(() => {
+      setHighlightRed(false)
+    }, 5000)
+  }
+
   const setIsLoadingAndPaused = state => {
     setIsLoading(state)
     setAreActionsPaused(state)
@@ -315,7 +343,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused
+    setIsLoading: setIsLoadingAndPaused,
+    onTimeout
   }
 
   const showAcceptModal = () =>
@@ -331,7 +360,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -362,16 +391,20 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       {/* {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>} */}
     </div>
 
-    {isLoading && <Loading styleName='transaction-row-loading' width={20} height={20} />}
+    {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    {isActionable && !isLoading && !isDisabled && <>
+    {inProcess && <ToolTip toolTipText={timeoutErrorMessage}>
+      <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>
+    </ToolTip>}
+
+    {isActionable && !isLoading && !isDisabled && !inProcess && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
         closeDrawer={() => setIsDrawerOpen(false)}
         areActionsPaused={areActionsPaused}
       />
-      {!isCanceled && <ActionOptions
+      {!isCanceled && !inProcess && <ActionOptions
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}
@@ -458,7 +491,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const declineTransaction = useDecline()
 
   const { newMessage } = useFlashMessageContext()
-  const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
+  const { transaction, action, shouldDisplay, onConfirm, setIsLoading, onTimeout } = confirmationModalProperties
 
   const { id, amount, type, notes, counterparty = {} } = transaction
   const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
@@ -528,9 +561,15 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     hideModal()
 
     actionHook(actionParams)
-      .then(() => {
-        onConfirm()
-        newMessage(flashMessage, 5000)
+      .then(result => {
+        const { data } = result
+        if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
+          onTimeout()
+          newMessage(timeoutErrorMessage, 5000)
+        } else {
+          onConfirm()
+          newMessage(flashMessage, 5000)
+        }
         setIsLoading(false)
       })
       .catch(() => {

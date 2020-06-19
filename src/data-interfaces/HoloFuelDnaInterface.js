@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _, { isEmpty } from 'lodash'
 import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
@@ -6,6 +6,7 @@ import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
 
 export const currentDataTimeIso = () => new Date().toISOString()
+export let userNotification
 
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
@@ -48,7 +49,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false, inProcess }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -61,7 +62,8 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
     fees,
-    isPayingARequest
+    isPayingARequest,
+    inProcess
   }
 }
 
@@ -104,7 +106,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, [], true)
   return {
     ...transaction,
     status: STATUS.declined
@@ -123,7 +125,25 @@ function presentPendingRequest (transaction, annuled = false) {
   return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
-function presentPendingOffer (transaction, annuled = false) {
+let counter = 0
+function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
+  const invalidEvent = invoicedOffers.find(io => !io.Invoice)
+  if (invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
+  const handleEvent = () => HoloFuelDnaInterface.offers.accept(transaction.event[0])
+  const findEvent = () => {
+    const invoice = invoicedOffers.find(io => io.Invoice)
+    console.log('---- >>', counter)
+    counter++
+    if (invoice) {
+      if (counter > 10) {
+        counter = 0
+        userNotification = ''
+        handleEvent()
+      }
+      return true
+    }
+    return false
+  }
   const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)
@@ -133,7 +153,8 @@ function presentPendingOffer (transaction, annuled = false) {
   const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest })
+  const inProcess = isEmpty(invoicedOffers) ? false : findEvent()
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, inProcess })
 }
 
 function presentTransaction (transaction) {
@@ -170,7 +191,6 @@ function presentTransaction (transaction) {
 // a hack while we clean up the apollo counterparties implementation
 // AND create a more generalized data loading system
 const cachedGetProfileCalls = {}
-
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
@@ -241,7 +261,7 @@ const HoloFuelDnaInterface = {
     },
     allActionable: async () => {
       const { requests, promises, declined } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction))
+      const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
       const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
 
@@ -296,7 +316,7 @@ const HoloFuelDnaInterface = {
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
-      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p)))
+      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1]))).filter(tx => !(tx instanceof Error))
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -413,8 +433,31 @@ const HoloFuelDnaInterface = {
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
 
       const acceptedPaymentHash = Object.entries(result)[0][1]
-      if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
-
+      if (acceptedPaymentHash.Err) {
+        if (acceptedPaymentHash.Err.Internal) {
+          const spenderValidationError = /(Spender chain invalid)/g
+          if (typeof acceptedPaymentHash.Err.Internal === 'string' && spenderValidationError.test(acceptedPaymentHash.Err.Internal)) {
+            userNotification = 'Transaction could not be validated and will never pass. Transaction is now stale.'
+            return {
+              ...transaction,
+              id: transactionId, // should always match `Object.entries(result)[0][0]`
+              direction: DIRECTION.incoming, // this indicates the hf recipient
+              status: STATUS.pending,
+              type: TYPE.offer
+            }
+          } else if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
+            return {
+              ...transaction,
+              id: transactionId, // should always match `Object.entries(result)[0][0]`
+              direction: DIRECTION.incoming, // this indicates the hf recipient
+              status: STATUS.pending,
+              type: TYPE.offer
+            }
+          }
+        } else {
+          throw new Error(acceptedPaymentHash.Err)
+        }
+      }
       return {
         ...transaction,
         id: transactionId, // should always match `Object.entries(result)[0][0]`
