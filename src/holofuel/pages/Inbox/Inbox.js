@@ -396,7 +396,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>
     </ToolTip>}
 
-    {isActionable && !isLoading && !isDisabled && !inProcess && <>
+    {isActionable && !isLoading && !isDisabled && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
