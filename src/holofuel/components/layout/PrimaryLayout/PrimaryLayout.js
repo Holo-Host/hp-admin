@@ -21,7 +21,7 @@ import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
-import { useInterval } from 'utils'
+import { useInterval, useLoadingFirstTime } from 'utils'
 
 function PrimaryLayout ({
   children,
@@ -86,6 +86,7 @@ function PrimaryLayout ({
     shouldRefetchUser,
     refetchHolofuelUser])
 
+  const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
   const inboxCount = actionableTransactions.filter(shouldShowTransactionInInbox).length
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -101,7 +102,7 @@ function PrimaryLayout ({
       agentLoading={currentUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
-      ledgerLoading={ledgerLoading}
+      ledgerLoading={isLoadingFirstLedger}
       isWide={isWide} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName={cx('styles.content')}>

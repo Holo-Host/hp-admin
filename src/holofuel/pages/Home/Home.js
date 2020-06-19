@@ -19,7 +19,7 @@ import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
 const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
-  if (ledgerLoading || !holofuelBalance) return <>-- TF</>
+  if (ledgerLoading || isNaN(holofuelBalance)) return <>-- TF</>
   else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 

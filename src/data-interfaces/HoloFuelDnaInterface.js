@@ -415,7 +415,7 @@ const HoloFuelDnaInterface = {
       const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
 
       return {
-        id: requestId || origin, // NB: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
+        id: requestId || origin, // NB: If requestId isn't defined, then offer uses origin as the ID (ie. Offer is the initiating transaction).
         amount,
         counterparty: {
           id: counterpartyId
@@ -423,7 +423,7 @@ const HoloFuelDnaInterface = {
         notes,
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,
-        type: TYPE.offer,
+        type: requestId ? TYPE.request : TYPE.offer, // NB: If requestId isn't defined, then base transaction is an offer, otherwise, it's a request user is paying
         timestamp: currentDataTimeIso
       }
     },
