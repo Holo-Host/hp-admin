@@ -151,6 +151,7 @@ async function initHolochainClient () {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
+    wsConnection = false
     isInitiatingHcConnection = false
     throw (error)
   }

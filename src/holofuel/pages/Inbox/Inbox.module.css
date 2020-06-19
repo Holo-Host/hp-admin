@@ -210,6 +210,10 @@
   background-color: #e4e6e9;
 }
 
+.inProcess {
+  opacity: 0.7;
+}
+
 .alert-msg {
   composes: notes;
   margin-right: 20px;

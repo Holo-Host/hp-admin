@@ -106,7 +106,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, null, true).filter(tx => !(tx instanceof Error))
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, [], true)
   return {
     ...transaction,
     status: STATUS.declined
@@ -124,25 +124,25 @@ function presentPendingRequest (transaction, annuled = false) {
   const { amount, notes, fee } = event[2].Request
   return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
+
 let counter = 0
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
-  const invalidEvent = invoicedOffers.find(io => !io.Invoice  )
-  if(invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
-
+  const invalidEvent = invoicedOffers.find(io => !io.Invoice)
+  if (invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
   const handleEvent = () => HoloFuelDnaInterface.offers.accept(transaction.event[0])
   const findEvent = () => {
     const invoice = invoicedOffers.find(io => io.Invoice)
-    console.log("---- >>",counter);
-    counter++ 
-    if(invoice) {
-      if (counter > 10){
+    console.log('---- >>', counter)
+    counter++
+    if (invoice) {
+      if (counter > 10) {
         counter = 0
         userNotification = ''
         handleEvent()
       }
       return true
     }
-   return false
+    return false
   }
   const { event, provenance } = transaction
   const origin = event[0]
@@ -264,7 +264,7 @@ const HoloFuelDnaInterface = {
       const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
       const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
-            
+
       return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
@@ -431,21 +431,29 @@ const HoloFuelDnaInterface = {
     accept: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
-
       const acceptedPaymentHash = Object.entries(result)[0][1]
       if (acceptedPaymentHash.Err) {
-        
-        if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout){
-          userNotification = "Timed out waiting for transaction confirmation from counterparty, will retry later"
-          return {
-            ...transaction,
-            id: transactionId, // should always match `Object.entries(result)[0][0]`
-            direction: DIRECTION.incoming, // this indicates the hf recipient
-            status: STATUS.pending,
-            type: TYPE.offer
-          } 
-        }
-        else {
+        if (acceptedPaymentHash.Err.Internal) {
+          const spenderValidationError = /(Spender chain invalid)/g
+          if (typeof acceptedPaymentHash.Err.Internal === 'string' && spenderValidationError.test(acceptedPaymentHash.Err.Internal)) {
+            userNotification = 'Transaction could not be validated and will never pass. Transaction is now stale.'
+            return {
+              ...transaction,
+              id: transactionId, // should always match `Object.entries(result)[0][0]`
+              direction: DIRECTION.incoming, // this indicates the hf recipient
+              status: STATUS.pending,
+              type: TYPE.offer
+            }
+          } else if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
+            return {
+              ...transaction,
+              id: transactionId, // should always match `Object.entries(result)[0][0]`
+              direction: DIRECTION.incoming, // this indicates the hf recipient
+              status: STATUS.pending,
+              type: TYPE.offer
+            }
+          }
+        } else {
           throw new Error(acceptedPaymentHash.Err)
         }
       }
