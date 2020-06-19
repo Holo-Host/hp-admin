@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -27,7 +27,7 @@ function PrimaryLayout ({
   headerProps = {},
   showAlphaFlag = true
 }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {}, } = {}, stopPolling: stopPollingLedger, startPolling: startPollingLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, stopPolling: stopPollingLedger, startPolling: startPollingLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { currentUser, currentUserLoading } = useCurrentUserContext()
@@ -49,7 +49,6 @@ function PrimaryLayout ({
         stopPollingActionableTransactions()
         stopPollingCompletedTransactions()
         stopPollingLedger()
-        
       } else {
         connectionErrorMessage = 'Your Holoport is currently unreachable.'
         defaultPath = HP_ADMIN_LOGIN_PATH
@@ -67,15 +66,15 @@ function PrimaryLayout ({
       startPollingLedger(5000)
     }
   }, [isConnected,
-     setIsConnected,
-     push,
-     newMessage,
-     stopPollingActionableTransactions,
-     startPollingActionableTransactions,
-     stopPollingCompletedTransactions,
-     startPollingCompletedTransactions,
-     stopPollingLedger,
-     startPollingLedger])
+    setIsConnected,
+    push,
+    newMessage,
+    stopPollingActionableTransactions,
+    startPollingActionableTransactions,
+    stopPollingCompletedTransactions,
+    startPollingCompletedTransactions,
+    stopPollingLedger,
+    startPollingLedger])
 
   const inboxCount = actionableTransactions.filter(shouldShowTransactionInInbox).length
   const isWide = useContext(ScreenWidthContext)
