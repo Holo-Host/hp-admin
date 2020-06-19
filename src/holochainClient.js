@@ -122,6 +122,8 @@ let wsTimeoutErrorCount = 0
 async function initHolochainClient () {
   isInitiatingHcConnection = true
   let url
+  console.log('attempting to init hc client');
+  
   try {
     if (process.env.REACT_APP_RAW_HOLOCHAIN === 'true') {
       url = process.env.REACT_APP_DNA_INTERFACE_URL
@@ -144,8 +146,8 @@ async function initHolochainClient () {
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
-    isInitiatingHcConnection = false
     wsConnection = true
+    isInitiatingHcConnection = false
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
@@ -167,6 +169,11 @@ async function initAndGetHolochainClient () {
       isInitiatingHcConnection = false
     }
   }
+
+  if(!wsConnection) {
+    holochainClient = null
+  }
+
   if (holochainClient) return holochainClient
   else return initHolochainClient()
 }
