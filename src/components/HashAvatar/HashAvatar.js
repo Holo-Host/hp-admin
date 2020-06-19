@@ -1,6 +1,5 @@
 import React from 'react'
-import { Network as Identicon } from 'react-identicon-variety-pack'
-
+import HashIcon from 'components/HashIcon'
 import './HashAvatar.module.css'
 
 const HashAvatar = ({ avatarUrl, seed, size = 96, className }) => avatarUrl
@@ -11,6 +10,9 @@ const HashAvatar = ({ avatarUrl, seed, size = 96, className }) => avatarUrl
     className={className}
     style={{ width: size, height: size }}
   />
-  : <Identicon seed={seed || 'default-seed'} className={className} size={size} circle />
+  : <HashIcon
+      hash={seed}
+      size={size}
+      className={className} />
 
 export default HashAvatar

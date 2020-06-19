@@ -121,9 +121,7 @@ let wsTimeoutErrorCount = 0
 
 async function initHolochainClient () {
   isInitiatingHcConnection = true
-  let url
-  console.log('attempting to init hc client');
-  
+  let url  
   try {
     if (process.env.REACT_APP_RAW_HOLOCHAIN === 'true') {
       url = process.env.REACT_APP_DNA_INTERFACE_URL
