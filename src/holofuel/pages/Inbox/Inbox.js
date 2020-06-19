@@ -442,7 +442,7 @@ function ActionOptions ({ isOffer, isRequest, transaction, showAcceptModal, show
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isCanceled, isDeclined }) {  
+function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isCanceled, isDeclined }) {
   let amountDisplay
   if (isActionable) {
     amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
