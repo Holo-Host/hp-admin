@@ -15,7 +15,6 @@ import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import { CurrentUserProvider as HFCurrentUserProvider } from 'holofuel/contexts/useCurrentUserContext'
 import { ConnectionProvider as HFConnectionProvider } from 'holofuel/contexts/useConnectionContext'
-import AcceptRequestedOffers from 'holofuel/components/wrappers/AcceptRequestedOffers'
 import LoadCurrentUser from 'holofuel/components/wrappers/LoadCurrentUser'
 import PromptForNickname from 'holofuel/components/wrappers/PromptForNickname'
 import HPAdminRouter from './HPAdminRouter'
@@ -36,11 +35,9 @@ function HoloFuelAppCore () {
       <HFCurrentUserProvider>
         <HFFlashMessageProvider>
           <LoadCurrentUser>
-            <AcceptRequestedOffers>
-              <PromptForNickname>
-                <HFRouter />
-              </PromptForNickname>
-            </AcceptRequestedOffers>
+            <PromptForNickname>
+              <HFRouter />
+            </PromptForNickname>
           </LoadCurrentUser>
         </HFFlashMessageProvider>
       </HFCurrentUserProvider>
