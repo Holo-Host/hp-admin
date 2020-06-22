@@ -18,6 +18,5 @@ export const DIRECTION = {
 // we hide cancelled and declined transactions, and offers that are paying a request (those are handled by AcceptRequestedOffers)
 export function shouldShowTransactionInInbox (transaction) {
   return transaction.status !== STATUS.canceled &&
-    transaction.status !== STATUS.declined &&
-    !transaction.isPayingARequest
+    transaction.status !== STATUS.declined
 }
