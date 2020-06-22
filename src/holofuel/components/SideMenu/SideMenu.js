@@ -102,7 +102,7 @@ export default function SideMenu ({
 }
 
 function DisplayBalance ({ ledgerLoading, holofuelBalance }) {
-  if (ledgerLoading) return <>-- TF</>
+  if (ledgerLoading || isNaN(holofuelBalance)) return <>-- TF</>
   else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 

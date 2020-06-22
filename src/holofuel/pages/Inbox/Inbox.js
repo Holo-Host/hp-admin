@@ -259,7 +259,6 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess } = transaction
-
   if (inProcess && userNotification) {
     showUserMessage()
   }

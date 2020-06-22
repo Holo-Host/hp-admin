@@ -19,15 +19,14 @@ import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
 const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
-  if (ledgerLoading) return <>-- TF</>
+  if (ledgerLoading || isNaN(holofuelBalance)) return <>-- TF</>
   else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 
 export default function Home () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
-
-  const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
+  const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
   const { setCurrentUser, currentUser } = useCurrentUserContext()
 
