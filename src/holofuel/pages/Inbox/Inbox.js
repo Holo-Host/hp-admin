@@ -230,20 +230,18 @@ export default function Inbox ({ history: { push } }) {
 
 export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
-  const [exemptTransactionIds, setExemptTransactionIds] = useState([])
 
-  const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
-  const manageExemptTransactionWithId = (id, shouldExempt) => {
-    if (shouldExempt) {
-      setExemptTransactionIds(exemptTransactionIds.concat([id]))
+  const manageHideTransactionWithId = (id, shouldHide) => {
+    if (shouldHide) {
+      setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
     } else {
-      setExemptTransactionIds(remove(id, exemptTransactionIds))
+      setHiddenTransactionIds(remove(id, hiddenTransactionIds))
     }
   }
 
-  const transactionIsVisible = id => !hiddenTransactionIds.includes(id) || (hiddenTransactionIds.includes(id) && exemptTransactionIds.includes(id))
+  const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
 
-  if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id)) && isEmpty(transactions.filter(transaction => exemptTransactionIds.includes(transaction.id)))) return null
+  if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
 
   return <React.Fragment>
     <PageDivider title={dateLabel} />
@@ -253,8 +251,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
         userId={userId}
-        hideTransaction={() => hideTransactionWithId(transaction.id)}
-        exemptTransaction={shouldExempt => manageExemptTransactionWithId(transaction.id, shouldExempt)}
+        hideTransaction={shouldHide => manageHideTransactionWithId(transaction.id, shouldHide)}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
@@ -265,7 +262,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, exemptTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned } = transaction
 
   const isDrawerOpen = id === openDrawerId
@@ -315,8 +312,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
   if (agent.id === null) return null
 
-  if (!inProcess && actioned) {
-    hideTransaction()
+  if (!inProcess && !highlightGreen && actioned) {
+    hideTransaction(true)
   }
 
   const onTimeout = () => {
@@ -336,11 +333,11 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setHighlightYellow(false)
     setHighlightGreen(true)
     setIsDisabled(true)
-    exemptTransaction(true)
+    hideTransaction(false)
     setTimeout(() => {
       setHighlightGreen(false)
       setIsDisplayingInProcess(false)
-      exemptTransaction(false)
+      hideTransaction(true)
     }, 5000)
   }
 
@@ -348,10 +345,10 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setHighlightYellow(false)
     setHighlightRed(true)
     setIsDisabled(true)
-    exemptTransaction(true)
+    hideTransaction(false)
     setTimeout(() => {
       setHighlightRed(false)
-      exemptTransaction(false)
+      hideTransaction(true)
     }, 5000)
   }
 
