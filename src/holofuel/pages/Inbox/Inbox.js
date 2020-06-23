@@ -243,7 +243,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id) || (hiddenTransactionIds.includes(id) && exemptTransactionIds.includes(id))
 
-  if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
+  if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id)) && isEmpty(transactions.filter(transaction => exemptTransactionIds.includes(transaction.id)))) return null
 
   return <React.Fragment>
     <PageDivider title={dateLabel} />
