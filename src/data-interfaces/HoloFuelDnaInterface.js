@@ -445,7 +445,7 @@ const HoloFuelDnaInterface = {
               direction: DIRECTION.incoming, // this indicates the hf recipient
               status: STATUS.pending,
               type: TYPE.offer,
-              actioned: true
+              actioned: false
             }
           } else if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
             return {

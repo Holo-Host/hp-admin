@@ -316,12 +316,10 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   if (agent.id === null) return null
 
   if (!inProcess && actioned) {
-    console.log('actioned transaction ', transaction)
     hideTransaction()
   }
 
   const onTimeout = () => {
-    console.log(' -----========---- >> inProcess')
     setHighlightYellow(true)
     setIsDisabled(true)
     setTimeout(() => {
