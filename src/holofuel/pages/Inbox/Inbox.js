@@ -128,7 +128,7 @@ export default function Inbox ({ history: { push } }) {
   }
   if (!isEmpty(userMessage)) {
     newMessage(userMessage, 5000)
-  } 
+  }
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
@@ -240,7 +240,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
       setExemptTransactionIds(remove(id, exemptTransactionIds))
     }
   }
-  
+
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id) || (hiddenTransactionIds.includes(id) && exemptTransactionIds.includes(id))
 
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id)) && isEmpty(transactions.filter(transaction => exemptTransactionIds.includes(transaction.id)))) return null
@@ -462,7 +462,7 @@ function ActionOptions ({ isOffer, isRequest, transaction, showAcceptModal, show
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isCanceled, isDeclined }) {  
+function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isCanceled, isDeclined }) {
   let amountDisplay
   if (isActionable) {
     amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
