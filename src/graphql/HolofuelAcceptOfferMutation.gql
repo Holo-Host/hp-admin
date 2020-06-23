@@ -7,5 +7,6 @@ mutation HolofuelAcceptOfferMutation ($transactionId: ID) {
     status
     type
     timestamp
+    actioned
   }
 }

@@ -71,6 +71,7 @@ type Transaction {
   canceledBy: HolofuelUser
   isPayingARequest: Boolean
   inProcess: Boolean
+  actioned: Boolean
 }
 
 type Ledger {
