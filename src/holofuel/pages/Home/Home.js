@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
+import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -28,6 +29,8 @@ export default function Home () {
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false)
+  const { isConnected } = useConnectionContext()
   const { setCurrentUser, currentUser } = useCurrentUserContext()
 
   useEffect(() => {
@@ -36,6 +39,14 @@ export default function Home () {
     }
   }, [holofuelUser, setCurrentUser])
 
+  useEffect(() => {
+    if (!isConnected) {
+      setIsLoadingTransactions(false)
+  } else {
+      setIsLoadingTransactions(loadingTransactions)
+    }
+  }, [loadingTransactions, setIsLoadingTransactions, isConnected])
+  
   const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
   const isTransactionsEmpty = isEmpty(transactions)
@@ -44,7 +55,7 @@ export default function Home () {
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
-  const isLoadingFirstPendingTransactions = useLoadingFirstTime(loadingTransactions)
+  const isLoadingFirstPendingTransactions = useLoadingFirstTime(isLoadingTransactions)
 
   return <PrimaryLayout headerProps={{ title: 'Holofuel Home' }}>
     <div styleName='container'>

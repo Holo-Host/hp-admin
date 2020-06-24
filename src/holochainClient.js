@@ -3,15 +3,6 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
-// only default wsConnetion to true in test env, or hpos hp-admin development env
-export let wsConnection = process.env.NODE_ENV === 'test'
-  ? true
-  : process.env.REACT_APP_HOLOFUEL_APP === 'true'
-    ? false
-    : process.env.NODE_ENV === 'development'
-      ? true
-      : false
-
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
@@ -123,6 +114,17 @@ let holochainClient
 let isInitiatingHcConnection = false
 let wsTimeoutErrorCount = 0
 
+// only default wsConnetion to true in test env, or hpos hp-admin development env
+export let wsConnection = holochainClient
+  ? true
+  : process.env.NODE_ENV === 'test'  
+    ? true
+    : process.env.REACT_APP_HOLOFUEL_APP === 'true'
+      ? false
+      : process.env.NODE_ENV === 'development'
+        ? true
+        : false
+
 async function initHolochainClient () {
   isInitiatingHcConnection = true
   let url
@@ -140,17 +142,26 @@ async function initHolochainClient () {
       url = urlObj.toString()
     }
 
-    holochainClient = await hcWebClientConnect({
-      url: url,
-      timeout: 5000, // In the hc-web-client module, this is set to a default of 50000 ms (https://github.com/holochain/hc-web-client/blob/master/src/index.ts#L6)
-      wsClient: { max_reconnects: 2 }
-    })
-    if (HOLOCHAIN_LOGGING) {
-      console.log('🎉 Successfully connected to Holochain!')
+    setTimeout(async () => {
+      holochainClient = await hcWebClientConnect({
+        url: url,
+        timeout: 5000,
+        wsClient: { max_reconnects: 2 }
+      })
+    }, 5500)
+
+    if (holochainClient) {
+      if (HOLOCHAIN_LOGGING) {
+        console.log('🎉 Successfully connected to Holochain!')
+      }
+      wsConnection = true
+      isInitiatingHcConnection = false
+      return holochainClient
+    } else {
+      wsConnection = false
+      // this occurs whenever hcWebClientConnect doesn't complete within the setTimeout duration
+      setTimeout(() => initHolochainClient(), 5000)
     }
-    wsConnection = true
-    isInitiatingHcConnection = false
-    return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
