@@ -45,11 +45,12 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     timestamp: eventTimestamp,
     notes: notes || event.Request.notes,
     fees,
-    isPayingARequest
+    isPayingARequest,
+    actioned: false
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false, inProcess }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -63,7 +64,8 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     notes: notes || event.Promise.tx.notes,
     fees,
     isPayingARequest,
-    inProcess
+    inProcess,
+    actioned: false
   }
 }
 
@@ -442,7 +444,8 @@ const HoloFuelDnaInterface = {
               id: transactionId, // should always match `Object.entries(result)[0][0]`
               direction: DIRECTION.incoming, // this indicates the hf recipient
               status: STATUS.pending,
-              type: TYPE.offer
+              type: TYPE.offer,
+              actioned: false
             }
           } else if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
             return {
@@ -450,7 +453,8 @@ const HoloFuelDnaInterface = {
               id: transactionId, // should always match `Object.entries(result)[0][0]`
               direction: DIRECTION.incoming, // this indicates the hf recipient
               status: STATUS.pending,
-              type: TYPE.offer
+              type: TYPE.offer,
+              actioned: true
             }
           }
         } else {
@@ -462,7 +466,8 @@ const HoloFuelDnaInterface = {
         id: transactionId, // should always match `Object.entries(result)[0][0]`
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.completed,
-        type: TYPE.offer
+        type: TYPE.offer,
+        actioned: true
       }
     }
   }

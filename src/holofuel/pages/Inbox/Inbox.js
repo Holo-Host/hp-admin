@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, isNil, isEqual } from 'lodash/fp'
+import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -115,7 +115,7 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
   const { currentUser } = useCurrentUserContext()
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
@@ -123,11 +123,11 @@ export default function Inbox ({ history: { push } }) {
 
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
-  const showUserMessage = () => {
-    if (userNotification !== userMessage) {
-      newMessage(userNotification, 0)
-      setUserMessage(userNotification)
-    }
+  if (userNotification !== userMessage) {
+    setUserMessage(userNotification)
+  }
+  if (!isEmpty(userMessage)) {
+    newMessage(userMessage, 5000)
   }
 
   const defaultConfirmationModalProperties = {
@@ -219,8 +219,7 @@ export default function Inbox ({ history: { push } }) {
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
-        setAreActionsPaused={setAreActionsPaused}
-        showUserMessage={showUserMessage} />)}
+        setAreActionsPaused={setAreActionsPaused} />)}
     </div>}
 
     <ConfirmationModal
@@ -229,10 +228,17 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, showUserMessage }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
-  const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
+  const manageHideTransactionWithId = (id, shouldHide) => {
+    if (shouldHide) {
+      setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
+    } else {
+      setHiddenTransactionIds(remove(id, hiddenTransactionIds))
+    }
+  }
+
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
 
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
@@ -245,23 +251,19 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
         userId={userId}
-        hideTransaction={() => hideTransactionWithId(transaction.id)}
+        hideTransaction={shouldHide => manageHideTransactionWithId(transaction.id, shouldHide)}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
         role='list'
-        key={transaction.id}
-        showUserMessage={showUserMessage} />)}
+        key={transaction.id} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, showUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess } = transaction
-  if (inProcess && userNotification) {
-    showUserMessage()
-  }
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned } = transaction
 
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
@@ -303,34 +305,50 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
   const [highlightGreen, setHighlightGreen] = useState(false)
   const [highlightRed, setHighlightRed] = useState(false)
+  const [highlightYellow, setHighlightYellow] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isDisplayingInProcess, setIsDisplayingInProcess] = useState(false)
 
   if (agent.id === null) return null
 
-  const onConfirmGreen = () => {
-    setHighlightGreen(true)
+  if (!inProcess && !highlightGreen && actioned) {
+    hideTransaction(true)
+  }
+
+  const onTimeout = () => {
+    setHighlightYellow(true)
     setIsDisabled(true)
     setTimeout(() => {
+      setHighlightRed(false)
+    }, 5000)
+  }
+
+  if (inProcess && !isDisplayingInProcess) {
+    setIsDisplayingInProcess(true)
+    onTimeout()
+  }
+
+  const onConfirmGreen = () => {
+    setHighlightYellow(false)
+    setHighlightGreen(true)
+    setIsDisabled(true)
+    hideTransaction(false)
+    setTimeout(() => {
       setHighlightGreen(false)
-      hideTransaction()
+      setIsDisplayingInProcess(false)
+      hideTransaction(true)
     }, 5000)
   }
 
   const onConfirmRed = () => {
+    setHighlightYellow(false)
     setHighlightRed(true)
     setIsDisabled(true)
+    hideTransaction(false)
     setTimeout(() => {
       setHighlightRed(false)
-      hideTransaction()
-    }, 5000)
-  }
-
-  const onTimeout = () => {
-    setHighlightRed(true)
-    setIsDisabled(true)
-    setTimeout(() => {
-      setHighlightRed(false)
+      hideTransaction(true)
     }, 5000)
   }
 
@@ -342,8 +360,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused,
-    onTimeout
+    setIsLoading: setIsLoadingAndPaused
   }
 
   const showAcceptModal = () =>
@@ -359,7 +376,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { inProcess })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { highlightYellow }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -392,7 +409,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    {inProcess && <ToolTip toolTipText={timeoutErrorMessage}>
+    {inProcess && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
       <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>
     </ToolTip>}
 
@@ -490,7 +507,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const declineTransaction = useDecline()
 
   const { newMessage } = useFlashMessageContext()
-  const { transaction, action, shouldDisplay, onConfirm, setIsLoading, onTimeout } = confirmationModalProperties
+  const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
 
   const { id, amount, type, notes, counterparty = {} } = transaction
   const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
@@ -556,14 +573,11 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
 
   const onYes = () => {
     setIsLoading(true)
-
     hideModal()
-
     actionHook(actionParams)
       .then(result => {
         const { data } = result
         if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
-          onTimeout()
           newMessage(timeoutErrorMessage, 5000)
         } else {
           onConfirm()
