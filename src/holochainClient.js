@@ -3,10 +3,14 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
-// var for updating the isConnected variable in primary layout upon ws connection error catch
-// NB: Currently this must start as true, as no hc zome calls are made on the hp-admin side of the happ,
-// thus this boolean would be false and set isConnected to false prematurely
-export let wsConnection = true
+// only default wsConnetion to true in test env, or hpos hp-admin development env
+export let wsConnection = process.env.NODE_ENV === 'test'
+  ? true
+  : process.env.REACT_APP_HOLOFUEL_APP === 'true'
+    ? false
+    : process.env.NODE_ENV === 'development'
+      ? true
+      : false
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
