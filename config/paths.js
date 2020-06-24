@@ -34,7 +34,7 @@ const getPublicUrl = appPackageJson =>
 function getServedPath (appPackageJson) {
   const publicUrl = getPublicUrl(appPackageJson)
   const servedUrl =
-    envPublicUrl || (publicUrl ? url.URL(publicUrl).pathname : '/')
+    envPublicUrl || (publicUrl ? (new url.URL(publicUrl)).pathname : '/')
   return ensureSlash(servedUrl, true)
 }
 
