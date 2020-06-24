@@ -5,7 +5,6 @@ import './ToolTip.module.css'
 import { caribbeanGreen } from 'utils/colors'
 
 export default function ToolTip ({ toolTipText, children }) {
-  console.log('timeoutErrorMessage : ', toolTipText)
   return <>
     <span data-tip='' data-for='registerTip'>
       {children}
