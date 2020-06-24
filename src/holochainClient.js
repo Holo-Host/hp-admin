@@ -4,8 +4,8 @@ import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
 // var for updating the isConnected variable in primary layout upon ws connection error catch
-// NB: Currently this must start as true, as no hc zome call are made on hp-admin,
-// thus this boolean would be false and set isConnected to false
+// NB: Currently this must start as true, as no hc zome calls are made on the hp-admin side of the happ,
+// thus this boolean would be false and set isConnected to false prematurely
 export let wsConnection = true
 
 // This can be written as a boolean expression then it's even less readable
