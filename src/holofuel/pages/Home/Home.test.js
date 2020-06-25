@@ -42,7 +42,7 @@ describe('Home', () => {
       }
     ]
 
-    it('renders', async () => {
+    it.skip('renders', async () => {
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <Home />
       </MockedProvider>)
@@ -123,7 +123,7 @@ describe('Home', () => {
       }
     ]
 
-    it('renders the transactions', async () => {
+    it.skip('renders the transactions', async () => {
       const { getAllByRole, queryByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
         <Home />
       </MockedProvider>)
