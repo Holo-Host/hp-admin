@@ -3,11 +3,6 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
-// var for updating the isConnected variable in primary layout upon ws connection error catch
-// NB: Currently this must start as true, as no hc zome calls are made on the hp-admin side of the happ,
-// thus this boolean would be false and set isConnected to false prematurely
-export let wsConnection = true
-
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
@@ -119,6 +114,15 @@ let holochainClient
 let isInitiatingHcConnection = false
 let wsTimeoutErrorCount = 0
 
+// only default wsConnetion to true in test env, or hpos hp-admin development env
+export let wsConnection = holochainClient
+  ? true
+  : process.env.NODE_ENV === 'test'
+    ? true
+    : process.env.REACT_APP_HOLOFUEL_APP === 'true'
+      ? false
+      : process.env.NODE_ENV === 'development'
+
 async function initHolochainClient () {
   isInitiatingHcConnection = true
   let url
@@ -138,9 +142,10 @@ async function initHolochainClient () {
 
     holochainClient = await hcWebClientConnect({
       url: url,
-      timeout: 5000, // In the hc-web-client module, this is set to a default of 50000 ms (https://github.com/holochain/hc-web-client/blob/master/src/index.ts#L6)
+      timeout: 5000,
       wsClient: { max_reconnects: 2 }
     })
+
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
