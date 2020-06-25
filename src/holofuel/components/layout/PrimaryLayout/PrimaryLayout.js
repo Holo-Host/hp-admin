@@ -55,7 +55,6 @@ function PrimaryLayout ({
         defaultPath = HOME_PATH
         stopPollingActionableTransactions()
         stopPollingCompletedTransactions()
-        stopPollingNonPendingTransactions()
         setShouldRefetchUser(true)
       } else {
         connectionErrorMessage = 'Your Holoport is currently unreachable.'
@@ -70,7 +69,6 @@ function PrimaryLayout ({
       newMessage('', 0)
       startPollingActionableTransactions(5000)
       startPollingCompletedTransactions(5000)
-      startPollingNonPendingTransactions(5000)
       if (shouldRefetchUser) {
         refetchHolofuelUser()
       }
