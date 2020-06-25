@@ -45,7 +45,7 @@ let
     id = dna.name;
     storage = {
       path = ".holochain/holo/storage/${agent.id}/${dna.name}";
-      type = "file";
+      type = "lmdb";
     };
   }) config.agent1;
 
@@ -63,7 +63,7 @@ let
     id = dna.name;
     storage = {
       path = ".holochain/holo/storage/${agent.id}/${dna.name}";
-      type = "file";
+      type = "lmdb";
     };
   }) config.agent2;
 
