@@ -17,6 +17,7 @@ jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('holofuel/contexts/useCurrentUserContext')
+jest.mock('holofuel/contexts/useConnectionContext')
 
 describe('Home', () => {
   describe('with no transactions', () => {

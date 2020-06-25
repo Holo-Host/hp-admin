@@ -117,13 +117,11 @@ let wsTimeoutErrorCount = 0
 // only default wsConnetion to true in test env, or hpos hp-admin development env
 export let wsConnection = holochainClient
   ? true
-  : process.env.NODE_ENV === 'test'  
+  : process.env.NODE_ENV === 'test'
     ? true
     : process.env.REACT_APP_HOLOFUEL_APP === 'true'
       ? false
       : process.env.NODE_ENV === 'development'
-        ? true
-        : false
 
 async function initHolochainClient () {
   isInitiatingHcConnection = true
@@ -158,9 +156,8 @@ async function initHolochainClient () {
       isInitiatingHcConnection = false
       return holochainClient
     } else {
-      wsConnection = false
       // this occurs whenever hcWebClientConnect doesn't complete within the setTimeout duration
-      setTimeout(() => initHolochainClient(), 5000)
+      wsConnection = false
     }
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {

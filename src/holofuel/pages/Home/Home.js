@@ -42,11 +42,11 @@ export default function Home () {
   useEffect(() => {
     if (!isConnected) {
       setIsLoadingTransactions(false)
-  } else {
+    } else {
       setIsLoadingTransactions(loadingTransactions)
     }
   }, [loadingTransactions, setIsLoadingTransactions, isConnected])
-  
+
   const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
   const isTransactionsEmpty = isEmpty(transactions)
