@@ -140,28 +140,18 @@ async function initHolochainClient () {
       url = urlObj.toString()
     }
 
-    setTimeout(async () => {
-      holochainClient = await hcWebClientConnect({
-        url: url,
-        timeout: 5000,
-        wsClient: { max_reconnects: 2 }
-      })
-    }, 5500)
+    holochainClient = await hcWebClientConnect({
+      url: url,
+      timeout: 5000,
+      wsClient: { max_reconnects: 2 }
+    })
 
-    if (holochainClient) {
-      if (HOLOCHAIN_LOGGING) {
-        console.log('🎉 Successfully connected to Holochain!')
-      }
-      wsConnection = true
-      isInitiatingHcConnection = false
-      return holochainClient
-    } else {
-      // this occurs whenever hcWebClientConnect doesn't complete within the setTimeout duration
-      wsConnection = false
-      isInitiatingHcConnection = false
-      // console.log('>>>>>>>> ', holochainClient)
-      setTimeout(() => initHolochainClient(), 5000)
+    if (HOLOCHAIN_LOGGING) {
+      console.log('🎉 Successfully connected to Holochain!')
     }
+    wsConnection = true
+    isInitiatingHcConnection = false
+    return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
