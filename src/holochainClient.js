@@ -158,6 +158,9 @@ async function initHolochainClient () {
     } else {
       // this occurs whenever hcWebClientConnect doesn't complete within the setTimeout duration
       wsConnection = false
+      isInitiatingHcConnection = false
+      // console.log('>>>>>>>> ', holochainClient)
+      setTimeout(() => initHolochainClient(), 5000)
     }
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
