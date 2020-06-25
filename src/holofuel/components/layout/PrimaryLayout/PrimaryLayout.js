@@ -5,7 +5,6 @@ import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
-import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import ScreenWidthContext from 'holofuel/contexts/screenWidth'
@@ -32,7 +31,6 @@ function PrimaryLayout ({
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, stopPolling: stopPollingLedger, startPolling: startPollingLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { stopPolling: stopPollingNonPendingTransactions, startPolling: startPollingNonPendingTransactions } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { refetch: refetchUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
@@ -85,8 +83,6 @@ function PrimaryLayout ({
     startPollingActionableTransactions,
     stopPollingCompletedTransactions,
     startPollingCompletedTransactions,
-    stopPollingNonPendingTransactions,
-    startPollingNonPendingTransactions,
     stopPollingLedger,
     startPollingLedger,
     shouldRefetchUser,
