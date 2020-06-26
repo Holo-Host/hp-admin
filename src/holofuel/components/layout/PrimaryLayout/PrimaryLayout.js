@@ -104,7 +104,7 @@ function PrimaryLayout ({
     refetchWaitingTransactions()
     refetchNonPendingTransactions()
   }
-  
+
   const isLoadingRefetchCalls = ledgerLoading || actionableTransactionsLoading || completedTransactionsLoading || nonPendingTransactionsLoading || waitingTransactionsLoading
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
