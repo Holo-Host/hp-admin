@@ -31,13 +31,19 @@
   overflow-y: scroll;
 }
 
-.new-transaction-button {
+.refresh-button {
   font-size: 13px;
   line-height: 15px;
   display: flex;
   height: 32px;
   box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
+  margin-top: 25px;
   margin-bottom: 30px;
+}
+
+.refresh-loading {
+  margin-right: 6px;
+  margin-left: 6px;  
 }
 
 .drawer-overlay {
@@ -159,6 +165,11 @@
 
 .alpha-link {
   color: var(--color-rhino);
+}
+
+.last-link {
+  border-bottom: 1px solid var(--color-loblolly);
+  margin-bottom: 25px;
 }
 
 /* Footer */

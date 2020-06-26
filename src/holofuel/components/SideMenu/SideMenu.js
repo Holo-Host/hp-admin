@@ -6,6 +6,7 @@ import HashAvatar from 'components/HashAvatar'
 import { presentHolofuelAmount, presentAgentId } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
+import Loading from 'components/Loading'
 import {
   HOME_PATH,
   INBOX_PATH,
@@ -24,6 +25,7 @@ export default function SideMenu ({
   inboxCount,
   holofuelBalance,
   ledgerLoading,
+  isLoadingRefetchCalls,
   refetchCalls
 }) {
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
@@ -60,7 +62,7 @@ export default function SideMenu ({
               History
             </Link>
           </li>
-          <li>
+          <li styleName='last-link'>
             <Link to={PROFILE_PATH} styleName='nav-link'>
               Profile
             </Link>
@@ -71,9 +73,10 @@ export default function SideMenu ({
             </Link>
           </li>}
           <li>
-            <Button onClick={() => refetchCalls()} styleName='new-transaction-button' variant='green'>
+            <Button onClick={() => refetchCalls()} styleName='refresh-button' variant='green'>
               Refresh
             </Button>
+            {isLoadingRefetchCalls && <Loading styleName='refresh-loading' width={20} height={20} />}
           </li>
         </ul>
       </nav>
