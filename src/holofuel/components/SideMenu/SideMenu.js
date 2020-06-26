@@ -62,21 +62,23 @@ export default function SideMenu ({
               History
             </Link>
           </li>
-          <li styleName='last-link'>
+          <li>
             <Link to={PROFILE_PATH} styleName='nav-link'>
               Profile
             </Link>
           </li>
-          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li>
-            <Link to='/admin/' styleName='nav-link'>
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='last-list-item'>
+            <Link to='/admin/' styleName='nav-link last-nav-link'>
               HP Admin
             </Link>
           </li>}
           <li>
-            <Button onClick={() => refetchCalls()} styleName='refresh-button' variant='green'>
-              Refresh
-            </Button>
-            {isLoadingRefetchCalls && <Loading styleName='refresh-loading' width={20} height={20} />}
+            <div styleName='loading-row'>
+              <Button onClick={() => refetchCalls()} styleName={cx('refresh-button', { 'btn-loading': isLoadingRefetchCalls })} variant='green'>
+                Refresh
+              </Button>
+              {isLoadingRefetchCalls && <Loading styleName='refresh-loading' width={20} height={20} />}
+            </div>
           </li>
         </ul>
       </nav>

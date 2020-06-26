@@ -42,8 +42,14 @@
 }
 
 .refresh-loading {
-  margin-right: 6px;
-  margin-left: 6px;  
+  display: flex;
+  align-self: center;
+  margin: 15px;
+}
+
+.loading-row {
+  display: flex;
+  flex: 1.8;
 }
 
 .drawer-overlay {
@@ -167,9 +173,16 @@
   color: var(--color-rhino);
 }
 
-.last-link {
+.last-list-item {
   border-bottom: 1px solid var(--color-loblolly);
-  margin-bottom: 25px;
+}
+
+.last-nav-link {
+  margin-bottom: 15px;
+}
+
+.btn-loading {
+  filter: grayscale(60%);
 }
 
 /* Footer */
