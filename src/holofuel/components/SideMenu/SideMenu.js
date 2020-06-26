@@ -72,7 +72,7 @@ export default function SideMenu ({
           </li>}
           <li>
             <Button onClick={() => refetchCalls()} styleName='new-transaction-button' variant='green'>
-              Refresh Page
+              Refresh
             </Button>
           </li>
         </ul>
