@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import { presentHolofuelAmount, presentAgentId } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import Button from 'components/UIButton'
 import {
   HOME_PATH,
   INBOX_PATH,
@@ -70,9 +71,9 @@ export default function SideMenu ({
             </Link>
           </li>}
           <li>
-            <div onClick={() => refetchCalls()} styleName='nav-link'>
+            <Button onClick={() => refetchCalls()} styleName='new-transaction-button' variant='green'>
               Refresh Page
-            </div>
+            </Button>
           </li>
         </ul>
       </nav>
