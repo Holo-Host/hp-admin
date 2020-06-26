@@ -36,9 +36,14 @@ export function PrimaryLayout ({
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const loginPage = '/' || '/admin/login'
 
   useInterval(() => {
-    setIsConnected(isHposConnectionAlive && wsConnection)
+    if(window.location.pathname === loginPage) {
+      setIsConnected(isHposConnectionAlive)
+    } else {
+      setIsConnected(isHposConnectionAlive && wsConnection)
+    }
   }, 5000)
 
   useEffect(() => {
