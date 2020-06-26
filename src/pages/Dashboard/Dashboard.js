@@ -22,7 +22,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
   // placeholder as we're not currently calling hha
   const noInstalledHapps = 0
 
-  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
 
   const isEarningsZero = Number(earnings) === 0
   const isBalanceZero = Number(balance) === 0

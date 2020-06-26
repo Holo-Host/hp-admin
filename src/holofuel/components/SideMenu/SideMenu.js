@@ -22,7 +22,8 @@ export default function SideMenu ({
   agentLoading,
   inboxCount,
   holofuelBalance,
-  ledgerLoading
+  ledgerLoading,
+  refetchCalls
 }) {
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
@@ -68,6 +69,11 @@ export default function SideMenu ({
               HP Admin
             </Link>
           </li>}
+          <li>
+            <div onClick={() => refetchCalls()} styleName='nav-link'>
+              Refresh Page
+            </div>
+          </li>
         </ul>
       </nav>
 
