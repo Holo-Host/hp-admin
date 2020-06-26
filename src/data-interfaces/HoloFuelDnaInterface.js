@@ -207,8 +207,8 @@ const HoloFuelDnaInterface = {
     getCounterparty: async ({ agentId }) => {
       const presentCounterparty = counterparty => ({
         id: counterparty.agent_address,
-        avatarUrl: counterparty.avatar_url,
-        nickname: counterparty.nickname
+        avatarUrl: counterparty.avatar_url || null,
+        nickname: counterparty.nickname || null
       })
 
       if (cachedGetProfileCalls[agentId]) {

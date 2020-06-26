@@ -36,10 +36,13 @@ export function PrimaryLayout ({
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
-  const loginPage = '/' || '/admin/login'
 
   useInterval(() => {
-    if(window.location.pathname === loginPage) {
+    console.log('window.location.pathname === loginPage', window.location.pathname === '/' || window.location.pathname === '/admin/login')
+    console.log('isHposConnectionAlive : ', isHposConnectionAlive)
+    console.log('wsConnection : ', wsConnection)
+
+    if(window.location.pathname === '/' || window.location.pathname === '/admin/login') {
       setIsConnected(isHposConnectionAlive)
     } else {
       setIsConnected(isHposConnectionAlive && wsConnection)
