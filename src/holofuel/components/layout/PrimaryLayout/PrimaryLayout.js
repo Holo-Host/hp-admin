@@ -18,7 +18,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { shouldShowTransactionInInbox } from 'models/Transaction'
-import { HOME_PATH, HP_ADMIN_LOGIN_PATH } from 'holofuel/utils/urls'
+import { HOME_PATH, HP_ADMIN_DASHBOARD } from 'holofuel/utils/urls'
 import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
@@ -54,18 +54,16 @@ function PrimaryLayout ({
 
   useEffect(() => {
     if (!isConnected) {
-      let connectionErrorMessage, defaultPath
+      let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-        connectionErrorMessage = 'Your Conductor is currently unreachable.'
         defaultPath = HOME_PATH
         stopPollingActionableTransactions()
         stopPollingCompletedTransactions()
         setShouldRefetchUser(true)
       } else {
-        connectionErrorMessage = 'Your Holoport is currently unreachable.'
-        defaultPath = HP_ADMIN_LOGIN_PATH
+        defaultPath = HP_ADMIN_DASHBOARD
       }
-      newMessage(connectionErrorMessage, 0)
+      newMessage('Your Holochain Conductor is currently unreachable.', 0)
       if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
         push(defaultPath)
         stopPollingActionableTransactions()
