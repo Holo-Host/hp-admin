@@ -17,6 +17,7 @@ import { CurrentUserProvider as HFCurrentUserProvider } from 'holofuel/contexts/
 import { ConnectionProvider as HFConnectionProvider } from 'holofuel/contexts/useConnectionContext'
 import AcceptRequestedOffers from 'holofuel/components/wrappers/AcceptRequestedOffers'
 import LoadCurrentUser from 'holofuel/components/wrappers/LoadCurrentUser'
+import ErrorBoundary from 'holofuel/components/ErrorBoundary'
 import PromptForNickname from 'holofuel/components/wrappers/PromptForNickname'
 import HPAdminRouter from './HPAdminRouter'
 
@@ -33,17 +34,19 @@ function HoloFuelAppCore () {
 
   return <HFScreenWidthContext.Provider value={isWide}>
     <HFConnectionProvider>
-      <HFCurrentUserProvider>
-        <HFFlashMessageProvider>
-          <LoadCurrentUser>
-            <AcceptRequestedOffers>
-              <PromptForNickname>
-                <HFRouter />
-              </PromptForNickname>
-            </AcceptRequestedOffers>
-          </LoadCurrentUser>
-        </HFFlashMessageProvider>
-      </HFCurrentUserProvider>
+      <ErrorBoundary>
+        <HFCurrentUserProvider>
+          <HFFlashMessageProvider>
+            <LoadCurrentUser>
+              <AcceptRequestedOffers>
+                <PromptForNickname>
+                  <HFRouter />
+                </PromptForNickname>
+              </AcceptRequestedOffers>
+            </LoadCurrentUser>
+          </HFFlashMessageProvider>
+        </HFCurrentUserProvider>
+      </ErrorBoundary>
     </HFConnectionProvider>
   </HFScreenWidthContext.Provider>
 }
