@@ -6,6 +6,7 @@ import HashAvatar from 'components/HashAvatar'
 import { presentHolofuelAmount, presentAgentId } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
+import Loading from 'components/Loading'
 import {
   HOME_PATH,
   INBOX_PATH,
@@ -24,6 +25,7 @@ export default function SideMenu ({
   inboxCount,
   holofuelBalance,
   ledgerLoading,
+  isLoadingRefetchCalls,
   refetchCalls
 }) {
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
@@ -65,15 +67,18 @@ export default function SideMenu ({
               Profile
             </Link>
           </li>
-          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li>
-            <Link to='/admin/' styleName='nav-link'>
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='last-list-item'>
+            <Link to='/admin/' styleName='nav-link last-nav-link'>
               HP Admin
             </Link>
           </li>}
           <li>
-            <Button onClick={() => refetchCalls()} styleName='new-transaction-button' variant='green'>
-              Refresh
-            </Button>
+            <div styleName='loading-row'>
+              <Button onClick={() => refetchCalls()} styleName={cx('refresh-button', { 'btn-loading': isLoadingRefetchCalls })} variant='green'>
+                Refresh
+              </Button>
+              {isLoadingRefetchCalls && <Loading styleName='refresh-loading' width={20} height={20} />}
+            </div>
           </li>
         </ul>
       </nav>

@@ -31,13 +31,25 @@
   overflow-y: scroll;
 }
 
-.new-transaction-button {
+.refresh-button {
   font-size: 13px;
   line-height: 15px;
   display: flex;
   height: 32px;
   box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
+  margin-top: 25px;
   margin-bottom: 30px;
+}
+
+.refresh-loading {
+  display: flex;
+  align-self: center;
+  margin: 15px;
+}
+
+.loading-row {
+  display: flex;
+  flex: 1.8;
 }
 
 .drawer-overlay {
@@ -159,6 +171,18 @@
 
 .alpha-link {
   color: var(--color-rhino);
+}
+
+.last-list-item {
+  border-bottom: 1px solid var(--color-loblolly);
+}
+
+.last-nav-link {
+  margin-bottom: 15px;
+}
+
+.btn-loading {
+  filter: grayscale(60%);
 }
 
 /* Footer */
