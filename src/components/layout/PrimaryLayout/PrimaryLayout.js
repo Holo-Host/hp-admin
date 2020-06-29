@@ -54,21 +54,13 @@ export function PrimaryLayout ({
       }
     } 
     
-    console.log('window.location.pathname !== / || window.location.pathname !== /admin/login :', window.location.pathname !== '/' || window.location.pathname !== '/admin/login');
-    console.log('window.location.pathname !== / && window.location.pathname !== /admin/login :', window.location.pathname !== '/' && window.location.pathname !== '/admin/login');    
-
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       if (isConnected.hpos && !isConnected.holochain) {
-        console.log('isConnected.hpos (should be true) : ', isConnected.hpos)
-        console.log('isConnected.holochain (should be false) : ', isConnected.holochain)
         newMessage('Your Holochain Conductor is currently unreachable.', 0)
         if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
           push('/admin/dashboard')
         }
-      } else {
-        console.log('isConnected.hpos (should be true) : ', isConnected.hpos)
-        console.log('isConnected.holochain (should be true) : ', isConnected.holochain)
-  
+      } else {  
         newMessage('', 0)
         setCurrentUser({
           hostPubKey: settings.hostPubKey,
