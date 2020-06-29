@@ -35,14 +35,10 @@ export function PrimaryLayout ({
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
-    console.log('window.location.pathname === loginPage', window.location.pathname === '/' || window.location.pathname === '/admin/login')
-    console.log('isHposConnectionAlive : ', isHposConnectionAlive)
-    console.log('wsConnection : ', wsConnection)
-
-    if(window.location.pathname === '/' || window.location.pathname === '/admin/login') {
+    if (window.location.pathname === '/' || window.location.pathname === '/admin/login') {
       setIsConnected({ ...isConnected, hpos: isHposConnectionAlive })
     } else {
       setIsConnected({ hpos: isHposConnectionAlive, holochain: wsConnection })
@@ -50,25 +46,35 @@ export function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    console.log('!isConnected.hpos : ', !isConnected.hpos)
-    console.log('!isConnected.holochain : ', !isConnected.holochain)
-
     if (!isConnected.hpos) {
+      console.log('isConnected.hpos (should be false) : ', isConnected.hpos)
       newMessage('Your Holoport is currently unreachable.', 0)
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
-      } 
-    } else if (isConnected.hpos && !isConnected.holochain) {
-      newMessage('Your Holochain Conductor is currently unreachable.', 0)
-      if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
-        push('/admin/dashboard')
       }
-    } else {
-      newMessage('', 0)
-      setCurrentUser({
-        hostPubKey: settings.hostPubKey,
-        hostName: settings.hostName || ''
-      })
+    } 
+    
+    console.log('window.location.pathname !== / || window.location.pathname !== /admin/login :', window.location.pathname !== '/' || window.location.pathname !== '/admin/login');
+    console.log('window.location.pathname !== / && window.location.pathname !== /admin/login :', window.location.pathname !== '/' && window.location.pathname !== '/admin/login');    
+
+    if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+      if (isConnected.hpos && !isConnected.holochain) {
+        console.log('isConnected.hpos (should be true) : ', isConnected.hpos)
+        console.log('isConnected.holochain (should be false) : ', isConnected.holochain)
+        newMessage('Your Holochain Conductor is currently unreachable.', 0)
+        if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
+          push('/admin/dashboard')
+        }
+      } else {
+        console.log('isConnected.hpos (should be true) : ', isConnected.hpos)
+        console.log('isConnected.holochain (should be true) : ', isConnected.holochain)
+  
+        newMessage('', 0)
+        setCurrentUser({
+          hostPubKey: settings.hostPubKey,
+          hostName: settings.hostName || ''
+        })
+      }
     }
   }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName])
 

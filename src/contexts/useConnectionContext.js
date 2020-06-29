@@ -5,7 +5,7 @@ export const ConnectionContext = createContext()
 export function ConnectionProvider ({ children }) {
   const [isConnected, setIsConnected] = useState({
     hpos: false,
-    holochain: false,
+    holochain: false
   })
 
   return <ConnectionContext.Provider value={{ isConnected, setIsConnected }}>
