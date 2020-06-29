@@ -15,6 +15,7 @@ import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import { CurrentUserProvider as HFCurrentUserProvider } from 'holofuel/contexts/useCurrentUserContext'
 import { ConnectionProvider as HFConnectionProvider } from 'holofuel/contexts/useConnectionContext'
+import {ErrorProvider as HFErrorProvider } from 'holofuel/contexts/useErrorContext'
 import AcceptRequestedOffers from 'holofuel/components/wrappers/AcceptRequestedOffers'
 import LoadCurrentUser from 'holofuel/components/wrappers/LoadCurrentUser'
 import ErrorBoundary from 'holofuel/components/ErrorBoundary'
@@ -35,17 +36,19 @@ function HoloFuelAppCore () {
   return <HFScreenWidthContext.Provider value={isWide}>
     <HFConnectionProvider>
       <ErrorBoundary>
-        <HFCurrentUserProvider>
-          <HFFlashMessageProvider>
-            <LoadCurrentUser>
-              <AcceptRequestedOffers>
-                <PromptForNickname>
-                  <HFRouter />
-                </PromptForNickname>
-              </AcceptRequestedOffers>
-            </LoadCurrentUser>
-          </HFFlashMessageProvider>
-        </HFCurrentUserProvider>
+        <HFErrorProvider>
+          <HFCurrentUserProvider>
+            <HFFlashMessageProvider>
+              <LoadCurrentUser>
+                <AcceptRequestedOffers>
+                  <PromptForNickname>
+                    <HFRouter />
+                  </PromptForNickname>
+                </AcceptRequestedOffers>
+              </LoadCurrentUser>
+            </HFFlashMessageProvider>
+          </HFCurrentUserProvider>
+        </HFErrorProvider>
       </ErrorBoundary>
     </HFConnectionProvider>
   </HFScreenWidthContext.Provider>
