@@ -40,7 +40,7 @@ export default function Login ({ history: { push } }) {
     } else if (isConnected.hpos) {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     } else if (!isConnected.hpos) {
-      newMessage('Your Holoport is currently unreachable.', 0)
+      newMessage('Your Holoport is currently unreachable. You cannot log in at this time.', 0)
     }
   }
 

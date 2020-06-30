@@ -54,8 +54,6 @@ function PrimaryLayout ({
 
   useEffect(() => {
     if (!isFirstLoad.current && !isConnected) {
-      newMessage('Your Holochain Conductor is currently unreachable. Attempting to reconnect.', 0)
-
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
         defaultPath = HOME_PATH

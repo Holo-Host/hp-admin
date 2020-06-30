@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -29,9 +30,11 @@ export default function Home () {
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
-  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false)
   const { isConnected } = useConnectionContext()
+  const { newMessage } = useFlashMessageContext()
   const { setCurrentUser, currentUser } = useCurrentUserContext()
+  const [isFirstRenderComplete, setIsFirstRenderComplete] = useState(false)
+  const isFirstLoad = useRef(true)
 
   useEffect(() => {
     if (!isEmpty(holofuelUser)) {
@@ -40,12 +43,20 @@ export default function Home () {
   }, [holofuelUser, setCurrentUser])
 
   useEffect(() => {
-    if (!isConnected) {
-      setIsLoadingTransactions(false)
-    } else {
-      setIsLoadingTransactions(loadingTransactions)
+    console.log('dashboard >>>shouldRenderMessage: ', isFirstRenderComplete)
+    if (isFirstRenderComplete && !isConnected) {
+      console.log('SIGNALING NEW MESSAGE >>>>>> dashboard')
+      newMessage('Your Holochain Conductor is currently unreachable.  \nAttempting to reconnect.', 0)
+    } else if (!isConnected)  {
+      newMessage('Checking connection to your Holochain Conductor...', 0)
     }
-  }, [loadingTransactions, setIsLoadingTransactions, isConnected])
+
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false
+      setTimeout(() => setIsFirstRenderComplete(true), 5000)
+    }
+  }, [isConnected, newMessage, isFirstRenderComplete])
+
 
   const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
@@ -55,7 +66,7 @@ export default function Home () {
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
-  const isLoadingFirstPendingTransactions = useLoadingFirstTime(isLoadingTransactions)
+  const isLoadingFirstPendingTransactions = useLoadingFirstTime(isConnected && loadingTransactions)
 
   return <PrimaryLayout headerProps={{ title: 'Holofuel Home' }}>
     <div styleName='container'>

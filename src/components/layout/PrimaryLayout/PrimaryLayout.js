@@ -35,11 +35,14 @@ export function PrimaryLayout ({
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
   const isFirstLoginRender = useRef(true)
   const isFirstAppRender = useRef(true)
 
   useInterval(() => {
+    console.log('isHposConnectionAlive : ', isHposConnectionAlive)
+    console.log('wsConnection in HP ADMIN>Primary layout : ',wsConnection)
+    
     if (window.location.pathname === '/' || window.location.pathname === '/admin/login') {
       setIsConnected({ ...isConnected, hpos: isHposConnectionAlive })
     } else {
@@ -48,8 +51,10 @@ export function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    if (!isFirstLoginRender.current && !isConnected.hpos) {
-      newMessage('Your Holoport is currently unreachable. Attempting to reconnect.', 0)
+    console.log('CONNECTION DETAILS >>>>>>>>>>> : ', isConnected)
+    
+    if (!isFirstLoginRender.current && !isConnected.hpos) {      
+      newMessage('Your Holoport is currently unreachable. \nAttempting to reconnect...', 0)
       // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
@@ -63,18 +68,26 @@ export function PrimaryLayout ({
       }, 3000)
     }
 
+    const renderConnected = () => {
+      newMessage('', 0)
+      setCurrentUser({
+        hostPubKey: settings.hostPubKey,
+        hostName: settings.hostName || ''
+      })
+    }
+
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       // if inside happ, check for connection to holochain
       if (!isFirstAppRender.current && isConnected.hpos && !isConnected.holochain) {
-        newMessage('Your Holochain Conductor is currently unreachable.', 0)
         // reroute to dashboard on ws connection / hc conductor failure
         if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
           push('/admin/dashboard')
         }
       } else {
-        newMessage('', 0)
+        renderConnected()
       }
       if (isFirstAppRender.current) {
+        // set timeout to allow time to let network connection check complete
         setTimeout(() => {
           isFirstAppRender.current = false
         }, 5000)
@@ -82,11 +95,7 @@ export function PrimaryLayout ({
     } else {
       // if on login page and connected to hpos, clear message and set user
       if (isConnected.hpos) {
-        newMessage('', 0)
-        setCurrentUser({
-          hostPubKey: settings.hostPubKey,
-          hostName: settings.hostName || ''
-        })
+        renderConnected()
       }
     }
   }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName])
@@ -100,11 +109,11 @@ export function PrimaryLayout ({
     {showHeader && <Header
       {...headerProps}
       hamburgerClick={showSideMenu && hamburgerClick}
-      settings={isConnected ? settings : {}} />}
+      settings={isConnected.hpos ? settings : {}} />}
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
-      settings={isConnected ? settings : {}} />
+      settings={isConnected.hpos ? settings : {}} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />
