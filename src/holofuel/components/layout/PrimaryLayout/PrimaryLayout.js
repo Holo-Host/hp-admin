@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -40,6 +40,7 @@ function PrimaryLayout ({
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
+  const isFirstLoad = useRef(true)
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -52,32 +53,20 @@ function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    if (!isConnected) {
+    if (!isFirstLoad.current && !isConnected) {
+      newMessage('Your Holochain Conductor is currently unreachable.', 0)
+
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
         defaultPath = HOME_PATH
-      } else {
-        defaultPath = HP_ADMIN_DASHBOARD
-      }
-
-      const stopPolling = () => {
         stopPollingActionableTransactions()
         stopPollingCompletedTransactions()
         setShouldRefetchUser(true)
-      }
-
-      if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
-        newMessage('Your Holochain Conductor is currently unreachable.', 0)
-        push(defaultPath)
-        stopPolling()
       } else {
-        // ignore the lack of connection the first 5s on Home Page to see if will connect after login
-        setTimeout(() => {
-          if (!isConnected) {
-            newMessage('Your Holochain Conductor is currently unreachable.', 0)
-            stopPolling()
-          }
-        }, 5000)
+        defaultPath = HP_ADMIN_DASHBOARD
+      }
+      if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
+        push(defaultPath)
       }
     } else {
       newMessage('', 0)
@@ -86,6 +75,10 @@ function PrimaryLayout ({
       if (shouldRefetchUser) {
         refetchHolofuelUser()
       }
+    }
+
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false
     }
   }, [isConnected,
     setIsConnected,

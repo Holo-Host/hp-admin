@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
@@ -36,6 +36,8 @@ export function PrimaryLayout ({
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 30000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const isFirstLoginRender = useRef(true)
+  const isFirstAppRender = useRef(true)
 
   useInterval(() => {
     if (window.location.pathname === '/' || window.location.pathname === '/admin/login') {
@@ -46,8 +48,7 @@ export function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    if (!isConnected.hpos) {
-      console.log('isConnected.hpos (should be false) : ', isConnected.hpos)
+    if (!isFirstLoginRender.current && !isConnected.hpos) {
       newMessage('Your Holoport is currently unreachable.', 0)
       // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
@@ -55,24 +56,30 @@ export function PrimaryLayout ({
       }
     }
 
+    if (isFirstLoginRender.current) {
+      setTimeout(() => {
+        isFirstLoginRender.current = false
+      }, 3000)
+    }
+
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
-      if (isConnected.hpos && !isConnected.holochain) {
+      // if inside happ, check for connection to holochain
+      if (!isFirstAppRender.current && isConnected.hpos && !isConnected.holochain) {
+        newMessage('Your Holochain Conductor is currently unreachable.', 0)
         // reroute to dashboard on ws connection / hc conductor failure
         if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
           push('/admin/dashboard')
-          newMessage('Your Holochain Conductor is currently unreachable.', 0)
-        } else {
-          // ignore the lack of connection the first 5s on Dashboard to see if will connect after login
-          setTimeout(() => {
-            if (isConnected.hpos && !isConnected.holochain) {
-              newMessage('Your Holochain Conductor is currently unreachable.', 0)
-            }
-          }, 5000)
         }
-      } else {  
+      } else {
         newMessage('', 0)
       }
+
+      if (isFirstAppRender.current) {
+        isFirstAppRender.current = false
+      }
+
     } else {
+      // if on login page and connected to hpos, clear message and set user
       if (isConnected.hpos) {  
         newMessage('', 0)
         setCurrentUser({
