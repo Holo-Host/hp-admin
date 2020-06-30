@@ -49,18 +49,24 @@ export function PrimaryLayout ({
     if (!isConnected.hpos) {
       console.log('isConnected.hpos (should be false) : ', isConnected.hpos)
       newMessage('Your Holoport is currently unreachable.', 0)
+      // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
       }
-    } 
-    
+    }
+
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       if (isConnected.hpos && !isConnected.holochain) {
         newMessage('Your Holochain Conductor is currently unreachable.', 0)
+        // reroute to dashboard on ws connection / hc conductor failure
         if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
           push('/admin/dashboard')
         }
       } else {  
+        newMessage('', 0)
+      }
+    } else {
+      if (isConnected.hpos) {  
         newMessage('', 0)
         setCurrentUser({
           hostPubKey: settings.hostPubKey,
