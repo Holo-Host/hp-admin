@@ -73,14 +73,14 @@ export function PrimaryLayout ({
       } else {
         newMessage('', 0)
       }
-
       if (isFirstAppRender.current) {
-        isFirstAppRender.current = false
+        setTimeout(() => {
+          isFirstAppRender.current = false
+        }, 5000)
       }
-
     } else {
       // if on login page and connected to hpos, clear message and set user
-      if (isConnected.hpos) {  
+      if (isConnected.hpos) {
         newMessage('', 0)
         setCurrentUser({
           hostPubKey: settings.hostPubKey,

@@ -37,8 +37,10 @@ export default function Login ({ history: { push } }) {
         hostName: hposSettings.hostName || ''
       }
       setCurrentUser(hostCurrentUser)
-    } else if (isConnected) {
+    } else if (isConnected.hpos) {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
+    } else if (!isConnected.hpos) {
+      newMessage('Your Holoport is currently unreachable.', 0)
     }
   }
 
@@ -58,7 +60,7 @@ export default function Login ({ history: { push } }) {
             id='email'
             styleName='input'
             ref={register({ required: true })}
-            disabled={!isConnected}
+            disabled={!isConnected.hpos}
           />
           {errors.email && <small styleName='field-error'>
             You need to provide a valid email address.
@@ -71,14 +73,14 @@ export default function Login ({ history: { push } }) {
             id='password'
             styleName='input'
             ref={register({ required: true, minLength: 6 })}
-            disabled={!isConnected}
+            disabled={!isConnected.hpos}
           />
           {errors.password && <small styleName='field-error'>
             {errors.password.type === 'required' && 'Type in your password, please.'}
             {errors.password.type === 'minLength' && 'Password need to be at least 6 characters long.'}
           </small>}
         </div>
-        <Button type='submit' variant='green' wide styleName='login-button' disabled={!isConnected}>Login</Button>
+        <Button type='submit' variant='green' wide styleName='login-button' disabled={!isConnected.hpos}>Login</Button>
       </form>
       <div styleName='reminder-text-block'>*Remember, Holo doesn’t store your password so we can’t recover it for you. Please save your password securely!</div>
       <div styleName='reminder-text-block'>
