@@ -114,14 +114,14 @@ let holochainClient
 let isInitiatingHcConnection = false
 let wsTimeoutErrorCount = 0
 
-// only default wsConnetion to true in test env, or hpos hp-admin development env
+// default wsConnetion to true in test env and hpos hp-admin env
 export let wsConnection = holochainClient
   ? true
   : process.env.NODE_ENV === 'test'
     ? true
-    : process.env.REACT_APP_HOLOFUEL_APP === 'true'
-      ? false
-      : true
+    : !process.env.REACT_APP_HOLOFUEL_APP
+
+console.log('wsConnection : ', wsConnection)
 
 async function initHolochainClient () {
   isInitiatingHcConnection = true

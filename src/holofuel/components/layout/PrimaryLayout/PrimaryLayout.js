@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -18,7 +18,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { shouldShowTransactionInInbox } from 'models/Transaction'
-import { HOME_PATH, HP_ADMIN_LOGIN_PATH } from 'holofuel/utils/urls'
+import { HOME_PATH, HP_ADMIN_DASHBOARD } from 'holofuel/utils/urls'
 import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
@@ -30,7 +30,7 @@ function PrimaryLayout ({
   headerProps = {},
   showAlphaFlag = true
 }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger, stopPolling: stopPollingLedger, startPolling: startPollingLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
   const { loading: actionableTransactionsLoading, data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, refetch: refetchActionableTransactions, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: completedTransactionsLoading, refetch: refetchCompletedTransactions, stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: nonPendingTransactionsLoading, refetch: refetchNonPendingTransactions } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
@@ -40,6 +40,7 @@ function PrimaryLayout ({
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
+  const isFirstLoad = useRef(true)
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -52,22 +53,20 @@ function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    if (!isConnected) {
-      let connectionErrorMessage, defaultPath
+    if (!isFirstLoad.current && !isConnected) {
+      newMessage('Your Holochain Conductor is currently unreachable. Attempting to reconnect.', 0)
+
+      let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-        connectionErrorMessage = 'Your Conductor is currently unreachable.'
         defaultPath = HOME_PATH
         stopPollingActionableTransactions()
         stopPollingCompletedTransactions()
         setShouldRefetchUser(true)
       } else {
-        connectionErrorMessage = 'Your Holoport is currently unreachable.'
-        defaultPath = HP_ADMIN_LOGIN_PATH
+        defaultPath = HP_ADMIN_DASHBOARD
       }
-      newMessage(connectionErrorMessage, 0)
       if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
         push(defaultPath)
-        stopPollingActionableTransactions()
       }
     } else {
       newMessage('', 0)
@@ -77,6 +76,10 @@ function PrimaryLayout ({
         refetchHolofuelUser()
       }
     }
+
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false
+    }
   }, [isConnected,
     setIsConnected,
     push,
@@ -85,8 +88,6 @@ function PrimaryLayout ({
     startPollingActionableTransactions,
     stopPollingCompletedTransactions,
     startPollingCompletedTransactions,
-    stopPollingLedger,
-    startPollingLedger,
     shouldRefetchUser,
     refetchHolofuelUser])
 

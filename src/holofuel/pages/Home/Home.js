@@ -100,7 +100,7 @@ export default function Home () {
           </div>}
 
           {!isLoadingFirstPendingTransactions && isTransactionsEmpty && <div styleName='transactions-empty'>
-            You have no recent transactions
+            {!isConnected ? 'Your transactions cannot be displayed at this time' : 'You have no recent transactions'}
           </div>}
 
           {!isTransactionsEmpty && <h2 styleName='transactions-label'>Recent Transactions</h2>}
