@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -30,7 +30,7 @@ function PrimaryLayout ({
   headerProps = {},
   showAlphaFlag = true
 }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger, stopPolling: stopPollingLedger, startPolling: startPollingLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
   const { loading: actionableTransactionsLoading, data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, refetch: refetchActionableTransactions, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: completedTransactionsLoading, refetch: refetchCompletedTransactions, stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: nonPendingTransactionsLoading, refetch: refetchNonPendingTransactions } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
@@ -40,6 +40,7 @@ function PrimaryLayout ({
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
+  const isFirstLoad = useRef(true)
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -52,7 +53,9 @@ function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    if (!isConnected) {
+    if (!isFirstLoad.current && !isConnected) {
+      newMessage('Your Holochain Conductor is currently unreachable. Attempting to reconnect.', 0)
+
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
         defaultPath = HOME_PATH
@@ -62,10 +65,8 @@ function PrimaryLayout ({
       } else {
         defaultPath = HP_ADMIN_DASHBOARD
       }
-      newMessage('Your Holochain Conductor is currently unreachable.', 0)
       if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
         push(defaultPath)
-        stopPollingActionableTransactions()
       }
     } else {
       newMessage('', 0)
@@ -75,6 +76,10 @@ function PrimaryLayout ({
         refetchHolofuelUser()
       }
     }
+
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false
+    }
   }, [isConnected,
     setIsConnected,
     push,
@@ -83,8 +88,6 @@ function PrimaryLayout ({
     startPollingActionableTransactions,
     stopPollingCompletedTransactions,
     startPollingCompletedTransactions,
-    stopPollingLedger,
-    startPollingLedger,
     shouldRefetchUser,
     refetchHolofuelUser])
 
