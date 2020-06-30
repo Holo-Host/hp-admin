@@ -30,7 +30,7 @@ function PrimaryLayout ({
   headerProps = {},
   showAlphaFlag = true
 }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger, stopPolling: stopPollingLedger, startPolling: startPollingLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
   const { loading: actionableTransactionsLoading, data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, refetch: refetchActionableTransactions, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: completedTransactionsLoading, refetch: refetchCompletedTransactions, stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: nonPendingTransactionsLoading, refetch: refetchNonPendingTransactions } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
@@ -56,16 +56,28 @@ function PrimaryLayout ({
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
         defaultPath = HOME_PATH
-        stopPollingActionableTransactions()
-        stopPollingCompletedTransactions()
-        setShouldRefetchUser(true)
       } else {
         defaultPath = HP_ADMIN_DASHBOARD
       }
-      newMessage('Your Holochain Conductor is currently unreachable.', 0)
-      if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
-        push(defaultPath)
+
+      const stopPolling = () => {
         stopPollingActionableTransactions()
+        stopPollingCompletedTransactions()
+        setShouldRefetchUser(true)
+      }
+
+      if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
+        newMessage('Your Holochain Conductor is currently unreachable.', 0)
+        push(defaultPath)
+        stopPolling()
+      } else {
+        // ignore the lack of connection the first 5s on Home Page to see if will connect after login
+        setTimeout(() => {
+          if (!isConnected) {
+            newMessage('Your Holochain Conductor is currently unreachable.', 0)
+            stopPolling()
+          }
+        }, 5000)
       }
     } else {
       newMessage('', 0)
@@ -83,8 +95,6 @@ function PrimaryLayout ({
     startPollingActionableTransactions,
     stopPollingCompletedTransactions,
     startPollingCompletedTransactions,
-    stopPollingLedger,
-    startPollingLedger,
     shouldRefetchUser,
     refetchHolofuelUser])
 

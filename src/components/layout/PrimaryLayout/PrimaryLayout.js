@@ -57,10 +57,17 @@ export function PrimaryLayout ({
 
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       if (isConnected.hpos && !isConnected.holochain) {
-        newMessage('Your Holochain Conductor is currently unreachable.', 0)
         // reroute to dashboard on ws connection / hc conductor failure
         if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
           push('/admin/dashboard')
+          newMessage('Your Holochain Conductor is currently unreachable.', 0)
+        } else {
+          // ignore the lack of connection the first 5s on Dashboard to see if will connect after login
+          setTimeout(() => {
+            if (isConnected.hpos && !isConnected.holochain) {
+              newMessage('Your Holochain Conductor is currently unreachable.', 0)
+            }
+          }, 5000)
         }
       } else {  
         newMessage('', 0)
