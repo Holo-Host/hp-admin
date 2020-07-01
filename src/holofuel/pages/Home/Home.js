@@ -28,16 +28,16 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 export default function Home () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })  
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
   const { isConnected } = useConnectionContext()
   const { isConnected: hpAdminIsConnected } = useHpAdminConnectionContext()
   const { setCurrentUser, currentUser } = useCurrentUserContext()
 
   const connection = process.env.REACT_APP_HOLOFUEL_APP === 'true'
-  ? isConnected
-  : hpAdminIsConnected.holochain
-  
+    ? isConnected
+    : hpAdminIsConnected.holochain
+
   useEffect(() => {
     if (!isEmpty(holofuelUser)) {
       setCurrentUser(holofuelUser)
