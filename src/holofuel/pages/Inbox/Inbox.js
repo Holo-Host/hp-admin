@@ -298,9 +298,9 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
         ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
         : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
     }
-    fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
+    fullNotes = isOffer ? ` Canceled Offer${notes ? `: ${notes}` : ''}` : ` Canceled Request${notes ? `: ${notes}` : ''}`
   } else if (isDeclined) {
-    fullNotes = isOffer ? ` Declined Offer: ${notes}` : ` Declined Request: ${notes}`
+    fullNotes = isOffer ? ` Declined Offer${notes ? `: ${notes}` : ''}` : ` Declined Request${notes ? `: ${notes}` : ''}`
   } else fullNotes = notes
 
   const [highlightGreen, setHighlightGreen] = useState(false)
