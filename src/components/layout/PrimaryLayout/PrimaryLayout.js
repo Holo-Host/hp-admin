@@ -44,14 +44,14 @@ export function PrimaryLayout ({
     }
   }, 5000)
 
-  useEffect(() => {  
+  useEffect(() => {
     if (!isConnected.hpos) {
       newMessage('Connecting to your Holoport...', 0)
       // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
       }
-      setIsConnected({ ...isConnected, hpos: isHposConnectionAlive }) 
+      setIsConnected({ ...isConnected, hpos: isHposConnectionAlive })
     }
 
     const renderConnected = () => {

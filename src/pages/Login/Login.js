@@ -20,7 +20,7 @@ export default function Login ({ history: { push } }) {
   const { setIsAuthed } = useAuthContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
-  
+
   const onSubmit = async ({ email, password }) => {
     eraseHpAdminKeypair()
     // we call this to SET the singleton value of HpAdminKeypair

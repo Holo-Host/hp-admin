@@ -48,7 +48,6 @@ export default function Home () {
     }
   }, [isConnected, newMessage])
 
-
   const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
   const isTransactionsEmpty = isEmpty(transactions)

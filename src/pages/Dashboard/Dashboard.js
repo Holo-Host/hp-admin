@@ -25,7 +25,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
   const { isConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const [isFirstRenderComplete, setIsFirstRenderComplete] = useState(false)
-  const isFirstAppRender = useRef(true)    
+  const isFirstAppRender = useRef(true)
 
   useEffect(() => {
     if (isFirstRenderComplete && !isConnected.holochain) {
