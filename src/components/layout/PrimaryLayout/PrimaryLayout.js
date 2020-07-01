@@ -52,15 +52,15 @@ export function PrimaryLayout ({
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
       }
-    } 
-    
+    }
+
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       if (isConnected.hpos && !isConnected.holochain) {
         newMessage('Your Holochain Conductor is currently unreachable.', 0)
         if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
           push('/admin/dashboard')
         }
-      } else {  
+      } else {
         newMessage('', 0)
         setCurrentUser({
           hostPubKey: settings.hostPubKey,
