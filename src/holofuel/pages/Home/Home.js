@@ -3,7 +3,8 @@ import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
-import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useHpAdminConnectionContext from 'contexts/useConnectionContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -14,7 +15,6 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HashAvatar from 'components/HashAvatar'
-import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
@@ -28,25 +28,21 @@ const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
 export default function Home () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })  
 
   const { isConnected } = useConnectionContext()
-  const { newMessage } = useFlashMessageContext()
+  const { isConnected: hpAdminIsConnected } = useHpAdminConnectionContext()
   const { setCurrentUser, currentUser } = useCurrentUserContext()
 
+  const connection = process.env.REACT_APP_HOLOFUEL_APP === 'true'
+  ? isConnected
+  : hpAdminIsConnected.holochain
+  
   useEffect(() => {
     if (!isEmpty(holofuelUser)) {
       setCurrentUser(holofuelUser)
     }
   }, [holofuelUser, setCurrentUser])
-
-  useEffect(() => {
-    if (!isConnected) {
-      newMessage('Checking connection to your Holochain Conductor...', 0)
-    } else if (isConnected) {
-      newMessage('', 0)
-    }
-  }, [isConnected, newMessage])
 
   const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
@@ -56,7 +52,7 @@ export default function Home () {
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
-  const isLoadingFirstPendingTransactions = useLoadingFirstTime(isConnected && loadingTransactions)
+  const isLoadingFirstPendingTransactions = useLoadingFirstTime(connection && loadingTransactions)
 
   return <PrimaryLayout headerProps={{ title: 'Test Fuel Home' }}>
     <div styleName='container'>
@@ -101,7 +97,7 @@ export default function Home () {
           </div>}
 
           {!isLoadingFirstPendingTransactions && isTransactionsEmpty && <div styleName='transactions-empty'>
-            {!isConnected ? 'Your transactions cannot be displayed at this time' : 'You have no recent transactions'}
+            {!connection ? 'Your transactions cannot be displayed at this time' : 'You have no recent transactions'}
           </div>}
 
           {!isTransactionsEmpty && <h2 styleName='transactions-label'>Recent Transactions</h2>}

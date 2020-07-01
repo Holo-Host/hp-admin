@@ -15,7 +15,7 @@ export default function HashIcon ({
   hash,
   size = 64,
   className
-}) { 
+}) {
   return <div data-testid='hash-icon'>
     {hash ? <Identicon
       seed={hash}

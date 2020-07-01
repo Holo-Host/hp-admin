@@ -36,7 +36,7 @@ export function PrimaryLayout ({
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
-  const isFirstAppRender = useRef(true)
+  const isFreshHpAdminRender = useRef(true)
 
   useInterval(() => {
     if (window.location.pathname !== '/' || window.location.pathname !== '/admin/login') {
@@ -46,15 +46,15 @@ export function PrimaryLayout ({
 
   useEffect(() => {
     if (!isConnected.hpos) {
-      newMessage('Connecting to your Holoport...', 0)
       // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
-        push('/')
+        push('/admin/login')
       }
+      newMessage('Connecting to your Holoport...', 0)
       setIsConnected({ ...isConnected, hpos: isHposConnectionAlive })
     }
 
-    const renderConnected = () => {
+    const setUser = () => {
       setCurrentUser({
         hostPubKey: settings.hostPubKey,
         hostName: settings.hostName || ''
@@ -63,29 +63,34 @@ export function PrimaryLayout ({
 
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       // if inside happ, check for connection to holochain
-      if (!isFirstAppRender.current && isConnected.hpos && !isConnected.holochain) {
-        // reroute to dashboard on ws connection / hc conductor failure
-        if (window.location.pathname !== '/admin' && window.location.pathname !== '/admin/' && window.location.pathname !== '/admin/dashboard') {
-          push('/admin/dashboard')
-        }
+      if (!isFreshHpAdminRender.current && isConnected.hpos && !isConnected.holochain) {
+        newMessage('Connecting to your Holochain Conductor...', 0)
       } else {
-        renderConnected()
+        newMessage('', 0)
+        setUser()
       }
 
-      if (isFirstAppRender.current) {
+      if (isFreshHpAdminRender.current) {
         // set timeout to allow time to let ws connection check to complete
         setTimeout(() => {
-          isFirstAppRender.current = false
+          isFreshHpAdminRender.current = false
         }, 5000)
       }
     } else {
       // if on login page and connected to hpos, clear message and set user
       if (isConnected.hpos) {
         newMessage('', 0)
-        renderConnected()
+        setUser()
       }
     }
-  }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName, setIsConnected, isHposConnectionAlive])
+  }, [isConnected,
+    newMessage,
+    push,
+    setCurrentUser,
+    settings.hostPubKey,
+    settings.hostName,
+    setIsConnected,
+    isHposConnectionAlive])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

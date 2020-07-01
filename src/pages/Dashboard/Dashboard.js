@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React from 'react'
 import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
@@ -7,8 +7,6 @@ import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import CopyAgentId from 'components/CopyAgentId'
-import useConnectionContext from 'contexts/useConnectionContext'
-import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
@@ -21,26 +19,6 @@ export const mockEarnings = 4984
 export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
   const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
-
-  const { isConnected } = useConnectionContext()
-  const { newMessage } = useFlashMessageContext()
-  const [isFirstRenderComplete, setIsFirstRenderComplete] = useState(false)
-  const isFirstAppRender = useRef(true)
-
-  useEffect(() => {
-    if (isFirstRenderComplete && !isConnected.holochain) {
-      newMessage('Your Holochain Conductor is currently unreachable.  \nAttempting to reconnect.', 0)
-    } else if (isConnected.holochain) {
-      setIsFirstRenderComplete(true)
-      newMessage('', 0)
-    }
-
-    if (isFirstAppRender.current) {
-      newMessage('Checking connection to your Holochain Conductor...', 0)
-      isFirstAppRender.current = false
-      setTimeout(() => setIsFirstRenderComplete(true), 5000)
-    }
-  }, [isConnected, newMessage, isFirstRenderComplete])
 
   // placeholder as we're not currently calling hha
   const noInstalledHapps = 0
