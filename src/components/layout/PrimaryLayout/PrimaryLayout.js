@@ -68,7 +68,7 @@ export function PrimaryLayout ({
       newMessage('Connecting to your Holoport...', 0)
       setTimeout(() => {
         isFirstLoginRender.current = false
-      }, 4000)
+      }, 5000)
     }
 
     const renderConnected = () => {
