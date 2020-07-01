@@ -6,20 +6,22 @@ import apolloLogger from 'apollo-link-logger'
 import { onError } from 'apollo-link-error'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 
-const errorLink = onError(({ graphQLErrors, response }) => {
-  if (graphQLErrors) {
-    graphQLErrors.map(({ message }) => {
-      if (message.includes('Network Error')) {
-        console.log(`[HPOS Connection Error]: ${message}`)
-        response.errors.isHposConnectionActive = false
+const errorLink = onError(({ graphQLErrors, response, operation }) => {
+  if (operation.operationName === 'HposSettings') {
+    if (graphQLErrors) {
+      graphQLErrors.map(({ message }) => {
+        if (message.includes('Network Error')) {
+          console.log(`[HPOS Connection Error]: ${message}`)
+          response.errors.isHposConnectionActive = false
+          return response
+        } else if (message.includes(401)) {
+          console.log(`[Authentication Error]: ${message}`)
+          response.errors.isHposConnectionActive = true
+          return response
+        }
         return response
-      } else if (message.includes(401)) {
-        console.log(`[Authentication Error]: ${message}`)
-        response.errors.isHposConnectionActive = true
-        return response
-      }
-      return response
-    })
+      })
+    }
   }
 })
 

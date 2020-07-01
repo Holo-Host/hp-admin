@@ -36,37 +36,22 @@ export function PrimaryLayout ({
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
-  const [NumUnAuthErrors, setNumUnAuthErrors] = useState(0)
-  const isFirstLoginRender = useRef(true)
   const isFirstAppRender = useRef(true)
 
   useInterval(() => {
-    if (window.location.pathname === '/' || window.location.pathname === '/admin/login') {
-      if (isHposConnectionAlive && NumUnAuthErrors < 4){
-        setNumUnAuthErrors(NumUnAuthErrors + 1)
-      }
-      if (NumUnAuthErrors >= 3) {
-        setIsConnected({ ...isConnected, hpos: isHposConnectionAlive })
-      } else {
-        setIsConnected({ ...isConnected, hpos: false })
-      }
-    } else {
+    if (window.location.pathname !== '/' || window.location.pathname !== '/admin/login') {
       setIsConnected({ hpos: isHposConnectionAlive, holochain: wsConnection })
     }
   }, 5000)
 
-  useEffect(() => {    
-    if (!isFirstLoginRender.current && !isConnected.hpos) {
-      newMessage('Your Holoport is currently unreachable. \nAttempting to reconnect...', 0)
+  useEffect(() => {  
+    if (!isConnected.hpos) {
+      newMessage('Connecting to your Holoport...', 0)
       // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
       }
-    } else if (isFirstLoginRender.current && !isConnected.hpos) {
-      newMessage('Connecting to your Holoport...', 0)
-      setTimeout(() => {
-        isFirstLoginRender.current = false
-      }, 10000)
+      setIsConnected({ ...isConnected, hpos: isHposConnectionAlive }) 
     }
 
     const renderConnected = () => {
@@ -86,6 +71,7 @@ export function PrimaryLayout ({
       } else {
         renderConnected()
       }
+
       if (isFirstAppRender.current) {
         // set timeout to allow time to let ws connection check to complete
         setTimeout(() => {
@@ -99,7 +85,7 @@ export function PrimaryLayout ({
         renderConnected()
       }
     }
-  }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName, NumUnAuthErrors])
+  }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName, setIsConnected, isHposConnectionAlive])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
@@ -33,8 +33,6 @@ export default function Home () {
   const { isConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { setCurrentUser, currentUser } = useCurrentUserContext()
-  const [isFirstRenderComplete, setIsFirstRenderComplete] = useState(false)
-  const isFirstLoad = useRef(true)
 
   useEffect(() => {
     if (!isEmpty(holofuelUser)) {
@@ -43,19 +41,12 @@ export default function Home () {
   }, [holofuelUser, setCurrentUser])
 
   useEffect(() => {
-    if (isFirstRenderComplete && !isConnected) {
-      newMessage('Your Holochain Conductor is currently unreachable.  \nAttempting to reconnect.', 0)
+    if (!isConnected) {
+      newMessage('Checking connection to your Holochain Conductor...', 0)
     } else if (isConnected) {
-      setIsFirstRenderComplete(true)
       newMessage('', 0)
     }
-    
-    if (isFirstLoad.current) {
-      newMessage('Checking connection to your Holochain Conductor...', 0)
-      isFirstLoad.current = false
-      setTimeout(() => setIsFirstRenderComplete(true), 5000)
-    }
-  }, [isConnected, newMessage, isFirstRenderComplete])
+  }, [isConnected, newMessage])
 
 
   const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
