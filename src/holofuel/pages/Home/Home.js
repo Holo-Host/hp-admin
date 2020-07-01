@@ -43,15 +43,15 @@ export default function Home () {
   }, [holofuelUser, setCurrentUser])
 
   useEffect(() => {
-    console.log('dashboard >>>shouldRenderMessage: ', isFirstRenderComplete)
     if (isFirstRenderComplete && !isConnected) {
-      console.log('SIGNALING NEW MESSAGE >>>>>> dashboard')
       newMessage('Your Holochain Conductor is currently unreachable.  \nAttempting to reconnect.', 0)
-    } else if (!isConnected)  {
-      newMessage('Checking connection to your Holochain Conductor...', 0)
+    } else if (isConnected) {
+      setIsFirstRenderComplete(true)
+      newMessage('', 0)
     }
-
+    
     if (isFirstLoad.current) {
+      newMessage('Checking connection to your Holochain Conductor...', 0)
       isFirstLoad.current = false
       setTimeout(() => setIsFirstRenderComplete(true), 5000)
     }

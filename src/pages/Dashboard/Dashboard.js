@@ -28,17 +28,17 @@ export default function Dashboard ({ earnings = mockEarnings }) {
   const isFirstAppRender = useRef(true)    
 
   useEffect(() => {
-    console.log('dashboard >>>shouldRenderMessage: ', isFirstRenderComplete)
     if (isFirstRenderComplete && !isConnected.holochain) {
-      console.log('SIGNALING NEW MESSAGE >>>>>> dashboard')
       newMessage('Your Holochain Conductor is currently unreachable.  \nAttempting to reconnect.', 0)
-    } else if (!isConnected.holochain)  {
-      newMessage('Checking connection to your Holochain Conductor...', 0)
+    } else if (isConnected.holochain) {
+      setIsFirstRenderComplete(true)
+      newMessage('', 0)
     }
 
     if (isFirstAppRender.current) {
+      newMessage('Checking connection to your Holochain Conductor...', 0)
       isFirstAppRender.current = false
-      setTimeout(() => setIsFirstRenderComplete(true), 6000)
+      setTimeout(() => setIsFirstRenderComplete(true), 5000)
     }
   }, [isConnected, newMessage, isFirstRenderComplete])
 

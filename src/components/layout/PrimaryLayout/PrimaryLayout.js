@@ -36,23 +36,26 @@ export function PrimaryLayout ({
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const [NumUnAuthErrors, setNumUnAuthErrors] = useState(0)
   const isFirstLoginRender = useRef(true)
   const isFirstAppRender = useRef(true)
 
   useInterval(() => {
-    console.log('isHposConnectionAlive : ', isHposConnectionAlive)
-    console.log('wsConnection in HP ADMIN>Primary layout : ',wsConnection)
-    
     if (window.location.pathname === '/' || window.location.pathname === '/admin/login') {
-      setIsConnected({ ...isConnected, hpos: isHposConnectionAlive })
+      if (isHposConnectionAlive && NumUnAuthErrors < 4){
+        setNumUnAuthErrors(NumUnAuthErrors + 1)
+      }
+      if (NumUnAuthErrors >= 3) {
+        setIsConnected({ ...isConnected, hpos: isHposConnectionAlive })
+      } else {
+        setIsConnected({ ...isConnected, hpos: false })
+      }
     } else {
       setIsConnected({ hpos: isHposConnectionAlive, holochain: wsConnection })
     }
   }, 5000)
 
-  useEffect(() => {
-    console.log('CONNECTION DETAILS >>>>>>>>>>> : ', isConnected)
-    
+  useEffect(() => {    
     if (!isFirstLoginRender.current && !isConnected.hpos) {      
       newMessage('Your Holoport is currently unreachable. \nAttempting to reconnect...', 0)
       // reroute to login on network/hpos connection error
@@ -62,14 +65,13 @@ export function PrimaryLayout ({
     }
 
     if (isFirstLoginRender.current) {
-      newMessage('Connecting to your Holoport..', 0)
+      newMessage('Connecting to your Holoport...', 0)
       setTimeout(() => {
         isFirstLoginRender.current = false
-      }, 3000)
+      }, 4000)
     }
 
     const renderConnected = () => {
-      newMessage('', 0)
       setCurrentUser({
         hostPubKey: settings.hostPubKey,
         hostName: settings.hostName || ''
@@ -87,7 +89,7 @@ export function PrimaryLayout ({
         renderConnected()
       }
       if (isFirstAppRender.current) {
-        // set timeout to allow time to let network connection check complete
+        // set timeout to allow time to let ws connection check to complete
         setTimeout(() => {
           isFirstAppRender.current = false
         }, 5000)
@@ -95,10 +97,11 @@ export function PrimaryLayout ({
     } else {
       // if on login page and connected to hpos, clear message and set user
       if (isConnected.hpos) {
+        newMessage('', 0)
         renderConnected()
       }
     }
-  }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName])
+  }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName, NumUnAuthErrors])
 
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)

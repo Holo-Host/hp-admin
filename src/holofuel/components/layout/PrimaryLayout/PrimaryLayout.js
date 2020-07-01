@@ -67,7 +67,6 @@ function PrimaryLayout ({
         push(defaultPath)
       }
     } else {
-      newMessage('', 0)
       startPollingActionableTransactions(60000)
       startPollingCompletedTransactions(60000)
       if (shouldRefetchUser) {
