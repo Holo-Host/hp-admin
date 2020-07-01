@@ -450,18 +450,24 @@ const HoloFuelDnaInterface = {
               type: TYPE.offer,
               actioned: false
             }
-          } else if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
-            return {
-              ...transaction,
-              id: transactionId, // should always match `Object.entries(result)[0][0]`
-              direction: DIRECTION.incoming, // this indicates the hf recipient
-              status: STATUS.pending,
-              type: TYPE.offer,
-              actioned: true
+          } else {
+            try {
+              if (JSON.parse(acceptedPaymentHash.Err.Internal) && JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
+                return {
+                  ...transaction,
+                  id: transactionId, // should always match `Object.entries(result)[0][0]`
+                  direction: DIRECTION.incoming, // this indicates the hf recipient
+                  status: STATUS.pending,
+                  type: TYPE.offer,
+                  actioned: true
+                }
+              }
+            } catch(e) {
+              throw new Error(acceptedPaymentHash.Err)
             }
+            // default:
+            throw new Error(acceptedPaymentHash.Err)
           }
-        } else {
-          throw new Error(acceptedPaymentHash.Err)
         }
       }
       return {
