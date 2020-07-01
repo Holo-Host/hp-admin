@@ -121,8 +121,6 @@ export let wsConnection = holochainClient
     ? true
     : !process.env.REACT_APP_HOLOFUEL_APP
 
-console.log('wsConnection : ', wsConnection)
-
 async function initHolochainClient () {
   isInitiatingHcConnection = true
   let url
