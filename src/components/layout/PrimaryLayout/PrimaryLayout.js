@@ -56,19 +56,17 @@ export function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {    
-    if (!isFirstLoginRender.current && !isConnected.hpos) {      
+    if (!isFirstLoginRender.current && !isConnected.hpos) {
       newMessage('Your Holoport is currently unreachable. \nAttempting to reconnect...', 0)
       // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
         push('/')
       }
-    }
-
-    if (isFirstLoginRender.current) {
+    } else if (isFirstLoginRender.current && !isConnected.hpos) {
       newMessage('Connecting to your Holoport...', 0)
       setTimeout(() => {
         isFirstLoginRender.current = false
-      }, 5000)
+      }, 10000)
     }
 
     const renderConnected = () => {

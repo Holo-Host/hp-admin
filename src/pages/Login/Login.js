@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import { get } from 'lodash/fp'
