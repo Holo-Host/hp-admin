@@ -452,7 +452,7 @@ const HoloFuelDnaInterface = {
             }
           } else {
             try {
-              if (JSON.parse(acceptedPaymentHash.Err.Internal) && JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
+              if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
                 return {
                   ...transaction,
                   id: transactionId, // should always match `Object.entries(result)[0][0]`
@@ -462,7 +462,7 @@ const HoloFuelDnaInterface = {
                   actioned: true
                 }
               }
-            } catch(e) {
+            } catch (e) {
               throw new Error(acceptedPaymentHash.Err)
             }
             // default:
