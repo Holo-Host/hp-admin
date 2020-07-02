@@ -31,7 +31,6 @@ import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Tr
 import { userNotification } from 'data-interfaces/HoloFuelDnaInterface'
 
 // TODO: Consult C for UX / copy for this
-const offerInProcessMessage = 'acceptance pending'
 const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
@@ -86,7 +85,6 @@ function useUpdatedTransactionLists () {
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
-
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
@@ -270,6 +268,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
   const agent = canceledBy || counterparty
 
+  const isPayment = (isPayingARequest && status === STATUS.pending)
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request
   const isOutgoing = direction === DIRECTION.outgoing
@@ -376,7 +375,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { highlightYellow }, { inProcess })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -410,17 +409,17 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
     {inProcess && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
-      <h4 styleName='alert-msg'>{offerInProcessMessage}</h4>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'acceptance pending'}</h4>
     </ToolTip>}
 
-    {isActionable && !isLoading && !isDisabled && <>
+    {isActionable && !isLoading && !isPayment && !isDisabled && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
         closeDrawer={() => setIsDrawerOpen(false)}
         areActionsPaused={areActionsPaused}
       />
-      {!isCanceled && !inProcess && <ActionOptions
+      {!isPayment && !isCanceled && !inProcess && <ActionOptions
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}
