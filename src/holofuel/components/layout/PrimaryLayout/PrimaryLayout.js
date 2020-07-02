@@ -59,12 +59,13 @@ function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    let connection
+    let connection, defaultPath
     if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
       connection = isConnected
+      defaultPath = HOME_PATH
     } else {
       connection = hpAdminIsConnected.holochain
-
+      defaultPath = '/admin/login'
       if (!hpAdminIsConnected.hpos) {
         newMessage('Connecting to your Holoport...', 0)
         // reroute to login on network/hpos connection error
@@ -79,7 +80,7 @@ function PrimaryLayout ({
       stopPollingActionableTransactions()
       stopPollingCompletedTransactions()
       setShouldRefetchUser(true)
-      push(HOME_PATH)
+      push(defaultPath)
     } else {
       newMessage('', 0)
       startPollingActionableTransactions(60000)

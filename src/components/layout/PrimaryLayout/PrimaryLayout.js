@@ -65,6 +65,10 @@ export function PrimaryLayout ({
       // if inside happ, check for connection to holochain
       if (!isFreshHpAdminRender.current && isConnected.hpos && !isConnected.holochain) {
         newMessage('Connecting to your Holochain Conductor...', 0)
+        // reroute to login on conductor connection error as it signals emerging hpos connetion failure
+        if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+          push('/admin/login')
+        }
       } else {
         newMessage('', 0)
         setUser()
