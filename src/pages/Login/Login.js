@@ -21,7 +21,7 @@ export default function Login ({ history: { push } }) {
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
 
-  useEffect(() => {    
+  useEffect(() => {
     if (!isConnected.hpos) {
       newMessage('Connecting to your Holoport...', 0)
     }
