@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
 import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
-import SideMenu from 'components/SideMenu'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
@@ -57,19 +56,11 @@ export function PrimaryLayout ({
   }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName])
 
   const isWide = useContext(ScreenWidthContext)
-  const [isMenuOpen, setMenuOpen] = useState(false)
-  const hamburgerClick = () => setMenuOpen(!isMenuOpen)
-  const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     {showHeader && <Header
       {...headerProps}
-      hamburgerClick={showSideMenu && hamburgerClick}
       settings={isConnected ? settings : {}} />}
-    <SideMenu
-      isOpen={isMenuOpen}
-      handleClose={handleMenuClose}
-      settings={isConnected ? settings : {}} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName='styles.content'>
       <FlashMessage />

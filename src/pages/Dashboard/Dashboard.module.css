@@ -1,72 +1,69 @@
-.avatar {
-  align-self: center;
-  margin-top: 6px;
-  margin-bottom: 10px;
-}
-
-.greeting {
-  text-align: center;
-  color: var(--color-limed-spruce);
-  margin-bottom: 36px;
-}
-
-.hosting-content {
+.hosting-row {
   display: flex;
   align-items: center;
-  margin-top: 16px;
   font-family: "Circular";
-  font-size: 18px;
-  line-height: 24px;
-  color: var(--color-rhino-80);
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--color-rhino);
+  padding-left: 30px;
+  margin-bottom: 10px;
+  position: relative;
 }
 
-.laptop-icon {
-  width: 26px;
-  height: 16px;
-  margin-right: 4px;
+.hosting-row-expanded {
+  composes: hosting-row;
+  margin-top: -8px;
+  margin-bottom: 20px;
 }
 
-.small-text {
-  font-size: 12px;
+.hosting-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
 }
 
-.balance {
-  background-color: var(--color-granny-apple-50);
-  padding: 5px 8px;
-  margin-top: 10px;
+.up-arrow {
+  transform: rotate(90deg);  
+  margin-left: 7px;
 }
 
-.empty-balance {
-  background-color: var(--color-rhino-10);
+.down-arrow {
+  transform: rotate(270deg);
+  margin-left: 7px;
 }
 
-.balance-header {
-  color: var(--color-rhino-50);
+.happ-list {
+  position: relative;
+  top: 30px;
+  right: 80px;
 }
 
-.balance-body {
-  font-size: 18px;
-  line-height: 24px;
-  color: var(--color-rhino-50);
+.happ-name {
+  font-family: "Circular";
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  color: var(--color-rhino);
+  text-align: end;
 }
-
 
 /* Card */
 
 .card {
-  display: block;
-  text-decoration: none;
-  color: black;
-  background-color: white;
-  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.1);
-  border-radius: 4px;
-  padding: 16px 24px;
-  margin-bottom: 20px;
+  background: rgba(220, 220, 220, 0.31);
+  border: 1px solid var(--color-blue-lagoon);
+  box-sizing: border-box;
+  border-radius: 10px;
+  padding: 16px 26px;
+  position: relative;
 }
 
 .card-title {
-  color: var(--color-limed-spruce);
-  margin-bottom: 0px;
+  font-size: 36px;
+  line-height: 28px;
+  color: var(--color-rhino);
+  margin-top: 0px;
+  margin-bottom: 16px;
 }
 
 .card-subtitle {

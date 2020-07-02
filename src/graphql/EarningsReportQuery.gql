@@ -1,0 +1,8 @@
+query EarningsReport  {
+  earningsReport {
+    totalEarnings
+    cpu
+    bandwidth
+    storage
+  }
+}
