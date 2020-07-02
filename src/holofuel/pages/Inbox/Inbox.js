@@ -83,13 +83,13 @@ function useCounterparty (agentId) {
 function useUpdatedTransactionLists () {
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
-  
+
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
-  
+
   const actionableLoadingFirstTime = useLoadingFirstTime(allActionableLoading)
   const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
 
