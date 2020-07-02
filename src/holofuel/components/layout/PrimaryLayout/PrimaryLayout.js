@@ -43,17 +43,24 @@ function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
   const isFreshRender = useRef(true)
+  const hposConnection = useRef(true)
+
+  if (!process.env.REACT_APP_HOLOFUEL_APP === 'true' && !hposConnection) {
+    // hpAdminSetIsConnected({ ...hpAdminIsConnected, hpos: false })
+    console.log('hpAdminIsConnected AFTER: ', hpAdminIsConnected)      
+  }
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
     setShouldRefetchUser(false)
     refetchUser()
   }, [setShouldRefetchUser, refetchUser])
-
+  
   useInterval(() => {
     if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
       setIsConnected(wsConnection)
     } else {
+      console.log('hpAdminIsConnected : ', hpAdminIsConnected)      
       hpAdminSetIsConnected({ ...hpAdminIsConnected, holochain: wsConnection })
     }
   }, 5000)
@@ -66,13 +73,8 @@ function PrimaryLayout ({
     } else {
       connection = hpAdminIsConnected.holochain
       defaultPath = '/admin/login'
-      if (!hpAdminIsConnected.hpos) {
-        newMessage('Connecting to your Holoport...', 0)
-        // reroute to login on network/hpos connection error
-        if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
-          push('/admin/login')
-        }
-      }
+      hposConnection.current = false
+      // useCallback(() => hpAdminSetIsConnected({ ...hpAdminIsConnected, hpos: false }), [hpAdminSetIsConnected, hpAdminIsConnected])
     }
 
     if (!isFreshRender.current && !connection) {
@@ -95,6 +97,7 @@ function PrimaryLayout ({
   }, [isConnected,
     hpAdminIsConnected,
     setIsConnected,
+    hpAdminSetIsConnected,
     push,
     newMessage,
     stopPollingActionableTransactions,

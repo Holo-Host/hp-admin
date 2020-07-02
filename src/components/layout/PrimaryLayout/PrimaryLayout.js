@@ -45,6 +45,8 @@ export function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
+    console.log('HPOS connection : ', isConnected)
+
     if (!isConnected.hpos) {
       // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
@@ -64,7 +66,6 @@ export function PrimaryLayout ({
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       // if inside happ, check for connection to holochain
       if (!isFreshHpAdminRender.current && isConnected.hpos && !isConnected.holochain) {
-        newMessage('Connecting to your Holochain Conductor...', 0)
         // reroute to login on conductor connection error as it signals emerging hpos connetion failure
         if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
           push('/admin/login')
