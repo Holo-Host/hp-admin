@@ -47,7 +47,7 @@ function PrimaryLayout ({
     setShouldRefetchUser(false)
     refetchUser()
   }, [setShouldRefetchUser, refetchUser])
-  
+
   useInterval(() => {
     setIsConnected(wsConnection)
   }, 5000)
