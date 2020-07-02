@@ -3,7 +3,6 @@ import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
-import useHpAdminConnectionContext from 'contexts/useConnectionContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -31,12 +30,7 @@ export default function Home () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
   const { isConnected } = useConnectionContext()
-  const { isConnected: hpAdminIsConnected } = useHpAdminConnectionContext()
   const { setCurrentUser, currentUser } = useCurrentUserContext()
-
-  const connection = process.env.REACT_APP_HOLOFUEL_APP === 'true'
-    ? isConnected
-    : hpAdminIsConnected.holochain
 
   useEffect(() => {
     if (!isEmpty(holofuelUser)) {
@@ -52,7 +46,7 @@ export default function Home () {
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
-  const isLoadingFirstPendingTransactions = useLoadingFirstTime(connection && loadingTransactions)
+  const isLoadingFirstPendingTransactions = useLoadingFirstTime(isConnected && loadingTransactions)
 
   return <PrimaryLayout headerProps={{ title: 'Test Fuel Home' }}>
     <div styleName='container'>
@@ -97,7 +91,7 @@ export default function Home () {
           </div>}
 
           {!isLoadingFirstPendingTransactions && isTransactionsEmpty && <div styleName='transactions-empty'>
-            {!connection ? 'Your transactions cannot be displayed at this time' : 'You have no recent transactions'}
+            {!isConnected ? 'Your transactions cannot be displayed at this time' : 'You have no recent transactions'}
           </div>}
 
           {!isTransactionsEmpty && <h2 styleName='transactions-label'>Recent Transactions</h2>}

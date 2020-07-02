@@ -12,7 +12,6 @@ import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransaction
 import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
-import useHpAdminConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
@@ -39,16 +38,9 @@ function PrimaryLayout ({
   const { refetch: refetchUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
-  const { isConnected: hpAdminIsConnected, setIsConnected: hpAdminSetIsConnected } = useHpAdminConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
   const isFreshRender = useRef(true)
-  const hposConnection = useRef(true)
-
-  if (!process.env.REACT_APP_HOLOFUEL_APP === 'true' && !hposConnection) {
-    // hpAdminSetIsConnected({ ...hpAdminIsConnected, hpos: false })
-    console.log('hpAdminIsConnected AFTER: ', hpAdminIsConnected)      
-  }
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -57,31 +49,21 @@ function PrimaryLayout ({
   }, [setShouldRefetchUser, refetchUser])
   
   useInterval(() => {
-    if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-      setIsConnected(wsConnection)
-    } else {
-      console.log('hpAdminIsConnected : ', hpAdminIsConnected)      
-      hpAdminSetIsConnected({ ...hpAdminIsConnected, holochain: wsConnection })
-    }
+    setIsConnected(wsConnection)
   }, 5000)
 
   useEffect(() => {
-    let connection, defaultPath
-    if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-      connection = isConnected
-      defaultPath = HOME_PATH
-    } else {
-      connection = hpAdminIsConnected.holochain
-      defaultPath = '/admin/login'
-      hposConnection.current = false
-      // useCallback(() => hpAdminSetIsConnected({ ...hpAdminIsConnected, hpos: false }), [hpAdminSetIsConnected, hpAdminIsConnected])
-    }
-
-    if (!isFreshRender.current && !connection) {
+    if (!isFreshRender.current && !isConnected) {
       newMessage('Connecting to your Holochain Conductor...', 0)
       stopPollingActionableTransactions()
       stopPollingCompletedTransactions()
       setShouldRefetchUser(true)
+      let defaultPath
+      if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
+        defaultPath = HOME_PATH
+      } else {
+        defaultPath = '/admin/login'
+      }
       push(defaultPath)
     } else {
       newMessage('', 0)
@@ -95,9 +77,7 @@ function PrimaryLayout ({
       isFreshRender.current = false
     }
   }, [isConnected,
-    hpAdminIsConnected,
     setIsConnected,
-    hpAdminSetIsConnected,
     push,
     newMessage,
     stopPollingActionableTransactions,
