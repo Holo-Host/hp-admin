@@ -10,10 +10,7 @@ import HostingReportQuery from 'graphql/HostingReportQuery.gql'
 import EarningsReportQuery from 'graphql/EarningsReportQuery.gql'
 import './Dashboard.module.css'
 
-// Mock value to be replaced by graphql query
-export const mockEarnings = 4984
-
-export default function Dashboard ({ earnings = mockEarnings }) {
+export default function Dashboard () {
   const { data: { hostingReport = {} } = {} } = useQuery(HostingReportQuery)
   const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
 
