@@ -21,8 +21,6 @@ export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hostingReport = {} } = {} } = useQuery(HostingReportQuery)
   const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
 
-  const isEarningsZero = Number(earningsReport.totalEarnings) === 0
-
   const hostedHapps = hostingReport.hostedHapps || []
 
   const [areHappsExpanded, setAreHappsExpanded] = useState(false)
@@ -44,16 +42,29 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    {/* {false && <Card title='Earnings' linkTo='/admin/earnings' subtitle='Track your TestFuel earnings'>
-      <div styleName={cx('balance', { 'empty-balance': isEarningsZero })}>
-        <h4 styleName='balance-header'>
-          {isEarningsZero ? 'Balance' : "Today's earnings"}
-        </h4>
-        <div styleName='balance-body' data-testid='hosted-earnings'>
-          {isEarningsZero ? "You haven't earned TestFuel" : `${presentHolofuelAmount(earnings)} TF`}
+    {<Card title='Earnings'>
+      <div styleName='balance'>
+        {(earningsReport.totalEarnings || '--').toLocaleString()} TF
+      </div>
+      <div styleName='pricing-section'>
+        <div styleName='pricing-title'>Pricing</div>
+        <div styleName='pricing-row'>
+          <div styleName='pricing-type'>CPU</div>
+          <div styleName='price'>{earningsReport.cpu} TF</div>
+          <div styleName='pricing-unit'>per ms</div>
+        </div>
+        <div styleName='pricing-row'>
+          <div styleName='pricing-type'>Bandwidth</div>
+          <div styleName='price'>{earningsReport.bandwidth} TF</div>
+          <div styleName='pricing-unit'>per MB</div>
+        </div>
+        <div styleName='pricing-row'>
+          <div styleName='pricing-type'>Storage</div>
+          <div styleName='price'>{earningsReport.storage} TF</div>
+          <div styleName='pricing-unit'>per MB</div>
         </div>
       </div>
-    </Card>} */}
+    </Card>}
   </PrimaryLayout>
 }
 

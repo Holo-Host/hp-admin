@@ -23,12 +23,12 @@
 }
 
 .up-arrow {
-  transform: rotate(90deg);  
+  transform: rotate(270deg);
   margin-left: 7px;
 }
 
 .down-arrow {
-  transform: rotate(270deg);
+  transform: rotate(90deg);  
   margin-left: 7px;
 }
 
@@ -47,6 +47,58 @@
   text-align: end;
 }
 
+.balance {
+  font-size: 24px;
+  line-height: 28px;
+  margin-top: -8px;
+  color: var(--color-rhino);
+  font-family: "Circular";
+  margin-bottom: 20px;
+}
+
+
+.pricing-section {
+  color: var(--color-rhino);
+  font-family: "Circular";
+  background-color: var(--color-geyser);
+  padding: 16px 21px 18px 21px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  margin: 0 -16px -16px -16px;
+}
+
+.pricing-title {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 6px;
+}
+
+.pricing-row {
+  display: flex;
+  margin-left: 2px;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.pricing-type {
+  font-size: 14px;
+  line-height: 19px;
+  width: 106px;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 22px;
+  width: 62px;
+}
+
+.pricing-unit {
+  font-size: 14px;
+  line-height: 19px;
+}
+
 /* Card */
 
 .card {
@@ -54,13 +106,15 @@
   border: 1px solid var(--color-blue-lagoon);
   box-sizing: border-box;
   border-radius: 10px;
-  padding: 16px 26px;
+  padding: 16px 16px 16px 16px;
   position: relative;
+  margin-bottom: 46px;
 }
 
 .card-title {
   font-size: 36px;
   line-height: 28px;
+  font-weight: 500;
   color: var(--color-rhino);
   margin-top: 0px;
   margin-bottom: 16px;

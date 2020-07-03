@@ -1,19 +1,14 @@
 import React from 'react'
-import Button from 'components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
 import { Link } from 'react-router-dom'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
-import MenuIcon from 'components/icons/MenuIcon'
 
-export default function Header ({ title, hamburgerClick }) {
+export default function Header ({ title, nickname }) {
   const { currentUser } = useCurrentUserContext()
-  const leftNav = hamburgerClick && <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
-    <MenuIcon styleName='menu-icon' />
-  </Button>
 
   return <div styleName='header'>
-    <div>MessyBobs HP</div>
+    <div styleName='nickname'>nickname</div>
     <h1 styleName='title'>{title}</h1>
     <Link to='/admin/settings' styleName='avatar-link' data-testid='avatar-link'>
       <HashAvatar seed={currentUser.hostPubKey} size={32} />

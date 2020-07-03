@@ -21,7 +21,6 @@ export function PrimaryLayout ({
   children,
   headerProps = {},
   showHeader = true,
-  showSideMenu = true,
   showAlphaFlag = true
 }) {
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
