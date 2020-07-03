@@ -6,7 +6,6 @@ import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
 
 export const currentDataTimeIso = () => new Date().toISOString()
-export let userNotification
 
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
@@ -139,7 +138,6 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
     if (invoice) {
       if (counter > 10) {
         counter = 0
-        userNotification = ''
         handleEvent()
       }
       return true
@@ -211,6 +209,8 @@ const HoloFuelDnaInterface = {
         nickname: counterparty.nickname
       })
 
+      console.log("COUNTERPARTY CACHE : ", cachedGetProfileCalls)
+      
       if (cachedGetProfileCalls[agentId]) {
         if (typeof cachedGetProfileCalls[agentId].then === 'function') {
           return presentCounterparty(await cachedGetProfileCalls[agentId])
@@ -350,7 +350,8 @@ const HoloFuelDnaInterface = {
       if (!declinedProof) throw new Error(`Decline Error: ${declinedProof}.`)
       return {
         ...transaction,
-        id: transactionId
+        id: transactionId,
+        actioned: true
       }
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
@@ -429,6 +430,7 @@ const HoloFuelDnaInterface = {
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,
         type: requestId ? TYPE.request : TYPE.offer, // NB: If requestId isn't defined, then base transaction is an offer, otherwise, it's a request user is paying
+        actioned: true,
         timestamp: currentDataTimeIso
       }
     },
@@ -441,14 +443,15 @@ const HoloFuelDnaInterface = {
         if (acceptedPaymentHash.Err.Internal) {
           const spenderValidationError = /(Spender chain invalid)/g
           if (typeof acceptedPaymentHash.Err.Internal === 'string' && spenderValidationError.test(acceptedPaymentHash.Err.Internal)) {
-            userNotification = 'Transaction could not be validated and will never pass. Transaction is now stale.'
             return {
               ...transaction,
               id: transactionId, // should always match `Object.entries(result)[0][0]`
               direction: DIRECTION.incoming, // this indicates the hf recipient
               status: STATUS.pending,
               type: TYPE.offer,
-              actioned: false
+              actioned: false,
+              inProcess: false,
+              stale: true
             }
           } else {
             try {
@@ -459,7 +462,9 @@ const HoloFuelDnaInterface = {
                   direction: DIRECTION.incoming, // this indicates the hf recipient
                   status: STATUS.pending,
                   type: TYPE.offer,
-                  actioned: true
+                  actioned: true,
+                  inProcess: true,
+                  stale: false
                 }
               }
             } catch (e) {
@@ -476,7 +481,9 @@ const HoloFuelDnaInterface = {
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.completed,
         type: TYPE.offer,
-        actioned: true
+        actioned: true,
+        inProcess: false,
+        stale: false
       }
     }
   }
