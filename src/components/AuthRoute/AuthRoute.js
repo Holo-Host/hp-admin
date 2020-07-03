@@ -7,10 +7,8 @@ import { omit } from 'lodash/fp'
 import useAuthContext from 'contexts/useAuthContext'
 
 export default function AuthRoute (props) {
-  // const { isAuthed } = useAuthContext()
+  const { isAuthed } = useAuthContext()
 
-  const isAuthed = true
-  
   if (isAuthed) return <Route {...props} />
 
   return <Route
