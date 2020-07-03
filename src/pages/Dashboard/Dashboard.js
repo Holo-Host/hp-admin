@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
@@ -7,11 +6,8 @@ import LocationIcon from 'components/icons/LocationIcon'
 import PhoneIcon from 'components/icons/PhoneIcon'
 import GridIcon from 'components/icons/GridIcon'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
-import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HostingReportQuery from 'graphql/HostingReportQuery.gql'
 import EarningsReportQuery from 'graphql/EarningsReportQuery.gql'
-import { presentHolofuelAmount } from 'utils'
-import cx from 'classnames'
 import './Dashboard.module.css'
 
 // Mock value to be replaced by graphql query

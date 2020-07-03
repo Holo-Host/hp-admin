@@ -4,11 +4,11 @@ import './Header.module.css'
 import { Link } from 'react-router-dom'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
 
-export default function Header ({ title, nickname }) {
+export default function Header ({ title, settings }) {
   const { currentUser } = useCurrentUserContext()
 
   return <div styleName='header'>
-    <div styleName='nickname'>nickname</div>
+    <div styleName='nickname'>{settings.hostName || 'HoloPort'}</div>
     <h1 styleName='title'>{title}</h1>
     <Link to='/admin/settings' styleName='avatar-link' data-testid='avatar-link'>
       <HashAvatar seed={currentUser.hostPubKey} size={32} />
