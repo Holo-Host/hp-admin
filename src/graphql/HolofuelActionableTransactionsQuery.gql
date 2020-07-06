@@ -13,5 +13,6 @@ query HolofuelActionableTransactionsQuery {
     canceledBy { id, nickname }
     inProcess
     actioned
+    shouldHighlight
   }
 }

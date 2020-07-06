@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, isNil, isEqual, remove, uniqBy } from 'lodash/fp'
+import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -27,7 +27,7 @@ import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox, setShouldNotShowtransactionsById } from 'models/Transaction'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -77,7 +77,7 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
-  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {}, refetch: refetchActionable } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
@@ -94,7 +94,8 @@ function useUpdatedTransactionLists () {
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
     actionableLoading: actionableLoadingFirstTime,
-    recentLoading: recentLoadingFirstTime
+    recentLoading: recentLoadingFirstTime,
+    refetchActionable
   }
 }
 
@@ -113,7 +114,7 @@ export default function Inbox ({ history: { push } }) {
   const { currentUser } = useCurrentUserContext()
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
-  const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
+  const { actionableTransactions, recentTransactions, actionableLoading, recentLoading, refetchActionable } = useUpdatedTransactionLists(inboxView)
 
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
@@ -136,16 +137,14 @@ export default function Inbox ({ history: { push } }) {
   }
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
 
-  const [openDrawerId, setOpenDrawerId] = useState()
-
-  const [highlightedTransactionsCache, setHighlightedTransactionsCache] = useState([])
-  
+  const [openDrawerId, setOpenDrawerId] = useState() 
+ 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   let displayTransactions = []
   let isDisplayLoading
   switch (inboxView) {
     case VIEW.actionable:
-      displayTransactions = uniqBy('id', actionableTransactions.concat(highlightedTransactionsCache))
+      displayTransactions = actionableTransactions
       isDisplayLoading = actionableLoading
       break
     case VIEW.recent:
@@ -217,11 +216,10 @@ export default function Inbox ({ history: { push } }) {
         setConfirmationModalProperties={setConfirmationModalProperties}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
-        setHighlightedTransactionsCache={setHighlightedTransactionsCache}
-        highlightedTransactionsCache={highlightedTransactionsCache}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        renderUserMessage={renderUserMessage} />)}
+        renderUserMessage={renderUserMessage}
+        refetchActionable={refetchActionable} />)}
     </div>}
 
     <ConfirmationModal
@@ -230,13 +228,15 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, setHighlightedTransactionsCache, highlightedTransactionsCache, areActionsPaused, setAreActionsPaused, renderUserMessage }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, renderUserMessage, refetchActionable }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
+  setShouldNotShowtransactionsById(hiddenTransactionIds)
 
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
+      console.log('going to HIDE the TRANSACTION....');
       setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
-      setHighlightedTransactionsCache(remove(highlightedTransactionsCache.find(tx => tx.id === id), highlightedTransactionsCache))
+      refetchActionable()
     } else {
       setHiddenTransactionIds(remove(id, hiddenTransactionIds))
     }
@@ -254,7 +254,6 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         isActionable={isActionable}
         userId={userId}
         hideTransaction={shouldHide => manageHideTransactionWithId(transaction.id, shouldHide)}
-        cacheHighlightedTransaction={() => setHighlightedTransactionsCache(highlightedTransactionsCache.concat([transaction]))}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
@@ -266,8 +265,8 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, cacheHighlightedTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, stale } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, shouldHighlight, stale } = transaction
 
   if (stale) {
     renderUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
@@ -360,7 +359,13 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       confirmRed()
     } else if (inProcess && actioned) {      
       signalInProcessEvent()
-    } else if (!hasTransactionAction && !inProcess && actioned) {
+    } else if (!hasTransactionAction && !inProcess && actioned && shouldHighlight) {
+      if (shouldHighlight === 'green') {
+        confirmGreen()
+      } else if (shouldHighlight === 'red') {
+        confirmRed()
+      }
+    } else if (!hasTransactionAction && !inProcess && actioned && !shouldHighlight) {
       console.log('>>>>>> GOING TO HIDE TRANSACTION....')
       hideTransaction(true)
     }
@@ -369,7 +374,6 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const onConfirm = action => {
     setHasTransactionAction(action)
     setHasRenderedTransaction(false)
-    cacheHighlightedTransaction()
   }
 
   const setIsLoadingAndPaused = state => {

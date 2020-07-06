@@ -102,6 +102,9 @@ function PrimaryLayout ({
     refetchNonPendingTransactions()
   }
 
+  console.log('TEST  : actionableTransactions.filter(shouldShowTransactionInInbox).length ', actionableTransactions.filter(shouldShowTransactionInInbox).length);
+  
+
   const isLoadingRefetchCalls = ledgerLoading || actionableTransactionsLoading || completedTransactionsLoading || nonPendingTransactionsLoading || waitingTransactionsLoading
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
