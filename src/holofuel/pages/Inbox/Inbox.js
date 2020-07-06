@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
+import { isEmpty, isNil, isEqual, remove, uniqBy } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -138,12 +138,14 @@ export default function Inbox ({ history: { push } }) {
 
   const [openDrawerId, setOpenDrawerId] = useState()
 
+  const [highlightedTransactionsCache, setHighlightedTransactionsCache] = useState([])
+  
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   let displayTransactions = []
   let isDisplayLoading
   switch (inboxView) {
     case VIEW.actionable:
-      displayTransactions = actionableTransactions
+      displayTransactions = uniqBy('id', actionableTransactions.concat(highlightedTransactionsCache))
       isDisplayLoading = actionableLoading
       break
     case VIEW.recent:
@@ -153,7 +155,6 @@ export default function Inbox ({ history: { push } }) {
     default:
       throw new Error('Invalid inboxView: ' + inboxView)
   }
-
   const displayBalance = (isNil(holofuelBalance) && ledgerLoading) ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
@@ -216,6 +217,8 @@ export default function Inbox ({ history: { push } }) {
         setConfirmationModalProperties={setConfirmationModalProperties}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
+        setHighlightedTransactionsCache={setHighlightedTransactionsCache}
+        highlightedTransactionsCache={highlightedTransactionsCache}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
         renderUserMessage={renderUserMessage} />)}
@@ -227,23 +230,21 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, renderUserMessage }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, setHighlightedTransactionsCache, highlightedTransactionsCache, areActionsPaused, setAreActionsPaused, renderUserMessage }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
       setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
+      setHighlightedTransactionsCache(remove(highlightedTransactionsCache.find(tx => tx.id === id), highlightedTransactionsCache))
     } else {
       setHiddenTransactionIds(remove(id, hiddenTransactionIds))
     }
   }
 
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
-  
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
   
-  console.log('hiddenTransactionIds : ', hiddenTransactionIds)
-
   return <React.Fragment>
     <PageDivider title={dateLabel} />
     <div styleName='transaction-list'>
@@ -253,6 +254,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         isActionable={isActionable}
         userId={userId}
         hideTransaction={shouldHide => manageHideTransactionWithId(transaction.id, shouldHide)}
+        cacheHighlightedTransaction={() => setHighlightedTransactionsCache(highlightedTransactionsCache.concat([transaction]))}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
@@ -264,7 +266,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, cacheHighlightedTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, stale } = transaction
 
   if (stale) {
@@ -316,7 +318,6 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [hasRenderedTransaction, setHasRenderedTransaction] = useState(false)
-  // const [isDisplayingInProcess, setIsDisplayingInProcess] = useState(false)
   const [hasTransactionAction, setHasTransactionAction] = useState('')
   
   if (agent.id === null) return null
@@ -329,29 +330,22 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
-  // if (inProcess && !highlightGreen && !isDisplayingInProcess) {
-  //   setIsDisplayingInProcess(true)
-  //   signalInProcessEvent()
-  // }
-
   const confirmGreen = () => {
     setHighlightYellow(false)
     setHighlightGreen(true)
     setIsDisabled(true)
     hideTransaction(false)
-    console.log('inside green')
     setTimeout(() => {
       setHighlightGreen(false)
       hideTransaction(true)
     }, 5000)
   }
 
-  const confirmRed = () => {
+  const confirmRed = () => {    
     setHighlightYellow(false)
     setHighlightRed(true)
     setIsDisabled(true)
     hideTransaction(false)
-    console.log('inside red')
     setTimeout(() => {
       setHighlightRed(false)
       hideTransaction(true)
@@ -367,6 +361,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     } else if (inProcess && actioned) {      
       signalInProcessEvent()
     } else if (!hasTransactionAction && !inProcess && actioned) {
+      console.log('>>>>>> GOING TO HIDE TRANSACTION....')
       hideTransaction(true)
     }
   }
@@ -374,6 +369,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const onConfirm = action => {
     setHasTransactionAction(action)
     setHasRenderedTransaction(false)
+    cacheHighlightedTransaction()
   }
 
   const setIsLoadingAndPaused = state => {

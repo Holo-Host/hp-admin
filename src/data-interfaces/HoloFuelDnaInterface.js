@@ -208,28 +208,30 @@ const HoloFuelDnaInterface = {
         avatarUrl: counterparty.avatar_url,
         nickname: counterparty.nickname
       })
-
-      console.log("COUNTERPARTY CACHE : ", cachedGetProfileCalls)
       
       if (cachedGetProfileCalls[agentId]) {
+        // console.log('>>>>>>>>> IF')
         if (typeof cachedGetProfileCalls[agentId].then === 'function') {
+          // console.log("1 COUNTERPARTY CACHE : ", cachedGetProfileCalls)
           return presentCounterparty(await cachedGetProfileCalls[agentId])
         } else {
+          // console.log("2 COUNTERPARTY CACHE : ", cachedGetProfileCalls)
           return cachedGetProfileCalls[agentId]
         }
-      }
-
-      const counterparty = await createZomeCall('profile/get_profile')({ agent_address: agentId })
-      if (counterparty.Err) {
-        return {
-          id: agentId,
-          avatarUrl: null,
-          nickname: null
+      } else {
+        // console.log('>>>>>>>>> ELSE')
+        cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
+        const counterparty = await cachedGetProfileCalls[agentId]
+        if (counterparty.Err) {
+          return {
+            id: agentId,
+            avatarUrl: null,
+            nickname: null
+          }
         }
+        cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
+        return presentCounterparty(counterparty)
       }
-
-      cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
-      return presentCounterparty(counterparty)
     },
     update: async (nickname, avatarUrl) => {
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
