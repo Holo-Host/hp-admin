@@ -15,21 +15,14 @@ export const DIRECTION = {
   outgoing: 'outgoing'
 }
 
-
-let shouldNotShowtransactionsById = []
-export const setShouldNotShowtransactionsById = hiddenTransactionIds => {
-  shouldNotShowtransactionsById = hiddenTransactionIds
-  console.log('>>>>>>>>>>>> shouldNotShowtransactionsById ', shouldNotShowtransactionsById);
-  
-  return shouldNotShowtransactionsById
-}
-
-// we hide cancelled and declined transactions, and offers that are paying a request (those are handled by AcceptRequestedOffers)
+// we hide cancelled and declined transactions 
+// ...offers that are paying a request and not in process (those are handled by AcceptRequestedOffers)
+// ...and actioned transactions that have been hidden explicitly
 export function shouldShowTransactionInInbox (transaction) {
-  const { id, status, isPayingARequest, inProcess, actioned } = transaction
+  const { status, isPayingARequest, inProcess } = transaction
   return status !== STATUS.canceled &&
     status !== STATUS.declined &&
     !(isPayingARequest && !inProcess) &&
-    !(isPayingARequest && !status === STATUS.pending) &&
-    ((actioned && !shouldNotShowtransactionsById.find(tx => tx.id === id)) || !actioned)
+    !(isPayingARequest && !status === STATUS.pending) // &&
+    // ((actioned && !shouldNotShowtransactionsById.find(tx => tx.id === id)) || !actioned)
 }

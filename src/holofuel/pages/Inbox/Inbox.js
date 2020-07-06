@@ -10,6 +10,7 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useActionableDisplayContext from 'holofuel/contexts/useActionableDisplayContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -27,7 +28,7 @@ import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox, setShouldNotShowtransactionsById } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -77,10 +78,18 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
-  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {}, refetch: refetchActionable } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { hiddenTransactionsById } = useActionableDisplayContext()
+
+  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
 
-  const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
+  const actionableDisplayFilter = transaction => {
+    const { id, actioned } = transaction
+    return shouldShowTransactionInInbox(transaction) &&
+    ((actioned && !hiddenTransactionsById.find(tx => tx.id === id)) || !actioned)
+  }
+
+  const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableDisplayFilter)
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
@@ -94,8 +103,7 @@ function useUpdatedTransactionLists () {
     recentTransactions: updatedNonPendingTransactions,
     declinedTransactions: updatedDeclinedTransactions,
     actionableLoading: actionableLoadingFirstTime,
-    recentLoading: recentLoadingFirstTime,
-    refetchActionable
+    recentLoading: recentLoadingFirstTime
   }
 }
 
@@ -229,21 +237,18 @@ export default function Inbox ({ history: { push } }) {
 }
 
 export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, renderUserMessage, refetchActionable }) {
-  const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
-  setShouldNotShowtransactionsById(hiddenTransactionIds)
-
+  const { hiddenTransactionsById, setHiddenTransactionsById } = useActionableDisplayContext()
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
       console.log('going to HIDE the TRANSACTION....');
-      setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
-      refetchActionable()
+      setHiddenTransactionsById(hiddenTransactionsById.concat([id]))
     } else {
-      setHiddenTransactionIds(remove(id, hiddenTransactionIds))
+      setHiddenTransactionsById(remove(id, hiddenTransactionsById))
     }
   }
 
-  const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
-  if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
+  const transactionIsVisible = id => !hiddenTransactionsById.includes(id)
+  if (isEqual(hiddenTransactionsById, transactions.map(transaction => transaction.id))) return null
   
   return <React.Fragment>
     <PageDivider title={dateLabel} />

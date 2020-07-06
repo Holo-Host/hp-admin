@@ -13,6 +13,7 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useActionableDisplayContext from 'holofuel/contexts/useActionableDisplayContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
@@ -39,6 +40,15 @@ function PrimaryLayout ({
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
+  const { hiddenTransactionsById } = useActionableDisplayContext()
+
+  const inboxCount = useRef()
+  const actionableDisplayFilter = useCallback(transaction => {
+    const { id, actioned } = transaction
+    return shouldShowTransactionInInbox(transaction) &&
+    ((actioned && !hiddenTransactionsById.find(tx => tx.id === id)) || !actioned)
+  }, [hiddenTransactionsById])
+
   const { push } = useHistory()
   const isFreshRender = useRef(true)
 
@@ -76,6 +86,13 @@ function PrimaryLayout ({
     if (isFreshRender.current) {
       isFreshRender.current = false
     }
+    
+    // to sync the notifcation badge actionable tx count with hidden values
+    if (hiddenTransactionsById) {
+      inboxCount.current = actionableTransactions.filter(actionableDisplayFilter).length
+    } else {
+      inboxCount.current = actionableTransactions.filter(shouldShowTransactionInInbox).length
+    }
   }, [isConnected,
     setIsConnected,
     push,
@@ -85,10 +102,13 @@ function PrimaryLayout ({
     stopPollingCompletedTransactions,
     startPollingCompletedTransactions,
     shouldRefetchUser,
-    refetchHolofuelUser])
+    refetchHolofuelUser,
+    actionableTransactions,
+    hiddenTransactionsById,
+    actionableDisplayFilter
+  ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
-  const inboxCount = actionableTransactions.filter(shouldShowTransactionInInbox).length
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
@@ -102,19 +122,16 @@ function PrimaryLayout ({
     refetchNonPendingTransactions()
   }
 
-  console.log('TEST  : actionableTransactions.filter(shouldShowTransactionInInbox).length ', actionableTransactions.filter(shouldShowTransactionInInbox).length);
-  
-
   const isLoadingRefetchCalls = ledgerLoading || actionableTransactionsLoading || completedTransactionsLoading || nonPendingTransactionsLoading || waitingTransactionsLoading
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
+    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount.current} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
       agent={currentUser}
       agentLoading={currentUserLoading}
-      inboxCount={inboxCount}
+      inboxCount={inboxCount.current}
       holofuelBalance={holofuelBalance}
       ledgerLoading={isLoadingFirstLedger}
       isWide={isWide}
