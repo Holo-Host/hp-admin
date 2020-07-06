@@ -301,7 +301,7 @@ export function Partition ({
 }
 
 export function TransactionRow ({
-  transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage, addTemporaryTransaction
+  transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage, addTemporaryTransaction, highlightColor
 }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, stale, temporary } = transaction
 
@@ -349,6 +349,9 @@ export function TransactionRow ({
   } else fullNotes = notes
 
   const [highlightYellow, setHighlightYellow] = useState(false)
+  const highlightGreen = highlightColor === 'green' && !highlightYellow
+  const highlightRed = highlightColor === 'red' && !highlightYellow
+
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -360,11 +363,11 @@ export function TransactionRow ({
     }, 5000)
   }, [])
 
-  const confirm = useCallback(highlight => {
+  const confirm = useCallback(highlightColor => {
     setHighlightYellow(false)
     addTemporaryTransaction({
       ...transaction,
-      highlight
+      highlightColor
     })
     setIsDisabled(true)
     hideTransaction(false)
@@ -373,11 +376,11 @@ export function TransactionRow ({
     }, 5000)
   }, [hideTransaction, addTemporaryTransaction, transaction])
 
-  const highlightColor = temporary
-    ? isDeclined ? 'red' : 'green'
-    : null
-
   useEffect(() => {
+    const highlightColor = temporary
+      ? isDeclined ? 'red' : 'green'
+      : null
+
     if (!stale) {
       if (!inProcess && actioned && highlightColor) {
         confirm(highlightColor)
@@ -387,7 +390,7 @@ export function TransactionRow ({
         hideTransaction(true)
       }
     }
-  }, [stale, actioned, inProcess, highlightColor, confirm, signalInProcessEvent, hideTransaction])
+  }, [stale, actioned, inProcess, highlightColor, confirm, signalInProcessEvent, hideTransaction, isDeclined, temporary])
 
   if (agent.id === null) return null
 
