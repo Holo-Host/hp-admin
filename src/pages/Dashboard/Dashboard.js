@@ -38,7 +38,6 @@ export default function Dashboard ({ earnings = mockEarnings }) {
     }
     setUrlOrigin(window.location.origin)
   }, [location, setUrlOrigin])
-  
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     {/* <div styleName='avatar'>
@@ -96,9 +95,9 @@ function Card ({ title, subtitle, linkTo, children }) {
 
 // a react-router link that can also take an external url
 function MixedLink ({ to, children, ...props }) {
-  const isExternal = /^https?:\/\//.test(to)
+  const isExternal = /^https?:\/\//.test(to) || /^http?:\/\//.test(to)
   if (isExternal) {
-    return <a href={to} {...props}>
+    return <a href={to} target='_blank' rel='noopener noreferrer' {...props}>
       {children}
     </a>
   } else {

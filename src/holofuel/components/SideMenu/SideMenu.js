@@ -34,8 +34,6 @@ export default function SideMenu ({
     setCurrentPath(location.pathname)
   }, [location])
 
-  const inboxPath = '/holofuel/inbox' || '/holofuel/' || '/holofuel'
-
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
