@@ -28,13 +28,13 @@ export default function Dashboard ({ earnings = mockEarnings }) {
 
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
 
-  return <PrimaryLayout headerProps={{ title: 'HP Admin hApps' }}>
-    <div styleName='avatar'>
+  return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
+    {/* <div styleName='avatar'>
       <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
         <HashIcon hash={settings.hostPubKey} size={42} />
       </CopyAgentId>
-    </div>
-    <h2 styleName='greeting'>{greeting}</h2>
+    </div> */}
+    <h1 styleName='greeting'>{greeting}</h1>
 
     {false && <Card title='Hosting' linkTo='/admin/browse-happs' subtitle='Manage your Holo applications'>
       <div styleName='hosting-content' data-testid='hosted-apps'>

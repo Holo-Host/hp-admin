@@ -7,7 +7,7 @@
 .greeting {
   text-align: center;
   color: var(--color-limed-spruce);
-  margin-bottom: 36px;
+  margin: 36px 0px;
 }
 
 .hosting-content {

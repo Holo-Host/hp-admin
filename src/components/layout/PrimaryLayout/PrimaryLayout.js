@@ -21,8 +21,7 @@ import 'global-styles/index.css'
 export function PrimaryLayout ({
   children,
   headerProps = {},
-  showHeader = true,
-  showSideMenu = true,
+  showHeader = true
 }) {
   const [isInsideApp, setIsInsideApp] = useState(true)
 
@@ -47,7 +46,6 @@ export function PrimaryLayout ({
 
   useEffect(() => {
     setIsInsideApp(window.location.pathname !== ROOT && window.location.pathname !== HP_ADMIN_LOGIN)
-    console.log(isInsideApp)
     
     if (!isConnected.hpos) {
       // reroute to login on network/hpos connection error
@@ -102,14 +100,11 @@ export function PrimaryLayout ({
     setIsInsideApp])
 
   const isWide = useContext(ScreenWidthContext)
-  const [isMenuOpen, setMenuOpen] = useState(false)
-  const hamburgerClick = () => setMenuOpen(!isMenuOpen)
 
   return <div styleName='styles.primary-layout'>
     <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
       {showHeader && <Header
         {...headerProps}
-        hamburgerClick={showSideMenu && hamburgerClick}
         settings={isConnected.hpos ? settings : {}} />}
 
       <div styleName='styles.content'>
@@ -132,7 +127,6 @@ export function PrimaryLayout ({
                 Alpha Testnet.
               </a>
             </p>
-  {/* 
             <ul styleName='styles.footer-list-2'>
               <li styleName='styles.footer-list-item-2'>
                 <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link-2'>Help</a>
@@ -140,17 +134,8 @@ export function PrimaryLayout ({
               <li styleName='styles.footer-list-item-2'>
                 <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link-2'>View Terms of Service</a>
               </li>
-            </ul> */}
+            </ul>
           </div>
-
-          <ul styleName='styles.footer-list'>
-            <li styleName='styles.footer-list-item'>
-              <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>Help</a>
-            </li>
-            <li styleName='styles.footer-list-item'>
-              <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>View Terms of Service</a>
-            </li>
-          </ul>
         </footer>
       </div>
     </div>}

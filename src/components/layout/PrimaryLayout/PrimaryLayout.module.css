@@ -35,10 +35,6 @@
   cursor: pointer;
 }
 
-/* .side-menu {
-  padding-right: 10px;
-} */
-
 
 /* Footer */
 
@@ -46,18 +42,18 @@
   box-sizing: border-box;
   margin-top: auto;
   padding: 0px 24px;
+  position: -webkit-sticky;
   position: sticky;
-  bottom: 0;
+  bottom: 2rem;
 }
 
 .container {
   box-sizing: border-box;
-  width: 100%;
+  width: 26%;
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: var(--color-alabaster-light);
-  pointer-events: none;
 }
 
 .footer {
@@ -83,6 +79,7 @@
 }
 
 .footer-list-2 {
+  margin: 0;
   padding: 0;
   list-style-type: none;
   display: flex;
@@ -106,7 +103,7 @@
 .alpha-info {
   position: relative;
   margin: 0 -32px 0px -32px;
-  padding: 30px 12px;
+  padding: 32px 10px 8px 10px;
   font-family: 'Circular';
   font-size: 14px;
   line-height: 16px;
