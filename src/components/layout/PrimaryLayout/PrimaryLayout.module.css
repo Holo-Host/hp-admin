@@ -35,6 +35,92 @@
   cursor: pointer;
 }
 
-.side-menu {
+/* .side-menu {
   padding-right: 10px;
+} */
+
+
+/* Footer */
+
+.wrapper {
+  box-sizing: border-box;
+  margin-top: auto;
+  padding: 0px 24px;
+  position: sticky;
+  bottom: 0;
+}
+
+.container {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-alabaster-light);
+  pointer-events: none;
+}
+
+.footer {
+  flex-shrink: 0;
+  justify-self: flex-end;
+  margin: 0px 10px;
+}
+
+.footer-list {
+  padding: 0;
+  list-style-type: none;
+}
+
+.footer-list-item {
+  padding: 4px 0px;
+}
+
+.footer-link {
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--color-caribbean-green)
+}
+
+.footer-list-2 {
+  padding: 0;
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  /* text-align: right; */
+}
+
+.footer-list-item-2 {
+  padding: 4px 0px;
+}
+
+.footer-link-2 {
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--color-rhino-35)
+}
+
+/* Alpha Info */
+
+.alpha-info {
+  position: relative;
+  margin: 0 -32px 0px -32px;
+  padding: 30px 12px;
+  font-family: 'Circular';
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--color-rhino);
+  background-color: var(--color-iceberg);
+  box-shadow: 1px -1.5px 14px rgba(163, 160, 160, 0.5);
+}
+
+.alpha-flag {
+  position: absolute;
+  top: -16px;
+  left: 0px;
+}
+
+.alpha-link {
+  color: var(--color-rhino);
 }
