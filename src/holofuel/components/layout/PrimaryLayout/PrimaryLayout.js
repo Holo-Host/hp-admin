@@ -107,7 +107,7 @@ function PrimaryLayout ({
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
-      isOpen={isMenuOpen}
+      isOpen={isWide || isMenuOpen}
       handleClose={handleMenuClose}
       agent={currentUser}
       agentLoading={currentUserLoading}
@@ -118,7 +118,7 @@ function PrimaryLayout ({
       isLoadingRefetchCalls={isLoadingRefetchCalls}
       refetchCalls={refetchCalls} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName={cx('styles.content')}>
+    <div styleName={cx('styles.content', { 'styles.desktop': isWide })}>
       <FlashMessage />
       {children}
     </div>
