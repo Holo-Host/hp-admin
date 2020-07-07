@@ -18,7 +18,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { shouldShowTransactionInInbox } from 'models/Transaction'
-import { HOME_PATH } from 'holofuel/utils/urls'
+import { INBOX_PATH } from 'holofuel/utils/urls'
 import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
@@ -60,7 +60,7 @@ function PrimaryLayout ({
       setShouldRefetchUser(true)
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-        defaultPath = HOME_PATH
+        defaultPath = INBOX_PATH
       } else {
         defaultPath = '/admin/login'
       }

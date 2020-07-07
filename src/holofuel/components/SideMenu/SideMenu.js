@@ -8,7 +8,6 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
 import Loading from 'components/Loading'
 import {
-  HOME_PATH,
   INBOX_PATH,
   HISTORY_PATH,
   PROFILE_PATH
@@ -48,11 +47,6 @@ export default function SideMenu ({
       <nav styleName='nav'>
         <ul styleName='nav-list'>
           <li>
-            <Link to={HOME_PATH} styleName='nav-link'>
-              Home
-            </Link>
-          </li>
-          <li>
             <Link to={INBOX_PATH} styleName='nav-link'>
               Inbox <InboxBadge count={inboxCount} />
             </Link>
@@ -62,13 +56,13 @@ export default function SideMenu ({
               History
             </Link>
           </li>
-          <li>
-            <Link to={PROFILE_PATH} styleName='nav-link'>
+          <li styleName='last-list-item'>
+            <Link to={PROFILE_PATH} styleName='nav-link last-nav-link'>
               Profile
             </Link>
           </li>
           {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='last-list-item'>
-            <Link to='/admin/' styleName='nav-link last-nav-link'>
+            <Link to='/admin/' styleName='nav-link admin-nav-link'>
               HP Admin
             </Link>
           </li>}

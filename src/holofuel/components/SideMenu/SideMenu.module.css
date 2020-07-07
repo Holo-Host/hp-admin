@@ -16,7 +16,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 32px 22px 20px;
+  padding: 14px 22px 20px;
   background-color: var(--color-alabaster-light);
   transform: translateX(-10%);
   transition: transform .3s ease;
@@ -154,7 +154,7 @@
 
 .alpha-info {
   position: relative;
-  margin: 0 -32px 60px -32px;
+  margin: 0 -32px 10px -32px;
   padding: 30px 12px;
   font-family: 'Circular';
   font-size: 14px;
@@ -179,6 +179,10 @@
 
 .last-nav-link {
   margin-bottom: 15px;
+}
+
+.admin-nav-link {
+  margin: 15px 0px
 }
 
 .btn-loading {
