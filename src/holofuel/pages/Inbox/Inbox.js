@@ -319,7 +319,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [highlightRed, setHighlightRed] = useState(false)
   const [highlightYellow, setHighlightYellow] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)  
+  const [isLoading, setIsLoading] = useState(false)
+  const [hasRendered, setHasRendered] = useState(false)
 
   const signalInProcessEvent = useCallback(() => {
     setHighlightYellow(true)
@@ -352,28 +353,21 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   }, [hideTransaction])
 
   useEffect(() => {
-    if (!stale) {    
+    setHasRendered(true)
+    if (!stale && !hasRendered) {  
       if (!inProcess && actioned && shouldHighlight) {
         if (shouldHighlight === 'green') {
           confirmGreen()
         } else if (shouldHighlight === 'red') {
           confirmRed()
         }
-      } if (!inProcess && actioned && shouldHighlight) {
-        if (shouldHighlight === 'green') {
-          confirmGreen()
-        } else if (shouldHighlight === 'red') {
-          confirmRed()
-        }
-      } else if (inProcess && actioned) {
-        signalInProcessEvent()
       } else if (!inProcess && actioned && !shouldHighlight) {
         hideTransaction(true)
+      } else if (inProcess && actioned) {
+        signalInProcessEvent()
       }
     }
-  }, [stale, actioned, inProcess, shouldHighlight, confirmGreen, confirmRed, signalInProcessEvent, hideTransaction])
-
-  if (agent.id === null) return null
+  }, [stale, actioned, inProcess, shouldHighlight, confirmGreen, confirmRed, signalInProcessEvent, hideTransaction, setHasRendered, hasRendered])
 
   const setIsLoadingAndPaused = state => {
     setIsLoading(state)
@@ -384,6 +378,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     shouldDisplay: true,
     transaction,
     setIsLoading: setIsLoadingAndPaused,
+    onConfirm: () => setHasRendered(false)
   }
 
   const showAcceptModal = () =>
@@ -397,7 +392,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
   const showCancelModal = () =>
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel' })
-
+  
+  if (agent.id === null) return null
   /* eslint-disable-next-line quote-props */
   return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, {  'highlightRed': highlightRed || stale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
@@ -515,7 +511,7 @@ function PayButton ({ showPayModal }) {
     styleName='accept-button'
   >
     {/* NB: Not a typo. This is to 'Accept Request for Payment' */}
-    <p>Accept</p>
+    <p>Accept</p>D
   </Button>
 }
 

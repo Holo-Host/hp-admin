@@ -42,7 +42,7 @@ function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { hiddenTransactionsById } = useActionableDisplayContext()
 
-  const inboxCount = useRef()
+  const [inboxCount, setInboxCount] = useState()
   const actionableDisplayFilter = useCallback(transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
@@ -89,9 +89,9 @@ function PrimaryLayout ({
     
     // to sync the notifcation badge actionable tx count with hidden values
     if (hiddenTransactionsById) {
-      inboxCount.current = actionableTransactions.filter(actionableDisplayFilter).length
+      setInboxCount(actionableTransactions.filter(actionableDisplayFilter).length)
     } else {
-      inboxCount.current = actionableTransactions.filter(shouldShowTransactionInInbox).length
+      setInboxCount(actionableTransactions.filter(shouldShowTransactionInInbox).length)
     }
   }, [isConnected,
     setIsConnected,
@@ -105,7 +105,8 @@ function PrimaryLayout ({
     refetchHolofuelUser,
     actionableTransactions,
     hiddenTransactionsById,
-    actionableDisplayFilter
+    actionableDisplayFilter,
+    setInboxCount
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
@@ -125,13 +126,13 @@ function PrimaryLayout ({
   const isLoadingRefetchCalls = ledgerLoading || actionableTransactionsLoading || completedTransactionsLoading || nonPendingTransactionsLoading || waitingTransactionsLoading
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount.current} />
+    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
       isOpen={isMenuOpen}
       handleClose={handleMenuClose}
       agent={currentUser}
       agentLoading={currentUserLoading}
-      inboxCount={inboxCount.current}
+      inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
       ledgerLoading={isLoadingFirstLedger}
       isWide={isWide}
