@@ -34,6 +34,8 @@ export default function SideMenu ({
     setCurrentPath(location.pathname)
   }, [location])
 
+  const inboxPath = '/holofuel/inbox' || '/holofuel/' || '/holofuel'
+
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
@@ -47,17 +49,17 @@ export default function SideMenu ({
 
       <nav styleName='nav'>
         <ul styleName='nav-list'>
-          <li styleName={cx({ 'active-link': currentPath === '/holofuel/inbox' })}>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/inbox/' || currentPath === '/holofuel/inbox' || currentPath === '/holofuel/' || currentPath === '/holofuel' })}>
             <Link to={INBOX_PATH} styleName='nav-link'>
               Inbox <InboxBadge count={inboxCount} />
             </Link>
           </li>
-          <li styleName={cx({ 'active-link': currentPath === '/holofuel/history' })}>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/history/' || currentPath === '/holofuel/history' })}>
             <Link to={HISTORY_PATH}  styleName='nav-link'>
               History
             </Link>
           </li>
-          <li styleName={cx({ 'active-link': currentPath === '/holofuel/profile' })}>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/profile/' || currentPath === '/holofuel/profile' })}>
             <Link to={PROFILE_PATH}  styleName='nav-link'>
               Profile
             </Link>
