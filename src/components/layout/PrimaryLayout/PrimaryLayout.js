@@ -24,7 +24,6 @@ export function PrimaryLayout ({
   showHeader = true
 }) {
   const [isInsideApp, setIsInsideApp] = useState(true)
-
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
   const { setIsConnected, isConnected } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()

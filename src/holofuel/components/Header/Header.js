@@ -20,9 +20,9 @@ export function Header ({ title, agent, agentLoading, history: { push }, hamburg
         {leftNav}
       </div>
       <div styleName='center-nav'>
-        {title && <div styleName='page-header'>
-          <h1 styleName='page-title'>{title}</h1>
-        </div>}
+        <div styleName='page-header'>
+          <h1 styleName='page-title'>Test Fuel</h1>
+        </div>
       </div>
       <div>
         <CopyAgentId agent={agent} isMe>

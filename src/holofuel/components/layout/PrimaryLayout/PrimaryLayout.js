@@ -117,7 +117,7 @@ function PrimaryLayout ({
       isWide={isWide}
       isLoadingRefetchCalls={isLoadingRefetchCalls}
       refetchCalls={refetchCalls} />
-    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
+    {(!isWide && showAlphaFlag) && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName={cx('styles.content', { 'styles.desktop': isWide })}>
       <FlashMessage />
       {children}

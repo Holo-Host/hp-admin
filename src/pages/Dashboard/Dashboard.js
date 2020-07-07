@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
-import HashIcon from 'components/HashIcon'
+// import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
-import CopyAgentId from 'components/CopyAgentId'
+// import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
@@ -27,6 +27,18 @@ export default function Dashboard ({ earnings = mockEarnings }) {
   const isBalanceZero = Number(balance) === 0
 
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
+  const [urlOrigin, setUrlOrigin] = useState()
+  let location = useLocation()
+  
+  useEffect(() => {
+    let origin = window.location.origin.trim()
+    const hasTrailingSlash =  origin.charAt(origin.length - 1) === '/'
+    if (hasTrailingSlash) {
+      origin.slice(0, origin.length - 1)
+    }
+    setUrlOrigin(window.location.origin)
+  }, [location, setUrlOrigin])
+  
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     {/* <div styleName='avatar'>
@@ -58,7 +70,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    <Card title='Test Fuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
+    <Card title='Test Fuel' linkTo={urlOrigin + '/holofuel/'} subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Current Balance

@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import { presentHolofuelAmount, presentAgentId } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
 import Loading from 'components/Loading'
+import BackIcon from 'components/icons/BackIcon'
+
 import {
   INBOX_PATH,
   HISTORY_PATH,
@@ -22,11 +24,16 @@ export default function SideMenu ({
   agent,
   agentLoading,
   inboxCount,
-  holofuelBalance,
-  ledgerLoading,
   isLoadingRefetchCalls,
   refetchCalls
 }) {
+
+  let location = useLocation()
+  const [currentPath, setCurrentPath] = useState()
+  useEffect(() => {
+    setCurrentPath(location.pathname)
+  }, [location])
+
   return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <header styleName='header'>
@@ -36,44 +43,40 @@ export default function SideMenu ({
         <h3 styleName='nickname'>
           {agent.nickname || (agentLoading && <>Loading...</>) || presentAgentId(agent.id)}
         </h3>
-
-        <h1 styleName='balance'><DisplayBalance
-          holofuelBalance={holofuelBalance}
-          ledgerLoading={ledgerLoading}
-        />
-        </h1>
       </header>
 
       <nav styleName='nav'>
         <ul styleName='nav-list'>
-          <li>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/inbox' })}>
             <Link to={INBOX_PATH} styleName='nav-link'>
               Inbox <InboxBadge count={inboxCount} />
             </Link>
           </li>
-          <li>
-            <Link to={HISTORY_PATH} styleName='nav-link'>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/history' })}>
+            <Link to={HISTORY_PATH}  styleName='nav-link'>
               History
             </Link>
           </li>
-          <li styleName='last-list-item'>
-            <Link to={PROFILE_PATH} styleName='nav-link last-nav-link'>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/profile' })}>
+            <Link to={PROFILE_PATH}  styleName='nav-link'>
               Profile
             </Link>
           </li>
-          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='last-list-item'>
-            <Link to='/admin/' styleName='nav-link admin-nav-link'>
-              HP Admin
-            </Link>
-          </li>}
           <li>
-            <div styleName='loading-row'>
+            <div styleName='loading-row last-list-item'>
               <Button onClick={() => refetchCalls()} styleName={cx('refresh-button', { 'btn-loading': isLoadingRefetchCalls })} variant='green'>
                 Refresh
               </Button>
               {isLoadingRefetchCalls && <Loading styleName='refresh-loading' width={20} height={20} />}
             </div>
           </li>
+
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='last-list-item'>
+            <Link to='/admin/' styleName='nav-link admin-nav-link'>
+              <BackIcon styleName='back-icon' /> HP Admin
+            </Link>
+          </li>}
+
         </ul>
       </nav>
 

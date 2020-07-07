@@ -97,6 +97,7 @@
   color: var(--color-cape-cod);
 }
 
+.back-icon,
 .gear-icon {
   width: 20px;
   height: 20px;
@@ -106,6 +107,12 @@
 
 .nav {
   color: #fff;
+}
+
+.active-link {
+  background-color: #CFF3EC;
+  padding: 0px 10px;
+  border-radius: 5px;
 }
 
 /* Header */
