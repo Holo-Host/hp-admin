@@ -1,22 +1,20 @@
 import React from 'react'
-import Button from 'components/Button'
-import HashAvatar from 'components/HashAvatar'
-import './Header.module.css'
 import { Link } from 'react-router-dom'
-import useCurrentUserContext from 'contexts/useCurrentUserContext'
-import MenuIcon from 'components/icons/MenuIcon'
+import './Header.module.css'
+import BackIcon from 'components/icons/BackIcon'
+import GearIcon from 'components/icons/GearIcon'
+import { HP_ADMIN_SETTINGS } from 'utils/urls'
 
-export default function Header ({ title, hamburgerClick }) {
-  const { currentUser } = useCurrentUserContext()
-  const leftNav = hamburgerClick && <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
-    <MenuIcon styleName='menu-icon' />
-  </Button>
-
+export default function Header ({ title }) {
   return <div styleName='header'>
-    <div styleName='left-nav'>{leftNav}</div>
-    <h1 styleName='title'>{title}</h1>
-    <Link to='/admin/settings' styleName='avatar-link' data-testid='avatar-link'>
-      <HashAvatar seed={currentUser.hostPubKey} size={32} />
+    <Link to='/admin/dashboard' styleName='avatar-link' data-testid='avatar-link'>
+      {window.location.pathname === HP_ADMIN_SETTINGS && <BackIcon styleName='back-icon' />}
     </Link>
+    <h1 styleName='title'>{title}</h1>
+    <div styleName='left-nav'>
+      <Link to='/admin/settings' styleName='settings-link'>
+        <GearIcon styleName='gear-icon' />
+      </Link>
+    </div>
   </div>
 }

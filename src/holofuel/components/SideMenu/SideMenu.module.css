@@ -16,7 +16,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 32px 22px 20px;
+  padding: 14px 22px 20px;
   background-color: var(--color-alabaster-light);
   transform: translateX(-10%);
   transition: transform .3s ease;
@@ -28,7 +28,7 @@
 .drawer--open .container {
   transform: translateX(100%);
   pointer-events: initial;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .refresh-button {
@@ -97,6 +97,7 @@
   color: var(--color-cape-cod);
 }
 
+.back-icon,
 .gear-icon {
   width: 20px;
   height: 20px;
@@ -106,6 +107,12 @@
 
 .nav {
   color: #fff;
+}
+
+.active-link {
+  background-color: #CFF3EC;
+  padding: 0px 10px;
+  border-radius: 5px;
 }
 
 /* Header */
@@ -154,7 +161,7 @@
 
 .alpha-info {
   position: relative;
-  margin: 0 -32px 60px -32px;
+  margin: 0 -32px 10px -32px;
   padding: 30px 12px;
   font-family: 'Circular';
   font-size: 14px;
@@ -179,6 +186,10 @@
 
 .last-nav-link {
   margin-bottom: 15px;
+}
+
+.admin-nav-link {
+  margin: 15px 0px
 }
 
 .btn-loading {
@@ -228,4 +239,8 @@
   font-size: 12px;
   text-align: center;
   margin-left: 10px;
+}
+
+.desktop {
+  flex: 0 1 280px;
 }
