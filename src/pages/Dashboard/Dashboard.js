@@ -3,10 +3,10 @@ import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
 import { Link, useLocation } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
-// import HashIcon from 'components/HashIcon'
+import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
-// import CopyAgentId from 'components/CopyAgentId'
+import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount } from 'utils'
@@ -40,12 +40,12 @@ export default function Dashboard ({ earnings = mockEarnings }) {
   }, [location, setUrlOrigin])
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
-    {/* <div styleName='avatar'>
+    <div styleName='avatar'>
       <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
         <HashIcon hash={settings.hostPubKey} size={42} />
       </CopyAgentId>
-    </div> */}
-    <h1 styleName='greeting'>{greeting}</h1>
+    </div>
+    <h2 styleName='greeting'>{greeting}</h2>
 
     {false && <Card title='Hosting' linkTo='/admin/browse-happs' subtitle='Manage your Holo applications'>
       <div styleName='hosting-content' data-testid='hosted-apps'>

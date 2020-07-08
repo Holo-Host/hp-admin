@@ -63,22 +63,6 @@
 }
 
 .footer-list {
-  padding: 0;
-  list-style-type: none;
-}
-
-.footer-list-item {
-  padding: 4px 0px;
-}
-
-.footer-link {
-  text-decoration: none;
-  font-size: 14px;
-  line-height: 16px;
-  color: var(--color-caribbean-green)
-}
-
-.footer-list-2 {
   margin: 0;
   padding: 0;
   list-style-type: none;
@@ -87,11 +71,11 @@
   /* text-align: right; */
 }
 
-.footer-list-item-2 {
+.footer-list-item {
   padding: 4px 0px;
 }
 
-.footer-link-2 {
+.footer-link {
   text-decoration: none;
   font-size: 14px;
   line-height: 16px;
@@ -108,7 +92,7 @@
   font-size: 14px;
   line-height: 16px;
   color: var(--color-rhino);
-  background-color: var(--color-iceberg);
+  background-color: #d2f2f5;
   box-shadow: 1px -1.5px 14px rgba(163, 160, 160, 0.5);
 }
 

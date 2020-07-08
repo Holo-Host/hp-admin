@@ -126,12 +126,12 @@ export function PrimaryLayout ({
                 Alpha Testnet.
               </a>
             </p>
-            <ul styleName='styles.footer-list-2'>
-              <li styleName='styles.footer-list-item-2'>
-                <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link-2'>Help</a>
+            <ul styleName='styles.footer-list'>
+              <li styleName='styles.footer-list-item'>
+                <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>Help</a>
               </li>
-              <li styleName='styles.footer-list-item-2'>
-                <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link-2'>View Terms of Service</a>
+              <li styleName='styles.footer-list-item'>
+                <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>View Terms of Service</a>
               </li>
             </ul>
           </div>
