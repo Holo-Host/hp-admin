@@ -3,7 +3,7 @@ import cx from 'classnames'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { Link, useLocation } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
-import { presentHolofuelAmount, presentAgentId } from 'utils'
+import { presentAgentId } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
 import Loading from 'components/Loading'
@@ -28,14 +28,13 @@ export default function SideMenu ({
   isLoadingRefetchCalls,
   refetchCalls
 }) {
-
-  let location = useLocation()
+  const location = useLocation()
   const [currentPath, setCurrentPath] = useState()
   useEffect(() => {
     setCurrentPath(location.pathname)
   }, [location])
 
-  return <aside styleName={cx('drawer', { 'drawer--open': isOpen }, { 'desktop' : isWide })}>
+  return <aside styleName={cx('drawer', { 'drawer--open': isOpen }, { desktop: isWide })}>
     <div styleName='container'>
       <header styleName='header'>
         <CopyAgentId agent={{ id: agent.id }} isMe>
@@ -54,12 +53,12 @@ export default function SideMenu ({
             </Link>
           </li>
           <li styleName={cx({ 'active-link': currentPath === '/holofuel/history/' || currentPath === '/holofuel/history' })}>
-            <Link to={HISTORY_PATH}  styleName='nav-link'>
+            <Link to={HISTORY_PATH} styleName='nav-link'>
               History
             </Link>
           </li>
           <li styleName={cx({ 'active-link': currentPath === '/holofuel/profile/' || currentPath === '/holofuel/profile' })}>
-            <Link to={PROFILE_PATH}  styleName='nav-link'>
+            <Link to={PROFILE_PATH} styleName='nav-link'>
               Profile
             </Link>
           </li>

@@ -7,7 +7,7 @@ import { withRouter } from 'react-router'
 import MenuIcon from 'components/icons/MenuIcon'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 
-export function Header ({ title, agent, agentLoading, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount, isWide}) {
+export function Header ({ agent, agentLoading, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount, isWide }) {
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' color='#000000' />
     {inboxCount > 0 && <span styleName='nav-badge' data-testid='inboxCount-badge'>{inboxCount}</span>}
@@ -21,7 +21,7 @@ export function Header ({ title, agent, agentLoading, history: { push }, hamburg
         {leftNav}
       </div>
       <div styleName='center-nav'>
-        <div styleName={cx('page-header', { 'desktop': isWide })}>
+        <div styleName={cx('page-header', { desktop: isWide })}>
           <h1 styleName='page-title'>Test Fuel</h1>
         </div>
       </div>

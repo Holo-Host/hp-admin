@@ -45,7 +45,7 @@ export function PrimaryLayout ({
 
   useEffect(() => {
     setIsInsideApp(window.location.pathname !== ROOT && window.location.pathname !== HP_ADMIN_LOGIN)
-    
+
     if (!isConnected.hpos) {
       // reroute to login on network/hpos connection error
       if (isInsideApp) {
