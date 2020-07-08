@@ -14,11 +14,14 @@
   text-align: center;
 }
 
+.desktop {
+  width: calc(100vw - 308px);
+}
+
 .flash-body {
   display: flex;
   flex-flow: column;
   margin: 0 auto;
-  margin-left: 30px;
 }
 
 .message {
