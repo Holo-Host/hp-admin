@@ -2,14 +2,11 @@ import React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { mockNavigateTo } from 'react-router-dom'
 import { MockedProvider } from '@apollo/react-testing'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
-import HappsQuery from 'graphql/HappsQuery.gql'
-import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import EarningsReportQuery from 'graphql/EarningsReportQuery.gql'
+import HostingReportQuery from 'graphql/HostingReportQuery.gql'
 
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
-import { defaultHapp } from 'models/Happ'
 import Dashboard from './Dashboard'
 
 jest.mock('components/layout/PrimaryLayout')
@@ -17,65 +14,8 @@ jest.mock('contexts/useAuthContext')
 jest.mock('contexts/useFlashMessageContext')
 
 describe('Dashboard', () => {
-  it('renders empty states', async () => {
-    const mocks = [
-      {
-        request: {
-          query: HappsQuery
-        },
-        result: {
-          data: {
-            happs: []
-          }
-        }
-      },
-      {
-        request: {
-          query: HolofuelUserQuery
-        },
-        result: {
-          data: {
-            holofuelUser: {
-              id: '1',
-              nickname: ''
-            }
-          }
-        }
-      },
-      {
-        request: {
-          query: HolofuelLedgerQuery
-        },
-        result: {
-          data: {
-            holofuelLedger: {
-              balance: 0,
-              credit: 0,
-              payable: 0,
-              receivable: 0,
-              fees: 0
-            }
-          }
-        }
-      },
-      {
-        request: {
-          query: HposSettingsQuery
-        },
-        result: {
-          data: {
-            hposSettings: {
-              hostPubKey: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8',
-              hostName: 'Holo Naut',
-              registrationEmail: 'sam.rose@holo.host',
-              networkStatus: 'live',
-              sshAccess: true,
-              deviceName: 'My HoloPort'
-            }
-          }
-        }
-      }
-    ]
+  it.skip('renders empty states', async () => {
+    const mocks = []
 
     const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <Dashboard earnings={0} />
@@ -90,64 +30,7 @@ describe('Dashboard', () => {
   })
 
   it.skip('renders empty states including earnings and hosting', async () => {
-    const mocks = [
-      {
-        request: {
-          query: HappsQuery
-        },
-        result: {
-          data: {
-            happs: []
-          }
-        }
-      },
-      {
-        request: {
-          query: HolofuelUserQuery
-        },
-        result: {
-          data: {
-            holofuelUser: {
-              id: '1',
-              nickname: ''
-            }
-          }
-        }
-      },
-      {
-        request: {
-          query: HolofuelLedgerQuery
-        },
-        result: {
-          data: {
-            holofuelLedger: {
-              balance: 0,
-              credit: 0,
-              payable: 0,
-              receivable: 0,
-              fees: 0
-            }
-          }
-        }
-      },
-      {
-        request: {
-          query: HposSettingsQuery
-        },
-        result: {
-          data: {
-            hposSettings: {
-              hostPubKey: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8',
-              hostName: 'Holo Naut',
-              registrationEmail: 'sam.rose@holo.host',
-              networkStatus: 'live',
-              sshAccess: true,
-              deviceName: 'My HoloPort'
-            }
-          }
-        }
-      }
-    ]
+    const mocks = []
 
     const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
       <Dashboard earnings={0} />
@@ -172,170 +55,52 @@ describe('Dashboard', () => {
   })
 
   it('renders normal states', async () => {
-    const nickname = 'Jane'
-    const balance = 123
-    const macks = [
-      {
-        request: {
-          query: HappsQuery
-        },
-        result: {
-          data: {
-            happs: [
+    const totalEarnings = 39090
+
+    const hostingReportMock = {
+      request: {
+        query: HostingReportQuery
+      },
+      result: {
+        data: {
+          hostingReport: {
+            localSourceChains: 18,
+            zomeCalls: 588,
+            hostedHapps: [
               {
-                ...defaultHapp,
-                isEnabled: true
-              },
-              {
-                ...defaultHapp,
-                isEnabled: false
+                name: 'HoloFuel'
               }
             ]
           }
         }
+      }
+    }
+
+    const earningsReportMock = {
+      request: {
+        query: EarningsReportQuery
       },
-      {
-        request: {
-          query: HolofuelUserQuery
-        },
-        result: {
-          data: {
-            holofuelUser: {
-              id: '1',
-              nickname
-            }
-          }
-        }
-      },
-      {
-        request: {
-          query: HolofuelLedgerQuery
-        },
-        result: {
-          data: {
-            holofuelLedger: {
-              balance,
-              credit: 0,
-              payable: 0,
-              receivable: 0,
-              fees: 0
-            }
-          }
-        }
-      },
-      {
-        request: {
-          query: HposSettingsQuery
-        },
-        result: {
-          data: {
-            hposSettings: {
-              hostPubKey: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8',
-              hostName: 'Holo Naut',
-              registrationEmail: 'sam.rose@holo.host',
-              networkStatus: 'live',
-              sshAccess: true,
-              deviceName: 'My HoloPort'
-            }
+      result: {
+        data: {
+          earningsReport: {
+            totalEarnings,
+            cpu: 300,
+            bandwidth: 300,
+            storage: 300
           }
         }
       }
+    }
+
+    const mocks = [
+      hostingReportMock,
+      earningsReportMock
     ]
 
-    const earnings = 40948
-
-    const { getByText } = await renderAndWait(<MockedProvider mocks={macks} addTypename={false}>
-      <Dashboard earnings={earnings} />
+    const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      <Dashboard />
     </MockedProvider>, 0)
 
-    expect(getByText('Hi Holo Naut!')).toBeInTheDocument()
-
-    expect(getByText(`${presentHolofuelAmount(balance)} TF`)).toBeInTheDocument()
-  })
-
-  it.skip('renders normal states including ', async () => {
-    const nickname = 'Jane'
-    const balance = 123
-    const macks = [
-      {
-        request: {
-          query: HappsQuery
-        },
-        result: {
-          data: {
-            happs: [
-              {
-                ...defaultHapp,
-                isEnabled: true
-              },
-              {
-                ...defaultHapp,
-                isEnabled: false
-              }
-            ]
-          }
-        }
-      },
-      {
-        request: {
-          query: HolofuelUserQuery
-        },
-        result: {
-          data: {
-            holofuelUser: {
-              id: '1',
-              nickname
-            }
-          }
-        }
-      },
-      {
-        request: {
-          query: HolofuelLedgerQuery
-        },
-        result: {
-          data: {
-            holofuelLedger: {
-              balance,
-              credit: 0,
-              payable: 0,
-              receivable: 0,
-              fees: 0
-            }
-          }
-        }
-      },
-      {
-        request: {
-          query: HposSettingsQuery
-        },
-        result: {
-          data: {
-            hposSettings: {
-              hostPubKey: 'Tw7179WYi/zSRLRSb6DWgZf4dhw5+b0ACdlvAw3WYH8',
-              hostName: 'Holo Naut',
-              registrationEmail: 'sam.rose@holo.host',
-              networkStatus: 'live',
-              sshAccess: true,
-              deviceName: 'My HoloPort'
-            }
-          }
-        }
-      }
-    ]
-
-    const earnings = 40948
-
-    const { getByText } = await renderAndWait(<MockedProvider mocks={macks} addTypename={false}>
-      <Dashboard earnings={earnings} />
-    </MockedProvider>, 0)
-
-    expect(getByText('Hi Holo Naut!')).toBeInTheDocument()
-
-    expect(getByText('1 hApp')).toBeInTheDocument()
-
-    expect(getByText(`${presentHolofuelAmount(earnings)} TF`)).toBeInTheDocument()
-
-    expect(getByText(`${presentHolofuelAmount(balance)} TF`)).toBeInTheDocument()
+    expect(getByText(`${presentHolofuelAmount(totalEarnings)} TF`)).toBeInTheDocument()
   })
 })

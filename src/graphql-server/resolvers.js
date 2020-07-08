@@ -58,7 +58,34 @@ export const resolvers = {
 
     hposSettings: (_) => HposInterface.os.settings(),
 
-    hposStatus: HposInterface.os.status
+    hposStatus: HposInterface.os.status,
+
+    hostingReport: () => {
+      return {
+        localSourceChains: 18,
+        zomeCalls: 588,
+        hostedHapps: [
+          {
+            name: 'Holofuel'
+          },
+          {
+            name: 'Communities'
+          },
+          {
+            name: 'H-Wiki'
+          }
+        ]
+      }
+    },
+
+    earningsReport: () => {
+      return {
+        totalEarnings: 650000,
+        cpu: 300,
+        bandwidth: 300,
+        storage: 300
+      }
+    }
   },
 
   Mutation: {
