@@ -28,7 +28,7 @@
 .drawer--open .container {
   transform: translateX(100%);
   pointer-events: initial;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .refresh-button {
@@ -239,4 +239,8 @@
   font-size: 12px;
   text-align: center;
   margin-left: 10px;
+}
+
+.desktop {
+  flex: 0 1 280px;
 }

@@ -7,6 +7,8 @@
 }
 
 .wide {
+  display: flex;
+  overflow: hidden;
   padding: 0;
 }
 
@@ -40,5 +42,6 @@
 }
 
 .desktop {
-  left: 280px
+  flex: 1;
+  margin-left: 280px
 }

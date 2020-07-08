@@ -19,6 +19,7 @@ import './SideMenu.module.css'
 
 export default function SideMenu ({
   isOpen,
+  isWide,
   handleClose,
   avatarUrl = '',
   agent,
@@ -34,7 +35,7 @@ export default function SideMenu ({
     setCurrentPath(location.pathname)
   }, [location])
 
-  return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
+  return <aside styleName={cx('drawer', { 'drawer--open': isOpen }, { 'desktop' : isWide })}>
     <div styleName='container'>
       <header styleName='header'>
         <CopyAgentId agent={{ id: agent.id }} isMe>
@@ -106,13 +107,8 @@ export default function SideMenu ({
       </footer>
 
     </div>
-    <div styleName='drawer-overlay' onClick={handleClose} />
+    {!isWide && <div styleName='drawer-overlay' onClick={handleClose} />}
   </aside>
-}
-
-function DisplayBalance ({ ledgerLoading, holofuelBalance }) {
-  if (ledgerLoading || isNaN(holofuelBalance)) return <>-- TF</>
-  else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 
 function InboxBadge ({ count = 0 }) {
