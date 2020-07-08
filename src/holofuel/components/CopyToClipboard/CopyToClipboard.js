@@ -13,7 +13,7 @@ export default function CopyToClipboard ({
 
   const handleCopyItem = async () => {
     const wasCopied = await copy(copyContent)
-    if (wasCopied === true) newMessage(messageText, 5000)
+    if (wasCopied === true) newMessage(messageText,  0)
   }
 
   return <div onClick={handleCopyItem} styleName='copy-item'>
