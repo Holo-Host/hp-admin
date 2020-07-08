@@ -14,13 +14,18 @@
   text-align: center;
 }
 
-.desktop {
+.desktop-message {
   width: calc(100vw - 308px);
 }
 
 .flash-body {
   display: flex;
   flex-flow: column;
+  margin: 0 auto;
+  margin-left: 30px;
+}
+
+.desktop-body {
   margin: 0 auto;
 }
 

@@ -22,8 +22,8 @@ export default function FlashMessage () {
 
   if (isEmpty(message)) return null
 
-  return <div styleName={cx('flash-message', { 'desktop': isWide })}>
-    <div styleName='flash-body'>{message}</div>
+  return <div styleName={cx('flash-message', { 'desktop-message': isWide })}>
+    <div styleName={cx('flash-body', { 'desktop-body': isWide })}>{message}</div>
     <button styleName='close-button' onClick={clearMessage}>x</button>
   </div>
 }
