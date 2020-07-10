@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
 import moment from 'moment'
 
-export const POLLING_INTERVAL = parseInt(process.env.REACT_APP_POLLING_INTERVAL)
+// Default polling interval to 30000ms
+export const POLLING_INTERVAL = parseInt(process.env.REACT_APP_POLLING_INTERVAL) || 30000
 
 export function bgImageStyle (url) {
   if (!url) return {}
