@@ -25,12 +25,14 @@ import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 import { useInterval, useLoadingFirstTime } from 'utils'
 
+export const POLLING_INTERVAL = process.env.REACT_APP_POLLING_INTERVAL
+
 function PrimaryLayout ({
   children,
   headerProps = {},
   showAlphaFlag = true
 }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL })
   const { loading: actionableTransactionsLoading, data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, refetch: refetchActionableTransactions, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: completedTransactionsLoading, refetch: refetchCompletedTransactions, stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: nonPendingTransactionsLoading, refetch: refetchNonPendingTransactions } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
@@ -67,8 +69,8 @@ function PrimaryLayout ({
       push(defaultPath)
     } else {
       newMessage('', 0)
-      startPollingActionableTransactions(60000)
-      startPollingCompletedTransactions(60000)
+      startPollingActionableTransactions(POLLING_INTERVAL)
+      startPollingCompletedTransactions(POLLING_INTERVAL)
       if (shouldRefetchUser) {
         refetchHolofuelUser()
       }

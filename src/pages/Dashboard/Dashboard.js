@@ -2,7 +2,7 @@ import React, { useEffect } from 'react' // , useState
 import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
 import { Link, useLocation } from 'react-router-dom'
-import PrimaryLayout from 'components/layout/PrimaryLayout'
+import PrimaryLayout, { POLLING_INTERVAL } from 'components/layout/PrimaryLayout'
 import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
@@ -18,7 +18,7 @@ export const mockEarnings = 4984
 
 export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
-  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL })
 
   // placeholder as we're not currently calling hha
   const noInstalledHapps = 0

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty, intersectionBy, find, reject, isNil } from 'lodash/fp'
-import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import PrimaryLayout, { POLLING_INTERVAL } from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import Loading from 'components/Loading'
@@ -18,7 +18,7 @@ import HashAvatar from 'components/HashAvatar'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 
 function usePollCompletedTransactions ({ since }) {
-  const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000, variables: { since } })
+  const { data: { holofuelNewCompletedTransactions = [] } = {} } = useQuery(HolofuelNewCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL, variables: { since } })
   return holofuelNewCompletedTransactions
 }
 
@@ -26,7 +26,7 @@ const FILTER_TYPES = ['all', 'withdrawals', 'deposits', 'pending']
 
 export default function TransactionsHistory ({ history: { push } }) {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: loadingPendingTransactions, data: { holofuelWaitingTransactions = [] } = {} } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL })
   const { loading: loadingCompletedTransactions, data: { holofuelCompletedTransactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
 
   const since = !isEmpty(holofuelCompletedTransactions) ? holofuelCompletedTransactions[0].timestamp : ''

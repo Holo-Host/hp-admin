@@ -13,7 +13,7 @@ import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
+import PrimaryLayout, { POLLING_INTERVAL } from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
@@ -86,7 +86,7 @@ function useUpdatedTransactionLists () {
   const { isConnected } = useConnectionContext()
 
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL })
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)

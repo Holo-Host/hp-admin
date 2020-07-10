@@ -137,7 +137,7 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
     console.log('---- >>', counter)
     counter++
     if (invoice) {
-      if (counter > 10) {
+      if (counter > 4) {
         counter = 0
         userNotification = ''
         handleEvent()

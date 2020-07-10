@@ -166,7 +166,7 @@ async function initAndGetHolochainClient () {
   while (isInitiatingHcConnection) {
     counter++
     await wait(100)
-    if (counter === 1) {
+    if (counter === 10) {
       isInitiatingHcConnection = false
     }
   }

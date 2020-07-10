@@ -18,6 +18,8 @@ import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
 
+export const POLLING_INTERVAL = process.env.REACT_APP_POLLING_INTERVAL
+
 export function PrimaryLayout ({
   children,
   headerProps = {},
@@ -34,7 +36,7 @@ export function PrimaryLayout ({
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL/3), onError, notifyOnNetworkStatusChange: true, ssr: false })
   const isFreshHpAdminRender = useRef(true)
 
   useInterval(() => {
