@@ -11,16 +11,14 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
-import { useInterval } from 'utils'
+import { useInterval, POLLING_INTERVAL } from 'utils'
 import { wsConnection } from 'holochainClient'
 import { ROOT, HP_ADMIN_LOGIN } from 'utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
 
-export const POLLING_INTERVAL = process.env.REACT_APP_POLLING_INTERVAL
-
-export function PrimaryLayout ({
+function PrimaryLayout ({
   children,
   headerProps = {},
   showHeader = true

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
 import moment from 'moment'
 
+export const POLLING_INTERVAL = parseInt(process.env.REACT_APP_POLLING_INTERVAL)
+
 export function bgImageStyle (url) {
   if (!url) return {}
   const escaped = url.replace(/([\(\)])/g, (match, $1) => '\\' + $1) // eslint-disable-line

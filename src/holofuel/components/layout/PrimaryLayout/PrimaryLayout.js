@@ -23,9 +23,7 @@ import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
-import { useInterval, useLoadingFirstTime } from 'utils'
-
-export const POLLING_INTERVAL = process.env.REACT_APP_POLLING_INTERVAL
+import { POLLING_INTERVAL, useInterval, useLoadingFirstTime } from 'utils'
 
 function PrimaryLayout ({
   children,
