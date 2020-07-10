@@ -127,7 +127,7 @@ function presentPendingRequest (transaction, annuled = false) {
   return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
-async function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
+function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
   const invalidEvent = invoicedOffers.find(io => !io.Invoice)
   if (invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
   const findEvent = () => {
