@@ -149,8 +149,8 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
 }
 
 let counter = 0
-async function getListPending () {
-  const { requests, promises, declined } = await createZomeCall('transactions/list_pending')()
+async function getListPending (params) {
+  const { requests, promises, declined } = await createZomeCall('transactions/list_pending')(params)
   counter++
   console.log('Counter to trigger receive_payments_pending at 8/', counter)
   if (counter === 8) {
@@ -278,7 +278,7 @@ const HoloFuelDnaInterface = {
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
-      const { requests, promises, declined } = await getListPending()
+      const { requests, promises, declined } = await getListPending({})
       const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
       const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
@@ -333,7 +333,7 @@ const HoloFuelDnaInterface = {
       return presentedNonActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
-      const { requests, promises } = await getListPending()
+      const { requests, promises } = await getListPending({ origins: transactionId })
       const transactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1]))).filter(tx => !(tx instanceof Error))
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
