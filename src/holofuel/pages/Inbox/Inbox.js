@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -10,6 +10,7 @@ import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTrans
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
@@ -514,6 +515,7 @@ function DeclineButton ({ showDeclineModal }) {
 }
 
 export function ConfirmationModal ({ confirmationModalProperties, setConfirmationModalProperties }) {
+  const isWide = useContext(ScreenWidthContext)
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -606,7 +608,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     contentLabel={contentLabel}
     isOpen={shouldDisplay}
     handleClose={() => hideModal()}
-    styleName='modal'
+    styleName={cx( 'modal', { 'modal-desktop' : isWide } )}
   >
     <div styleName='modal-message'>{message}</div>
     {counterpartyMessage}
