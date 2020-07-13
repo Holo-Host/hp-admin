@@ -72,7 +72,6 @@ type Transaction {
   isPayingARequest: Boolean
   pendingCompletion: Boolean
   actioned: Boolean
-  shouldHighlight: String
   stale: Boolean
 }
 

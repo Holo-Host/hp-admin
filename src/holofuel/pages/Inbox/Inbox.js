@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import cx from 'classnames'
-import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
+import { isEmpty, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
@@ -10,7 +10,7 @@ import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import useActionableDisplayContext from 'holofuel/contexts/useActionableDisplayContext'
+import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -78,7 +78,7 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
-  const { hiddenTransactionsById } = useActionableDisplayContext()
+  const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
@@ -86,7 +86,7 @@ function useUpdatedTransactionLists () {
   const shouldShowTransaction = transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionsById.find(tx => tx.id === id)) || !actioned)
+    ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
   }
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransaction)
@@ -122,7 +122,60 @@ export default function Inbox ({ history: { push } }) {
   const { currentUser } = useCurrentUserContext()
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
-  const { actionableTransactions, recentTransactions, actionableLoading, recentLoading, refetchActionable } = useUpdatedTransactionLists(inboxView)
+  const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
+
+  const [temporaryActionableTransactions, setTemporaryActionableTransactions] = useState([])
+  const [temporaryRecentTransactions, setTemporaryRecentTransactions] = useState([])
+
+  const { hiddenTransactionIds, setHiddenTransactionIds } = useHiddenTransactionsContext()
+
+  const hideTransaction = transaction => {
+    setHiddenTransactionIds(hiddenTransactionIds => hiddenTransactionIds.concat([transaction.id]))
+    setTemporaryActionableTransactions(temporaryActionableTransactions => temporaryActionableTransactions.filter(trx => trx.id !== transaction.id))
+    setTemporaryRecentTransactions(temporaryRecentTransactions => temporaryRecentTransactions.filter(trx => trx.id !== transaction.id))
+  }
+
+  const getVisibleTransactions = (transactions, temporaryTransactions) => {
+    return transactions
+      .filter(transaction => !hiddenTransactionIds.includes(transaction.id))
+      .filter(transaction => !temporaryTransactions.map(tt => tt.id).includes(transaction.id))
+      .concat(temporaryTransactions)
+      .sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+  }
+
+  const visibleActionableTransactions = getVisibleTransactions(actionableTransactions, temporaryActionableTransactions)
+  const visibleRecentTransactions = getVisibleTransactions(recentTransactions, temporaryRecentTransactions)
+
+  let displayTransactions = []
+  let isDisplayLoading
+  let addTemporaryTransaction
+
+  const makeAddTemporaryTransaction = setTransactions => temporaryTransaction => {
+    setTransactions(transactions => transactions.concat([
+      {
+        ...temporaryTransaction,
+        temporary: true
+      }
+    ]))
+  }
+
+  switch (inboxView) {
+    case VIEW.actionable:
+      displayTransactions = visibleActionableTransactions
+      isDisplayLoading = actionableLoading
+      addTemporaryTransaction = makeAddTemporaryTransaction(setTemporaryActionableTransactions)
+      break
+    case VIEW.recent:
+      displayTransactions = visibleRecentTransactions
+      isDisplayLoading = recentLoading
+      addTemporaryTransaction = makeAddTemporaryTransaction(setTemporaryRecentTransactions)
+      break
+    default:
+      throw new Error('Invalid inboxView: ' + inboxView)
+  }
+
+  const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
+  const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
@@ -145,27 +198,11 @@ export default function Inbox ({ history: { push } }) {
   }
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
 
-  const [openDrawerId, setOpenDrawerId] = useState() 
- 
-  const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
-  let displayTransactions = []
-  let isDisplayLoading
-  switch (inboxView) {
-    case VIEW.actionable:
-      displayTransactions = actionableTransactions
-      isDisplayLoading = actionableLoading
-      break
-    case VIEW.recent:
-      displayTransactions = recentTransactions
-      isDisplayLoading = recentLoading
-      break
-    default:
-      throw new Error('Invalid inboxView: ' + inboxView)
-  }
-  const displayBalance = (isNil(holofuelBalance) && ledgerLoading) ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+  const [openDrawerId, setOpenDrawerId] = useState()
 
-  const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
-  const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
+  const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
+
+  const displayBalance = (isNil(holofuelBalance) && ledgerLoading) ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const [areActionsPaused, setAreActionsPaused] = useState(false)
 
@@ -227,7 +264,8 @@ export default function Inbox ({ history: { push } }) {
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
         setUserMessage={setUserMessage}
-        refetchActionable={refetchActionable} />)}
+        hideTransaction={hideTransaction} 
+        addTemporaryTransaction={addTemporaryTransaction} />)}
     </div>}
 
     <ConfirmationModal
@@ -236,41 +274,32 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage, refetchActionable }) {
-  const { hiddenTransactionsById, setHiddenTransactionsById } = useActionableDisplayContext()
-  const manageHideTransactionWithId = (id, shouldHide) => {
-    if (shouldHide) {
-      setHiddenTransactionsById(hiddenTransactionsById.concat([id]))
-    } else {
-      setHiddenTransactionsById(remove(id, hiddenTransactionsById))
-    }
-  }
-
-  const transactionIsVisible = id => !hiddenTransactionsById.includes(id)
-  if (isEqual(hiddenTransactionsById, transactions.map(transaction => transaction.id))) return null
-  
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage, hideTransaction, addTemporaryTransaction }) {
   return <React.Fragment>
     <PageDivider title={dateLabel} />
     <div styleName='transaction-list'>
-      {transactions.map(transaction => transactionIsVisible(transaction.id) && <TransactionRow
+      {transactions.map(transaction => <TransactionRow
         transaction={transaction}
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
         userId={userId}
-        hideTransaction={shouldHide => manageHideTransactionWithId(transaction.id, shouldHide)}
+        hideTransaction={hideTransaction}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
         role='list'
         key={transaction.id}
-        setUserMessage={setUserMessage} />)}
+        setUserMessage={setUserMessage}
+        addTemporaryTransaction={addTemporaryTransaction} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, pendingCompletion, actioned, shouldHighlight, stale } = transaction
+export function TransactionRow ({
+  transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage, addTemporaryTransaction, highlightColor
+}) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, pendingCompletion, actioned, stale, temporary } = transaction
 
   if (stale) {
     setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
@@ -315,12 +344,12 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     fullNotes = isOffer ? ` Declined Offer${notes ? `: ${notes}` : ''}` : ` Declined Request${notes ? `: ${notes}` : ''}`
   } else fullNotes = notes
 
-  const [highlightGreen, setHighlightGreen] = useState(false)
-  const [highlightRed, setHighlightRed] = useState(false)
   const [highlightYellow, setHighlightYellow] = useState(false)
+  const highlightGreen = highlightColor === 'green' && !highlightYellow
+  const highlightRed = highlightColor === 'red' && !highlightYellow
+
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [hasRendered, setHasRendered] = useState(false)
 
   const signalPendingCompletionEvent = useCallback(() => {
     setHighlightYellow(true)
@@ -330,44 +359,38 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }, [])
 
-  const confirmGreen = useCallback(() => {
+  const confirm = useCallback(highlightColor => {
     setHighlightYellow(false)
-    setHighlightGreen(true)
+    addTemporaryTransaction({
+      ...transaction,
+      highlightColor
+    })
     setIsDisabled(true)
     hideTransaction(false)
     setTimeout(() => {
-      setHighlightGreen(false)
-      hideTransaction(true)
+      hideTransaction(transaction)
     }, 5000)
-  }, [hideTransaction])
-
-  const confirmRed = useCallback(() => {    
-    setHighlightYellow(false)
-    setHighlightRed(true)
-    setIsDisabled(true)
-    hideTransaction(false)
-    setTimeout(() => {
-      setHighlightRed(false)
-      hideTransaction(true)
-    }, 5000)
-  }, [hideTransaction])
+  }, [hideTransaction, addTemporaryTransaction, transaction])
 
   useEffect(() => {
-    setHasRendered(true)
-    if (!stale && !hasRendered) {  
-      if (!pendingCompletion && actioned && shouldHighlight) {
-        if (shouldHighlight === 'green') {
-          confirmGreen()
-        } else if (shouldHighlight === 'red') {
-          confirmRed()
-        }
-      } else if (!pendingCompletion && actioned && !shouldHighlight) {
+    const highlightColor = temporary
+      ? isDeclined ? 'red' : 'green'
+      : null
+
+    if (!stale) {
+      if (!pendingCompletion && actioned && highlightColor) {
+        confirm(highlightColor)
+      } else if (pendingCompletion && actioned) {
+        signalPendingCompletionEvent()
+      } else if (!pendingCompletion && actioned && !highlightColor) {
         hideTransaction(true)
       } else if (pendingCompletion && actioned) {
-        signalInProcessEvent()
+        signalPendingCompletionEvent()
       }
     }
-  }, [stale, actioned, pendingCompletion, shouldHighlight, confirmGreen, confirmRed, signalPendingCompletionEvent, hideTransaction, setHasRendered, hasRendered])
+  }, [stale, actioned, pendingCompletion, highlightColor, confirm, signalPendingCompletionEvent, hideTransaction, isDeclined, temporary])
+
+  if (agent.id === null) return null
 
   const setIsLoadingAndPaused = state => {
     setIsLoading(state)
@@ -377,8 +400,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused,
-    onConfirm: () => setHasRendered(false)
+    setIsLoading: setIsLoadingAndPaused
   }
 
   const showAcceptModal = () =>
@@ -428,8 +450,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
     {isLoading && !pendingCompletion && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    {pendingCompletion && !highlightGreen && <ToolTip toolTipText='Timed out waiting for transaction confirmation from counterparty, will retry later'>
-      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing'}</h4>
+    {pendingCompletion && <ToolTip toolTipText='Timed out waiting for transaction confirmation from counterparty, will retry later'>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'acceptance pending'}</h4>
     </ToolTip>}
 
     {stale && <ToolTip toolTipText='Validation failed. Transaction is stale'>

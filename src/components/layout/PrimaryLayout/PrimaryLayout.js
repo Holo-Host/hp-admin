@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
@@ -36,7 +36,6 @@ export function PrimaryLayout ({
   }
 
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
-  const isFreshHpAdminRender = useRef(true)
 
   useInterval(() => {
     if (window.location.pathname !== '/' || window.location.pathname !== '/admin/login') {
@@ -63,7 +62,7 @@ export function PrimaryLayout ({
 
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       // if inside happ, check for connection to holochain
-      if (!isFreshHpAdminRender.current && isConnected.hpos && !isConnected.holochain) {
+      if (isConnected.hpos && !isConnected.holochain) {
         // reroute to login on conductor connection error as it signals emerging hpos connetion failure
         if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
           push('/admin/login')
@@ -71,13 +70,6 @@ export function PrimaryLayout ({
       } else {
         newMessage('', 0)
         setUser()
-      }
-
-      if (isFreshHpAdminRender.current) {
-        // set timeout to allow time to let ws connection check to complete
-        setTimeout(() => {
-          isFreshHpAdminRender.current = false
-        }, 5000)
       }
     } else {
       // if on login page and connected to hpos, clear message and set user

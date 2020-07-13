@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback, useRef } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -13,7 +13,7 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import useActionableDisplayContext from 'holofuel/contexts/useActionableDisplayContext'
+import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
@@ -40,17 +40,16 @@ function PrimaryLayout ({
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
-  const { hiddenTransactionsById } = useActionableDisplayContext()
+  const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
   const [inboxCount, setInboxCount] = useState()
   const shouldShowTransaction = useCallback(transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionsById.find(tx => tx.id === id)) || !actioned)
-  }, [hiddenTransactionsById])
+    ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
+  }, [hiddenTransactionIds])
 
   const { push } = useHistory()
-  const isFreshRender = useRef(true)
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -63,7 +62,7 @@ function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    if (!isFreshRender.current && !isConnected) {
+    if (!isConnected) {
       newMessage('Connecting to your Holochain Conductor...', 0)
       stopPollingActionableTransactions()
       stopPollingCompletedTransactions()
@@ -83,12 +82,9 @@ function PrimaryLayout ({
         refetchHolofuelUser()
       }
     }
-    if (isFreshRender.current) {
-      isFreshRender.current = false
-    }
     
     // to sync the notifcation badge actionable tx count with hidden values
-    if (hiddenTransactionsById) {
+    if (hiddenTransactionIds) {
       setInboxCount(actionableTransactions.filter(shouldShowTransaction).length)
     } else {
       setInboxCount(actionableTransactions.filter(shouldShowTransactionInInbox).length)
@@ -104,7 +100,7 @@ function PrimaryLayout ({
     shouldRefetchUser,
     refetchHolofuelUser,
     actionableTransactions,
-    hiddenTransactionsById,
+    hiddenTransactionIds,
     shouldShowTransaction,
     setInboxCount
   ])
