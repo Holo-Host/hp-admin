@@ -34,7 +34,7 @@ function PrimaryLayout ({
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL/3), onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL / 3), onError, notifyOnNetworkStatusChange: true, ssr: false })
   const isFreshHpAdminRender = useRef(true)
 
   useInterval(() => {

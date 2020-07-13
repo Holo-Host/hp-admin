@@ -157,18 +157,18 @@ async function getListPending (params) {
     counter = 0
     promises.forEach(p => {
       if (!isEmpty(p[1])) {
-            findEvent(p[0],p[1])
+        findEvent(p[0], p[1])
       }
     })
   }
-  return {requests, promises, declined }
+  return { requests, promises, declined }
 }
 
 const findEvent = async (tx, invoicedOffers) => {
   const invoice = invoicedOffers.find(io => io.Invoice)
   if (invoice) {
-      userNotification = ''
-      await HoloFuelDnaInterface.offers.accept(tx.event[0])
+    userNotification = ''
+    await HoloFuelDnaInterface.offers.accept(tx.event[0])
   }
 }
 
