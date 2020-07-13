@@ -41,15 +41,15 @@ function PrimaryLayout ({
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
-
-  const [inboxCount, setInboxCount] = useState()
+  const { push } = useHistory()
+  
   const shouldShowTransaction = useCallback(transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
     ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
   }, [hiddenTransactionIds])
 
-  const { push } = useHistory()
+  const inboxCount = actionableTransactions.filter(shouldShowTransaction).length
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -61,11 +61,29 @@ function PrimaryLayout ({
     setIsConnected(wsConnection)
   }, 5000)
 
+  const usePollingTransactionQueries = useCallback(() => {
+    return {
+      startPolling: (pollingInterval) => {
+        startPollingActionableTransactions(pollingInterval)
+        startPollingCompletedTransactions(pollingInterval)
+      },
+      stopPolling: () => {
+        stopPollingActionableTransactions()
+        stopPollingCompletedTransactions()
+      }
+    }
+  }, [startPollingActionableTransactions,
+    startPollingCompletedTransactions,
+    stopPollingActionableTransactions,
+    stopPollingCompletedTransactions
+  ])
+
+  const { startPolling, stopPolling } = usePollingTransactionQueries()
+
   useEffect(() => {
     if (!isConnected) {
       newMessage('Connecting to your Holochain Conductor...', 0)
-      stopPollingActionableTransactions()
-      stopPollingCompletedTransactions()
+      stopPolling()
       setShouldRefetchUser(true)
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
@@ -76,33 +94,22 @@ function PrimaryLayout ({
       push(defaultPath)
     } else {
       newMessage('', 0)
-      startPollingActionableTransactions(60000)
-      startPollingCompletedTransactions(60000)
+      startPolling(60000)
       if (shouldRefetchUser) {
         refetchHolofuelUser()
       }
-    }
-    
-    // to sync the notifcation badge actionable tx count with hidden values
-    if (hiddenTransactionIds) {
-      setInboxCount(actionableTransactions.filter(shouldShowTransaction).length)
-    } else {
-      setInboxCount(actionableTransactions.filter(shouldShowTransactionInInbox).length)
     }
   }, [isConnected,
     setIsConnected,
     push,
     newMessage,
-    stopPollingActionableTransactions,
-    startPollingActionableTransactions,
-    stopPollingCompletedTransactions,
-    startPollingCompletedTransactions,
+    startPolling,
+    stopPolling,
     shouldRefetchUser,
     refetchHolofuelUser,
     actionableTransactions,
     hiddenTransactionIds,
-    shouldShowTransaction,
-    setInboxCount
+    shouldShowTransaction
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)

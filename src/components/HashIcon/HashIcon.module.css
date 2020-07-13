@@ -24,15 +24,3 @@
   max-height: 85px;
   margin: 10px;
 }
-
-.big-icon {
-  composes: default-identicon;
-  width: 48px;
-  height: 48px;
-}
-
-.small-icon {
-  composes: default-identicon;
-  width: 32px;
-  height: 32px;
-}
