@@ -43,7 +43,7 @@ function PrimaryLayout ({
   const { hiddenTransactionsById } = useActionableDisplayContext()
 
   const [inboxCount, setInboxCount] = useState()
-  const actionableDisplayFilter = useCallback(transaction => {
+  const shouldShowTransaction = useCallback(transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
     ((actioned && !hiddenTransactionsById.find(tx => tx.id === id)) || !actioned)
@@ -89,7 +89,7 @@ function PrimaryLayout ({
     
     // to sync the notifcation badge actionable tx count with hidden values
     if (hiddenTransactionsById) {
-      setInboxCount(actionableTransactions.filter(actionableDisplayFilter).length)
+      setInboxCount(actionableTransactions.filter(shouldShowTransaction).length)
     } else {
       setInboxCount(actionableTransactions.filter(shouldShowTransactionInInbox).length)
     }
@@ -105,7 +105,7 @@ function PrimaryLayout ({
     refetchHolofuelUser,
     actionableTransactions,
     hiddenTransactionsById,
-    actionableDisplayFilter,
+    shouldShowTransaction,
     setInboxCount
   ])
 

@@ -49,7 +49,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false, pendingCompletion = false }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -63,7 +63,7 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     notes: notes || event.Promise.tx.notes,
     fees,
     isPayingARequest,
-    inProcess,
+    pendingCompletion,
     actioned: false
   }
 }
@@ -152,8 +152,8 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
   const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
-  const inProcess = isEmpty(invoicedOffers) ? false : findEvent()
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, inProcess })
+  const pendingCompletion = isEmpty(invoicedOffers) ? false : findEvent()
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, pendingCompletion })
 }
 
 function presentTransaction (transaction) {
@@ -353,18 +353,18 @@ const HoloFuelDnaInterface = {
       const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId })
       if (!declinedProof) throw new Error(`Decline Error: ${declinedProof}.`)
 
-      const presentableTransaction = {
+      const presentedTransaction = {
         ...transaction,
         id: transactionId,
         actioned: true,
         shouldHighlight: 'red'
       }
 
-      cachedRecentlyActionedTransactions.push(presentableTransaction)
+      cachedRecentlyActionedTransactions.push(presentedTransaction)
       setTimeout(() => {
-        removeTransactionFromCache(presentableTransaction.id)
+        removeTransactionFromCache(presentedTransaction.id)
       }, 5000)
-      return presentableTransaction
+      return presentedTransaction
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
     cancel: async (transactionId) => {
@@ -432,7 +432,7 @@ const HoloFuelDnaInterface = {
     create: async (counterpartyId, amount, notes, requestId) => {
       const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
 
-      const presentableTransaction = {
+      const presentedTransaction = {
         id: requestId || origin, // NB: If requestId isn't defined, then offer uses origin as the ID (ie. Offer is the initiating transaction).
         amount,
         counterparty: {
@@ -448,12 +448,12 @@ const HoloFuelDnaInterface = {
       }
 
       if (requestId) {
-        cachedRecentlyActionedTransactions.push(presentableTransaction)  
+        cachedRecentlyActionedTransactions.push(presentedTransaction)  
         setTimeout(() => {
-          removeTransactionFromCache(presentableTransaction.id)
+          removeTransactionFromCache(presentedTransaction.id)
         }, 5000)
     }
-      return presentableTransaction
+      return presentedTransaction
     },
 
     accept: async (transactionId) => {
@@ -471,7 +471,7 @@ const HoloFuelDnaInterface = {
               status: STATUS.pending,
               type: TYPE.offer,
               actioned: false,
-              inProcess: false,
+              pendingCompletion: false,
               stale: true
             }
           } else {
@@ -484,7 +484,7 @@ const HoloFuelDnaInterface = {
                   status: STATUS.pending,
                   type: TYPE.offer,
                   actioned: true,
-                  inProcess: true,
+                  pendingCompletion: true,
                   stale: false
                 }
               }
@@ -497,23 +497,23 @@ const HoloFuelDnaInterface = {
         }
       }
 
-      const presentableTransaction = {
+      const presentedTransaction = {
         ...transaction,
         id: transactionId, // should always match `Object.entries(result)[0][0]`
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.completed,
         type: TYPE.offer,
         actioned: true,
-        inProcess: false,
+        pendingCompletion: false,
         shouldHighlight: 'green',
         stale: false
       }
 
-      cachedRecentlyActionedTransactions.push(presentableTransaction)
+      cachedRecentlyActionedTransactions.push(presentedTransaction)
       setTimeout(() => {
-        removeTransactionFromCache(presentableTransaction.id)
+        removeTransactionFromCache(presentedTransaction.id)
       }, 5000)
-      return presentableTransaction
+      return presentedTransaction
     }
   }
 }

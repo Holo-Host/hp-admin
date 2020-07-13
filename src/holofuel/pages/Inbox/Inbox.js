@@ -83,13 +83,13 @@ function useUpdatedTransactionLists () {
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
 
-  const actionableDisplayFilter = transaction => {
+  const shouldShowTransaction = transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
     ((actioned && !hiddenTransactionsById.find(tx => tx.id === id)) || !actioned)
   }
 
-  const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableDisplayFilter)
+  const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransaction)
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
@@ -127,11 +127,11 @@ export default function Inbox ({ history: { push } }) {
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
 
-  const renderUserMessage = message => {
-    if (message !== userMessage) {
-      setUserMessage(message)
-    }
-  }
+  // const renderUserMessage = message => {
+  //   if (message !== userMessage) {
+  //     setUserMessage(message)
+  //   }
+  // }
 
   if (!isEmpty(userMessage)) {
     newMessage(userMessage, 5000)
@@ -226,7 +226,7 @@ export default function Inbox ({ history: { push } }) {
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        renderUserMessage={renderUserMessage}
+        setUserMessage={setUserMessage}
         refetchActionable={refetchActionable} />)}
     </div>}
 
@@ -236,7 +236,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, renderUserMessage, refetchActionable }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage, refetchActionable }) {
   const { hiddenTransactionsById, setHiddenTransactionsById } = useActionableDisplayContext()
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
@@ -264,16 +264,16 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         setAreActionsPaused={setAreActionsPaused}
         role='list'
         key={transaction.id}
-        renderUserMessage={renderUserMessage} />)}
+        setUserMessage={setUserMessage} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, shouldHighlight, stale } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, pendingCompletion, actioned, shouldHighlight, stale } = transaction
 
   if (stale) {
-    renderUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
+    setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
   }
 
   const isDrawerOpen = id === openDrawerId
@@ -322,7 +322,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [isLoading, setIsLoading] = useState(false)
   const [hasRendered, setHasRendered] = useState(false)
 
-  const signalInProcessEvent = useCallback(() => {
+  const signalPendingCompletionEvent = useCallback(() => {
     setHighlightYellow(true)
     setIsDisabled(true)
     setTimeout(() => {
@@ -355,19 +355,19 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   useEffect(() => {
     setHasRendered(true)
     if (!stale && !hasRendered) {  
-      if (!inProcess && actioned && shouldHighlight) {
+      if (!pendingCompletion && actioned && shouldHighlight) {
         if (shouldHighlight === 'green') {
           confirmGreen()
         } else if (shouldHighlight === 'red') {
           confirmRed()
         }
-      } else if (!inProcess && actioned && !shouldHighlight) {
+      } else if (!pendingCompletion && actioned && !shouldHighlight) {
         hideTransaction(true)
-      } else if (inProcess && actioned) {
+      } else if (pendingCompletion && actioned) {
         signalInProcessEvent()
       }
     }
-  }, [stale, actioned, inProcess, shouldHighlight, confirmGreen, confirmRed, signalInProcessEvent, hideTransaction, setHasRendered, hasRendered])
+  }, [stale, actioned, pendingCompletion, shouldHighlight, confirmGreen, confirmRed, signalPendingCompletionEvent, hideTransaction, setHasRendered, hasRendered])
 
   const setIsLoadingAndPaused = state => {
     setIsLoading(state)
@@ -395,7 +395,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   
   if (agent.id === null) return null
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, {  'highlightRed': highlightRed || stale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, {  'highlightRed': highlightRed || stale }, { 'highlightYellow': highlightYellow || isPayment }, { pendingCompletion })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -426,24 +426,24 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       {/* {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>} */}
     </div>
 
-    {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
+    {isLoading && !pendingCompletion && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    {inProcess && !highlightGreen && <ToolTip toolTipText='Timed out waiting for transaction confirmation from counterparty, will retry later'>
-      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'acceptance pending'}</h4>
+    {pendingCompletion && !highlightGreen && <ToolTip toolTipText='Timed out waiting for transaction confirmation from counterparty, will retry later'>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing'}</h4>
     </ToolTip>}
 
     {stale && <ToolTip toolTipText='Validation failed. Transaction is stale'>
       <h4 styleName='alert-msg'>stale transaction</h4>
     </ToolTip>}
 
-    {isActionable && !isLoading && !isPayment && !isDisabled && !inProcess && <>
+    {isActionable && !isLoading && !isPayment && !isDisabled && !pendingCompletion && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
         closeDrawer={() => setIsDrawerOpen(false)}
         areActionsPaused={areActionsPaused}
       />
-      {!isPayment && !isCanceled && !inProcess && <ActionOptions
+      {!isPayment && !isCanceled && !pendingCompletion && <ActionOptions
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}

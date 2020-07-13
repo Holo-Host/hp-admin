@@ -7,7 +7,7 @@ mutation HolofuelAcceptOfferMutation ($transactionId: ID) {
     status
     type
     timestamp
-    inProcess
+    pendingCompletion
     actioned
     shouldHighlight
     stale

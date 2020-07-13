@@ -70,7 +70,7 @@ type Transaction {
   happName: String
   canceledBy: HolofuelUser
   isPayingARequest: Boolean
-  inProcess: Boolean
+  pendingCompletion: Boolean
   actioned: Boolean
   shouldHighlight: String
   stale: Boolean

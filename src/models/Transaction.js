@@ -19,10 +19,10 @@ export const DIRECTION = {
 // ...offers that are paying a request and not in process (those are handled by AcceptRequestedOffers)
 // ...and actioned transactions that have been hidden explicitly
 export function shouldShowTransactionInInbox (transaction) {
-  const { status, isPayingARequest, inProcess } = transaction
+  const { status, isPayingARequest, pendingCompletion } = transaction
   return status !== STATUS.canceled &&
     status !== STATUS.declined &&
-    !(isPayingARequest && !inProcess) &&
+    !(isPayingARequest && !pendingCompletion) &&
     !(isPayingARequest && !status === STATUS.pending) // &&
     // ((actioned && !shouldNotShowtransactionsById.find(tx => tx.id === id)) || !actioned)
 }

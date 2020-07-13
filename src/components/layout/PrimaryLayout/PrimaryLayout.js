@@ -45,8 +45,6 @@ export function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    console.log('HPOS connection : ', isConnected)
-
     if (!isConnected.hpos) {
       // reroute to login on network/hpos connection error
       if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
