@@ -46,7 +46,7 @@ function PrimaryLayout ({
   const shouldShowTransaction = useCallback(transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
+    ((actioned && !hiddenTransactionIds.find(tx => tx && tx.id === id)) || !actioned)
   }, [hiddenTransactionIds])
 
   const inboxCount = actionableTransactions.filter(shouldShowTransaction).length

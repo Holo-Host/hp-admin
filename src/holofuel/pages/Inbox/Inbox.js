@@ -78,7 +78,7 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
-  const { hiddenTransactionIds } = useHiddenTransactionsContext()
+  const { hiddenTransactionIds } = useHiddenTransactionsContext([])
 
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
@@ -86,7 +86,7 @@ function useUpdatedTransactionLists () {
   const shouldShowTransaction = transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
+    ((actioned && !hiddenTransactionIds.find(tx => tx && tx.id === id)) || !actioned)
   }
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransaction)
