@@ -13,7 +13,7 @@ import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
 import { useInterval, POLLING_INTERVAL } from 'utils'
 import { wsConnection } from 'holochainClient'
-import { ROOT, HP_ADMIN_LOGIN } from 'utils/urls'
+import { HP_ADMIN_LOGIN } from 'utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -34,7 +34,7 @@ function PrimaryLayout ({
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL/3), onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL / 3), onError, notifyOnNetworkStatusChange: true, ssr: false })
   const isFreshHpAdminRender = useRef(true)
 
   useInterval(() => {

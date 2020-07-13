@@ -608,7 +608,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     contentLabel={contentLabel}
     isOpen={shouldDisplay}
     handleClose={() => hideModal()}
-    styleName={cx( 'modal', { 'modal-desktop' : isWide } )}
+    styleName={cx('modal', { 'modal-desktop': isWide })}
   >
     <div styleName='modal-message'>{message}</div>
     {counterpartyMessage}
