@@ -13,7 +13,7 @@ import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
 import { useInterval, POLLING_INTERVAL } from 'utils'
 import { wsConnection } from 'holochainClient'
-import { ROOT, HP_ADMIN_LOGIN } from 'utils/urls'
+import { HP_ADMIN_LOGIN } from 'utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -44,7 +44,7 @@ function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    setIsInsideApp(window.location.pathname !== ROOT && window.location.pathname !== HP_ADMIN_LOGIN)
+    setIsInsideApp(window.location.pathname !== '/' && window.location.pathname !== HP_ADMIN_LOGIN)
 
     if (!isConnected.hpos) {
       // reroute to login on network/hpos connection error

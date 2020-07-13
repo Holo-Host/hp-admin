@@ -319,6 +319,11 @@
   align-items: center;
 }
 
+.modal-desktop {
+  margin-left: 282px;
+  margin-right: 2px;
+}
+
 .modal-message {
   font-family: "Circular";
   font-size: 18px;
