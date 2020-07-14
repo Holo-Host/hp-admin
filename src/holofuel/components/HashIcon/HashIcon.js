@@ -1,6 +1,5 @@
 import { string, number } from 'prop-types'
 import React from 'react'
-import cx from 'classnames'
 import { Network as Identicon } from 'react-identicon-variety-pack'
 import './HashIcon.module.css'
 

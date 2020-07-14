@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback, useRef } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
