@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -121,15 +121,11 @@ export default function Inbox ({ history: { push } }) {
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
 
-  const renderUserMessage = message => {
-    if (message !== userMessage) {
-      setUserMessage(message)
+  useEffect(() => {
+    if (!isEmpty(userMessage)) {
+      newMessage(userMessage, 5000)
     }
-  }
-
-  if (!isEmpty(userMessage)) {
-    newMessage(userMessage, 5000)
-  }
+  }, [userMessage, newMessage])
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
@@ -221,7 +217,7 @@ export default function Inbox ({ history: { push } }) {
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        renderUserMessage={renderUserMessage} />)}
+        setUserMessage={setUserMessage} />)}
     </div>}
 
     <ConfirmationModal
@@ -230,7 +226,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, renderUserMessage }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
   const manageHideTransactionWithId = (id, shouldHide) => {
@@ -260,16 +256,16 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        renderUserMessage={renderUserMessage} />)}
+        setUserMessage={setUserMessage} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
   const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, stale } = transaction
 
   if (stale) {
-    renderUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
+    setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
   }
 
   const isDrawerOpen = id === openDrawerId
