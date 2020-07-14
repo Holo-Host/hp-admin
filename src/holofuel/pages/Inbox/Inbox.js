@@ -130,9 +130,12 @@ export default function Inbox ({ history: { push } }) {
   const { hiddenTransactionIds, setHiddenTransactionIds } = useHiddenTransactionsContext()
 
   const hideTransaction = transaction => {
-    setHiddenTransactionIds(hiddenTransactionIds => hiddenTransactionIds.concat([transaction.id]))
-    setTemporaryActionableTransactions(temporaryActionableTransactions => temporaryActionableTransactions.filter(trx => trx.id !== transaction.id))
-    setTemporaryRecentTransactions(temporaryRecentTransactions => temporaryRecentTransactions.filter(trx => trx.id !== transaction.id))
+    console.log('HIDE THIS >>> transaction : ', transaction)
+    if (!hiddenTransactionIds.includes(transaction.id)) {
+      setHiddenTransactionIds(hiddenTransactionIds => hiddenTransactionIds.concat([transaction.id]))
+      setTemporaryActionableTransactions(temporaryActionableTransactions => temporaryActionableTransactions.filter(trx => trx.id !== transaction.id))
+      setTemporaryRecentTransactions(temporaryRecentTransactions => temporaryRecentTransactions.filter(trx => trx.id !== transaction.id))
+    }
   }
 
   const getVisibleTransactions = (transactions, temporaryTransactions) => {
@@ -283,7 +286,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
         userId={userId}
-        hideTransaction={hideTransaction}
+        hideTransaction={() => hideTransaction(transaction)}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
@@ -297,9 +300,11 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 }
 
 export function TransactionRow ({
-  transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage, addTemporaryTransaction, highlightColor
+  transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage, addTemporaryTransaction
 }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, pendingCompletion, actioned, stale, temporary } = transaction
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, pendingCompletion, actioned, stale, temporary, highlightColor} = transaction
+
+  console.log('ACTIONED ????? , ', actioned)
 
   if (stale) {
     setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
@@ -359,36 +364,34 @@ export function TransactionRow ({
     }, 5000)
   }, [])
 
-  const confirm = useCallback(highlightColor => {
+  const onConfirm = useCallback(() => {
+    console.log('==================> In confirm <==========================')
+    const highlightColor = isDeclined ? 'red' : 'green'
     setHighlightYellow(false)
     addTemporaryTransaction({
       ...transaction,
       highlightColor
     })
     setIsDisabled(true)
-    hideTransaction(false)
     setTimeout(() => {
       hideTransaction(transaction)
     }, 5000)
-  }, [hideTransaction, addTemporaryTransaction, transaction])
+  }, [hideTransaction, addTemporaryTransaction, transaction, isDeclined])
 
   useEffect(() => {
-    const highlightColor = temporary
-      ? isDeclined ? 'red' : 'green'
-      : null
+    console.log('============= temporary : ', temporary)
+    console.log('============= isDeclined : ', isDeclined)
 
     if (!stale) {
-      if (!pendingCompletion && actioned && highlightColor) {
-        confirm(highlightColor)
-      } else if (pendingCompletion && actioned) {
-        signalPendingCompletionEvent()
-      } else if (!pendingCompletion && actioned && !highlightColor) {
-        hideTransaction(true)
-      } else if (pendingCompletion && actioned) {
+      if (actioned && !pendingCompletion && !temporary) {
+        console.log('>>> HIDING TRANSACTION : ')
+        hideTransaction()
+      } else if (actioned && pendingCompletion && !temporary) {
+        console.log('>>> GOING TO DISPLAY AS PENDING TRANSACTION : ')
         signalPendingCompletionEvent()
       }
     }
-  }, [stale, actioned, pendingCompletion, highlightColor, confirm, signalPendingCompletionEvent, hideTransaction, isDeclined, temporary])
+  }, [stale, actioned, pendingCompletion, signalPendingCompletionEvent, hideTransaction, isDeclined, temporary])
 
   if (agent.id === null) return null
 
@@ -400,7 +403,8 @@ export function TransactionRow ({
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused
+    setIsLoading: setIsLoadingAndPaused,
+    onConfirm
   }
 
   const showAcceptModal = () =>
@@ -451,7 +455,7 @@ export function TransactionRow ({
     {isLoading && !pendingCompletion && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
     {pendingCompletion && <ToolTip toolTipText='Timed out waiting for transaction confirmation from counterparty, will retry later'>
-      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'acceptance pending'}</h4>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing'}</h4>
     </ToolTip>}
 
     {stale && <ToolTip toolTipText='Validation failed. Transaction is stale'>
@@ -627,7 +631,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
         } else {
           newMessage(flashMessage, 5000)
         }
-        onConfirm(action)
+        onConfirm()
         setIsLoading(false)
       })
       .catch(() => {
