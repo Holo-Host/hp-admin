@@ -45,7 +45,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     notes: notes || event.Request.notes,
     fees,
     isPayingARequest,
-    actioned: false
+    isActioned: false
   }
 }
 
@@ -64,7 +64,7 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     fees,
     isPayingARequest,
     inProcess,
-    actioned: false
+    isActioned: false
   }
 }
 
@@ -369,7 +369,7 @@ const HoloFuelDnaInterface = {
       const presentableTransaction = {
         ...transaction,
         id: transactionId,
-        actioned: true
+        isActioned: true
       }
 
       cachedRecentlyActionedTransactions.push(presentableTransaction)
@@ -454,7 +454,7 @@ const HoloFuelDnaInterface = {
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,
         type: requestId ? TYPE.request : TYPE.offer, // NB: If requestId isn't defined, then base transaction is an offer, otherwise, it's a request user is paying
-        actioned: !!requestId, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
+        isActioned: !!requestId, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
         timestamp: currentDataTimeIso
       }
 
@@ -481,9 +481,9 @@ const HoloFuelDnaInterface = {
               direction: DIRECTION.incoming, // this indicates the hf recipient
               status: STATUS.pending,
               type: TYPE.offer,
-              actioned: false,
+              isActioned: false,
               inProcess: false,
-              stale: true
+              isStale: true
             }
           } else {
             try {
@@ -494,9 +494,9 @@ const HoloFuelDnaInterface = {
                   direction: DIRECTION.incoming, // this indicates the hf recipient
                   status: STATUS.pending,
                   type: TYPE.offer,
-                  actioned: true,
+                  isActioned: true,
                   inProcess: true,
-                  stale: false
+                  isStale: false
                 }
               }
             } catch (e) {
@@ -514,9 +514,9 @@ const HoloFuelDnaInterface = {
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.completed,
         type: TYPE.offer,
-        actioned: true,
+        isActioned: true,
         inProcess: false,
-        stale: false
+        isStale: false
       }
 
       cachedRecentlyActionedTransactions.push(presentableTransaction)

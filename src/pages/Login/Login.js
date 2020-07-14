@@ -16,16 +16,16 @@ import { getHpAdminKeypair, eraseHpAdminKeypair } from 'holochainClient'
 export default function Login ({ history: { push } }) {
   const [checkAuth] = useMutation(HposCheckAuthMutation)
   const { register, handleSubmit, errors } = useForm()
-  const { isConnected } = useConnectionContext()
+  const { connectionStatus } = useConnectionContext()
   const { setIsAuthed } = useAuthContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
 
   useEffect(() => {
-    if (!isConnected.hpos) {
+    if (!connectionStatus.hpos) {
       newMessage('Connecting to your Holoport...', 0)
     }
-  }, [isConnected, newMessage])
+  }, [connectionStatus, newMessage])
 
   const onSubmit = async ({ email, password }) => {
     eraseHpAdminKeypair()
@@ -43,9 +43,9 @@ export default function Login ({ history: { push } }) {
         hostName: hposSettings.hostName || ''
       }
       setCurrentUser(hostCurrentUser)
-    } else if (isConnected.hpos) {
+    } else if (connectionStatus.hpos) {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
-    } else if (!isConnected.hpos) {
+    } else if (!connectionStatus.hpos) {
       newMessage('Your Holoport is currently unreachable. You cannot log in at this time.', 0)
     }
   }
@@ -66,7 +66,7 @@ export default function Login ({ history: { push } }) {
             id='email'
             styleName='input'
             ref={register({ required: true })}
-            disabled={!isConnected.hpos}
+            disabled={!connectionStatus.hpos}
           />
           {errors.email && <small styleName='field-error'>
             You need to provide a valid email address.
@@ -79,14 +79,14 @@ export default function Login ({ history: { push } }) {
             id='password'
             styleName='input'
             ref={register({ required: true, minLength: 6 })}
-            disabled={!isConnected.hpos}
+            disabled={!connectionStatus.hpos}
           />
           {errors.password && <small styleName='field-error'>
             {errors.password.type === 'required' && 'Type in your password, please.'}
             {errors.password.type === 'minLength' && 'Password need to be at least 6 characters long.'}
           </small>}
         </div>
-        <Button type='submit' variant='green' wide styleName='login-button' disabled={!isConnected.hpos}>Login</Button>
+        <Button type='submit' variant='green' wide styleName='login-button' disabled={!connectionStatus.hpos}>Login</Button>
       </form>
       <div styleName='reminder-text-block'>*Remember, Holo doesn’t store your password so we can’t recover it for you. Please save your password securely!</div>
       <div styleName='reminder-text-block'>
