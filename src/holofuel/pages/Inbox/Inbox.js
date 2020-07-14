@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -9,6 +10,8 @@ import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTrans
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+import useConnectionContext from 'holofuel/contexts/useConnectionContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
@@ -22,7 +25,6 @@ import ToolTip from 'holofuel/components/ToolTip'
 import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
-import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
@@ -79,18 +81,19 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
+  const { isConnected } = useConnectionContext()
+
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
-
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
 
-  const actionableLoadingFirstTime = useLoadingFirstTime(allActionableLoading)
-  const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
+  const actionableLoadingFirstTime = useLoadingFirstTime(isConnected && allActionableLoading)
+  const recentLoadingFirstTime = useLoadingFirstTime(isConnected && allRecentLoading)
 
   return {
     actionableTransactions: updatedDisplayableActionable,
@@ -112,8 +115,16 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
+  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { currentUser } = useCurrentUserContext()
+  const { currentUser, setCurrentUser } = useCurrentUserContext()
+  const { isConnected } = useConnectionContext()
+
+  useEffect(() => {
+    if (!isEmpty(holofuelUser)) {
+      setCurrentUser(holofuelUser)
+    }
+  }, [holofuelUser, setCurrentUser])
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
@@ -153,7 +164,7 @@ export default function Inbox ({ history: { push } }) {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
-  const displayBalance = (isNil(holofuelBalance) && ledgerLoading) ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+  const displayBalance = (!holofuelBalance && ledgerLoading) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
@@ -195,10 +206,11 @@ export default function Inbox ({ history: { push } }) {
     {isDisplayTransactionsEmpty && !isDisplayLoading && <>
       <NullStateMessage
         styleName='null-state-message'
-        message={inboxView === VIEW.actionable
-          ? 'You have no pending offers or requests'
-          : 'You have no recent activity'}
-      >
+        message={!isConnected
+          ? 'Your transactions cannot be displayed at this time'
+          : inboxView === VIEW.actionableLoading
+            ? 'You have no pending offers or requests'
+            : 'You have no recent activity'}>
         <div onClick={() => push(OFFER_REQUEST_PATH)}>
           <PlusInDiscIcon styleName='null-add-icon' backgroundColor={caribbeanGreen} />
         </div>
@@ -273,6 +285,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
   const agent = canceledBy || counterparty
 
+  const isPayment = (isPayingARequest && status === STATUS.pending)
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request
   const isOutgoing = direction === DIRECTION.outgoing
@@ -379,7 +392,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { highlightYellow }, { inProcess })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -413,17 +426,17 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
     {inProcess && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
-      <h4 styleName='alert-msg'>Processing...</h4>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
     </ToolTip>}
 
-    {isActionable && !isLoading && !isDisabled && <>
+    {isActionable && !isLoading && !isPayment && !isDisabled && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
         closeDrawer={() => setIsDrawerOpen(false)}
         areActionsPaused={areActionsPaused}
       />
-      {!isCanceled && !inProcess && <ActionOptions
+      {!isPayment && !isCanceled && !inProcess && <ActionOptions
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}

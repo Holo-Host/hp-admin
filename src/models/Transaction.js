@@ -19,5 +19,6 @@ export const DIRECTION = {
 export function shouldShowTransactionInInbox (transaction) {
   return transaction.status !== STATUS.canceled &&
     transaction.status !== STATUS.declined &&
-    !transaction.isPayingARequest
+    !(transaction.isPayingARequest && !transaction.inProcess) &&
+    !(transaction.isPayingARequest && !transaction.status === STATUS.pending)
 }

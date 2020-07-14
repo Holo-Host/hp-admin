@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import { get } from 'lodash/fp'
@@ -21,6 +21,12 @@ export default function Login ({ history: { push } }) {
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
 
+  useEffect(() => {
+    if (!isConnected.hpos) {
+      newMessage('Connecting to your Holoport...', 0)
+    }
+  }, [isConnected, newMessage])
+
   const onSubmit = async ({ email, password }) => {
     eraseHpAdminKeypair()
     // we call this to SET the singleton value of HpAdminKeypair
@@ -40,7 +46,7 @@ export default function Login ({ history: { push } }) {
     } else if (isConnected.hpos) {
       newMessage('Incorrect email or password. Please check and try again.', 5000)
     } else if (!isConnected.hpos) {
-      newMessage('Your Holoport is currently unreachable.', 0)
+      newMessage('Your Holoport is currently unreachable. You cannot log in at this time.', 0)
     }
   }
 

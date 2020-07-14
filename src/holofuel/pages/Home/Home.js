@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -13,7 +14,6 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HashAvatar from 'components/HashAvatar'
-import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
@@ -48,7 +48,7 @@ export default function Home () {
 
   const isLoadingFirstPendingTransactions = useLoadingFirstTime(isConnected && loadingTransactions)
 
-  return <PrimaryLayout headerProps={{ title: 'Holofuel Home' }}>
+  return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>
       <div styleName='backdrop' />
       <div styleName='avatar'>

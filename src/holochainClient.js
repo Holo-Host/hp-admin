@@ -156,7 +156,7 @@ async function initHolochainClient () {
 }
 async function initAndGetHolochainClient () {
   let counter = 0
-  // This code is to let avoid multiple ws connections.
+  // This code is to avoid multiple ws connections.
   // isInitiatingHcConnection is changed in a different call of this function running in parallel
   while (isInitiatingHcConnection) {
     counter++

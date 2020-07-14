@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react' // , useState
 import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
@@ -18,16 +18,26 @@ export const mockEarnings = 4984
 
 export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
 
   // placeholder as we're not currently calling hha
   const noInstalledHapps = 0
-
-  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
 
   const isEarningsZero = Number(earnings) === 0
   const isBalanceZero = Number(balance) === 0
 
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
+  // const [urlOrigin, setUrlOrigin] = useState()
+  const location = useLocation()
+
+  useEffect(() => {
+    const origin = window.location.origin.trim()
+    const hasTrailingSlash = origin.charAt(origin.length - 1) === '/'
+    if (hasTrailingSlash) {
+      origin.slice(0, origin.length - 1)
+    }
+    // setUrlOrigin(window.location.origin)
+  }, [location]) // setUrlOrigin
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     <div styleName='avatar'>
@@ -59,7 +69,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    <Card title='HoloFuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
+    <Card title='Test Fuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Current Balance
@@ -85,9 +95,9 @@ function Card ({ title, subtitle, linkTo, children }) {
 
 // a react-router link that can also take an external url
 function MixedLink ({ to, children, ...props }) {
-  const isExternal = /^https?:\/\//.test(to)
+  const isExternal = /^https?:\/\//.test(to) || /^http?:\/\//.test(to)
   if (isExternal) {
-    return <a href={to} {...props}>
+    return <a href={to} target='_blank' rel='noopener noreferrer' {...props}>
       {children}
     </a>
   } else {

@@ -18,7 +18,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { shouldShowTransactionInInbox } from 'models/Transaction'
-import { HOME_PATH, HP_ADMIN_DASHBOARD } from 'holofuel/utils/urls'
+import { INBOX_PATH } from 'holofuel/utils/urls'
 import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
@@ -26,7 +26,7 @@ import 'holofuel/global-styles/index.css'
 import { useInterval, useLoadingFirstTime } from 'utils'
 
 function useUpdatedTransactionLists () {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
   const { loading: actionableTransactionsLoading, data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, refetch: refetchActionableTransactions, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: completedTransactionsLoading, refetch: refetchCompletedTransactions, stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: nonPendingTransactionsLoading, refetch: refetchNonPendingTransactions } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
@@ -88,21 +88,19 @@ function PrimaryLayout ({
 
   useEffect(() => {
     if (!isConnected) {
-      newMessage('Your Holochain Conductor is currently unreachable. Attempting to reconnect.', 0)
+      newMessage('Connecting to your Holochain Conductor...', 0)
       stopPolling()
       setShouldRefetchUser(true)
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-        defaultPath = HOME_PATH
+        defaultPath = INBOX_PATH
       } else {
-        defaultPath = HP_ADMIN_DASHBOARD
+        defaultPath = '/admin/login'
       }
-      if (window.location.pathname !== '/' && window.location.pathname !== defaultPath) {
-        push(defaultPath)
-      }
+      push(defaultPath)
     } else {
       newMessage('', 0)
-      startPolling(60000)
+      startPolling(30000)
       if (shouldRefetchUser) {
         refetchHolofuelUser()
       }
@@ -124,9 +122,9 @@ function PrimaryLayout ({
   const handleMenuClose = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
+    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} isWide={isWide} />
     <SideMenu
-      isOpen={isMenuOpen}
+      isOpen={isWide || isMenuOpen}
       handleClose={handleMenuClose}
       agent={currentUser}
       agentLoading={currentUserLoading}
@@ -136,8 +134,8 @@ function PrimaryLayout ({
       isWide={isWide}
       isLoadingRefetchCalls={isLoadingRefetchCalls}
       refetchCalls={refetchCalls} />
-    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName={cx('styles.content')}>
+    {(!isWide && showAlphaFlag) && <AlphaFlag styleName='styles.alpha-flag' />}
+    <div styleName={cx('styles.content', { 'styles.desktop': isWide })}>
       <FlashMessage />
       {children}
     </div>
