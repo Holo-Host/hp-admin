@@ -34,15 +34,15 @@ function useUpdatedTransactionLists () {
 
   const isLoadingRefetchCalls = ledgerLoading || actionableTransactionsLoading || completedTransactionsLoading || nonPendingTransactionsLoading || waitingTransactionsLoading
 
-  const stopPolling = () => {
+  const stopPolling = useCallback(() => {
     stopPollingActionableTransactions()
     stopPollingCompletedTransactions()
-  }
+  }, [stopPollingActionableTransactions, stopPollingCompletedTransactions])
 
-  const startPolling = pollInterval => {
+  const startPolling = useCallback(pollInterval => {
     startPollingActionableTransactions(pollInterval)
     startPollingCompletedTransactions(pollInterval)
-  }
+  }, [startPollingActionableTransactions, startPollingCompletedTransactions])
 
   const refetchCalls = () => {
     refetchLedger()
@@ -51,7 +51,7 @@ function useUpdatedTransactionLists () {
     refetchWaitingTransactions()
     refetchNonPendingTransactions()
   }
-
+ 
   return {
     actionableTransactions,
     holofuelBalance,
@@ -69,7 +69,8 @@ function PrimaryLayout ({
   showAlphaFlag = true
 }) {
   const { refetch: refetchUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
-  const { holofuelBalance, actionableTransactions, ledgerLoading, isLoadingRefetchCalls, stopPolling, startPolling, refetchCalls } = useUpdatedTransactionLists
+  const { holofuelBalance, actionableTransactions, ledgerLoading, isLoadingRefetchCalls, stopPolling, startPolling, refetchCalls } = useUpdatedTransactionLists()
+
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
@@ -88,7 +89,7 @@ function PrimaryLayout ({
   useEffect(() => {
     if (!isConnected) {
       newMessage('Your Holochain Conductor is currently unreachable. Attempting to reconnect.', 0)
-      startPolling()
+      stopPolling()
       setShouldRefetchUser(true)
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
