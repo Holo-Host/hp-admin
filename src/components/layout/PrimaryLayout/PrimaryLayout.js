@@ -25,14 +25,10 @@ export function PrimaryLayout ({
 }) {
   const [isInsideApp, setIsInsideApp] = useState(true)
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
-  const { setIsConnected, isConnected } = useConnectionContext()
+  const { setConnectionStatus, connectionStatus } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
-
-  console.log('useConnectionContext : ', useConnectionContext);
-  console.log('isConnected : ', isConnected);
-  console.log('setIsConnected : ', setIsConnected);
 
   const onError = ({ graphQLErrors: { isHposConnectionActive } }) => {
     setIsHposConnectionAlive(isHposConnectionActive)
@@ -42,19 +38,19 @@ export function PrimaryLayout ({
 
   useInterval(() => {
     if (isInsideApp) {
-      setIsConnected({ hpos: isHposConnectionAlive, holochain: wsConnection })
+      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
     }
   }, 5000)
 
   useEffect(() => {
     setIsInsideApp(window.location.pathname !== ROOT && window.location.pathname !== HP_ADMIN_LOGIN)
-    if (!isConnected.hpos) {
+    if (!connectionStatus.hpos) {
       // reroute to login on network/hpos connection error
       if (isInsideApp) {
         push('/admin/login')
       }
       newMessage('Connecting to your Holoport...', 0)
-      setIsConnected({ ...isConnected, hpos: isHposConnectionAlive })
+      setConnectionStatus({ ...connectionStatus, hpos: isHposConnectionAlive })
     }
 
     const setUser = () => {
@@ -66,7 +62,7 @@ export function PrimaryLayout ({
 
     if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
       // if inside happ, check for connection to holochain
-      if (isConnected.hpos && !isConnected.holochain) {
+      if (connectionStatus.hpos && !connectionStatus.holochain) {
         // reroute to login on conductor connection error as it signals emerging hpos connetion failure
         if (isInsideApp) {
           push('/admin/login')
@@ -77,18 +73,18 @@ export function PrimaryLayout ({
       }
     } else {
       // if on login page and connected to hpos, clear message and set user
-      if (isConnected.hpos) {
+      if (connectionStatus.hpos) {
         newMessage('', 0)
         setUser()
       }
     }
-  }, [isConnected,
+  }, [connectionStatus,
     newMessage,
     push,
     setCurrentUser,
     settings.hostPubKey,
     settings.hostName,
-    setIsConnected,
+    setConnectionStatus,
     isHposConnectionAlive,
     isInsideApp,
     setIsInsideApp])
@@ -99,7 +95,7 @@ export function PrimaryLayout ({
     <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
       {showHeader && <Header
         {...headerProps}
-        settings={isConnected.hpos ? settings : {}} />}
+        settings={connectionStatus.hpos ? settings : {}} />}
 
       <div styleName='styles.content'>
         <FlashMessage />

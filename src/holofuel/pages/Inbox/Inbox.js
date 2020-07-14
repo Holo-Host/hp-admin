@@ -274,9 +274,9 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 }
 
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, stale } = transaction
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, isActioned, isStale } = transaction
 
-  if (stale) {
+  if (isStale) {
     setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
   }
 
@@ -328,7 +328,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
   if (agent.id === null) return null
 
-  if (!inProcess && !highlightGreen && actioned) {
+  if (!inProcess && !highlightGreen && isActioned) {
     hideTransaction(true)
   }
 
