@@ -151,7 +151,6 @@ let counter = 0
 async function getListPending (params) {
   const { requests, promises, declined } = await createZomeCall('transactions/list_pending')(params)
   counter++
-  console.log('Counter to trigger receive_payments_pending at 8/', counter)
   if (counter === 8) {
     counter = 0
     promises.forEach(p => {

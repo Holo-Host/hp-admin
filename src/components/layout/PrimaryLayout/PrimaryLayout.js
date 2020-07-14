@@ -30,6 +30,10 @@ export function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
 
+  console.log('useConnectionContext : ', useConnectionContext);
+  console.log('isConnected : ', isConnected);
+  console.log('setIsConnected : ', setIsConnected);
+
   const onError = ({ graphQLErrors: { isHposConnectionActive } }) => {
     setIsHposConnectionAlive(isHposConnectionActive)
   }
