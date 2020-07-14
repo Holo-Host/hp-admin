@@ -47,11 +47,6 @@
   margin: 15px;
 }
 
-.loading-row {
-  display: flex;
-  flex: 1.8;
-}
-
 .drawer-overlay {
   position: fixed;
   top: 0;
@@ -159,6 +154,25 @@
   font-weight: bold;
 }
 
+.nav-link:last-child {
+  margin-bottom: 15px;
+}
+
+.underline {
+  border-bottom: 1px solid var(--color-loblolly);
+}
+
+.loading-row {
+  composes: underline;
+  display: flex;
+  flex: 1.8;
+}
+
+.admin-nav-link {
+  composes: nav-link;
+  margin: 15px 0px;
+}
+
 .alpha-info {
   position: relative;
   margin: 0 -32px 10px -32px;
@@ -178,18 +192,6 @@
 
 .alpha-link {
   color: var(--color-rhino);
-}
-
-.last-list-item {
-  border-bottom: 1px solid var(--color-loblolly);
-}
-
-.last-nav-link {
-  margin-bottom: 15px;
-}
-
-.admin-nav-link {
-  margin: 15px 0px
 }
 
 .btn-loading {

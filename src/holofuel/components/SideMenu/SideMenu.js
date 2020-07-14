@@ -63,7 +63,7 @@ export default function SideMenu ({
             </Link>
           </li>
           <li>
-            <div styleName='loading-row last-list-item'>
+            <div styleName='loading-row'>
               <Button onClick={() => refetchCalls()} styleName={cx('refresh-button', { 'btn-loading': isLoadingRefetchCalls })} variant='green'>
                 Refresh
               </Button>
@@ -71,8 +71,8 @@ export default function SideMenu ({
             </div>
           </li>
 
-          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='last-list-item'>
-            <Link to='/admin/' styleName='nav-link admin-nav-link'>
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='underline'>
+            <Link to='/admin/' styleName='admin-nav-link'>
               <BackIcon styleName='back-icon' /> HP Admin
             </Link>
           </li>}

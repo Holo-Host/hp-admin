@@ -6,7 +6,6 @@ import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
 
 export const currentDataTimeIso = () => new Date().toISOString()
-export let userNotification
 
 export const INSTANCE_ID = 'holofuel'
 const createZomeCall = instanceCreateZomeCall(INSTANCE_ID)
@@ -167,8 +166,7 @@ async function getListPending (params) {
 const findEvent = async (tx, invoicedOffers) => {
   const invoice = invoicedOffers.find(io => io.Invoice)
   if (invoice) {
-      userNotification = ''
-      await HoloFuelDnaInterface.offers.accept(tx.event[0])
+    await HoloFuelDnaInterface.offers.accept(tx.event[0])
   }
 }
 
@@ -206,6 +204,12 @@ function presentTransaction (transaction) {
 // a hack while we clean up the apollo counterparties implementation
 // AND create a more generalized data loading system
 const cachedGetProfileCalls = {}
+
+const cachedRecentlyActionedTransactions = []
+const removeTransactionFromCache = transactionId => {
+  _.remove(cachedRecentlyActionedTransactions, cachedRecentlyActionedTransactions.find(tx => tx.id === transactionId))
+}
+
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
@@ -230,19 +234,19 @@ const HoloFuelDnaInterface = {
         } else {
           return cachedGetProfileCalls[agentId]
         }
-      }
-
-      const counterparty = await createZomeCall('profile/get_profile')({ agent_address: agentId })
-      if (counterparty.Err) {
-        return {
-          id: agentId,
-          avatarUrl: null,
-          nickname: null
+      } else {
+        cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
+        const counterparty = await cachedGetProfileCalls[agentId]
+        if (counterparty.Err) {
+          return {
+            id: agentId,
+            avatarUrl: null,
+            nickname: null
+          }
         }
+        cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
+        return presentCounterparty(counterparty)
       }
-
-      cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
-      return presentCounterparty(counterparty)
     },
     update: async (nickname, avatarUrl) => {
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
@@ -280,7 +284,8 @@ const HoloFuelDnaInterface = {
     allActionable: async () => {
       const { requests, promises, declined } = await getListPending({})
       const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
-      const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
+      const actionableTransactionsDisplay = actionableTransactions.concat(cachedRecentlyActionedTransactions)
+      const uniqActionableTransactions = _.uniqBy(actionableTransactionsDisplay, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
 
       return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
@@ -361,10 +366,18 @@ const HoloFuelDnaInterface = {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId })
       if (!declinedProof) throw new Error(`Decline Error: ${declinedProof}.`)
-      return {
+
+      const presentableTransaction = {
         ...transaction,
-        id: transactionId
+        id: transactionId,
+        actioned: true
       }
+
+      cachedRecentlyActionedTransactions.push(presentableTransaction)
+      setTimeout(() => {
+        removeTransactionFromCache(presentableTransaction.id)
+      }, 5000)
+      return presentableTransaction
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
     cancel: async (transactionId) => {
@@ -432,7 +445,7 @@ const HoloFuelDnaInterface = {
     create: async (counterpartyId, amount, notes, requestId) => {
       const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
 
-      return {
+      const presentableTransaction = {
         id: requestId || origin, // NB: If requestId isn't defined, then offer uses origin as the ID (ie. Offer is the initiating transaction).
         amount,
         counterparty: {
@@ -442,8 +455,17 @@ const HoloFuelDnaInterface = {
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,
         type: requestId ? TYPE.request : TYPE.offer, // NB: If requestId isn't defined, then base transaction is an offer, otherwise, it's a request user is paying
+        actioned: !!requestId, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
         timestamp: currentDataTimeIso
       }
+
+      if (requestId) {
+        cachedRecentlyActionedTransactions.push(presentableTransaction)
+        setTimeout(() => {
+          removeTransactionFromCache(presentableTransaction.id)
+        }, 5000)
+      }
+      return presentableTransaction
     },
 
     accept: async (transactionId) => {
@@ -454,14 +476,15 @@ const HoloFuelDnaInterface = {
         if (acceptedPaymentHash.Err.Internal) {
           const spenderValidationError = /(Spender chain invalid)/g
           if (typeof acceptedPaymentHash.Err.Internal === 'string' && spenderValidationError.test(acceptedPaymentHash.Err.Internal)) {
-            userNotification = 'Transaction could not be validated and will never pass. Transaction is now stale.'
             return {
               ...transaction,
               id: transactionId, // should always match `Object.entries(result)[0][0]`
               direction: DIRECTION.incoming, // this indicates the hf recipient
               status: STATUS.pending,
               type: TYPE.offer,
-              actioned: false
+              actioned: false,
+              inProcess: false,
+              stale: true
             }
           } else {
             try {
@@ -472,7 +495,9 @@ const HoloFuelDnaInterface = {
                   direction: DIRECTION.incoming, // this indicates the hf recipient
                   status: STATUS.pending,
                   type: TYPE.offer,
-                  actioned: true
+                  actioned: true,
+                  inProcess: true,
+                  stale: false
                 }
               }
             } catch (e) {
@@ -483,14 +508,23 @@ const HoloFuelDnaInterface = {
           }
         }
       }
-      return {
+
+      const presentableTransaction = {
         ...transaction,
         id: transactionId, // should always match `Object.entries(result)[0][0]`
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.completed,
         type: TYPE.offer,
-        actioned: true
+        actioned: true,
+        inProcess: false,
+        stale: false
       }
+
+      cachedRecentlyActionedTransactions.push(presentableTransaction)
+      setTimeout(() => {
+        removeTransactionFromCache(presentableTransaction.id)
+      }, 5000)
+      return presentableTransaction
     }
   }
 }

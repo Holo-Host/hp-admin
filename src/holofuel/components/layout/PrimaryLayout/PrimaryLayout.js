@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback, useRef } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -25,22 +25,56 @@ import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 import { useInterval, useLoadingFirstTime } from 'utils'
 
-function PrimaryLayout ({
-  children,
-  headerProps = {},
-  showAlphaFlag = true
-}) {
+function useUpdatedTransactionLists () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
   const { loading: actionableTransactionsLoading, data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, refetch: refetchActionableTransactions, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: completedTransactionsLoading, refetch: refetchCompletedTransactions, stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: nonPendingTransactionsLoading, refetch: refetchNonPendingTransactions } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: waitingTransactionsLoading, refetch: refetchWaitingTransactions } = useQuery(HolofuelWaitingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+
+  const isLoadingRefetchCalls = ledgerLoading || actionableTransactionsLoading || completedTransactionsLoading || nonPendingTransactionsLoading || waitingTransactionsLoading
+
+  const stopPolling = useCallback(() => {
+    stopPollingActionableTransactions()
+    stopPollingCompletedTransactions()
+  }, [stopPollingActionableTransactions, stopPollingCompletedTransactions])
+
+  const startPolling = useCallback(pollInterval => {
+    startPollingActionableTransactions(pollInterval)
+    startPollingCompletedTransactions(pollInterval)
+  }, [startPollingActionableTransactions, startPollingCompletedTransactions])
+
+  const refetchCalls = () => {
+    refetchLedger()
+    refetchActionableTransactions()
+    refetchCompletedTransactions()
+    refetchWaitingTransactions()
+    refetchNonPendingTransactions()
+  }
+
+  return {
+    actionableTransactions,
+    holofuelBalance,
+    ledgerLoading,
+    isLoadingRefetchCalls,
+    stopPolling,
+    startPolling,
+    refetchCalls
+  }
+}
+
+function PrimaryLayout ({
+  children,
+  headerProps = {},
+  showAlphaFlag = true
+}) {
   const { refetch: refetchUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { holofuelBalance, actionableTransactions, ledgerLoading, isLoadingRefetchCalls, stopPolling, startPolling, refetchCalls } = useUpdatedTransactionLists()
+
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
-  const isFreshRender = useRef(true)
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -53,10 +87,9 @@ function PrimaryLayout ({
   }, 5000)
 
   useEffect(() => {
-    if (!isFreshRender.current && !isConnected) {
+    if (!isConnected) {
       newMessage('Connecting to your Holochain Conductor...', 0)
-      stopPollingActionableTransactions()
-      stopPollingCompletedTransactions()
+      stopPolling()
       setShouldRefetchUser(true)
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
@@ -67,23 +100,17 @@ function PrimaryLayout ({
       push(defaultPath)
     } else {
       newMessage('', 0)
-      startPollingActionableTransactions(30000)
-      startPollingCompletedTransactions(30000)
+      startPolling(30000)
       if (shouldRefetchUser) {
         refetchHolofuelUser()
       }
-    }
-    if (isFreshRender.current) {
-      isFreshRender.current = false
     }
   }, [isConnected,
     setIsConnected,
     push,
     newMessage,
-    stopPollingActionableTransactions,
-    startPollingActionableTransactions,
-    stopPollingCompletedTransactions,
-    startPollingCompletedTransactions,
+    startPolling,
+    stopPolling,
     shouldRefetchUser,
     refetchHolofuelUser])
 
@@ -93,16 +120,6 @@ function PrimaryLayout ({
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
-
-  const refetchCalls = () => {
-    refetchLedger()
-    refetchActionableTransactions()
-    refetchCompletedTransactions()
-    refetchWaitingTransactions()
-    refetchNonPendingTransactions()
-  }
-
-  const isLoadingRefetchCalls = ledgerLoading || actionableTransactionsLoading || completedTransactionsLoading || nonPendingTransactionsLoading || waitingTransactionsLoading
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} isWide={isWide} />

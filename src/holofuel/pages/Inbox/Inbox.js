@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -30,9 +30,7 @@ import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, 
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
-import { userNotification } from 'data-interfaces/HoloFuelDnaInterface'
 
-// TODO: Consult C for UX / copy for this
 const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
@@ -133,12 +131,12 @@ export default function Inbox ({ history: { push } }) {
 
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
-  if (userNotification !== userMessage) {
-    setUserMessage(userNotification)
-  }
-  if (!isEmpty(userMessage)) {
-    newMessage(userMessage, 5000)
-  }
+
+  useEffect(() => {
+    if (!isEmpty(userMessage)) {
+      newMessage(userMessage, 5000)
+    }
+  }, [userMessage, newMessage])
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
@@ -230,7 +228,8 @@ export default function Inbox ({ history: { push } }) {
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
-        setAreActionsPaused={setAreActionsPaused} />)}
+        setAreActionsPaused={setAreActionsPaused}
+        setUserMessage={setUserMessage} />)}
     </div>}
 
     <ConfirmationModal
@@ -239,7 +238,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
   const manageHideTransactionWithId = (id, shouldHide) => {
@@ -258,6 +257,8 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
     <PageDivider title={dateLabel} />
     <div styleName='transaction-list'>
       {transactions.map(transaction => transactionIsVisible(transaction.id) && <TransactionRow
+        role='list'
+        key={transaction.id}
         transaction={transaction}
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
@@ -267,14 +268,17 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        role='list'
-        key={transaction.id} />)}
+        setUserMessage={setUserMessage} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, stale } = transaction
+
+  if (stale) {
+    setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
+  }
 
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
@@ -422,7 +426,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
     {inProcess && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
-      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'acceptance pending'}</h4>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
     </ToolTip>}
 
     {isActionable && !isLoading && !isPayment && !isDisabled && <>
