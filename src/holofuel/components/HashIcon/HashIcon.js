@@ -8,7 +8,7 @@ function DefaultIdenticon ({
   size,
   className
 }) {
-  return <div styleName={cx({ 'big-icon': size > 40 }, { 'small-icon': size < 40 })} className={className} />
+  return <div styleName='default-identicon' style={{ width: size, height: size }} className={className} />
 }
 
 export default function HashIcon ({

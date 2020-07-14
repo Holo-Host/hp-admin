@@ -86,8 +86,6 @@ describe('Inbox connected (with Agent Nicknames)', () => {
 
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
 
-    console.log('actionableTransactions : ', actionableTransactions)
-
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)
 

@@ -134,7 +134,6 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
   const handleEvent = () => HoloFuelDnaInterface.offers.accept(transaction.event[0])
   const findEvent = () => {
     const invoice = invoicedOffers.find(io => io.Invoice)
-    console.log('---- >>', counter)
     counter++
     if (invoice) {
       if (counter > 10) {
