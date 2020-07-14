@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'

@@ -213,7 +213,7 @@ const HoloFuelDnaInterface = {
         avatarUrl: counterparty.avatar_url,
         nickname: counterparty.nickname
       })
-      
+
       if (cachedGetProfileCalls[agentId]) {
         if (typeof cachedGetProfileCalls[agentId].then === 'function') {
           return presentCounterparty(await cachedGetProfileCalls[agentId])
@@ -356,8 +356,7 @@ const HoloFuelDnaInterface = {
       const presentableTransaction = {
         ...transaction,
         id: transactionId,
-        actioned: true,
-        shouldHighlight: 'red'
+        actioned: true
       }
 
       cachedRecentlyActionedTransactions.push(presentableTransaction)
@@ -442,17 +441,16 @@ const HoloFuelDnaInterface = {
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,
         type: requestId ? TYPE.request : TYPE.offer, // NB: If requestId isn't defined, then base transaction is an offer, otherwise, it's a request user is paying
-        actioned: requestId ? true : false, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
-        timestamp: currentDataTimeIso,
-        shouldHighlight: 'green'
+        actioned: requestId, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
+        timestamp: currentDataTimeIso
       }
 
       if (requestId) {
-        cachedRecentlyActionedTransactions.push(presentableTransaction)  
+        cachedRecentlyActionedTransactions.push(presentableTransaction)
         setTimeout(() => {
           removeTransactionFromCache(presentableTransaction.id)
         }, 5000)
-    }
+      }
       return presentableTransaction
     },
 
@@ -505,7 +503,6 @@ const HoloFuelDnaInterface = {
         type: TYPE.offer,
         actioned: true,
         inProcess: false,
-        shouldHighlight: 'green',
         stale: false
       }
 

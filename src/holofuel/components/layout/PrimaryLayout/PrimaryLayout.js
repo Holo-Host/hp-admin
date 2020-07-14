@@ -25,7 +25,6 @@ import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 import { useInterval, useLoadingFirstTime } from 'utils'
 
-
 function useUpdatedTransactionLists () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
   const { loading: actionableTransactionsLoading, data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, refetch: refetchActionableTransactions, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
@@ -122,7 +121,6 @@ function PrimaryLayout ({
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const handleMenuClose = () => setMenuOpen(false)
-
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
