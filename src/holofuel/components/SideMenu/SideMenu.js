@@ -67,8 +67,8 @@ export default function SideMenu ({
               Profile
             </Link>
           </li>
-          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='last-list-item'>
-            <Link to='/admin/' styleName='nav-link last-nav-link'>
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='underline'>
+            <Link to='/admin/' styleName='nav-link'>
               HP Admin
             </Link>
           </li>}

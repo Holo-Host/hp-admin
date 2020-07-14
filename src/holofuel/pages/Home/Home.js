@@ -29,7 +29,6 @@ export default function Home () {
   const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
-  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false)
   const { isConnected } = useConnectionContext()
   const { setCurrentUser, currentUser } = useCurrentUserContext()
 
@@ -39,14 +38,6 @@ export default function Home () {
     }
   }, [holofuelUser, setCurrentUser])
 
-  useEffect(() => {
-    if (!isConnected) {
-      setIsLoadingTransactions(false)
-    } else {
-      setIsLoadingTransactions(loadingTransactions)
-    }
-  }, [loadingTransactions, setIsLoadingTransactions, isConnected])
-
   const greeting = !isEmpty(get('nickname', currentUser)) ? `Hi ${currentUser.nickname}!` : 'Hi!'
 
   const isTransactionsEmpty = isEmpty(transactions)
@@ -55,7 +46,7 @@ export default function Home () {
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
-  const isLoadingFirstPendingTransactions = useLoadingFirstTime(isLoadingTransactions)
+  const isLoadingFirstPendingTransactions = useLoadingFirstTime(isConnected && loadingTransactions)
 
   return <PrimaryLayout headerProps={{ title: 'Holofuel Home' }}>
     <div styleName='container'>
