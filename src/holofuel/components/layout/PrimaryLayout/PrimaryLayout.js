@@ -51,7 +51,7 @@ function useUpdatedTransactionLists () {
     refetchWaitingTransactions()
     refetchNonPendingTransactions()
   }
- 
+
   return {
     actionableTransactions,
     holofuelBalance,
