@@ -27,17 +27,6 @@ export default function Dashboard ({ earnings = mockEarnings }) {
   const isBalanceZero = Number(balance) === 0
 
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
-  // const [urlOrigin, setUrlOrigin] = useState()
-  const location = useLocation()
-
-  useEffect(() => {
-    const origin = window.location.origin.trim()
-    const hasTrailingSlash = origin.charAt(origin.length - 1) === '/'
-    if (hasTrailingSlash) {
-      origin.slice(0, origin.length - 1)
-    }
-    // setUrlOrigin(window.location.origin)
-  }, [location]) // setUrlOrigin
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     <div styleName='avatar'>
