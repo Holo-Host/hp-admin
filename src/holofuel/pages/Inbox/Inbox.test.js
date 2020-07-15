@@ -22,6 +22,7 @@ import { presentAgentId, promiseMap } from '../../../utils'
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useConnnectionContext')
 jest.mock('holofuel/contexts/useCurrentUserContext')
 jest.unmock('holochainClient')
 

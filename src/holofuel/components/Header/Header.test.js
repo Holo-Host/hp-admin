@@ -14,13 +14,12 @@ jest.mock('components/HashAvatar')
 
 it('should render the title and a menu icon', () => {
   const props = {
-    title: 'the title',
     history: { push: jest.fn() },
     agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' }
   }
   const { getByText, getByTestId } = render(<Header {...props} />)
 
-  expect(getByText(props.title)).toBeInTheDocument()
+  expect(getByText('Test Fuel')).toBeInTheDocument()
   expect(getByText(menuIconTitle)).toBeInTheDocument()
 
   fireEvent.click(getByTestId('menu-button'))

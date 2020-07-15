@@ -6,6 +6,7 @@ import PrimaryLayout from './PrimaryLayout'
 jest.mock('contexts/useFlashMessageContext')
 jest.mock('contexts/useConnectionContext')
 jest.mock('contexts/useAuthContext')
+jest.mock('contexts/useConnectionContext')
 jest.mock('contexts/useCurrentUserContext')
 jest.mock('components/Header')
 
