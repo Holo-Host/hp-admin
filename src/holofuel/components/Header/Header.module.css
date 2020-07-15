@@ -97,3 +97,7 @@
 .empty-spacer {
   flex: 1;
 }
+
+.desktop {
+  margin-left: 260px;
+}

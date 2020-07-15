@@ -206,8 +206,18 @@
   background-color: #FCE3E8;
 }
 
-.highlightNeutral {
-  background-color: #e4e6e9;
+.highlightYellow {
+  background-color: #f6e3ab;
+}
+
+.inProcess {
+  opacity: 0.7;
+}
+
+.alert-msg {
+  composes: notes;
+  margin-right: 20px;
+  color: rgba(44, 64, 90, 0.8);;
 }
 
 /* ActionsCell */

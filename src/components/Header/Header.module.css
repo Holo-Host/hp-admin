@@ -36,3 +36,23 @@
   height: 32px;
   margin-right: 5px;
 }
+
+.settings-link {
+  font-family: 'Circular';
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--color-cape-cod);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--color-cape-cod);
+}
+
+.back-icon,
+.gear-icon {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  margin-right: 2px;
+}

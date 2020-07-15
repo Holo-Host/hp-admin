@@ -1,7 +1,10 @@
-const isConnected = true
-const setIsConnected = jest.fn()
+const connectionStatus = {
+  hpos: true,
+  holochain: true
+}
+const setConnectionStatus = jest.fn()
 
 export default () => ({
-  isConnected,
-  setIsConnected
+  connectionStatus,
+  setConnectionStatus
 })

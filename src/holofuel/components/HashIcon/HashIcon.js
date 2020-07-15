@@ -3,17 +3,27 @@ import React from 'react'
 import { Network as Identicon } from 'react-identicon-variety-pack'
 import './HashIcon.module.css'
 
+function DefaultIdenticon ({
+  size,
+  className
+}) {
+  return <div styleName='default-identicon' style={{ width: size, height: size }} className={className} />
+}
+
 export default function HashIcon ({
   hash,
   size = 64,
   className
 }) {
   return <div data-testid='hash-icon'>
-    <Identicon
+    {hash ? <Identicon
       seed={hash}
       size={size}
       className={className}
       circle />
+      : <DefaultIdenticon
+        size={size}
+        className={className} />}
   </div>
 }
 

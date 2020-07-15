@@ -16,7 +16,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 32px 22px 20px;
+  padding: 14px 22px 20px;
   background-color: var(--color-alabaster-light);
   transform: translateX(-10%);
   transition: transform .3s ease;
@@ -28,7 +28,23 @@
 .drawer--open .container {
   transform: translateX(100%);
   pointer-events: initial;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
+}
+
+.refresh-button {
+  font-size: 13px;
+  line-height: 15px;
+  display: flex;
+  height: 32px;
+  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
+  margin-top: 25px;
+  margin-bottom: 30px;
+}
+
+.refresh-loading {
+  display: flex;
+  align-self: center;
+  margin: 15px;
 }
 
 .drawer-overlay {
@@ -76,6 +92,7 @@
   color: var(--color-cape-cod);
 }
 
+.back-icon,
 .gear-icon {
   width: 20px;
   height: 20px;
@@ -85,6 +102,12 @@
 
 .nav {
   color: #fff;
+}
+
+.active-link {
+  background-color: #CFF3EC;
+  padding: 0px 10px;
+  border-radius: 5px;
 }
 
 /* Header */
@@ -131,9 +154,28 @@
   font-weight: bold;
 }
 
+.nav-link:last-child {
+  margin-bottom: 15px;
+}
+
+.underline {
+  border-bottom: 1px solid var(--color-loblolly);
+}
+
+.loading-row {
+  composes: underline;
+  display: flex;
+  flex: 1.8;
+}
+
+.admin-nav-link {
+  composes: nav-link;
+  margin: 15px 0px;
+}
+
 .alpha-info {
   position: relative;
-  margin: 0 -32px 60px -32px;
+  margin: 0 -32px 10px -32px;
   padding: 30px 12px;
   font-family: 'Circular';
   font-size: 14px;
@@ -150,6 +192,10 @@
 
 .alpha-link {
   color: var(--color-rhino);
+}
+
+.btn-loading {
+  filter: grayscale(60%);
 }
 
 /* Footer */
@@ -195,4 +241,8 @@
   font-size: 12px;
   text-align: center;
   margin-left: 10px;
+}
+
+.desktop {
+  flex: 0 1 280px;
 }

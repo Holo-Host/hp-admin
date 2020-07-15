@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react' // , useState
 import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
@@ -18,11 +18,10 @@ export const mockEarnings = 4984
 
 export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
 
   // placeholder as we're not currently calling hha
   const noInstalledHapps = 0
-
-  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery)
 
   const isEarningsZero = Number(earnings) === 0
   const isBalanceZero = Number(balance) === 0
@@ -59,7 +58,7 @@ export default function Dashboard ({ earnings = mockEarnings }) {
       </div>
     </Card>}
 
-    <Card title='HoloFuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
+    <Card title='Test Fuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
       <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
         <h4 styleName='balance-header'>
           Current Balance
@@ -85,9 +84,9 @@ function Card ({ title, subtitle, linkTo, children }) {
 
 // a react-router link that can also take an external url
 function MixedLink ({ to, children, ...props }) {
-  const isExternal = /^https?:\/\//.test(to)
+  const isExternal = /^https?:\/\//.test(to) || /^http?:\/\//.test(to)
   if (isExternal) {
-    return <a href={to} {...props}>
+    return <a href={to} target='_blank' rel='noopener noreferrer' {...props}>
       {children}
     </a>
   } else {

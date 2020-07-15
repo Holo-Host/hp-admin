@@ -3,11 +3,6 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
-// var for updating the isConnected variable in primary layout upon ws connection error catch
-// NB: Currently this must start as true, as no hc zome call are made on hp-admin,
-// thus this boolean would be false and set isConnected to false
-export let wsConnection = true
-
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
@@ -119,6 +114,8 @@ let holochainClient
 let isInitiatingHcConnection = false
 let wsTimeoutErrorCount = 0
 
+export let wsConnection = true
+
 async function initHolochainClient () {
   isInitiatingHcConnection = true
   let url
@@ -138,26 +135,28 @@ async function initHolochainClient () {
 
     holochainClient = await hcWebClientConnect({
       url: url,
-      timeout: 5000, // In the hc-web-client module, this is set to a default of 50000 ms (https://github.com/holochain/hc-web-client/blob/master/src/index.ts#L6)
+      timeout: 5000,
       wsClient: { max_reconnects: 2 }
     })
+
     if (HOLOCHAIN_LOGGING) {
       console.log('🎉 Successfully connected to Holochain!')
     }
-    isInitiatingHcConnection = false
     wsConnection = true
+    isInitiatingHcConnection = false
     return holochainClient
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
     }
+    wsConnection = false
     isInitiatingHcConnection = false
     throw (error)
   }
 }
 async function initAndGetHolochainClient () {
   let counter = 0
-  // This code is to let avoid multiple ws connections.
+  // This code is to avoid multiple ws connections.
   // isInitiatingHcConnection is changed in a different call of this function running in parallel
   while (isInitiatingHcConnection) {
     counter++
@@ -166,6 +165,11 @@ async function initAndGetHolochainClient () {
       isInitiatingHcConnection = false
     }
   }
+
+  if (!wsConnection) {
+    holochainClient = null
+  }
+
   if (holochainClient) return holochainClient
   else return initHolochainClient()
 }
