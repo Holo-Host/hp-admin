@@ -4,6 +4,13 @@ import SideMenu from './SideMenu'
 
 jest.mock('holofuel/contexts/useFlashMessageContext')
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: () => ({
+    pathname: 'localhost:3100/holofuel/'
+  })
+}))
+
 describe('SideMenu', () => {
   const props = {
     agent: {}
