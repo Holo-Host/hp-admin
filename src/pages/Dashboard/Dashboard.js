@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react' // , useState
+import React from 'react' // , useState
 import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
