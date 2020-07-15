@@ -161,7 +161,7 @@ async function getListPending (params) {
       }
     })
   }
-  return {requests, promises, declined }
+  return { requests, promises, declined }
 }
 
 const acceptInvoicedOffer = async (tx, invoicedOffers) => {
