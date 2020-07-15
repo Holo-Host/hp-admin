@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
-import { withRouter } from 'react-router'
 import { Link, useLocation } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import { presentAgentId } from 'utils'
@@ -18,7 +17,7 @@ import {
 
 import './SideMenu.module.css'
 
-function SideMenu ({
+export default function SideMenu ({
   isOpen,
   isWide,
   handleClose,
@@ -118,5 +117,3 @@ function InboxBadge ({ count = 0 }) {
     {count}
   </div>
 }
-
-export default withRouter(SideMenu)

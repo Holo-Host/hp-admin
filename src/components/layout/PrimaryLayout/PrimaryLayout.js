@@ -102,7 +102,7 @@ export function PrimaryLayout ({
       </div>
     </div>
 
-    {isInsideApp && <div styleName='styles.wrapper'>
+    {isLoginPage(window) && <div styleName='styles.wrapper'>
       <div styleName='styles.container'>
         <footer styleName='styles.footer'>
           <div styleName='styles.alpha-info'>

@@ -164,7 +164,7 @@ export default function Inbox ({ history: { push } }) {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
-  const displayBalance = (!holofuelBalance && ledgerLoading) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+  const displayBalance = (isEmpty(holofuelBalance) && ledgerLoading) || isNaN(holofuelBalance) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
@@ -208,7 +208,7 @@ export default function Inbox ({ history: { push } }) {
         styleName='null-state-message'
         message={!isConnected
           ? 'Your transactions cannot be displayed at this time'
-          : inboxView === VIEW.actionableLoading
+          : inboxView === VIEW.actionable
             ? 'You have no pending offers or requests'
             : 'You have no recent activity'}>
         <div onClick={() => push(OFFER_REQUEST_PATH)}>
