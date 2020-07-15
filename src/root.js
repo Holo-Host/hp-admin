@@ -11,11 +11,13 @@ import { ConnectionProvider } from 'contexts/useConnectionContext'
 import { CurrentUserProvider } from 'contexts/useCurrentUserContext'
 import { AuthProvider } from 'contexts/useAuthContext'
 import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
+import ManageConnection from 'components/wrappers/ManageConnection'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import { CurrentUserProvider as HFCurrentUserProvider } from 'holofuel/contexts/useCurrentUserContext'
 import { ConnectionProvider as HFConnectionProvider } from 'holofuel/contexts/useConnectionContext'
 import AcceptRequestedOffers from 'holofuel/components/wrappers/AcceptRequestedOffers'
+import HFManageConnection from 'holofuel/components/wrappers/ManageConnection'
 import LoadCurrentUser from 'holofuel/components/wrappers/LoadCurrentUser'
 import PromptForNickname from 'holofuel/components/wrappers/PromptForNickname'
 import HPAdminRouter from './HPAdminRouter'
@@ -35,13 +37,15 @@ function HoloFuelAppCore () {
     <HFConnectionProvider>
       <HFCurrentUserProvider>
         <HFFlashMessageProvider>
-          <LoadCurrentUser>
-            <AcceptRequestedOffers>
-              <PromptForNickname>
-                <HFRouter />
-              </PromptForNickname>
-            </AcceptRequestedOffers>
-          </LoadCurrentUser>
+          <HFManageConnection>
+            <LoadCurrentUser>
+              <AcceptRequestedOffers>
+                <PromptForNickname>
+                  <HFRouter />
+                </PromptForNickname>
+              </AcceptRequestedOffers>
+            </LoadCurrentUser>
+          </HFManageConnection>
         </HFFlashMessageProvider>
       </HFCurrentUserProvider>
     </HFConnectionProvider>
@@ -68,7 +72,9 @@ export function HPAdminApp () {
               <FlashMessageProvider>
                 <Switch>
                   <Route path='/holofuel' component={HoloFuelAppCore} />
-                  <HPAdminRouter />
+                  <ManageConnection>
+                    <HPAdminRouter />
+                  </ManageConnection>
                 </Switch>
               </FlashMessageProvider>
             </CurrentUserProvider>
