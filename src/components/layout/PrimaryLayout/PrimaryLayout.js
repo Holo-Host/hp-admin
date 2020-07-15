@@ -13,7 +13,7 @@ import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
 import { useInterval } from 'utils'
 import { wsConnection } from 'holochainClient'
-import { ROOT, HP_ADMIN_LOGIN } from 'utils/urls'
+import { isLoginPage, HP_ADMIN_LOGIN_PATH } from 'utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -37,17 +37,16 @@ export function PrimaryLayout ({
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
-    if (isInsideApp) {
+    if (!isLoginPage(window)) {
       setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
     }
   }, 5000)
 
   useEffect(() => {
-    setIsInsideApp(window.location.pathname !== ROOT && window.location.pathname !== HP_ADMIN_LOGIN)
     if (!connectionStatus.hpos) {
       // reroute to login on network/hpos connection error
-      if (isInsideApp) {
-        push('/admin/login')
+      if (!isLoginPage(window)) {
+        push(HP_ADMIN_LOGIN_PATH)
       }
       newMessage('Connecting to your Holoport...', 0)
       setConnectionStatus({ ...connectionStatus, hpos: isHposConnectionAlive })
@@ -60,12 +59,12 @@ export function PrimaryLayout ({
       })
     }
 
-    if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
+    if (!isLoginPage(window)) {
       // if inside happ, check for connection to holochain
       if (connectionStatus.hpos && !connectionStatus.holochain) {
         // reroute to login on conductor connection error as it signals emerging hpos connetion failure
-        if (isInsideApp) {
-          push('/admin/login')
+        if (!isLoginPage(window)) {
+          push(HP_ADMIN_LOGIN_PATH)
         }
       } else {
         newMessage('', 0)

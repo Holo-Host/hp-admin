@@ -129,7 +129,7 @@ function presentPendingRequest (transaction, annuled = false) {
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
   const invalidEvent = invoicedOffers.find(io => !io.Invoice)
   if (invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
-  const findEvent = () => {
+  const hasInvoice = () => {
     const invoice = invoicedOffers.find(io => io.Invoice)
     if (invoice) return true
     else return false
@@ -143,28 +143,30 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
   const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
-  const inProcess = isEmpty(invoicedOffers) ? false : findEvent()
+  const inProcess = isEmpty(invoicedOffers) ? false : hasInvoice()
   return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, inProcess })
 }
 
 let counter = 0
 async function getListPending (params) {
   const { requests, promises, declined } = await createZomeCall('transactions/list_pending')(params)
+  // The counter is a trigger for accepting any in-process offers (offers with an invoice)
+  // currently, the decision is to check every 8 times when polling for list_pending is set to 30000ms (effectively being called every 4min)
   counter++
   if (counter === 8) {
     counter = 0
     promises.forEach(p => {
       if (!isEmpty(p[1])) {
-            findEvent(p[0],p[1])
+        acceptInvoicedOffer(p[0], p[1])
       }
     })
   }
   return {requests, promises, declined }
 }
 
-const findEvent = async (tx, invoicedOffers) => {
-  const invoice = invoicedOffers.find(io => io.Invoice)
-  if (invoice) {
+const acceptInvoicedOffer = async (tx, invoicedOffers) => {
+  const invoicedOffer = invoicedOffers.find(io => io.Invoice)
+  if (invoicedOffer) {
     await HoloFuelDnaInterface.offers.accept(tx.event[0])
   }
 }
@@ -282,7 +284,7 @@ const HoloFuelDnaInterface = {
     },
     allActionable: async () => {
       const { requests, promises, declined } = await getListPending({})
-      const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
+      const actionableTransactions = requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
       const actionableTransactionsDisplay = actionableTransactions.concat(cachedRecentlyActionedTransactions)
       const uniqActionableTransactions = _.uniqBy(actionableTransactionsDisplay, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
@@ -338,7 +340,7 @@ const HoloFuelDnaInterface = {
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await getListPending({ origins: transactionId })
-      const transactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1]))).filter(tx => !(tx instanceof Error))
+      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1]))).filter(tx => !(tx instanceof Error))
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -366,17 +368,17 @@ const HoloFuelDnaInterface = {
       const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId })
       if (!declinedProof) throw new Error(`Decline Error: ${declinedProof}.`)
 
-      const presentableTransaction = {
+      const presentedTransaction = {
         ...transaction,
         id: transactionId,
         isActioned: true
       }
 
-      cachedRecentlyActionedTransactions.push(presentableTransaction)
+      cachedRecentlyActionedTransactions.push(presentedTransaction)
       setTimeout(() => {
-        removeTransactionFromCache(presentableTransaction.id)
+        removeTransactionFromCache(presentedTransaction.id)
       }, 5000)
-      return presentableTransaction
+      return presentedTransaction
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
     cancel: async (transactionId) => {
@@ -444,7 +446,7 @@ const HoloFuelDnaInterface = {
     create: async (counterpartyId, amount, notes, requestId) => {
       const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
 
-      const presentableTransaction = {
+      const presentedTransaction = {
         id: requestId || origin, // NB: If requestId isn't defined, then offer uses origin as the ID (ie. Offer is the initiating transaction).
         amount,
         counterparty: {
@@ -459,12 +461,12 @@ const HoloFuelDnaInterface = {
       }
 
       if (requestId) {
-        cachedRecentlyActionedTransactions.push(presentableTransaction)
+        cachedRecentlyActionedTransactions.push(presentedTransaction)
         setTimeout(() => {
-          removeTransactionFromCache(presentableTransaction.id)
+          removeTransactionFromCache(presentedTransaction.id)
         }, 5000)
       }
-      return presentableTransaction
+      return presentedTransaction
     },
 
     accept: async (transactionId) => {
@@ -508,7 +510,7 @@ const HoloFuelDnaInterface = {
         }
       }
 
-      const presentableTransaction = {
+      const presentedTransaction = {
         ...transaction,
         id: transactionId, // should always match `Object.entries(result)[0][0]`
         direction: DIRECTION.incoming, // this indicates the hf recipient
@@ -519,11 +521,11 @@ const HoloFuelDnaInterface = {
         isStale: false
       }
 
-      cachedRecentlyActionedTransactions.push(presentableTransaction)
+      cachedRecentlyActionedTransactions.push(presentedTransaction)
       setTimeout(() => {
-        removeTransactionFromCache(presentableTransaction.id)
+        removeTransactionFromCache(presentedTransaction.id)
       }, 5000)
-      return presentableTransaction
+      return presentedTransaction
     }
   }
 }
