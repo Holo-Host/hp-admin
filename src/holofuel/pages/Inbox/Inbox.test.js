@@ -22,6 +22,7 @@ import { presentAgentId, promiseMap } from '../../../utils'
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
+jest.mock('holofuel/contexts/useConnectionContext')
 jest.mock('holofuel/contexts/useCurrentUserContext')
 jest.unmock('holochainClient')
 
@@ -85,8 +86,6 @@ describe('Inbox connected (with Agent Nicknames)', () => {
     </ApolloProvider>, 1500)
 
     expect(getByText(`${presentHolofuelAmount(ledger.balance)} TF`)).toBeInTheDocument()
-
-    console.log('actionableTransactions : ', actionableTransactions)
 
     const listItems = getAllByRole('listitem')
     expect(listItems).toHaveLength(2)

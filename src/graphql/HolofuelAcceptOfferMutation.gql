@@ -8,8 +8,8 @@ mutation HolofuelAcceptOfferMutation ($transactionId: ID) {
     type
     timestamp
     inProcess
-    actioned
+    isActioned
     shouldHighlight
-    stale
+    isStale 
   }
 }

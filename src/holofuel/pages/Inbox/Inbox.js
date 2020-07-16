@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, isNil, isEqual, remove } from 'lodash/fp'
+import { isEmpty, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -9,8 +10,10 @@ import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTrans
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+import useConnectionContext from 'holofuel/contexts/useConnectionContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import useActionableDisplayContext from 'holofuel/contexts/useActionableDisplayContext'
+import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -23,12 +26,13 @@ import ToolTip from 'holofuel/components/ToolTip'
 import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
-import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+
+const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -78,15 +82,16 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
-  const { hiddenTransactionsById } = useActionableDisplayContext()
+  const { hiddenTransactionIds } = useHiddenTransactionsContext()
+  const { isConnected } = useConnectionContext()
 
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
 
   const actionableDisplayFilter = transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionsById.find(tx => tx.id === id)) || !actioned)
+    ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
   }
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableDisplayFilter)
@@ -95,8 +100,8 @@ function useUpdatedTransactionLists () {
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
 
-  const actionableLoadingFirstTime = useLoadingFirstTime(allActionableLoading)
-  const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
+  const actionableLoadingFirstTime = useLoadingFirstTime(isConnected && allActionableLoading)
+  const recentLoadingFirstTime = useLoadingFirstTime(isConnected && allRecentLoading)
 
   return {
     actionableTransactions: updatedDisplayableActionable,
@@ -118,8 +123,16 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
+  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { currentUser } = useCurrentUserContext()
+  const { currentUser, setCurrentUser } = useCurrentUserContext()
+  const { isConnected } = useConnectionContext()
+
+  useEffect(() => {
+    if (!isEmpty(holofuelUser)) {
+      setCurrentUser(holofuelUser)
+    }
+  }, [holofuelUser, setCurrentUser])
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading, refetchActionable } = useUpdatedTransactionLists(inboxView)
@@ -127,15 +140,11 @@ export default function Inbox ({ history: { push } }) {
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
 
-  const renderUserMessage = message => {
-    if (message !== userMessage) {
-      setUserMessage(message)
+  useEffect(() => {
+    if (!isEmpty(userMessage)) {
+      newMessage(userMessage, 5000)
     }
-  }
-
-  if (!isEmpty(userMessage)) {
-    newMessage(userMessage, 5000)
-  }
+  }, [userMessage, newMessage])
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
@@ -162,7 +171,8 @@ export default function Inbox ({ history: { push } }) {
     default:
       throw new Error('Invalid inboxView: ' + inboxView)
   }
-  const displayBalance = (isNil(holofuelBalance) && ledgerLoading) ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+
+  const displayBalance = (isEmpty(holofuelBalance) && ledgerLoading) || isNaN(holofuelBalance) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
@@ -204,10 +214,11 @@ export default function Inbox ({ history: { push } }) {
     {isDisplayTransactionsEmpty && !isDisplayLoading && <>
       <NullStateMessage
         styleName='null-state-message'
-        message={inboxView === VIEW.actionable
-          ? 'You have no pending offers or requests'
-          : 'You have no recent activity'}
-      >
+        message={!isConnected
+          ? 'Your transactions cannot be displayed at this time'
+          : inboxView === VIEW.actionable
+            ? 'You have no pending offers or requests'
+            : 'You have no recent activity'}>
         <div onClick={() => push(OFFER_REQUEST_PATH)}>
           <PlusInDiscIcon styleName='null-add-icon' backgroundColor={caribbeanGreen} />
         </div>
@@ -226,8 +237,7 @@ export default function Inbox ({ history: { push } }) {
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        renderUserMessage={renderUserMessage}
-        refetchActionable={refetchActionable} />)}
+        setUserMessage={setUserMessage} />)}
     </div>}
 
     <ConfirmationModal
@@ -236,24 +246,27 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, renderUserMessage, refetchActionable }) {
-  const { hiddenTransactionsById, setHiddenTransactionsById } = useActionableDisplayContext()
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
+  const [hiddenTransactionIds, setHiddenTransactionIds] = useHiddenTransactionsContext()
+
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
       console.log('going to HIDE the TRANSACTION....');
-      setHiddenTransactionsById(hiddenTransactionsById.concat([id]))
+      setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
     } else {
-      setHiddenTransactionsById(remove(id, hiddenTransactionsById))
+      setHiddenTransactionIds(remove(id, hiddenTransactionIds))
     }
   }
 
-  const transactionIsVisible = id => !hiddenTransactionsById.includes(id)
-  if (isEqual(hiddenTransactionsById, transactions.map(transaction => transaction.id))) return null
+  const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
+  if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
   
   return <React.Fragment>
     <PageDivider title={dateLabel} />
     <div styleName='transaction-list'>
       {transactions.map(transaction => transactionIsVisible(transaction.id) && <TransactionRow
+        role='list'
+        key={transaction.id}
         transaction={transaction}
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
@@ -263,18 +276,16 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        role='list'
-        key={transaction.id}
-        renderUserMessage={renderUserMessage} />)}
+        setUserMessage={setUserMessage} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, renderUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, actioned, shouldHighlight, stale } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, isActioned, shouldHighlight, isStale } = transaction
 
-  if (stale) {
-    renderUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
+  if (isStale) {
+    setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
   }
 
   const isDrawerOpen = id === openDrawerId
@@ -438,8 +449,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
 
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    {inProcess && !highlightGreen && <ToolTip toolTipText='Timed out waiting for transaction confirmation from counterparty, will retry later'>
-      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'acceptance pending'}</h4>
+    {inProcess && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
     </ToolTip>}
 
     {stale && <ToolTip toolTipText='Validation failed. Transaction is stale'>

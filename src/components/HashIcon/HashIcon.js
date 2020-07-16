@@ -1,6 +1,5 @@
 import { string, number } from 'prop-types'
 import React from 'react'
-import cx from 'classnames'
 import { Network as Identicon } from 'react-identicon-variety-pack'
 import './HashIcon.module.css'
 
@@ -8,7 +7,7 @@ function DefaultIdenticon ({
   size,
   className
 }) {
-  return <div styleName={cx({ 'big-icon': size > 40 }, { 'small-icon': size < 40 })} className={className} />
+  return <div styleName='default-identicon' style={{ width: size, height: size }} className={className} />
 }
 
 export default function HashIcon ({
