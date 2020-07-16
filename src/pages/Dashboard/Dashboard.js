@@ -8,18 +8,22 @@ import GridIcon from 'components/icons/GridIcon'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import HostingReportQuery from 'graphql/HostingReportQuery.gql'
 import EarningsReportQuery from 'graphql/EarningsReportQuery.gql'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import './Dashboard.module.css'
+import { presentHolofuelAmount } from '../../utils'
 
 export default function Dashboard () {
   const { data: { hostingReport = {} } = {} } = useQuery(HostingReportQuery)
   const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
+  const { data: { holofuelLedger = {} } = {} } = useQuery(HolofuelLedgerQuery)
+  const { balance } = holofuelLedger
 
   const hostedHapps = hostingReport.hostedHapps || []
 
   const [areHappsExpanded, setAreHappsExpanded] = useState(false)
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
-    {<Card title='Hosting'>
+    {/* hiding this until hosting release */ false && <Card title='Hosting'>
       <div styleName='hosting-row'>
         <LocationIcon styleName='hosting-icon' /> {hostingReport.localSourceChains || '--'} Local source chains
       </div>
@@ -35,7 +39,7 @@ export default function Dashboard () {
       </div>
     </Card>}
 
-    {<Card title='Earnings'>
+    {/* hiding this until earnings are available */ false && <Card title='Earnings'>
       <div styleName='balance'>
         {(earningsReport.totalEarnings || '--').toLocaleString()} TF
       </div>
@@ -58,6 +62,12 @@ export default function Dashboard () {
         </div>
       </div>
     </Card>}
+
+    {<Card title='TestFuel' linkTo='/holofuel'>
+      <div styleName='balance-label'>Balance</div>
+      <div styleName='balance'>{presentHolofuelAmount(balance)} TF</div>
+    </Card>}
+
   </PrimaryLayout>
 }
 
