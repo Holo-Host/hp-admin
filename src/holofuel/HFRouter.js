@@ -17,16 +17,18 @@ function HFRoute (props) {
 }
 
 export default function HFRouter () {
-  const root = process.env.REACT_APP_HOLOFUEL_ROOT || 'holofuel'
+  const root = process.env.REACT_APP_HOLOFUEL_AT_ROOT === 'true'
+    ? ''
+    : 'holofuel'
 
   return <Switch>
-    <HFRoute path={`/${root}/(|home)`} exact component={Home} />
-    <HFRoute path={`/${root}/inbox`} exact component={Inbox} />
-    <HFRoute path={`/${root}/history`} exact component={TransactionHistory} />
-    <HFRoute path={`/${root}/offer-request`} exact component={CreateOfferRequest} />
-    <HFRoute path={`/${root}/profile`} exact component={Profile} />
-    <HFRoute path={`/${root}`} exact component={() => <Redirect to={`/${root}/`} />} />
-    <HFRoute path='/' exact component={() => <Redirect to={`/${root}/`} />} />
+    <HFRoute path={`${root}/(|home)`} exact component={Home} />
+    <HFRoute path={`${root}/inbox`} exact component={Inbox} />
+    <HFRoute path={`${root}/history`} exact component={TransactionHistory} />
+    <HFRoute path={`${root}/offer-request`} exact component={CreateOfferRequest} />
+    <HFRoute path={`${root}/profile`} exact component={Profile} />
+    <HFRoute path={`${root}`} exact component={() => <Redirect to={`${root}/`} />} />
+    <HFRoute path='/' exact component={() => <Redirect to={`${root}/`} />} />
     <HFRoute component={FourOhFour} />
   </Switch>
 }
