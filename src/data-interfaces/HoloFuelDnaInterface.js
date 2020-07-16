@@ -228,7 +228,7 @@ const HoloFuelDnaInterface = {
         avatarUrl: counterparty.avatar_url,
         nickname: counterparty.nickname
       })
-      
+
       if (cachedGetProfileCalls[agentId]) {
         if (typeof cachedGetProfileCalls[agentId].then === 'function') {
           return presentCounterparty(await cachedGetProfileCalls[agentId])

@@ -37,7 +37,7 @@ function HoloFuelAppCore () {
       <HFCurrentUserProvider>
         <HFFlashMessageProvider>
           <ActionableDisplayProvider>
-           <LoadCurrentUser>
+            <LoadCurrentUser>
               <AcceptRequestedOffers>
                 <PromptForNickname>
                   <HFRouter />

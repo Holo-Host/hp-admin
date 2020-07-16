@@ -15,7 +15,7 @@ export const DIRECTION = {
   outgoing: 'outgoing'
 }
 
-// we hide cancelled and declined transactions 
+// we hide cancelled and declined transactions
 // ...offers that are paying a request and not in process (those are handled by AcceptRequestedOffers)
 // ...and actioned transactions that have been hidden explicitly
 export function shouldShowTransactionInInbox (transaction) {

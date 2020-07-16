@@ -78,7 +78,7 @@ function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
-  const inboxCount = useRef()
+  const [inboxCount, setInboxCount] = useState()
   const actionableDisplayFilter = useCallback(transaction => {
     const { id, actioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
@@ -119,9 +119,9 @@ function PrimaryLayout ({
 
     // to sync the notifcation badge actionable tx count with hidden values
     if (hiddenTransactionIds) {
-      inboxCount.current = actionableTransactions.filter(actionableDisplayFilter).length
+      setInboxCount(actionableTransactions.filter(actionableDisplayFilter).length)
     } else {
-      inboxCount.current = actionableTransactions.filter(shouldShowTransactionInInbox).length
+      setInboxCount(actionableTransactions.filter(shouldShowTransactionInInbox).length)
     }
   }, [isConnected,
     setIsConnected,
@@ -149,7 +149,7 @@ function PrimaryLayout ({
       handleClose={handleMenuClose}
       agent={currentUser}
       agentLoading={currentUserLoading}
-      inboxCount={inboxCount.current}
+      inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
       ledgerLoading={isLoadingFirstLedger}
       isWide={isWide}

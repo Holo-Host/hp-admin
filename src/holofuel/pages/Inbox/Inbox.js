@@ -89,9 +89,9 @@ function useUpdatedTransactionLists () {
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
 
   const actionableDisplayFilter = transaction => {
-    const { id, actioned } = transaction
+    const { id, isActioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
+    ((isActioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !isActioned)
   }
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableDisplayFilter)
@@ -135,7 +135,7 @@ export default function Inbox ({ history: { push } }) {
   }, [holofuelUser, setCurrentUser])
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
-  const { actionableTransactions, recentTransactions, actionableLoading, recentLoading, refetchActionable } = useUpdatedTransactionLists(inboxView)
+  const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
 
   const [userMessage, setUserMessage] = useState('')
   const { newMessage } = useFlashMessageContext()
@@ -154,8 +154,8 @@ export default function Inbox ({ history: { push } }) {
   }
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
 
-  const [openDrawerId, setOpenDrawerId] = useState() 
- 
+  const [openDrawerId, setOpenDrawerId] = useState()
+
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
   let displayTransactions = []
   let isDisplayLoading
@@ -251,7 +251,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
-      console.log('going to HIDE the TRANSACTION....');
+      console.log('going to HIDE the TRANSACTION....')
       setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
     } else {
       setHiddenTransactionIds(remove(id, hiddenTransactionIds))
@@ -260,7 +260,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
-  
+
   return <React.Fragment>
     <PageDivider title={dateLabel} />
     <div styleName='transaction-list'>
@@ -334,7 +334,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [isLoading, setIsLoading] = useState(false)
   const [hasRenderedTransaction, setHasRenderedTransaction] = useState(false)
   const [hasTransactionAction, setHasTransactionAction] = useState('')
-  
+
   if (agent.id === null) return null
 
   const signalInProcessEvent = () => {
@@ -356,7 +356,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
-  const confirmRed = () => {    
+  const confirmRed = () => {
     setHighlightYellow(false)
     setHighlightRed(true)
     setIsDisabled(true)
@@ -367,21 +367,21 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
-  if (!hasRenderedTransaction && !stale) {    
+  if (!hasRenderedTransaction && !isStale) {
     setHasRenderedTransaction(true)
-    if ((hasTransactionAction === 'acceptOffer' || hasTransactionAction === 'pay')  && !inProcess && actioned) {
+    if ((hasTransactionAction === 'acceptOffer' || hasTransactionAction === 'pay') && !inProcess && isActioned) {
       confirmGreen()
-    } else if ((hasTransactionAction === 'decline' || hasTransactionAction === 'cancel')  && !inProcess && actioned) {
+    } else if ((hasTransactionAction === 'decline' || hasTransactionAction === 'cancel') && !inProcess && isActioned) {
       confirmRed()
-    } else if (inProcess && actioned) {      
+    } else if (inProcess && isActioned) {
       signalInProcessEvent()
-    } else if (!hasTransactionAction && !inProcess && actioned && shouldHighlight) {
+    } else if (!hasTransactionAction && !inProcess && isActioned && shouldHighlight) {
       if (shouldHighlight === 'green') {
         confirmGreen()
       } else if (shouldHighlight === 'red') {
         confirmRed()
       }
-    } else if (!hasTransactionAction && !inProcess && actioned && !shouldHighlight) {
+    } else if (!hasTransactionAction && !inProcess && isActioned && !shouldHighlight) {
       console.log('>>>>>> GOING TO HIDE TRANSACTION....')
       hideTransaction(true)
     }
@@ -400,7 +400,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused,
+    setIsLoading: setIsLoadingAndPaused
   }
 
   const showAcceptModal = () =>
@@ -416,7 +416,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, {  'highlightRed': highlightRed || stale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { 'highlightRed': highlightRed || isStale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -453,7 +453,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
     </ToolTip>}
 
-    {stale && <ToolTip toolTipText='Validation failed. Transaction is stale'>
+    {isStale && <ToolTip toolTipText='Validation failed. Transaction is stale'>
       <h4 styleName='alert-msg'>stale transaction</h4>
     </ToolTip>}
 
