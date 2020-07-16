@@ -3,7 +3,7 @@
 }
 
 .flag {
-  background-color: #6D5AAD;
+  background-color: var(--color-scampi);
   font-family: 'Circular';
   font-style: normal;
   font-weight: bold;
@@ -33,7 +33,7 @@
   border-top: 16px solid transparent;
   border-bottom: 16px solid transparent;
   
-  border-right: 16px solid #6D5AAD;
+  border-right: 16px solid var(--color-scampi);
 }
 
 .right-arrow {
@@ -42,5 +42,5 @@
   border-top: 16px solid transparent;
   border-bottom: 16px solid transparent;
   
-  border-left: 16px solid #6D5AAD;
+  border-left: 16px solid var(--color-scampi);
 }

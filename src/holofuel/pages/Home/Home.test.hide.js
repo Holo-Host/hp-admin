@@ -1,3 +1,5 @@
+// Currently Home page is removed from the app.
+
 import React from 'react'
 import { fireEvent, within } from '@testing-library/react'
 import { MockedProvider } from '@apollo/react-testing'

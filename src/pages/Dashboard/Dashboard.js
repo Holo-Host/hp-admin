@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react' // , useState
+import React from 'react' // , useState
 import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import HashIcon from 'components/HashIcon'
 import LaptopIcon from 'components/icons/LaptopIcon'
@@ -27,17 +27,6 @@ export default function Dashboard ({ earnings = mockEarnings }) {
   const isBalanceZero = Number(balance) === 0
 
   const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
-  // const [urlOrigin, setUrlOrigin] = useState()
-  const location = useLocation()
-
-  useEffect(() => {
-    const origin = window.location.origin.trim()
-    const hasTrailingSlash = origin.charAt(origin.length - 1) === '/'
-    if (hasTrailingSlash) {
-      origin.slice(0, origin.length - 1)
-    }
-    // setUrlOrigin(window.location.origin)
-  }, [location]) // setUrlOrigin
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     <div styleName='avatar'>

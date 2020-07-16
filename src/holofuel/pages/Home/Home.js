@@ -1,3 +1,5 @@
+// Currently Home Page is removed from the app
+
 import React, { useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
