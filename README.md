@@ -72,3 +72,5 @@ Add the repo as a remote:
 Then `npm run deploy`
 
 Then go to https://github.com/Holo-Host/holofuel-static-ui/settings and update the 'custom domain field' (in the 'Github Pages' section) to `testfuel.holo.host`
+
+(If this step gets too annoying, I believe it's possible to automate it by having the deploy process also create a file in the build bundle called `CNAME` with contents `testfuel.holo.host`)
