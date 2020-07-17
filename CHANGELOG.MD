@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## unreleased
 ### Added
 - Github Pages deploy process
+- Updated Github Pages deploy process for testfuel.holo.host
 ### Fixed
 - Missing style bug causing crash after accepting a transaction
 - Inbox Dont allow multiple transaction drawers to be open at once, but allow actioning a transaction while another is in process
