@@ -3,8 +3,6 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import { Link } from 'react-router-dom'
 import './FourOhFour.module.css'
 
-jest.mock('holofuel/components/layout/PrimaryLayout')
-
 export default function FourOhFour () {
   return <PrimaryLayout headerProps={{ title: 'Holofuel' }}>
     <div styleName='card'>
