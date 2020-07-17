@@ -1,7 +1,6 @@
 import React from 'react'
 import AuthRoute from 'components/AuthRoute'
 import { Route, Switch, Redirect } from 'react-router-dom'
-import Home from 'holofuel/pages/Home'
 import Inbox from 'holofuel/pages/Inbox'
 import TransactionHistory from 'holofuel/pages/TransactionHistory'
 import CreateOfferRequest from 'holofuel/pages/CreateOfferRequest'
@@ -22,8 +21,7 @@ export default function HFRouter () {
     : '/holofuel'
 
   return <Switch>
-    <HFRoute path={`${root}/(|home)`} exact component={Home} />
-    <HFRoute path={`${root}/inbox`} exact component={Inbox} />
+    <HFRoute path={`${root}/(|inbox)`} exact component={Inbox} />
     <HFRoute path={`${root}/history`} exact component={TransactionHistory} />
     <HFRoute path={`${root}/offer-request`} exact component={CreateOfferRequest} />
     <HFRoute path={`${root}/profile`} exact component={Profile} />

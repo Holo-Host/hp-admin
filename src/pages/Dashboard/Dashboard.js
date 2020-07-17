@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
@@ -13,6 +14,8 @@ import './Dashboard.module.css'
 import { presentHolofuelAmount } from '../../utils'
 
 export default function Dashboard () {
+  // nb: we only call settings here to track hpos connection status (see apolloClient.js for use)
+  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
   const { data: { hostingReport = {} } = {} } = useQuery(HostingReportQuery)
   const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
   const { data: { holofuelLedger = {} } = {} } = useQuery(HolofuelLedgerQuery)
@@ -89,9 +92,9 @@ function Card ({ title, subtitle, linkTo, children }) {
 
 // a react-router link that can also take an external url
 function MixedLink ({ to, children, ...props }) {
-  const isExternal = /^https?:\/\//.test(to)
+  const isExternal = /^https?:\/\//.test(to) || /^http?:\/\//.test(to)
   if (isExternal) {
-    return <a href={to} {...props}>
+    return <a href={to} target='_blank' rel='noopener noreferrer' {...props}>
       {children}
     </a>
   } else {

@@ -19,5 +19,5 @@ it('should render the title and a menu icon', async () => {
   expect(getByText(props.settings.hostName)).toBeInTheDocument()
 
   fireEvent.click(getByTestId('avatar-link'))
-  expect(mockNavigateTo).toHaveBeenCalledWith('/admin/settings')
+  expect(mockNavigateTo).toHaveBeenCalledWith('/admin/dashboard')
 })

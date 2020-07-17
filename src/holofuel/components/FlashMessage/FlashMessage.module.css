@@ -6,13 +6,18 @@
   background-color: var(--color-caribbean-green);
   opacity: 0.9;
   padding: 10px;
-  margin: 0 5px;
+  margin: 0 auto;
   align-items: center;
-  align-self: center;
   border-radius: 4px;
   z-index: 30;
   color: white;
   text-align: center;
+  width: 98vw;
+}
+
+.desktop-message {
+  margin: 0 5px;
+  width: calc(100vw - 308px);
 }
 
 .flash-body {
@@ -20,6 +25,10 @@
   flex-flow: column;
   margin: 0 auto;
   margin-left: 30px;
+}
+
+.desktop-body {
+  margin: 0 auto;
 }
 
 .message {

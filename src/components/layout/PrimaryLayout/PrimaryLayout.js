@@ -13,6 +13,7 @@ import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
 import { useInterval } from 'utils'
 import { wsConnection } from 'holochainClient'
+import { isLoginPage, HP_ADMIN_LOGIN_PATH } from 'utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
@@ -23,8 +24,9 @@ export function PrimaryLayout ({
   showHeader = true,
   showAlphaFlag = true
 }) {
+  const [isInsideApp, setIsInsideApp] = useState(true)
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
-  const { setIsConnected, isConnected } = useConnectionContext()
+  const { setConnectionStatus, connectionStatus } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
@@ -36,35 +38,97 @@ export function PrimaryLayout ({
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
-    setIsConnected(isHposConnectionAlive && wsConnection)
+    if (!isLoginPage(window)) {
+      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
+    }
   }, 5000)
 
   useEffect(() => {
-    if (isConnected) {
-      newMessage('', 0)
+    if (!connectionStatus.hpos) {
+      // reroute to login on network/hpos connection error
+      if (!isLoginPage(window)) {
+        push(HP_ADMIN_LOGIN_PATH)
+      }
+      newMessage('Connecting to your Holoport...', 0)
+      setConnectionStatus({ ...connectionStatus, hpos: isHposConnectionAlive })
+    }
+
+    const setUser = () => {
       setCurrentUser({
         hostPubKey: settings.hostPubKey,
         hostName: settings.hostName || ''
       })
+    }
+
+    if (!isLoginPage(window)) {
+      // if inside happ, check for connection to holochain
+      if (connectionStatus.hpos && !connectionStatus.holochain) {
+        // reroute to login on conductor connection error as it signals emerging hpos connetion failure
+        if (!isLoginPage(window)) {
+          push(HP_ADMIN_LOGIN_PATH)
+        }
+      } else {
+        newMessage('', 0)
+        setUser()
+      }
     } else {
-      newMessage('Your Holoport is currently unreachable.', 0)
-      if (window.location.pathname !== '/' && window.location.pathname !== '/admin/login') {
-        push('/')
+      // if on login page and connected to hpos, clear message and set user
+      if (connectionStatus.hpos) {
+        newMessage('', 0)
+        setUser()
       }
     }
-  }, [isConnected, newMessage, push, setCurrentUser, settings.hostPubKey, settings.hostName])
+  }, [connectionStatus,
+    newMessage,
+    push,
+    setCurrentUser,
+    settings.hostPubKey,
+    settings.hostName,
+    setConnectionStatus,
+    isHposConnectionAlive,
+    isInsideApp,
+    setIsInsideApp])
 
   const isWide = useContext(ScreenWidthContext)
 
-  return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    {showHeader && <Header
-      {...headerProps}
-      settings={isConnected ? settings : {}} />}
-    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName='styles.content'>
-      <FlashMessage />
-      {children}
+  return <div styleName='styles.primary-layout'>
+    <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
+      {showHeader && <Header
+        {...headerProps}
+        settings={connectionStatus.hpos ? settings : {}} />}
+        {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
+      <div styleName='styles.content'>
+        <FlashMessage />
+        {children}
+      </div>
     </div>
+
+    {isLoginPage(window) && <div styleName='styles.wrapper'>
+      <div styleName='styles.container'>
+        <footer styleName='styles.footer'>
+          <div styleName='styles.alpha-info'>
+            <AlphaFlag variant='right' styleName='styles.alpha-flag' />
+            <p>
+              HP Admin is in Alpha testing.
+            </p>
+            <p>
+              Learn more about out our&nbsp;
+              <a href='https://holo.host/holo-testnet' target='_blank' rel='noopener noreferrer' styleName='styles.alpha-link'>
+                Alpha Testnet.
+              </a>
+            </p>
+            <ul styleName='styles.footer-list'>
+              <li styleName='styles.footer-list-item'>
+                <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>Help</a>
+              </li>
+              <li styleName='styles.footer-list-item'>
+                <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>View Terms of Service</a>
+              </li>
+            </ul>
+          </div>
+        </footer>
+      </div>
+    </div>}
   </div>
 }
 

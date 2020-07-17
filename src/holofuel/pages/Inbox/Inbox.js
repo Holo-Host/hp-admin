@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
-import { isEmpty, isNil, isEqual } from 'lodash/fp'
+import { isEmpty, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -9,24 +10,28 @@ import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTrans
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+import useConnectionContext from 'holofuel/contexts/useConnectionContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
-import CopyAgentId from 'holofuel/components/CopyAgentId'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
 import Jumbotron from 'holofuel/components/Jumbotron'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
 import HashAvatar from 'components/HashAvatar'
+import CopyAgentId from 'holofuel/components/CopyAgentId'
+import ToolTip from 'holofuel/components/ToolTip'
 import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
-import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+
+const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -76,18 +81,19 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
-  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
-  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
+  const { isConnected } = useConnectionContext()
+
+  const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
-
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
 
-  const actionableLoadingFirstTime = useLoadingFirstTime(allActionableLoading)
-  const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
+  const actionableLoadingFirstTime = useLoadingFirstTime(isConnected && allActionableLoading)
+  const recentLoadingFirstTime = useLoadingFirstTime(isConnected && allRecentLoading)
 
   return {
     actionableTransactions: updatedDisplayableActionable,
@@ -109,11 +115,28 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 15000 })
-  const { currentUser } = useCurrentUserContext()
+  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
+  const { currentUser, setCurrentUser } = useCurrentUserContext()
+  const { isConnected } = useConnectionContext()
+
+  useEffect(() => {
+    if (!isEmpty(holofuelUser)) {
+      setCurrentUser(holofuelUser)
+    }
+  }, [holofuelUser, setCurrentUser])
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
+
+  const [userMessage, setUserMessage] = useState('')
+  const { newMessage } = useFlashMessageContext()
+
+  useEffect(() => {
+    if (!isEmpty(userMessage)) {
+      newMessage(userMessage, 5000)
+    }
+  }, [userMessage, newMessage])
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
@@ -121,7 +144,6 @@ export default function Inbox ({ history: { push } }) {
     action: '',
     onConfirm: () => {}
   }
-
   const [confirmationModalProperties, setConfirmationModalProperties] = useState(defaultConfirmationModalProperties)
 
   const [openDrawerId, setOpenDrawerId] = useState()
@@ -142,7 +164,7 @@ export default function Inbox ({ history: { push } }) {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
-  const displayBalance = (isNil(holofuelBalance) && ledgerLoading) ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+  const displayBalance = (isEmpty(holofuelBalance) && ledgerLoading) || isNaN(holofuelBalance) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
@@ -184,10 +206,11 @@ export default function Inbox ({ history: { push } }) {
     {isDisplayTransactionsEmpty && !isDisplayLoading && <>
       <NullStateMessage
         styleName='null-state-message'
-        message={inboxView === VIEW.actionable
-          ? 'You have no pending offers or requests'
-          : 'You have no recent activity'}
-      >
+        message={!isConnected
+          ? 'Your transactions cannot be displayed at this time'
+          : inboxView === VIEW.actionable
+            ? 'You have no pending offers or requests'
+            : 'You have no recent activity'}>
         <div onClick={() => push(OFFER_REQUEST_PATH)}>
           <PlusInDiscIcon styleName='null-add-icon' backgroundColor={caribbeanGreen} />
         </div>
@@ -205,7 +228,8 @@ export default function Inbox ({ history: { push } }) {
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
-        setAreActionsPaused={setAreActionsPaused} />)}
+        setAreActionsPaused={setAreActionsPaused}
+        setUserMessage={setUserMessage} />)}
     </div>}
 
     <ConfirmationModal
@@ -214,10 +238,17 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused }) {
+export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
   const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
 
-  const hideTransactionWithId = id => setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
+  const manageHideTransactionWithId = (id, shouldHide) => {
+    if (shouldHide) {
+      setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
+    } else {
+      setHiddenTransactionIds(remove(id, hiddenTransactionIds))
+    }
+  }
+
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
 
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
@@ -226,29 +257,35 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
     <PageDivider title={dateLabel} />
     <div styleName='transaction-list'>
       {transactions.map(transaction => transactionIsVisible(transaction.id) && <TransactionRow
+        role='list'
+        key={transaction.id}
         transaction={transaction}
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
         userId={userId}
-        hideTransaction={() => hideTransactionWithId(transaction.id)}
+        hideTransaction={shouldHide => manageHideTransactionWithId(transaction.id, shouldHide)}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        role='list'
-        key={transaction.id} />)}
+        setUserMessage={setUserMessage} />)}
     </div>
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, isActioned, isStale } = transaction
+
+  if (isStale) {
+    setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
+  }
 
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
 
   const agent = canceledBy || counterparty
 
+  const isPayment = (isPayingARequest && status === STATUS.pending)
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request
   const isOutgoing = direction === DIRECTION.outgoing
@@ -277,33 +314,57 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
         ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
         : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
     }
-    fullNotes = isOffer ? ` Canceled Offer: ${notes}` : ` Canceled Request: ${notes}`
+    fullNotes = isOffer ? ` Canceled Offer${notes ? `: ${notes}` : ''}` : ` Canceled Request${notes ? `: ${notes}` : ''}`
   } else if (isDeclined) {
-    fullNotes = isOffer ? ` Declined Offer: ${notes}` : ` Declined Request: ${notes}`
+    fullNotes = isOffer ? ` Declined Offer${notes ? `: ${notes}` : ''}` : ` Declined Request${notes ? `: ${notes}` : ''}`
   } else fullNotes = notes
 
   const [highlightGreen, setHighlightGreen] = useState(false)
   const [highlightRed, setHighlightRed] = useState(false)
+  const [highlightYellow, setHighlightYellow] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isDisplayingInProcess, setIsDisplayingInProcess] = useState(false)
 
   if (agent.id === null) return null
 
-  const onConfirmGreen = () => {
-    setHighlightGreen(true)
+  if (!inProcess && !highlightGreen && isActioned) {
+    hideTransaction(true)
+  }
+
+  const onTimeout = () => {
+    setHighlightYellow(true)
     setIsDisabled(true)
     setTimeout(() => {
+      setHighlightRed(false)
+    }, 5000)
+  }
+
+  if (inProcess && !isDisplayingInProcess) {
+    setIsDisplayingInProcess(true)
+    onTimeout()
+  }
+
+  const onConfirmGreen = () => {
+    setHighlightYellow(false)
+    setHighlightGreen(true)
+    setIsDisabled(true)
+    hideTransaction(false)
+    setTimeout(() => {
       setHighlightGreen(false)
-      hideTransaction()
+      setIsDisplayingInProcess(false)
+      hideTransaction(true)
     }, 5000)
   }
 
   const onConfirmRed = () => {
+    setHighlightYellow(false)
     setHighlightRed(true)
     setIsDisabled(true)
+    hideTransaction(false)
     setTimeout(() => {
       setHighlightRed(false)
-      hideTransaction()
+      hideTransaction(true)
     }, 5000)
   }
 
@@ -331,7 +392,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -362,16 +423,20 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       {/* {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>} */}
     </div>
 
-    {isLoading && <Loading styleName='transaction-row-loading' width={20} height={20} />}
+    {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    {isActionable && !isLoading && !isDisabled && <>
+    {inProcess && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
+    </ToolTip>}
+
+    {isActionable && !isLoading && !isPayment && !isDisabled && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
         closeDrawer={() => setIsDrawerOpen(false)}
         areActionsPaused={areActionsPaused}
       />
-      {!isCanceled && <ActionOptions
+      {!isPayment && !isCanceled && !inProcess && <ActionOptions
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}
@@ -524,13 +589,16 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
 
   const onYes = () => {
     setIsLoading(true)
-
     hideModal()
-
     actionHook(actionParams)
-      .then(() => {
-        onConfirm()
-        newMessage(flashMessage, 5000)
+      .then(result => {
+        const { data } = result
+        if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
+          newMessage(timeoutErrorMessage, 5000)
+        } else {
+          onConfirm()
+          newMessage(flashMessage, 5000)
+        }
         setIsLoading(false)
       })
       .catch(() => {

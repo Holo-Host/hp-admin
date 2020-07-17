@@ -1,7 +1,11 @@
+// Currently Home Page is removed from the app
+
 import React, { useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
 import { isEmpty, get, isNil } from 'lodash/fp'
+import useConnectionContext from 'holofuel/contexts/useConnectionContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
@@ -12,23 +16,22 @@ import CopyAgentId from 'holofuel/components/CopyAgentId'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import HashAvatar from 'components/HashAvatar'
-import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Home.module.css'
 import { presentAgentId, presentHolofuelAmount, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH, HISTORY_PATH } from 'holofuel/utils/urls'
 
 const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {
-  if (ledgerLoading) return <>-- TF</>
+  if (ledgerLoading || isNaN(holofuelBalance)) return <>-- TF</>
   else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 
 export default function Home () {
   const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
 
-  const { loading: loadingTransactions, data: { holofuelCompletedTransactions: transactions = [] } = {} } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 5000 })
-
+  const { isConnected } = useConnectionContext()
   const { setCurrentUser, currentUser } = useCurrentUserContext()
 
   useEffect(() => {
@@ -45,9 +48,9 @@ export default function Home () {
   const history = useHistory()
   const goToOfferRequest = () => history.push(OFFER_REQUEST_PATH)
 
-  const isLoadingFirstPendingTransactions = useLoadingFirstTime(loadingTransactions)
+  const isLoadingFirstPendingTransactions = useLoadingFirstTime(isConnected && loadingTransactions)
 
-  return <PrimaryLayout headerProps={{ title: 'Holofuel Home' }}>
+  return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>
       <div styleName='backdrop' />
       <div styleName='avatar'>
@@ -90,7 +93,7 @@ export default function Home () {
           </div>}
 
           {!isLoadingFirstPendingTransactions && isTransactionsEmpty && <div styleName='transactions-empty'>
-            You have no recent transactions
+            {!isConnected ? 'Your transactions cannot be displayed at this time' : 'You have no recent transactions'}
           </div>}
 
           {!isTransactionsEmpty && <h2 styleName='transactions-label'>Recent Transactions</h2>}

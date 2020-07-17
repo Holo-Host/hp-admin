@@ -28,7 +28,6 @@
 .drawer--open .container {
   transform: translateX(100%);
   pointer-events: initial;
-  overflow-y: scroll;
 }
 
 .drawer-overlay {

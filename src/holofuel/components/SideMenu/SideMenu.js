@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
-import { presentHolofuelAmount, presentAgentId } from 'utils'
+import { presentAgentId } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import Button from 'components/UIButton'
+import Loading from 'components/Loading'
+import BackIcon from 'components/icons/BackIcon'
+
 import {
-  HOME_PATH,
   INBOX_PATH,
   HISTORY_PATH,
   PROFILE_PATH
@@ -16,15 +19,22 @@ import './SideMenu.module.css'
 
 export default function SideMenu ({
   isOpen,
+  isWide,
   handleClose,
   avatarUrl = '',
   agent,
   agentLoading,
   inboxCount,
-  holofuelBalance,
-  ledgerLoading
+  isLoadingRefetchCalls,
+  refetchCalls
 }) {
-  return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
+  const location = useLocation()
+  const [currentPath, setCurrentPath] = useState()
+  useEffect(() => {
+    setCurrentPath(location.pathname)
+  }, [location])
+
+  return <aside styleName={cx('drawer', { 'drawer--open': isOpen }, { desktop: isWide })}>
     <div styleName='container'>
       <header styleName='header'>
         <CopyAgentId agent={{ id: agent.id }} isMe>
@@ -33,41 +43,40 @@ export default function SideMenu ({
         <h3 styleName='nickname'>
           {agent.nickname || (agentLoading && <>Loading...</>) || presentAgentId(agent.id)}
         </h3>
-
-        <h1 styleName='balance'><DisplayBalance
-          holofuelBalance={holofuelBalance}
-          ledgerLoading={ledgerLoading}
-        />
-        </h1>
       </header>
 
       <nav styleName='nav'>
         <ul styleName='nav-list'>
-          <li>
-            <Link to={HOME_PATH} styleName='nav-link'>
-              Home
-            </Link>
-          </li>
-          <li>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/inbox/' || currentPath === '/holofuel/inbox' || currentPath === '/holofuel/' || currentPath === '/holofuel' })}>
             <Link to={INBOX_PATH} styleName='nav-link'>
               Inbox <InboxBadge count={inboxCount} />
             </Link>
           </li>
-          <li>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/history/' || currentPath === '/holofuel/history' })}>
             <Link to={HISTORY_PATH} styleName='nav-link'>
               History
             </Link>
           </li>
-          <li>
+          <li styleName={cx({ 'active-link': currentPath === '/holofuel/profile/' || currentPath === '/holofuel/profile' })}>
             <Link to={PROFILE_PATH} styleName='nav-link'>
               Profile
             </Link>
           </li>
-          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li>
-            <Link to='/admin/' styleName='nav-link'>
-              HP Admin
+          <li>
+            <div styleName='loading-row'>
+              <Button onClick={() => refetchCalls()} styleName={cx('refresh-button', { 'btn-loading': isLoadingRefetchCalls })} variant='green'>
+                Refresh
+              </Button>
+              {isLoadingRefetchCalls && <Loading styleName='refresh-loading' width={20} height={20} />}
+            </div>
+          </li>
+
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='underline'>
+            <Link to='/admin/' styleName='admin-nav-link'>
+              <BackIcon styleName='back-icon' /> HP Admin
             </Link>
           </li>}
+
         </ul>
       </nav>
 
@@ -97,13 +106,8 @@ export default function SideMenu ({
       </footer>
 
     </div>
-    <div styleName='drawer-overlay' onClick={handleClose} />
+    {!isWide && <div styleName='drawer-overlay' onClick={handleClose} />}
   </aside>
-}
-
-function DisplayBalance ({ ledgerLoading, holofuelBalance }) {
-  if (ledgerLoading) return <>-- TF</>
-  else return <>{presentHolofuelAmount(holofuelBalance)} TF</>
 }
 
 function InboxBadge ({ count = 0 }) {

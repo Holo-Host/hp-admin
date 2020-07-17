@@ -13,3 +13,26 @@
   display: inline-block;
   border-radius: 50%;
 }
+
+.default-identicon {
+  border-radius: 50%;
+  background-color: grey;
+  display: inline-block;
+  min-width: 30px;
+  min-height: 30px;
+  max-width: 85px;
+  max-height: 85px;
+  margin: 10px;
+}
+
+.big-icon {
+  composes: default-identicon;
+  width: 48px;
+  height: 48px;
+}
+
+.small-icon {
+  composes: default-identicon;
+  width: 32px;
+  height: 32px;
+}

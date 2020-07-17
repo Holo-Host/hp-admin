@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _, { isEmpty } from 'lodash'
 import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
@@ -44,11 +44,12 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     timestamp: eventTimestamp,
     notes: notes || event.Request.notes,
     fees,
-    isPayingARequest
+    isPayingARequest,
+    isActioned: false
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -61,7 +62,9 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
     fees,
-    isPayingARequest
+    isPayingARequest,
+    inProcess,
+    isActioned: false
   }
 }
 
@@ -104,7 +107,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
 
 const presentDeclinedTransaction = declinedTx => {
   if (!declinedTx[2]) throw new Error('The Declined Transaction Entry(declinedTx[2]) is UNDEFINED : ', declinedTx)
-  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, true)
+  const transaction = declinedTx[2].Request ? presentPendingRequest({ event: declinedTx }, true) : presentPendingOffer({ event: declinedTx }, [], true)
   return {
     ...transaction,
     status: STATUS.declined
@@ -123,7 +126,14 @@ function presentPendingRequest (transaction, annuled = false) {
   return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
-function presentPendingOffer (transaction, annuled = false) {
+function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
+  const invalidEvent = invoicedOffers.find(io => !io.Invoice)
+  if (invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
+  const hasInvoice = () => {
+    const invoice = invoicedOffers.find(io => io.Invoice)
+    if (invoice) return true
+    else return false
+  }
   const { event, provenance } = transaction
   const origin = event[0]
   const stateDirection = DIRECTION.incoming // this indicates the spender of funds. (Note: This is an actionable Tx.)
@@ -133,7 +143,32 @@ function presentPendingOffer (transaction, annuled = false) {
   const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest })
+  const inProcess = isEmpty(invoicedOffers) ? false : hasInvoice()
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, inProcess })
+}
+
+let counter = 0
+async function getListPending (params) {
+  const { requests, promises, declined } = await createZomeCall('transactions/list_pending')(params)
+  // The counter is a trigger for accepting any in-process offers (offers with an invoice)
+  // currently, the decision is to check every 8 times when polling for list_pending is set to 30000ms (effectively being called every 4min)
+  counter++
+  if (counter === 8) {
+    counter = 0
+    promises.forEach(p => {
+      if (!isEmpty(p[1])) {
+        acceptInvoicedOffer(p[0], p[1])
+      }
+    })
+  }
+  return { requests, promises, declined }
+}
+
+const acceptInvoicedOffer = async (tx, invoicedOffers) => {
+  const invoicedOffer = invoicedOffers.find(io => io.Invoice)
+  if (invoicedOffer) {
+    await HoloFuelDnaInterface.offers.accept(tx.event[0])
+  }
 }
 
 function presentTransaction (transaction) {
@@ -171,6 +206,11 @@ function presentTransaction (transaction) {
 // AND create a more generalized data loading system
 const cachedGetProfileCalls = {}
 
+const cachedRecentlyActionedTransactions = []
+const removeTransactionFromCache = transactionId => {
+  _.remove(cachedRecentlyActionedTransactions, cachedRecentlyActionedTransactions.find(tx => tx.id === transactionId))
+}
+
 const HoloFuelDnaInterface = {
   user: {
     get: async () => {
@@ -195,16 +235,19 @@ const HoloFuelDnaInterface = {
         } else {
           return cachedGetProfileCalls[agentId]
         }
+      } else {
+        cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
+        const counterparty = await cachedGetProfileCalls[agentId]
+        if (counterparty.Err) {
+          return {
+            id: agentId,
+            avatarUrl: null,
+            nickname: null
+          }
+        }
+        cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
+        return presentCounterparty(counterparty)
       }
-
-      cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
-      const counterparty = await cachedGetProfileCalls[agentId]
-      if (counterparty.Err) {
-        throw new Error(`There was an error locating the holofuel agent with ID: ${agentId}. ERROR: ${counterparty.Err}. `)
-      }
-
-      cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
-      return presentCounterparty(counterparty)
     },
     update: async (nickname, avatarUrl) => {
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
@@ -240,9 +283,10 @@ const HoloFuelDnaInterface = {
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
-      const { requests, promises, declined } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p))).concat(declined.map(presentDeclinedTransaction))
-      const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
+      const { requests, promises, declined } = await getListPending({})
+      const actionableTransactions = requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
+      const actionableTransactionsDisplay = actionableTransactions.concat(cachedRecentlyActionedTransactions)
+      const uniqActionableTransactions = _.uniqBy(actionableTransactionsDisplay, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
 
       return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
@@ -295,8 +339,8 @@ const HoloFuelDnaInterface = {
       return presentedNonActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
-      const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
-      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p)))
+      const { requests, promises } = await getListPending({ origins: transactionId })
+      const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1]))).filter(tx => !(tx instanceof Error))
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -323,10 +367,18 @@ const HoloFuelDnaInterface = {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId })
       if (!declinedProof) throw new Error(`Decline Error: ${declinedProof}.`)
-      return {
+
+      const presentedTransaction = {
         ...transaction,
-        id: transactionId
+        id: transactionId,
+        isActioned: true
       }
+
+      cachedRecentlyActionedTransactions.push(presentedTransaction)
+      setTimeout(() => {
+        removeTransactionFromCache(presentedTransaction.id)
+      }, 5000)
+      return presentedTransaction
     },
     /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
     cancel: async (transactionId) => {
@@ -394,8 +446,8 @@ const HoloFuelDnaInterface = {
     create: async (counterpartyId, amount, notes, requestId) => {
       const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
 
-      return {
-        id: requestId || origin, // NB: If requestId isn't defined, then offer use origin as the ID (ie. Offer is the initiating transaction).
+      const presentedTransaction = {
+        id: requestId || origin, // NB: If requestId isn't defined, then offer uses origin as the ID (ie. Offer is the initiating transaction).
         amount,
         counterparty: {
           id: counterpartyId
@@ -403,25 +455,77 @@ const HoloFuelDnaInterface = {
         notes,
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,
-        type: TYPE.offer,
+        type: requestId ? TYPE.request : TYPE.offer, // NB: If requestId isn't defined, then base transaction is an offer, otherwise, it's a request user is paying
+        isActioned: !!requestId, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
         timestamp: currentDataTimeIso
       }
+
+      if (requestId) {
+        cachedRecentlyActionedTransactions.push(presentedTransaction)
+        setTimeout(() => {
+          removeTransactionFromCache(presentedTransaction.id)
+        }, 5000)
+      }
+      return presentedTransaction
     },
 
     accept: async (transactionId) => {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       const result = await createZomeCall('transactions/receive_payments_pending')({ promises: transactionId })
-
       const acceptedPaymentHash = Object.entries(result)[0][1]
-      if (acceptedPaymentHash.Err) throw new Error(`There was an error accepting the payment for the referenced transaction. ERROR: ${acceptedPaymentHash.Err}.`)
+      if (acceptedPaymentHash.Err) {
+        if (acceptedPaymentHash.Err.Internal) {
+          const spenderValidationError = /(Spender chain invalid)/g
+          if (typeof acceptedPaymentHash.Err.Internal === 'string' && spenderValidationError.test(acceptedPaymentHash.Err.Internal)) {
+            return {
+              ...transaction,
+              id: transactionId, // should always match `Object.entries(result)[0][0]`
+              direction: DIRECTION.incoming, // this indicates the hf recipient
+              status: STATUS.pending,
+              type: TYPE.offer,
+              isActioned: false,
+              inProcess: false,
+              isStale: true
+            }
+          } else {
+            try {
+              if (JSON.parse(acceptedPaymentHash.Err.Internal).kind.Timeout) {
+                return {
+                  ...transaction,
+                  id: transactionId, // should always match `Object.entries(result)[0][0]`
+                  direction: DIRECTION.incoming, // this indicates the hf recipient
+                  status: STATUS.pending,
+                  type: TYPE.offer,
+                  isActioned: true,
+                  inProcess: true,
+                  isStale: false
+                }
+              }
+            } catch (e) {
+              throw new Error(acceptedPaymentHash.Err)
+            }
+            // default:
+            throw new Error(acceptedPaymentHash.Err)
+          }
+        }
+      }
 
-      return {
+      const presentedTransaction = {
         ...transaction,
         id: transactionId, // should always match `Object.entries(result)[0][0]`
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.completed,
-        type: TYPE.offer
+        type: TYPE.offer,
+        isActioned: true,
+        inProcess: false,
+        isStale: false
       }
+
+      cachedRecentlyActionedTransactions.push(presentedTransaction)
+      setTimeout(() => {
+        removeTransactionFromCache(presentedTransaction.id)
+      }, 5000)
+      return presentedTransaction
     }
   }
 }

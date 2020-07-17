@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { isEmpty, difference } from 'lodash/fp'
+import { STATUS } from 'models/Transaction'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -22,7 +23,7 @@ function AcceptRequestedOffers ({
   children
 }) {
   const { data: { holofuelActionableTransactions: actionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const requestPayments = actionableTransactions.filter(transaction => transaction.isPayingARequest)
+  const requestPayments = actionableTransactions.filter(transaction => (transaction.status === STATUS.pending && transaction.isPayingARequest))
   const acceptOffer = useAcceptOffer()
 
   const [acceptedPaymentIds, setAcceptedPaymentIds] = useState([])
