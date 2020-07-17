@@ -96,7 +96,7 @@ export function PrimaryLayout ({
       {showHeader && <Header
         {...headerProps}
         settings={connectionStatus.hpos ? settings : {}} />}
-        {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
+      {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
       <div styleName='styles.content'>
         <FlashMessage />
         {children}

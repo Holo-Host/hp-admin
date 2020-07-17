@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { isEmpty } from 'lodash/fp'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
@@ -7,6 +6,7 @@ import LocationIcon from 'components/icons/LocationIcon'
 import PhoneIcon from 'components/icons/PhoneIcon'
 import GridIcon from 'components/icons/GridIcon'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
+import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HostingReportQuery from 'graphql/HostingReportQuery.gql'
 import EarningsReportQuery from 'graphql/EarningsReportQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -15,7 +15,7 @@ import { presentHolofuelAmount } from '../../utils'
 
 export default function Dashboard () {
   // nb: we only call settings here to track hpos connection status (see apolloClient.js for use)
-  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
+  useQuery(HposSettingsQuery)
   const { data: { hostingReport = {} } = {} } = useQuery(HostingReportQuery)
   const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
   const { data: { holofuelLedger = {} } = {} } = useQuery(HolofuelLedgerQuery)

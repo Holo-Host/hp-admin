@@ -15,11 +15,5 @@ export default function Header ({ title, settings, showBackButton }) {
     <Link to='/admin/settings' styleName='settings-link' data-testid='settings-link'>
       <GearIcon />
     </Link>
-    <h1 styleName='title'>{title}</h1>
-    <div styleName='left-nav'>
-      <Link to='/admin/settings' styleName='settings-link'>
-        <GearIcon styleName='gear-icon' />
-      </Link>
-    </div>
   </div>
 }
