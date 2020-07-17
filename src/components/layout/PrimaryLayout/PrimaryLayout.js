@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
@@ -9,6 +9,7 @@ import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
+import useHFConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
 import { useInterval } from 'utils'
@@ -27,6 +28,7 @@ export function PrimaryLayout ({
   const [isInsideApp, setIsInsideApp] = useState(true)
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
   const { connectionStatus, setConnectionStatus } = useConnectionContext()
+  const { isConnected: isHFConductorConnected } = useHFConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
@@ -49,12 +51,18 @@ export function PrimaryLayout ({
     }
   }, 5000)
 
+  const setConductorConnectionFalse = useCallback(() => setConnectionStatus({ ...connectionStatus, holochain: false }), [setConnectionStatus, connectionStatus])
+
   useEffect(() => {
     const setUser = () => {
       setCurrentUser({
         hostPubKey: settings.hostPubKey,
         hostName: settings.hostName || ''
       })
+    }
+
+    if (!isHFConductorConnected && connectionStatus.holochain) {
+      setConductorConnectionFalse()
     }
 
     if (!connectionStatus.hpos && !isPausedConnectionCheckInterval) {

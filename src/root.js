@@ -32,26 +32,26 @@ function HoloFuelAppCore () {
   const isWide = useMediaPredicate('(min-width: 550px)')
 
   return <HFScreenWidthContext.Provider value={isWide}>
-    <HFConnectionProvider>
-      <HFCurrentUserProvider>
-        <HFFlashMessageProvider>
-          <LoadCurrentUser>
-            <AcceptRequestedOffers>
-              <PromptForNickname>
-                <HFRouter />
-              </PromptForNickname>
-            </AcceptRequestedOffers>
-          </LoadCurrentUser>
-        </HFFlashMessageProvider>
-      </HFCurrentUserProvider>
-    </HFConnectionProvider>
+    <HFCurrentUserProvider>
+      <HFFlashMessageProvider>
+        <LoadCurrentUser>
+          <AcceptRequestedOffers>
+            <PromptForNickname>
+              <HFRouter />
+            </PromptForNickname>
+          </AcceptRequestedOffers>
+        </LoadCurrentUser>
+      </HFFlashMessageProvider>
+    </HFCurrentUserProvider>
   </HFScreenWidthContext.Provider>
 }
 
 export function HoloFuelApp () {
   return <ApolloProvider client={apolloClient}>
     <Router>
-      <HoloFuelAppCore />
+      <HFConnectionProvider>
+        <HoloFuelAppCore />
+      </HFConnectionProvider>
     </Router>
   </ApolloProvider>
 }
@@ -63,16 +63,18 @@ export function HPAdminApp () {
     <Router>
       <ScreenWidthContext.Provider value={isWide}>
         <ConnectionProvider>
-          <AuthProvider>
-            <CurrentUserProvider>
-              <FlashMessageProvider>
-                <Switch>
-                  <Route path='/holofuel' component={HoloFuelAppCore} />
-                  <HPAdminRouter />
-                </Switch>
-              </FlashMessageProvider>
-            </CurrentUserProvider>
-          </AuthProvider>
+          <HFConnectionProvider>
+            <AuthProvider>
+              <CurrentUserProvider>
+                <FlashMessageProvider>
+                  <Switch>
+                    <Route path='/holofuel' component={HoloFuelAppCore} />
+                    <HPAdminRouter />
+                  </Switch>
+                </FlashMessageProvider>
+              </CurrentUserProvider>
+            </AuthProvider>
+          </HFConnectionProvider>
         </ConnectionProvider>
       </ScreenWidthContext.Provider>
     </Router>

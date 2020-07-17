@@ -171,8 +171,6 @@ export default function Inbox ({ history: { push } }) {
 
   const [areActionsPaused, setAreActionsPaused] = useState(false)
 
-  console.log('isConnected ? ', isConnected)
-
   return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
     <Jumbotron
       className='inbox-header'
