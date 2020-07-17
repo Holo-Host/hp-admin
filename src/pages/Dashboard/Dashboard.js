@@ -9,7 +9,7 @@ import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import CopyAgentId from 'components/CopyAgentId'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentHolofuelAmount, POLLING_INTERVAL } from 'utils'
+import { presentHolofuelAmount, POLLING_INTERVAL_GENERAL } from 'utils'
 import cx from 'classnames'
 import './Dashboard.module.css'
 
@@ -18,7 +18,7 @@ export const mockEarnings = 4984
 
 export default function Dashboard ({ earnings = mockEarnings }) {
   const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
-  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL })
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL_GENERAL })
 
   // placeholder as we're not currently calling hha
   const noInstalledHapps = 0

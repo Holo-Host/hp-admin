@@ -11,7 +11,7 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
-import { useInterval, POLLING_INTERVAL } from 'utils'
+import { useInterval, POLLING_INTERVAL_SETTINGS } from 'utils'
 import { wsConnection } from 'holochainClient'
 import { isLoginPage, HP_ADMIN_LOGIN_PATH } from 'utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
@@ -34,7 +34,7 @@ function PrimaryLayout ({
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL / 3), onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL_SETTINGS / 3), onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
     if (!isLoginPage(window)) {

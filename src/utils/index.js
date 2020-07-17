@@ -4,6 +4,9 @@ import moment from 'moment'
 
 // Default polling interval to 30000ms
 export const POLLING_INTERVAL = parseInt(process.env.REACT_APP_POLLING_INTERVAL) || 30000
+export const POLLING_INTERVAL_GENERAL = Math.max(Math.floor(POLLING_INTERVAL), 5000)
+// settings is called x3 as frequently for hpos connection monitoring, but the min should still be set to 5000ms (ie: 15000/3)
+export const POLLING_INTERVAL_SETTINGS = Math.max(Math.floor(POLLING_INTERVAL), 15000)
 
 export function bgImageStyle (url) {
   if (!url) return {}
