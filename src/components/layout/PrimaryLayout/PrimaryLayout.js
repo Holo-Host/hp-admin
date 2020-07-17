@@ -26,10 +26,13 @@ export function PrimaryLayout ({
 }) {
   const [isInsideApp, setIsInsideApp] = useState(true)
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
-  const { setConnectionStatus, connectionStatus } = useConnectionContext()
+  const { connectionStatus, setConnectionStatus } = useConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
+
+  const [isPausedConnectionCheckInterval, setIsPausedConnectionCheckInterval] = useState(false)
+  const [userMessage, setUserMessage] = useState('')
 
   const onError = ({ graphQLErrors: { isHposConnectionActive } }) => {
     setIsHposConnectionAlive(isHposConnectionActive)
@@ -38,21 +41,15 @@ export function PrimaryLayout ({
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
-    if (!isLoginPage(window)) {
+    if (isLoginPage(window)) {
       setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
+    } else {
+      // on login page, set holochain conductor connnection as false when hpos connection is false, or true when true
+      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: isHposConnectionAlive })
     }
   }, 5000)
 
   useEffect(() => {
-    if (!connectionStatus.hpos) {
-      // reroute to login on network/hpos connection error
-      if (!isLoginPage(window)) {
-        push(HP_ADMIN_LOGIN_PATH)
-      }
-      newMessage('Connecting to your Holoport...', 0)
-      setConnectionStatus({ ...connectionStatus, hpos: isHposConnectionAlive })
-    }
-
     const setUser = () => {
       setCurrentUser({
         hostPubKey: settings.hostPubKey,
@@ -60,34 +57,48 @@ export function PrimaryLayout ({
       })
     }
 
-    if (!isLoginPage(window)) {
-      // if inside happ, check for connection to holochain
-      if (connectionStatus.hpos && !connectionStatus.holochain) {
-        // reroute to login on conductor connection error as it signals emerging hpos connetion failure
-        if (!isLoginPage(window)) {
-          push(HP_ADMIN_LOGIN_PATH)
-        }
-      } else {
-        newMessage('', 0)
-        setUser()
+    if (!connectionStatus.hpos && !isPausedConnectionCheckInterval) {
+      // reroute to login on network/hpos connection error
+      if (!isLoginPage(window)) {
+        push(HP_ADMIN_LOGIN_PATH)
       }
-    } else {
-      // if on login page and connected to hpos, clear message and set user
-      if (connectionStatus.hpos) {
-        newMessage('', 0)
-        setUser()
+      const noHoloportConnectionMsg = 'Connecting to your Holoport...'
+      if (userMessage !== noHoloportConnectionMsg) {
+        setUserMessage(noHoloportConnectionMsg)
+        newMessage(noHoloportConnectionMsg, 0)
       }
+      setIsPausedConnectionCheckInterval(true)
+      setTimeout(() => setIsPausedConnectionCheckInterval(false), 5000)
+    } else if (connectionStatus.hpos && !connectionStatus.holochain) {
+      if (!isLoginPage(window)) {
+        push(HP_ADMIN_LOGIN_PATH)
+      }
+      const noConductorConnectionMsg = 'Connecting to your Conductor...'
+      if (userMessage !== noConductorConnectionMsg) {
+        setUserMessage(noConductorConnectionMsg)
+        newMessage(noConductorConnectionMsg, 0)
+      }
+      // set as false until receive back onError result from next hpos (settingsQuery) polling
+      setIsHposConnectionAlive(false)
+    } else if (connectionStatus.hpos) {
+      setUserMessage('')
+      newMessage('', 0)
+      setUser()
     }
   }, [connectionStatus,
+    isPausedConnectionCheckInterval,
     newMessage,
     push,
     setCurrentUser,
     settings.hostPubKey,
     settings.hostName,
-    setConnectionStatus,
-    isHposConnectionAlive,
+    connectionStatus.hpos,
+    connectionStatus.holochain,
+    setIsHposConnectionAlive,
+    setIsPausedConnectionCheckInterval,
     isInsideApp,
-    setIsInsideApp])
+    setIsInsideApp,
+    userMessage])
 
   const isWide = useContext(ScreenWidthContext)
 
@@ -103,7 +114,7 @@ export function PrimaryLayout ({
       </div>
     </div>
 
-    {isLoginPage(window) && <div styleName='styles.wrapper'>
+    {!isLoginPage(window) && <div styleName='styles.wrapper'>
       <div styleName='styles.container'>
         <footer styleName='styles.footer'>
           <div styleName='styles.alpha-info'>
