@@ -99,6 +99,24 @@
   line-height: 19px;
 }
 
+.balance-label {
+  font-family: "Circular";
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 22px;  
+  letter-spacing: -0.4px;  
+  color: var(--color-rhino);
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+.balance {
+  font-family: "Circular";
+  font-size: 24px;
+  line-height: 28px;
+  color: var(--color-rhino)
+}
+
 /* Card */
 
 .card {
@@ -109,6 +127,7 @@
   padding: 16px 16px 16px 16px;
   position: relative;
   margin-bottom: 46px;
+  text-decoration: none;
 }
 
 .card-title {
