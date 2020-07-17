@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## unreleased
 ### Added
 - Github Pages deploy process
+- Updated Github Pages deploy process for testfuel.holo.host
 - TestFuel card on Dashboard linking to Holofuel
 ### Removed
 - Temporarily removed Hosting and Earnings cards on Dashboard
