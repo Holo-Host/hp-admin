@@ -129,6 +129,23 @@ input TransactionInput {
   notes: String
 }
 
+type HostingReport {
+  localSourceChains: Int
+  zomeCalls: Int
+  hostedHapps: [HostedHapp]
+}
+
+type HostedHapp {
+  name: String
+}
+
+type EarningsReport {
+  totalEarnings: Float
+  cpu: Float
+  bandwidth: Float
+  storage: Float
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser
@@ -147,6 +164,8 @@ type Query {
   holofuelCounterparty(agentId: String): HolofuelUser
   holofuelHistoryCounterparties: [HolofuelUser]
   hposSettings: HposSettings
+  hostingReport: HostingReport
+  earningsReport: EarningsReport
   hposStatus: HposStatus
 }
 

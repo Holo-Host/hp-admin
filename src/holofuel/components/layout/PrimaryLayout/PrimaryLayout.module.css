@@ -8,7 +8,6 @@
 
 .wide {
   display: flex;
-  overflow: hidden;
   padding: 0;
 }
 

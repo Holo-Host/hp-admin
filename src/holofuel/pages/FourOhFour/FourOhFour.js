@@ -1,5 +1,5 @@
 import React from 'react'
-import PrimaryLayout from 'components/layout/PrimaryLayout'
+import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import { Link } from 'react-router-dom'
 import './FourOhFour.module.css'
 

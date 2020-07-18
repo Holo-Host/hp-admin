@@ -1,0 +1,9 @@
+query HostingReportQuery  {
+  hostingReport {
+    localSourceChains
+    zomeCalls
+    hostedHapps {
+      name
+    }
+  }
+}
