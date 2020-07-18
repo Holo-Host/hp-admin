@@ -35,6 +35,12 @@ function useUpdatedTransactionLists () {
 
   const isLoadingRefetchCalls = ledgerLoading || actionableTransactionsLoading || completedTransactionsLoading || nonPendingTransactionsLoading || waitingTransactionsLoading
 
+  console.log('ledgerLoading : ', ledgerLoading)
+  console.log('actionableTransactionsLoading : ', actionableTransactionsLoading)
+  console.log('completedTransactionsLoading : ', completedTransactionsLoading)
+  console.log('nonPendingTransactionsLoading : ', nonPendingTransactionsLoading)
+  console.log('waitingTransactionsLoading : ', waitingTransactionsLoading)
+
   const stopPolling = useCallback(() => {
     stopPollingActionableTransactions()
     stopPollingCompletedTransactions()

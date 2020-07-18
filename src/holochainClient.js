@@ -2,6 +2,7 @@ import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
+import resolve from 'resolve'
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -133,18 +134,32 @@ async function initHolochainClient () {
       url = urlObj.toString()
     }
 
-    holochainClient = await hcWebClientConnect({
-      url: url,
-      timeout: 5000,
-      wsClient: { max_reconnects: 2 }
-    })
+    // if hc-web-client connection never completes promise    
+    await Promise.race([
+      hcWebClientConnect({
+        url: url,
+        timeout: 5000,
+        wsClient: { max_reconnects: 2 }
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000))
+      ]).then((hc)=>{
+        holochainClient = hc
+        if (HOLOCHAIN_LOGGING) {
+          console.log('🎉 Successfully connected to Holochain!')
+        }
+        wsConnection = true
+        isInitiatingHcConnection = false
+        return holochainClient
+      } )
+      .catch(function(err) {
+        if (HOLOCHAIN_LOGGING) {
+          console.log('😞 Holochain client connection failed -- ', err.toString())
+        }
+        wsConnection = false
+        isInitiatingHcConnection = false
+        throw (err)
 
-    if (HOLOCHAIN_LOGGING) {
-      console.log('🎉 Successfully connected to Holochain!')
-    }
-    wsConnection = true
-    isInitiatingHcConnection = false
-    return holochainClient
+      })
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
@@ -170,6 +185,10 @@ async function initAndGetHolochainClient () {
     holochainClient = null
   }
 
+  if (holochainClient === undefined) {
+    wsConnection = false
+  }
+
   if (holochainClient) return holochainClient
   else return initHolochainClient()
 }
@@ -187,14 +206,16 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   const prevErr = []
 
   return async function (args = {}) {
+    console.log("Start zome call");
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
       let zomeCall
       if (MOCK_DNA_CONNECTION && MOCK_INDIVIDUAL_DNAS[instanceId]) {
         zomeCall = mockCallZome(instanceId, zome, zomeFunc)
       } else {
-        wsConnection = false
+        console.log("Start initAndGetHolochainClient");
         await initAndGetHolochainClient()
+        console.log("End initAndGetHolochainClient");
         const dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
         zomeCall = holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
       }
