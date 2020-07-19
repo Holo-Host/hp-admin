@@ -102,8 +102,10 @@ function PrimaryLayout ({
     settings.hostName,
     connectionStatus.hpos,
     connectionStatus.holochain,
+    isHFConductorConnected,
     setIsHposConnectionAlive,
     setIsPausedConnectionCheckInterval,
+    setConductorConnectionFalse,
     isInsideApp,
     setIsInsideApp,
     userMessage])
