@@ -33,9 +33,7 @@ jest.mock('holofuel/pages/FourOhFour')
 FourOhFour.mockImplementation(makeMockHFPage('FourOhFour'))
 
 const testLinks = ui => {
-  const { getByText, debug } = render(ui)
-
-  debug()
+  const { getByText } = render(ui)
 
   fireEvent.click(getByText('inbox'))
   expect(getByText('Inbox')).toBeInTheDocument()
