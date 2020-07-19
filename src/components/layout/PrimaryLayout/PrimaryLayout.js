@@ -117,7 +117,7 @@ export function PrimaryLayout ({
       {showHeader && <Header
         {...headerProps}
         settings={connectionStatus.hpos ? settings : {}} />}
-      {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
+      {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag-page' />}
       <div styleName='styles.content'>
         <FlashMessage />
         {children}
@@ -128,7 +128,7 @@ export function PrimaryLayout ({
       <div styleName={cx('styles.container', { 'styles.container-wide': isWide })}>
         <footer styleName='styles.footer'>
           <div styleName='styles.alpha-info'>
-            <AlphaFlag variant='right' styleName='styles.alpha-flag' />
+            <AlphaFlag variant='right' styleName='styles.alpha-flag-banner' />
             <p>
               HP Admin is in Alpha testing.
             </p>

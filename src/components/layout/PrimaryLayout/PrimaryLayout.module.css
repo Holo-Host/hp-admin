@@ -106,6 +106,16 @@
 
 .alpha-flag {
   position: absolute;
+}
+
+.alpha-flag-page {
+  composes: alpha-flag;
+  top: 8px;
+  right: 0px;
+}
+
+.alpha-flag-banner {
+  composes: alpha-flag;
   top: -16px;
   left: 0px;
 }
