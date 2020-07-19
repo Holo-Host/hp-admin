@@ -124,8 +124,8 @@ export function PrimaryLayout ({
       </div>
     </div>
 
-    {!isLoginPage(window) && <div styleName='styles.wrapper'>
-      <div styleName='styles.container'>
+    {!isLoginPage(window) && <div styleName={cx('styles.wrapper', { 'styles.wrapper-narrow': !isWide })}>
+      <div styleName={cx('styles.container', { 'styles.container-wide': isWide })}>
         <footer styleName='styles.footer'>
           <div styleName='styles.alpha-info'>
             <AlphaFlag variant='right' styleName='styles.alpha-flag' />
