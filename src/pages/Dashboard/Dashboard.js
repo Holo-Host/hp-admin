@@ -12,7 +12,6 @@ import EarningsReportQuery from 'graphql/EarningsReportQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount, POLLING_INTERVAL_GENERAL } from 'utils'
 import './Dashboard.module.css'
-import { presentHolofuelAmount } from '../../utils'
 
 export default function Dashboard () {
   // nb: we only call settings here to track hpos connection status (see apolloClient.js for use)
