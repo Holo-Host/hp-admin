@@ -31,7 +31,8 @@ export const resolvers = {
     holofuelHistoryCounterparties: async () => {
       const completed = await HoloFuelDnaInterface.transactions.allCompleted()
       const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
-      const historyTransactions = completed.concat(waiting)
+      const actionable = await HoloFuelDnaInterface.transactions.allActionable()
+      const historyTransactions = completed.concat(waiting).concat(actionable)
       return getTxCounterparties(historyTransactions)
     },
 

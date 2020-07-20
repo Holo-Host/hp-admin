@@ -237,7 +237,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
 export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
   const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    variables: { agentId }
+    variables: { agentId },
+    fetchPolicy: 'network-only'
   })
 
   const { id, nickname } = holofuelCounterparty
