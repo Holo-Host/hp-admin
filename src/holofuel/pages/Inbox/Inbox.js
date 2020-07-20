@@ -248,7 +248,7 @@ export default function Inbox ({ history: { push } }) {
 
 export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
   const { hiddenTransactionIds, setHiddenTransactionIds } = useHiddenTransactionsContext()
-  
+
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
       setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
@@ -256,7 +256,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
       setHiddenTransactionIds(remove(id, hiddenTransactionIds))
     }
   }
-  
+
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
 

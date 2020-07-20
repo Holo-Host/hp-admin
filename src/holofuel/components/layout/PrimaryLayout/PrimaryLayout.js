@@ -26,7 +26,6 @@ import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 import { useInterval, useLoadingFirstTime } from 'utils'
-import Login from '../../../../pages/Login/Login'
 
 function useUpdatedTransactionLists () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
@@ -84,9 +83,9 @@ function PrimaryLayout ({
     return shouldShowTransactionInInbox(transaction) &&
     ((isActioned && !hiddenTransactionIds.find(txId => txId === id)) || !isActioned)
   }
-  
+
   const inboxCount = actionableTransactions.filter(actionableDisplayFilter).length
-  
+
   const { push } = useHistory()
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -118,16 +117,12 @@ function PrimaryLayout ({
       }
     }
   }, [isConnected,
-    setIsConnected,
     push,
     newMessage,
     startPolling,
     stopPolling,
     shouldRefetchUser,
-    refetchHolofuelUser,
-    actionableTransactions,
-    hiddenTransactionIds,
-    actionableDisplayFilter
+    refetchHolofuelUser
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
