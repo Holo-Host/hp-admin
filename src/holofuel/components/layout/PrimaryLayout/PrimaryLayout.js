@@ -13,7 +13,6 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
@@ -40,16 +39,7 @@ function PrimaryLayout ({
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
-  const { hiddenTransactionIds } = useHiddenTransactionsContext()
   const { push } = useHistory()
-  
-  const shouldShowTransaction = useCallback(transaction => {
-    const { id, actioned } = transaction
-    return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionIds.find(tx => tx && tx.id === id)) || !actioned)
-  }, [hiddenTransactionIds])
-
-  const inboxCount = actionableTransactions.filter(shouldShowTransaction).length
 
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
@@ -100,19 +90,16 @@ function PrimaryLayout ({
       }
     }
   }, [isConnected,
-    setIsConnected,
     push,
     newMessage,
     startPolling,
     stopPolling,
     shouldRefetchUser,
-    refetchHolofuelUser,
-    actionableTransactions,
-    hiddenTransactionIds,
-    shouldShowTransaction
+    refetchHolofuelUser
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
+  const inboxCount = actionableTransactions.filter(shouldShowTransactionInInbox).length
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)

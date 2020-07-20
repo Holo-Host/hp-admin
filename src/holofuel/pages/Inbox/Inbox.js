@@ -365,7 +365,6 @@ export function TransactionRow ({
   }, [])
 
   const onConfirm = useCallback(() => {
-    console.log('==================> In confirm <==========================')
     const highlightColor = isDeclined ? 'red' : 'green'
     setHighlightYellow(false)
     addTemporaryTransaction({
