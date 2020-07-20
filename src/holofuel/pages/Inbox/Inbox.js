@@ -30,7 +30,7 @@ import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, shouldShowTransactionAsActionable } from 'models/Transaction'
 
 const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
@@ -88,13 +88,7 @@ function useUpdatedTransactionLists () {
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
 
-  const actionableDisplayFilter = transaction => {
-    const { id, isActioned } = transaction
-    return shouldShowTransactionInInbox(transaction) &&
-    ((isActioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !isActioned)
-  }
-
-  const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableDisplayFilter)
+  const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds))
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
@@ -336,7 +330,6 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   if (agent.id === null) return null
 
   if (!isStale && !inProcess && !isSuccessfulHighlight && isActioned) {
-    console.log('>>>>>> GOING TO HIDE TRANSACTION....')
     hideTransaction(true)
   }
 

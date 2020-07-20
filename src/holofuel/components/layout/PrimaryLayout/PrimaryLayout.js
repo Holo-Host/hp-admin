@@ -18,7 +18,7 @@ import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
-import { shouldShowTransactionInInbox } from 'models/Transaction'
+import { shouldShowTransactionAsActionable } from 'models/Transaction'
 import { INBOX_PATH } from 'holofuel/utils/urls'
 import { HP_ADMIN_LOGIN_PATH } from 'utils/urls'
 import { wsConnection } from 'holochainClient'
@@ -78,13 +78,7 @@ function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
-  const actionableDisplayFilter = transaction => {
-    const { id, isActioned } = transaction
-    return shouldShowTransactionInInbox(transaction) &&
-    ((isActioned && !hiddenTransactionIds.find(txId => txId === id)) || !isActioned)
-  }
-
-  const inboxCount = actionableTransactions.filter(actionableDisplayFilter).length
+  const inboxCount = actionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds)).length
 
   const { push } = useHistory()
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
