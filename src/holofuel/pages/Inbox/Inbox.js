@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import cx from 'classnames'
-import { isEmpty, isEqual, isNil, remove } from 'lodash/fp'
+import { isEmpty, isEqual } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
@@ -190,6 +190,8 @@ export default function Inbox ({ history: { push } }) {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
+  const displayBalance = (isEmpty(holofuelBalance) && ledgerLoading) || isNaN(holofuelBalance) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
 
@@ -290,9 +292,9 @@ export default function Inbox ({ history: { push } }) {
 }
 
 export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage, hideTransaction, addTemporaryTransaction }) {
+  const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
-
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
 
   return <React.Fragment>
@@ -470,7 +472,7 @@ export function TransactionRow ({
 
     {isLoading && !pendingCompletion && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    {inProcess && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
+    {pendingCompletion && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
       <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
     </ToolTip>}
 

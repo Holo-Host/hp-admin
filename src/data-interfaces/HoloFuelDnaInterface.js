@@ -64,7 +64,6 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     fees,
     isPayingARequest,
     pendingCompletion,
-    inProcess,
     isActioned: false
   }
 }
@@ -144,7 +143,7 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
   const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   const { amount, notes, fee } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
-  const pendingCompletion = isEmpty(invoicedOffers) ? false : findEvent()
+  const pendingCompletion = isEmpty(invoicedOffers) ? false : hasInvoice()
   return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, pendingCompletion })
 }
 

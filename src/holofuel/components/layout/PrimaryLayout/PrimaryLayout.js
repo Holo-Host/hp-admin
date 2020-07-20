@@ -87,25 +87,6 @@ function PrimaryLayout ({
     setIsConnected(wsConnection)
   }, 5000)
 
-  const usePollingTransactionQueries = useCallback(() => {
-    return {
-      startPolling: (pollingInterval) => {
-        startPollingActionableTransactions(pollingInterval)
-        startPollingCompletedTransactions(pollingInterval)
-      },
-      stopPolling: () => {
-        stopPollingActionableTransactions()
-        stopPollingCompletedTransactions()
-      }
-    }
-  }, [startPollingActionableTransactions,
-    startPollingCompletedTransactions,
-    stopPollingActionableTransactions,
-    stopPollingCompletedTransactions
-  ])
-
-  const { startPolling, stopPolling } = usePollingTransactionQueries()
-
   useEffect(() => {
     if (!isConnected) {
       newMessage('Connecting to your Holochain Conductor...', 0)
