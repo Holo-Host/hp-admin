@@ -1,8 +1,8 @@
 {
   "name": "hp-admin",
-  "version": "0.12.6",
+  "version": "0.12.7",
   "private": true,
-  "homepage": "https://holo-host.github.io/holofuel-static-ui/",
+  "homepage": "http://testfuel.holo.host",
   "scripts": {
     "start": "REACT_APP_VERSION=$npm_package_version npm run start:mock",
     "start:mock": "rm -rf ./node_modules/.cache/babel-loader && REACT_APP_MOCK_DNA_CONNECTION='true' node scripts/start.js",
@@ -30,7 +30,7 @@
     "test:preseed-data": "npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data",
     "test:integration": "nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "test:integration-with-setup": "npm run test:preseed-data && npm run test:integration",
-    "predeploy": "REACT_APP_HOLOFUEL_ROOT=holofuel-static-ui npm run build:holofuel",
+    "predeploy": "REACT_APP_HOLOFUEL_AT_ROOT=true npm run build:holofuel",
     "deploy": "gh-pages -d build -o static"
   },
   "dependencies": {

@@ -1,3 +1,5 @@
+// Currently Home Page is removed from the app
+
 import React, { useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useHistory, Link } from 'react-router-dom'
@@ -48,7 +50,7 @@ export default function Home () {
 
   const isLoadingFirstPendingTransactions = useLoadingFirstTime(isConnected && loadingTransactions)
 
-  return <PrimaryLayout headerProps={{ title: 'Test Fuel Home' }}>
+  return <PrimaryLayout headerProps={{ title: 'Home' }}>
     <div styleName='container'>
       <div styleName='backdrop' />
       <div styleName='avatar'>

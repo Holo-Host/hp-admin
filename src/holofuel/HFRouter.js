@@ -1,7 +1,6 @@
 import React from 'react'
 import AuthRoute from 'components/AuthRoute'
 import { Route, Switch, Redirect } from 'react-router-dom'
-import Home from 'holofuel/pages/Home'
 import Inbox from 'holofuel/pages/Inbox'
 import TransactionHistory from 'holofuel/pages/TransactionHistory'
 import CreateOfferRequest from 'holofuel/pages/CreateOfferRequest'
@@ -17,16 +16,17 @@ function HFRoute (props) {
 }
 
 export default function HFRouter () {
-  const root = process.env.REACT_APP_HOLOFUEL_ROOT || 'holofuel'
+  const root = process.env.REACT_APP_HOLOFUEL_AT_ROOT === 'true'
+    ? ''
+    : '/holofuel'
 
   return <Switch>
-    <HFRoute path={`/${root}/(|home)`} exact component={Home} />
-    <HFRoute path={`/${root}/inbox`} exact component={Inbox} />
-    <HFRoute path={`/${root}/history`} exact component={TransactionHistory} />
-    <HFRoute path={`/${root}/offer-request`} exact component={CreateOfferRequest} />
-    <HFRoute path={`/${root}/profile`} exact component={Profile} />
-    <HFRoute path={`/${root}`} exact component={() => <Redirect to={`/${root}/`} />} />
-    <HFRoute path='/' exact component={() => <Redirect to={`/${root}/`} />} />
+    <HFRoute path={`${root}/(|inbox)`} exact component={Inbox} />
+    <HFRoute path={`${root}/history`} exact component={TransactionHistory} />
+    <HFRoute path={`${root}/offer-request`} exact component={CreateOfferRequest} />
+    <HFRoute path={`${root}/profile`} exact component={Profile} />
+    <HFRoute path={`${root}`} exact component={() => <Redirect to={`${root}/`} />} />
+    <HFRoute path='/' exact component={() => <Redirect to={`${root}/`} />} />
     <HFRoute component={FourOhFour} />
   </Switch>
 }

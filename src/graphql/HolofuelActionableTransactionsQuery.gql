@@ -12,6 +12,7 @@ query HolofuelActionableTransactionsQuery {
     isPayingARequest
     canceledBy { id, nickname }
     pendingCompletion
-    actioned
+    inProcess
+    isActioned
   }
 }

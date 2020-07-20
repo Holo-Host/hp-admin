@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import cx from 'classnames'
-import { isEmpty, isNil } from 'lodash/fp'
+import { isEmpty, isEqual, isNil, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
+import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
@@ -9,6 +10,8 @@ import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTrans
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
+import useConnectionContext from 'holofuel/contexts/useConnectionContext'
+import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
@@ -23,12 +26,13 @@ import ToolTip from 'holofuel/components/ToolTip'
 import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
-import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Inbox.module.css'
 import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+
+const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -79,14 +83,15 @@ function useCounterparty (agentId) {
 
 function useUpdatedTransactionLists () {
   const { hiddenTransactionIds } = useHiddenTransactionsContext([])
+  const { isConnected } = useConnectionContext()
 
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 60000 })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
 
   const shouldShowTransaction = transaction => {
-    const { id, actioned } = transaction
+    const { id, isActioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionIds.find(tx => tx && tx.id === id)) || !actioned)
+    ((isActioned && !hiddenTransactionIds.find(tx => tx && tx.id === id)) || !isActioned)
   }
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransaction)
@@ -95,8 +100,8 @@ function useUpdatedTransactionLists () {
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
 
-  const actionableLoadingFirstTime = useLoadingFirstTime(allActionableLoading)
-  const recentLoadingFirstTime = useLoadingFirstTime(allRecentLoading)
+  const actionableLoadingFirstTime = useLoadingFirstTime(isConnected && allActionableLoading)
+  const recentLoadingFirstTime = useLoadingFirstTime(isConnected && allRecentLoading)
 
   return {
     actionableTransactions: updatedDisplayableActionable,
@@ -118,8 +123,16 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
+  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { currentUser } = useCurrentUserContext()
+  const { currentUser, setCurrentUser } = useCurrentUserContext()
+  const { isConnected } = useConnectionContext()
+
+  useEffect(() => {
+    if (!isEmpty(holofuelUser)) {
+      setCurrentUser(holofuelUser)
+    }
+  }, [holofuelUser, setCurrentUser])
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
@@ -205,8 +218,6 @@ export default function Inbox ({ history: { push } }) {
 
   const viewButtons = [{ view: VIEW.actionable, label: 'To-Do' }, { view: VIEW.recent, label: 'Activity' }]
 
-  const displayBalance = (isNil(holofuelBalance) && ledgerLoading) ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
-
   const [areActionsPaused, setAreActionsPaused] = useState(false)
 
   return <PrimaryLayout headerProps={{ title: 'Inbox' }}>
@@ -244,10 +255,11 @@ export default function Inbox ({ history: { push } }) {
     {isDisplayTransactionsEmpty && !isDisplayLoading && <>
       <NullStateMessage
         styleName='null-state-message'
-        message={inboxView === VIEW.actionable
-          ? 'You have no pending offers or requests'
-          : 'You have no recent activity'}
-      >
+        message={!isConnected
+          ? 'Your transactions cannot be displayed at this time'
+          : inboxView === VIEW.actionable
+            ? 'You have no pending offers or requests'
+            : 'You have no recent activity'}>
         <div onClick={() => push(OFFER_REQUEST_PATH)}>
           <PlusInDiscIcon styleName='null-add-icon' backgroundColor={caribbeanGreen} />
         </div>
@@ -278,10 +290,17 @@ export default function Inbox ({ history: { push } }) {
 }
 
 export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage, hideTransaction, addTemporaryTransaction }) {
+
+  const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
+
+  if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
+
   return <React.Fragment>
     <PageDivider title={dateLabel} />
     <div styleName='transaction-list'>
-      {transactions.map(transaction => <TransactionRow
+      {transactions.map(transaction => transactionIsVisible(transaction.id) && <TransactionRow
+        role='list'
+        key={transaction.id}
         transaction={transaction}
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
@@ -291,8 +310,6 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         setOpenDrawerId={setOpenDrawerId}
         areActionsPaused={areActionsPaused}
         setAreActionsPaused={setAreActionsPaused}
-        role='list'
-        key={transaction.id}
         setUserMessage={setUserMessage}
         addTemporaryTransaction={addTemporaryTransaction} />)}
     </div>
@@ -302,11 +319,11 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 export function TransactionRow ({
   transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage, addTemporaryTransaction
 }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, pendingCompletion, actioned, stale, temporary, highlightColor} = transaction
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, pendingCompletion, isActioned, isStale, temporary, highlightColor} = transaction
 
-  console.log('ACTIONED ????? , ', actioned)
+  console.log('isACTIONED ????? , ', isActioned)
 
-  if (stale) {
+  if (isStale) {
     setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
   }
 
@@ -381,16 +398,16 @@ export function TransactionRow ({
     console.log('============= temporary : ', temporary)
     console.log('============= isDeclined : ', isDeclined)
 
-    if (!stale) {
-      if (actioned && !pendingCompletion && !temporary) {
+    if (!isStale) {
+      if (isActioned && !pendingCompletion && !temporary) {
         console.log('>>> HIDING TRANSACTION : ')
         hideTransaction()
-      } else if (actioned && pendingCompletion && !temporary) {
+      } else if (isActioned && pendingCompletion && !temporary) {
         console.log('>>> GOING TO DISPLAY AS PENDING TRANSACTION : ')
         signalPendingCompletionEvent()
       }
     }
-  }, [stale, actioned, pendingCompletion, signalPendingCompletionEvent, hideTransaction, isDeclined, temporary])
+  }, [isStale, isActioned, pendingCompletion, signalPendingCompletionEvent, hideTransaction, isDeclined, temporary])
 
   if (agent.id === null) return null
 
@@ -420,7 +437,7 @@ export function TransactionRow ({
   
   if (agent.id === null) return null
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, {  'highlightRed': highlightRed || stale }, { 'highlightYellow': highlightYellow || isPayment }, { pendingCompletion })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, {  'highlightRed': highlightRed || isStale }, { 'highlightYellow': highlightYellow || isPayment }, { pendingCompletion })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -453,11 +470,11 @@ export function TransactionRow ({
 
     {isLoading && !pendingCompletion && <Loading styleName='transaction-row-loading' width={20} height={20} />}
 
-    {pendingCompletion && <ToolTip toolTipText='Timed out waiting for transaction confirmation from counterparty, will retry later'>
-      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing'}</h4>
+    {inProcess && !highlightGreen && <ToolTip toolTipText={timeoutErrorMessage}>
+      <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
     </ToolTip>}
 
-    {stale && <ToolTip toolTipText='Validation failed. Transaction is stale'>
+    {isStale && <ToolTip toolTipText='Validation failed. Transaction is stale'>
       <h4 styleName='alert-msg'>stale transaction</h4>
     </ToolTip>}
 

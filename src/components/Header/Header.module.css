@@ -13,6 +13,33 @@
   box-shadow: 0px 2.5px 10px rgba(0, 0, 0, 0.1);
 }
 
+.back-button {
+  display: flex;
+  align-items: center;
+  font-family: "Circular";
+  font-size: 10px;
+  line-height: 13px;
+  color: var(--color-rhino);
+  text-decoration: none;
+}
+
+.back-text {
+  margin-left: 5px;
+}
+
+.arrow-icon {
+  transform: rotate(180deg);
+}
+
+.nickname {
+  font-family: "Circular";
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  color: black;
+}
+
+
 .menu-button {
   border: none;
   padding: 5px;
@@ -30,9 +57,31 @@
   line-height: 21px;
 }
 
-.avatar-link {
+.settings-link {
   display: inline-block;
   width: 32px;
   height: 32px;
-  margin-right: 5px;
+  margin-top: 14px;
+  position: relative;
+  right: -16px;
+}
+
+.settings-link {
+  font-family: 'Circular';
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--color-cape-cod);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--color-cape-cod);
+}
+
+.back-icon,
+.gear-icon {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  margin-right: 2px;
 }

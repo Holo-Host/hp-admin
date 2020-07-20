@@ -7,6 +7,6 @@ mutation HolofuelDeclineMutation ($transactionId: ID) {
     status
     type
     timestamp
-    actioned
+    isActioned
   }
 }

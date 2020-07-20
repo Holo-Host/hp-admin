@@ -24,5 +24,4 @@ export function shouldShowTransactionInInbox (transaction) {
     status !== STATUS.declined &&
     !(isPayingARequest && !pendingCompletion) &&
     !(isPayingARequest && !status === STATUS.pending) // &&
-    // ((actioned && !shouldNotShowtransactionsById.find(tx => tx.id === id)) || !actioned)
 }

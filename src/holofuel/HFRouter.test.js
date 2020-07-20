@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link, MemoryRouter } from 'react-router-dom'
 import { render, fireEvent } from '@testing-library/react'
-import Home from 'holofuel/pages/Home'
 import Inbox from 'holofuel/pages/Inbox'
 import CreateOfferRequest from 'holofuel/pages/CreateOfferRequest'
 import TransactionHistory from 'holofuel/pages/TransactionHistory'
+import FourOhFour from 'holofuel/pages/FourOhFour'
 import HFRouter from './HFRouter'
 import {
   INBOX_PATH,
@@ -17,25 +17,25 @@ jest.mock('components/AuthRoute')
 
 const makeMockHFPage = title => () => <div>
   <div data-testid='title'>{title}</div>
-  <Link to='/'>slash</Link>
-  <Link to={INBOX_PATH}>inbox</Link>
-  <Link to={OFFER_REQUEST_PATH}>offer-request</Link>
-  <Link to={HISTORY_PATH}>history</Link>
+  <Link to='/holofuel'>slash</Link>
+  <Link to={`/holofuel/${INBOX_PATH}`}>inbox</Link>
+  <Link to={`/holofuel/${OFFER_REQUEST_PATH}`}>offer-request</Link>
+  <Link to={`/holofuel/${HISTORY_PATH}`}>history</Link>
 </div>
 
-jest.mock('holofuel/pages/Home')
-Home.mockImplementation(makeMockHFPage('Home'))
 jest.mock('holofuel/pages/Inbox')
 Inbox.mockImplementation(makeMockHFPage('Inbox'))
 jest.mock('holofuel/pages/CreateOfferRequest')
 CreateOfferRequest.mockImplementation(makeMockHFPage('CreateOfferRequest'))
 jest.mock('holofuel/pages/TransactionHistory')
 TransactionHistory.mockImplementation(makeMockHFPage('TransactionHistory'))
+jest.mock('holofuel/pages/FourOhFour')
+FourOhFour.mockImplementation(makeMockHFPage('FourOhFour'))
 
 const testLinks = ui => {
-  const { getByText } = render(ui)
+  const { getByText, debug } = render(ui)
 
-  expect(getByText('Home')).toBeInTheDocument()
+  debug()
 
   fireEvent.click(getByText('inbox'))
   expect(getByText('Inbox')).toBeInTheDocument()

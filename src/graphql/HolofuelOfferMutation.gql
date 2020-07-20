@@ -7,7 +7,7 @@ mutation HolofuelOffer ($counterpartyId: String, $amount: Float, $notes: String,
     direction
     status
     type
-    actioned
+    isActioned
     timestamp
   }
 }

@@ -45,7 +45,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     notes: notes || event.Request.notes,
     fees,
     isPayingARequest,
-    actioned: false
+    isActioned: false
   }
 }
 
@@ -64,7 +64,8 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     fees,
     isPayingARequest,
     pendingCompletion,
-    actioned: false
+    inProcess,
+    isActioned: false
   }
 }
 
@@ -126,22 +127,13 @@ function presentPendingRequest (transaction, annuled = false) {
   return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
 }
 
-let counter = 0
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
   const invalidEvent = invoicedOffers.find(io => !io.Invoice)
   if (invalidEvent) return new Error(`Error: invalidEvent found: ${invalidEvent}.`)
-  const handleEvent = () => HoloFuelDnaInterface.offers.accept(transaction.event[0])
-  const findEvent = () => {
+  const hasInvoice = () => {
     const invoice = invoicedOffers.find(io => io.Invoice)
-    counter++
-    if (invoice) {
-      if (counter > 10) {
-        counter = 0
-        handleEvent()
-      }
-      return true
-    }
-    return false
+    if (invoice) return true
+    else return false
   }
   const { event, provenance } = transaction
   const origin = event[0]
@@ -154,6 +146,30 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
   const isPayingARequest = !!event[2].Promise.request
   const pendingCompletion = isEmpty(invoicedOffers) ? false : findEvent()
   return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, pendingCompletion })
+}
+
+let counter = 0
+async function getListPending (params) {
+  const { requests, promises, declined } = await createZomeCall('transactions/list_pending')(params)
+  // The counter is a trigger for accepting any in-process offers (offers with an invoice)
+  // currently, the decision is to check every 8 times when polling for list_pending is set to 30000ms (effectively being called every 4min)
+  counter++
+  if (counter === 8) {
+    counter = 0
+    promises.forEach(p => {
+      if (!isEmpty(p[1])) {
+        acceptInvoicedOffer(p[0], p[1])
+      }
+    })
+  }
+  return { requests, promises, declined }
+}
+
+const acceptInvoicedOffer = async (tx, invoicedOffers) => {
+  const invoicedOffer = invoicedOffers.find(io => io.Invoice)
+  if (invoicedOffer) {
+    await HoloFuelDnaInterface.offers.accept(tx.event[0])
+  }
 }
 
 function presentTransaction (transaction) {
@@ -268,8 +284,8 @@ const HoloFuelDnaInterface = {
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
-      const { requests, promises, declined } = await createZomeCall('transactions/list_pending')()
-      const actionableTransactions = await requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
+      const { requests, promises, declined } = await getListPending({})
+      const actionableTransactions = requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
       const actionableTransactionsDisplay = actionableTransactions.concat(cachedRecentlyActionedTransactions)
       const uniqActionableTransactions = _.uniqBy(actionableTransactionsDisplay, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
@@ -324,7 +340,7 @@ const HoloFuelDnaInterface = {
       return presentedNonActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
-      const { requests, promises } = await createZomeCall('transactions/list_pending')({ origins: transactionId })
+      const { requests, promises } = await getListPending({ origins: transactionId })
       const transactions = requests.map(r => presentPendingRequest(r)).concat(promises.map(p => presentPendingOffer(p[0], p[1]))).filter(tx => !(tx instanceof Error))
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
@@ -356,7 +372,7 @@ const HoloFuelDnaInterface = {
       const presentedTransaction = {
         ...transaction,
         id: transactionId,
-        actioned: true
+        isActioned: true
       }
 
       cachedRecentlyActionedTransactions.push(presentedTransaction)
@@ -441,7 +457,7 @@ const HoloFuelDnaInterface = {
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,
         type: requestId ? TYPE.request : TYPE.offer, // NB: If requestId isn't defined, then base transaction is an offer, otherwise, it's a request user is paying
-        actioned: !!requestId, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
+        isActioned: !!requestId, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
         timestamp: currentDataTimeIso
       }
 
@@ -468,9 +484,9 @@ const HoloFuelDnaInterface = {
               direction: DIRECTION.incoming, // this indicates the hf recipient
               status: STATUS.pending,
               type: TYPE.offer,
-              actioned: false,
+              isActioned: false,
               pendingCompletion: false,
-              stale: true
+              isStale: true
             }
           } else {
             try {
@@ -481,9 +497,9 @@ const HoloFuelDnaInterface = {
                   direction: DIRECTION.incoming, // this indicates the hf recipient
                   status: STATUS.pending,
                   type: TYPE.offer,
-                  actioned: true,
+                  isActioned: true,
                   pendingCompletion: true,
-                  stale: false
+                  isStale: false
                 }
               }
             } catch (e) {
@@ -501,9 +517,9 @@ const HoloFuelDnaInterface = {
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.completed,
         type: TYPE.offer,
-        actioned: true,
+        isActioned: true,
         pendingCompletion: false,
-        stale: false
+        isStale: false
       }
 
       cachedRecentlyActionedTransactions.push(presentedTransaction)

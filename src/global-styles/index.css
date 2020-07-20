@@ -13,7 +13,7 @@ body {
   font-family: "Circular";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-alabaster);
+  background-color: white;
 }
 
 html, body, #root {

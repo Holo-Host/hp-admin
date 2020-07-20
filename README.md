@@ -29,7 +29,7 @@ If referencing **Live** Data :
 
 ---
 ### HoloFuel:
-
+  
 **Decide if you'll be using Mock or Live data.**
 
 If referencing **Mock** Data :
@@ -63,7 +63,7 @@ If referencing **Live** Data :
 
 ### HoloFuel UI deploy process:
 
-To deploy a build to https://holo-host.github.io/holofuel-static-ui/
+To deploy a build to http://testfuel.holo.host
 
 Add the repo as a remote:
 
@@ -71,4 +71,6 @@ Add the repo as a remote:
 
 Then `npm run deploy`
 
-If you want to deploy it somewhere else, you'll have to update "homepage" and "predeploy" in package.json to reflect the new url
+Then go to https://github.com/Holo-Host/holofuel-static-ui/settings and update the 'custom domain field' (in the 'Github Pages' section) to `testfuel.holo.host`
+
+(If this step gets too annoying, I believe it's possible to automate it by having the deploy process also create a file in the build bundle called `CNAME` with contents `testfuel.holo.host`)
