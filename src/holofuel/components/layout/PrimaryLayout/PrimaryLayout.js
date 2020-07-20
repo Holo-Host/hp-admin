@@ -26,6 +26,7 @@ import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 import { useInterval, useLoadingFirstTime } from 'utils'
+import Login from '../../../../pages/Login/Login'
 
 function useUpdatedTransactionLists () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
@@ -78,15 +79,15 @@ function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
-  const [inboxCount, setInboxCount] = useState()
-  const actionableDisplayFilter = useCallback(transaction => {
-    const { id, actioned } = transaction
+  const actionableDisplayFilter = transaction => {
+    const { id, isActioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
-  }, [hiddenTransactionIds])
-
+    ((isActioned && !hiddenTransactionIds.find(txId => txId === id)) || !isActioned)
+  }
+  
+  const inboxCount = actionableTransactions.filter(actionableDisplayFilter).length
+  
   const { push } = useHistory()
-
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
     setShouldRefetchUser(false)
@@ -115,13 +116,6 @@ function PrimaryLayout ({
       if (shouldRefetchUser) {
         refetchHolofuelUser()
       }
-    }
-
-    // to sync the notifcation badge actionable tx count with hidden values
-    if (hiddenTransactionIds) {
-      setInboxCount(actionableTransactions.filter(actionableDisplayFilter).length)
-    } else {
-      setInboxCount(actionableTransactions.filter(shouldShowTransactionInInbox).length)
     }
   }, [isConnected,
     setIsConnected,

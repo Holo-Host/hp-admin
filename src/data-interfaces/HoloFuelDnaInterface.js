@@ -457,8 +457,7 @@ const HoloFuelDnaInterface = {
         status: STATUS.pending,
         type: requestId ? TYPE.request : TYPE.offer, // NB: If requestId isn't defined, then base transaction is an offer, otherwise, it's a request user is paying
         isActioned: !!requestId, // NB: If requestId isn't defined, then offer was initiated, otherwise, a response to a payment has been actioned
-        timestamp: currentDataTimeIso,
-        shouldHighlight: 'green'
+        timestamp: currentDataTimeIso
       }
 
       if (requestId) {
@@ -519,7 +518,6 @@ const HoloFuelDnaInterface = {
         type: TYPE.offer,
         isActioned: true,
         inProcess: false,
-        shouldHighlight: 'green',
         isStale: false
       }
 

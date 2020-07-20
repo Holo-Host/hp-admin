@@ -247,17 +247,16 @@ export default function Inbox ({ history: { push } }) {
 }
 
 export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
-  const [hiddenTransactionIds, setHiddenTransactionIds] = useHiddenTransactionsContext()
-
+  const { hiddenTransactionIds, setHiddenTransactionIds } = useHiddenTransactionsContext()
+  
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
-      console.log('going to HIDE the TRANSACTION....')
       setHiddenTransactionIds(hiddenTransactionIds.concat([id]))
     } else {
       setHiddenTransactionIds(remove(id, hiddenTransactionIds))
     }
   }
-
+  
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
 
@@ -282,7 +281,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
 }
 
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, isActioned, shouldHighlight, isStale } = transaction
+  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, isActioned, isStale } = transaction
 
   if (isStale) {
     setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
@@ -332,12 +331,16 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [highlightYellow, setHighlightYellow] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [hasRenderedTransaction, setHasRenderedTransaction] = useState(false)
-  const [hasTransactionAction, setHasTransactionAction] = useState('')
+  const isSuccessfulHighlight = highlightGreen || highlightRed
 
   if (agent.id === null) return null
 
-  const signalInProcessEvent = () => {
+  if (!isStale && !inProcess && !isSuccessfulHighlight && isActioned) {
+    console.log('>>>>>> GOING TO HIDE TRANSACTION....')
+    hideTransaction(true)
+  }
+
+  const onSignalInProcessEvent = () => {
     setHighlightYellow(true)
     setIsDisabled(true)
     setTimeout(() => {
@@ -345,7 +348,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
-  const confirmGreen = () => {
+  const onConfirmGreen = () => {
     setHighlightYellow(false)
     setHighlightGreen(true)
     setIsDisabled(true)
@@ -356,8 +359,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     }, 5000)
   }
 
-  const confirmRed = () => {
-    setHighlightYellow(false)
+  const onConfirmRed = () => {
     setHighlightRed(true)
     setIsDisabled(true)
     hideTransaction(false)
@@ -365,31 +367,6 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       setHighlightRed(false)
       hideTransaction(true)
     }, 5000)
-  }
-
-  if (!hasRenderedTransaction && !isStale) {
-    setHasRenderedTransaction(true)
-    if ((hasTransactionAction === 'acceptOffer' || hasTransactionAction === 'pay') && !inProcess && isActioned) {
-      confirmGreen()
-    } else if ((hasTransactionAction === 'decline' || hasTransactionAction === 'cancel') && !inProcess && isActioned) {
-      confirmRed()
-    } else if (inProcess && isActioned) {
-      signalInProcessEvent()
-    } else if (!hasTransactionAction && !inProcess && isActioned && shouldHighlight) {
-      if (shouldHighlight === 'green') {
-        confirmGreen()
-      } else if (shouldHighlight === 'red') {
-        confirmRed()
-      }
-    } else if (!hasTransactionAction && !inProcess && isActioned && !shouldHighlight) {
-      console.log('>>>>>> GOING TO HIDE TRANSACTION....')
-      hideTransaction(true)
-    }
-  }
-
-  const onConfirm = action => {
-    setHasTransactionAction(action)
-    setHasRenderedTransaction(false)
   }
 
   const setIsLoadingAndPaused = state => {
@@ -400,20 +377,21 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused
+    setIsLoading: setIsLoadingAndPaused,
+    onSignalInProcessEvent
   }
 
   const showAcceptModal = () =>
-    setConfirmationModalProperties({ ...commonModalProperties, action: 'acceptOffer', onConfirm })
+    setConfirmationModalProperties({ ...commonModalProperties, action: 'acceptOffer', onConfirm: onConfirmGreen })
 
   const showPayModal = () =>
-    setConfirmationModalProperties({ ...commonModalProperties, action: 'pay', onConfirm })
+    setConfirmationModalProperties({ ...commonModalProperties, action: 'pay', onConfirm: onConfirmGreen })
 
   const showDeclineModal = () =>
-    setConfirmationModalProperties({ ...commonModalProperties, action: 'decline', onConfirm })
+    setConfirmationModalProperties({ ...commonModalProperties, action: 'decline', onConfirm: onConfirmRed })
 
   const showCancelModal = () =>
-    setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm })
+    setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
   return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { 'highlightRed': highlightRed || isStale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
