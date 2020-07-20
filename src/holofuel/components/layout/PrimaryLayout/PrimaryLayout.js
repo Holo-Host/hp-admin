@@ -83,9 +83,9 @@ function PrimaryLayout ({
     return shouldShowTransactionInInbox(transaction) &&
     ((isActioned && !hiddenTransactionIds.find(txId => txId === id)) || !isActioned)
   }
-  
+
   const inboxCount = actionableTransactions.filter(actionableDisplayFilter).length
-  
+
   const { push } = useHistory()
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
