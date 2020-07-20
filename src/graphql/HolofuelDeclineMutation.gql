@@ -8,6 +8,5 @@ mutation HolofuelDeclineMutation ($transactionId: ID) {
     type
     timestamp
     actioned
-    shouldHighlight
   }
 }

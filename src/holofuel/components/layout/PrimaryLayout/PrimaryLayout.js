@@ -26,6 +26,7 @@ import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
 import { useInterval, useLoadingFirstTime } from 'utils'
+import Login from '../../../../pages/Login/Login'
 
 function useUpdatedTransactionLists () {
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
@@ -80,9 +81,9 @@ function PrimaryLayout ({
 
   const [inboxCount, setInboxCount] = useState()
   const actionableDisplayFilter = useCallback(transaction => {
-    const { id, actioned } = transaction
+    const { id, isActioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
-    ((actioned && !hiddenTransactionIds.find(tx => tx.id === id)) || !actioned)
+    ((isActioned && !hiddenTransactionIds.find(txId => txId === id)) || !isActioned)
   }, [hiddenTransactionIds])
 
   const { push } = useHistory()
@@ -116,7 +117,6 @@ function PrimaryLayout ({
         refetchHolofuelUser()
       }
     }
-
     // to sync the notifcation badge actionable tx count with hidden values
     if (hiddenTransactionIds) {
       setInboxCount(actionableTransactions.filter(actionableDisplayFilter).length)
