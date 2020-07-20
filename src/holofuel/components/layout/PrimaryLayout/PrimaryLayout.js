@@ -79,15 +79,15 @@ function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
-  const [inboxCount, setInboxCount] = useState()
-  const actionableDisplayFilter = useCallback(transaction => {
+  const actionableDisplayFilter = transaction => {
     const { id, isActioned } = transaction
     return shouldShowTransactionInInbox(transaction) &&
     ((isActioned && !hiddenTransactionIds.find(txId => txId === id)) || !isActioned)
-  }, [hiddenTransactionIds])
-
+  }
+  
+  const inboxCount = actionableTransactions.filter(actionableDisplayFilter).length
+  
   const { push } = useHistory()
-
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
     setShouldRefetchUser(false)
@@ -116,12 +116,6 @@ function PrimaryLayout ({
       if (shouldRefetchUser) {
         refetchHolofuelUser()
       }
-    }
-    // to sync the notifcation badge actionable tx count with hidden values
-    if (hiddenTransactionIds) {
-      setInboxCount(actionableTransactions.filter(actionableDisplayFilter).length)
-    } else {
-      setInboxCount(actionableTransactions.filter(shouldShowTransactionInInbox).length)
     }
   }, [isConnected,
     setIsConnected,
