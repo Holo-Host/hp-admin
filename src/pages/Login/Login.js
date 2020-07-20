@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useMutation } from '@apollo/react-hooks'
 import useForm from 'react-hook-form'
 import { get } from 'lodash/fp'
@@ -20,12 +20,6 @@ export default function Login ({ history: { push } }) {
   const { setIsAuthed } = useAuthContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
-
-  useEffect(() => {
-    if (!connectionStatus.hpos) {
-      newMessage('Connecting to your Holoport...', 0)
-    }
-  }, [connectionStatus, newMessage])
 
   const onSubmit = async ({ email, password }) => {
     eraseHpAdminKeypair()

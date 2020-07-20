@@ -164,7 +164,7 @@ export default function Inbox ({ history: { push } }) {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
-  const displayBalance = (isEmpty(holofuelBalance) && ledgerLoading) || isNaN(holofuelBalance) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+  const displayBalance = (isEmpty(holofuelBalance) && ledgerLoading) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
