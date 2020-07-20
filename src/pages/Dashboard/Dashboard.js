@@ -1,85 +1,93 @@
-import React from 'react' // , useState
-import { isEmpty } from 'lodash/fp'
+import React, { useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
-import HashIcon from 'components/HashIcon'
-import LaptopIcon from 'components/icons/LaptopIcon'
-import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
-import CopyAgentId from 'components/CopyAgentId'
+import LocationIcon from 'components/icons/LocationIcon'
+import PhoneIcon from 'components/icons/PhoneIcon'
+import GridIcon from 'components/icons/GridIcon'
+import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import HostingReportQuery from 'graphql/HostingReportQuery.gql'
+import EarningsReportQuery from 'graphql/EarningsReportQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { presentHolofuelAmount } from 'utils'
-import cx from 'classnames'
 import './Dashboard.module.css'
+import { presentHolofuelAmount } from '../../utils'
 
-// Mock value to be replaced by graphql query
-export const mockEarnings = 4984
+export default function Dashboard () {
+  // nb: we only call settings here to track hpos connection status (see apolloClient.js for use)
+  useQuery(HposSettingsQuery)
+  const { data: { hostingReport = {} } = {} } = useQuery(HostingReportQuery)
+  const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
+  const { data: { holofuelLedger = {} } = {} } = useQuery(HolofuelLedgerQuery)
+  const { balance } = holofuelLedger
 
-export default function Dashboard ({ earnings = mockEarnings }) {
-  const { data: { hposSettings: settings = [] } = {} } = useQuery(HposSettingsQuery)
-  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
+  const hostedHapps = hostingReport.hostedHapps || []
 
-  // placeholder as we're not currently calling hha
-  const noInstalledHapps = 0
-
-  const isEarningsZero = Number(earnings) === 0
-  const isBalanceZero = Number(balance) === 0
-
-  const greeting = !isEmpty(settings.hostName) ? `Hi ${settings.hostName}!` : 'Hi!'
+  const [areHappsExpanded, setAreHappsExpanded] = useState(false)
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
-    <div styleName='avatar'>
-      <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
-        <HashIcon hash={settings.hostPubKey} size={42} />
-      </CopyAgentId>
-    </div>
-    <h2 styleName='greeting'>{greeting}</h2>
-
-    {false && <Card title='Hosting' linkTo='/admin/browse-happs' subtitle='Manage your Holo applications'>
-      <div styleName='hosting-content' data-testid='hosted-apps'>
-        {noInstalledHapps === 0 && <>
-          <PlusInDiscIcon color='#06C470' />Host your first hApp!
-        </>}
-        {noInstalledHapps > 0 && <>
-          <LaptopIcon styleName='laptop-icon' color='rgba(44, 63, 89, 0.80)' /> {noInstalledHapps} hApp{noInstalledHapps > 1 && 's'}
-        </>}
+    {/* hiding this until hosting release */ false && <Card title='Hosting'>
+      <div styleName='hosting-row'>
+        <LocationIcon styleName='hosting-icon' /> {hostingReport.localSourceChains || '--'} Local source chains
+      </div>
+      <div styleName='hosting-row'>
+        <PhoneIcon styleName='hosting-icon' /> {hostingReport.zomeCalls || '--'} Zome calls
+      </div>
+      <div styleName={areHappsExpanded ? 'hosting-row-expanded' : 'hosting-row'} onClick={() => setAreHappsExpanded(!areHappsExpanded)}>
+        <GridIcon styleName='hosting-icon' /> {hostedHapps.length || '--'} Hosted hApps
+        <ArrowRightIcon color='#979797' styleName={areHappsExpanded ? 'up-arrow' : 'down-arrow'} />
+        {areHappsExpanded && <div styleName='happ-list'>
+          {hostedHapps.map(({ name }) => <div styleName='happ-name'>{name}</div>)}
+        </div>}
       </div>
     </Card>}
 
-    {false && <Card title='Earnings' linkTo='/admin/earnings' subtitle='Track your TestFuel earnings'>
-      <div styleName={cx('balance', { 'empty-balance': isEarningsZero })}>
-        <h4 styleName='balance-header'>
-          {isEarningsZero ? 'Balance' : "Today's earnings"}
-        </h4>
-        <div styleName='balance-body' data-testid='hosted-earnings'>
-          {isEarningsZero ? "You haven't earned TestFuel" : `${presentHolofuelAmount(earnings)} TF`}
+    {/* hiding this until earnings are available */ false && <Card title='Earnings'>
+      <div styleName='balance'>
+        {(earningsReport.totalEarnings || '--').toLocaleString()} TF
+      </div>
+      <div styleName='pricing-section'>
+        <div styleName='pricing-title'>Pricing</div>
+        <div styleName='pricing-row'>
+          <div styleName='pricing-type'>CPU</div>
+          <div styleName='price'>{earningsReport.cpu} TF</div>
+          <div styleName='pricing-unit'>per ms</div>
+        </div>
+        <div styleName='pricing-row'>
+          <div styleName='pricing-type'>Bandwidth</div>
+          <div styleName='price'>{earningsReport.bandwidth} TF</div>
+          <div styleName='pricing-unit'>per MB</div>
+        </div>
+        <div styleName='pricing-row'>
+          <div styleName='pricing-type'>Storage</div>
+          <div styleName='price'>{earningsReport.storage} TF</div>
+          <div styleName='pricing-unit'>per MB</div>
         </div>
       </div>
     </Card>}
 
-    <Card title='Test Fuel' linkTo='/holofuel/' subtitle='Send, and receive TestFuel'>
-      <div styleName={cx('balance', { 'empty-balance': isBalanceZero })}>
-        <h4 styleName='balance-header'>
-          Current Balance
-        </h4>
-        <div styleName='balance-body' data-testid='holofuel-balance'>
-          {isBalanceZero ? 'You have no TestFuel' : `${presentHolofuelAmount(balance)} TF`}
-        </div>
-      </div>
-    </Card>
+    {<Card title='TestFuel' linkTo='/holofuel'>
+      <div styleName='balance-label'>Balance</div>
+      <div styleName='balance'>{presentHolofuelAmount(balance)} TF</div>
+    </Card>}
 
-    {/* NB: Comment back in once community app is released. */}
-    {/* <Card title='Community' linkTo={'/community/'} subtitle='Connect with your peers' /> */}
   </PrimaryLayout>
 }
 
 function Card ({ title, subtitle, linkTo, children }) {
-  return <MixedLink styleName='card' to={linkTo}>
+  const Wrapper = linkTo
+    ? ({ children }) => <MixedLink styleName='card' to={linkTo}>
+      {children}
+    </MixedLink>
+    : ({ children }) => <div styleName='card'>
+      {children}
+    </div>
+
+  return <Wrapper>
     <h1 styleName='card-title'>{title}</h1>
-    <h3 styleName='card-subtitle'>{subtitle}</h3>
+    {subtitle && <h3 styleName='card-subtitle'>{subtitle}</h3>}
     {children}
-  </MixedLink>
+  </Wrapper>
 }
 
 // a react-router link that can also take an external url

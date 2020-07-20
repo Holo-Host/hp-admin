@@ -75,7 +75,7 @@ export function Settings () {
 
   const title = (settings.hostName ? `${settings.hostName}'s` : 'Your') + ' HoloPort'
 
-  return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
+  return <PrimaryLayout headerProps={{ title: 'HoloPort Settings', showBackButton: true }}>
     <div styleName='avatar'>
       <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
         <HashIcon hash={settings.hostPubKey} size={42} />

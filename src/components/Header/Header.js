@@ -1,20 +1,19 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './Header.module.css'
-import BackIcon from 'components/icons/BackIcon'
 import GearIcon from 'components/icons/GearIcon'
-import { HP_ADMIN_SETTINGS_PATH } from 'utils/urls'
+import ArrowRightIcon from 'components/icons/ArrowRightIcon'
+import './Header.module.css'
 
-export default function Header ({ title }) {
+export default function Header ({ title, settings, showBackButton }) {
   return <div styleName='header'>
-    <Link to='/admin/dashboard' styleName='avatar-link' data-testid='avatar-link'>
-      {window.location.pathname === HP_ADMIN_SETTINGS_PATH && <BackIcon styleName='back-icon' />}
-    </Link>
+    {showBackButton && <Link to='/admin' styleName='back-button'>
+      <ArrowRightIcon styleName='arrow-icon' color={'#979797'} />
+      <div styleName='back-text'>Back</div>
+    </Link>}
+    {!showBackButton && <div styleName='nickname'>{settings.hostName || 'HoloPort'}</div>}
     <h1 styleName='title'>{title}</h1>
-    <div styleName='left-nav'>
-      <Link to='/admin/settings' styleName='settings-link'>
-        <GearIcon styleName='gear-icon' />
-      </Link>
-    </div>
+    <Link to='/admin/settings' styleName='settings-link' data-testid='settings-link'>
+      <GearIcon />
+    </Link>
   </div>
 }

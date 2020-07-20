@@ -61,4 +61,16 @@ If referencing **Live** Data :
 
 ---
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### HoloFuel UI deploy process:
+
+To deploy a build to http://testfuel.holo.host
+
+Add the repo as a remote:
+
+`$ git add remote static https://github.com/Holo-Host/holofuel-static-ui.git`
+
+Then `npm run deploy`
+
+Then go to https://github.com/Holo-Host/holofuel-static-ui/settings and update the 'custom domain field' (in the 'Github Pages' section) to `testfuel.holo.host`
+
+(If this step gets too annoying, I believe it's possible to automate it by having the deploy process also create a file in the build bundle called `CNAME` with contents `testfuel.holo.host`)
