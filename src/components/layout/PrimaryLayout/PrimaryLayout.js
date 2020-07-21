@@ -40,7 +40,7 @@ function PrimaryLayout ({
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL_SETTINGS / 3), onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL_SETTINGS), onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
     if (isLoginPage(window)) {

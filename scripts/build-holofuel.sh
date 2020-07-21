@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Default polling interval to 30000ms
-POLLING_INTERVAL=${1:-'30000'}
+# Set polling var if passed in
+# (polling default is set in app utils)
+POLLING_INTERVAL=${1:-'0'}
 
 # Check to verify that POLLING_INTERVAL is comprised of numbers
 case $POLLING_INTERVAL in
