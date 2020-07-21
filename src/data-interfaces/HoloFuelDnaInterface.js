@@ -238,7 +238,7 @@ const HoloFuelDnaInterface = {
       } else {
         cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
         const counterparty = await cachedGetProfileCalls[agentId]
-        if (counterparty.Err) {
+        if (!counterparty || counterparty.Err) {
           return {
             id: agentId,
             avatarUrl: null,
