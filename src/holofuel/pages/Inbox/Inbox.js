@@ -14,6 +14,7 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -30,7 +31,7 @@ import './Inbox.module.css'
 import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, shouldShowTransactionAsActionable } from 'models/Transaction'
 
 const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
@@ -82,12 +83,13 @@ function useCounterparty (agentId) {
 }
 
 function useUpdatedTransactionLists () {
+  const { hiddenTransactionIds } = useHiddenTransactionsContext()
   const { isConnected } = useConnectionContext()
 
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL_GENERAL })
 
-  const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
+  const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds))
   const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
@@ -240,7 +242,7 @@ export default function Inbox ({ history: { push } }) {
 }
 
 export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
-  const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
+  const { hiddenTransactionIds, setHiddenTransactionIds } = useHiddenTransactionsContext()
 
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
@@ -251,7 +253,6 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   }
 
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
-
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
 
   return <React.Fragment>
@@ -325,25 +326,20 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [highlightYellow, setHighlightYellow] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isDisplayingInProcess, setIsDisplayingInProcess] = useState(false)
+  const isSuccessfulHighlight = highlightGreen || highlightRed
 
   if (agent.id === null) return null
 
-  if (!inProcess && !highlightGreen && isActioned) {
+  if (!isStale && !inProcess && !isSuccessfulHighlight && isActioned) {
     hideTransaction(true)
   }
 
-  const onTimeout = () => {
+  const onSignalInProcessEvent = () => {
     setHighlightYellow(true)
     setIsDisabled(true)
     setTimeout(() => {
-      setHighlightRed(false)
+      setHighlightYellow(false)
     }, 5000)
-  }
-
-  if (inProcess && !isDisplayingInProcess) {
-    setIsDisplayingInProcess(true)
-    onTimeout()
   }
 
   const onConfirmGreen = () => {
@@ -353,13 +349,11 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     hideTransaction(false)
     setTimeout(() => {
       setHighlightGreen(false)
-      setIsDisplayingInProcess(false)
       hideTransaction(true)
     }, 5000)
   }
 
   const onConfirmRed = () => {
-    setHighlightYellow(false)
     setHighlightRed(true)
     setIsDisabled(true)
     hideTransaction(false)
@@ -377,7 +371,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused
+    setIsLoading: setIsLoadingAndPaused,
+    onSignalInProcessEvent
   }
 
   const showAcceptModal = () =>
@@ -393,7 +388,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { 'highlightRed': highlightRed || isStale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
         <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
@@ -430,7 +425,11 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
     </ToolTip>}
 
-    {isActionable && !isLoading && !isPayment && !isDisabled && <>
+    {isStale && <ToolTip toolTipText='Validation failed. Transaction is stale'>
+      <h4 styleName='alert-msg'>stale transaction</h4>
+    </ToolTip>}
+
+    {isActionable && !isLoading && !isPayment && !isDisabled && !inProcess && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
@@ -596,11 +595,11 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       .then(result => {
         const { data } = result
         if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
-          newMessage(timeoutErrorMessage, 5000)
+          newMessage('Timed out waiting for transaction confirmation from counterparty, will retry later', 5000)
         } else {
-          onConfirm()
           newMessage(flashMessage, 5000)
         }
+        onConfirm(action)
         setIsLoading(false)
       })
       .catch(() => {

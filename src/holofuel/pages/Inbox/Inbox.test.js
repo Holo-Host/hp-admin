@@ -24,6 +24,7 @@ jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('holofuel/contexts/useConnectionContext')
 jest.mock('holofuel/contexts/useCurrentUserContext')
+jest.mock('holofuel/contexts/useHiddenTransactionsContext')
 jest.unmock('holochainClient')
 
 // eslint-disable-next-line array-callback-return

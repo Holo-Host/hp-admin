@@ -13,11 +13,12 @@ import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import SideMenu from 'holofuel/components/SideMenu'
 import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
-import { shouldShowTransactionInInbox } from 'models/Transaction'
+import { shouldShowTransactionAsActionable } from 'models/Transaction'
 import { INBOX_PATH } from 'holofuel/utils/urls'
 import { HP_ADMIN_LOGIN_PATH } from 'utils/urls'
 import { wsConnection } from 'holochainClient'
@@ -75,8 +76,11 @@ function PrimaryLayout ({
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
-  const { push } = useHistory()
+  const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
+  const inboxCount = actionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds)).length
+
+  const { push } = useHistory()
   const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
   const refetchHolofuelUser = useCallback(() => {
     setShouldRefetchUser(false)
@@ -107,16 +111,15 @@ function PrimaryLayout ({
       }
     }
   }, [isConnected,
-    setIsConnected,
     push,
     newMessage,
     startPolling,
     stopPolling,
     shouldRefetchUser,
-    refetchHolofuelUser])
+    refetchHolofuelUser
+  ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
-  const inboxCount = actionableTransactions.filter(shouldShowTransactionInInbox).length
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
