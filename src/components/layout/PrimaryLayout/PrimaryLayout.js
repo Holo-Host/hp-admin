@@ -34,7 +34,6 @@ function PrimaryLayout ({
   const { push } = useHistory()
 
   const [isPausedConnectionCheckInterval, setIsPausedConnectionCheckInterval] = useState(false)
-  const [userMessage, setUserMessage] = useState('')
 
   const onError = ({ graphQLErrors: { isHposConnectionActive } }) => {
     setIsHposConnectionAlive(isHposConnectionActive)
@@ -70,11 +69,7 @@ function PrimaryLayout ({
       if (!isLoginPage(window)) {
         push(HP_ADMIN_LOGIN_PATH)
       }
-      const noHoloportConnectionMsg = 'Connecting to your Holoport...'
-      if (userMessage !== noHoloportConnectionMsg) {
-        setUserMessage(noHoloportConnectionMsg)
-        newMessage(noHoloportConnectionMsg, 0)
-      }
+      newMessage('Connecting to your Holoport...', 0)
       setIsPausedConnectionCheckInterval(true)
       setTimeout(() => setIsPausedConnectionCheckInterval(false), 5000)
     } else if (connectionStatus.hpos && !connectionStatus.holochain) {
@@ -82,14 +77,10 @@ function PrimaryLayout ({
         push(HP_ADMIN_LOGIN_PATH)
       }
       const noConductorConnectionMsg = 'Connecting to your Conductor...'
-      if (userMessage !== noConductorConnectionMsg) {
-        setUserMessage(noConductorConnectionMsg)
-        newMessage(noConductorConnectionMsg, 0)
-      }
+      newMessage(noConductorConnectionMsg, 0)
       // set as false until receive back onError result from next hpos (settingsQuery) polling
       setIsHposConnectionAlive(false)
     } else if (connectionStatus.hpos) {
-      setUserMessage('')
       newMessage('', 0)
       setUser()
     }
@@ -107,8 +98,7 @@ function PrimaryLayout ({
     setIsPausedConnectionCheckInterval,
     setConductorConnectionFalse,
     isInsideApp,
-    setIsInsideApp,
-    userMessage])
+    setIsInsideApp])
 
   const isWide = useContext(ScreenWidthContext)
 
