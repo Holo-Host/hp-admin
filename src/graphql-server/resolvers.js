@@ -60,21 +60,18 @@ export const resolvers = {
 
     hposStatus: HposInterface.os.status,
 
-    hostingReport: () => {
+    hostingReport: async () => {
+      const hostedHapps = await HposInterface.os.hostedHapps()
+
+      const localSourceChains = hostedHapps.reduce((total, happ) => total + happ.number_instances, 0)
+
+      console.log('in resolvers, hostedHapps', hostedHapps)
+      console.log('in resolvers, localSourceChains', localSourceChains)
+
       return {
-        localSourceChains: 18,
+        localSourceChains,
         zomeCalls: 588,
-        hostedHapps: [
-          {
-            name: 'Holofuel'
-          },
-          {
-            name: 'Communities'
-          },
-          {
-            name: 'H-Wiki'
-          }
-        ]
+        hostedHapps
       }
     },
 
