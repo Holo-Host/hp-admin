@@ -26,13 +26,13 @@ export default function Dashboard () {
   const [areHappsExpanded, setAreHappsExpanded] = useState(false)
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
-    {/* hiding this until hosting release */ false && <Card title='Hosting'>
+    <Card title='Hosting'>
       <div styleName='hosting-row'>
         <LocationIcon styleName='hosting-icon' /> {hostingReport.localSourceChains || '--'} Local source chains
       </div>
-      <div styleName='hosting-row'>
+      {/* hiding until zome call count is implemented */ false && <div styleName='hosting-row'>
         <PhoneIcon styleName='hosting-icon' /> {hostingReport.zomeCalls || '--'} Zome calls
-      </div>
+      </div>}
       <div styleName={areHappsExpanded ? 'hosting-row-expanded' : 'hosting-row'} onClick={() => setAreHappsExpanded(!areHappsExpanded)}>
         <GridIcon styleName='hosting-icon' /> {hostedHapps.length || '--'} Hosted hApps
         <ArrowRightIcon color='#979797' styleName={areHappsExpanded ? 'up-arrow' : 'down-arrow'} />
@@ -40,7 +40,7 @@ export default function Dashboard () {
           {hostedHapps.map(({ name }) => <div styleName='happ-name'>{name}</div>)}
         </div>}
       </div>
-    </Card>}
+    </Card>
 
     {/* hiding this until earnings are available */ false && <Card title='Earnings'>
       <div styleName='balance'>
