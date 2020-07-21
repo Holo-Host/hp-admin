@@ -134,6 +134,10 @@ const HposInterface = {
     updateVersion: async () => {
       const result = await hposCall({ method: 'post', path: 'upgrade' })()
       return presentHposStatus(result)
+    },
+
+    hostedHapps: async () => {
+      
     }
   }
 }
