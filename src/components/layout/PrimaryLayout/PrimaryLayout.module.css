@@ -110,7 +110,7 @@
 
 .alpha-flag-page {
   composes: alpha-flag;
-  top: 8px;
+  top: 80px;
   right: 0px;
 }
 
