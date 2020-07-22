@@ -11,16 +11,15 @@ import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HostingReportQuery from 'graphql/HostingReportQuery.gql'
 import EarningsReportQuery from 'graphql/EarningsReportQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import { presentHolofuelAmount, POLLING_INTERVAL_GENERAL } from 'utils'
 import './Dashboard.module.css'
-import { presentHolofuelAmount } from '../../utils'
 
 export default function Dashboard () {
   // nb: we only call settings here to track hpos connection status (see apolloClient.js for use)
   useQuery(HposSettingsQuery)
   const { data: { hostingReport = {} } = {} } = useQuery(HostingReportQuery)
   const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
-  const { data: { holofuelLedger = {} } = {} } = useQuery(HolofuelLedgerQuery)
-  const { balance } = holofuelLedger
+  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL_GENERAL })
   const { localSourceChains } = hostingReport
 
   const hostedHapps = hostingReport.hostedHapps || []
