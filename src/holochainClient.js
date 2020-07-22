@@ -1,3 +1,4 @@
+import { Connection as HoloWebSdkConnection } from '@holo-host/web-sdk'
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
@@ -120,17 +121,46 @@ async function initHolochainClient () {
   isInitiatingHcConnection = true
   let url
   try {
-    if (process.env.REACT_APP_RAW_HOLOCHAIN === 'true') {
-      url = process.env.REACT_APP_DNA_INTERFACE_URL
-    } else {
-      url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
-      // Construct url with query param X-Hpos-Admin-Signature = signature
+    if (!(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true') {
+      console.log('Inside hosted holofuel environment...')
+      console.log('Establishing Holo web-sdk connection...')
+      // use the web-sdk instead of hc-web-client
+      const webSdkConnection = new HoloWebSdkConnection()
+      await webSdkConnection.ready()
+      if (HOLOCHAIN_LOGGING) {
+        webSdkConnection.on('🎉 Web SDK connected and ready for Zome Calls...', console.log.bind(console))
+      }
+      // don't allow sign-in, if context returns an anonymous user
+      const hostContext = await webSdkConnection.context()
+      // todo: the context is hard coded in chaperone right now to only return 2,
+      // update to only accept the int 3, after updated
+      if (hostContext >= 2) {
+        console.log('Signing in as an anonymous hosted agent...!  Don\'t allow once chaperone is updated')
+        await webSdkConnection.signIn()
+      }
+      window.webSdkConnection = webSdkConnection
+      holochainClient = webSdkConnection
+    } else if (!(process.env.REACT_APP_RAW_HOLOCHAIN === 'true')) {
+      console.log('Inside hp-admin/host environment...')
+      console.log('Establishing HPOS connection...')
+      let url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL
+      // construct url with query param X-Hpos-Admin-Signature = signature
       const urlObj = new URL(url)
       const params = new URLSearchParams(urlObj.search.slice(1))
       params.append('X-Hpos-Admin-Signature', await signPayload('get', urlObj.pathname))
       params.sort()
       urlObj.search = params.toString()
       url = urlObj.toString()
+      holochainClient = await hcWebClientConnect({
+        url,
+        wsClient: { max_reconnects: 1 }
+      })
+    } else {
+      console.log('Defaulting to local holochain environment...')
+      holochainClient = await hcWebClientConnect({
+        url: process.env.REACT_APP_DNA_INTERFACE_URL,
+        wsClient: { max_reconnects: 1 }
+      })
     }
 
     // if hc-web-client connection never completes promise

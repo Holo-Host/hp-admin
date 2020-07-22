@@ -81,6 +81,15 @@
   height: 32px;
 }
 
+.signout-button {
+  border: none;
+  display: block;
+  background-color: transparent;
+  font-size: 9px;
+  text-decoration: underline;
+  margin-top: 4px;
+}
+
 .page-header {
   text-align: center;
   color: black;
