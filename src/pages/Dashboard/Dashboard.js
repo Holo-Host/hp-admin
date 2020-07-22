@@ -21,7 +21,19 @@ export default function Dashboard () {
   const { data: { holofuelLedger = {} } = {} } = useQuery(HolofuelLedgerQuery)
   const { balance } = holofuelLedger
 
-  const hostedHapps = hostingReport.hostedHapps || []
+  const list = [
+    {
+      name: 'HoloFuel'
+    },
+    {
+      name: 'hWiki'
+    },
+    {
+      name: 'hApp Store'
+    }
+  ]
+
+  const hostedHapps = hostingReport.hostedHapps || list.slice(0,3)
 
   const [areHappsExpanded, setAreHappsExpanded] = useState(false)
 
@@ -36,10 +48,10 @@ export default function Dashboard () {
       <div styleName={areHappsExpanded ? 'hosting-row-expanded' : 'hosting-row'} onClick={() => setAreHappsExpanded(!areHappsExpanded)}>
         <GridIcon styleName='hosting-icon' /> {hostedHapps.length || '--'} Hosted hApps
         <ArrowRightIcon color='#979797' styleName={areHappsExpanded ? 'up-arrow' : 'down-arrow'} />
-        {areHappsExpanded && <div styleName='happ-list'>
-          {hostedHapps.map(({ name }) => <div styleName='happ-name'>{name}</div>)}
-        </div>}
       </div>
+      {areHappsExpanded && <div styleName='happ-list'>
+        {hostedHapps.map(({ name }) => <div styleName='happ-name'>{name}</div>)}
+      </div>}
     </Card>
 
     {/* hiding this until earnings are available */ false && <Card title='Earnings'>
