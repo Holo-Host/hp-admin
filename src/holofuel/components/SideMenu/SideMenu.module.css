@@ -135,6 +135,10 @@
   font-weight: 700;
 }
 
+.menu-button {
+  width: 32px;
+}
+
 /* Nav */
 
 .nav-list {

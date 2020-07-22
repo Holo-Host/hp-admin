@@ -30,7 +30,18 @@
 }
 
 .menu-button {
+  position: relative;
+  z-index: 99;
+  border: none;
+  padding: 5px;
+  background-color: white;
+}
 
+.menu-icon {
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  z-index: 100;
 }
 
 .header {
