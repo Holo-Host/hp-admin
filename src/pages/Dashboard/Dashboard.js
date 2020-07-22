@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
+import { isNil } from 'lodash/fp'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import LocationIcon from 'components/icons/LocationIcon'
 import PhoneIcon from 'components/icons/PhoneIcon'
@@ -20,34 +21,23 @@ export default function Dashboard () {
   const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
   const { data: { holofuelLedger = {} } = {} } = useQuery(HolofuelLedgerQuery)
   const { balance } = holofuelLedger
+  const { localSourceChains } = hostingReport
 
-  const list = [
-    {
-      name: 'HoloFuel'
-    },
-    {
-      name: 'hWiki'
-    },
-    {
-      name: 'hApp Store'
-    }
-  ]
-
-  const hostedHapps = hostingReport.hostedHapps || list.slice(0,3)
+  const hostedHapps = hostingReport.hostedHapps || []
 
   const [areHappsExpanded, setAreHappsExpanded] = useState(false)
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     <Card title='Hosting'>
       <div styleName='hosting-row'>
-        <LocationIcon styleName='hosting-icon' /> {hostingReport.localSourceChains || '--'} Local source chains
+        <LocationIcon styleName='hosting-icon' /> {isNil(localSourceChains) ? '--' : localSourceChains} Local source chains
       </div>
       {/* hiding until zome call count is implemented */ false && <div styleName='hosting-row'>
         <PhoneIcon styleName='hosting-icon' /> {hostingReport.zomeCalls || '--'} Zome calls
       </div>}
       <div styleName={areHappsExpanded ? 'hosting-row-expanded' : 'hosting-row'} onClick={() => setAreHappsExpanded(!areHappsExpanded)}>
-        <GridIcon styleName='hosting-icon' /> {hostedHapps.length || '--'} Hosted hApps
-        <ArrowRightIcon color='#979797' styleName={areHappsExpanded ? 'up-arrow' : 'down-arrow'} />
+        <GridIcon styleName='hosting-icon' /> {hostedHapps.length} Hosted hApps
+        {!!hostedHapps.length && <ArrowRightIcon color='#979797' styleName={areHappsExpanded ? 'up-arrow' : 'down-arrow'} />}
       </div>
       {areHappsExpanded && <div styleName='happ-list'>
         {hostedHapps.map(({ name }) => <div styleName='happ-name'>{name}</div>)}
