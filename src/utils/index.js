@@ -3,7 +3,7 @@ import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
 import moment from 'moment'
 
 // Default polling interval to 30000ms
-export const POLLING_INTERVAL = parseInt(process.env.REACT_APP_POLLING_INTERVAL) || 30000
+export const POLLING_INTERVAL = parseInt(process.env.REACT_APP_CLI_POLLING_INTERVAL) || 30000
 export const POLLING_INTERVAL_GENERAL = Math.max(Math.floor(POLLING_INTERVAL), 5000)
 export const POLLING_INTERVAL_SETTINGS = Math.max(Math.floor(POLLING_INTERVAL / 3), 5000)
 
