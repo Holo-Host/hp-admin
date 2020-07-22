@@ -29,10 +29,6 @@
   padding: 5px;
 }
 
-.menu-button {
-
-}
-
 .header {
   height: 50px;
   padding: 5px 10px;
@@ -86,8 +82,4 @@
 
 .empty-spacer {
   flex: 1;
-}
-
-.desktop {
-  margin-left: 260px;
 }

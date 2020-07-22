@@ -6,10 +6,6 @@
   z-index: 98;
 }
 
-.drawer--open {
-
-}
-
 .container {
   box-sizing: border-box;
   width: 280px;
@@ -245,8 +241,4 @@
   font-size: 12px;
   text-align: center;
   margin-left: 10px;
-}
-
-.desktop {
-  flex: 0 1 280px;
 }

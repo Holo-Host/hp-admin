@@ -18,7 +18,6 @@ import './SideMenu.module.css'
 
 export default function SideMenu ({
   isOpen,
-  isWide,
   avatarUrl = '',
   agent,
   agentLoading,
@@ -31,7 +30,7 @@ export default function SideMenu ({
     setCurrentPath(location.pathname)
   }, [location])
 
-  return <aside styleName={cx('drawer', { 'drawer--open': isOpen }, { desktop: isWide })}>
+  return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
       <MenuButton onClick={closeMenu} styleName='menu-button' />
       <header styleName='header'>

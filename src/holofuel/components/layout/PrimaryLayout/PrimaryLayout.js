@@ -137,7 +137,7 @@ function PrimaryLayout ({
       ledgerLoading={isLoadingFirstLedger}
       isWide={isWide} />
     {(!isWide && showAlphaFlag) && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName={cx('styles.content', { 'styles.desktop': isWide })}>
+    <div styleName={cx('styles.content')}>
       <FlashMessage />
       {children}
     </div>
