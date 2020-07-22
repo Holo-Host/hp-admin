@@ -65,9 +65,6 @@ export const resolvers = {
 
       const localSourceChains = hostedHapps.reduce((total, happ) => total + happ.number_instances, 0)
 
-      console.log('in resolvers, hostedHapps', hostedHapps)
-      console.log('in resolvers, localSourceChains', localSourceChains)
-
       return {
         localSourceChains,
         zomeCalls: 588,

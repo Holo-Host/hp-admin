@@ -143,7 +143,6 @@ const HposInterface = {
 
     hostedHapps: async () => {
       const result = await hposCall({ method: 'get', path: 'hosted_happs' })()
-      console.log('in HPOSInterface', result)
       return result.hosted_happs.map(presentHostedHapp)
     }
   }
