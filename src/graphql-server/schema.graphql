@@ -38,6 +38,15 @@ type HolofuelUser {
   avatarUrl: String
 }
 
+type TxHolofuelUser {
+  # NB: We are intentionally not caching the id for the transaction counterparty (ie: TxHolofuelUser)
+  # to display what the nickname of the counterparty was at the time 
+  # the transaction was initiated
+  id: String
+  nickname: String
+  avatarUrl: String
+}
+
 enum TransactionType {
   offer
   request
@@ -59,7 +68,7 @@ enum TransactionDirection {
 type Transaction {
   id: ID # ID will be the origin commit hash
   amount: Float
-  counterparty: HolofuelUser
+  counterparty: TxHolofuelUser
   direction: TransactionDirection
   status: TransactionStatus
   type: TransactionType
