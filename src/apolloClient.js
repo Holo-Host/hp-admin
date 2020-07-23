@@ -40,8 +40,8 @@ if (process.env.NODE_ENV !== 'test') {
 const cache = new InMemoryCache({
   typePolicies: {
     TxHolofuelUser: {
-      keyFields: ['agentAddress', 'nickname'],
-    },
+      keyFields: ['agentAddress', 'nickname']
+    }
   }
 })
 

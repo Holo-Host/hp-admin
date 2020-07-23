@@ -399,7 +399,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {agent.agentAddress === userId ?`${agentNameDisplay} (You)` : agentNameDisplay}
+          {agent.agentAddress === userId ? `${agentNameDisplay} (You)` : agentNameDisplay}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>

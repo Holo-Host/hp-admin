@@ -125,14 +125,14 @@ function presentPendingRequest (transaction, annuled = false) {
 
   const counterpartyId = annuled ? event[2].Request.from : provenance[0]
   // If the transaction is not declined or cancelled, and has a counterparty whose nickname is not set, return nickname an empty string, not null
-  //  in order to assign the counterpartyId with a value to be referenced downstream 
-  const counterpartyNickname = annuled ?
-    event[2].Request.from_nickname
+  // in order to assign the counterpartyId with a value to be referenced downstream
+  const counterpartyNickname = annuled
+    ? event[2].Request.from_nickname
     : isNil(event[2].Request.to_nickname)
       ? ''
       : event[2].Request.to_nickname
 
-      return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees: fee })
+  return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees: fee })
 }
 
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
@@ -155,7 +155,7 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
 
   const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
   // If the transaction is not declined or cancelled, and has a counterparty whose nickname is not set, return nickname an empty string, not null
-  //  in order to assign the counterpartyId with a value to be referenced downstream 
+  // in order to assign the counterpartyId with a value to be referenced downstream
   const counterpartyNickname = annuled
     ? event[2].Promise.tx.to_nickname
     : isNil(event[2].Promise.tx.from_nickname)
