@@ -84,7 +84,6 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
   }
 }
 
-// TODO: Review whether we should be showing this in addition to the receipt
 const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
   const transaction = event.Cheque.invoice.promise.tx
   const incomingTransaction = stateDirection === DIRECTION.incoming
@@ -341,13 +340,8 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
-
-      // const myProfile = await HoloFuelDnaInterface.user.get()
-
       const nonActionableTransactionsWithCancelByKey = uniqueNonActionableTransactions
         .filter(tx => tx.status !== 'pending')
-        // nb: cancelled txs have been removed for now; keep this commented out as long as they continue being so
-        // .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: myProfile } : { ...tx, canceledBy: null })
 
       return nonActionableTransactionsWithCancelByKey.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
