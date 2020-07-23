@@ -169,7 +169,7 @@ const holofuelUser = {
 describe('Inbox', () => {
   const timestamp = moment('2013-02-04')
 
-  const counterparty = { id: 'last 6', nickname: null, avatarUrl: null }
+  const counterparty = { agentAddress: 'last 6', nickname: null, avatarUrl: null }
   const canceledBy = null
 
   const offer1 = {
@@ -369,7 +369,7 @@ describe('TransactionRow', () => {
 
   const request = {
     id: '123',
-    counterparty: { id: 'last 6' },
+    counterparty: { agentAddress: 'last 6' },
     amount: 100,
     type: TYPE.request,
     timestamp: moment().subtract(14, 'days'),
@@ -392,7 +392,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} currentUser={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={request} userId={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -402,7 +402,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} currentUser={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={offer} userId={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -412,7 +412,7 @@ describe('TransactionRow', () => {
 
   it('renders an recent request', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} currentUser={holofuelUser} />
+      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={holofuelUser} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -422,7 +422,7 @@ describe('TransactionRow', () => {
 
   it('renders a recent offer', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} currentUser={holofuelUser} />
+      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={holofuelUser} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -439,7 +439,7 @@ describe('TransactionRow', () => {
   const offerMock = {
     request: {
       query: HolofuelOfferMutation,
-      variables: { amount: request.amount, counterpartyId: request.counterparty.id, requestId: request.id }
+      variables: { amount: request.amount, counterpartyId: request.counterparty.agentAddress, requestId: request.id }
     },
     result: {
       data: { holofuelOffer: mockTransaction }
@@ -604,7 +604,7 @@ describe('TransactionRow', () => {
 
   describe('Accept Payment Modal', () => {
     it('responds properly', async () => {
-      const transaction = { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' } }
+      const transaction = { ...request, counterparty: { agentAddress: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' } }
 
       const props = {
         confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay' },
@@ -640,7 +640,7 @@ describe('TransactionRow', () => {
     })
 
     describe('with request', () => {
-      const transaction = { ...request, counterparty: { id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' } }
+      const transaction = { ...request, counterparty: { agentAddress: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r' } }
 
       const props = {
         confirmationModalProperties: { ...confirmationModalProperties, transaction, action: 'pay', shouldDisplay: true },
@@ -650,7 +650,7 @@ describe('TransactionRow', () => {
       const counterpartyQuery = {
         request: {
           query: HolofuelCounterpartyQuery,
-          variables: { agentId: transaction.counterparty.id }
+          variables: { agentId: transaction.counterparty.agentAddress }
         },
         result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, avatarUrl: null } } })
       }
@@ -658,7 +658,7 @@ describe('TransactionRow', () => {
       const localOfferMock = {
         request: {
           query: HolofuelOfferMutation,
-          variables: { amount: transaction.amount, counterpartyId: transaction.counterparty.id, requestId: transaction.id, notes: transaction.notes }
+          variables: { amount: transaction.amount, counterpartyId: transaction.counterparty.agentAddress, requestId: transaction.id, notes: transaction.notes }
         },
         result: {
           data: { holofuelOffer: mockTransaction }
@@ -690,7 +690,7 @@ describe('TransactionRow', () => {
       const props = {
         transaction: offer,
         isActionable: true,
-        currentUser: mockAgent1,
+        userId: mockAgent1,
         setConfirmationModalProperties: jest.fn(),
         confirmationModalProperties: confirmationModalProperties,
         setOpenDrawerId: () => {}

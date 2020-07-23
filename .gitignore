@@ -38,3 +38,4 @@ conductor.pid
 conductor-config-1.toml
 conductor-config-2.toml
 conductor-config-backup
+chaperone.json
