@@ -37,11 +37,19 @@ if (process.env.NODE_ENV !== 'test') {
   links = [apolloLogger].concat(links)
 }
 
+const cache = new InMemoryCache({
+  typePolicies: {
+    TxHolofuelUser: {
+      keyFields: ['agentAddress', 'nickname'],
+    },
+  }
+})
+
 const link = ApolloLink.from(links)
 
 const apolloClient = new ApolloClient({
   link,
-  cache: new InMemoryCache(),
+  cache,
   connectToDevTools: true
 })
 

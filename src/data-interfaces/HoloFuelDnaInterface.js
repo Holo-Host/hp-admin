@@ -18,16 +18,16 @@ const mockDeadline = () => {
 
 /* Creates an array of all counterparties for a provided transaction list */
 export async function getTxCounterparties (transactionList) {
-  const counterpartyList = transactionList.map(({ counterparty }) => counterparty.id)
+  const counterpartyList = transactionList.map(({ counterparty }) => counterparty.agentAddress)
   const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
   const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
   return noDuplicatesAgentList
 }
 
-const addFullCounterpartyToTx = async (tx) => {
-  const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })
-  return { ...tx, counterparty: fullCounterparty }
-}
+// const addFullCounterpartyToTx = async (tx) => {
+//   const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.agentAddress })
+//   return { ...tx, counterparty: fullCounterparty }
+// }
 
 // const getTxWithCounterparties = transactionList => promiseMap(transactionList, addFullCounterpartyToTx)
 
@@ -36,7 +36,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     id: origin,
     amount: amount || event.Request.amount,
     counterparty: {
-      id: counterpartyId || event.Request.from,
+      agentAddress: counterpartyId || event.Request.from,
       nickname: counterpartyNickname || event.Request.from_nickname
     },
     direction: stateDirection,
@@ -55,7 +55,7 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     id: origin,
     amount: amount || event.Promise.tx.amount,
     counterparty: {
-      id: counterpartyId || event.Promise.tx.to,
+      agentAddress: counterpartyId || event.Promise.tx.to,
       nickname: counterpartyNickname || event.Promise.tx.to_nickname
     },
     direction: stateDirection,
@@ -78,7 +78,7 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     id: origin,
     amount: transaction.amount,
     counterparty: {
-      id: incomingTransaction ? transaction.from : transaction.to,
+      agentAddress: incomingTransaction ? transaction.from : transaction.to,
       nickname: incomingTransaction ? transaction.from_nickname : transaction.to_nickname
     },
     direction: stateDirection,
@@ -99,7 +99,7 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
     id: origin,
     amount: event.Cheque.invoice.promise.tx.amount,
     counterparty: {
-      id: incomingTransaction ? transaction.from : transaction.to,
+      agentAddress: incomingTransaction ? transaction.from : transaction.to,
       nickname: incomingTransaction ? transaction.from_nickname : transaction.to_nickname
     },
     direction: stateDirection,
@@ -284,8 +284,8 @@ const HoloFuelDnaInterface = {
   transactions: {
     allCompleted: async (since) => {
       const params = since ? { since } : {}
-
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
+      console.log(' =============== >> Completed Transactions : ', transactions);
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = uniqueNonActionableTransactions.filter(tx => tx.status === 'completed')
@@ -349,7 +349,7 @@ const HoloFuelDnaInterface = {
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
-        return addFullCounterpartyToTx(transactions[0])
+        return transactions[0]
       }
     },
     /* NOTE: This is to allow handling of the other side of the transaction that was declined.  */

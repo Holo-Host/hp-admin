@@ -42,7 +42,7 @@ type TxHolofuelUser {
   # NB: We are intentionally not caching the id for the transaction counterparty (ie: TxHolofuelUser)
   # to display what the nickname of the counterparty was at the time 
   # the transaction was initiated
-  id: String
+  agentAddress: String
   nickname: String
   avatarUrl: String
 }
