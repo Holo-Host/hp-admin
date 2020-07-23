@@ -2,7 +2,7 @@ mutation HolofuelRecoverFunds ($transactionId: ID) {
   holofuelRecoverFunds (transactionId: $transactionId) {
     id
     amount
-    counterparty { id, nickname, avatarUrl }
+    counterparty { agentAddress, nickname, avatarUrl }
     direction
     status
     type

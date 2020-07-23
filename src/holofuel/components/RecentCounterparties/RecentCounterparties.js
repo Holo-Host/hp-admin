@@ -6,6 +6,7 @@ import Loading from 'components/Loading'
 import { presentAgentId } from 'utils'
 import './RecentCounterparties.module.css'
 
+// nb: the counterparties here are of type HolofuelUser (not TxHolofuelUser) and therefore have and ID key
 export default function RecentCounterparties ({ agents = [], selectedAgentId, selectAgent, className, loading }) {
   const recentAgents = agents.slice(0, 6)
 

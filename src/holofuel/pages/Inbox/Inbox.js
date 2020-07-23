@@ -37,7 +37,7 @@ const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
   return ({ id, amount, counterparty, notes }) => offer({
-    variables: { amount, counterpartyId: counterparty.id, requestId: id, notes },
+    variables: { amount, counterpartyId: counterparty.agentAddress, requestId: id, notes },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },
@@ -312,8 +312,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   if (isCanceled) {
     if (canceledBy) {
       story = isOffer
-        ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
-        : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
+        ? ` Canceled an Offer to ${counterparty.agentAddress === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.agentAddress))}`
+        : ` Canceled a Request from ${counterparty.agentAddress === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.agentAddress))}`
     }
     fullNotes = isOffer ? ` Canceled Offer${notes ? `: ${notes}` : ''}` : ` Canceled Request${notes ? `: ${notes}` : ''}`
   } else if (isDeclined) {
@@ -327,7 +327,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [isLoading, setIsLoading] = useState(false)
   const isSuccessfulHighlight = highlightGreen || highlightRed
 
-  if (agent.id === null) return null
+  if (agent.agentAddress === null) return null
 
   if (!isStale && !inProcess && !isSuccessfulHighlight && isActioned) {
     hideTransaction(true)
@@ -386,18 +386,20 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const showCancelModal = () =>
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
+  const agentNameDisplay = isEmpty(agent.nickname) ? presentAgentId(agent.agentAddress) : agent.nickname
+
   /* eslint-disable-next-line quote-props */
   return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { 'highlightRed': highlightRed || isStale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
-        <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
+        <HashAvatar seed={agent.agentAddress} size={32} data-testid='hash-icon' />
       </CopyAgentId>
     </div>
 
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {(agent.id === userId ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
+          {agent.agentAddress === userId ? `${agentNameDisplay} (You)` : agentNameDisplay}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
@@ -525,7 +527,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
 
   const { id, amount, type, notes, counterparty = {} } = transaction
-  const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
+  const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.agentAddress)
   const { id: activeCounterpartyId } = holofuelCounterparty
 
   const counterpartyMessage = loadingCounterparty
@@ -541,7 +543,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionParams = { id, amount, counterparty, notes }
       actionHook = payTransaction
       message = <>
-        Accept the request and send {counterparty.nickname || presentAgentId(counterparty.id)} {presentHolofuelAmount(amount)} TF?
+        Accept the request and send {counterparty.nickname || presentAgentId(counterparty.agentAddress)} {presentHolofuelAmount(amount)} TF?
       </>
       flashMessage = 'Payment sent succesfully'
       break
@@ -551,7 +553,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionParams = { id }
       actionHook = acceptOffer
       message = <>
-        Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
       </>
       flashMessage = 'Offer Accepted succesfully'
       break
@@ -562,11 +564,11 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionHook = declineTransaction
       if (type === 'offer') {
         message = <>
-          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
         </>
       } else {
         message = <>
-          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
         </>
       }
       flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`
