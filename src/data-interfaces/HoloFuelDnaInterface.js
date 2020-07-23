@@ -1,4 +1,4 @@
-import _, { isEmpty } from 'lodash'
+import _, { isEmpty, isNil } from 'lodash'
 import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
@@ -50,7 +50,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {  
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -128,10 +128,18 @@ function presentPendingRequest (transaction, annuled = false) {
   const status = STATUS.pending
   const type = TYPE.request
   const eventTimestamp = event[1]
-  const counterpartyId = annuled ? event[2].Request.from : provenance[0]
-  const counterpartyNickname = annuled ? event[2].Request.from_nickname : event[2].Request.to_nickname
   const { amount, notes, fee } = event[2].Request
-  return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees: fee })
+
+  const counterpartyId = annuled ? event[2].Request.from : provenance[0]
+  // If the transaction is not declined or cancelled, and has a counterparty whose nickname is not set, return nickname an empty string, not null
+  //  in order to assign the counterpartyId with a value to be referenced downstream 
+  const counterpartyNickname = annuled ?
+    event[2].Request.from_nickname
+    : isNil(event[2].Request.to_nickname)
+      ? ''
+      : event[2].Request.to_nickname
+
+      return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees: fee })
 }
 
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
@@ -148,11 +156,19 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
   const status = STATUS.pending
   const type = TYPE.offer
   const eventTimestamp = event[1]
-  const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
-  const counterpartyNickname = annuled ? event[2].Promise.tx.to_nickname : event[2].Promise.tx.from_nickname
   const { amount, notes, fee } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
   const inProcess = isEmpty(invoicedOffers) ? false : hasInvoice()
+
+  const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
+  // If the transaction is not declined or cancelled, and has a counterparty whose nickname is not set, return nickname an empty string, not null
+  //  in order to assign the counterpartyId with a value to be referenced downstream 
+  const counterpartyNickname = annuled
+    ? event[2].Promise.tx.to_nickname
+    : isNil(event[2].Promise.tx.from_nickname)
+      ? ''
+      : event[2].Promise.tx.from_nickname
+
   return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees: fee, isPayingARequest, inProcess })
 }
 
@@ -285,7 +301,6 @@ const HoloFuelDnaInterface = {
     allCompleted: async (since) => {
       const params = since ? { since } : {}
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
-      console.log(' =============== >> Completed Transactions : ', transactions);
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
       const presentedCompletedTransactions = uniqueNonActionableTransactions.filter(tx => tx.status === 'completed')

@@ -327,7 +327,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [isLoading, setIsLoading] = useState(false)
   const isSuccessfulHighlight = highlightGreen || highlightRed
 
-  if (agent.id === null) return null
+  if (agent.agentAddress === null) return null
 
   if (!isStale && !inProcess && !isSuccessfulHighlight && isActioned) {
     hideTransaction(true)
@@ -386,6 +386,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const showCancelModal = () =>
     setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
 
+  const agentNameDisplay = isEmpty(agent.nickname) ? presentAgentId(agent.agentAddress) : agent.nickname
+
   /* eslint-disable-next-line quote-props */
   return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { 'highlightRed': highlightRed || isStale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
@@ -397,7 +399,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {(agent.id === userId ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
+          {agent.agentAddress === userId ?`${agentNameDisplay} (You)` : agentNameDisplay}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
