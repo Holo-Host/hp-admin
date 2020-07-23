@@ -24,13 +24,6 @@ export async function getTxCounterparties (transactionList) {
   return noDuplicatesAgentList
 }
 
-// const addFullCounterpartyToTx = async (tx) => {
-//   const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.agentAddress })
-//   return { ...tx, counterparty: fullCounterparty }
-// }
-
-// const getTxWithCounterparties = transactionList => promiseMap(transactionList, addFullCounterpartyToTx)
-
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false }) => {
   return {
     id: origin,
