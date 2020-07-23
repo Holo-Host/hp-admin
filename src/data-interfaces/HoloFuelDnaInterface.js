@@ -37,7 +37,7 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     amount: amount || event.Request.amount,
     counterparty: {
       agentAddress: counterpartyId || event.Request.from,
-      nickname: counterpartyNickname || event.Request.from_nickname
+      nickname: !isNil(counterpartyNickname) ? counterpartyNickname : event.Request.from_nickname
     },
     direction: stateDirection,
     status: status || STATUS.pending,
@@ -50,13 +50,13 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {  
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
     counterparty: {
       agentAddress: counterpartyId || event.Promise.tx.to,
-      nickname: counterpartyNickname || event.Promise.tx.to_nickname
+      nickname: !isNil(counterpartyNickname) ? counterpartyNickname : event.Promise.tx.to_nickname
     },
     direction: stateDirection,
     status: status || STATUS.pending,
