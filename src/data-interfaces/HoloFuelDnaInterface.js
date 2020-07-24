@@ -18,10 +18,10 @@ const mockDeadline = () => {
 
 /* Creates an array of all counterparties for a provided transaction list */
 export async function getTxCounterparties (transactionList) {
-  const counterpartyList = transactionList.map(({ counterparty }) => counterparty.agentAddress)
-  const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
-  const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
-  return noDuplicatesAgentList
+  const counterpartyList = transactionList.map(({ counterparty }) => counterparty)
+  const noDuplicatesCounterpartyList = _.uniqBy(counterpartyList, 'agentAddress')
+  const counterpartyNicknameList = noDuplicatesCounterpartyList.map(counterparty => counterparty.nickname || '')
+  return counterpartyNicknameList
 }
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false }) => {
@@ -237,33 +237,6 @@ const HoloFuelDnaInterface = {
         id,
         avatarUrl,
         nickname
-      }
-    },
-    getCounterparty: async ({ agentId }) => {
-      const presentCounterparty = counterparty => ({
-        id: counterparty.agent_address,
-        avatarUrl: counterparty.avatar_url,
-        nickname: counterparty.nickname
-      })
-
-      if (cachedGetProfileCalls[agentId]) {
-        if (typeof cachedGetProfileCalls[agentId].then === 'function') {
-          return presentCounterparty(await cachedGetProfileCalls[agentId])
-        } else {
-          return cachedGetProfileCalls[agentId]
-        }
-      } else {
-        cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
-        const counterparty = await cachedGetProfileCalls[agentId]
-        if (!counterparty || counterparty.Err) {
-          return {
-            id: agentId,
-            avatarUrl: null,
-            nickname: null
-          }
-        }
-        cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
-        return presentCounterparty(counterparty)
       }
     },
     update: async (nickname, avatarUrl) => {

@@ -7,8 +7,7 @@ import CreateOfferRequest, { FEE_PERCENTAGE } from './CreateOfferRequest'
 import { TYPE } from 'models/Transaction'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import holofuelRecentCounterpartiesQuery from 'graphql/holofuelRecentCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
 import { presentHolofuelAmount } from 'utils'
@@ -60,19 +59,8 @@ const mockWhoIsAgent1 = {
   avatarUrl: ''
 }
 
-const counterpartyQueryMock = {
-  request: {
-    query: HolofuelCounterpartyQuery,
-    variables: { agentId: mockAgent1.agent_address }
-  },
-  result: {
-    data: { holofuelCounterparty: mockWhoIsAgent1 }
-  }
-}
-
 const mocks = [
-  offerMock,
-  counterpartyQueryMock
+  offerMock
 ]
 
 const enterAmountAndMode = async ({ amount, modeLabel, getByTestId, getByText }) => {
@@ -123,18 +111,15 @@ describe('CreateOfferRequest', () => {
       expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
 
+    // test...
     it('renders error message upon attempt to transact with self', async () => {
       afterEach(() => {
         jest.clearAllMocks()
       })
 
-      const mocks = [
-        counterpartyQueryMock
-      ]
-
       const push = jest.fn()
 
-      const { getByLabelText, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, getByTestId, getByText } = await renderAndWait(<MockedProvider addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
 
@@ -153,13 +138,9 @@ describe('CreateOfferRequest', () => {
         jest.clearAllMocks()
       })
 
-      const mocks = [
-        counterpartyQueryMock
-      ]
-
       const push = jest.fn()
 
-      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
 
@@ -187,21 +168,9 @@ describe('CreateOfferRequest', () => {
         avatar_url: ''
       }
 
-      const counterpartyQueryMockError = {
-        request: {
-          query: HolofuelCounterpartyQuery,
-          variables: { agentId: mockAgent1.agent_address }
-        },
-        error: new Error('ERR')
-      }
-
-      const mocks = [
-        counterpartyQueryMockError
-      ]
-
       const push = jest.fn()
 
-      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
 
@@ -229,21 +198,9 @@ describe('CreateOfferRequest', () => {
         avatarUrl: ''
       }
 
-      const counterpartyQueryMockError = {
-        request: {
-          query: HolofuelCounterpartyQuery,
-          variables: { agentId: mockAgent1.agent_address }
-        },
-        error: new Error('ERR')
-      }
-
-      const mocks = [
-        counterpartyQueryMockError
-      ]
-
       const push = jest.fn()
 
-      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
+      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider addTypename={false}>
         <CreateOfferRequest history={{ push }} />
       </MockedProvider>)
 
@@ -275,10 +232,10 @@ describe('CreateOfferRequest', () => {
       const mocks = [
         {
           request: {
-            query: HolofuelHistoryCounterpartiesQuery
+            query: holofuelRecentCounterpartiesQuery
           },
           result: {
-            data: { holofuelHistoryCounterparties: [agent1, agent2] }
+            data: { holofuelRecentCounterparties: [agent1, agent2] }
           }
         }
       ]
@@ -343,8 +300,7 @@ describe('CreateOfferRequest', () => {
     }
 
     const mocks = [
-      requestMock,
-      counterpartyQueryMock
+      requestMock
     ]
 
     it('renders a form that can be filled out and submitted', async () => {

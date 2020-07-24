@@ -6,7 +6,6 @@ import Loading from 'components/Loading'
 import { presentAgentId } from 'utils'
 import './RecentCounterparties.module.css'
 
-// nb: the counterparties here are of type HolofuelUser (not TxHolofuelUser) and therefore have and ID key
 export default function RecentCounterparties ({ agents = [], selectedAgentId, selectAgent, className, loading }) {
   const recentAgents = agents.slice(0, 6)
 
@@ -19,20 +18,20 @@ export default function RecentCounterparties ({ agents = [], selectedAgentId, se
 
     {recentAgents.map(agent => <AgentRow
       agent={agent}
-      selected={agent.id === selectedAgentId}
-      selectThisAgent={() => selectAgent(agent.id)}
-      key={agent.id} />)}
+      selected={agent.agentAddress === selectedAgentId}
+      selectThisAgent={() => selectAgent(agent.agentAddress)}
+      key={agent.agentAddress} />)}
   </div>
 }
 
 function AgentRow ({ agent, selectThisAgent, selected }) {
-  const agentName = agent.nickname || presentAgentId(agent.id)
+  const agentName = agent.nickname || presentAgentId(agent.agentAddress)
 
   return <div styleName={cx('agent-row', { selected })} onClick={selectThisAgent} data-testid='agent-row'>
-    <HashIcon hash={agent.id} size={32} styleName='avatar' />
+    <HashIcon hash={agent.agentAddress} size={32} styleName='avatar' />
     <div styleName='name-and-id'>
       <div styleName='name'>{agentName}</div>
-      {agent.nickname && <div styleName='id'>{presentAgentId(agent.id)}</div>}
+      {agent.nickname && <div styleName='id'>{presentAgentId(agent.agentAddress)}</div>}
     </div>
     {selected && <div styleName='selected-indicator'>Selected</div>}
   </div>

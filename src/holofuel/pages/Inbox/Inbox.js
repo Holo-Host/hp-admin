@@ -4,7 +4,6 @@ import { isEmpty, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -71,14 +70,6 @@ function useDecline () {
       query: HolofuelLedgerQuery
     }]
   })
-}
-
-function useCounterparty (agentId) {
-  const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    fetchPolicy: 'cache-and-network',
-    variables: { agentId }
-  })
-  return { holofuelCounterparty, loading }
 }
 
 function useUpdatedTransactionLists () {
@@ -527,14 +518,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
 
   const { id, amount, type, notes, counterparty = {} } = transaction
-  const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.agentAddress)
-  const { id: activeCounterpartyId } = holofuelCounterparty
-
-  const counterpartyMessage = loadingCounterparty
-    ? <div styleName='counterparty-message'>Verifying active status of your counterparty...<Loading styleName='counterparty-loading' width={15} height={15} /></div>
-    : !activeCounterpartyId
-      ? <div styleName='counterparty-message'>Your counterparty can't be located on the network. If this error persists, please contact your Peer and confirm the Profile ID referenced is still active.</div>
-      : null
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
@@ -614,7 +597,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     styleName='modal'
   >
     <div styleName='modal-message'>{message}</div>
-    {counterpartyMessage}
     <div styleName='modal-buttons'>
       <Button
         onClick={() => hideModal()}
@@ -625,7 +607,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
-        disabled={loadingCounterparty || !activeCounterpartyId}
       >
         Yes
       </Button>
