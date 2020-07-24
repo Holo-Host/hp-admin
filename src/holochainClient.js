@@ -111,11 +111,12 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
   }[instanceId]
 }
 
-let holochainClient
+export let holochainClient, hostContext
+export let wsConnection = true
+
 let isInitiatingHcConnection = false
 let wsTimeoutErrorCount = 0
 
-export let wsConnection = true
 
 async function initHolochainClient () {
   isInitiatingHcConnection = true
@@ -131,7 +132,7 @@ async function initHolochainClient () {
         webSdkConnection.on('🎉 Web SDK connected and ready for Zome Calls...', console.log.bind(console))
       }
       // don't allow sign-in, if context returns an anonymous user
-      const hostContext = await webSdkConnection.context()
+      hostContext = await webSdkConnection.context()
       // todo: the context is hard coded in chaperone right now to only return 2,
       // update to only accept the int 3, after updated
       if (hostContext >= 2) {
