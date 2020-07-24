@@ -133,6 +133,8 @@
 
 .menu-button {
   width: 32px;
+  top: -8px;
+  right: 11px;
 }
 
 /* Nav */
@@ -158,14 +160,9 @@
   margin-bottom: 15px;
 }
 
-.underline {
+.back-link {
+  border-top: 1px solid var(--color-loblolly);
   border-bottom: 1px solid var(--color-loblolly);
-}
-
-.loading-row {
-  composes: underline;
-  display: flex;
-  flex: 1.8;
 }
 
 .admin-nav-link {

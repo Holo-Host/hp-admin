@@ -1,16 +1,15 @@
 
 .menu-button {
   position: relative;
-  z-index: 99;
   border: none;
   padding: 5px;
-  background-color: white;
+  background-color: transparent;
 }
 
 .menu-icon {
   width: 22px;
   height: 22px;
-  background-color: white;
+  background-color: transparent;
   z-index: 100;
 }
 
