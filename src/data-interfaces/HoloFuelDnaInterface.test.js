@@ -22,7 +22,9 @@ const fourRequestsWithADupe = ['QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz',
       {
         Request: {
           from: 'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
+          from_nickname: 'Sam',
           to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+          to_nickname: 'Perry',
           amount: '124500.00',
           fee: '2',
           deadline: '2020-12-02T00:00:00+00:00',
