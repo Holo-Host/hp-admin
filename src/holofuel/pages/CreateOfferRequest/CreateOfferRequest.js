@@ -79,7 +79,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const updateCounterparty = agentAddress => {
     const recentCounterparty = recentCounterpartiesWithoutMe.find(recentCounterparty => recentCounterparty.agentAddress === agentAddress)
-    const agentNickname = !isEmpty(recentCounterparty) 
+    const agentNickname = !isEmpty(recentCounterparty)
       ? recentCounterparty.nickname
       : agentAddress === currentUser.id
         ? `${currentUser.nickname} (You)`
