@@ -47,18 +47,6 @@ const offerMock = {
   }
 }
 
-const mockAgent1 = {
-  agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry',
-  avatar_url: ''
-}
-
-const mockWhoIsAgent1 = {
-  agentAddress: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry',
-  avatarUrl: ''
-}
-
 const mocks = [
   offerMock
 ]
