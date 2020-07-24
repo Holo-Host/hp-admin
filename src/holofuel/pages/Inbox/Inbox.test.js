@@ -158,12 +158,6 @@ const ledgerMock = {
   }
 }
 
-const myHolofuelUser = {
-  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-  nickname: 'Perry',
-  avatarUrl: null
-}
-
 describe('Inbox', () => {
   const timestamp = moment('2013-02-04')
 
@@ -373,7 +367,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} userId={myHolofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -383,7 +377,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} userId={myHolofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -393,7 +387,7 @@ describe('TransactionRow', () => {
 
   it('renders an recent request', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={myHolofuelUser} />
+      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -403,7 +397,7 @@ describe('TransactionRow', () => {
 
   it('renders a recent offer', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={myHolofuelUser} />
+      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()

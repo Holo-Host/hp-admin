@@ -110,9 +110,10 @@ const presentTruncatedAmount = (string, number = 15) => {
 export default function Inbox ({ history: { push } }) {
   const { data: { myHolofuelUser = {} } = {} } = useQuery(MyHolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { currentUser, setCurrentUser } = useCurrentUserContext()
+  const { setCurrentUser } = useCurrentUserContext()
   const { isConnected } = useConnectionContext()
 
+  // landing page setup: set the currentUser app context upon load
   useEffect(() => {
     if (!isEmpty(myHolofuelUser)) {
       setCurrentUser(myHolofuelUser)
@@ -215,7 +216,6 @@ export default function Inbox ({ history: { push } }) {
         key={dateLabel}
         dateLabel={dateLabel}
         transactions={transactions}
-        userId={currentUser.id}
         isActionable={inboxView === VIEW.actionable}
         setConfirmationModalProperties={setConfirmationModalProperties}
         openDrawerId={openDrawerId}
@@ -231,7 +231,7 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
+export function Partition ({ dateLabel, transactions, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
   const { hiddenTransactionIds, setHiddenTransactionIds } = useHiddenTransactionsContext()
 
   const manageHideTransactionWithId = (id, shouldHide) => {
@@ -254,7 +254,6 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         transaction={transaction}
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
-        userId={userId}
         hideTransaction={shouldHide => manageHideTransactionWithId(transaction.id, shouldHide)}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
@@ -265,7 +264,7 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
   const { id, counterparty, amount, type, status, direction, notes, isPayingARequest, inProcess, isActioned, isStale } = transaction
 
   if (isStale) {
@@ -379,7 +378,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {agent.agentAddress === userId ? `${agentNameDisplay} (You)` : agentNameDisplay}
+          {agentNameDisplay}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
