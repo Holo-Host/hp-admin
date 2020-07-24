@@ -394,8 +394,6 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
         isOutgoing={isOutgoing}
         isDeclined={isDeclined}
       />
-      {/* BALANCE-BUG: Intentionally commented out until DNA balance bug is resolved. */}
-      {/* {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>} */}
     </div>
 
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}

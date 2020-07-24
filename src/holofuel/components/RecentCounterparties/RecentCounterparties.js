@@ -19,7 +19,7 @@ export default function RecentCounterparties ({ agents = [], selectedAgentId, se
     {recentAgents.map(agent => <AgentRow
       agent={agent}
       selected={agent.agentAddress === selectedAgentId}
-      selectThisAgent={() => selectAgent(agent.agentAddress)}
+      selectThisAgent={() => selectAgent(agent)}
       key={agent.agentAddress} />)}
   </div>
 }

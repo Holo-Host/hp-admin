@@ -77,9 +77,19 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
 
-  useEffect(() => {
-    setCounterpartyNick(presentAgentId(counterpartyId))
+  const updateCounterparty = agentAddress => {
+    const recentCounterparty = recentCounterpartiesWithoutMe.find(recentCounterparty => recentCounterparty.agentAddress === agentAddress)
+    const agentNickname = !isEmpty(recentCounterparty) 
+      ? recentCounterparty.nickname
+      : agentAddress === currentUser.id
+        ? `${currentUser.nickname} (You)`
+        : presentAgentId(agentAddress)
 
+    setCounterpartyNick(agentNickname)
+    setCounterpartyId(agentAddress)
+  }
+
+  useEffect(() => {
     if (counterpartyId === currentUser.id) {
       newMessage('You cannot send yourself TestFuel.', 5000)
     }
@@ -87,9 +97,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
-  const selectAgent = id => {
-    setCounterpartyId(id)
-    setFormValue('counterpartyId', id)
+  const selectAgent = agent => {
+    setCounterpartyId(agent.agentAddress)
+    setFormValue('counterpartyId', agent.agentAddress)
+    setCounterpartyNick(agent.nickname || presentAgentId(counterpartyId))
   }
 
   const [amount, setAmountRaw] = useState(0)
@@ -182,7 +193,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
             styleName='form-input'
             placeholder={`Who is this ${modeRelations[mode]}?`}
             ref={register}
-            onChange={({ target: { value } }) => setCounterpartyId(value)}
+            onChange={({ target: { value } }) => updateCounterparty(value)}
           />
           <div styleName='hash-and-nick'>
             {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
