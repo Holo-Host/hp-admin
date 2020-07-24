@@ -288,7 +288,6 @@ const HoloFuelDnaInterface = {
       const actionableTransactionsDisplay = actionableTransactions.concat(cachedRecentlyActionedTransactions)
       const uniqActionableTransactions = _.uniqBy(actionableTransactionsDisplay, 'id')
       const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
-
       return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
