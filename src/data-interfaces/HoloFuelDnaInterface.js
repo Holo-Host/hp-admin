@@ -19,8 +19,7 @@ const mockDeadline = () => {
 export async function getTxCounterparties (transactionList) {
   const counterpartyList = transactionList.map(({ counterparty }) => counterparty)
   const noDuplicatesCounterpartyList = _.uniqBy(counterpartyList, 'agentAddress')
-  const counterpartyNicknameList = noDuplicatesCounterpartyList.map(counterparty => counterparty.nickname || '')
-  return counterpartyNicknameList
+  return noDuplicatesCounterpartyList
 }
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false }) => {

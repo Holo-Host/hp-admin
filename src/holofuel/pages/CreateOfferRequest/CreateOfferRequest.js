@@ -69,6 +69,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const { loading: loadingRecentCounterparties, data: { holofuelRecentCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelRecentCounterpartiesQuery)
   const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== currentUser.id)
 
+  console.log('allRecentCounterparties : ', allRecentCounterparties)
+
   const createOffer = useOfferMutation()
   const createRequest = useRequestMutation()
   const { newMessage: newMessageRaw } = useFlashMessageContext()

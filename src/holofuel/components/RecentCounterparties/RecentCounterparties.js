@@ -14,7 +14,7 @@ export default function RecentCounterparties ({ agents = [], selectedAgentId, se
 
     {loading && <Loading styleName='loading' />}
 
-    {!loading && isEmpty(agents) && <div styleName='no-peers'>You have no recent peers.</div>}
+    {!loading && isEmpty(agents) && <div styleName='no-peers' >You have no recent peers.</div>}
 
     {recentAgents.map(agent => <AgentRow
       agent={agent}

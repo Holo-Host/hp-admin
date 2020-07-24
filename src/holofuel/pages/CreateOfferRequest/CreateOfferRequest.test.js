@@ -10,7 +10,7 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelRecentCounterpartiesQuery from 'graphql/HolofuelRecentCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
-import { presentHolofuelAmount } from 'utils'
+import { presentHolofuelAmount, presentAgentId } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 
@@ -19,7 +19,7 @@ jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('holofuel/contexts/useCurrentUserContext')
 
 const counterparty = {
-  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  agentAddress: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
   avatarUrl: ''
 }
@@ -29,7 +29,7 @@ const notes = 'Hi there'
 const offerMock = {
   request: {
     query: HolofuelOfferMutation,
-    variables: { amount, counterpartyId: counterparty.id, notes }
+    variables: { amount, counterpartyId: counterparty.agentAddress, notes }
   },
   result: {
     data: {
@@ -54,7 +54,7 @@ const mockAgent1 = {
 }
 
 const mockWhoIsAgent1 = {
-  id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+  agentAddress: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
   avatarUrl: ''
 }
@@ -88,7 +88,7 @@ describe('CreateOfferRequest', () => {
       expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
       await act(async () => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: counterparty.id } })
+        fireEvent.change(getByLabelText('To:'), { target: { value: counterparty.agentAddress } })
         await wait(50)
       })
 
@@ -108,10 +108,9 @@ describe('CreateOfferRequest', () => {
       })
 
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
-      expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
+      expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${presentAgentId(counterparty.agentAddress)}.`, 5000)
     })
 
-    // test...
     it('renders error message upon attempt to transact with self', async () => {
       afterEach(() => {
         jest.clearAllMocks()
@@ -133,98 +132,15 @@ describe('CreateOfferRequest', () => {
       expect(mockNewMessage).toHaveBeenCalledWith('You cannot send yourself TestFuel.', 5000)
     })
 
-    it('renders the counterparty nickname upon *successful* fetch', async () => {
-      afterEach(() => {
-        jest.clearAllMocks()
-      })
-
-      const push = jest.fn()
-
-      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-        <CreateOfferRequest history={{ push }} />
-      </MockedProvider>)
-
-      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
-
-      expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
-
-      await act(async () => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
-        await wait(0)
-      })
-
-      expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
-      expect(within(getByTestId('counterparty-nickname')).getByText(mockWhoIsAgent1.nickname)).toBeInTheDocument()
-    })
-
-    it('renders the counterparty error message upon *unsuccessful* fetch', async () => {
-      afterEach(() => {
-        jest.clearAllMocks()
-      })
-
-      const mockAgent1 = {
-        agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nickname: 'Perry',
-        avatar_url: ''
-      }
-
-      const push = jest.fn()
-
-      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-        <CreateOfferRequest history={{ push }} />
-      </MockedProvider>)
-
-      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
-
-      expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
-
-      await act(async () => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
-        await wait(0)
-      })
-
-      expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
-      expect(within(getByTestId('counterparty-nickname')).getByText('No nickname available.')).toBeInTheDocument()
-    })
-
-    it('renders loading message/indicator while fetching', async () => {
-      afterEach(() => {
-        jest.clearAllMocks()
-      })
-
-      const mockAgent1 = {
-        agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-        nickname: 'Perry',
-        avatarUrl: ''
-      }
-
-      const push = jest.fn()
-
-      const { getByLabelText, queryByTestId, getByTestId, getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-        <CreateOfferRequest history={{ push }} />
-      </MockedProvider>)
-
-      await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
-
-      expect(queryByTestId('counterparty-nickname')).not.toBeInTheDocument()
-
-      act(() => {
-        fireEvent.change(getByLabelText('To:'), { target: { value: mockAgent1.agent_address } })
-      })
-
-      expect(getByTestId('counterparty-nickname')).toBeInTheDocument()
-      expect(getByTestId('counterparty-loading')).toBeInTheDocument()
-    })
-
     it('renders a clickable list of recent counterparties', async () => {
       const agent1 = {
-        id: 'fkljd',
+        agentAddress: 'fkljdn',
         nickname: 'Jo',
         avatarUrl: ''
       }
 
       const agent2 = {
-        id: 'dskajln',
+        agentAddress: 'dskajl',
         nickname: 'Bob',
         avatarUrl: ''
       }
@@ -256,7 +172,7 @@ describe('CreateOfferRequest', () => {
       expect(agent1Row).toBeInTheDocument()
       fireEvent.click(agent1Row)
 
-      expect(getByLabelText('To:').value).toEqual(agent1.id)
+      expect(getByLabelText('To:').value).toEqual(agent1.agentAddress)
 
       const { getByText: getByTextInAgent1Row } = within(agent1Row)
       expect(getByTextInAgent1Row('Selected')).toBeInTheDocument()
@@ -271,17 +187,13 @@ describe('CreateOfferRequest', () => {
       fireEvent.click(getByText(`${presentHolofuelAmount(amount)} TF`))
       expect(getByTestId('amount').value).toEqual(presentHolofuelAmount(amount))
     })
-
-    it.skip('responds appropriately to bad input', () => {
-      // this is a placeholder for once we add proper error handling
-    })
   })
 
   describe('request mode', () => {
     const requestMock = {
       request: {
         query: HolofuelRequestMutation,
-        variables: { amount, counterpartyId: counterparty.id, notes }
+        variables: { amount, counterpartyId: counterparty.agentAddress, notes }
       },
       result: {
         data: {
@@ -315,7 +227,7 @@ describe('CreateOfferRequest', () => {
       expect(queryByTestId('hash-icon')).not.toBeInTheDocument()
 
       await act(async () => {
-        fireEvent.change(getByLabelText('From:'), { target: { value: counterparty.id } })
+        fireEvent.change(getByLabelText('From:'), { target: { value: counterparty.agentAddress } })
         await wait(50)
       })
 
@@ -335,7 +247,7 @@ describe('CreateOfferRequest', () => {
       })
 
       expect(push).toHaveBeenCalledWith(HISTORY_PATH)
-      expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
+      expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${presentAgentId(counterparty.agentAddress)}.`, 5000)
     })
   })
 })

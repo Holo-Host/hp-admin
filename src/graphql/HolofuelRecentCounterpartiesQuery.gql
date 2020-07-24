@@ -1,6 +1,6 @@
 query HolofuelRecentCounterpartiesQuery {
   holofuelRecentCounterparties {
-    id
+    agentAddress
     nickname
     avatarUrl
   }

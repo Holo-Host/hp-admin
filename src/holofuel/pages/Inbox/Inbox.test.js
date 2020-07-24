@@ -8,7 +8,7 @@ import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow, ConfirmationModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
-import { presentHolofuelAmount, getDateLabel } from 'utils'
+import { presentHolofuelAmount, presentAgentId, promiseMap, getDateLabel } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
@@ -16,7 +16,6 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-import { presentAgentId, promiseMap } from '../../../utils'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
@@ -452,12 +451,6 @@ describe('TransactionRow', () => {
     agent_address: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry',
     avatar_url: ''
-  }
-
-  const mockWhoIsAgent1 = {
-    id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-    nickname: 'Perry',
-    avatarUrl: null
   }
 
   const mocks = [
