@@ -24,7 +24,7 @@ export const resolvers = {
 
     hostPricing: HhaDnaInterface.hostPricing.get,
 
-    holofuelUser: HoloFuelDnaInterface.user.get,
+    myHolofuelUser: HoloFuelDnaInterface.user.get,
 
     holofuelRecentCounterparties: async () => {
       const completed = await HoloFuelDnaInterface.transactions.allCompleted()
@@ -36,7 +36,10 @@ export const resolvers = {
 
     holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
 
-    holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
+    holofuelActionableTransactions: async () => {
+      const result = await HoloFuelDnaInterface.transactions.allActionable()
+      return result
+    },
 
     // NOTE: NonPending includes both completed and rejected/declined transactions.
     holofuelNonPendingTransactions: HoloFuelDnaInterface.transactions.allNonPending,
@@ -124,12 +127,6 @@ export const resolvers = {
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
     holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId),
-
-    holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
-
-    holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
-
-    holofuelRefundTransactions: (_, { transactions }) => HoloFuelDnaInterface.transactions.refundTransactions(transactions),
 
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 

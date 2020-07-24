@@ -76,7 +76,6 @@ type Transaction {
   presentBalance: Float
   notes: String
   happName: String
-  canceledBy: HolofuelUser
   isPayingARequest: Boolean
   inProcess: Boolean
   isActioned: Boolean
@@ -120,23 +119,6 @@ type HposAuth {
   hposSettings: HposSettings
 }
 
-input HolofuelUserInput {
-  agentAddress: ID
-  nickname: String
-}
-
-input TransactionInput {
-  id: ID # ID will be the origin commit hash
-  amount: Float
-  counterparty: HolofuelUserInput
-  direction: TransactionDirection
-  status: TransactionStatus
-  type: TransactionType
-  timestamp: String
-  fees: Float
-  notes: String
-}
-
 type HostingReport {
   localSourceChains: Int
   zomeCalls: Int
@@ -168,7 +150,7 @@ type Query {
   holofuelActionableTransactions: [Transaction]
   holofuelEarningsTransactions: [Transaction]
   holofuelLedger: Ledger
-  holofuelUser: MyHolofuelUser
+  myHolofuelUser: MyHolofuelUser
   holofuelRecentCounterparties: [HolofuelUser]
   hposSettings: HposSettings
   hostingReport: HostingReport
@@ -187,9 +169,6 @@ type Mutation {
   holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction
   holofuelDecline(transactionId: ID): Transaction
-  holofuelCancel(transactionId: ID): Transaction
-  holofuelRecoverFunds(transactionId: ID): Transaction
-  holofuelRefundTransactions(transactions: [TransactionInput]): [Transaction]
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings
   hposUpdateVersion: HposStatus
   hposCheckAuth: HposAuth

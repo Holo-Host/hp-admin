@@ -1,4 +1,4 @@
-query holofuelRecentCounterparties {
+query HolofuelRecentCounterpartiesQuery {
   holofuelRecentCounterparties {
     id
     nickname

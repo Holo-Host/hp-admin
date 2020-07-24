@@ -7,7 +7,7 @@ import CreateOfferRequest, { FEE_PERCENTAGE } from './CreateOfferRequest'
 import { TYPE } from 'models/Transaction'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import holofuelRecentCounterpartiesQuery from 'graphql/holofuelRecentCounterpartiesQuery.gql'
+import HolofuelRecentCounterpartiesQuery from 'graphql/HolofuelRecentCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
 import { presentHolofuelAmount } from 'utils'
@@ -232,7 +232,7 @@ describe('CreateOfferRequest', () => {
       const mocks = [
         {
           request: {
-            query: holofuelRecentCounterpartiesQuery
+            query: HolofuelRecentCounterpartiesQuery
           },
           result: {
             data: { holofuelRecentCounterparties: [agent1, agent2] }

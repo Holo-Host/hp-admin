@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import holofuelRecentCounterpartiesQuery from 'graphql/holofuelRecentCounterpartiesQuery.gql'
+import HolofuelRecentCounterpartiesQuery from 'graphql/HolofuelRecentCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
@@ -66,7 +66,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { currentUser } = useCurrentUserContext()
-  const { loading: loadingRecentCounterparties, data: { holofuelRecentCounterparties: allRecentCounterparties = [] } = {} } = useQuery(holofuelRecentCounterpartiesQuery)
+  const { loading: loadingRecentCounterparties, data: { holofuelRecentCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelRecentCounterpartiesQuery)
   const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== currentUser.id)
 
   const createOffer = useOfferMutation()
@@ -76,7 +76,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
-  const [isCounterpartyFound, setCounterpartyFound] = useState(false)
 
   useEffect(() => {
     setCounterpartyNick(presentAgentId(counterpartyId))
@@ -128,7 +127,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
-    !isCounterpartyFound ||
     counterpartyId === currentUser.id ||
     amount < 0
 

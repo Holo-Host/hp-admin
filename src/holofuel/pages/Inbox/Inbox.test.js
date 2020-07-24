@@ -159,7 +159,7 @@ const ledgerMock = {
   }
 }
 
-const holofuelUser = {
+const myHolofuelUser = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
   avatarUrl: null
@@ -169,12 +169,10 @@ describe('Inbox', () => {
   const timestamp = moment('2013-02-04')
 
   const counterparty = { agentAddress: 'last 6', nickname: null, avatarUrl: null }
-  const canceledBy = null
 
   const offer1 = {
     id: '1',
     counterparty,
-    canceledBy,
     amount: 100,
     timestamp,
     type: TYPE.offer,
@@ -188,7 +186,6 @@ describe('Inbox', () => {
   const offer2 = {
     id: '2',
     counterparty,
-    canceledBy,
     amount: 100,
     timestamp,
     type: TYPE.offer,
@@ -377,7 +374,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} userId={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={request} userId={myHolofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -387,7 +384,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} userId={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={offer} userId={myHolofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -397,7 +394,7 @@ describe('TransactionRow', () => {
 
   it('renders an recent request', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={holofuelUser} />
+      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={myHolofuelUser} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -407,7 +404,7 @@ describe('TransactionRow', () => {
 
   it('renders a recent offer', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={holofuelUser} />
+      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={myHolofuelUser} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
