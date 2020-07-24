@@ -12,14 +12,14 @@ import useConnectionContext from 'contexts/useConnectionContext'
 import useHFConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
-import { useInterval } from 'utils'
+import { useInterval, POLLING_INTERVAL_SETTINGS } from 'utils'
 import { wsConnection } from 'holochainClient'
 import { isLoginPage, HP_ADMIN_LOGIN_PATH } from 'utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
 
-export function PrimaryLayout ({
+function PrimaryLayout ({
   children,
   headerProps = {},
   showHeader = true,
@@ -34,13 +34,12 @@ export function PrimaryLayout ({
   const { push } = useHistory()
 
   const [isPausedConnectionCheckInterval, setIsPausedConnectionCheckInterval] = useState(false)
-  const [userMessage, setUserMessage] = useState('')
 
   const onError = ({ graphQLErrors: { isHposConnectionActive } }) => {
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL_SETTINGS), onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
     if (isLoginPage(window)) {
@@ -70,11 +69,7 @@ export function PrimaryLayout ({
       if (!isLoginPage(window)) {
         push(HP_ADMIN_LOGIN_PATH)
       }
-      const noHoloportConnectionMsg = 'Connecting to your Holoport...'
-      if (userMessage !== noHoloportConnectionMsg) {
-        setUserMessage(noHoloportConnectionMsg)
-        newMessage(noHoloportConnectionMsg, 0)
-      }
+      newMessage('Connecting to your Holoport...', 0)
       setIsPausedConnectionCheckInterval(true)
       setTimeout(() => setIsPausedConnectionCheckInterval(false), 5000)
     } else if (connectionStatus.hpos && !connectionStatus.holochain) {
@@ -82,14 +77,10 @@ export function PrimaryLayout ({
         push(HP_ADMIN_LOGIN_PATH)
       }
       const noConductorConnectionMsg = 'Connecting to your Conductor...'
-      if (userMessage !== noConductorConnectionMsg) {
-        setUserMessage(noConductorConnectionMsg)
-        newMessage(noConductorConnectionMsg, 0)
-      }
+      newMessage(noConductorConnectionMsg, 0)
       // set as false until receive back onError result from next hpos (settingsQuery) polling
       setIsHposConnectionAlive(false)
     } else if (connectionStatus.hpos) {
-      setUserMessage('')
       newMessage('', 0)
       setUser()
     }
@@ -107,8 +98,7 @@ export function PrimaryLayout ({
     setIsPausedConnectionCheckInterval,
     setConductorConnectionFalse,
     isInsideApp,
-    setIsInsideApp,
-    userMessage])
+    setIsInsideApp])
 
   const isWide = useContext(ScreenWidthContext)
 
