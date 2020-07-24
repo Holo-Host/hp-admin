@@ -1,0 +1,13 @@
+{
+    "instance_prefix": "hhaId",
+    "log_level": true,
+    "connection": {
+        "secure": false,
+        "port": 33000
+    },
+    "web_user_legend": {
+        "agent1@holo.host": "HcSCjCvkR5uywn6z5t9SBFtTs7p83Ex3urUtpY8jsUa7pn3zdF6XJU4U6tuzpui",
+        "agent2@holo.host": "HcSCiRv3ihjkgksj986C6sHj9FMZhdog4shw5mjYUi8zrukrCxIzfWovqa9jcxa",
+        "testAgent@holo.host": "HcSCJrvXeGR8kutgfnw99oor9796der67DMFRHuotsxqbmsnnaxkW8K34985b4A"
+    }
+}
