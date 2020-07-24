@@ -2,7 +2,6 @@ import _, { isEmpty, isNil } from 'lodash'
 import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
-import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
 
 export const currentDataTimeIso = () => new Date().toISOString()
@@ -18,10 +17,9 @@ const mockDeadline = () => {
 
 /* Creates an array of all counterparties for a provided transaction list */
 export async function getTxCounterparties (transactionList) {
-  const counterpartyList = transactionList.map(({ counterparty }) => counterparty.agentAddress)
-  const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
-  const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
-  return noDuplicatesAgentList
+  const counterpartyList = transactionList.map(({ counterparty }) => counterparty)
+  const noDuplicatesCounterpartyList = _.uniqBy(counterpartyList, 'agentAddress')
+  return noDuplicatesCounterpartyList
 }
 
 const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false }) => {
@@ -219,10 +217,6 @@ function presentTransaction (transaction) {
   }
 }
 
-// a hack while we clean up the apollo counterparties implementation
-// AND create a more generalized data loading system
-const cachedGetProfileCalls = {}
-
 const cachedRecentlyActionedTransactions = []
 const removeTransactionFromCache = transactionId => {
   _.remove(cachedRecentlyActionedTransactions, cachedRecentlyActionedTransactions.find(tx => tx.id === transactionId))
@@ -237,33 +231,6 @@ const HoloFuelDnaInterface = {
         id,
         avatarUrl,
         nickname
-      }
-    },
-    getCounterparty: async ({ agentId }) => {
-      const presentCounterparty = counterparty => ({
-        id: counterparty.agent_address,
-        avatarUrl: counterparty.avatar_url,
-        nickname: counterparty.nickname
-      })
-
-      if (cachedGetProfileCalls[agentId]) {
-        if (typeof cachedGetProfileCalls[agentId].then === 'function') {
-          return presentCounterparty(await cachedGetProfileCalls[agentId])
-        } else {
-          return cachedGetProfileCalls[agentId]
-        }
-      } else {
-        cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
-        const counterparty = await cachedGetProfileCalls[agentId]
-        if (!counterparty || counterparty.Err) {
-          return {
-            id: agentId,
-            avatarUrl: null,
-            nickname: null
-          }
-        }
-        cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
-        return presentCounterparty(counterparty)
       }
     },
     update: async (nickname, avatarUrl) => {
@@ -386,50 +353,6 @@ const HoloFuelDnaInterface = {
         removeTransactionFromCache(presentedTransaction.id)
       }, 5000)
       return presentedTransaction
-    },
-    /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
-    cancel: async (transactionId) => {
-      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'])
-      const transaction = authoredRequests.find(authoredRequest => authoredRequest.id === transactionId)
-      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: transactionId })
-      if (!canceledProof) throw new Error(`Cancel Error: ${canceledProof}.`)
-
-      return {
-        ...transaction,
-        id: transactionId
-      }
-    },
-    /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */
-    recoverFunds: async (transactionId) => {
-      // const TX_DECLINED = 'declined-transaction'
-      const { rawTransaction, transaction } = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId, { raw: true })
-      const canceledProof = await createZomeCall('transactions/cancel')({ entry: rawTransaction })
-      if (!canceledProof) {
-        throw new Error(`Recover Funds Error.  Couldn'\t find a transaction with id ${transactionId}.`)
-      }
-
-      return {
-        ...transaction,
-        id: transactionId,
-        status: STATUS.canceled
-      }
-    },
-
-    refundTransactions: async (transactions) => {
-      const listOfTransactionIds = transactions.map(({ id }) => id)
-      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
-      if (!canceledProof) {
-        throw new Error(`Recover Funds Error.  Couldn'\t find a transactions with ids ${transactions}.`)
-      }
-
-      const canceledDeclined = transactions.map(transaction => {
-        return {
-          ...transaction,
-          status: STATUS.canceled
-        }
-      })
-
-      return canceledDeclined
     }
   },
   requests: {

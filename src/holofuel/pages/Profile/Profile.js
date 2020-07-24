@@ -7,7 +7,7 @@ import Input from 'components/Input'
 import HashAvatar from 'components/HashAvatar'
 import Loading from 'components/Loading'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
 import HolofuelUpdateUserMutation from 'graphql/HolofuelUpdateUserMutation.gql'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import './Profile.module.css'
@@ -21,7 +21,7 @@ function Card ({ title, subtitle, children }) {
 }
 
 export default function Profile () {
-  const { loading, data: { holofuelUser, holofuelUser: { id, nickname } = {} } = {}, refetch: refetchHolofuelUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { loading, data: { myHolofuelUser, myHolofuelUser: { id, nickname } = {} } = {}, refetch: refetchMyHolofuelUser } = useQuery(MyHolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const [updateUser] = useMutation(HolofuelUpdateUserMutation)
   const { setCurrentUser } = useCurrentUserContext()
   const [optimisticNickname, setOptimisticNickname] = useState()
@@ -30,10 +30,10 @@ export default function Profile () {
 
   useEffect(() => {
     if (optimisticNickname && !hasRefetched) {
-      refetchHolofuelUser()
+      refetchMyHolofuelUser()
       setHasRefetched(true)
     }
-  }, [optimisticNickname, hasRefetched, refetchHolofuelUser])
+  }, [optimisticNickname, hasRefetched, refetchMyHolofuelUser])
 
   const { register, handleSubmit, triggerValidation, reset, errors } = useForm({ mode: 'onChange' })
 
@@ -41,18 +41,18 @@ export default function Profile () {
     updateUser({
       variables: { nickname },
       refetchQueries: [{
-        query: HolofuelUserQuery
+        query: MyHolofuelUserQuery
       }]
     })
       .catch(() => {
         // if updateUser throws an error we roll back our optimistic updates
         setOptimisticNickname()
-        setCurrentUser(holofuelUser)
+        setCurrentUser(myHolofuelUser)
       })
 
     setOptimisticNickname(nickname)
     setCurrentUser({
-      ...holofuelUser,
+      ...myHolofuelUser,
       nickname
     })
     setHasRefetched(false)

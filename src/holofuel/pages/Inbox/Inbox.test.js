@@ -8,7 +8,7 @@ import apolloClient from 'apolloClient'
 import Inbox, { TransactionRow, ConfirmationModal } from './Inbox'
 import { pendingList, transactionList } from 'mock-dnas/holofuel'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
-import { presentHolofuelAmount, getDateLabel } from 'utils'
+import { presentHolofuelAmount, presentAgentId, promiseMap, getDateLabel } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
@@ -16,8 +16,6 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import { presentAgentId, promiseMap } from '../../../utils'
 
 jest.mock('data-interfaces/EnvoyInterface')
 jest.mock('holofuel/components/layout/PrimaryLayout')
@@ -160,7 +158,7 @@ const ledgerMock = {
   }
 }
 
-const holofuelUser = {
+const myHolofuelUser = {
   id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
   nickname: 'Perry',
   avatarUrl: null
@@ -170,12 +168,10 @@ describe('Inbox', () => {
   const timestamp = moment('2013-02-04')
 
   const counterparty = { agentAddress: 'last 6', nickname: null, avatarUrl: null }
-  const canceledBy = null
 
   const offer1 = {
     id: '1',
     counterparty,
-    canceledBy,
     amount: 100,
     timestamp,
     type: TYPE.offer,
@@ -189,7 +185,6 @@ describe('Inbox', () => {
   const offer2 = {
     id: '2',
     counterparty,
-    canceledBy,
     amount: 100,
     timestamp,
     type: TYPE.offer,
@@ -207,17 +202,6 @@ describe('Inbox', () => {
     result: {
       data: {
         holofuelActionableTransactions: [offer1, offer2]
-      }
-    }
-  }
-
-  const counterpartyMock = {
-    request: {
-      query: HolofuelCounterpartyQuery
-    },
-    result: {
-      data: {
-        holofuelCounterparty: counterparty
       }
     }
   }
@@ -259,10 +243,7 @@ describe('Inbox', () => {
       actionableTransactionsMock,
       actionableTransactionsMock,
       acceptOffer1Mock,
-      acceptOffer2Mock,
-      counterpartyMock,
-      counterpartyMock,
-      counterpartyMock
+      acceptOffer2Mock
     ]
 
     const { getByText, getAllByText, getAllByTestId } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
@@ -392,7 +373,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable request', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} userId={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={request} userId={myHolofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -402,7 +383,7 @@ describe('TransactionRow', () => {
 
   it('renders an actionable offer', async () => {
     const { getByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} userId={holofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
+      <TransactionRow transaction={offer} userId={myHolofuelUser} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} isActionable />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -412,7 +393,7 @@ describe('TransactionRow', () => {
 
   it('renders an recent request', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={holofuelUser} />
+      <TransactionRow transaction={request} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={myHolofuelUser} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -422,7 +403,7 @@ describe('TransactionRow', () => {
 
   it('renders a recent offer', async () => {
     const { getByText, queryByText } = await renderAndWait(<MockedProvider addTypename={false}>
-      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={holofuelUser} />
+      <TransactionRow transaction={offer} setConfirmationModalProperties={jest.fn()} confirmationModalProperties={confirmationModalProperties} userId={myHolofuelUser} />
     </MockedProvider>, 0)
 
     expect(getByText('last 6')).toBeInTheDocument()
@@ -472,28 +453,11 @@ describe('TransactionRow', () => {
     avatar_url: ''
   }
 
-  const mockWhoIsAgent1 = {
-    id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
-    nickname: 'Perry',
-    avatarUrl: null
-  }
-
-  const counterpartyQueryMock = {
-    request: {
-      query: HolofuelCounterpartyQuery,
-      variables: { agentId: mockAgent1.agent_address }
-    },
-    result: {
-      data: { holofuelCounterparty: mockWhoIsAgent1 }
-    }
-  }
-
   const mocks = [
     offerMock,
     acceptOfferMock,
     declineMock,
     actionableTransactionsMock,
-    counterpartyQueryMock,
     ledgerMock
   ]
 
@@ -611,21 +575,10 @@ describe('TransactionRow', () => {
         setConfirmationModalProperties: jest.fn()
       }
 
-      const counterpartyQueryErrorMock = {
-        request: {
-          query: HolofuelCounterpartyQuery,
-          variables: { agentId: mockAgent1.pub_sign_key }
-        },
-        result: {
-          data: { holofuelCounterparty: { Err: 'Agent ID not located in DNA dht.' } }
-        }
-      }
-
       const mocks = [
         offerMock,
         declineMock,
         actionableTransactionsMock,
-        counterpartyQueryErrorMock,
         ledgerMock
       ]
       const { getByText } = await renderAndWait(<MockedProvider mocks={mocks} addTypename={false}>
@@ -647,14 +600,6 @@ describe('TransactionRow', () => {
         setConfirmationModalProperties: jest.fn()
       }
 
-      const counterpartyQuery = {
-        request: {
-          query: HolofuelCounterpartyQuery,
-          variables: { agentId: transaction.counterparty.agentAddress }
-        },
-        result: () => ({ data: { holofuelCounterparty: { id: mockWhoIsAgent1.id, nickname: null, avatarUrl: null } } })
-      }
-
       const localOfferMock = {
         request: {
           query: HolofuelOfferMutation,
@@ -670,7 +615,6 @@ describe('TransactionRow', () => {
         localOfferMock,
         declineMock,
         actionableTransactionsMock,
-        counterpartyQuery,
         ledgerMock
       ]
 
