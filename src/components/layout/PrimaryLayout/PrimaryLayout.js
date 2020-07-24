@@ -107,7 +107,7 @@ function PrimaryLayout ({
       {showHeader && <Header
         {...headerProps}
         settings={connectionStatus.hpos ? settings : {}} />}
-      {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag-page' />}
+      {showAlphaFlag && <AlphaFlag styleName={isWide ? 'styles.alpha-flag-page-desktop' : 'styles.alpha-flag-page'} />}
       <div styleName='styles.content'>
         <FlashMessage />
         {children}

@@ -14,6 +14,9 @@ import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount, POLLING_INTERVAL_GENERAL } from 'utils'
 import './Dashboard.module.css'
 
+// Temporary. This should be removed once we move to hosted release, as we will always show Hosting Card
+const SHOW_HOSTING_CARD = false
+
 export default function Dashboard () {
   // nb: we only call settings here to track hpos connection status (see apolloClient.js for use)
   useQuery(HposSettingsQuery)
@@ -27,13 +30,13 @@ export default function Dashboard () {
   const [areHappsExpanded, setAreHappsExpanded] = useState(false)
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
-    <Card title='Hosting'>
+    {SHOW_HOSTING_CARD && <Card title='Hosting'>
       <div styleName='hosting-row'>
         <LocationIcon styleName='hosting-icon' /> {isNil(localSourceChains) ? '--' : localSourceChains} Local source chains
       </div>
-      {/* hiding until zome call count is implemented */ false && <div styleName='hosting-row'>
+      <div styleName='hosting-row'>
         <PhoneIcon styleName='hosting-icon' /> {hostingReport.zomeCalls || '--'} Zome calls
-      </div>}
+      </div>
       <div styleName={areHappsExpanded ? 'hosting-row-expanded' : 'hosting-row'} onClick={() => setAreHappsExpanded(!areHappsExpanded)}>
         <GridIcon styleName='hosting-icon' /> {hostedHapps.length} Hosted hApps
         {!!hostedHapps.length && <ArrowRightIcon color='#979797' styleName={areHappsExpanded ? 'up-arrow' : 'down-arrow'} />}
@@ -41,7 +44,7 @@ export default function Dashboard () {
       {areHappsExpanded && <div styleName='happ-list'>
         {hostedHapps.map(({ name }) => <div styleName='happ-name'>{name}</div>)}
       </div>}
-    </Card>
+    </Card>}
 
     {/* hiding this until earnings are available */ false && <Card title='Earnings'>
       <div styleName='balance'>

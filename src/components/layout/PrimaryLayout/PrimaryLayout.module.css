@@ -15,13 +15,6 @@
   padding: 0px 24px;
 }
 
-.alpha-flag {
-  position: absolute;
-  right: 0px;
-  top: 80px;
-  z-index: 1
-}
-
 .content {
   display: flex;
   flex-direction: column;
@@ -106,11 +99,18 @@
 
 .alpha-flag {
   position: absolute;
+  z-index: 1;
 }
 
 .alpha-flag-page {
   composes: alpha-flag;
   top: 80px;
+  right: 0px;
+}
+
+.alpha-flag-page-desktop {
+  composes: alpha-flag;
+  top: 140px;
   right: 0px;
 }
 
