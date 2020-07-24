@@ -1,0 +1,21 @@
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0px 50px;
+}
+
+.modal-message {
+  font-family: "Circular";
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--color-rhino-60);
+  margin-bottom: 20px;
+}
+
+.label {
+  font-family: "Circular";
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--color-rhino-60);
+}

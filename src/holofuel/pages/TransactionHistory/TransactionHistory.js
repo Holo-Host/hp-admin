@@ -6,6 +6,7 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import Loading from 'components/Loading'
+import OneTimeEducationModal from 'holofuel/components/OneTimeEducationModal/OneTimeEducationModal'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
@@ -92,6 +93,9 @@ export default function TransactionsHistory ({ history: { push } }) {
     loading: isLoadingFirstPendingTransactions
   }]).concat(completedPartitionedTransactions).filter(({ transactions, loading }) => !isEmpty(transactions) || loading)
 
+  const urlParams = new URLSearchParams(window.location.search)
+  const shouldShowSentTransactionMessage = urlParams.get('sent-transaction')
+
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='header'>
       <h4 styleName='balance-label'>Current Balance</h4>
@@ -117,6 +121,10 @@ export default function TransactionsHistory ({ history: { push } }) {
           partition={partition}
         />)}
     </div>}
+    {shouldShowSentTransactionMessage && <OneTimeEducationModal
+      id='history'
+      message='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+    />}
   </PrimaryLayout>
 }
 

@@ -122,7 +122,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       default:
         throw new Error(`Unknown mode: '${mode}' in CreateOfferRequest`)
     }
-    push(HISTORY_PATH)
+    push(`${HISTORY_PATH}?sent-transaction=true`)
   }
 
   !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)
