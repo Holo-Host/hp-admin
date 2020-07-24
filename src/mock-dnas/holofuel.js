@@ -1,5 +1,4 @@
 import bcrypt from 'bcryptjs'
-import { isString } from 'lodash/fp'
 
 export const transactionList = {
   ledger: {

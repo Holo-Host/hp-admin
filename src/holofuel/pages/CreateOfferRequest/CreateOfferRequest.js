@@ -17,7 +17,7 @@ import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
-import { HISTORY_PATH } from 'holofuel/utils/urls'
+import { HISTORY_FROM_SENT_TRANSACTION_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
@@ -122,7 +122,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       default:
         throw new Error(`Unknown mode: '${mode}' in CreateOfferRequest`)
     }
-    push(`${HISTORY_PATH}?sent-transaction=true`)
+    push(HISTORY_FROM_SENT_TRANSACTION_PATH)
   }
 
   !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)

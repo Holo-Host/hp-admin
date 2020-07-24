@@ -13,7 +13,7 @@ import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageC
 import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
 import { presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
-import { HISTORY_PATH } from 'holofuel/utils/urls'
+import { HISTORY_FROM_SENT_TRANSACTION_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
@@ -42,7 +42,8 @@ const offerMock = {
         type: TYPE.offer,
         timestamp: moment().subtract(14, 'days'),
         direction: '',
-        status: ''
+        status: '',
+        isActioned: false
       }
     }
   }
@@ -119,7 +120,7 @@ describe('CreateOfferRequest', () => {
         await wait(0)
       })
 
-      expect(push).toHaveBeenCalledWith(HISTORY_PATH)
+      expect(push).toHaveBeenCalledWith(HISTORY_FROM_SENT_TRANSACTION_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
 
@@ -378,7 +379,7 @@ describe('CreateOfferRequest', () => {
         await wait(0)
       })
 
-      expect(push).toHaveBeenCalledWith(HISTORY_PATH)
+      expect(push).toHaveBeenCalledWith(HISTORY_FROM_SENT_TRANSACTION_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterparty.nickname}.`, 5000)
     })
   })
