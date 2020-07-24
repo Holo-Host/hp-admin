@@ -51,7 +51,7 @@ const data = {
         versionRev: 12
       }
     },
-    'v1/hosted_happs': {
+    '/v1/hosted_happs': {
       hosted_happs: [
         {
           'happ-title': 'HoloFuel',

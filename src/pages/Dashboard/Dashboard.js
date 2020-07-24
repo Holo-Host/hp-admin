@@ -15,7 +15,7 @@ import { presentHolofuelAmount, POLLING_INTERVAL_GENERAL } from 'utils'
 import './Dashboard.module.css'
 
 // Temporary. This should be removed once we move to hosted release, as we will always show Hosting Card
-const SHOW_HOSTING_CARD = false
+const SHOW_HOSTING_CARD = true
 
 export default function Dashboard () {
   // nb: we only call settings here to track hpos connection status (see apolloClient.js for use)
