@@ -14,6 +14,7 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { TYPE, STATUS } from 'models/Transaction'
+import './ConfirmationModal.module.css'
 
 function useOffer () {
   const [offer] = useMutation(HolofuelOfferMutation)
@@ -62,7 +63,7 @@ function useCounterparty (agentId) {
   return { holofuelCounterparty, loading }
 }
 
-export function ConfirmationModal ({ confirmationModalProperties, setConfirmationModalProperties }) {
+export default function ConfirmationModal ({ confirmationModalProperties, setConfirmationModalProperties }) {
   const isWide = useContext(ScreenWidthContext)
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
@@ -155,7 +156,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   return <Modal
     contentLabel={contentLabel}
     isOpen={shouldDisplay}
-    handleClose={() => hideModal()}
+    handleClose={hideModal}
     styleName={cx('modal', { 'modal-desktop': isWide })}
   >
     <div styleName='modal-message'>{message}</div>
