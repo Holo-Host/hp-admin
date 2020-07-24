@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TestFuel card on Dashboard linking to Holofuel
 ### Removed
 - Temporarily removed Hosting and Earnings cards on Dashboard
+- Removed refresh button
+- Removed separate Sidemenu behaviour in Desktop. 
 ### Fixed
 - Missing style bug causing crash after accepting a transaction
 - Inbox Dont allow multiple transaction drawers to be open at once, but allow actioning a transaction while another is in process
