@@ -102,18 +102,6 @@
   z-index: 1;
 }
 
-.alpha-flag-page {
-  composes: alpha-flag;
-  top: 80px;
-  right: 0px;
-}
-
-.alpha-flag-page-desktop {
-  composes: alpha-flag;
-  top: 140px;
-  right: 0px;
-}
-
 .alpha-flag-banner {
   composes: alpha-flag;
   top: -16px;

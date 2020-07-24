@@ -11,10 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hosting card gets real data from HPOS for hosted happs and local source chain count
 ### Removed
 - Temporarily removed Hosting and Earnings cards on Dashboard
+- Header Alpha Flag
 ### Fixed
 - Missing style bug causing crash after accepting a transaction
 - Inbox Dont allow multiple transaction drawers to be open at once, but allow actioning a transaction while another is in process
-- Alpha flag positioning bug on Desktop layout
 
 ## [0.11.11] - 2020-05-26
 ### Added

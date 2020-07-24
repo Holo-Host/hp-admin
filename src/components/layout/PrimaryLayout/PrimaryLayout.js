@@ -22,8 +22,7 @@ import 'global-styles/index.css'
 function PrimaryLayout ({
   children,
   headerProps = {},
-  showHeader = true,
-  showAlphaFlag = true
+  showHeader = true
 }) {
   const [isInsideApp, setIsInsideApp] = useState(true)
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
@@ -107,7 +106,6 @@ function PrimaryLayout ({
       {showHeader && <Header
         {...headerProps}
         settings={connectionStatus.hpos ? settings : {}} />}
-      {showAlphaFlag && <AlphaFlag styleName={isWide ? 'styles.alpha-flag-page-desktop' : 'styles.alpha-flag-page'} />}
       <div styleName='styles.content'>
         <FlashMessage />
         {children}
