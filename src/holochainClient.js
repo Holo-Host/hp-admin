@@ -117,7 +117,6 @@ export let wsConnection = true
 let isInitiatingHcConnection = false
 let wsTimeoutErrorCount = 0
 
-
 async function initHolochainClient () {
   isInitiatingHcConnection = true
   let url

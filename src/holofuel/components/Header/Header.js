@@ -9,19 +9,19 @@ import { holochainClient as webSdkConnection, hostContext } from 'holochainClien
 import MenuIcon from 'components/icons/MenuIcon'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 
-export function Header ({ agent, agentLoading, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount, isWide }) { 
+export function Header ({ agent, agentLoading, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount, isWide }) {
   const [isSignedIn, setIsSignedIn] = useState(false)
   const [shouldDisable, setShouldDisable] = useState()
 
   useEffect(() => {
     if (!(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-      // once chaperone is updated, disable if the context is less than 3 
+      // once chaperone is updated, disable if the context is less than 3
       setShouldDisable(!hostContext || hostContext < 2)
     }
   }, [])
 
   const handleAppAccess = async () => {
-    if(isSignedIn) {
+    if (isSignedIn) {
       await webSdkConnection.signOut()
       setIsSignedIn(false)
       // todo: the context is hard coded in chaperone right now to only return 2;
@@ -31,7 +31,7 @@ export function Header ({ agent, agentLoading, history: { push }, hamburgerClick
       setIsSignedIn(true)
     }
   }
-  
+
   const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
     <MenuIcon styleName='menu-icon' color='#000000' />
     {inboxCount > 0 && <span styleName='nav-badge' data-testid='inboxCount-badge'>{inboxCount}</span>}
