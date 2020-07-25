@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import ScreenWidthContext from 'holofuel/contexts/screenWidth'
@@ -25,10 +25,10 @@ import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
-import { useInterval, useLoadingFirstTime } from 'utils'
+import { POLLING_INTERVAL_GENERAL, useInterval, useLoadingFirstTime } from 'utils'
 
 function useUpdatedTransactionLists () {
-  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
+  const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {}, refetch: refetchLedger } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL_GENERAL })
   const { loading: actionableTransactionsLoading, data: { holofuelActionableTransactions: actionableTransactions = [] } = {}, refetch: refetchActionableTransactions, stopPolling: stopPollingActionableTransactions, startPolling: startPollingActionableTransactions } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: completedTransactionsLoading, refetch: refetchCompletedTransactions, stopPolling: stopPollingCompletedTransactions, startPolling: startPollingCompletedTransactions } = useQuery(HolofuelCompletedTransactionsQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: nonPendingTransactionsLoading, refetch: refetchNonPendingTransactions } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network' })
@@ -70,7 +70,7 @@ function PrimaryLayout ({
   headerProps = {},
   showAlphaFlag = true
 }) {
-  const { refetch: refetchUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { refetch: refetchMyUser } = useQuery(MyHolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { holofuelBalance, actionableTransactions, ledgerLoading, isLoadingRefetchCalls, stopPolling, startPolling, refetchCalls } = useUpdatedTransactionLists()
 
   const { currentUser, currentUserLoading } = useCurrentUserContext()
@@ -81,11 +81,11 @@ function PrimaryLayout ({
   const inboxCount = actionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds)).length
 
   const { push } = useHistory()
-  const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
-  const refetchHolofuelUser = useCallback(() => {
-    setShouldRefetchUser(false)
-    refetchUser()
-  }, [setShouldRefetchUser, refetchUser])
+  const [shouldRefetchMyUser, setShouldRefetchMyUser] = useState(false)
+  const refetchMyHolofuelUser = useCallback(() => {
+    setShouldRefetchMyUser(false)
+    refetchMyUser()
+  }, [setShouldRefetchMyUser, refetchMyUser])
 
   useInterval(() => {
     setIsConnected(wsConnection)
@@ -95,7 +95,7 @@ function PrimaryLayout ({
     if (!isConnected) {
       newMessage('Connecting to your Holochain Conductor...', 0)
       stopPolling()
-      setShouldRefetchUser(true)
+      setShouldRefetchMyUser(true)
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
         defaultPath = INBOX_PATH
@@ -105,9 +105,9 @@ function PrimaryLayout ({
       push(defaultPath)
     } else {
       newMessage('', 0)
-      startPolling(30000)
-      if (shouldRefetchUser) {
-        refetchHolofuelUser()
+      startPolling(POLLING_INTERVAL_GENERAL)
+      if (shouldRefetchMyUser) {
+        refetchMyHolofuelUser()
       }
     }
   }, [isConnected,
@@ -115,8 +115,8 @@ function PrimaryLayout ({
     newMessage,
     startPolling,
     stopPolling,
-    shouldRefetchUser,
-    refetchHolofuelUser
+    shouldRefetchMyUser,
+    refetchMyHolofuelUser
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
