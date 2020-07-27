@@ -71,7 +71,7 @@ function PrimaryLayout ({
   showAlphaFlag = true
 }) {
   const { refetch: refetchMyUser } = useQuery(MyHolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
-  const { holofuelBalance, actionableTransactions, ledgerLoading, isLoadingRefetchCalls, stopPolling, startPolling, refetchCalls } = useUpdatedTransactionLists()
+  const { holofuelBalance, actionableTransactions, ledgerLoading, stopPolling, startPolling } = useUpdatedTransactionLists()
 
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
@@ -123,23 +123,21 @@ function PrimaryLayout ({
   const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
-  const handleMenuClose = () => setMenuOpen(false)
+  const closeMenu = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
     <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} isWide={isWide} />
     <SideMenu
-      isOpen={isWide || isMenuOpen}
-      handleClose={handleMenuClose}
+      isOpen={isMenuOpen}
+      closeMenu={closeMenu}
       agent={currentUser}
       agentLoading={currentUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
       ledgerLoading={isLoadingFirstLedger}
-      isWide={isWide}
-      isLoadingRefetchCalls={isLoadingRefetchCalls}
-      refetchCalls={refetchCalls} />
+      isWide={isWide} />
     {(!isWide && showAlphaFlag) && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName={cx('styles.content', { 'styles.desktop': isWide })}>
+    <div styleName={cx('styles.content')}>
       <FlashMessage />
       {children}
     </div>
