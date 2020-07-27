@@ -82,7 +82,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     const agentNickname = (!isEmpty(recentCounterparty) && recentCounterparty.nickname)
       ? recentCounterparty.nickname
       : agentAddress === currentUser.id
-        ? `${currentUser.nickname ||  presentAgentId(currentUser.id)} (You)`
+        ? `${currentUser.nickname || presentAgentId(currentUser.id)} (You)`
         : presentAgentId(agentAddress)
 
     setCounterpartyNick(agentNickname)
