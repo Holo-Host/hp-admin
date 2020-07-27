@@ -82,7 +82,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     const agentNickname = !isEmpty(recentCounterparty)
       ? recentCounterparty.nickname
       : agentAddress === currentUser.id
-        ? `${currentUser.nickname} (You)`
+        ? `${currentUser.nickname ||  presentAgentId(currentUser.id)} (You)`
         : presentAgentId(agentAddress)
 
     setCounterpartyNick(agentNickname)
@@ -99,8 +99,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const selectAgent = agent => {
     setCounterpartyId(agent.agentAddress)
+    setCounterpartyNick(agent.nickname || presentAgentId(agent.agentAddress))
     setFormValue('counterpartyId', agent.agentAddress)
-    setCounterpartyNick(agent.nickname || presentAgentId(counterpartyId))
   }
 
   const [amount, setAmountRaw] = useState(0)
