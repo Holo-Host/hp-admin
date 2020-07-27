@@ -4,7 +4,7 @@ import wait from 'waait'
 import { MockedProvider } from '@apollo/react-testing'
 import { ApolloProvider } from '@apollo/react-hooks'
 import apolloClient from 'apolloClient'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
 import HolofuelUpdateUserMutation from 'graphql/HolofuelUpdateUserMutation.gql'
 import Profile from './Profile'
 import { renderAndWait } from 'utils/test-utils'
@@ -74,10 +74,10 @@ describe('Save Profile Updates', () => {
 
   const myProfileMock = {
     request: {
-      query: HolofuelUserQuery
+      query: MyHolofuelUserQuery
     },
     result: {
-      data: { holofuelUser: mockProfile }
+      data: { myHolofuelUser: mockProfile }
     }
   }
 

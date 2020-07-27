@@ -163,13 +163,13 @@ export function TransactionRow ({ transaction, isFirst }) {
   return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })} data-testid='transaction-row'>
     <div styleName='avatar'>
       <CopyAgentId agent={counterparty}>
-        <HashAvatar seed={counterparty.id} size={32} />
+        <HashAvatar seed={counterparty.agentAddress} size={32} />
       </CopyAgentId>
     </div>
     <div styleName='name-and-notes'>
       <div styleName={cx('name', { 'pending-style': pending })}>
         <CopyAgentId agent={counterparty}>
-          {counterparty.nickname || presentAgentId(counterparty.id)}
+          {counterparty.nickname || presentAgentId(counterparty.agentAddress)}
         </CopyAgentId>
       </div>
       <div styleName='notes'>

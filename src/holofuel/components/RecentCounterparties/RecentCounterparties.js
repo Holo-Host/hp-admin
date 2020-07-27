@@ -14,24 +14,24 @@ export default function RecentCounterparties ({ agents = [], selectedAgentId, se
 
     {loading && <Loading styleName='loading' />}
 
-    {!loading && isEmpty(agents) && <div styleName='no-peers'>You have no recent peers.</div>}
+    {!loading && isEmpty(agents) && <div styleName='no-peers' >You have no recent peers.</div>}
 
     {recentAgents.map(agent => <AgentRow
       agent={agent}
-      selected={agent.id === selectedAgentId}
-      selectThisAgent={() => selectAgent(agent.id)}
-      key={agent.id} />)}
+      selected={agent.agentAddress === selectedAgentId}
+      selectThisAgent={() => selectAgent(agent)}
+      key={agent.agentAddress} />)}
   </div>
 }
 
 function AgentRow ({ agent, selectThisAgent, selected }) {
-  const agentName = agent.nickname || presentAgentId(agent.id)
+  const agentName = agent.nickname || presentAgentId(agent.agentAddress)
 
   return <div styleName={cx('agent-row', { selected })} onClick={selectThisAgent} data-testid='agent-row'>
-    <HashIcon hash={agent.id} size={32} styleName='avatar' />
+    <HashIcon hash={agent.agentAddress} size={32} styleName='avatar' />
     <div styleName='name-and-id'>
       <div styleName='name'>{agentName}</div>
-      {agent.nickname && <div styleName='id'>{presentAgentId(agent.id)}</div>}
+      {agent.nickname && <div styleName='id'>{presentAgentId(agent.agentAddress)}</div>}
     </div>
     {selected && <div styleName='selected-indicator'>Selected</div>}
   </div>

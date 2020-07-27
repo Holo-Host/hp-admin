@@ -6,12 +6,10 @@ import * as yup from 'yup'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelRecentCounterpartiesQuery from 'graphql/HolofuelRecentCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
-import Loading from 'components/Loading'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
@@ -68,7 +66,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { currentUser } = useCurrentUserContext()
-  const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { loading: loadingRecentCounterparties, data: { holofuelRecentCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelRecentCounterpartiesQuery, { fetchPolicy: 'network-only' })
   const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== currentUser.id)
 
   const createOffer = useOfferMutation()
@@ -78,11 +76,20 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
-  const [isCounterpartyFound, setCounterpartyFound] = useState(false)
+
+  const updateCounterparty = agentAddress => {
+    const recentCounterparty = recentCounterpartiesWithoutMe.find(recentCounterparty => recentCounterparty.agentAddress === agentAddress)
+    const agentNickname = (!isEmpty(recentCounterparty) && recentCounterparty.nickname)
+      ? recentCounterparty.nickname
+      : agentAddress === currentUser.id
+        ? `${currentUser.nickname || presentAgentId(currentUser.id)} (You)`
+        : presentAgentId(agentAddress)
+
+    setCounterpartyNick(agentNickname)
+    setCounterpartyId(agentAddress)
+  }
 
   useEffect(() => {
-    setCounterpartyNick(presentAgentId(counterpartyId))
-
     if (counterpartyId === currentUser.id) {
       newMessage('You cannot send yourself TestFuel.', 5000)
     }
@@ -90,9 +97,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
 
-  const selectAgent = id => {
-    setCounterpartyId(id)
-    setFormValue('counterpartyId', id)
+  const selectAgent = agent => {
+    setCounterpartyId(agent.agentAddress)
+    setCounterpartyNick(agent.nickname || presentAgentId(agent.agentAddress))
+    setFormValue('counterpartyId', agent.agentAddress)
   }
 
   const [amount, setAmountRaw] = useState(0)
@@ -130,7 +138,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
-    !isCounterpartyFound ||
     counterpartyId === currentUser.id ||
     amount < 0
 
@@ -186,19 +193,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
             styleName='form-input'
             placeholder={`Who is this ${modeRelations[mode]}?`}
             ref={register}
-            onChange={({ target: { value } }) => setCounterpartyId(value)}
+            onChange={({ target: { value } }) => updateCounterparty(value)}
           />
           <div styleName='hash-and-nick'>
             {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
-            {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname' styleName='nickname'>
-              <RenderNickname
-                agentId={counterpartyId}
-                setCounterpartyNick={setCounterpartyNick}
-                counterpartyNick={counterpartyNick}
-                setCounterpartyFound={setCounterpartyFound}
-                newMessage={newMessage}
-              />
-            </h4>}
+            {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname' styleName='nickname'>{counterpartyNick || ''}</h4>}
           </div>
         </div>
       </div>
@@ -233,45 +232,4 @@ export default function CreateOfferRequest ({ history: { push } }) {
       selectAgent={selectAgent}
       loading={loadingRecentCounterparties} />
   </PrimaryLayout>
-}
-
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
-  const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    variables: { agentId }
-  })
-
-  const { id, nickname } = holofuelCounterparty
-  useEffect(() => {
-    if (!isEmpty(nickname)) {
-      setCounterpartyNick(nickname)
-    }
-  }, [setCounterpartyNick, nickname])
-
-  useEffect(() => {
-    if (!loading) {
-      if (!id) {
-        setCounterpartyFound(false)
-        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash of your HoloFuel Peer and try again.')
-      } else {
-        setCounterpartyFound(true)
-      }
-    } else {
-      setCounterpartyFound(false)
-    }
-  }, [setCounterpartyFound, loading, newMessage, id])
-
-  if (loading) {
-    // TODO: Unsubscribe from Loader to avoid any potential mem leak.
-    return <>
-      <Loading
-        dataTestId='counterparty-loading'
-        type='ThreeDots'
-        height={30}
-        width={30}
-      />
-    </>
-  }
-
-  if (queryError || !nickname) return <>No nickname available.</>
-  return <>{nickname}</>
 }
