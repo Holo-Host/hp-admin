@@ -122,7 +122,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
       case OFFER_MODE:
         createOffer(transaction)
           .then(() => {
-            console.log(':::::::::::::: message : ', `Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`)
             newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
             push(HISTORY_PATH)
@@ -157,7 +156,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     }
   }
 
-  !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)
+  !isEmpty(errors) && console.log('Form errors:', errors)
 
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 

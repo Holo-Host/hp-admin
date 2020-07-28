@@ -35,7 +35,7 @@ const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from
 
 function useOffer () {
   const [offerHoloFuel] = useMutation(HolofuelOfferMutation)
-  return ( offer ) => offerHoloFuel({
+  return (offer) => offerHoloFuel({
     variables: { offer },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery

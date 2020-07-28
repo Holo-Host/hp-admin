@@ -16,7 +16,7 @@ const mapGraphQLError = (graphQLErrors, response, { hposCheck, errorMessage }) =
       console.log(`[Authentication Error]: ${message}`)
       response.errors.isHposConnectionActive = true
       return response
-    }  else if (message.includes('Counterparty not found')) {
+    } else if (message.includes('Counterparty not found')) {
       console.log(`[Query Error]: ${errorMessage}, counterparty not found.`)
       return response
     }
@@ -42,13 +42,11 @@ let links = [
   new SchemaLink({ schema })
 ]
 
-// if (process.env.REACT_APP_HOLOFUEL_APP !== 'true') {
-  links = [errorLink].concat(links)
-// }
-
 if (process.env.NODE_ENV !== 'test') {
   links = [apolloLogger].concat(links)
 }
+
+links = [errorLink].concat(links)
 
 const cache = new InMemoryCache({
   typePolicies: {
