@@ -128,6 +128,8 @@ export default function Inbox ({ history: { push } }) {
   useEffect(() => {
     if (!isEmpty(userMessage)) {
       newMessage(userMessage, 5000)
+    } else {
+      newMessage('', 0)
     }
   }, [userMessage, newMessage])
 

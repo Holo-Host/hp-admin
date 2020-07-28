@@ -7,6 +7,7 @@ export function FlashMessageProvider ({ children }) {
   const [time, setTime] = useState()
 
   const newMessage = useCallback((message, time) => {
+    console.log('going to set message .... : ', message);
     setMessage(message)
     setTime(time)
   }, [setMessage, setTime])

@@ -12,6 +12,7 @@ import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
+import Loading from 'components/Loading'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
@@ -66,7 +67,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { currentUser } = useCurrentUserContext()
-  const { loading: loadingRecentCounterparties, data: { holofuelRecentCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelRecentCounterpartiesQuery, { fetchPolicy: 'network-only' })
+  const { loading: loadingRecentCounterparties, data: { holofuelRecentCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelRecentCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
   const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== currentUser.id)
 
   const createOffer = useOfferMutation()
@@ -103,6 +104,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
     setFormValue('counterpartyId', agent.agentAddress)
   }
 
+  const [isProcessing, setIsProcessing] = useState(false)
+
   const [amount, setAmountRaw] = useState(0)
   const setAmount = amount => setAmountRaw(Number(amount))
 
@@ -112,16 +115,17 @@ export default function CreateOfferRequest ({ history: { push } }) {
     : amount
 
   const onSubmit = ({ counterpartyId, notes }) => {
-    setShouldDisable(true)
+    setIsProcessing(true)
     const counterpartyNickname = counterpartyNick === presentAgentId(counterpartyId) ? '' : counterpartyNick
     const transaction = { amount, counterparty: { agentAddress: counterpartyId, nickname: counterpartyNickname }, notes }
     switch (mode) {
       case OFFER_MODE:
         createOffer(transaction)
           .then(() => {
-            setShouldDisable(false)
-            push(HISTORY_PATH)
+            console.log(':::::::::::::: message : ', `Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`)
             newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+            setIsProcessing(false)
+            push(HISTORY_PATH)
           }).catch(({ message }) => {
             const counterpartyError = message.includes('Counterparty not found')
             if (counterpartyError) {
@@ -129,15 +133,15 @@ export default function CreateOfferRequest ({ history: { push } }) {
             } else {
               newMessage('Sorry, something went wrong', 5000)
             }
-            setShouldDisable(false)
+            setIsProcessing(false)
           })
         break
       case REQUEST_MODE:
         createRequest(transaction)
           .then(() => {
-            setShouldDisable(false)
-            push(HISTORY_PATH)
             newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+            setIsProcessing(false)
+            push(HISTORY_PATH)
           }).catch(({ message }) => {
             const counterpartyError = message.includes('Counterparty not found')
             if (counterpartyError) {
@@ -145,7 +149,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
             } else {
               newMessage('Sorry, something went wrong', 5000)
             }
-            setShouldDisable(false)
+            setIsProcessing(false)
           })
         break
       default:
@@ -157,11 +161,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 
-  const [shouldDisable, setShouldDisable] = useState(false)
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
     counterpartyId === currentUser.id ||
     amount < 0 ||
-    shouldDisable
+    isProcessing
 
   if (numpadVisible) {
     const chooseSend = () => {
@@ -206,7 +209,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     </div>
 
     <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
-      <div styleName='form-row'>
+      <div>
         <div><label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}:</label></div>
         <div styleName='input-row'>
           <input
@@ -223,7 +226,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           </div>
         </div>
       </div>
-      <div styleName='form-row'>
+      <div>
         <div><label htmlFor='notes' styleName='form-label'>For:</label></div>
         <input
           name='notes'
@@ -245,6 +248,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
         disabled={disableSubmit}
       >{title}
       </Button>
+
+      {isProcessing && <>
+        <Loading styleName='display-loading' />
+      </>}
     </form>
 
     <RecentCounterparties

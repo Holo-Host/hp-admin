@@ -103,7 +103,6 @@ function PrimaryLayout ({
       }
       push(defaultPath)
     } else {
-      newMessage('', 0)
       startPolling(POLLING_INTERVAL_GENERAL)
       if (shouldRefetchMyUser) {
         refetchMyHolofuelUser()
