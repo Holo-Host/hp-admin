@@ -4,22 +4,59 @@ import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import './AmountInput.module.css'
 
+const usePresentHolofuelString = () => {
+  return stringAmount => {
+    let verifiedInteger, verifiedFraction
+    const hasAmountError = { integer: '', fraction: '' }
+    const [integer, fraction] = stringAmount.split('.')
+
+    const parsedInteger = (Number(integer)).toLocaleString()
+    const parsedFraction = (Number(fraction)).toString()
+    verifiedInteger = !isNaN(parsedInteger) ? parsedInteger : ''
+    verifiedFraction = !isNaN(parsedFraction) ? parsedFraction : ''
+    
+    if (parsedInteger && parsedInteger.length > 13) {
+      console.log('PARSED INTEGER : ', parsedInteger);
+      // todo: throw error if integer exceeds trillions
+      hasAmountError[parsedInteger] = 'The max transaction amount per a single transaction is 1 trillion TF'
+      verifiedInteger = parsedInteger.substring(0, 14)
+    }
+    if (parsedFraction && parsedFraction.length > 6) {
+      console.log('PARSED FRACTION : ', parsedFraction);
+      // todo: throw error if decimal exceeds 6 place values of percision (one-millionths)
+      hasAmountError[parsedFraction] = 'Your transaction amount cannot exceed 6 decimals'
+      verifiedFraction = parsedFraction.substring(0, 7)
+    }
+    
+    const amount = (verifiedInteger && verifiedFraction)
+      ? verifiedInteger + '.' + verifiedFraction
+      : verifiedInteger || verifiedFraction
+
+    return { verifiedInteger, verifiedFraction, amount, hasAmountError }
+  }
+}
+
 export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequest }) {
-  // we can't just use amount because amount is a number, and here we need to distinguish between values like '23' and '23.'
   const [inputValue, setInputValueRaw] = useState(String(amount))
 
   const isValidAmount = amount > 0
+  const presentHolofuelAmont = usePresentHolofuelString()
+
 
   const setInputValue = value => {
     const cleanValue = value.replace(/[^0-9.]/g, '') || '0' // strips non numerical characters
-    setInputValueRaw(cleanValue)
-    setAmount(Number(cleanValue))
+    const { verifiedInteger, verifiedFraction, amount } = presentHolofuelAmont(cleanValue)
+    setInputValueRaw(amount)
+    // setAmount(amount)
+    console.log('AMOUNT >>>>>> ', amount)
   }
+
+  const { hasAmountError } = presentHolofuelAmont(inputValue)
+  // TODO: determine how to show error...
 
   const addDigit = digit => () => {
     // return early if trying to add a second .
     if (digit === '.' && /\./.test(inputValue)) return
-
     setInputValue(inputValue + String(digit))
   }
 
@@ -31,7 +68,7 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
         styleName='amount-input-amount'
         data-testid='amount'
         onChange={e => setInputValue(e.target.value)}
-        value={`${presentHolofuelString(inputValue)}`}
+        value={`${inputValue}`}
       />
       <div styleName='numpad'>
         {[1, 4, 7].map(rowStart => <div styleName='numpad-row' key={rowStart}>
@@ -57,13 +94,3 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
   </PrimaryLayout>
 }
 
-function presentHolofuelString (amount) {
-  const hasDot = /\./.test(amount)
-  const [integer, fraction] = amount.split('.')
-  const parsedInteger = Number.parseFloat(integer).toLocaleString()
-  if (hasDot) {
-    return parsedInteger + '.' + fraction
-  } else {
-    return parsedInteger
-  }
-}

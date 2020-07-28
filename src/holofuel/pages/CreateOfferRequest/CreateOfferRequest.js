@@ -106,23 +106,30 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const [amount, setAmountRaw] = useState(0)
-  const setAmount = amount => setAmountRaw(Number(amount))
+  // NB: amount is maintained as a string, until submission, when the numeric value is verified 
+  const [amountString, setAmountString] = useState('')
+  const [amountFloat, setAmountFloat] = useState(0)
 
-  const fee = (amount * FEE_PERCENTAGE) || 0
+  const setAmount = amount => {
+    setAmountString(amount)
+    // we can't just use amount because amount is a number, and here we need to distinguish between values like '23' and '23.'
+    setAmountFloat(Number(amount))
+  }
+
+  const fee = (amountFloat * FEE_PERCENTAGE) || 0
   const total = mode === OFFER_MODE
-    ? amount + fee
-    : amount
+    ? amountFloat + fee
+    : amountFloat
 
   const onSubmit = ({ counterpartyId, notes }) => {
     setIsProcessing(true)
     const counterpartyNickname = counterpartyNick === presentAgentId(counterpartyId) ? '' : counterpartyNick
-    const transaction = { amount, counterparty: { agentAddress: counterpartyId, nickname: counterpartyNickname }, notes }
+    const transaction = { amount: amountFloat, counterparty: { agentAddress: counterpartyId, nickname: counterpartyNickname }, notes }
     switch (mode) {
       case OFFER_MODE:
         createOffer(transaction)
           .then(() => {
-            newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+            newMessage(`Offer of ${amountString} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
             push(HISTORY_PATH)
           }).catch(({ message }) => {
@@ -138,7 +145,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       case REQUEST_MODE:
         createRequest(transaction)
           .then(() => {
-            newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+            newMessage(`Request for ${amountString} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
             push(HISTORY_PATH)
           }).catch(({ message }) => {
@@ -162,7 +169,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
     counterpartyId === currentUser.id ||
-    amount < 0 ||
+    amountFloat < 0 ||
     isProcessing
 
   if (numpadVisible) {
@@ -176,7 +183,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       setNumpadVisible(false)
     }
 
-    return <AmountInput amount={amount} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
+    return <AmountInput amount={amountFloat} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
   }
 
   return <PrimaryLayout headerProps={{ title }} showAlphaFlag={false}>
@@ -186,7 +193,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         {title}
       </h4>
       <div styleName='amount' onClick={() => setNumpadVisible(true)}>
-        {presentHolofuelAmount(amount)} TF
+        {amountString} TF
       </div>
       <div styleName='fee-notice'>
         {mode === OFFER_MODE
