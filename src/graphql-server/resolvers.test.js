@@ -151,7 +151,7 @@ describe('resolvers', () => {
 
     describe('.holofuelRequest', () => {
       it('calls create request and constructs the result transaction', async () => {
-        const counterparty = { agentAddress: 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', nickname: ''}
+        const counterparty = { agentAddress: 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', nickname: '' }
         const amount = 200.01
         const notes = 'Hi there'
         const request = { counterparty, amount, notes }
@@ -163,7 +163,7 @@ describe('resolvers', () => {
 
     describe('.holofuelOffer', () => {
       it('calls create offer and constructs the result transaction', async () => {
-        const counterparty = { agentAddress: 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', nickname: ''}
+        const counterparty = { agentAddress: 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', nickname: '' }
         const amount = 200.01
         const notes = 'Hi there'
         const requestId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
