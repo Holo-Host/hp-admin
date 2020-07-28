@@ -4,14 +4,6 @@
   word-break: break-word;
   height: 100%;
   box-sizing: border-box;
-}
-
-.wide {
-  display: flex;
-  padding: 0;
-}
-
-.narrow {
   padding: 0;
 }
 

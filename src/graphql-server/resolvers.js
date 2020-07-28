@@ -120,9 +120,9 @@ export const resolvers = {
 
     holofuelUpdateUser: (_, { nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(nickname, avatarUrl),
 
-    holofuelRequest: (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
+    holofuelRequest: (_, { request }) => HoloFuelDnaInterface.requests.create(request),
 
-    holofuelOffer: (_, { counterpartyId, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterpartyId, amount, notes, requestId),
+    holofuelOffer: (_, { offer }) => HoloFuelDnaInterface.offers.create(offer),
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 

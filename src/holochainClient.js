@@ -267,6 +267,8 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
           error
         )
       }
+
+      return { Err: error }
     }
   }
 }

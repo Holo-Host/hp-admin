@@ -30,16 +30,16 @@ const FormValidationSchema = yup.object().shape({
 })
 
 function useOfferMutation () {
-  const [offer] = useMutation(HolofuelOfferMutation)
-  return (amount, counterpartyId, notes) => offer({
-    variables: { amount, counterpartyId, notes }
+  const [offerHoloFuel] = useMutation(HolofuelOfferMutation)
+  return (offer) => offerHoloFuel({
+    variables: { offer }
   })
 }
 
 function useRequestMutation () {
-  const [offer] = useMutation(HolofuelRequestMutation)
-  return (amount, counterpartyId, notes) => offer({
-    variables: { amount, counterpartyId, notes }
+  const [requestHoloFuel] = useMutation(HolofuelRequestMutation)
+  return (request) => requestHoloFuel({
+    variables: { request }
   })
 }
 
@@ -112,34 +112,56 @@ export default function CreateOfferRequest ({ history: { push } }) {
     : amount
 
   const onSubmit = ({ counterpartyId, notes }) => {
+    setShouldDisable(true)
+    const counterpartyNickname = counterpartyNick === presentAgentId(counterpartyId) ? '' : counterpartyNick
+    const transaction = { amount, counterparty: { agentAddress: counterpartyId, nickname: counterpartyNickname }, notes }
     switch (mode) {
       case OFFER_MODE:
-        createOffer(amount, counterpartyId, notes).then(() => {
-          newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
-        }).catch(() => {
-          newMessage('Sorry, something went wrong', 5000)
-        })
+        createOffer(transaction)
+          .then(() => {
+            setShouldDisable(false)
+            push(HISTORY_PATH)
+            newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+          }).catch(({ message }) => {
+            const counterpartyError = message.includes('Counterparty not found')
+            if (counterpartyError) {
+              newMessage('Offer timed out waiting for transaction confirmation from counterparty. Will try again. Please wait or check back later.', 5000)
+            } else {
+              newMessage('Sorry, something went wrong', 5000)
+            }
+            setShouldDisable(false)
+          })
         break
       case REQUEST_MODE:
-        createRequest(amount, counterpartyId, notes).then(() => {
-          newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
-        }).catch(() => {
-          newMessage('Sorry, something went wrong', 5000)
-        })
+        createRequest(transaction)
+          .then(() => {
+            setShouldDisable(false)
+            push(HISTORY_PATH)
+            newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+          }).catch(({ message }) => {
+            const counterpartyError = message.includes('Counterparty not found')
+            if (counterpartyError) {
+              newMessage('Request timed out waiting for transaction confirmation from counterparty. Will try again. Please wait or check back later.', 5000)
+            } else {
+              newMessage('Sorry, something went wrong', 5000)
+            }
+            setShouldDisable(false)
+          })
         break
       default:
         throw new Error(`Unknown mode: '${mode}' in CreateOfferRequest`)
     }
-    push(HISTORY_PATH)
   }
 
   !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)
 
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 
+  const [shouldDisable, setShouldDisable] = useState(false)
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
     counterpartyId === currentUser.id ||
-    amount < 0
+    amount < 0 ||
+    shouldDisable
 
   if (numpadVisible) {
     const chooseSend = () => {
