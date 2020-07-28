@@ -1,72 +1,142 @@
-.avatar {
-  align-self: center;
-  margin-top: 6px;
-  margin-bottom: 10px;
-}
-
-.greeting {
-  text-align: center;
-  color: var(--color-limed-spruce);
-  margin-bottom: 36px;
-}
-
-.hosting-content {
+.hosting-row {
   display: flex;
   align-items: center;
-  margin-top: 16px;
   font-family: "Circular";
-  font-size: 18px;
-  line-height: 24px;
-  color: var(--color-rhino-80);
+  font-size: 14px;
+  line-height: 19px;
+  color: var(--color-rhino);
+  padding-left: 30px;
+  margin-bottom: 10px;
+  position: relative;
 }
 
-.laptop-icon {
-  width: 26px;
-  height: 16px;
-  margin-right: 4px;
+.hosting-row-expanded {
+  composes: hosting-row;
+  margin-top: -8px;
+  margin-bottom: 20px;
 }
 
-.small-text {
-  font-size: 12px;
+.hosting-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+}
+
+.up-arrow {
+  transform: rotate(270deg);
+  margin-left: 7px;
+}
+
+.down-arrow {
+  transform: rotate(90deg);  
+  margin-left: 7px;
+}
+
+.happ-list {
+  position: relative;
+  top: 30px;
+  right: 80px;
+}
+
+.happ-name {
+  font-family: "Circular";
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  color: var(--color-rhino);
+  text-align: end;
 }
 
 .balance {
-  background-color: var(--color-granny-apple-50);
-  padding: 5px 8px;
-  margin-top: 10px;
+  font-size: 24px;
+  line-height: 28px;
+  margin-top: -8px;
+  color: var(--color-rhino);
+  font-family: "Circular";
+  margin-bottom: 20px;
 }
 
-.empty-balance {
-  background-color: var(--color-rhino-10);
+
+.pricing-section {
+  color: var(--color-rhino);
+  font-family: "Circular";
+  background-color: var(--color-geyser);
+  padding: 16px 21px 18px 21px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  margin: 0 -16px -16px -16px;
 }
 
-.balance-header {
-  color: var(--color-rhino-50);
-}
-
-.balance-body {
+.pricing-title {
+  font-weight: bold;
   font-size: 18px;
-  line-height: 24px;
-  color: var(--color-rhino-50);
+  line-height: 22px;
+  margin-bottom: 6px;
 }
 
+.pricing-row {
+  display: flex;
+  margin-left: 2px;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.pricing-type {
+  font-size: 14px;
+  line-height: 19px;
+  width: 106px;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 22px;
+  width: 62px;
+}
+
+.pricing-unit {
+  font-size: 14px;
+  line-height: 19px;
+}
+
+.balance-label {
+  font-family: "Circular";
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 22px;  
+  letter-spacing: -0.4px;  
+  color: var(--color-rhino);
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+.balance {
+  font-family: "Circular";
+  font-size: 24px;
+  line-height: 28px;
+  color: var(--color-rhino)
+}
 
 /* Card */
 
 .card {
-  display: block;
+  background: rgba(220, 220, 220, 0.31);
+  border: 1px solid var(--color-blue-lagoon);
+  box-sizing: border-box;
+  border-radius: 10px;
+  padding: 16px 16px 16px 16px;
+  position: relative;
+  margin-bottom: 46px;
   text-decoration: none;
-  color: black;
-  background-color: white;
-  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.1);
-  border-radius: 4px;
-  padding: 16px 24px;
-  margin-bottom: 20px;
 }
 
 .card-title {
-  color: var(--color-limed-spruce);
-  margin-bottom: 0px;
+  font-size: 36px;
+  line-height: 28px;
+  font-weight: 500;
+  color: var(--color-rhino);
+  margin-top: 0px;
+  margin-bottom: 16px;
 }
 
 .card-subtitle {

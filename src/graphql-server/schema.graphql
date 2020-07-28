@@ -32,8 +32,16 @@ type HostPricing {
   pricePerUnit: String
 }
 
-type HolofuelUser {
+type MyHolofuelUser {
   id: ID
+  nickname: String
+  avatarUrl: String
+}
+
+type HolofuelUser {
+  # NB: HolofuelUser is cached by agentAddress and nickname. - We are intentionally not caching only by id for the transaction counterparty
+  # in order to maintain what the nickname of the counterparty was at the time the transaction was initiated.
+  agentAddress: String
   nickname: String
   avatarUrl: String
 }
@@ -68,7 +76,6 @@ type Transaction {
   presentBalance: Float
   notes: String
   happName: String
-  canceledBy: HolofuelUser
   isPayingARequest: Boolean
   inProcess: Boolean
   isActioned: Boolean
@@ -112,21 +119,35 @@ type HposAuth {
   hposSettings: HposSettings
 }
 
+type HostingReport {
+  localSourceChains: Int
+  zomeCalls: Int
+  hostedHapps: [HostedHapp]
+}
+
+type HostedHapp {
+  name: String
+}
+
+type EarningsReport {
+  totalEarnings: Float
+  cpu: Float
+  bandwidth: Float
+  storage: Float
+}
+
+
 input HolofuelUserInput {
-  id: ID
+  agentAddress: String
   nickname: String
+  avatarUrl: String
 }
 
 input TransactionInput {
-  id: ID # ID will be the origin commit hash
   amount: Float
   counterparty: HolofuelUserInput
-  direction: TransactionDirection
-  status: TransactionStatus
-  type: TransactionType
-  timestamp: String
-  fees: Float
   notes: String
+  requestId: ID
 }
 
 type Query {
@@ -143,10 +164,11 @@ type Query {
   holofuelActionableTransactions: [Transaction]
   holofuelEarningsTransactions: [Transaction]
   holofuelLedger: Ledger
-  holofuelUser: HolofuelUser
-  holofuelCounterparty(agentId: String): HolofuelUser
-  holofuelHistoryCounterparties: [HolofuelUser]
+  myHolofuelUser: MyHolofuelUser
+  holofuelRecentCounterparties: [HolofuelUser]
   hposSettings: HposSettings
+  hostingReport: HostingReport
+  earningsReport: EarningsReport
   hposStatus: HposStatus
 }
 
@@ -156,14 +178,11 @@ type Mutation {
   enableHapp(appId: String): Happ
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
-  holofuelUpdateUser(nickname: String!, avatarUrl: String): HolofuelUser
-  holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
-  holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
+  holofuelUpdateUser(nickname: String!, avatarUrl: String): MyHolofuelUser
+  holofuelRequest(request: TransactionInput): Transaction
+  holofuelOffer(offer: TransactionInput): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction
   holofuelDecline(transactionId: ID): Transaction
-  holofuelCancel(transactionId: ID): Transaction
-  holofuelRecoverFunds(transactionId: ID): Transaction
-  holofuelRefundTransactions(transactions: [TransactionInput]): [Transaction]
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings
   hposUpdateVersion: HposStatus
   hposCheckAuth: HposAuth

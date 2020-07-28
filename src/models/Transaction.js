@@ -15,10 +15,20 @@ export const DIRECTION = {
   outgoing: 'outgoing'
 }
 
-// we hide cancelled and declined transactions, and offers that are paying a request (those are handled by AcceptRequestedOffers)
+// we hide cancelled and declined transactions
+// ...offers that are paying a request and not in process (those are handled by AcceptRequestedOffers)
 export function shouldShowTransactionInInbox (transaction) {
-  return transaction.status !== STATUS.canceled &&
-    transaction.status !== STATUS.declined &&
-    !(transaction.isPayingARequest && !transaction.inProcess) &&
-    !(transaction.isPayingARequest && !transaction.status === STATUS.pending)
+  const { status, isPayingARequest, inProcess } = transaction
+  return status !== STATUS.canceled &&
+    status !== STATUS.declined &&
+    !(isPayingARequest && !inProcess) &&
+    !(isPayingARequest && !status === STATUS.pending) // &&
+}
+
+// ...and also hide actioned transactions that have been hidden explicitly
+// from actionable notification badge and inbox
+export const shouldShowTransactionAsActionable = (transaction, hiddenTransactionIds) => {
+  const { id, isActioned } = transaction
+  return shouldShowTransactionInInbox(transaction) &&
+  ((isActioned && !hiddenTransactionIds.find(txId => txId === id)) || !isActioned)
 }

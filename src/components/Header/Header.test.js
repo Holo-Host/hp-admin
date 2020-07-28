@@ -5,15 +5,19 @@ import Header from './Header'
 
 jest.mock('contexts/useCurrentUserContext')
 
-it('should render the title', async () => {
+it('should render the title and a menu icon', async () => {
   const props = {
-    title: 'the title'
+    title: 'the title',
+    settings: {
+      hostName: 'hostname'
+    }
   }
 
   const { getByText, getByTestId } = render(<Header {...props} />)
 
   expect(getByText(props.title)).toBeInTheDocument()
+  expect(getByText(props.settings.hostName)).toBeInTheDocument()
 
-  fireEvent.click(getByTestId('avatar-link'))
-  expect(mockNavigateTo).toHaveBeenCalledWith('/admin/dashboard')
+  fireEvent.click(getByTestId('settings-link'))
+  expect(mockNavigateTo).toHaveBeenCalledWith('/admin/settings')
 })

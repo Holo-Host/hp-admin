@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
@@ -13,6 +12,7 @@ import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import Modal from 'holofuel/components/Modal'
@@ -26,17 +26,17 @@ import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
+import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, shouldShowTransactionAsActionable } from 'models/Transaction'
 
 const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
-  const [offer] = useMutation(HolofuelOfferMutation)
-  return ({ id, amount, counterparty, notes }) => offer({
-    variables: { amount, counterpartyId: counterparty.id, requestId: id, notes },
+  const [offerHoloFuel] = useMutation(HolofuelOfferMutation)
+  return (offer) => offerHoloFuel({
+    variables: { offer },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },
@@ -47,8 +47,8 @@ function useOffer () {
 }
 
 function useAcceptOffer () {
-  const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)
-  return ({ id }) => acceptOffer({
+  const [acceptOfferHoloFuel] = useMutation(HolofuelAcceptOfferMutation)
+  return ({ id }) => acceptOfferHoloFuel({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
@@ -60,8 +60,8 @@ function useAcceptOffer () {
 }
 
 function useDecline () {
-  const [decline] = useMutation(HolofuelDeclineMutation)
-  return ({ id }) => decline({
+  const [declineHoloFuel] = useMutation(HolofuelDeclineMutation)
+  return ({ id }) => declineHoloFuel({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
@@ -72,25 +72,17 @@ function useDecline () {
   })
 }
 
-function useCounterparty (agentId) {
-  const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    fetchPolicy: 'cache-and-network',
-    variables: { agentId }
-  })
-  return { holofuelCounterparty, loading }
-}
-
 function useUpdatedTransactionLists () {
+  const { hiddenTransactionIds } = useHiddenTransactionsContext()
   const { isConnected } = useConnectionContext()
 
   const { loading: allActionableLoading, data: { holofuelActionableTransactions = [] } = {} } = useQuery(HolofuelActionableTransactionsQuery, { fetchPolicy: 'cache-and-network' })
-  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: 30000 })
+  const { loading: allRecentLoading, data: { holofuelNonPendingTransactions = [] } = {} } = useQuery(HolofuelNonPendingTransactionsQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL_GENERAL })
 
-  const updatedDisplayableActionable = holofuelActionableTransactions.filter(shouldShowTransactionInInbox)
-  const updatedCanceledTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.canceled)
+  const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds))
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
-  const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedCanceledTransactions).concat(updatedDeclinedTransactions)
+  const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedDeclinedTransactions)
 
   const actionableLoadingFirstTime = useLoadingFirstTime(isConnected && allActionableLoading)
   const recentLoadingFirstTime = useLoadingFirstTime(isConnected && allRecentLoading)
@@ -115,16 +107,17 @@ const presentTruncatedAmount = (string, number = 15) => {
 }
 
 export default function Inbox ({ history: { push } }) {
-  const { data: { holofuelUser = {} } = {} } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { data: { myHolofuelUser = {} } = {} } = useQuery(MyHolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
   const { loading: ledgerLoading, data: { holofuelLedger: { balance: holofuelBalance } = {} } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network' })
-  const { currentUser, setCurrentUser } = useCurrentUserContext()
+  const { setCurrentUser } = useCurrentUserContext()
   const { isConnected } = useConnectionContext()
 
+  // landing page setup: set the currentUser app context upon load
   useEffect(() => {
-    if (!isEmpty(holofuelUser)) {
-      setCurrentUser(holofuelUser)
+    if (!isEmpty(myHolofuelUser)) {
+      setCurrentUser(myHolofuelUser)
     }
-  }, [holofuelUser, setCurrentUser])
+  }, [myHolofuelUser, setCurrentUser])
 
   const [inboxView, setInboxView] = useState(VIEW.actionable)
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
@@ -135,6 +128,8 @@ export default function Inbox ({ history: { push } }) {
   useEffect(() => {
     if (!isEmpty(userMessage)) {
       newMessage(userMessage, 5000)
+    } else {
+      newMessage('', 0)
     }
   }, [userMessage, newMessage])
 
@@ -164,7 +159,7 @@ export default function Inbox ({ history: { push } }) {
       throw new Error('Invalid inboxView: ' + inboxView)
   }
 
-  const displayBalance = (isEmpty(holofuelBalance) && ledgerLoading) || isNaN(holofuelBalance) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
+  const displayBalance = (isEmpty(holofuelBalance) && ledgerLoading) || !isConnected ? '-- TF' : `${presentHolofuelAmount(holofuelBalance)} TF`
 
   const isDisplayTransactionsEmpty = isEmpty(displayTransactions)
   const partitionedTransactions = partitionByDate(displayTransactions).filter(({ transactions }) => !isEmpty(transactions))
@@ -222,7 +217,6 @@ export default function Inbox ({ history: { push } }) {
         key={dateLabel}
         dateLabel={dateLabel}
         transactions={transactions}
-        userId={currentUser.id}
         isActionable={inboxView === VIEW.actionable}
         setConfirmationModalProperties={setConfirmationModalProperties}
         openDrawerId={openDrawerId}
@@ -238,8 +232,8 @@ export default function Inbox ({ history: { push } }) {
   </PrimaryLayout>
 }
 
-export function Partition ({ dateLabel, transactions, userId, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
-  const [hiddenTransactionIds, setHiddenTransactionIds] = useState([])
+export function Partition ({ dateLabel, transactions, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
+  const { hiddenTransactionIds, setHiddenTransactionIds } = useHiddenTransactionsContext()
 
   const manageHideTransactionWithId = (id, shouldHide) => {
     if (shouldHide) {
@@ -250,7 +244,6 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   }
 
   const transactionIsVisible = id => !hiddenTransactionIds.includes(id)
-
   if (isEqual(hiddenTransactionIds, transactions.map(transaction => transaction.id))) return null
 
   return <React.Fragment>
@@ -262,7 +255,6 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
         transaction={transaction}
         setConfirmationModalProperties={setConfirmationModalProperties}
         isActionable={isActionable}
-        userId={userId}
         hideTransaction={shouldHide => manageHideTransactionWithId(transaction.id, shouldHide)}
         openDrawerId={openDrawerId}
         setOpenDrawerId={setOpenDrawerId}
@@ -273,8 +265,8 @@ export function Partition ({ dateLabel, transactions, userId, setConfirmationMod
   </React.Fragment>
 }
 
-export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, userId, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, canceledBy, isPayingARequest, inProcess, isActioned, isStale } = transaction
+export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
+  const { id, counterparty, amount, type, status, direction, notes, isPayingARequest, inProcess, isStale } = transaction
 
   if (isStale) {
     setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
@@ -283,13 +275,12 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const isDrawerOpen = id === openDrawerId
   const setIsDrawerOpen = state => state ? setOpenDrawerId(id) : setOpenDrawerId(null)
 
-  const agent = canceledBy || counterparty
+  const agent = counterparty
 
   const isPayment = (isPayingARequest && status === STATUS.pending)
   const isOffer = type === TYPE.offer
   const isRequest = type === TYPE.request
   const isOutgoing = direction === DIRECTION.outgoing
-  const isCanceled = status === STATUS.canceled
   const isDeclined = status === STATUS.declined
 
   let story
@@ -308,14 +299,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   }
 
   let fullNotes
-  if (isCanceled) {
-    if (canceledBy) {
-      story = isOffer
-        ? ` Canceled an Offer to ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
-        : ` Canceled a Request from ${counterparty.id === userId ? 'you' : (counterparty.nickname || presentAgentId(counterparty.id))}`
-    }
-    fullNotes = isOffer ? ` Canceled Offer${notes ? `: ${notes}` : ''}` : ` Canceled Request${notes ? `: ${notes}` : ''}`
-  } else if (isDeclined) {
+  if (isDeclined) {
     fullNotes = isOffer ? ` Declined Offer${notes ? `: ${notes}` : ''}` : ` Declined Request${notes ? `: ${notes}` : ''}`
   } else fullNotes = notes
 
@@ -324,25 +308,15 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [highlightYellow, setHighlightYellow] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isDisplayingInProcess, setIsDisplayingInProcess] = useState(false)
 
-  if (agent.id === null) return null
+  if (agent.agentAddress === null) return null
 
-  if (!inProcess && !highlightGreen && isActioned) {
-    hideTransaction(true)
-  }
-
-  const onTimeout = () => {
+  const onSignalInProcessEvent = () => {
     setHighlightYellow(true)
     setIsDisabled(true)
     setTimeout(() => {
-      setHighlightRed(false)
+      setHighlightYellow(false)
     }, 5000)
-  }
-
-  if (inProcess && !isDisplayingInProcess) {
-    setIsDisplayingInProcess(true)
-    onTimeout()
   }
 
   const onConfirmGreen = () => {
@@ -352,13 +326,11 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     hideTransaction(false)
     setTimeout(() => {
       setHighlightGreen(false)
-      setIsDisplayingInProcess(false)
       hideTransaction(true)
     }, 5000)
   }
 
   const onConfirmRed = () => {
-    setHighlightYellow(false)
     setHighlightRed(true)
     setIsDisabled(true)
     hideTransaction(false)
@@ -376,7 +348,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const commonModalProperties = {
     shouldDisplay: true,
     transaction,
-    setIsLoading: setIsLoadingAndPaused
+    setIsLoading: setIsLoadingAndPaused,
+    onSignalInProcessEvent
   }
 
   const showAcceptModal = () =>
@@ -388,21 +361,20 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const showDeclineModal = () =>
     setConfirmationModalProperties({ ...commonModalProperties, action: 'decline', onConfirm: onConfirmRed })
 
-  const showCancelModal = () =>
-    setConfirmationModalProperties({ ...commonModalProperties, action: 'cancel', onConfirm: onConfirmRed })
+  const agentNameDisplay = isEmpty(agent.nickname) ? presentAgentId(agent.agentAddress) : agent.nickname
 
   /* eslint-disable-next-line quote-props */
-  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isCanceled || isDeclined }, { disabled: isDisabled }, { highlightGreen }, { highlightRed }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
+  return <div styleName={cx('transaction-row', { 'transaction-row-drawer-open': isDrawerOpen }, { 'annulled': isDeclined }, { disabled: isDisabled }, { highlightGreen }, { 'highlightRed': highlightRed || isStale }, { 'highlightYellow': highlightYellow || isPayment }, { inProcess })} role='listitem'>
     <div styleName='avatar'>
       <CopyAgentId agent={agent}>
-        <HashAvatar seed={agent.id} size={32} data-testid='hash-icon' />
+        <HashAvatar seed={agent.agentAddress} size={32} data-testid='hash-icon' />
       </CopyAgentId>
     </div>
 
     <div styleName='description-cell'>
       <div><span styleName='counterparty'>
         <CopyAgentId agent={agent}>
-          {(agent.id === userId ? `${agent.nickname} (You)` : agent.nickname) || presentAgentId(agent.id)}
+          {agentNameDisplay}
         </CopyAgentId>
       </span><p styleName='story'>{story}</p>
       </div>
@@ -417,10 +389,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
         isActionable={isActionable}
         isOutgoing={isOutgoing}
         isDeclined={isDeclined}
-        isCanceled={isCanceled}
       />
-      {/* BALANCE-BUG: Intentionally commented out until DNA balance bug is resolved. */}
-      {/* {isActionable ? <div /> : <div styleName='balance'>{presentBalance}</div>} */}
     </div>
 
     {isLoading && !inProcess && <Loading styleName='transaction-row-loading' width={20} height={20} />}
@@ -429,21 +398,24 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
       <h4 styleName='alert-msg'>{isPayment ? 'incoming payment pending' : 'processing...'}</h4>
     </ToolTip>}
 
-    {isActionable && !isLoading && !isPayment && !isDisabled && <>
+    {isStale && <ToolTip toolTipText='Validation failed. Transaction is stale'>
+      <h4 styleName='alert-msg'>stale transaction</h4>
+    </ToolTip>}
+
+    {isActionable && !isLoading && !isPayment && !isDisabled && !inProcess && <>
       <RevealActionsButton
         isDrawerOpen={isDrawerOpen}
         openDrawer={() => setIsDrawerOpen(true)}
         closeDrawer={() => setIsDrawerOpen(false)}
         areActionsPaused={areActionsPaused}
       />
-      {!isPayment && !isCanceled && !inProcess && <ActionOptions
+      {!isPayment && !inProcess && <ActionOptions
         isOffer={isOffer}
         isRequest={isRequest}
         transaction={transaction}
         showAcceptModal={showAcceptModal}
         showPayModal={showPayModal}
         showDeclineModal={showDeclineModal}
-        showCancelModal={showCancelModal}
         isDeclined={isDeclined}
         isDrawerOpen={isDrawerOpen}
         areActionsPaused={areActionsPaused}
@@ -475,7 +447,7 @@ function ActionOptions ({ isOffer, isRequest, transaction, showAcceptModal, show
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isCanceled, isDeclined }) {
+function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isDeclined }) {
   let amountDisplay
   if (isActionable) {
     amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
@@ -484,7 +456,7 @@ function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isC
   } else {
     amountDisplay = isOutgoing ? `-${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}` : `+${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}`
   }
-  return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && isDeclined) }, { credit: (isOffer && isActionable) || (isRequest && isDeclined) }, { removed: isDeclined || isCanceled })}>
+  return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && isDeclined) }, { credit: (isOffer && isActionable) || (isRequest && isDeclined) }, { removed: isDeclined })}>
     {amountDisplay} TF
   </div>
 }
@@ -526,23 +498,16 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
 
   const { id, amount, type, notes, counterparty = {} } = transaction
-  const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
-  const { id: activeCounterpartyId } = holofuelCounterparty
-
-  const counterpartyMessage = loadingCounterparty
-    ? <div styleName='counterparty-message'>Verifying active status of your counterparty...<Loading styleName='counterparty-loading' width={15} height={15} /></div>
-    : !activeCounterpartyId
-      ? <div styleName='counterparty-message'>Your counterparty can't be located on the network. If this error persists, please contact your Peer and confirm the Profile ID referenced is still active.</div>
-      : null
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
     case 'pay': {
+      const counterpartyInput = { agentAddress: counterparty.agentAddress, nickname: counterparty.nickname || '' }
       contentLabel = 'Pay request'
-      actionParams = { id, amount, counterparty, notes }
+      actionParams = { amount, counterparty: counterpartyInput, notes, requestId: id }
       actionHook = payTransaction
       message = <>
-        Accept the request and send {counterparty.nickname || presentAgentId(counterparty.id)} {presentHolofuelAmount(amount)} TF?
+        Accept the request and send {counterparty.nickname || presentAgentId(counterparty.agentAddress)} {presentHolofuelAmount(amount)} TF?
       </>
       flashMessage = 'Payment sent succesfully'
       break
@@ -552,7 +517,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionParams = { id }
       actionHook = acceptOffer
       message = <>
-        Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
       </>
       flashMessage = 'Offer Accepted succesfully'
       break
@@ -563,11 +528,11 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       actionHook = declineTransaction
       if (type === 'offer') {
         message = <>
-          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
         </>
       } else {
         message = <>
-          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
         </>
       }
       flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`
@@ -594,11 +559,11 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       .then(result => {
         const { data } = result
         if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
-          newMessage(timeoutErrorMessage, 5000)
+          newMessage('Timed out waiting for transaction confirmation from counterparty, will retry later', 5000)
         } else {
-          onConfirm()
           newMessage(flashMessage, 5000)
         }
+        onConfirm(action)
         setIsLoading(false)
       })
       .catch(() => {
@@ -610,10 +575,9 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     contentLabel={contentLabel}
     isOpen={shouldDisplay}
     handleClose={() => hideModal()}
-    styleName='modal'
+    styleName={cx('modal')}
   >
     <div styleName='modal-message'>{message}</div>
-    {counterpartyMessage}
     <div styleName='modal-buttons'>
       <Button
         onClick={() => hideModal()}
@@ -624,7 +588,6 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
-        disabled={loadingCounterparty || !activeCounterpartyId}
       >
         Yes
       </Button>

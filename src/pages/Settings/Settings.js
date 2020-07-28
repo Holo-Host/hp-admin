@@ -4,7 +4,6 @@ import { useQuery, useMutation } from '@apollo/react-hooks'
 import './Settings.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
 import HashIcon from 'components/HashIcon'
-import CopyAgentId from 'components/CopyAgentId'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
@@ -75,11 +74,9 @@ export function Settings () {
 
   const title = (settings.hostName ? `${settings.hostName}'s` : 'Your') + ' HoloPort'
 
-  return <PrimaryLayout headerProps={{ title: 'HoloPort Settings' }}>
+  return <PrimaryLayout headerProps={{ title: 'HoloPort Settings', showBackButton: true }}>
     <div styleName='avatar'>
-      <CopyAgentId agent={{ id: settings.hostPubKey }} hpAdmin isMe>
-        <HashIcon hash={settings.hostPubKey} size={42} />
-      </CopyAgentId>
+      <HashIcon hash={settings.hostPubKey} size={42} />
     </div>
     <div styleName='title'>{title}</div>
 

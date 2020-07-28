@@ -15,6 +15,7 @@ import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import { CurrentUserProvider as HFCurrentUserProvider } from 'holofuel/contexts/useCurrentUserContext'
 import { ConnectionProvider as HFConnectionProvider } from 'holofuel/contexts/useConnectionContext'
+import { HiddenTransactionsProvider } from 'holofuel/contexts/useHiddenTransactionsContext'
 import AcceptRequestedOffers from 'holofuel/components/wrappers/AcceptRequestedOffers'
 import LoadCurrentUser from 'holofuel/components/wrappers/LoadCurrentUser'
 import PromptForNickname from 'holofuel/components/wrappers/PromptForNickname'
@@ -32,9 +33,9 @@ function HoloFuelAppCore () {
   const isWide = useMediaPredicate('(min-width: 550px)')
 
   return <HFScreenWidthContext.Provider value={isWide}>
-    <HFConnectionProvider>
-      <HFCurrentUserProvider>
-        <HFFlashMessageProvider>
+    <HFCurrentUserProvider>
+      <HFFlashMessageProvider>
+        <HiddenTransactionsProvider>
           <LoadCurrentUser>
             <AcceptRequestedOffers>
               <PromptForNickname>
@@ -42,16 +43,18 @@ function HoloFuelAppCore () {
               </PromptForNickname>
             </AcceptRequestedOffers>
           </LoadCurrentUser>
-        </HFFlashMessageProvider>
-      </HFCurrentUserProvider>
-    </HFConnectionProvider>
+        </HiddenTransactionsProvider>
+      </HFFlashMessageProvider>
+    </HFCurrentUserProvider>
   </HFScreenWidthContext.Provider>
 }
 
 export function HoloFuelApp () {
   return <ApolloProvider client={apolloClient}>
     <Router>
-      <HoloFuelAppCore />
+      <HFConnectionProvider>
+        <HoloFuelAppCore />
+      </HFConnectionProvider>
     </Router>
   </ApolloProvider>
 }
@@ -63,16 +66,18 @@ export function HPAdminApp () {
     <Router>
       <ScreenWidthContext.Provider value={isWide}>
         <ConnectionProvider>
-          <AuthProvider>
-            <CurrentUserProvider>
-              <FlashMessageProvider>
-                <Switch>
-                  <Route path='/holofuel' component={HoloFuelAppCore} />
-                  <HPAdminRouter />
-                </Switch>
-              </FlashMessageProvider>
-            </CurrentUserProvider>
-          </AuthProvider>
+          <HFConnectionProvider>
+            <AuthProvider>
+              <CurrentUserProvider>
+                <FlashMessageProvider>
+                  <Switch>
+                    <Route path='/holofuel' component={HoloFuelAppCore} />
+                    <HPAdminRouter />
+                  </Switch>
+                </FlashMessageProvider>
+              </CurrentUserProvider>
+            </AuthProvider>
+          </HFConnectionProvider>
         </ConnectionProvider>
       </ScreenWidthContext.Provider>
     </Router>

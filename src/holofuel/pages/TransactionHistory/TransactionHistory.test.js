@@ -27,7 +27,7 @@ const agent2 = {
 
 const defaultTransaction = {
   amount: '0',
-  counterparty: agent1,
+  counterparty: { ...agent1, agentAddress: agent1.id },
   direction: '',
   status: '',
   type: '',
@@ -79,7 +79,7 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 1,
       counterparty: {
-        id: agent1.id,
+        agentAddress: agent1.id,
         nickname: agent1.nickname,
         avatarUrl: ''
       },
@@ -94,7 +94,7 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 2,
       counterparty: {
-        id: agent2.id,
+        agentAddress: agent2.id,
         nickname: agent2.nickname,
         avatarUrl: ''
       },
@@ -108,7 +108,7 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 3,
       counterparty: {
-        id: agent1.id,
+        agentAddress: agent1.id,
         nickname: agent1.nickname,
         avatarUrl: ''
       },

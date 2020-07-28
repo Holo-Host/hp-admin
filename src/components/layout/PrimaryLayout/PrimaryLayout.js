@@ -1,57 +1,57 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
-import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import useConnectionContext from 'contexts/useConnectionContext'
+import useHFConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import useCurrentUserContext from 'contexts/useCurrentUserContext'
-import { useInterval } from 'utils'
+import { useInterval, POLLING_INTERVAL_SETTINGS } from 'utils'
 import { wsConnection } from 'holochainClient'
 import { isLoginPage, HP_ADMIN_LOGIN_PATH } from 'utils/urls'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'global-styles/colors.css'
 import 'global-styles/index.css'
 
-export function PrimaryLayout ({
+function PrimaryLayout ({
   children,
   headerProps = {},
-  showHeader = true
+  showHeader = true,
+  showAlphaFlag = true
 }) {
   const [isInsideApp, setIsInsideApp] = useState(true)
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
-  const { setConnectionStatus, connectionStatus } = useConnectionContext()
+  const { connectionStatus, setConnectionStatus } = useConnectionContext()
+  const { isConnected: isHFConductorConnected } = useHFConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
+
+  const [isPausedConnectionCheckInterval, setIsPausedConnectionCheckInterval] = useState(false)
 
   const onError = ({ graphQLErrors: { isHposConnectionActive } }) => {
     setIsHposConnectionAlive(isHposConnectionActive)
   }
 
-  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: 10000, onError, notifyOnNetworkStatusChange: true, ssr: false })
+  const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery, { pollInterval: (POLLING_INTERVAL_SETTINGS), onError, notifyOnNetworkStatusChange: true, ssr: false })
 
   useInterval(() => {
-    if (!isLoginPage(window)) {
+    if (isLoginPage(window)) {
       setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
+    } else {
+      // on login page, set holochain conductor connnection as false when hpos connection is false, or true when true
+      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: isHposConnectionAlive })
     }
   }, 5000)
 
-  useEffect(() => {
-    if (!connectionStatus.hpos) {
-      // reroute to login on network/hpos connection error
-      if (!isLoginPage(window)) {
-        push(HP_ADMIN_LOGIN_PATH)
-      }
-      newMessage('Connecting to your Holoport...', 0)
-      setConnectionStatus({ ...connectionStatus, hpos: isHposConnectionAlive })
-    }
+  const setConductorConnectionFalse = useCallback(() => setConnectionStatus({ ...connectionStatus, holochain: false }), [setConnectionStatus, connectionStatus])
 
+  useEffect(() => {
     const setUser = () => {
       setCurrentUser({
         hostPubKey: settings.hostPubKey,
@@ -59,54 +59,63 @@ export function PrimaryLayout ({
       })
     }
 
-    if (!isLoginPage(window)) {
-      // if inside happ, check for connection to holochain
-      if (connectionStatus.hpos && !connectionStatus.holochain) {
-        // reroute to login on conductor connection error as it signals emerging hpos connetion failure
-        if (!isLoginPage(window)) {
-          push(HP_ADMIN_LOGIN_PATH)
-        }
-      } else {
-        newMessage('', 0)
-        setUser()
+    if (!isHFConductorConnected && connectionStatus.holochain) {
+      setConductorConnectionFalse()
+    }
+
+    if (!connectionStatus.hpos && !isPausedConnectionCheckInterval) {
+      // reroute to login on network/hpos connection error
+      if (!isLoginPage(window)) {
+        push(HP_ADMIN_LOGIN_PATH)
       }
-    } else {
-      // if on login page and connected to hpos, clear message and set user
-      if (connectionStatus.hpos) {
-        newMessage('', 0)
-        setUser()
+      newMessage('Connecting to your Holoport...', 0)
+      setIsPausedConnectionCheckInterval(true)
+      setTimeout(() => setIsPausedConnectionCheckInterval(false), 5000)
+    } else if (connectionStatus.hpos && !connectionStatus.holochain) {
+      if (!isLoginPage(window)) {
+        push(HP_ADMIN_LOGIN_PATH)
       }
+      const noConductorConnectionMsg = 'Connecting to your Conductor...'
+      newMessage(noConductorConnectionMsg, 0)
+      // set as false until receive back onError result from next hpos (settingsQuery) polling
+      setIsHposConnectionAlive(false)
+    } else if (connectionStatus.hpos) {
+      newMessage('', 0)
+      setUser()
     }
   }, [connectionStatus,
+    isPausedConnectionCheckInterval,
     newMessage,
     push,
     setCurrentUser,
     settings.hostPubKey,
     settings.hostName,
-    setConnectionStatus,
-    isHposConnectionAlive,
+    connectionStatus.hpos,
+    connectionStatus.holochain,
+    isHFConductorConnected,
+    setIsHposConnectionAlive,
+    setIsPausedConnectionCheckInterval,
+    setConductorConnectionFalse,
     isInsideApp,
     setIsInsideApp])
 
-  const isWide = useContext(ScreenWidthContext)
-
   return <div styleName='styles.primary-layout'>
-    <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
+    <div>
       {showHeader && <Header
         {...headerProps}
         settings={connectionStatus.hpos ? settings : {}} />}
-
+      {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag-page' />}
       <div styleName='styles.content'>
         <FlashMessage />
         {children}
       </div>
     </div>
 
-    {isLoginPage(window) && <div styleName='styles.wrapper'>
-      <div styleName='styles.container'>
+    {!isLoginPage(window) && <div styleName={cx('styles.wrapper')}>
+      <div styleName={cx('styles.container')}>
         <footer styleName='styles.footer'>
           <div styleName='styles.alpha-info'>
-            <AlphaFlag variant='right' styleName='styles.alpha-flag' />
+            <AlphaFlag variant='right' styleName='styles.alpha-flag-banner' />
             <p>
               HP Admin is in Alpha testing.
             </p>

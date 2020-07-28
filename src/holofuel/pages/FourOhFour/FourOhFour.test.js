@@ -2,7 +2,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import FourOhFour from './FourOhFour'
 
-jest.mock('components/layout/PrimaryLayout')
+jest.mock('holofuel/components/layout/PrimaryLayout')
 
 describe('Tos', () => {
   it('renders 404 message', () => {

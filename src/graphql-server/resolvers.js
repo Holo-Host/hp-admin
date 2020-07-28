@@ -24,20 +24,22 @@ export const resolvers = {
 
     hostPricing: HhaDnaInterface.hostPricing.get,
 
-    holofuelUser: HoloFuelDnaInterface.user.get,
+    myHolofuelUser: HoloFuelDnaInterface.user.get,
 
-    holofuelCounterparty: (_, { agentId }) => HoloFuelDnaInterface.user.getCounterparty({ agentId }),
-
-    holofuelHistoryCounterparties: async () => {
+    holofuelRecentCounterparties: async () => {
       const completed = await HoloFuelDnaInterface.transactions.allCompleted()
       const waiting = await HoloFuelDnaInterface.transactions.allWaiting()
-      const historyTransactions = completed.concat(waiting)
+      const actionable = await HoloFuelDnaInterface.transactions.allActionable()
+      const historyTransactions = completed.concat(waiting).concat(actionable)
       return getTxCounterparties(historyTransactions)
     },
 
     holofuelWaitingTransactions: HoloFuelDnaInterface.transactions.allWaiting,
 
-    holofuelActionableTransactions: HoloFuelDnaInterface.transactions.allActionable,
+    holofuelActionableTransactions: async () => {
+      const result = await HoloFuelDnaInterface.transactions.allActionable()
+      return result
+    },
 
     // NOTE: NonPending includes both completed and rejected/declined transactions.
     holofuelNonPendingTransactions: HoloFuelDnaInterface.transactions.allNonPending,
@@ -58,7 +60,34 @@ export const resolvers = {
 
     hposSettings: (_) => HposInterface.os.settings(),
 
-    hposStatus: HposInterface.os.status
+    hposStatus: HposInterface.os.status,
+
+    hostingReport: () => {
+      return {
+        localSourceChains: 18,
+        zomeCalls: 588,
+        hostedHapps: [
+          {
+            name: 'Holofuel'
+          },
+          {
+            name: 'Communities'
+          },
+          {
+            name: 'H-Wiki'
+          }
+        ]
+      }
+    },
+
+    earningsReport: () => {
+      return {
+        totalEarnings: 650000,
+        cpu: 300,
+        bandwidth: 300,
+        storage: 300
+      }
+    }
   },
 
   Mutation: {
@@ -91,19 +120,13 @@ export const resolvers = {
 
     holofuelUpdateUser: (_, { nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(nickname, avatarUrl),
 
-    holofuelRequest: (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
+    holofuelRequest: (_, { request }) => HoloFuelDnaInterface.requests.create(request),
 
-    holofuelOffer: (_, { counterpartyId, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterpartyId, amount, notes, requestId),
+    holofuelOffer: (_, { offer }) => HoloFuelDnaInterface.offers.create(offer),
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 
     holofuelDecline: (_, { transactionId }) => HoloFuelDnaInterface.transactions.decline(transactionId),
-
-    holofuelCancel: (_, { transactionId }) => HoloFuelDnaInterface.transactions.cancel(transactionId),
-
-    holofuelRecoverFunds: (_, { transactionId }) => HoloFuelDnaInterface.transactions.recoverFunds(transactionId),
-
-    holofuelRefundTransactions: (_, { transactions }) => HoloFuelDnaInterface.transactions.refundTransactions(transactions),
 
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 

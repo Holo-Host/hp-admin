@@ -5,13 +5,6 @@
   height: 100%;
   box-sizing: border-box;
   position: relative;
-}
-
-.wide {
-  padding: 50px;
-}
-
-.narrow {
   padding: 0px 24px;
 }
 
@@ -41,15 +34,13 @@
 .wrapper {
   box-sizing: border-box;
   margin-top: auto;
+  margin-bottom: 0rem;
   padding: 0px 24px;
-  position: -webkit-sticky;
-  position: sticky;
-  bottom: 2rem;
 }
 
 .container {
   box-sizing: border-box;
-  width: 26%;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -98,6 +89,16 @@
 
 .alpha-flag {
   position: absolute;
+}
+
+.alpha-flag-page {
+  composes: alpha-flag;
+  top: 8px;
+  right: 0px;
+}
+
+.alpha-flag-banner {
+  composes: alpha-flag;
   top: -16px;
   left: 0px;
 }
