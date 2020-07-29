@@ -3,56 +3,80 @@ import cx from 'classnames'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import './AmountInput.module.css'
+import { isEmpty } from 'lodash'
 
-const usePresentHolofuelString = () => {
+const useParseHolofuelAmount = () => {
   return stringAmount => {
-    let verifiedInteger, verifiedFraction
-    const hasAmountError = { integer: '', fraction: '' }
+    const hasDot =  /\./.test(stringAmount)
     const [integer, fraction] = stringAmount.split('.')
+    const hasAmountError = { integer: '', fraction: '' }
 
-    const parsedInteger = (Number(integer)).toLocaleString()
-    const parsedFraction = (Number(fraction)).toString()
+    const parsedInteger = Number(integer).toString()
+    const parsedFraction = (fraction === undefined || fraction === null || fraction === '') 
+      ? '' 
+      : fraction === 0
+        ? '0'
+        // toString method will filter a leading zero,
+        //  we compare the length diff to determine whether
+        //  to maintain the leading 0
+        : (fraction.length - Number(fraction).toString().length) === 1
+          ? '0' + Number(fraction).toString()
+          : Number(fraction).toString()
+
+    let verifiedInteger, verifiedFraction
     verifiedInteger = !isNaN(parsedInteger) ? parsedInteger : ''
     verifiedFraction = !isNaN(parsedFraction) ? parsedFraction : ''
-    
+
     if (parsedInteger && parsedInteger.length > 13) {
       console.log('PARSED INTEGER : ', parsedInteger);
-      // todo: throw error if integer exceeds trillions
-      hasAmountError[parsedInteger] = 'The max transaction amount per a single transaction is 1 trillion TF'
-      verifiedInteger = parsedInteger.substring(0, 14)
+      // throw error if integer exceeds trillions
+      hasAmountError['integer'] = 'The max transaction amount per a single transaction is 1 trillion TF'
+      console.log('hasAmountError : ', hasAmountError)
+      verifiedInteger = parsedInteger.substring(0, 13)
     }
-    if (parsedFraction && parsedFraction.length > 6) {
-      console.log('PARSED FRACTION : ', parsedFraction);
-      // todo: throw error if decimal exceeds 6 place values of percision (one-millionths)
-      hasAmountError[parsedFraction] = 'Your transaction amount cannot exceed 6 decimals'
-      verifiedFraction = parsedFraction.substring(0, 7)
-    }
-    
-    const amount = (verifiedInteger && verifiedFraction)
-      ? verifiedInteger + '.' + verifiedFraction
-      : verifiedInteger || verifiedFraction
 
-    return { verifiedInteger, verifiedFraction, amount, hasAmountError }
+    if (parsedFraction && parsedFraction.length > 6) {
+      console.log('PARSED Fraction : ', parsedFraction);
+      // throw error if decimal exceeds 6 place values of percision (one-millionths)
+      hasAmountError[fraction] = 'Your transaction amount cannot exceed 6 decimals'
+      verifiedFraction = parsedFraction.substring(0, 6)
+    }
+
+    const amount = (hasDot && verifiedFraction)
+      ? verifiedInteger + '.' + verifiedFraction
+      : hasDot
+        ? verifiedInteger + '.'
+        : verifiedInteger || verifiedFraction    
+
+    const presentedAmount = (hasDot && verifiedFraction)
+      ? Number(verifiedInteger).toLocaleString() + '.' + verifiedFraction
+      : hasDot
+        ? Number(verifiedInteger).toLocaleString() + '.'
+        : Number(verifiedInteger).toLocaleString() || verifiedFraction
+
+    return { amount, presentedAmount, hasAmountError }
   }
 }
 
 export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequest }) {
   const [inputValue, setInputValueRaw] = useState(String(amount))
+  const [presentedValue, setPresentedValue] = useState('')
 
   const isValidAmount = amount > 0
-  const presentHolofuelAmont = usePresentHolofuelString()
+  const parseHolofuelAmount = useParseHolofuelAmount()
 
 
   const setInputValue = value => {
     const cleanValue = value.replace(/[^0-9.]/g, '') || '0' // strips non numerical characters
-    const { verifiedInteger, verifiedFraction, amount } = presentHolofuelAmont(cleanValue)
+    const { amount, presentedAmount } = parseHolofuelAmount(cleanValue)
     setInputValueRaw(amount)
-    // setAmount(amount)
+    setPresentedValue(presentedAmount)
+    setAmount(amount)
     console.log('AMOUNT >>>>>> ', amount)
   }
 
-  const { hasAmountError } = presentHolofuelAmont(inputValue)
   // TODO: determine how to show error...
+  const { hasAmountError } = parseHolofuelAmount(inputValue)
 
   const addDigit = digit => () => {
     // return early if trying to add a second .
@@ -68,7 +92,7 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
         styleName='amount-input-amount'
         data-testid='amount'
         onChange={e => setInputValue(e.target.value)}
-        value={`${inputValue}`}
+        value={presentedValue}
       />
       <div styleName='numpad'>
         {[1, 4, 7].map(rowStart => <div styleName='numpad-row' key={rowStart}>
@@ -90,6 +114,8 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
           Request
         </Button>
       </div>
+      {/* for num pad entry errors */}
+      {!isEmpty(hasAmountError) && <h3 styleName='numpad-button'>{hasAmountError.integer || hasAmountError.fraction}</h3>} 
     </div>
   </PrimaryLayout>
 }
