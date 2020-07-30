@@ -108,23 +108,27 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   // NB: amount is maintained as a string, until submission, when the numeric value is verified 
   const [amountString, setAmountString] = useState('')
-  const [amountFloat, setAmountFloat] = useState(0)
+  const [amount, setAmountRaw] = useState(0)
 
-  const setAmount = amount => {
-    setAmountString(amount)
-    // we can't just use amount because amount is a number, and here we need to distinguish between values like '23' and '23.'
-    setAmountFloat(Number(amount))
+  const setAmount = (amount, presentedAmount) => {
+    const hasDot = /\./.test(amount)
+    const lastRawAmountIndex = amount.length - 1
+    const lastpresentedAmountIndex = presentedAmount.length - 1
+
+    if (hasDot && amount.charAt(lastRawAmountIndex) === '.') {
+      setAmountRaw(amount.slice(0, lastRawAmountIndex))
+      setAmountString(presentedAmount.slice(0, lastpresentedAmountIndex))
+    } else {
+      setAmountRaw(amount)
+      setAmountString(presentedAmount)
+    }
   }
-
-  const fee = (amountFloat * FEE_PERCENTAGE) || 0
-  const total = mode === OFFER_MODE
-    ? amountFloat + fee
-    : amountFloat
 
   const onSubmit = ({ counterpartyId, notes }) => {
     setIsProcessing(true)
+    console.log('amount : ', amount)
     const counterpartyNickname = counterpartyNick === presentAgentId(counterpartyId) ? '' : counterpartyNick
-    const transaction = { amount: amountFloat, counterparty: { agentAddress: counterpartyId, nickname: counterpartyNickname }, notes }
+    const transaction = { amount, counterparty: { agentAddress: counterpartyId, nickname: counterpartyNickname }, notes }
     switch (mode) {
       case OFFER_MODE:
         createOffer(transaction)
@@ -169,23 +173,23 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
     counterpartyId === currentUser.id ||
-    amountFloat < 0 ||
+    amount < 0 ||
     isProcessing
 
+  // render num pad:
   if (numpadVisible) {
     const chooseSend = () => {
       setMode(OFFER_MODE)
       setNumpadVisible(false)
     }
-
     const chooseRequest = () => {
       setMode(REQUEST_MODE)
       setNumpadVisible(false)
     }
-
-    return <AmountInput amount={amountFloat} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
+    return <AmountInput amount={amount} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
   }
 
+  // render main page
   return <PrimaryLayout headerProps={{ title }} showAlphaFlag={false}>
     <div styleName='amount-backdrop' />
     <div styleName='amount-banner'>
@@ -244,7 +248,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         <div />
       </div>
 
-      <div styleName='total'>Total Amount: {presentHolofuelAmount(total)} TF</div>
+      <div styleName='total'>Total Amount: {amountString} TF</div>
 
       <Button
         type='submit'
