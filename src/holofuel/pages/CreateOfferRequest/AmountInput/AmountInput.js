@@ -11,7 +11,7 @@ const FRACTION_PLACEVALUE_LIMIT = 6
 
 const useParseHolofuelAmount = () => {
   return stringAmount => {
-    const hasDot =  /\./.test(stringAmount)
+    const hasDot = /\./.test(stringAmount)
     const [integer, fraction] = stringAmount.split('.')
     let hasAmountError = ''
 
@@ -36,7 +36,7 @@ const useParseHolofuelAmount = () => {
       ? verifiedInteger + '.' + verifiedFraction
       : hasDot
         ? verifiedInteger + '.'
-        : verifiedInteger || verifiedFraction    
+        : verifiedInteger || verifiedFraction
 
     const presentedAmount = (hasDot && verifiedFraction)
       ? Number(verifiedInteger).toLocaleString() + '.' + verifiedFraction
@@ -101,8 +101,7 @@ export default function AmountInput ({ amount, setAmount, chooseSend, chooseRequ
           Request
         </Button>
       </div>
-      {!isEmpty(amountError) && <h3 styleName='error-text'>{amountError}</h3>} 
+      {!isEmpty(amountError) && <h3 styleName='error-text'>{amountError}</h3>}
     </div>
   </PrimaryLayout>
 }
-

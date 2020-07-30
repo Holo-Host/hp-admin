@@ -42,7 +42,7 @@ describe('AcceptRequestedOffers', () => {
           balance: '1110000',
           credit: 0,
           payable: 0,
-          receivable: 0,
+          receivable: 0
         }
       }
     }

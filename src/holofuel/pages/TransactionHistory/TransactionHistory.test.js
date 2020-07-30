@@ -32,7 +32,7 @@ const defaultTransaction = {
   status: '',
   type: '',
   timestamp: '2019-11-11',
-  presentBalance: 0,
+  presentBalance: '0',
   notes: ''
 }
 
@@ -43,9 +43,9 @@ const ledgerMock = {
     data: {
       holofuelLedger: {
         balance,
-        credit: 0,
-        payable: 0,
-        receivable: 0,
+        credit: '0',
+        payable: '0',
+        receivable: '0'
       }
     }
   }
@@ -164,8 +164,6 @@ describe('TransactionHistory', () => {
       expect(queryByText(pendingOutgoingAmount)).not.toBeInTheDocument()
 
       expect(getByText(completedOutgoing.notes)).toBeInTheDocument()
-      //  BALANCE-BUG: Intentionally commented out until DNA balance bug is resolved
-      // expect(getByText(presentHolofuelAmount(completedOutgoing.presentBalance))).toBeInTheDocument()
       expect(getByText(agent1.nickname)).toBeInTheDocument()
 
       fireEvent.click(getFilterButtonByText('Deposits'))

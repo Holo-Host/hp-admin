@@ -36,7 +36,7 @@ describe('Home', () => {
               balance,
               credit: 0,
               payable: 0,
-              receivable: 0,
+              receivable: 0
             }
           }
         }

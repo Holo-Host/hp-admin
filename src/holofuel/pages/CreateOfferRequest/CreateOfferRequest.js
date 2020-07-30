@@ -106,7 +106,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const [isProcessing, setIsProcessing] = useState(false)
 
-  // NB: amount is maintained as a string, until submission, when the numeric value is verified 
+  // NB: amount is maintained as a string, until submission, when the numeric value is verified
   const [amountString, setAmountString] = useState('')
   const [amount, setAmountRaw] = useState(0)
 
