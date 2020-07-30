@@ -45,6 +45,7 @@
 .transaction-button {
   background: transparent;
   border-radius: unset !important;
+  font-weight: bold
 }
 
 .selected {
