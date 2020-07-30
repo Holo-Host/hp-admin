@@ -20,6 +20,13 @@ export async function promiseMap (array, fn) {
   return resolved
 }
 
+
+// TODO: Determine at which number to truncate if number is flexible on either side of decimal...
+export const presentTruncatedAmount = (string, number = 14) => {
+  if (string.length > number) return `${string.slice(0, number)}...`
+  return string
+}
+
 export function sliceHash (hashString = '', desiredLength = 6) {
   if (typeof desiredLength !== 'number') throw new Error('Fn sliceHash requires a number input.')
   return (hashString).slice(-desiredLength)

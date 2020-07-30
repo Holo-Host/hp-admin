@@ -26,7 +26,7 @@ import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
+import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, presentTruncatedAmount, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionAsActionable } from 'models/Transaction'
@@ -99,11 +99,6 @@ function useUpdatedTransactionLists () {
 const VIEW = {
   actionable: 'actionable',
   recent: 'recent'
-}
-
-const presentTruncatedAmount = (string, number = 15) => {
-  if (string.length > number) return `${sliceHash(string, number)}...`
-  return sliceHash(string, number)
 }
 
 export default function Inbox ({ history: { push } }) {
@@ -384,6 +379,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     <div styleName='amount-cell'>
       <AmountCell
         amount={amount}
+        isDrawerOpen={isDrawerOpen}
         isRequest={isRequest}
         isOffer={isOffer}
         isActionable={isActionable}
@@ -447,15 +443,20 @@ function ActionOptions ({ isOffer, isRequest, transaction, showAcceptModal, show
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isDeclined }) {
+function AmountCell ({ amount, isDrawerOpen, isRequest, isOffer, isActionable, isOutgoing, isDeclined }) {
   let amountDisplay
   if (isActionable) {
-    amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
+    amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
   } else if (isDeclined) {
-    amountDisplay = isRequest ? `+${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}` : `-${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}`
+    amountDisplay = isRequest ? `+${presentHolofuelAmount(amount)}` : `-${presentHolofuelAmount(amount)}`
   } else {
-    amountDisplay = isOutgoing ? `-${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}` : `+${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}`
+    amountDisplay = isOutgoing ? `-${presentHolofuelAmount(amount)}` : `+${presentHolofuelAmount(amount)}`
   }
+
+  if (isDrawerOpen) {
+    amountDisplay = presentTruncatedAmount(amountDisplay)
+  }
+
   return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && isDeclined) }, { credit: (isOffer && isActionable) || (isRequest && isDeclined) }, { removed: isDeclined })}>
     {amountDisplay} TF
   </div>

@@ -10,7 +10,7 @@ import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransaction
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
+import { POLLING_INTERVAL_GENERAL, presentAgentId, presentTruncatedAmount, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
 import './TransactionHistory.module.css'
@@ -157,8 +157,8 @@ export function TransactionRow ({ transaction, isFirst }) {
   const pending = status === STATUS.pending
 
   const presentedAmount = direction === DIRECTION.incoming
-    ? `+ ${presentHolofuelAmount(amount)}`
-    : `- ${presentHolofuelAmount(amount)}`
+    ? `+ ${presentTruncatedAmount(presentHolofuelAmount(amount))}`
+    : `- ${presentTruncatedAmount(presentHolofuelAmount(amount))}`
 
   return <div styleName={cx('transaction-row', { 'not-first-row': !isFirst })} data-testid='transaction-row'>
     <div styleName='avatar'>
