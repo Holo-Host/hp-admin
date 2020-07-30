@@ -22,7 +22,7 @@ export async function getTxCounterparties (transactionList) {
   return noDuplicatesCounterpartyList
 }
 
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, status, isPayingARequest = false }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
@@ -35,13 +35,12 @@ const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counter
     type: TYPE.request,
     timestamp: eventTimestamp,
     notes: notes || event.Request.notes,
-    fees,
     isPayingARequest,
     isActioned: false
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, status, isPayingARequest = false, inProcess = false }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
@@ -54,14 +53,13 @@ const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpa
     type: TYPE.offer,
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
-    fees,
     isPayingARequest,
     inProcess,
     isActioned: false
   }
 }
 
-const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
+const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, presentBalance }) => {
   const transaction = event.Receipt.cheque.invoice.promise.tx
   const incomingTransaction = stateDirection === DIRECTION.incoming
 
@@ -76,13 +74,12 @@ const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, p
     status: STATUS.completed,
     type: stateDirection === DIRECTION.outgoing ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
-    fees,
     presentBalance,
     notes: transaction.notes
   }
 }
 
-const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
+const presentCheque = ({ origin, event, stateDirection, eventTimestamp, presentBalance }) => {
   const transaction = event.Cheque.invoice.promise.tx
   const incomingTransaction = stateDirection === DIRECTION.incoming
   return {
@@ -96,7 +93,6 @@ const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, pr
     status: STATUS.completed,
     type: event.Cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
-    fees,
     presentBalance,
     notes: event.Cheque.invoice.promise.tx.notes
   }
@@ -129,7 +125,7 @@ function presentPendingRequest (transaction, annuled = false) {
       ? ''
       : event[2].Request.to_nickname
 
-  return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees: fee })
+  return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes })
 }
 
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
@@ -159,7 +155,7 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
       ? ''
       : event[2].Promise.tx.from_nickname
 
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, fees: fee, isPayingARequest, inProcess })
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, isPayingARequest, inProcess })
 }
 
 let counter = 0
@@ -194,24 +190,24 @@ function presentTransaction (transaction) {
 
   switch (stateStage) {
     case 'completed': {
-      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
-      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
+      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, presentBalance: available })
+      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, presentBalance: available })
       return new Error(`Completed event did not have a Receipt or Cheque event`)
     }
 
     case 'canceled': {
-      if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
-      if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
+      if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, status: STATUS.canceled })
+      if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, status: STATUS.canceled })
       return new Error(`Canceled event did not have a Request or Promise event`)
     }
     /* **************************  NOTE: ********************************** */
     /* The below two cases are 'waitingTransaction' cases. */
     case 'requested': {
-      return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
+      return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event })
     }
     /* 'approved' only indicates that a payment was offered (could be in response to a request or an isolate payment) */
     case 'approved': {
-      return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
+      return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event })
     }
     default: return new Error(`Error: No transaction stateStage was matched. Current transaction stateStage : ${stateStage}.`)
   }
@@ -246,13 +242,12 @@ const HoloFuelDnaInterface = {
   },
   ledger: {
     get: async () => {
-      const { balance, credit, payable, receivable, fees } = await createZomeCall('transactions/ledger_state')()
+      const { balance, credit, payable, receivable } = await createZomeCall('transactions/ledger_state')()
       return {
         balance,
         credit,
         payable,
-        receivable,
-        fees
+        receivable
       }
     }
   },

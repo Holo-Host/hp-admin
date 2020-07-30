@@ -6,8 +6,8 @@ import Button from 'components/UIButton'
 import './AmountInput.module.css'
 
 // NB: The sum of the intgr and fraction cannot exceed 19 and be within a valid holofuel range
-const FRACTION_PLACEVALUE_LIMIT = 13
-const INTEGER_PLACEVALUE_LIMIT = 6
+const INTEGER_PLACEVALUE_LIMIT = 13
+const FRACTION_PLACEVALUE_LIMIT = 6
 
 const useParseHolofuelAmount = () => {
   return stringAmount => {
@@ -20,16 +20,16 @@ const useParseHolofuelAmount = () => {
     verifiedInteger = !isNaN(parsedInteger) ? parsedInteger : ''
     verifiedFraction = fraction
 
-    if (parsedInteger && parsedInteger.length > FRACTION_PLACEVALUE_LIMIT) {
+    if (parsedInteger && parsedInteger.length > INTEGER_PLACEVALUE_LIMIT) {
       // throw error if integer exceeds trillions
       hasAmountError = 'The max transaction amount per a single transaction is 1 trillion TF'
-      verifiedInteger = parsedInteger.substring(0, FRACTION_PLACEVALUE_LIMIT)
+      verifiedInteger = parsedInteger.substring(0, INTEGER_PLACEVALUE_LIMIT)
     }
 
-    if (fraction && fraction.length > INTEGER_PLACEVALUE_LIMIT) {
-      // throw error if decimal exceeds the INTEGER_PLACEVALUE_LIMIT place values of percision (one-millionths)
-      hasAmountError = `Your transaction amount cannot exceed ${INTEGER_PLACEVALUE_LIMIT} decimals`
-      verifiedFraction = fraction.substring(0, INTEGER_PLACEVALUE_LIMIT)
+    if (fraction && fraction.length > FRACTION_PLACEVALUE_LIMIT) {
+      // throw error if decimal exceeds 6 place values of percision (one-millionths)
+      hasAmountError = `Your transaction amount cannot exceed ${FRACTION_PLACEVALUE_LIMIT} decimals`
+      verifiedFraction = fraction.substring(0, FRACTION_PLACEVALUE_LIMIT)
     }
 
     const amount = (hasDot && verifiedFraction)

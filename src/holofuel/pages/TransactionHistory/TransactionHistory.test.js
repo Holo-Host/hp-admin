@@ -32,7 +32,6 @@ const defaultTransaction = {
   status: '',
   type: '',
   timestamp: '2019-11-11',
-  fees: 0,
   presentBalance: 0,
   notes: ''
 }
@@ -47,7 +46,6 @@ const ledgerMock = {
         credit: 0,
         payable: 0,
         receivable: 0,
-        fees: 0
       }
     }
   }

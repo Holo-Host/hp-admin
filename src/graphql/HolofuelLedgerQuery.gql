@@ -4,6 +4,5 @@ query HolofuelLedger {
     credit
     payable
     receivable
-    fees
   }
 }

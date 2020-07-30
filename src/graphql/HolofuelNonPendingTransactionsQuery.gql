@@ -7,7 +7,6 @@ query HolofuelNonPendingTransactionsQuery {
     status
     type
     timestamp
-    fees
     presentBalance
     notes
     inProcess

@@ -23,7 +23,6 @@ describe('AcceptRequestedOffers', () => {
     type: TYPE.offer,
     timestamp: '123',
     notes: '',
-    fees: '',
     isPayingARequest: false
   }
 
@@ -44,7 +43,6 @@ describe('AcceptRequestedOffers', () => {
           credit: 0,
           payable: 0,
           receivable: 0,
-          fees: 0
         }
       }
     }

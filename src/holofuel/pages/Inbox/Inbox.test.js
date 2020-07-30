@@ -152,7 +152,6 @@ const ledgerMock = {
         credit: 0,
         payable: 0,
         receivable: 0,
-        fees: 0
       }
     }
   }
@@ -172,7 +171,6 @@ describe('Inbox', () => {
     notes: 'Here\'s your money',
     direction: DIRECTION.incoming,
     status: STATUS.pending,
-    fees: 0,
     isPayingARequest: false
   }
 
@@ -185,7 +183,6 @@ describe('Inbox', () => {
     notes: 'Here\'s more of your money',
     direction: DIRECTION.incoming,
     status: STATUS.pending,
-    fees: 0,
     isPayingARequest: false
   }
 

@@ -72,7 +72,6 @@ type Transaction {
   status: TransactionStatus
   type: TransactionType
   timestamp: String
-  fees: Float
   presentBalance: String
   notes: String
   happName: String
@@ -87,7 +86,6 @@ type Ledger {
   credit: String
   payable: String
   receivable: String
-  fees: String
 }
 
 type HposSettings {
