@@ -114,7 +114,7 @@ function presentPendingRequest (transaction, annuled = false) {
   const status = STATUS.pending
   const type = TYPE.request
   const eventTimestamp = event[1]
-  const { amount, notes, fee } = event[2].Request
+  const { amount, notes } = event[2].Request
 
   const counterpartyId = annuled ? event[2].Request.from : provenance[0]
   // If the transaction is not declined or cancelled, and has a counterparty whose nickname is not set, return nickname an empty string, not null
@@ -142,7 +142,7 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
   const status = STATUS.pending
   const type = TYPE.offer
   const eventTimestamp = event[1]
-  const { amount, notes, fee } = event[2].Promise.tx
+  const { amount, notes } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
   const inProcess = isEmpty(invoicedOffers) ? false : hasInvoice()
 
@@ -183,10 +183,9 @@ const acceptInvoicedOffer = async (tx, invoicedOffers) => {
 }
 
 function presentTransaction (transaction) {
-  const { state, origin, event, timestamp, adjustment, available } = transaction
+  const { state, origin, event, timestamp, available } = transaction
   const stateStage = state.split('/')[1]
   const stateDirection = state.split('/')[0] // NOTE: This returns either 'incoming' or 'outgoing,' wherein, 'incoming' indicates the recipient of funds, 'outgoing' indicates the spender of funds.
-  const parsedAdjustment = adjustment.Ok
 
   switch (stateStage) {
     case 'completed': {

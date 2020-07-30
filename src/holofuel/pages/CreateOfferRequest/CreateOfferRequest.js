@@ -15,7 +15,7 @@ import AmountInput from './AmountInput'
 import Loading from 'components/Loading'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
