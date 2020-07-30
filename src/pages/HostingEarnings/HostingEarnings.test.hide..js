@@ -13,7 +13,7 @@ jest.mock('./Graph', () => () => <div>Graph</div>)
 const transactions = [{
   id: 1,
   timestamp: moment(),
-  amount: '150',
+  amount: 150,
   happName: 'HoloFuel',
   counterparty: {
     id: 1,
@@ -24,7 +24,7 @@ const transactions = [{
 {
   id: 2,
   timestamp: moment().subtract(3, 'days'),
-  amount: '250',
+  amount: 250,
   happName: 'HoloFuel',
   counterparty: {
     id: 1,
@@ -35,7 +35,7 @@ const transactions = [{
 {
   id: 3,
   timestamp: moment().subtract(10, 'days'),
-  amount: '350',
+  amount: 350,
   happName: 'HoloFuel',
   counterparty: {
     id: 1,
