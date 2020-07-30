@@ -594,10 +594,12 @@ describe('TransactionRow', () => {
         setConfirmationModalProperties: jest.fn()
       }
 
+      const offer = { amount: transaction.amount, counterparty: { agentAddress: transaction.counterparty.agentAddress, nickname: '' }, requestId: transaction.id, notes: transaction.notes }
+
       const localOfferMock = {
         request: {
           query: HolofuelOfferMutation,
-          variables: { amount: transaction.amount, counterpartyId: transaction.counterparty.agentAddress, requestId: transaction.id, notes: transaction.notes }
+          variables: { offer }
         },
         result: {
           data: { holofuelOffer: mockTransaction }

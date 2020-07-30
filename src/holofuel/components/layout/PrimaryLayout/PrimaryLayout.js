@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -9,7 +9,6 @@ import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
-import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
@@ -104,7 +103,6 @@ function PrimaryLayout ({
       }
       push(defaultPath)
     } else {
-      newMessage('', 0)
       startPolling(POLLING_INTERVAL_GENERAL)
       if (shouldRefetchMyUser) {
         refetchMyHolofuelUser()
@@ -120,13 +118,12 @@ function PrimaryLayout ({
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
-  const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const closeMenu = () => setMenuOpen(false)
 
-  return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} isWide={isWide} />
+  return <div styleName={cx('styles.primary-layout')}>
+    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
       isOpen={isMenuOpen}
       closeMenu={closeMenu}
@@ -134,9 +131,8 @@ function PrimaryLayout ({
       agentLoading={currentUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
-      ledgerLoading={isLoadingFirstLedger}
-      isWide={isWide} />
-    {(!isWide && showAlphaFlag) && <AlphaFlag styleName='styles.alpha-flag' />}
+      ledgerLoading={isLoadingFirstLedger} />
+    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
     <div styleName={cx('styles.content')}>
       <FlashMessage />
       {children}

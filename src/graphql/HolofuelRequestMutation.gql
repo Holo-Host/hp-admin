@@ -1,5 +1,5 @@
-mutation HolofuelRequest ($counterpartyId: String, $amount: Float, $notes: String) {
-  holofuelRequest(counterpartyId: $counterpartyId, amount: $amount, notes: $notes) {
+mutation HolofuelRequest ($request: TransactionInput) {
+  holofuelRequest(request: $request) {
     id
     amount
     counterparty { agentAddress, nickname, avatarUrl }

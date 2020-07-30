@@ -268,8 +268,7 @@ const HoloFuelDnaInterface = {
     allActionable: async () => {
       const { requests, promises, declined } = await getListPending({})
       const actionableTransactions = requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
-      const actionableTransactionsDisplay = actionableTransactions.concat(cachedRecentlyActionedTransactions)
-      const uniqActionableTransactions = _.uniqBy(actionableTransactionsDisplay, 'id')
+      const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
       return uniqActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
@@ -356,14 +355,24 @@ const HoloFuelDnaInterface = {
     }
   },
   requests: {
-    create: async (counterpartyId, amount, notes) => {
-      const origin = await createZomeCall('transactions/request')({ from: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes })
+    create: async ({ counterparty, amount, notes }) => {
+      const origin = await createZomeCall('transactions/request')({ from: counterparty.agentAddress, amount: amount.toString(), deadline: mockDeadline(), notes })
+
+      if (!origin || origin.Err) {
+        const error = { error: 'Request unsuccessful', counterpartyError: '' }
+        const counterpartyValidationError = /(link not found)/gi
+        if (origin.Err && origin.Err.Internal && counterpartyValidationError.test(origin.Err.Internal)) {
+          const counterpartyError = { ...error, counterpartyError: 'Counterparty not found' }
+          throw (counterpartyError)
+        } else {
+          throw (error)
+        }
+      }
+
       return {
         id: origin,
         amount,
-        counterparty: {
-          id: counterpartyId
-        },
+        counterparty,
         notes,
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.pending,
@@ -373,15 +382,24 @@ const HoloFuelDnaInterface = {
     }
   },
   offers: {
-    create: async (counterpartyId, amount, notes, requestId) => {
-      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
+    create: async ({ counterparty, amount, notes, requestId }) => {
+      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterparty.agentAddress, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
+
+      if (!origin || origin.Err) {
+        const error = { error: 'Offer unsuccessful', counterpartyError: '' }
+        const counterpartyValidationError = /(link not found)/gi
+        if (origin.Err && origin.Err.Internal && counterpartyValidationError.test(origin.Err.Internal)) {
+          const counterpartyError = { ...error, counterpartyError: 'Counterparty not found' }
+          throw (counterpartyError)
+        } else {
+          throw (error)
+        }
+      }
 
       const presentedTransaction = {
         id: requestId || origin, // NB: If requestId isn't defined, then offer uses origin as the ID (ie. Offer is the initiating transaction).
         amount,
-        counterparty: {
-          id: counterpartyId
-        },
+        counterparty,
         notes,
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,

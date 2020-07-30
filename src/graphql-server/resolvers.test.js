@@ -151,24 +151,26 @@ describe('resolvers', () => {
 
     describe('.holofuelRequest', () => {
       it('calls create request and constructs the result transaction', async () => {
-        const counterpartyId = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
+        const counterparty = { agentAddress: 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', nickname: '' }
         const amount = 200.01
         const notes = 'Hi there'
-        resolvers.Mutation.holofuelRequest(null, { counterpartyId, amount, notes })
+        const request = { counterparty, amount, notes }
+        resolvers.Mutation.holofuelRequest(null, { request })
         await wait(0)
-        expect(mockHoloFuelInterface.requests.create).toHaveBeenCalledWith(counterpartyId, amount, notes)
+        expect(mockHoloFuelInterface.requests.create).toHaveBeenCalledWith(request)
       })
     })
 
     describe('.holofuelOffer', () => {
       it('calls create offer and constructs the result transaction', async () => {
-        const counterpartyId = 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a'
+        const counterparty = { agentAddress: 'HcSCIdm3y8fjJ8g753YEMOo4qdIctqsqrxpIEnph7Fj7dm4ze776bEPDwxoog8a', nickname: '' }
         const amount = 200.01
         const notes = 'Hi there'
         const requestId = 'Qmbm4B1u3rN8ua39QwDkjmxssmcKzj4nMngbqnxU7fDfQE'
-        resolvers.Mutation.holofuelOffer(null, { counterpartyId, amount, notes, requestId })
+        const offer = { counterparty, amount, notes, requestId }
+        resolvers.Mutation.holofuelOffer(null, { offer })
         await wait(0)
-        expect(mockHoloFuelInterface.offers.create).toHaveBeenCalledWith(counterpartyId, amount, notes, requestId)
+        expect(mockHoloFuelInterface.offers.create).toHaveBeenCalledWith(offer)
       })
     })
 

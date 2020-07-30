@@ -1,9 +1,8 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
-import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
@@ -100,10 +99,8 @@ function PrimaryLayout ({
     isInsideApp,
     setIsInsideApp])
 
-  const isWide = useContext(ScreenWidthContext)
-
   return <div styleName='styles.primary-layout'>
-    <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
+    <div>
       {showHeader && <Header
         {...headerProps}
         settings={connectionStatus.hpos ? settings : {}} />}
@@ -114,8 +111,8 @@ function PrimaryLayout ({
       </div>
     </div>
 
-    {!isLoginPage(window) && <div styleName={cx('styles.wrapper', { 'styles.wrapper-narrow': !isWide })}>
-      <div styleName={cx('styles.container', { 'styles.container-wide': isWide })}>
+    {!isLoginPage(window) && <div styleName={cx('styles.wrapper')}>
+      <div styleName={cx('styles.container')}>
         <footer styleName='styles.footer'>
           <div styleName='styles.alpha-info'>
             <AlphaFlag variant='right' styleName='styles.alpha-flag-banner' />

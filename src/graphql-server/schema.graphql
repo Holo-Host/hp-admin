@@ -136,6 +136,20 @@ type EarningsReport {
   storage: Float
 }
 
+
+input HolofuelUserInput {
+  agentAddress: String
+  nickname: String
+  avatarUrl: String
+}
+
+input TransactionInput {
+  amount: Float
+  counterparty: HolofuelUserInput
+  notes: String
+  requestId: ID
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser
@@ -165,8 +179,8 @@ type Mutation {
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
   holofuelUpdateUser(nickname: String!, avatarUrl: String): MyHolofuelUser
-  holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
-  holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
+  holofuelRequest(request: TransactionInput): Transaction
+  holofuelOffer(offer: TransactionInput): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction
   holofuelDecline(transactionId: ID): Transaction
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings

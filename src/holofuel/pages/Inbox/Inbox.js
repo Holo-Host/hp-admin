@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isEqual, remove } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -9,7 +9,6 @@ import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTrans
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
@@ -35,9 +34,9 @@ import { TYPE, STATUS, DIRECTION, shouldShowTransactionAsActionable } from 'mode
 const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
 function useOffer () {
-  const [offer] = useMutation(HolofuelOfferMutation)
-  return ({ id, amount, counterparty, notes }) => offer({
-    variables: { amount, counterpartyId: counterparty.agentAddress, requestId: id, notes },
+  const [offerHoloFuel] = useMutation(HolofuelOfferMutation)
+  return (offer) => offerHoloFuel({
+    variables: { offer },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },
@@ -48,8 +47,8 @@ function useOffer () {
 }
 
 function useAcceptOffer () {
-  const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)
-  return ({ id }) => acceptOffer({
+  const [acceptOfferHoloFuel] = useMutation(HolofuelAcceptOfferMutation)
+  return ({ id }) => acceptOfferHoloFuel({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
@@ -61,8 +60,8 @@ function useAcceptOffer () {
 }
 
 function useDecline () {
-  const [decline] = useMutation(HolofuelDeclineMutation)
-  return ({ id }) => decline({
+  const [declineHoloFuel] = useMutation(HolofuelDeclineMutation)
+  return ({ id }) => declineHoloFuel({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
@@ -129,6 +128,8 @@ export default function Inbox ({ history: { push } }) {
   useEffect(() => {
     if (!isEmpty(userMessage)) {
       newMessage(userMessage, 5000)
+    } else {
+      newMessage('', 0)
     }
   }, [userMessage, newMessage])
 
@@ -265,7 +266,7 @@ export function Partition ({ dateLabel, transactions, setConfirmationModalProper
 }
 
 export function TransactionRow ({ transaction, setConfirmationModalProperties, isActionable, hideTransaction, areActionsPaused, setAreActionsPaused, openDrawerId, setOpenDrawerId, setUserMessage }) {
-  const { id, counterparty, amount, type, status, direction, notes, isPayingARequest, inProcess, isActioned, isStale } = transaction
+  const { id, counterparty, amount, type, status, direction, notes, isPayingARequest, inProcess, isStale } = transaction
 
   if (isStale) {
     setUserMessage('Transaction could not be validated and will never pass. Transaction is now stale.')
@@ -307,13 +308,8 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
   const [highlightYellow, setHighlightYellow] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const isSuccessfulHighlight = highlightGreen || highlightRed
 
   if (agent.agentAddress === null) return null
-
-  if (!isStale && !inProcess && !isSuccessfulHighlight && isActioned) {
-    hideTransaction(true)
-  }
 
   const onSignalInProcessEvent = () => {
     setHighlightYellow(true)
@@ -494,7 +490,6 @@ function DeclineButton ({ showDeclineModal }) {
 }
 
 export function ConfirmationModal ({ confirmationModalProperties, setConfirmationModalProperties }) {
-  const isWide = useContext(ScreenWidthContext)
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -507,8 +502,9 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
     case 'pay': {
+      const counterpartyInput = { agentAddress: counterparty.agentAddress, nickname: counterparty.nickname || '' }
       contentLabel = 'Pay request'
-      actionParams = { id, amount, counterparty, notes }
+      actionParams = { amount, counterparty: counterpartyInput, notes, requestId: id }
       actionHook = payTransaction
       message = <>
         Accept the request and send {counterparty.nickname || presentAgentId(counterparty.agentAddress)} {presentHolofuelAmount(amount)} TF?
@@ -579,7 +575,7 @@ export function ConfirmationModal ({ confirmationModalProperties, setConfirmatio
     contentLabel={contentLabel}
     isOpen={shouldDisplay}
     handleClose={() => hideModal()}
-    styleName={cx('modal', { 'modal-desktop': isWide })}
+    styleName={cx('modal')}
   >
     <div styleName='modal-message'>{message}</div>
     <div styleName='modal-buttons'>

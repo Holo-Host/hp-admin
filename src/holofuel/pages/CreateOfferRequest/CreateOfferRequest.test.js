@@ -25,11 +25,12 @@ const counterparty = {
 }
 const amount = 35674
 const notes = 'Hi there'
+const offer = { amount, counterparty: { agentAddress: counterparty.agentAddress, nickname: '' }, notes }
 
 const offerMock = {
   request: {
     query: HolofuelOfferMutation,
-    variables: { amount, counterpartyId: counterparty.agentAddress, notes }
+    variables: { offer }
   },
   result: {
     data: {
@@ -178,10 +179,12 @@ describe('CreateOfferRequest', () => {
   })
 
   describe('request mode', () => {
+    const request = { amount, counterparty: { agentAddress: counterparty.agentAddress, nickname: '' }, notes }
+
     const requestMock = {
       request: {
         query: HolofuelRequestMutation,
-        variables: { amount, counterpartyId: counterparty.agentAddress, notes }
+        variables: { request }
       },
       result: {
         data: {
