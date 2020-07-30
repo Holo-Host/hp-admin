@@ -21,7 +21,7 @@ const useParseHolofuelAmount = () => {
     verifiedFraction = fraction
 
     if (parsedInteger && parsedInteger.length > INTEGER_PLACEVALUE_LIMIT) {
-      // throw error if integer exceeds trillions
+      // throw error if integer exceeds trillions (13 digits)
       hasAmountError = 'The max transaction amount per a single transaction is 1 trillion TF'
       verifiedInteger = parsedInteger.substring(0, INTEGER_PLACEVALUE_LIMIT)
     }

@@ -126,7 +126,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const onSubmit = ({ counterpartyId, notes }) => {
     setIsProcessing(true)
-    console.log('amount : ', amount)
     const counterpartyNickname = counterpartyNick === presentAgentId(counterpartyId) ? '' : counterpartyNick
     const transaction = { amount, counterparty: { agentAddress: counterpartyId, nickname: counterpartyNickname }, notes }
     switch (mode) {
