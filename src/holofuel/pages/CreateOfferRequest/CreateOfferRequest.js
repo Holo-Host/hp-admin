@@ -198,7 +198,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     <div styleName='mode-toggle'>
       {[OFFER_MODE, REQUEST_MODE].map((buttonMode, i) =>
         <Button
-          styleName={cx('mode-toggle-button', { 'left-button': i === 0, 'right-button': i === 1, selected: buttonMode === mode })}
+          styleName={cx('mode-toggle-button', 'transaction-button', { selected: buttonMode === mode })}
           variant='white'
           onClick={() => setMode(buttonMode)}
           key={buttonMode}
