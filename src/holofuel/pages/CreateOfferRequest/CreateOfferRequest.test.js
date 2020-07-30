@@ -10,7 +10,7 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelRecentCounterpartiesQuery from 'graphql/HolofuelRecentCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
-import { presentHolofuelAmount } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
 import { HISTORY_FROM_SENT_TRANSACTION_PATH } from 'holofuel/utils/urls'
 

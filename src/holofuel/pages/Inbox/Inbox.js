@@ -183,9 +183,7 @@ export default function Inbox ({ history: { push } }) {
     {inboxView === VIEW.actionable && actionableTransactions.length > 0 && <OneTimeEducationModal
       id='inbox'
       message='You have offers or requests for payment needing your attention.
-
-      When you accept or decline an item, it will begin processing. Depending on timing, it may show as pending or processing. 
-      
+      When you accept or decline an item, it will begin processing. Depending on timing, it may show as pending or processing.
       Once the transaction has been saved to both peer source chains it will update the display in your history and activity views.'
     />}
 
