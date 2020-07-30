@@ -182,15 +182,23 @@ export default function Inbox ({ history: { push } }) {
 
     {inboxView === VIEW.actionable && actionableTransactions.length > 0 && <OneTimeEducationModal
       id='inbox'
-      message='You have offers or requests for payment needing your attention.
-      When you accept or decline an item, it will begin processing. Depending on timing, it may show as pending or processing.
-      Once the transaction has been saved to both peer source chains it will update the display in your history and activity views.'
+      message={<InboxEducationMessage />}
     />}
 
     <ConfirmationModal
       setConfirmationModalProperties={setConfirmationModalProperties}
       confirmationModalProperties={confirmationModalProperties || {}} />
   </PrimaryLayout>
+}
+
+function InboxEducationMessage () {
+  return <>
+    <div styleName='message'>
+      <h2 styleName='message-paragraph'>You have offers or requests for payment needing your attention.</h2>
+      <h2 styleName='message-paragraph'>When you accept or decline an item, it will begin processing. Depending on timing, it may show as pending or processing.</h2>
+      <h2 styleName='message-paragraph'>Once the transaction has been saved to both peer source chains it will update the display in your history and activity views.</h2>
+    </div>
+  </>
 }
 
 export function Partition ({ dateLabel, transactions, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {

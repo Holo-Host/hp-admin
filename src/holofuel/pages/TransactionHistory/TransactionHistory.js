@@ -123,11 +123,18 @@ export default function TransactionsHistory ({ history: { push } }) {
     </div>}
     {shouldShowSentTransactionMessage && <OneTimeEducationModal
       id='history'
-      message='You have offers or requests for payment needing your attention.
-      When you accept or decline an item, it will begin processing. Depending on timing, it may show as pending or processing.
-      Once the transaction has been saved to both peer source chains it will update the display in your history and activity views.'
+      message={<HistoryEducationMessage />}
     />}
   </PrimaryLayout>
+}
+
+function HistoryEducationMessage () {
+  return <>
+    <div styleName='message'>
+      <h2 styleName='message-paragraph'>You have just sent or requested Test Fuel. Your promise (or request) for payment is making its way to the intended recipient in the HoloFuel app.</h2>
+      <h2 styleName='message-paragraph'>If the recipient is located, the record should display as pending or processing in your history until it has been accepted or declined and has been saved to both peer source chains.</h2>
+    </div>
+  </>
 }
 
 const DisplayBalance = ({ ledgerLoading, holofuelBalance }) => {

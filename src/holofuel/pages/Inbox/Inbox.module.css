@@ -285,3 +285,13 @@
   composes: action-button;
   background-color: var(--color-amaranth);
 }
+
+/* Education Modal */
+
+.message {
+  margin: 0 auto;
+}
+
+.message-paragraph {
+  margin: 20px 0px;
+}
