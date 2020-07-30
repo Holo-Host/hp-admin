@@ -186,7 +186,9 @@ export default function Inbox ({ history: { push } }) {
 
     {inboxView === VIEW.actionable && actionableTransactions.length > 0 && <OneTimeEducationModal
       id='inbox'
-      message='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+      message='You have just sent or requested Test Fuel. Your promise (or request) for payment is making its way to the intended recipient in the HoloFuel app.
+
+      If the recipient is located, the record should display as pending or processing in your history until it has been accepted or declined and has been saved to both peer source chains.'
     />}
 
     <ConfirmationModal

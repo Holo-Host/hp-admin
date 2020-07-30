@@ -123,7 +123,11 @@ export default function TransactionsHistory ({ history: { push } }) {
     </div>}
     {shouldShowSentTransactionMessage && <OneTimeEducationModal
       id='history'
-      message='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+      message='You have offers or requests for payment needing your attention.
+
+      When you accept or decline an item, it will begin processing. Depending on timing, it may show as pending or processing. 
+      
+      Once the transaction has been saved to both peer source chains it will update the display in your history and activity views.'
     />}
   </PrimaryLayout>
 }
