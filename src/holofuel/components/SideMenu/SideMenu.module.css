@@ -6,10 +6,6 @@
   z-index: 98;
 }
 
-.drawer--open {
-
-}
-
 .container {
   box-sizing: border-box;
   width: 280px;
@@ -135,6 +131,12 @@
   font-weight: 700;
 }
 
+.menu-button {
+  width: 32px;
+  top: -8px;
+  right: 11px;
+}
+
 /* Nav */
 
 .nav-list {
@@ -158,14 +160,9 @@
   margin-bottom: 15px;
 }
 
-.underline {
+.back-link {
+  border-top: 1px solid var(--color-loblolly);
   border-bottom: 1px solid var(--color-loblolly);
-}
-
-.loading-row {
-  composes: underline;
-  display: flex;
-  flex: 1.8;
 }
 
 .admin-nav-link {
@@ -241,8 +238,4 @@
   font-size: 12px;
   text-align: center;
   margin-left: 10px;
-}
-
-.desktop {
-  flex: 0 1 280px;
 }

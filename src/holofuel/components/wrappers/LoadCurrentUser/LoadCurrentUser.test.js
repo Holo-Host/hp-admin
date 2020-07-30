@@ -1,6 +1,6 @@
 import React from 'react'
 import { MockedProvider } from '@apollo/react-testing'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
 import { renderAndWait } from 'utils/test-utils'
 import LoadCurrentUser from './LoadCurrentUser'
 import { setCurrentUser as mockSetCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
@@ -8,25 +8,25 @@ import { setCurrentUser as mockSetCurrentUser } from 'holofuel/contexts/useCurre
 jest.mock('holofuel/contexts/useCurrentUserContext')
 
 describe('LoadCurrentUser', () => {
-  const holofuelUser = {
+  const myHolofuelUser = {
     id: 1,
     nickname: 'Alice',
     avatarUrl: ''
   }
 
-  const holofuelUserMock = {
+  const myHolofuelUserMock = {
     request: {
-      query: HolofuelUserQuery
+      query: MyHolofuelUserQuery
     },
     result: {
       data: {
-        holofuelUser
+        myHolofuelUser
       }
     }
   }
 
   const mocks = [
-    holofuelUserMock
+    myHolofuelUserMock
   ]
 
   it('sets CurrentUserContext with the Holofuel User', async () => {
@@ -34,6 +34,6 @@ describe('LoadCurrentUser', () => {
       <LoadCurrentUser />
     </MockedProvider>)
 
-    expect(mockSetCurrentUser).toHaveBeenCalledWith(holofuelUser)
+    expect(mockSetCurrentUser).toHaveBeenCalledWith(myHolofuelUser)
   })
 })

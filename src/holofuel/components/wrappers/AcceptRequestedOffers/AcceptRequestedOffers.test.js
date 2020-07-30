@@ -24,11 +24,7 @@ describe('AcceptRequestedOffers', () => {
     timestamp: '123',
     notes: '',
     fees: '',
-    isPayingARequest: false,
-    canceledBy: {
-      id: null,
-      nickname: null
-    }
+    isPayingARequest: false
   }
 
   const offerPayingRequest = {

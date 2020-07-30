@@ -6,21 +6,34 @@ import apolloLogger from 'apollo-link-logger'
 import { onError } from 'apollo-link-error'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 
+const mapGraphQLError = (graphQLErrors, response, { hposCheck, errorMessage }) => {
+  graphQLErrors.map(({ message }) => {
+    if (hposCheck && message.includes('Network Error')) {
+      console.log(`[HPOS Connection Error]: ${message}`)
+      response.errors.isHposConnectionActive = false
+      return response
+    } else if (hposCheck && message.includes(401)) {
+      console.log(`[Authentication Error]: ${message}`)
+      response.errors.isHposConnectionActive = true
+      return response
+    } else if (message.includes('Counterparty not found')) {
+      console.log(`[Query Error]: ${errorMessage}, counterparty not found.`)
+      return response
+    }
+    return response
+  })
+}
+
 const errorLink = onError(({ graphQLErrors, response, operation }) => {
-  if (operation.operationName === 'HposSettings') {
-    if (graphQLErrors) {
-      graphQLErrors.map(({ message }) => {
-        if (message.includes('Network Error')) {
-          console.log(`[HPOS Connection Error]: ${message}`)
-          response.errors.isHposConnectionActive = false
-          return response
-        } else if (message.includes(401)) {
-          console.log(`[Authentication Error]: ${message}`)
-          response.errors.isHposConnectionActive = true
-          return response
-        }
-        return response
-      })
+  if (graphQLErrors) {
+    if (operation.operationName === 'HposSettings') {
+      return mapGraphQLError(graphQLErrors, response, { hposCheck: true })
+    } else if (operation.operationName === 'HolofuelOffer') {
+      const offerErrorMessage = 'Offer unsuccessful'
+      return mapGraphQLError(graphQLErrors, response, { hposCheck: false, errorMessage: offerErrorMessage })
+    } else if (operation.operationName === 'HolofuelRequest') {
+      const requestErrorMessage = 'Request unsuccessful'
+      return mapGraphQLError(graphQLErrors, response, { hposCheck: false, errorMessage: requestErrorMessage })
     }
   }
 })
@@ -29,19 +42,25 @@ let links = [
   new SchemaLink({ schema })
 ]
 
-if (process.env.REACT_APP_HOLOFUEL_APP !== 'true') {
-  links = [errorLink].concat(links)
-}
-
 if (process.env.NODE_ENV !== 'test') {
   links = [apolloLogger].concat(links)
 }
+
+links = [errorLink].concat(links)
+
+const cache = new InMemoryCache({
+  typePolicies: {
+    HolofuelUser: {
+      keyFields: ['agentAddress', 'nickname']
+    }
+  }
+})
 
 const link = ApolloLink.from(links)
 
 const apolloClient = new ApolloClient({
   link,
-  cache: new InMemoryCache(),
+  cache,
   connectToDevTools: true
 })
 
