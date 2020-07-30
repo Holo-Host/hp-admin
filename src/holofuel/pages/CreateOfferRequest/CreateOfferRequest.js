@@ -124,7 +124,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           .then(() => {
             newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
-            push(HISTORY_PATH)
+            push(HISTORY_FROM_SENT_TRANSACTION_PATH)
           }).catch(({ message }) => {
             const counterpartyError = message.includes('Counterparty not found')
             if (counterpartyError) {
@@ -140,7 +140,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           .then(() => {
             newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
-            push(HISTORY_PATH)
+            push(HISTORY_FROM_SENT_TRANSACTION_PATH)
           }).catch(({ message }) => {
             const counterpartyError = message.includes('Counterparty not found')
             if (counterpartyError) {

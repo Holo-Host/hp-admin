@@ -1,4 +1,4 @@
-mutation DisableHapp ($appId: String) {
+mutation DisableHappMutation ($appId: String) {
   disableHapp(appId: $appId) {
     id
     title

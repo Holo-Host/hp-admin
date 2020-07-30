@@ -1,4 +1,4 @@
-query HappStoreUser {
+query HappStoreUserQuery {
   happStoreUser {
     name
     hash

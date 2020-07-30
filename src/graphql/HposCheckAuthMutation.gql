@@ -1,4 +1,4 @@
-mutation HposCheckAuth {
+mutation HposCheckAuthMutation {
   hposCheckAuth {
     isAuthed
     hposSettings { hostPubKey, hostName, registrationEmail, networkStatus, sshAccess, deviceName }

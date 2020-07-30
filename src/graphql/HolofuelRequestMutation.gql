@@ -1,4 +1,4 @@
-mutation HolofuelRequest ($request: TransactionInput) {
+mutation HolofuelRequestMutation ($request: TransactionInput) {
   holofuelRequest(request: $request) {
     id
     amount

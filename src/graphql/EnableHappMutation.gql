@@ -1,4 +1,4 @@
-mutation EnableHapp ($appId: String) {
+mutation EnableHappMutation ($appId: String) {
   enableHapp(appId: $appId) {
     id
     title
