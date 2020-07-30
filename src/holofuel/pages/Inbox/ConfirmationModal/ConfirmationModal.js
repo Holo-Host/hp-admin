@@ -1,25 +1,22 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import cx from 'classnames'
-import { useQuery, useMutation } from '@apollo/react-hooks'
-import ScreenWidthContext from 'holofuel/contexts/screenWidth'
-import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
-import Modal from 'holofuel/components/Modal'
-import Button from 'components/UIButton'
-import Loading from 'components/Loading'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
+import { useMutation } from '@apollo/react-hooks'
+import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
-import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
-import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+import Button from 'components/UIButton'
+import Modal from 'holofuel/components/Modal'
+import './ConfirmationModal.module.css'
 import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { TYPE, STATUS } from 'models/Transaction'
-import './ConfirmationModal.module.css'
 
 function useOffer () {
-  const [offer] = useMutation(HolofuelOfferMutation)
-  return ({ id, amount, counterparty, notes }) => offer({
-    variables: { amount, counterpartyId: counterparty.id, requestId: id, notes },
+  const [offerHoloFuel] = useMutation(HolofuelOfferMutation)
+  return (offer) => offerHoloFuel({
+    variables: { offer },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
     },
@@ -30,8 +27,8 @@ function useOffer () {
 }
 
 function useAcceptOffer () {
-  const [acceptOffer] = useMutation(HolofuelAcceptOfferMutation)
-  return ({ id }) => acceptOffer({
+  const [acceptOfferHoloFuel] = useMutation(HolofuelAcceptOfferMutation)
+  return ({ id }) => acceptOfferHoloFuel({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
@@ -43,8 +40,8 @@ function useAcceptOffer () {
 }
 
 function useDecline () {
-  const [decline] = useMutation(HolofuelDeclineMutation)
-  return ({ id }) => decline({
+  const [declineHoloFuel] = useMutation(HolofuelDeclineMutation)
+  return ({ id }) => declineHoloFuel({
     variables: { transactionId: id },
     refetchQueries: [{
       query: HolofuelActionableTransactionsQuery
@@ -55,16 +52,7 @@ function useDecline () {
   })
 }
 
-function useCounterparty (agentId) {
-  const { loading, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    fetchPolicy: 'cache-and-network',
-    variables: { agentId }
-  })
-  return { holofuelCounterparty, loading }
-}
-
 export default function ConfirmationModal ({ confirmationModalProperties, setConfirmationModalProperties }) {
-  const isWide = useContext(ScreenWidthContext)
   const payTransaction = useOffer()
   const acceptOffer = useAcceptOffer()
   const declineTransaction = useDecline()
@@ -73,23 +61,16 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
   const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
 
   const { id, amount, type, notes, counterparty = {} } = transaction
-  const { loading: loadingCounterparty, holofuelCounterparty } = useCounterparty(counterparty.id)
-  const { id: activeCounterpartyId } = holofuelCounterparty
-
-  const counterpartyMessage = loadingCounterparty
-    ? <div styleName='counterparty-message'>Verifying active status of your counterparty...<Loading styleName='counterparty-loading' width={15} height={15} /></div>
-    : !activeCounterpartyId
-      ? <div styleName='counterparty-message'>Your counterparty can't be located on the network. If this error persists, please contact your Peer and confirm the Profile ID referenced is still active.</div>
-      : null
 
   let message, actionHook, actionParams, contentLabel, flashMessage
   switch (action) {
     case 'pay': {
+      const counterpartyInput = { agentAddress: counterparty.agentAddress, nickname: counterparty.nickname || '' }
       contentLabel = 'Pay request'
-      actionParams = { id, amount, counterparty, notes }
+      actionParams = { amount, counterparty: counterpartyInput, notes, requestId: id }
       actionHook = payTransaction
       message = <>
-        Accept the request and send {counterparty.nickname || presentAgentId(counterparty.id)} {presentHolofuelAmount(amount)} TF?
+        Accept the request and send {counterparty.nickname || presentAgentId(counterparty.agentAddress)} {presentHolofuelAmount(amount)} TF?
       </>
       flashMessage = 'Payment sent succesfully'
       break
@@ -99,7 +80,7 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
       actionParams = { id }
       actionHook = acceptOffer
       message = <>
-        Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+        Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
       </>
       flashMessage = 'Offer Accepted succesfully'
       break
@@ -110,11 +91,11 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
       actionHook = declineTransaction
       if (type === 'offer') {
         message = <>
-          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
         </>
       } else {
         message = <>
-          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.id)}?
+          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
         </>
       }
       flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`
@@ -156,11 +137,10 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
   return <Modal
     contentLabel={contentLabel}
     isOpen={shouldDisplay}
-    handleClose={hideModal}
-    styleName={cx('modal', { 'modal-desktop': isWide })}
+    handleClose={() => hideModal()}
+    styleName={cx('modal')}
   >
     <div styleName='modal-message'>{message}</div>
-    {counterpartyMessage}
     <div styleName='modal-buttons'>
       <Button
         onClick={() => hideModal()}
@@ -171,7 +151,6 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
       <Button
         onClick={onYes}
         styleName='modal-button-yes'
-        disabled={loadingCounterparty || !activeCounterpartyId}
       >
         Yes
       </Button>

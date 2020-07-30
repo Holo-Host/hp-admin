@@ -1,3 +1,3 @@
-import Component from './ConfirmationModal'
+import ConfirmationModal from './ConfirmationModal'
 
-export default Component
+export default ConfirmationModal
