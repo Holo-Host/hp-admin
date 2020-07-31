@@ -1,4 +1,4 @@
-mutation UpdateHostPricing ($units: String, $pricePerUnit: String) {
+mutation UpdateHostPricingMutation ($units: String, $pricePerUnit: String) {
   updateHostPricing(units: $units, pricePerUnit: $pricePerUnit) {
     units
     pricePerUnit
