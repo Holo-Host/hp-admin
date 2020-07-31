@@ -23,6 +23,12 @@ import './CreateOfferRequest.module.css'
 export const FEE_PERCENTAGE = 0
 const AGENT_ID_LENGTH = 63
 
+// yup.setLocale({
+//   counterpartyId: {
+//     length: 'Incorrect peer hash ID length.  Check sequence and spelling.'
+//   }
+// })
+
 const FormValidationSchema = yup.object().shape({
   counterpartyId: yup.string()
     .required()
@@ -96,7 +102,11 @@ export default function CreateOfferRequest ({ history: { push } }) {
     }
   }, [currentUser.id, counterpartyId, newMessage])
 
-  const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
+  const { register, handleSubmit, errors, values, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
+
+  console.log(' errors ', errors);
+  console.log(' values ', values);
+
 
   const selectAgent = agent => {
     setCounterpartyId(agent.agentAddress)
@@ -226,7 +236,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           <input
             name='counterpartyId'
             id='counterpartyId'
-            styleName='form-input'
+            styleName={cx('form-input', { 'form-input-error' : !isEmpty(errors) && errors.counterpartyId.message })}
             placeholder={`Who is this ${modeRelations[mode]}?`}
             ref={register}
             onChange={({ target: { value } }) => updateCounterparty(value)}
@@ -237,6 +247,9 @@ export default function CreateOfferRequest ({ history: { push } }) {
           </div>
         </div>
       </div>
+      
+      {!isEmpty(errors) && <h3 styleName='error-text'>{errors.counterpartyId.message}</h3>} 
+      
       <div>
         <div><label htmlFor='notes' styleName='form-label'>For:</label></div>
         <input
