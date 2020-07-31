@@ -49,7 +49,7 @@ export function useLoadingFirstTime (loading) {
 }
 
 export function presentHolofuelAmount (amount) {
-  if (isNaN(amount)|| isNil(amount)) return '--'
+  if (isNaN(amount) || isNil(amount)) return '--'
   return Number.parseFloat(amount).toLocaleString()
 }
 

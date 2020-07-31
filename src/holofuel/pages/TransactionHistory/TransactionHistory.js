@@ -99,7 +99,7 @@ export default function TransactionsHistory ({ history: { push } }) {
   const shouldShowSentTransactionMessage = urlParams.get('sent-transaction')
   const [newTransactionActionType, setNewTransactionActionType] = useState('')
   const { message: flashMessage } = useFlashMessageContext()
-  const hasOffer = new RegExp("\\b(Offer)\\b")
+  const hasOffer = new RegExp('\\b(Offer)\\b')
 
   useEffect(() => {
     if (!newTransactionActionType && flashMessage && typeof flashMessage === 'string') {
