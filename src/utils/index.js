@@ -20,6 +20,12 @@ export async function promiseMap (array, fn) {
   return resolved
 }
 
+// TODO: Determine at which number to truncate if number is flexible on either side of decimal...
+export const presentTruncatedAmount = (string, number = 14) => {
+  if (string.length > number) return `${string.slice(0, number)}...`
+  return string
+}
+
 export function sliceHash (hashString = '', desiredLength = 6) {
   if (typeof desiredLength !== 'number') throw new Error('Fn sliceHash requires a number input.')
   return (hashString).slice(-desiredLength)
@@ -50,7 +56,21 @@ export function useLoadingFirstTime (loading) {
 
 export function presentHolofuelAmount (amount) {
   if (isNaN(amount)) return '--'
-  return Number.parseFloat(amount).toLocaleString()
+
+  const hasDot = /\./.test(amount)
+  const [integer, fraction] = amount.split('.')
+
+  const parsedInteger = Number(integer).toString()
+  const verifiedInteger = !isNaN(parsedInteger) ? parsedInteger : ''
+  const verifiedFraction = fraction
+
+  const presentedAmount = (hasDot && verifiedFraction)
+    ? Number(verifiedInteger).toLocaleString() + '.' + verifiedFraction
+    : hasDot
+      ? Number(verifiedInteger).toLocaleString() + '.'
+      : Number(verifiedInteger).toLocaleString() || verifiedFraction
+
+  return presentedAmount
 }
 
 export function presentDateAndTime (dateTime) {

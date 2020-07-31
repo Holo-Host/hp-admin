@@ -26,7 +26,6 @@ const fourRequestsWithADupe = ['QmZR4u634UN9TtwaHvcS1vUkh6VdhmxUfkzTHjmKxZMryz',
           to: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
           to_nickname: 'Perry',
           amount: '124500.00',
-          fee: '2',
           deadline: '2020-12-02T00:00:00+00:00',
           notes: 'I want my $2!',
           synchronous: null

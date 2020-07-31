@@ -15,7 +15,7 @@ import AmountInput from './AmountInput'
 import Loading from 'components/Loading'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
+import { presentAgentId } from 'utils'
 import { HISTORY_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
@@ -106,13 +106,23 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const [isProcessing, setIsProcessing] = useState(false)
 
+  // NB: amount is maintained as a string, until submission, when the numeric value is verified
+  const [amountString, setAmountString] = useState('')
   const [amount, setAmountRaw] = useState(0)
-  const setAmount = amount => setAmountRaw(Number(amount))
 
-  const fee = (amount * FEE_PERCENTAGE) || 0
-  const total = mode === OFFER_MODE
-    ? amount + fee
-    : amount
+  const setAmount = (amount, presentedAmount) => {
+    const hasDot = /\./.test(amount)
+    const lastRawAmountIndex = amount.length - 1
+    const lastpresentedAmountIndex = presentedAmount.length - 1
+
+    if (hasDot && amount.charAt(lastRawAmountIndex) === '.') {
+      setAmountRaw(amount.slice(0, lastRawAmountIndex))
+      setAmountString(presentedAmount.slice(0, lastpresentedAmountIndex))
+    } else {
+      setAmountRaw(amount)
+      setAmountString(presentedAmount)
+    }
+  }
 
   const onSubmit = ({ counterpartyId, notes }) => {
     setIsProcessing(true)
@@ -122,7 +132,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       case OFFER_MODE:
         createOffer(transaction)
           .then(() => {
-            newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+            newMessage(`Offer of ${amountString} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
             push(HISTORY_PATH)
           }).catch(({ message }) => {
@@ -138,7 +148,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
       case REQUEST_MODE:
         createRequest(transaction)
           .then(() => {
-            newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
+            newMessage(`Request for ${amountString} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
             push(HISTORY_PATH)
           }).catch(({ message }) => {
@@ -165,20 +175,20 @@ export default function CreateOfferRequest ({ history: { push } }) {
     amount < 0 ||
     isProcessing
 
+  // render num pad:
   if (numpadVisible) {
     const chooseSend = () => {
       setMode(OFFER_MODE)
       setNumpadVisible(false)
     }
-
     const chooseRequest = () => {
       setMode(REQUEST_MODE)
       setNumpadVisible(false)
     }
-
     return <AmountInput amount={amount} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
   }
 
+  // render main page
   return <PrimaryLayout headerProps={{ title }} showAlphaFlag={false}>
     <div styleName='amount-backdrop' />
     <div styleName='amount-banner'>
@@ -186,7 +196,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         {title}
       </h4>
       <div styleName='amount' onClick={() => setNumpadVisible(true)}>
-        {presentHolofuelAmount(amount)} TF
+        {amountString} TF
       </div>
       <div styleName='fee-notice'>
         {mode === OFFER_MODE
@@ -237,7 +247,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         <div />
       </div>
 
-      <div styleName='total'>Total Amount: {presentHolofuelAmount(total)} TF</div>
+      <div styleName='total'>Total Amount: {amountString} TF</div>
 
       <Button
         type='submit'
