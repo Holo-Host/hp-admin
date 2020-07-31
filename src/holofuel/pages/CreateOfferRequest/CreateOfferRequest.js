@@ -16,7 +16,7 @@ import Loading from 'components/Loading'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import { presentAgentId } from 'utils'
-import { HISTORY_PATH } from 'holofuel/utils/urls'
+import { HISTORY_FROM_SENT_TRANSACTION_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
@@ -134,7 +134,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           .then(() => {
             newMessage(`Offer of ${amountString} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
-            push(HISTORY_PATH)
+            push(HISTORY_FROM_SENT_TRANSACTION_PATH)
           }).catch(({ message }) => {
             const counterpartyError = message.includes('Counterparty not found')
             if (counterpartyError) {
@@ -150,7 +150,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           .then(() => {
             newMessage(`Request for ${amountString} TF sent to ${counterpartyNick}.`, 5000)
             setIsProcessing(false)
-            push(HISTORY_PATH)
+            push(HISTORY_FROM_SENT_TRANSACTION_PATH)
           }).catch(({ message }) => {
             const counterpartyError = message.includes('Counterparty not found')
             if (counterpartyError) {

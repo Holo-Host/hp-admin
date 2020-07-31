@@ -1,4 +1,4 @@
-query Happ($id: String!) {
+query HappQuery ($id: String!) {
   happ(id: $id) {
     id
     title
