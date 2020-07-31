@@ -20,42 +20,42 @@ const useParseHolofuelAmount = () => {
     const exceedsOneTrillion = amount => {
       return Number(amount) > 1000000000000
     }
-    
+
     if (parsedInteger && exceedsOneTrillion(parsedInteger)) {
       // throw error if integer is higher than 1 trillion
       hasAmountError = integerThresholdError
     }
-    
+
     let verifiedInteger, verifiedFraction
     verifiedInteger = !isNaN(parsedInteger) ? parsedInteger : ''
     verifiedFraction = fraction
-    
+
     if (parsedInteger && parsedInteger.length > INTEGER_PLACEVALUE_LIMIT) {
       // throw error if integer exceeds 13 digits (trillions)
       hasAmountError = `Your transaction cannot exceed ${INTEGER_PLACEVALUE_LIMIT} whole numbers`
       verifiedInteger = parsedInteger.substring(0, INTEGER_PLACEVALUE_LIMIT)
     }
-    
+
     if (fraction && fraction.length > FRACTION_PLACEVALUE_LIMIT) {
       // throw error if decimal exceeds 6 place values of percision (one-millionths)
       hasAmountError = `Your transaction amount cannot exceed ${FRACTION_PLACEVALUE_LIMIT} decimals`
       verifiedFraction = fraction.substring(0, FRACTION_PLACEVALUE_LIMIT)
     }
-    
+
     const amount = (hasDot && verifiedFraction)
-    ? verifiedInteger + '.' + verifiedFraction
-    : hasDot
-    ? verifiedInteger + '.'
-    : verifiedInteger || verifiedFraction
-    
+      ? verifiedInteger + '.' + verifiedFraction
+      : hasDot
+        ? verifiedInteger + '.'
+        : verifiedInteger || verifiedFraction
+
     const presentedAmount = (hasDot && verifiedFraction)
-    ? Number(verifiedInteger).toLocaleString() + '.' + verifiedFraction
-    : hasDot
-    ? Number(verifiedInteger).toLocaleString() + '.'
-    : Number(verifiedInteger).toLocaleString() || verifiedFraction
-    
+      ? Number(verifiedInteger).toLocaleString() + '.' + verifiedFraction
+      : hasDot
+        ? Number(verifiedInteger).toLocaleString() + '.'
+        : Number(verifiedInteger).toLocaleString() || verifiedFraction
+
     const exceedsCeiling = exceedsOneTrillion(verifiedInteger)
- 
+
     return { amount, presentedAmount, hasAmountError, exceedsCeiling }
   }
 }
