@@ -97,6 +97,11 @@
   color: var(--color-rhino-35);
 }
 
+.form-input-error {
+  composes: form-input;
+  border-bottom: 1px solid #EE4266;
+}
+
 .hash-and-nick {
   display: flex;
   margin-left: 10px;
@@ -167,3 +172,10 @@
   margin-top: 40px;
 }
 
+.error-text {
+  font-family: 'CircularStd', sans-serif;
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.4px;
+  color: rgba(44, 64, 90, 0.5);
+}

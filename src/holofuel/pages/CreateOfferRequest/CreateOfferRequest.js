@@ -97,6 +97,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   }, [currentUser.id, counterpartyId, newMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
+  const isValid = yup.reach(FormValidationSchema, 'counterpartyId').isValidSync(counterpartyId)
 
   const selectAgent = agent => {
     setCounterpartyId(agent.agentAddress)
@@ -166,8 +167,6 @@ export default function CreateOfferRequest ({ history: { push } }) {
     }
   }
 
-  !isEmpty(errors) && console.log('Form errors:', errors)
-
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
@@ -180,10 +179,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
     const chooseSend = () => {
       setMode(OFFER_MODE)
       setNumpadVisible(false)
+      setCounterpartyId('')
     }
     const chooseRequest = () => {
       setMode(REQUEST_MODE)
       setNumpadVisible(false)
+      setCounterpartyId('')
     }
     return <AmountInput amount={amount} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
   }
@@ -224,7 +225,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
           <input
             name='counterpartyId'
             id='counterpartyId'
-            styleName='form-input'
+            styleName={cx('form-input', { 'form-input-error': !isValid || (!isEmpty(errors) && errors.counterpartyId.message) })}
             placeholder={`Who is this ${modeRelations[mode]}?`}
             ref={register}
             onChange={({ target: { value } }) => updateCounterparty(value)}
@@ -235,6 +236,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
           </div>
         </div>
       </div>
+
+      {!isValid && isEmpty(errors) && <h3 styleName='error-text'>You peer hash ID must be {AGENT_ID_LENGTH} characters</h3>}
+      {!isEmpty(errors) && <h3 styleName='error-text'>No matching peers found. Check hash ID spelling.</h3>}
+
       <div>
         <div><label htmlFor='notes' styleName='form-label'>For:</label></div>
         <input
