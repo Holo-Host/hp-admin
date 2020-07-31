@@ -180,10 +180,12 @@ export default function CreateOfferRequest ({ history: { push } }) {
     const chooseSend = () => {
       setMode(OFFER_MODE)
       setNumpadVisible(false)
+      setCounterpartyId('')
     }
     const chooseRequest = () => {
       setMode(REQUEST_MODE)
       setNumpadVisible(false)
+      setCounterpartyId('')
     }
     return <AmountInput amount={amount} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
   }
