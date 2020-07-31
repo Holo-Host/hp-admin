@@ -150,10 +150,9 @@ const ledgerMock = {
     data: {
       holofuelLedger: {
         balance: '1110000',
-        credit: 0,
-        payable: 0,
-        receivable: 0,
-        fees: 0
+        credit: '0',
+        payable: '0',
+        receivable: '0'
       }
     }
   }
@@ -167,26 +166,24 @@ describe('Inbox', () => {
   const offer1 = {
     id: '1',
     counterparty,
-    amount: 100,
+    amount: '100',
     timestamp,
     type: TYPE.offer,
     notes: 'Here\'s your money',
     direction: DIRECTION.incoming,
     status: STATUS.pending,
-    fees: 0,
     isPayingARequest: false
   }
 
   const offer2 = {
     id: '2',
     counterparty,
-    amount: 100,
+    amount: '100',
     timestamp,
     type: TYPE.offer,
     notes: 'Here\'s more of your money',
     direction: DIRECTION.incoming,
     status: STATUS.pending,
-    fees: 0,
     isPayingARequest: false
   }
 
@@ -346,7 +343,7 @@ describe('TransactionRow', () => {
   const request = {
     id: '123',
     counterparty: { agentAddress: 'last 6' },
-    amount: 100,
+    amount: '100',
     type: TYPE.request,
     timestamp: moment().subtract(14, 'days'),
     notes: 'Pay me'

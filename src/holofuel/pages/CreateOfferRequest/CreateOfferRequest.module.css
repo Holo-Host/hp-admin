@@ -6,7 +6,7 @@
 }
 
 .amount-banner {
-  padding: 38px 24px 0 24px;
+  padding: 24px 24px 0 24px;
   z-index: 1;
 }
 
@@ -33,30 +33,24 @@
   display: flex;
   justify-content: center;
   z-index: 1;
-  margin-top: 13px;
+  margin-top: 10px;
 }
 
 .mode-toggle-button {
   width: 132px;
   font-size: 16px;
   border: none;
-  box-shadow: 0px 2.5px 10px rgba(44, 64, 90, 0.15);
 }
 
-.left-button {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.right-button {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
+.transaction-button {
+  background: transparent;
+  border-radius: unset !important;
+  font-weight: bold
 }
 
 .selected {
-  background-color: var(--color-iceberg);
+  border-bottom: 6px solid var(--color-caribbean-green);
 }
-
 
 .offer-form {
   display: flex;

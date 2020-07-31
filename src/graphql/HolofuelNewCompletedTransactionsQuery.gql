@@ -7,7 +7,6 @@ query HolofuelNewCompletedTransactionsQuery($since: String) {
     status
     type
     timestamp
-    fees
     presentBalance
     notes
   }

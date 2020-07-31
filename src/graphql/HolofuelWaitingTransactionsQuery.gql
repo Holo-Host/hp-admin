@@ -8,6 +8,5 @@ query HolofuelWaitingTransactionsQuery {
     type
     timestamp
     notes
-    fees
   }
 }

@@ -23,7 +23,7 @@ const counterparty = {
   nickname: 'Perry',
   avatarUrl: ''
 }
-const amount = 35674
+const amount = '35674'
 const notes = 'Hi there'
 const offer = { amount, counterparty: { agentAddress: counterparty.agentAddress, nickname: '' }, notes }
 
@@ -85,7 +85,7 @@ describe('CreateOfferRequest', () => {
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
       expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
-      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
+      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
       expect(getByText(`For TestFuel, a ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).toBeInTheDocument()
 
       act(() => {
@@ -175,7 +175,7 @@ describe('CreateOfferRequest', () => {
 
       await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
       fireEvent.click(getByText(`${presentHolofuelAmount(amount)} TF`))
-      expect(getByTestId('amount').value).toEqual(presentHolofuelAmount(amount))
+      expect(getByTestId('amount').value).toEqual(amount)
     })
   })
 
@@ -226,7 +226,7 @@ describe('CreateOfferRequest', () => {
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
       expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
-      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
+      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
       expect(queryByText(`A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).not.toBeInTheDocument()
 
       act(() => {
@@ -259,7 +259,7 @@ describe('AmountInput', () => {
     fireEvent.click(getByText('2'))
 
     fireEvent.click(getByText('Send'))
-    expect(getByText(`${presentHolofuelAmount(1.02)} TF`)).toBeInTheDocument()
+    expect(getByText(`${presentHolofuelAmount('1.02')} TF`)).toBeInTheDocument()
   })
 
   it('ignores all presses of . beyond the first', async () => {

@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Missing style bug causing crash after accepting a transaction
 - Inbox Dont allow multiple transaction drawers to be open at once, but allow actioning a transaction while another is in process
 
+## [0.13.1] - 2020-07-28
+### Fixed
+ - correct rounding
+ - amount validation in inbox
+
 ## [0.13.0] - 2020-07-27
 ### Added
 - list_pending and list_transaction endpoints now return a counterparty object with both an agentAddress and nickname
