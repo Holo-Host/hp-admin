@@ -98,12 +98,11 @@ function PrimaryLayout ({
     setConductorConnectionFalse,
     isInsideApp,
     setIsInsideApp])
-    
-  
+
   const isWide = useContext(ScreenWidthContext)
 
   return <div styleName='styles.primary-layout'>
-     <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
+    <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
       {showHeader && <Header
         {...headerProps}
         settings={connectionStatus.hpos ? settings : {}} />}

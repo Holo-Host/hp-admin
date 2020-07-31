@@ -15,10 +15,10 @@ export default function Header ({ title, settings, showBackButton }) {
     {/* Q2: What happened to the option to rename your agent? */}
     {!showBackButton && <div styleName='nickname'>{settings.hostName || 'HoloPort'}</div>}
     <h1 styleName='title'>{title}</h1>
-    { !isPage('settings', window)
+    {!isPage('settings', window)
       ? <Link to='/admin/settings' styleName='settings-link' data-testid='settings-link'>
         <GearIcon />
       </Link>
-      : < div styleName='settings-link'/>}
+      : <div styleName='settings-link' />}
   </div>
 }

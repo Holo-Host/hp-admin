@@ -8,7 +8,7 @@ export function isPage (page, window) {
   const pageTest = window.location.pathname === `/admin/${page}` || window.location.pathname === `/admin/${page}/`
   if (page === 'login') return isLoginPage(window)
   else if (page === 'dashboard') return window.location.pathname === '/admin/' || window.location.pathname === '/admin' || pageTest
-  else return pageTest 
+  else return pageTest
 }
 
 export function isLoginPage (window) {
