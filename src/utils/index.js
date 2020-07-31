@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { flow, groupBy, keys, sortBy, reverse } from 'lodash/fp'
+import { flow, groupBy, keys, sortBy, reverse, isNil } from 'lodash/fp'
 import moment from 'moment'
 
 // Default polling interval to 30000ms
@@ -49,7 +49,7 @@ export function useLoadingFirstTime (loading) {
 }
 
 export function presentHolofuelAmount (amount) {
-  if (isNaN(amount)) return '--'
+  if (isNaN(amount)|| isNil(amount)) return '--'
   return Number.parseFloat(amount).toLocaleString()
 }
 

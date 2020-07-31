@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { useQuery } from '@apollo/react-hooks'
 import { isEmpty, intersectionBy, find, reject, isNil } from 'lodash/fp'
@@ -11,6 +11,8 @@ import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransaction
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelNewCompletedTransactionsQuery from 'graphql/HolofuelNewCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
+import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
+
 import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, partitionByDate, useLoadingFirstTime } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { DIRECTION, STATUS } from 'models/Transaction'
@@ -95,6 +97,15 @@ export default function TransactionsHistory ({ history: { push } }) {
 
   const urlParams = new URLSearchParams(window.location.search)
   const shouldShowSentTransactionMessage = urlParams.get('sent-transaction')
+  const [newTransactionActionType, setNewTransactionActionType] = useState('')
+  const { message: flashMessage } = useFlashMessageContext()
+  const hasOffer = new RegExp("\\b(Offer)\\b")
+
+  useEffect(() => {
+    if (!newTransactionActionType && flashMessage && typeof flashMessage === 'string') {
+      setNewTransactionActionType(hasOffer.test(flashMessage) ? 'offer to pay' : 'request for payment')
+    }
+  }, [flashMessage, newTransactionActionType, hasOffer])
 
   return <PrimaryLayout headerProps={{ title: 'History' }}>
     <div styleName='header'>
@@ -121,17 +132,17 @@ export default function TransactionsHistory ({ history: { push } }) {
           partition={partition}
         />)}
     </div>}
-    {shouldShowSentTransactionMessage && <OneTimeEducationModal
+    {shouldShowSentTransactionMessage && newTransactionActionType && <OneTimeEducationModal
       id='history'
-      message={<HistoryEducationMessage />}
+      message={<HistoryEducationMessage newTransactionActionType={newTransactionActionType} />}
     />}
   </PrimaryLayout>
 }
 
-function HistoryEducationMessage () {
+function HistoryEducationMessage ({ newTransactionActionType }) {
   return <>
     <div styleName='message'>
-      <h2 styleName='message-paragraph'>You have just sent or requested Test Fuel. Your promise (or request) for payment is making its way to the intended recipient in the HoloFuel app.</h2>
+      <h2 styleName='message-paragraph'>{`You have just sent or requested Test Fuel. Your ${newTransactionActionType} is making its way to the intended recipient in the HoloFuel app.`}</h2>
       <h2 styleName='message-paragraph'>If the recipient is located, the record should display as pending or processing in your history until it has been accepted or declined and has been saved to both peer source chains.</h2>
     </div>
   </>

@@ -31,11 +31,13 @@ export default function OneTimeEducationModal ({ id, message }) {
 
     <label styleName='label'>
       <div styleName='modal-checkbox'>
-        <input
-          type='checkbox'
-          checked={isSelected}
-          onChange={onCheckBoxChange} />
-        Don't show me this again
+        <div>
+          <input
+            type='checkbox'
+            checked={isSelected}
+            onChange={onCheckBoxChange} />
+          Don't show me this again
+        </div>
       </div>
     </label>
   </Modal>
