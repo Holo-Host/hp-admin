@@ -42,10 +42,10 @@ function PrimaryLayout ({
 
   useInterval(() => {
     if (isLoginPage(window)) {
-      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
-    } else {
       // on login page, set holochain conductor connnection as false when hpos connection is false, or true when true
       setConnectionStatus({ hpos: isHposConnectionAlive, holochain: isHposConnectionAlive })
+    } else {
+      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
     }
   }, 5000)
 
