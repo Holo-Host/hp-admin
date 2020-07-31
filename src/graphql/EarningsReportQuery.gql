@@ -1,4 +1,4 @@
-query EarningsReport  {
+query EarningsReportQuery {
   earningsReport {
     totalEarnings
     cpu

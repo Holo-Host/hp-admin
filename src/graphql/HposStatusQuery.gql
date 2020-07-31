@@ -1,4 +1,4 @@
-query HposStatus {
+query HposStatusQuery {
   hposStatus {
     versionInfo { 
       availableVersion,

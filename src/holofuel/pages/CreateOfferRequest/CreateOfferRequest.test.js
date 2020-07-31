@@ -10,9 +10,9 @@ import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
 import HolofuelRecentCounterpartiesQuery from 'graphql/HolofuelRecentCounterpartiesQuery.gql'
 import { newMessage as mockNewMessage } from 'holofuel/contexts/useFlashMessageContext'
 import { currentUser as mockCurrentUser } from 'holofuel/contexts/useCurrentUserContext'
-import { presentHolofuelAmount, presentAgentId } from 'utils'
+import { presentAgentId, presentHolofuelAmount } from 'utils'
 import { renderAndWait } from 'utils/test-utils'
-import { HISTORY_PATH } from 'holofuel/utils/urls'
+import { HISTORY_FROM_SENT_TRANSACTION_PATH } from 'holofuel/utils/urls'
 
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('holofuel/contexts/useFlashMessageContext')
@@ -23,7 +23,7 @@ const counterparty = {
   nickname: 'Perry',
   avatarUrl: ''
 }
-const amount = 35674
+const amount = '35674'
 const notes = 'Hi there'
 const offer = { amount, counterparty: { agentAddress: counterparty.agentAddress, nickname: '' }, notes }
 
@@ -42,7 +42,8 @@ const offerMock = {
         type: TYPE.offer,
         timestamp: moment().subtract(14, 'days'),
         direction: '',
-        status: ''
+        status: '',
+        isActioned: false
       }
     }
   }
@@ -84,7 +85,7 @@ describe('CreateOfferRequest', () => {
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
       expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
-      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
+      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
       expect(getByText(`For TestFuel, a ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).toBeInTheDocument()
 
       act(() => {
@@ -96,7 +97,7 @@ describe('CreateOfferRequest', () => {
         await wait(0)
       })
 
-      expect(push).toHaveBeenCalledWith(HISTORY_PATH)
+      expect(push).toHaveBeenCalledWith(HISTORY_FROM_SENT_TRANSACTION_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${presentAgentId(counterparty.agentAddress)}.`, 5000)
     })
 
@@ -174,7 +175,7 @@ describe('CreateOfferRequest', () => {
 
       await enterAmountAndMode({ amount, modeLabel: 'Send', getByTestId, getByText })
       fireEvent.click(getByText(`${presentHolofuelAmount(amount)} TF`))
-      expect(getByTestId('amount').value).toEqual(presentHolofuelAmount(amount))
+      expect(getByTestId('amount').value).toEqual(amount)
     })
   })
 
@@ -225,7 +226,7 @@ describe('CreateOfferRequest', () => {
       expect(getByTestId('hash-icon')).toBeInTheDocument()
 
       expect(getByText(`${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
-      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount + (amount * FEE_PERCENTAGE))} TF`)).toBeInTheDocument()
+      expect(getByText(`Total Amount: ${presentHolofuelAmount(amount)} TF`)).toBeInTheDocument()
       expect(queryByText(`A ${100 * FEE_PERCENTAGE}% fee is processed with all outgoing transactions`)).not.toBeInTheDocument()
 
       act(() => {
@@ -237,7 +238,7 @@ describe('CreateOfferRequest', () => {
         await wait(0)
       })
 
-      expect(push).toHaveBeenCalledWith(HISTORY_PATH)
+      expect(push).toHaveBeenCalledWith(HISTORY_FROM_SENT_TRANSACTION_PATH)
       expect(mockNewMessage).toHaveBeenCalledWith(`Request for ${presentHolofuelAmount(amount)} TF sent to ${presentAgentId(counterparty.agentAddress)}.`, 5000)
     })
   })
@@ -258,7 +259,7 @@ describe('AmountInput', () => {
     fireEvent.click(getByText('2'))
 
     fireEvent.click(getByText('Send'))
-    expect(getByText(`${presentHolofuelAmount(1.02)} TF`)).toBeInTheDocument()
+    expect(getByText(`${presentHolofuelAmount('1.02')} TF`)).toBeInTheDocument()
   })
 
   it('ignores all presses of . beyond the first', async () => {

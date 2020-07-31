@@ -1,4 +1,4 @@
-mutation RegisterHostingUser {
+mutation RegisterHostingUserMutation {
   registerHostingUser {
     id
     isRegistered

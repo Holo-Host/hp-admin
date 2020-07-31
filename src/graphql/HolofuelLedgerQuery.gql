@@ -1,9 +1,8 @@
-query HolofuelLedger {
+query HolofuelLedgerQuery {
   holofuelLedger {
     balance
     credit
     payable
     receivable
-    fees
   }
 }

@@ -38,6 +38,14 @@
   border: none;
 }
 
+.error-text {
+  margin-top: 75px;
+  font-size: 18px;
+  text-align: center;
+  color: white;
+  width: 90%;
+}
+
 .action-row {
   display: flex;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
@@ -7,6 +7,7 @@ import FlashMessage from 'components/FlashMessage'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import ScreenWidthContext from 'contexts/screenWidth'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useHFConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
@@ -21,8 +22,7 @@ import 'global-styles/index.css'
 function PrimaryLayout ({
   children,
   headerProps = {},
-  showHeader = true,
-  showAlphaFlag = true
+  showHeader = true
 }) {
   const [isInsideApp, setIsInsideApp] = useState(true)
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
@@ -99,20 +99,21 @@ function PrimaryLayout ({
     isInsideApp,
     setIsInsideApp])
 
+  const isWide = useContext(ScreenWidthContext)
+
   return <div styleName='styles.primary-layout'>
-    <div>
+    <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
       {showHeader && <Header
         {...headerProps}
         settings={connectionStatus.hpos ? settings : {}} />}
-      {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag-page' />}
       <div styleName='styles.content'>
         <FlashMessage />
         {children}
       </div>
     </div>
 
-    {!isLoginPage(window) && <div styleName={cx('styles.wrapper')}>
-      <div styleName={cx('styles.container')}>
+    {!isLoginPage(window) && <div styleName={cx('styles.wrapper', { 'styles.wrapper-narrow': !isWide })}>
+      <div styleName={cx('styles.container', { 'styles.container-wide': isWide })}>
         <footer styleName='styles.footer'>
           <div styleName='styles.alpha-info'>
             <AlphaFlag variant='right' styleName='styles.alpha-flag-banner' />

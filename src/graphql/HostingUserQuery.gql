@@ -1,4 +1,4 @@
-query HostingUser {
+query HostingUserQuery {
   hostingUser {
     id
     isRegistered

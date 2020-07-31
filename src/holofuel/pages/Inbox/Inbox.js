@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import { isEmpty, isEqual, remove } from 'lodash/fp'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import { useQuery } from '@apollo/react-hooks'
 import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
-import HolofuelAcceptOfferMutation from 'graphql/HolofuelAcceptOfferMutation.gql'
-import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
-import HolofuelDeclineMutation from 'graphql/HolofuelDeclineMutation.gql'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useHiddenTransactionsContext from 'holofuel/contexts/useHiddenTransactionsContext'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
-import Modal from 'holofuel/components/Modal'
+import ConfirmationModal from './ConfirmationModal'
+import OneTimeEducationModal from 'holofuel/components/OneTimeEducationModal'
 import Jumbotron from 'holofuel/components/Jumbotron'
 import NullStateMessage from 'holofuel/components/NullStateMessage'
 import PageDivider from 'holofuel/components/PageDivider'
@@ -26,51 +24,12 @@ import Loading from 'components/Loading'
 import PlusInDiscIcon from 'components/icons/PlusInDiscIcon'
 import ForwardIcon from 'components/icons/ForwardIcon'
 import './Inbox.module.css'
-import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, sliceHash, useLoadingFirstTime, partitionByDate } from 'utils'
+import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, presentTruncatedAmount, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
 import { TYPE, STATUS, DIRECTION, shouldShowTransactionAsActionable } from 'models/Transaction'
 
 const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
-
-function useOffer () {
-  const [offerHoloFuel] = useMutation(HolofuelOfferMutation)
-  return (offer) => offerHoloFuel({
-    variables: { offer },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    },
-    {
-      query: HolofuelLedgerQuery
-    }]
-  })
-}
-
-function useAcceptOffer () {
-  const [acceptOfferHoloFuel] = useMutation(HolofuelAcceptOfferMutation)
-  return ({ id }) => acceptOfferHoloFuel({
-    variables: { transactionId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    },
-    {
-      query: HolofuelLedgerQuery
-    }]
-  })
-}
-
-function useDecline () {
-  const [declineHoloFuel] = useMutation(HolofuelDeclineMutation)
-  return ({ id }) => declineHoloFuel({
-    variables: { transactionId: id },
-    refetchQueries: [{
-      query: HolofuelActionableTransactionsQuery
-    },
-    {
-      query: HolofuelLedgerQuery
-    }]
-  })
-}
 
 function useUpdatedTransactionLists () {
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
@@ -99,11 +58,6 @@ function useUpdatedTransactionLists () {
 const VIEW = {
   actionable: 'actionable',
   recent: 'recent'
-}
-
-const presentTruncatedAmount = (string, number = 15) => {
-  if (string.length > number) return `${sliceHash(string, number)}...`
-  return sliceHash(string, number)
 }
 
 export default function Inbox ({ history: { push } }) {
@@ -226,10 +180,25 @@ export default function Inbox ({ history: { push } }) {
         setUserMessage={setUserMessage} />)}
     </div>}
 
+    {inboxView === VIEW.actionable && actionableTransactions.length > 0 && <OneTimeEducationModal
+      id='inbox'
+      message={<InboxEducationMessage />}
+    />}
+
     <ConfirmationModal
       setConfirmationModalProperties={setConfirmationModalProperties}
       confirmationModalProperties={confirmationModalProperties || {}} />
   </PrimaryLayout>
+}
+
+function InboxEducationMessage () {
+  return <>
+    <div styleName='message'>
+      <h2 styleName='message-paragraph'>You have offers or requests for payment needing your attention.</h2>
+      <h2 styleName='message-paragraph'>When you accept or decline an item, it will begin processing. Depending on timing, it may show as pending or processing.</h2>
+      <h2 styleName='message-paragraph'>Once the transaction has been saved to both peer source chains it will update the display in your history and activity views.</h2>
+    </div>
+  </>
 }
 
 export function Partition ({ dateLabel, transactions, setConfirmationModalProperties, isActionable, openDrawerId, setOpenDrawerId, areActionsPaused, setAreActionsPaused, setUserMessage }) {
@@ -384,6 +353,7 @@ export function TransactionRow ({ transaction, setConfirmationModalProperties, i
     <div styleName='amount-cell'>
       <AmountCell
         amount={amount}
+        isDrawerOpen={isDrawerOpen}
         isRequest={isRequest}
         isOffer={isOffer}
         isActionable={isActionable}
@@ -447,15 +417,20 @@ function ActionOptions ({ isOffer, isRequest, transaction, showAcceptModal, show
   </aside>
 }
 
-function AmountCell ({ amount, isRequest, isOffer, isActionable, isOutgoing, isDeclined }) {
+function AmountCell ({ amount, isDrawerOpen, isRequest, isOffer, isActionable, isOutgoing, isDeclined }) {
   let amountDisplay
   if (isActionable) {
-    amountDisplay = isRequest ? `(${presentTruncatedAmount(presentHolofuelAmount(amount), 15)})` : presentTruncatedAmount(presentHolofuelAmount(amount), 15)
+    amountDisplay = isRequest ? `(${presentHolofuelAmount(amount)})` : presentHolofuelAmount(amount)
   } else if (isDeclined) {
-    amountDisplay = isRequest ? `+${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}` : `-${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}`
+    amountDisplay = isRequest ? `+${presentHolofuelAmount(amount)}` : `-${presentHolofuelAmount(amount)}`
   } else {
-    amountDisplay = isOutgoing ? `-${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}` : `+${presentTruncatedAmount(presentHolofuelAmount(amount), 15)}`
+    amountDisplay = isOutgoing ? `-${presentHolofuelAmount(amount)}` : `+${presentHolofuelAmount(amount)}`
   }
+
+  if (isDrawerOpen) {
+    amountDisplay = presentTruncatedAmount(amountDisplay)
+  }
+
   return <div styleName={cx('amount', { debit: (isRequest && isActionable) || (isOffer && isDeclined) }, { credit: (isOffer && isActionable) || (isRequest && isDeclined) }, { removed: isDeclined })}>
     {amountDisplay} TF
   </div>
@@ -487,110 +462,4 @@ function DeclineButton ({ showDeclineModal }) {
   >
     <p>Decline</p>
   </Button>
-}
-
-export function ConfirmationModal ({ confirmationModalProperties, setConfirmationModalProperties }) {
-  const payTransaction = useOffer()
-  const acceptOffer = useAcceptOffer()
-  const declineTransaction = useDecline()
-
-  const { newMessage } = useFlashMessageContext()
-  const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
-
-  const { id, amount, type, notes, counterparty = {} } = transaction
-
-  let message, actionHook, actionParams, contentLabel, flashMessage
-  switch (action) {
-    case 'pay': {
-      const counterpartyInput = { agentAddress: counterparty.agentAddress, nickname: counterparty.nickname || '' }
-      contentLabel = 'Pay request'
-      actionParams = { amount, counterparty: counterpartyInput, notes, requestId: id }
-      actionHook = payTransaction
-      message = <>
-        Accept the request and send {counterparty.nickname || presentAgentId(counterparty.agentAddress)} {presentHolofuelAmount(amount)} TF?
-      </>
-      flashMessage = 'Payment sent succesfully'
-      break
-    }
-    case 'acceptOffer': {
-      contentLabel = 'Accept offer'
-      actionParams = { id }
-      actionHook = acceptOffer
-      message = <>
-        Accept offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
-      </>
-      flashMessage = 'Offer Accepted succesfully'
-      break
-    }
-    case 'decline': {
-      contentLabel = `Decline ${type}?`
-      actionParams = { id }
-      actionHook = declineTransaction
-      if (type === 'offer') {
-        message = <>
-          Decline request for payment of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
-        </>
-      } else {
-        message = <>
-          Decline offer of {presentHolofuelAmount(amount)} TF from {counterparty.nickname || presentAgentId(counterparty.agentAddress)}?
-        </>
-      }
-      flashMessage = `${type.replace(/^\w/, c => c.toUpperCase())} succesfully declined`
-
-      break
-    }
-    // NB: action === undefined when first loading page && no transaction is yet passed in
-    case undefined:
-    case '':
-    case 'refund':
-      break
-    default:
-      throw new Error(`Modal doesn't recognize action: ${action}`)
-  }
-
-  const hideModal = () => {
-    setConfirmationModalProperties({ ...confirmationModalProperties, shouldDisplay: false })
-  }
-
-  const onYes = () => {
-    setIsLoading(true)
-    hideModal()
-    actionHook(actionParams)
-      .then(result => {
-        const { data } = result
-        if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
-          newMessage('Timed out waiting for transaction confirmation from counterparty, will retry later', 5000)
-        } else {
-          newMessage(flashMessage, 5000)
-        }
-        onConfirm(action)
-        setIsLoading(false)
-      })
-      .catch(() => {
-        newMessage('Sorry, something went wrong', 5000)
-      })
-  }
-
-  return <Modal
-    contentLabel={contentLabel}
-    isOpen={shouldDisplay}
-    handleClose={() => hideModal()}
-    styleName={cx('modal')}
-  >
-    <div styleName='modal-message'>{message}</div>
-    <div styleName='modal-buttons'>
-      <Button
-        onClick={() => hideModal()}
-        styleName='modal-button-no'
-      >
-        No
-      </Button>
-      <Button
-        onClick={onYes}
-        styleName='modal-button-yes'
-      >
-        Yes
-      </Button>
-    </div>
-  </Modal>
 }

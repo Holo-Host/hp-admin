@@ -5,6 +5,13 @@
   height: 100%;
   box-sizing: border-box;
   position: relative;
+}
+
+.wide {
+  padding: 50px;
+}
+
+.narrow {
   padding: 0px 24px;
 }
 
@@ -34,8 +41,13 @@
 .wrapper {
   box-sizing: border-box;
   margin-top: auto;
-  margin-bottom: 0rem;
+  margin-bottom: 2rem;
   padding: 0px 24px;
+}
+
+.wrapper-narrow {
+  composes: wrapper;
+  margin-bottom: 0rem;
 }
 
 .container {
@@ -45,6 +57,11 @@
   display: flex;
   flex-direction: column;
   background-color: var(--color-alabaster-light);
+}
+
+.container-wide {
+  composes: container;
+  width: 26%;
 }
 
 .footer {
