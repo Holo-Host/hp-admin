@@ -51,7 +51,7 @@ function PrimaryLayout ({
 
   const setConductorConnectionFalse = useCallback(() => setConnectionStatus({ ...connectionStatus, holochain: false }), [setConnectionStatus, connectionStatus])
 
-  useEffect(() => {
+  useEffect(() => {    
     const setUser = () => {
       setCurrentUser({
         hostPubKey: settings.hostPubKey,

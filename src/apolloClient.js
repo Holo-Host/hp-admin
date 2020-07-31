@@ -26,7 +26,7 @@ const mapGraphQLError = (graphQLErrors, response, { hposCheck, errorMessage }) =
 
 const errorLink = onError(({ graphQLErrors, response, operation }) => {
   if (graphQLErrors) {
-    if (operation.operationName === 'HposSettings') {
+    if (operation.operationName === 'HposSettingsQuery') {
       return mapGraphQLError(graphQLErrors, response, { hposCheck: true })
     } else if (operation.operationName === 'HolofuelOffer') {
       const offerErrorMessage = 'Offer unsuccessful'
