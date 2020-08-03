@@ -16,7 +16,7 @@ import Loading from 'components/Loading'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import { presentAgentId } from 'utils'
-import { HISTORY_FROM_SENT_TRANSACTION_PATH } from 'holofuel/utils/urls'
+import { HISTORY_FROM_SENT_TRANSACTION_PATH, INBOX_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
@@ -155,7 +155,8 @@ export default function CreateOfferRequest ({ history: { push } }) {
           }).catch(({ message }) => {
             const counterpartyError = message.includes('Counterparty not found')
             if (counterpartyError) {
-              newMessage('Request timed out waiting for transaction confirmation from counterparty. Will try again. Please wait or check back later.', 5000)
+              newMessage('The recipient for the transaction could not be found.  The transaction will appear as declined', 10000)
+              push(INBOX_PATH)
             } else {
               newMessage('Sorry, something went wrong', 5000)
             }
