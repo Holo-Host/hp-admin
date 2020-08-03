@@ -2,12 +2,11 @@ query HolofuelWaitingTransactionsQuery {
   holofuelWaitingTransactions {
     id
     amount
-    counterparty { id, nickname, avatarUrl }
+    counterparty { agentAddress, nickname, avatarUrl }
     direction
     status
     type
     timestamp
     notes
-    fees
   }
 }

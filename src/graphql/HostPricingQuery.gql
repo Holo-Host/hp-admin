@@ -1,4 +1,4 @@
-query HostPricing {
+query HostPricingQuery {
   hostPricing {
     units
     pricePerUnit

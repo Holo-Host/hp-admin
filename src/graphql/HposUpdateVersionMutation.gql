@@ -1,4 +1,4 @@
-mutation HposUpdateVersion {
+mutation HposUpdateVersionMutation {
   hposUpdateVersion {
     versionInfo {
       availableVersion,

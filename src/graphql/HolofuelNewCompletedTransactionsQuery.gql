@@ -2,12 +2,11 @@ query HolofuelNewCompletedTransactionsQuery($since: String) {
   holofuelNewCompletedTransactions(since: $since) {
     id
     amount
-    counterparty { id, nickname, avatarUrl }
+    counterparty { agentAddress, nickname, avatarUrl }
     direction
     status
     type
     timestamp
-    fees
     presentBalance
     notes
   }

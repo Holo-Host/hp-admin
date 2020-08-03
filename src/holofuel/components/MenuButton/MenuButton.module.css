@@ -1,0 +1,31 @@
+
+.menu-button {
+  position: relative;
+  border: none;
+  padding: 5px;
+  background-color: transparent;
+}
+
+.menu-icon {
+  width: 22px;
+  height: 22px;
+  background-color: transparent;
+  z-index: 100;
+}
+
+/* We should turn this into a design-system component */
+.nav-badge {
+  box-sizing: border-box;
+  position: absolute;
+  top: -5px;
+  right: -15px;
+  color: #FFF;
+  background-color: var(--color-persimmon);
+  font-size: .7em;
+  min-width: 30px;
+  line-height: 14px;
+  text-align: center;
+  border-radius: 9999px;
+  font-weight: 700;
+  padding: 8px;
+}

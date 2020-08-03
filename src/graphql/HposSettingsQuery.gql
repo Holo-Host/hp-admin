@@ -1,4 +1,4 @@
-query HposSettings  {
+query HposSettingsQuery  {
   hposSettings {
     hostPubKey
     hostName

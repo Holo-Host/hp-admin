@@ -1,7 +1,0 @@
-query HolofuelHistoryCounterparties {
-  holofuelHistoryCounterparties {
-    id
-    nickname
-    avatarUrl
-  }
-}
