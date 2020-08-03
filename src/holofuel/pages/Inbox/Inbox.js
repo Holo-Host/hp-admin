@@ -41,7 +41,7 @@ function useUpdatedTransactionLists () {
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds))
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
-  const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedDeclinedTransactions)
+  const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedDeclinedTransactions).sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
 
   const actionableLoadingFirstTime = useLoadingFirstTime(isConnected && allActionableLoading)
   const recentLoadingFirstTime = useLoadingFirstTime(isConnected && allRecentLoading)
