@@ -15,6 +15,8 @@ export const DIRECTION = {
   outgoing: 'outgoing'
 }
 
+export const FAILED_TRANSACTION_MESSAGE = 'The recipient for the transaction could not be found.  The transaction will appear as declined'
+
 // we hide cancelled and declined transactions
 // ...offers that are paying a request and not in process (those are handled by AcceptRequestedOffers)
 export function shouldShowTransactionInInbox (transaction) {
