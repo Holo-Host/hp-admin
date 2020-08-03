@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Github Pages deploy process
 - Updated Github Pages deploy process for testfuel.holo.host
 - TestFuel card on Dashboard linking to Holofuel
+- Hosting card gets real data from HPOS for hosted happs and local source chain count
 ### Removed
 - Temporarily removed Hosting and Earnings cards on Dashboard
+- Header Alpha Flag
 - Removed refresh button
 - Removed separate Sidemenu behaviour in Desktop. 
 ### Fixed

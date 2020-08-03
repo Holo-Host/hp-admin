@@ -50,6 +50,14 @@ const data = {
         versionMinor: 2,
         versionRev: 12
       }
+    },
+    '/v1/hosted_happs': {
+      hosted_happs: [
+        {
+          'happ-title': 'HoloFuel',
+          number_instances: 17
+        }
+      ]
     }
   },
   put: {

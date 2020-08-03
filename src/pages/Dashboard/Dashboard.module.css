@@ -1,6 +1,5 @@
 .hosting-row {
   display: flex;
-  align-items: center;
   font-family: "Circular";
   font-size: 14px;
   line-height: 19px;
@@ -12,8 +11,6 @@
 
 .hosting-row-expanded {
   composes: hosting-row;
-  margin-top: -8px;
-  margin-bottom: 20px;
 }
 
 .hosting-icon {
@@ -34,8 +31,9 @@
 
 .happ-list {
   position: relative;
-  top: 30px;
-  right: 80px;
+  top: -6px;
+  left: -44px;
+  width: 200px;
 }
 
 .happ-name {
