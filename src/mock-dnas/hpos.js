@@ -55,7 +55,14 @@ const data = {
       hosted_happs: [
         {
           'happ-title': 'HoloFuel',
-          number_instances: 17
+          number_instances: 17,
+          stats: {
+            traffic: {
+             start_date: "2020-07-27T21:27:25Z",
+             total_zome_calls: 100,
+             values: [10,40,20,30]
+            }
+          }
         }
       ]
     }
