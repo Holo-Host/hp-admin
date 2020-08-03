@@ -4,10 +4,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## unreleased
+### Removed
+- Header Alpha Flag
+
+## [0.13.3] - 2020-07-31
 ### Added
 - Github Pages deploy process
 - Updated Github Pages deploy process for testfuel.holo.host
 - TestFuel card on Dashboard linking to Holofuel
+- Hosting card gets real data from HPOS for hosted happs and local source chain count
 ### Removed
 - Temporarily removed Hosting and Earnings cards on Dashboard
 - Removed refresh button
