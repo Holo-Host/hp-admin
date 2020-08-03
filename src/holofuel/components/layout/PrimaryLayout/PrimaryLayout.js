@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { object } from 'prop-types'
 import cx from 'classnames'
@@ -6,10 +6,9 @@ import { useHistory } from 'react-router-dom'
 import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTransactionsQuery.gql'
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
-import HolofuelUserQuery from 'graphql/HolofuelUserQuery.gql'
+import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
-import ScreenWidthContext from 'holofuel/contexts/screenWidth'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
 import useConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
@@ -70,8 +69,8 @@ function PrimaryLayout ({
   headerProps = {},
   showAlphaFlag = true
 }) {
-  const { refetch: refetchUser } = useQuery(HolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
-  const { holofuelBalance, actionableTransactions, ledgerLoading, isLoadingRefetchCalls, stopPolling, startPolling, refetchCalls } = useUpdatedTransactionLists()
+  const { refetch: refetchMyUser } = useQuery(MyHolofuelUserQuery, { fetchPolicy: 'cache-and-network' })
+  const { holofuelBalance, actionableTransactions, ledgerLoading, stopPolling, startPolling } = useUpdatedTransactionLists()
 
   const { currentUser, currentUserLoading } = useCurrentUserContext()
   const { isConnected, setIsConnected } = useConnectionContext()
@@ -81,11 +80,11 @@ function PrimaryLayout ({
   const inboxCount = actionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds)).length
 
   const { push } = useHistory()
-  const [shouldRefetchUser, setShouldRefetchUser] = useState(false)
-  const refetchHolofuelUser = useCallback(() => {
-    setShouldRefetchUser(false)
-    refetchUser()
-  }, [setShouldRefetchUser, refetchUser])
+  const [shouldRefetchMyUser, setShouldRefetchMyUser] = useState(false)
+  const refetchMyHolofuelUser = useCallback(() => {
+    setShouldRefetchMyUser(false)
+    refetchMyUser()
+  }, [setShouldRefetchMyUser, refetchMyUser])
 
   useInterval(() => {
     setIsConnected(wsConnection)
@@ -95,7 +94,7 @@ function PrimaryLayout ({
     if (!isConnected) {
       newMessage('Connecting to your Holochain Conductor...', 0)
       stopPolling()
-      setShouldRefetchUser(true)
+      setShouldRefetchMyUser(true)
       let defaultPath
       if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
         defaultPath = INBOX_PATH
@@ -104,10 +103,9 @@ function PrimaryLayout ({
       }
       push(defaultPath)
     } else {
-      newMessage('', 0)
       startPolling(POLLING_INTERVAL_GENERAL)
-      if (shouldRefetchUser) {
-        refetchHolofuelUser()
+      if (shouldRefetchMyUser) {
+        refetchMyHolofuelUser()
       }
     }
   }, [isConnected,
@@ -115,31 +113,27 @@ function PrimaryLayout ({
     newMessage,
     startPolling,
     stopPolling,
-    shouldRefetchUser,
-    refetchHolofuelUser
+    shouldRefetchMyUser,
+    refetchMyHolofuelUser
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
-  const isWide = useContext(ScreenWidthContext)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
-  const handleMenuClose = () => setMenuOpen(false)
+  const closeMenu = () => setMenuOpen(false)
 
-  return <div styleName={cx('styles.primary-layout', { 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
-    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} isWide={isWide} />
+  return <div styleName={cx('styles.primary-layout')}>
+    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
     <SideMenu
-      isOpen={isWide || isMenuOpen}
-      handleClose={handleMenuClose}
+      isOpen={isMenuOpen}
+      closeMenu={closeMenu}
       agent={currentUser}
       agentLoading={currentUserLoading}
       inboxCount={inboxCount}
       holofuelBalance={holofuelBalance}
-      ledgerLoading={isLoadingFirstLedger}
-      isWide={isWide}
-      isLoadingRefetchCalls={isLoadingRefetchCalls}
-      refetchCalls={refetchCalls} />
-    {(!isWide && showAlphaFlag) && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName={cx('styles.content', { 'styles.desktop': isWide })}>
+      ledgerLoading={isLoadingFirstLedger} />
+    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
+    <div styleName={cx('styles.content')}>
       <FlashMessage />
       {children}
     </div>

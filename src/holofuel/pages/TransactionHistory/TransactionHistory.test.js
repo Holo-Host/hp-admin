@@ -27,13 +27,12 @@ const agent2 = {
 
 const defaultTransaction = {
   amount: '0',
-  counterparty: agent1,
+  counterparty: { ...agent1, agentAddress: agent1.id },
   direction: '',
   status: '',
   type: '',
   timestamp: '2019-11-11',
-  fees: 0,
-  presentBalance: 0,
+  presentBalance: '0',
   notes: ''
 }
 
@@ -44,10 +43,9 @@ const ledgerMock = {
     data: {
       holofuelLedger: {
         balance,
-        credit: 0,
-        payable: 0,
-        receivable: 0,
-        fees: 0
+        credit: '0',
+        payable: '0',
+        receivable: '0'
       }
     }
   }
@@ -79,7 +77,7 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 1,
       counterparty: {
-        id: agent1.id,
+        agentAddress: agent1.id,
         nickname: agent1.nickname,
         avatarUrl: ''
       },
@@ -94,7 +92,7 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 2,
       counterparty: {
-        id: agent2.id,
+        agentAddress: agent2.id,
         nickname: agent2.nickname,
         avatarUrl: ''
       },
@@ -108,7 +106,7 @@ describe('TransactionHistory', () => {
       ...defaultTransaction,
       id: 3,
       counterparty: {
-        id: agent1.id,
+        agentAddress: agent1.id,
         nickname: agent1.nickname,
         avatarUrl: ''
       },
@@ -166,8 +164,6 @@ describe('TransactionHistory', () => {
       expect(queryByText(pendingOutgoingAmount)).not.toBeInTheDocument()
 
       expect(getByText(completedOutgoing.notes)).toBeInTheDocument()
-      //  BALANCE-BUG: Intentionally commented out until DNA balance bug is resolved
-      // expect(getByText(presentHolofuelAmount(completedOutgoing.presentBalance))).toBeInTheDocument()
       expect(getByText(agent1.nickname)).toBeInTheDocument()
 
       fireEvent.click(getFilterButtonByText('Deposits'))

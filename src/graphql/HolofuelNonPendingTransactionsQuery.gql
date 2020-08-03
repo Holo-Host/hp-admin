@@ -2,15 +2,13 @@ query HolofuelNonPendingTransactionsQuery {
   holofuelNonPendingTransactions {
     id
     amount
-    counterparty { id, nickname, avatarUrl }
+    counterparty { agentAddress, nickname, avatarUrl }
     direction
     status
     type
     timestamp
-    fees
     presentBalance
     notes
-    canceledBy  { id, nickname, avatarUrl }
     inProcess
   }
 }

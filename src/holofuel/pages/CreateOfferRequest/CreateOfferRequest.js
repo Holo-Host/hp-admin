@@ -6,18 +6,17 @@ import * as yup from 'yup'
 import cx from 'classnames'
 import HolofuelOfferMutation from 'graphql/HolofuelOfferMutation.gql'
 import HolofuelRequestMutation from 'graphql/HolofuelRequestMutation.gql'
-import HolofuelCounterpartyQuery from 'graphql/HolofuelCounterpartyQuery.gql'
-import HolofuelHistoryCounterpartiesQuery from 'graphql/HolofuelHistoryCounterpartiesQuery.gql'
+import HolofuelRecentCounterpartiesQuery from 'graphql/HolofuelRecentCounterpartiesQuery.gql'
 import PrimaryLayout from 'holofuel/components/layout/PrimaryLayout'
 import HashIcon from 'holofuel/components/HashIcon'
 import Button from 'components/UIButton'
-import Loading from 'components/Loading'
 import RecentCounterparties from 'holofuel/components/RecentCounterparties'
 import AmountInput from './AmountInput'
+import Loading from 'components/Loading'
 import useFlashMessageContext from 'holofuel/contexts/useFlashMessageContext'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
-import { presentAgentId, presentHolofuelAmount } from 'utils'
-import { HISTORY_PATH } from 'holofuel/utils/urls'
+import { presentAgentId } from 'utils'
+import { HISTORY_FROM_SENT_TRANSACTION_PATH } from 'holofuel/utils/urls'
 import './CreateOfferRequest.module.css'
 
 // TODO: these constants should come from somewhere more scientific
@@ -32,16 +31,16 @@ const FormValidationSchema = yup.object().shape({
 })
 
 function useOfferMutation () {
-  const [offer] = useMutation(HolofuelOfferMutation)
-  return (amount, counterpartyId, notes) => offer({
-    variables: { amount, counterpartyId, notes }
+  const [offerHoloFuel] = useMutation(HolofuelOfferMutation)
+  return (offer) => offerHoloFuel({
+    variables: { offer }
   })
 }
 
 function useRequestMutation () {
-  const [offer] = useMutation(HolofuelRequestMutation)
-  return (amount, counterpartyId, notes) => offer({
-    variables: { amount, counterpartyId, notes }
+  const [requestHoloFuel] = useMutation(HolofuelRequestMutation)
+  return (request) => requestHoloFuel({
+    variables: { request }
   })
 }
 
@@ -68,7 +67,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
   const [mode, setMode] = useState(OFFER_MODE)
 
   const { currentUser } = useCurrentUserContext()
-  const { loading: loadingRecentCounterparties, data: { holofuelHistoryCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelHistoryCounterpartiesQuery)
+  const { loading: loadingRecentCounterparties, data: { holofuelRecentCounterparties: allRecentCounterparties = [] } = {} } = useQuery(HolofuelRecentCounterpartiesQuery, { fetchPolicy: 'cache-and-network' })
   const recentCounterpartiesWithoutMe = allRecentCounterparties.filter(counterparty => counterparty.id !== currentUser.id)
 
   const createOffer = useOfferMutation()
@@ -78,76 +77,119 @@ export default function CreateOfferRequest ({ history: { push } }) {
 
   const [counterpartyId, setCounterpartyId] = useState('')
   const [counterpartyNick, setCounterpartyNick] = useState('')
-  const [isCounterpartyFound, setCounterpartyFound] = useState(false)
+
+  const updateCounterparty = agentAddress => {
+    const recentCounterparty = recentCounterpartiesWithoutMe.find(recentCounterparty => recentCounterparty.agentAddress === agentAddress)
+    const agentNickname = (!isEmpty(recentCounterparty) && recentCounterparty.nickname)
+      ? recentCounterparty.nickname
+      : agentAddress === currentUser.id
+        ? `${currentUser.nickname || presentAgentId(currentUser.id)} (You)`
+        : presentAgentId(agentAddress)
+
+    setCounterpartyNick(agentNickname)
+    setCounterpartyId(agentAddress)
+  }
 
   useEffect(() => {
-    setCounterpartyNick(presentAgentId(counterpartyId))
-
     if (counterpartyId === currentUser.id) {
       newMessage('You cannot send yourself TestFuel.', 5000)
     }
   }, [currentUser.id, counterpartyId, newMessage])
 
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm({ validationSchema: FormValidationSchema })
+  const isValid = yup.reach(FormValidationSchema, 'counterpartyId').isValidSync(counterpartyId)
 
-  const selectAgent = id => {
-    setCounterpartyId(id)
-    setFormValue('counterpartyId', id)
+  const selectAgent = agent => {
+    setCounterpartyId(agent.agentAddress)
+    setCounterpartyNick(agent.nickname || presentAgentId(agent.agentAddress))
+    setFormValue('counterpartyId', agent.agentAddress)
   }
 
-  const [amount, setAmountRaw] = useState(0)
-  const setAmount = amount => setAmountRaw(Number(amount))
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const fee = (amount * FEE_PERCENTAGE) || 0
-  const total = mode === OFFER_MODE
-    ? amount + fee
-    : amount
+  // NB: amount is maintained as a string, until submission, when the numeric value is verified
+  const [amountString, setAmountString] = useState('')
+  const [amount, setAmountRaw] = useState(0)
+
+  const setAmount = (amount, presentedAmount) => {
+    const hasDot = /\./.test(amount)
+    const lastRawAmountIndex = amount.length - 1
+    const lastpresentedAmountIndex = presentedAmount.length - 1
+
+    if (hasDot && amount.charAt(lastRawAmountIndex) === '.') {
+      setAmountRaw(amount.slice(0, lastRawAmountIndex))
+      setAmountString(presentedAmount.slice(0, lastpresentedAmountIndex))
+    } else {
+      setAmountRaw(amount)
+      setAmountString(presentedAmount)
+    }
+  }
 
   const onSubmit = ({ counterpartyId, notes }) => {
+    setIsProcessing(true)
+    const counterpartyNickname = counterpartyNick === presentAgentId(counterpartyId) ? '' : counterpartyNick
+    const transaction = { amount, counterparty: { agentAddress: counterpartyId, nickname: counterpartyNickname }, notes }
     switch (mode) {
       case OFFER_MODE:
-        createOffer(amount, counterpartyId, notes).then(() => {
-          newMessage(`Offer of ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
-        }).catch(() => {
-          newMessage('Sorry, something went wrong', 5000)
-        })
+        createOffer(transaction)
+          .then(() => {
+            newMessage(`Offer of ${amountString} TF sent to ${counterpartyNick}.`, 5000)
+            setIsProcessing(false)
+            push(HISTORY_FROM_SENT_TRANSACTION_PATH)
+          }).catch(({ message }) => {
+            const counterpartyError = message.includes('Counterparty not found')
+            if (counterpartyError) {
+              newMessage('Offer timed out waiting for transaction confirmation from counterparty. Will try again. Please wait or check back later.', 5000)
+            } else {
+              newMessage('Sorry, something went wrong', 5000)
+            }
+            setIsProcessing(false)
+          })
         break
       case REQUEST_MODE:
-        createRequest(amount, counterpartyId, notes).then(() => {
-          newMessage(`Request for ${presentHolofuelAmount(amount)} TF sent to ${counterpartyNick}.`, 5000)
-        }).catch(() => {
-          newMessage('Sorry, something went wrong', 5000)
-        })
+        createRequest(transaction)
+          .then(() => {
+            newMessage(`Request for ${amountString} TF sent to ${counterpartyNick}.`, 5000)
+            setIsProcessing(false)
+            push(HISTORY_FROM_SENT_TRANSACTION_PATH)
+          }).catch(({ message }) => {
+            const counterpartyError = message.includes('Counterparty not found')
+            if (counterpartyError) {
+              newMessage('Request timed out waiting for transaction confirmation from counterparty. Will try again. Please wait or check back later.', 5000)
+            } else {
+              newMessage('Sorry, something went wrong', 5000)
+            }
+            setIsProcessing(false)
+          })
         break
       default:
         throw new Error(`Unknown mode: '${mode}' in CreateOfferRequest`)
     }
-    push(HISTORY_PATH)
   }
-
-  !isEmpty(errors) && console.log('Form errors (leave here until proper error handling is implemented):', errors)
 
   const title = mode === OFFER_MODE ? 'Send TestFuel' : 'Request TestFuel'
 
   const disableSubmit = counterpartyId.length !== AGENT_ID_LENGTH ||
-    !isCounterpartyFound ||
     counterpartyId === currentUser.id ||
-    amount < 0
+    amount < 0 ||
+    isProcessing
 
+  // render num pad:
   if (numpadVisible) {
     const chooseSend = () => {
       setMode(OFFER_MODE)
       setNumpadVisible(false)
+      setCounterpartyId('')
     }
-
     const chooseRequest = () => {
       setMode(REQUEST_MODE)
       setNumpadVisible(false)
+      setCounterpartyId('')
     }
-
     return <AmountInput amount={amount} setAmount={setAmount} chooseSend={chooseSend} chooseRequest={chooseRequest} />
   }
 
+  // render main page
   return <PrimaryLayout headerProps={{ title }} showAlphaFlag={false}>
     <div styleName='amount-backdrop' />
     <div styleName='amount-banner'>
@@ -155,7 +197,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         {title}
       </h4>
       <div styleName='amount' onClick={() => setNumpadVisible(true)}>
-        {presentHolofuelAmount(amount)} TF
+        {amountString} TF
       </div>
       <div styleName='fee-notice'>
         {mode === OFFER_MODE
@@ -167,7 +209,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
     <div styleName='mode-toggle'>
       {[OFFER_MODE, REQUEST_MODE].map((buttonMode, i) =>
         <Button
-          styleName={cx('mode-toggle-button', { 'left-button': i === 0, 'right-button': i === 1, selected: buttonMode === mode })}
+          styleName={cx('mode-toggle-button', 'transaction-button', { selected: buttonMode === mode })}
           variant='white'
           onClick={() => setMode(buttonMode)}
           key={buttonMode}
@@ -177,32 +219,28 @@ export default function CreateOfferRequest ({ history: { push } }) {
     </div>
 
     <form styleName='offer-form' onSubmit={handleSubmit(onSubmit)}>
-      <div styleName='form-row'>
+      <div>
         <div><label htmlFor='counterpartyId' styleName='form-label'>{modePrepositions[mode]}:</label></div>
         <div styleName='input-row'>
           <input
             name='counterpartyId'
             id='counterpartyId'
-            styleName='form-input'
+            styleName={cx('form-input', { 'form-input-error': !isValid || (!isEmpty(errors) && errors.counterpartyId.message) })}
             placeholder={`Who is this ${modeRelations[mode]}?`}
             ref={register}
-            onChange={({ target: { value } }) => setCounterpartyId(value)}
+            onChange={({ target: { value } }) => updateCounterparty(value)}
           />
           <div styleName='hash-and-nick'>
             {counterpartyId.length === AGENT_ID_LENGTH && <HashIcon hash={counterpartyId} size={26} styleName='hash-icon' />}
-            {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname' styleName='nickname'>
-              <RenderNickname
-                agentId={counterpartyId}
-                setCounterpartyNick={setCounterpartyNick}
-                counterpartyNick={counterpartyNick}
-                setCounterpartyFound={setCounterpartyFound}
-                newMessage={newMessage}
-              />
-            </h4>}
+            {counterpartyId.length === AGENT_ID_LENGTH && <h4 data-testid='counterparty-nickname' styleName='nickname'>{counterpartyNick || ''}</h4>}
           </div>
         </div>
       </div>
-      <div styleName='form-row'>
+
+      {!isValid && isEmpty(errors) && <h3 styleName='error-text'>You peer hash ID must be {AGENT_ID_LENGTH} characters</h3>}
+      {!isEmpty(errors) && <h3 styleName='error-text'>No matching peers found. Check hash ID spelling.</h3>}
+
+      <div>
         <div><label htmlFor='notes' styleName='form-label'>For:</label></div>
         <input
           name='notes'
@@ -214,7 +252,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
         <div />
       </div>
 
-      <div styleName='total'>Total Amount: {presentHolofuelAmount(total)} TF</div>
+      <div styleName='total'>Total Amount: {amountString} TF</div>
 
       <Button
         type='submit'
@@ -224,6 +262,10 @@ export default function CreateOfferRequest ({ history: { push } }) {
         disabled={disableSubmit}
       >{title}
       </Button>
+
+      {isProcessing && <>
+        <Loading styleName='display-loading' />
+      </>}
     </form>
 
     <RecentCounterparties
@@ -233,45 +275,4 @@ export default function CreateOfferRequest ({ history: { push } }) {
       selectAgent={selectAgent}
       loading={loadingRecentCounterparties} />
   </PrimaryLayout>
-}
-
-export function RenderNickname ({ agentId, setCounterpartyNick, setCounterpartyFound, newMessage }) {
-  const { loading, error: queryError, data: { holofuelCounterparty = {} } = {} } = useQuery(HolofuelCounterpartyQuery, {
-    variables: { agentId }
-  })
-
-  const { id, nickname } = holofuelCounterparty
-  useEffect(() => {
-    if (!isEmpty(nickname)) {
-      setCounterpartyNick(nickname)
-    }
-  }, [setCounterpartyNick, nickname])
-
-  useEffect(() => {
-    if (!loading) {
-      if (!id) {
-        setCounterpartyFound(false)
-        newMessage('This HoloFuel Peer is currently unable to be located in the network. \n Please verify the hash of your HoloFuel Peer and try again.')
-      } else {
-        setCounterpartyFound(true)
-      }
-    } else {
-      setCounterpartyFound(false)
-    }
-  }, [setCounterpartyFound, loading, newMessage, id])
-
-  if (loading) {
-    // TODO: Unsubscribe from Loader to avoid any potential mem leak.
-    return <>
-      <Loading
-        dataTestId='counterparty-loading'
-        type='ThreeDots'
-        height={30}
-        width={30}
-      />
-    </>
-  }
-
-  if (queryError || !nickname) return <>No nickname available.</>
-  return <>{nickname}</>
 }

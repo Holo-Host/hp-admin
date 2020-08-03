@@ -6,8 +6,12 @@ import moment from 'moment'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import './HostingEarnings.module.css'
-import { presentHolofuelAmount } from 'utils'
 import Graph from './Graph'
+
+function presentHolofuelAmount (amount) {
+  if (isNaN(amount)) return '--'
+  return Number.parseFloat(amount).toLocaleString()
+}
 
 export const DAYS = {
   one: 'one',

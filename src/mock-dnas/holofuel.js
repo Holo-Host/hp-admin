@@ -1,5 +1,4 @@
 import bcrypt from 'bcryptjs'
-import { isString } from 'lodash/fp'
 
 export const transactionList = {
   ledger: {
@@ -369,7 +368,7 @@ export const pendingList = {
         'HcScic3VAmEP9ucmrw4MMFKVARIvvdn43k6xi3d75PwnOswdaIE3BKFEUr3eozi',
         '3+BrqUuu3sC4bZmub4qGvkmfeKnkJfkm5qZGOM88uompxM0/gE2KNpvTyxpGg44MCbNMB8i8vHBmhTIDMjFwAQ=='
       ]
-    }, {
+    }, [{
       Invoice: {
         promise: {
           tx: {
@@ -386,7 +385,7 @@ export const pendingList = {
         promise_sig: 'gcAT6bIvN5wd11OS3gxd1mmimtf/5c9niLhL7eWruG1Kd3kg+CfclsbI/dG69NSXBQbvhwj1u4DLhdSMHutRAQ==',
         promise_commit: 'QmXTCCEMeobd97tiMTyqZsGGVFHL6MWyStxnePSc6MCGes'
       }
-    }],
+    }]],
     [{
       event: [
         'QmYNt6DYMiymJtf8oeZ4qn86yWANurFEuAzKuzMQGhsnsj',
@@ -444,16 +443,9 @@ const agentArray = [{
 
 const getProfile = agentId => agentArray.find(agent => agent.agent_address === agentId) || { Err: `Error locating profile for ${agentId}.` }
 
-function listPending ({ origins }) {
-  if (!origins) return pendingList
-  if (isString(origins)) {
-    const filter = entry => entry.event[0] === origins
-    return {
-      requests: pendingList.requests.filter(filter),
-      promises: pendingList.promises.filter(filter)
-    }
-  }
-  throw new Error('Array value for origins param of list_pending is not supported in the mock dna')
+function listPending () {
+  // this no longer supports the 'origins' option
+  return pendingList
 }
 
 function receivedPaymentsHashMap (promiseArr) {

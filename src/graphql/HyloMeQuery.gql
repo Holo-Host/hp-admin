@@ -1,4 +1,4 @@
-query HyloMe {
+query HyloMeQyery {
   me {
     id
     name

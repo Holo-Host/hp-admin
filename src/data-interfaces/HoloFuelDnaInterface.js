@@ -1,8 +1,7 @@
-import _, { isEmpty } from 'lodash'
+import _, { isEmpty, isNil } from 'lodash'
 import { omitBy, pickBy } from 'lodash/fp'
 import { instanceCreateZomeCall } from 'holochainClient'
 import { TYPE, STATUS, DIRECTION } from 'models/Transaction'
-import { promiseMap } from 'utils'
 import mockEarningsData from './mockEarningsData'
 
 export const currentDataTimeIso = () => new Date().toISOString()
@@ -18,88 +17,82 @@ const mockDeadline = () => {
 
 /* Creates an array of all counterparties for a provided transaction list */
 export async function getTxCounterparties (transactionList) {
-  const counterpartyList = transactionList.map(({ counterparty }) => counterparty.id)
-  const agentDetailsList = await promiseMap(counterpartyList, agentId => HoloFuelDnaInterface.user.getCounterparty({ agentId }))
-  const noDuplicatesAgentList = _.uniqBy(agentDetailsList, 'id')
-  return noDuplicatesAgentList
+  const counterpartyList = transactionList.map(({ counterparty }) => counterparty)
+  const noDuplicatesCounterpartyList = _.uniqBy(counterpartyList, 'agentAddress')
+  return noDuplicatesCounterpartyList
 }
 
-const addFullCounterpartyToTx = async (tx) => {
-  const fullCounterparty = await HoloFuelDnaInterface.user.getCounterparty({ agentId: tx.counterparty.id })
-  return { ...tx, counterparty: fullCounterparty }
-}
-
-const getTxWithCounterparties = transactionList => promiseMap(transactionList, addFullCounterpartyToTx)
-
-const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false }) => {
+const presentRequest = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, status, isPayingARequest = false }) => {
   return {
     id: origin,
     amount: amount || event.Request.amount,
     counterparty: {
-      id: counterpartyId || event.Request.from
+      agentAddress: counterpartyId || event.Request.from,
+      nickname: !isNil(counterpartyNickname) ? counterpartyNickname : event.Request.from_nickname
     },
     direction: stateDirection,
     status: status || STATUS.pending,
     type: TYPE.request,
     timestamp: eventTimestamp,
     notes: notes || event.Request.notes,
-    fees,
     isPayingARequest,
     isActioned: false
   }
 }
 
-const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, amount, notes, fees, status, isPayingARequest = false, inProcess = false }) => {
+const presentOffer = ({ origin, event, stateDirection, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, status, isPayingARequest = false, inProcess = false }) => {
   return {
     id: origin,
     amount: amount || event.Promise.tx.amount,
     counterparty: {
-      id: counterpartyId || event.Promise.tx.to
+      agentAddress: counterpartyId || event.Promise.tx.to,
+      nickname: !isNil(counterpartyNickname) ? counterpartyNickname : event.Promise.tx.to_nickname
     },
     direction: stateDirection,
     status: status || STATUS.pending,
     type: TYPE.offer,
     timestamp: eventTimestamp,
     notes: notes || event.Promise.tx.notes,
-    fees,
     isPayingARequest,
     inProcess,
     isActioned: false
   }
 }
 
-const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
-  const counterpartyId = stateDirection === DIRECTION.incoming ? event.Receipt.cheque.invoice.promise.tx.from : event.Receipt.cheque.invoice.promise.tx.to
+const presentReceipt = ({ origin, event, stateDirection, eventTimestamp, presentBalance }) => {
+  const transaction = event.Receipt.cheque.invoice.promise.tx
+  const incomingTransaction = stateDirection === DIRECTION.incoming
+
   return {
     id: origin,
-    amount: event.Receipt.cheque.invoice.promise.tx.amount,
+    amount: transaction.amount,
     counterparty: {
-      id: counterpartyId
+      agentAddress: incomingTransaction ? transaction.from : transaction.to,
+      nickname: incomingTransaction ? transaction.from_nickname : transaction.to_nickname
     },
     direction: stateDirection,
     status: STATUS.completed,
     type: stateDirection === DIRECTION.outgoing ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
-    fees,
     presentBalance,
-    notes: event.Receipt.cheque.invoice.promise.tx.notes
+    notes: transaction.notes
   }
 }
 
-// TODO: Review whether we should be showing this in addition to the receipt
-const presentCheque = ({ origin, event, stateDirection, eventTimestamp, fees, presentBalance }) => {
-  const counterpartyId = stateDirection === DIRECTION.incoming ? event.Cheque.invoice.promise.tx.from : event.Cheque.invoice.promise.tx.to
+const presentCheque = ({ origin, event, stateDirection, eventTimestamp, presentBalance }) => {
+  const transaction = event.Cheque.invoice.promise.tx
+  const incomingTransaction = stateDirection === DIRECTION.incoming
   return {
     id: origin,
     amount: event.Cheque.invoice.promise.tx.amount,
     counterparty: {
-      id: counterpartyId
+      agentAddress: incomingTransaction ? transaction.from : transaction.to,
+      nickname: incomingTransaction ? transaction.from_nickname : transaction.to_nickname
     },
     direction: stateDirection,
     status: STATUS.completed,
     type: event.Cheque.invoice.promise.request ? TYPE.request : TYPE.offer, // this indicates the original event type (eg. 'I requested hf from you', 'You sent a offer to me', etc.)
     timestamp: eventTimestamp,
-    fees,
     presentBalance,
     notes: event.Cheque.invoice.promise.tx.notes
   }
@@ -121,9 +114,18 @@ function presentPendingRequest (transaction, annuled = false) {
   const status = STATUS.pending
   const type = TYPE.request
   const eventTimestamp = event[1]
+  const { amount, notes } = event[2].Request
+
   const counterpartyId = annuled ? event[2].Request.from : provenance[0]
-  const { amount, notes, fee } = event[2].Request
-  return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee })
+  // If the transaction is not declined or cancelled, and has a counterparty whose nickname is not set, return nickname an empty string, not null
+  // in order to assign the counterpartyId with a value to be referenced downstream
+  const counterpartyNickname = annuled
+    ? event[2].Request.from_nickname
+    : isNil(event[2].Request.to_nickname)
+      ? ''
+      : event[2].Request.to_nickname
+
+  return presentRequest({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes })
 }
 
 function presentPendingOffer (transaction, invoicedOffers = [], annuled = false) {
@@ -140,11 +142,20 @@ function presentPendingOffer (transaction, invoicedOffers = [], annuled = false)
   const status = STATUS.pending
   const type = TYPE.offer
   const eventTimestamp = event[1]
-  const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
-  const { amount, notes, fee } = event[2].Promise.tx
+  const { amount, notes } = event[2].Promise.tx
   const isPayingARequest = !!event[2].Promise.request
   const inProcess = isEmpty(invoicedOffers) ? false : hasInvoice()
-  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, amount, notes, fees: fee, isPayingARequest, inProcess })
+
+  const counterpartyId = annuled ? event[2].Promise.tx.to : provenance[0]
+  // If the transaction is not declined or cancelled, and has a counterparty whose nickname is not set, return nickname an empty string, not null
+  // in order to assign the counterpartyId with a value to be referenced downstream
+  const counterpartyNickname = annuled
+    ? event[2].Promise.tx.to_nickname
+    : isNil(event[2].Promise.tx.from_nickname)
+      ? ''
+      : event[2].Promise.tx.from_nickname
+
+  return presentOffer({ origin, event: event[2], stateDirection, status, type, eventTimestamp, counterpartyId, counterpartyNickname, amount, notes, isPayingARequest, inProcess })
 }
 
 let counter = 0
@@ -172,39 +183,34 @@ const acceptInvoicedOffer = async (tx, invoicedOffers) => {
 }
 
 function presentTransaction (transaction) {
-  const { state, origin, event, timestamp, adjustment, available } = transaction
+  const { state, origin, event, timestamp, available } = transaction
   const stateStage = state.split('/')[1]
   const stateDirection = state.split('/')[0] // NOTE: This returns either 'incoming' or 'outgoing,' wherein, 'incoming' indicates the recipient of funds, 'outgoing' indicates the spender of funds.
-  const parsedAdjustment = adjustment.Ok
 
   switch (stateStage) {
     case 'completed': {
-      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
-      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, presentBalance: available })
+      if (event.Receipt) return presentReceipt({ origin, event, stateDirection, eventTimestamp: timestamp.event, presentBalance: available })
+      if (event.Cheque) return presentCheque({ origin, event, stateDirection, eventTimestamp: timestamp.event, presentBalance: available })
       return new Error(`Completed event did not have a Receipt or Cheque event`)
     }
 
     case 'canceled': {
-      if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
-      if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees, status: STATUS.canceled })
+      if (event.Cancel.entry.Request) return presentRequest({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, status: STATUS.canceled })
+      if (event.Cancel.entry.Promise) return presentOffer({ origin, event: event.Cancel.entry, stateDirection, eventTimestamp: timestamp.event, status: STATUS.canceled })
       return new Error(`Canceled event did not have a Request or Promise event`)
     }
     /* **************************  NOTE: ********************************** */
     /* The below two cases are 'waitingTransaction' cases. */
     case 'requested': {
-      return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
+      return presentRequest({ origin, event, stateDirection, eventTimestamp: timestamp.event })
     }
     /* 'approved' only indicates that a payment was offered (could be in response to a request or an isolate payment) */
     case 'approved': {
-      return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event, fees: parsedAdjustment.fees })
+      return presentOffer({ origin, event, stateDirection, eventTimestamp: timestamp.event })
     }
     default: return new Error(`Error: No transaction stateStage was matched. Current transaction stateStage : ${stateStage}.`)
   }
 }
-
-// a hack while we clean up the apollo counterparties implementation
-// AND create a more generalized data loading system
-const cachedGetProfileCalls = {}
 
 const cachedRecentlyActionedTransactions = []
 const removeTransactionFromCache = transactionId => {
@@ -222,33 +228,6 @@ const HoloFuelDnaInterface = {
         nickname
       }
     },
-    getCounterparty: async ({ agentId }) => {
-      const presentCounterparty = counterparty => ({
-        id: counterparty.agent_address,
-        avatarUrl: counterparty.avatar_url,
-        nickname: counterparty.nickname
-      })
-
-      if (cachedGetProfileCalls[agentId]) {
-        if (typeof cachedGetProfileCalls[agentId].then === 'function') {
-          return presentCounterparty(await cachedGetProfileCalls[agentId])
-        } else {
-          return cachedGetProfileCalls[agentId]
-        }
-      } else {
-        cachedGetProfileCalls[agentId] = createZomeCall('profile/get_profile')({ agent_address: agentId })
-        const counterparty = await cachedGetProfileCalls[agentId]
-        if (counterparty.Err) {
-          return {
-            id: agentId,
-            avatarUrl: null,
-            nickname: null
-          }
-        }
-        cachedGetProfileCalls[agentId] = presentCounterparty(counterparty)
-        return presentCounterparty(counterparty)
-      }
-    },
     update: async (nickname, avatarUrl) => {
       const params = omitBy(param => param === undefined, { nickname, avatarUrl })
       const { agent_address: id, avatar_url: newAvatarUrl, nickname: newNickname, Err } = await createZomeCall('profile/update_my_profile')(params)
@@ -262,34 +241,29 @@ const HoloFuelDnaInterface = {
   },
   ledger: {
     get: async () => {
-      const { balance, credit, payable, receivable, fees } = await createZomeCall('transactions/ledger_state')()
+      const { balance, credit, payable, receivable } = await createZomeCall('transactions/ledger_state')()
       return {
         balance,
         credit,
         payable,
-        receivable,
-        fees
+        receivable
       }
     }
   },
   transactions: {
     allCompleted: async (since) => {
       const params = since ? { since } : {}
-
       const { transactions } = await createZomeCall('transactions/list_transactions')(params)
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
-      const presentedCompletedTransactions = await getTxWithCounterparties(uniqueNonActionableTransactions.filter(tx => tx.status === 'completed'))
+      const presentedCompletedTransactions = uniqueNonActionableTransactions.filter(tx => tx.status === 'completed')
       return presentedCompletedTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allActionable: async () => {
       const { requests, promises, declined } = await getListPending({})
       const actionableTransactions = requests.map(request => presentPendingRequest(request)).concat(promises.map(promise => presentPendingOffer(promise[0], promise[1]))).concat(declined.map(presentDeclinedTransaction)).filter(tx => !(tx instanceof Error))
-      const actionableTransactionsDisplay = actionableTransactions.concat(cachedRecentlyActionedTransactions)
-      const uniqActionableTransactions = _.uniqBy(actionableTransactionsDisplay, 'id')
-      const presentedActionableTransactions = await getTxWithCounterparties(uniqActionableTransactions)
-
-      return presentedActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      const uniqActionableTransactions = _.uniqBy(actionableTransactions, 'id')
+      return uniqActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allWaiting: async () => {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
@@ -299,15 +273,13 @@ const HoloFuelDnaInterface = {
       const declinedTransactions = await HoloFuelDnaInterface.transactions.allDeclinedTransactions()
       // Filter out transactions that share a TX ID with a Declined or Cancelled Transaction
       const uniqueListWithOutDeclinedOrCanceled = _.differenceBy(uniqueNonActionableTransactions, declinedTransactions, 'id')
-      const presentedWaitingTransactions = await getTxWithCounterparties(uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending'))
-
+      const presentedWaitingTransactions = uniqueListWithOutDeclinedOrCanceled.filter(tx => tx.status === 'pending')
       return presentedWaitingTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     allDeclinedTransactions: async () => {
       const declinedTransactions = await createZomeCall('transactions/list_pending_declined')()
       const presentedDeclinedTransactions = declinedTransactions.map(presentDeclinedTransaction)
       const uniqueDeclinedTransactions = _.uniqBy(presentedDeclinedTransactions, 'id')
-
       return uniqueDeclinedTransactions
     },
     allEarnings: () => mockEarningsData,
@@ -315,7 +287,6 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')({ state: stateFilter })
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const cleanedList = _.uniqBy(nonActionableTransactions, 'id')
-
       if (cleanedList.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
@@ -327,16 +298,9 @@ const HoloFuelDnaInterface = {
       const { transactions } = await createZomeCall('transactions/list_transactions')()
       const nonActionableTransactions = transactions.map(presentTransaction).filter(tx => !(tx instanceof Error))
       const uniqueNonActionableTransactions = _.uniqBy(nonActionableTransactions, 'id')
-
-      const myProfile = await HoloFuelDnaInterface.user.get()
-
       const nonActionableTransactionsWithCancelByKey = uniqueNonActionableTransactions
         .filter(tx => tx.status !== 'pending')
-        .map(tx => tx.status === STATUS.canceled ? { ...tx, canceledBy: myProfile } : { ...tx, canceledBy: null })
-
-      const presentedNonActionableTransactions = await getTxWithCounterparties(nonActionableTransactionsWithCancelByKey)
-
-      return presentedNonActionableTransactions.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
+      return nonActionableTransactionsWithCancelByKey.sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     },
     getPending: async (transactionId) => {
       const { requests, promises } = await getListPending({ origins: transactionId })
@@ -344,13 +308,12 @@ const HoloFuelDnaInterface = {
       if (transactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else {
-        return addFullCounterpartyToTx(transactions[0])
+        return transactions[0]
       }
     },
     /* NOTE: This is to allow handling of the other side of the transaction that was declined.  */
     getPendingDeclined: async (transactionId, { raw = false }) => {
       const declinedTransactions = await createZomeCall('transactions/list_pending_declined')({ origins: transactionId })
-
       if (declinedTransactions.length === 0) {
         throw new Error(`No pending transaction with id ${transactionId} found.`)
       } else if (raw) {
@@ -367,73 +330,36 @@ const HoloFuelDnaInterface = {
       const transaction = await HoloFuelDnaInterface.transactions.getPending(transactionId)
       const declinedProof = await createZomeCall('transactions/decline_pending')({ origins: transactionId })
       if (!declinedProof) throw new Error(`Decline Error: ${declinedProof}.`)
-
       const presentedTransaction = {
         ...transaction,
         id: transactionId,
         isActioned: true
       }
-
       cachedRecentlyActionedTransactions.push(presentedTransaction)
       setTimeout(() => {
         removeTransactionFromCache(presentedTransaction.id)
       }, 5000)
       return presentedTransaction
-    },
-    /* NOTE: cancel WAITING TRANSACTION that current agent authored. */
-    cancel: async (transactionId) => {
-      const authoredRequests = await HoloFuelDnaInterface.transactions.allNonActionableByState(transactionId, ['incoming/requested', 'outgoing/approved'])
-      const transaction = authoredRequests.find(authoredRequest => authoredRequest.id === transactionId)
-      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: transactionId })
-      if (!canceledProof) throw new Error(`Cancel Error: ${canceledProof}.`)
-
-      return {
-        ...transaction,
-        id: transactionId
-      }
-    },
-    /* NOTE: recover funds from DECLINED PENDING TRANSACTION (ie: Counterparty declined offer) - intended for REFUNDS  */
-    recoverFunds: async (transactionId) => {
-      // const TX_DECLINED = 'declined-transaction'
-      const { rawTransaction, transaction } = await HoloFuelDnaInterface.transactions.getPendingDeclined(transactionId, { raw: true })
-      const canceledProof = await createZomeCall('transactions/cancel')({ entry: rawTransaction })
-      if (!canceledProof) {
-        throw new Error(`Recover Funds Error.  Couldn'\t find a transaction with id ${transactionId}.`)
-      }
-
-      return {
-        ...transaction,
-        id: transactionId,
-        status: STATUS.canceled
-      }
-    },
-
-    refundTransactions: async (transactions) => {
-      const listOfTransactionIds = transactions.map(({ id }) => id)
-      const canceledProof = await createZomeCall('transactions/cancel_transactions')({ origins: listOfTransactionIds })
-      if (!canceledProof) {
-        throw new Error(`Recover Funds Error.  Couldn'\t find a transactions with ids ${transactions}.`)
-      }
-
-      const canceledDeclined = transactions.map(transaction => {
-        return {
-          ...transaction,
-          status: STATUS.canceled
-        }
-      })
-
-      return canceledDeclined
     }
   },
   requests: {
-    create: async (counterpartyId, amount, notes) => {
-      const origin = await createZomeCall('transactions/request')({ from: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes })
+    create: async ({ counterparty, amount, notes }) => {
+      const origin = await createZomeCall('transactions/request')({ from: counterparty.agentAddress, amount, deadline: mockDeadline(), notes })
+      if (!origin || origin.Err) {
+        const error = { error: 'Request unsuccessful', counterpartyError: '' }
+        const counterpartyValidationError = /(link not found)/gi
+        if (origin.Err && origin.Err.Internal && counterpartyValidationError.test(origin.Err.Internal)) {
+          const counterpartyError = { ...error, counterpartyError: 'Counterparty not found' }
+          throw (counterpartyError)
+        } else {
+          throw (error)
+        }
+      }
+
       return {
         id: origin,
         amount,
-        counterparty: {
-          id: counterpartyId
-        },
+        counterparty,
         notes,
         direction: DIRECTION.incoming, // this indicates the hf recipient
         status: STATUS.pending,
@@ -443,15 +369,23 @@ const HoloFuelDnaInterface = {
     }
   },
   offers: {
-    create: async (counterpartyId, amount, notes, requestId) => {
-      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterpartyId, amount: amount.toString(), deadline: mockDeadline(), notes, request: requestId }))
+    create: async ({ counterparty, amount, notes, requestId }) => {
+      const origin = await createZomeCall('transactions/promise')(pickBy(i => i, { to: counterparty.agentAddress, amount, deadline: mockDeadline(), notes, request: requestId }))
+      if (!origin || origin.Err) {
+        const error = { error: 'Offer unsuccessful', counterpartyError: '' }
+        const counterpartyValidationError = /(link not found)/gi
+        if (origin.Err && origin.Err.Internal && counterpartyValidationError.test(origin.Err.Internal)) {
+          const counterpartyError = { ...error, counterpartyError: 'Counterparty not found' }
+          throw (counterpartyError)
+        } else {
+          throw (error)
+        }
+      }
 
       const presentedTransaction = {
         id: requestId || origin, // NB: If requestId isn't defined, then offer uses origin as the ID (ie. Offer is the initiating transaction).
         amount,
-        counterparty: {
-          id: counterpartyId
-        },
+        counterparty,
         notes,
         direction: DIRECTION.outgoing, // this indicates the hf spender
         status: STATUS.pending,

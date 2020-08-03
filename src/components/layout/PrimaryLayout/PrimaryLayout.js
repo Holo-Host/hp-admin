@@ -3,11 +3,11 @@ import { object } from 'prop-types'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
-import ScreenWidthContext from 'contexts/screenWidth'
 import FlashMessage from 'components/FlashMessage'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import ScreenWidthContext from 'contexts/screenWidth'
 import useConnectionContext from 'contexts/useConnectionContext'
 import useHFConnectionContext from 'holofuel/contexts/useConnectionContext'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
@@ -42,10 +42,10 @@ function PrimaryLayout ({
 
   useInterval(() => {
     if (isLoginPage(window)) {
-      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
-    } else {
       // on login page, set holochain conductor connnection as false when hpos connection is false, or true when true
       setConnectionStatus({ hpos: isHposConnectionAlive, holochain: isHposConnectionAlive })
+    } else {
+      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
     }
   }, 5000)
 
