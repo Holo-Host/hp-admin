@@ -15,6 +15,8 @@ export const DIRECTION = {
   outgoing: 'outgoing'
 }
 
+export const FAILED_TRANSACTION_MESSAGE = 'The recipient for the transaction could not be found. The transaction will appear as declined.'
+
 // Any cancelled and declined transactions, or
 // offers that are paying a request (those are handled by AcceptRequestedOffers)
 // are not actionable transactions

@@ -27,7 +27,7 @@ import './Inbox.module.css'
 import { POLLING_INTERVAL_GENERAL, presentAgentId, presentHolofuelAmount, presentTruncatedAmount, useLoadingFirstTime, partitionByDate } from 'utils'
 import { caribbeanGreen } from 'utils/colors'
 import { OFFER_REQUEST_PATH } from 'holofuel/utils/urls'
-import { TYPE, STATUS, DIRECTION, shouldShowTransactionInInbox } from 'models/Transaction'
+import { TYPE, STATUS, DIRECTION, FAILED_TRANSACTION_MESSAGE, shouldShowTransactionInInbox } from 'models/Transaction'
 
 const timeoutErrorMessage = 'Timed out waiting for transaction confirmation from counterparty, will retry later'
 
@@ -42,7 +42,7 @@ function useUpdatedTransactionLists () {
 
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
-  const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedDeclinedTransactions)
+  const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedDeclinedTransactions).sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
 
   const actionableLoadingFirstTime = useLoadingFirstTime(isConnected && allActionableLoading)
   const recentLoadingFirstTime = useLoadingFirstTime(isConnected && allRecentLoading)
@@ -78,15 +78,17 @@ export default function Inbox ({ history: { push } }) {
   const { actionableTransactions, recentTransactions, actionableLoading, recentLoading } = useUpdatedTransactionLists(inboxView)
 
   const [userMessage, setUserMessage] = useState('')
-  const { newMessage } = useFlashMessageContext()
+  const { newMessage, message } = useFlashMessageContext()
 
   useEffect(() => {
     if (!isEmpty(userMessage)) {
       newMessage(userMessage, 5000)
-    } else {
+    } else if (typeof message === 'string' && message === FAILED_TRANSACTION_MESSAGE) {
+      setInboxView(VIEW.recent)
+    } else if (message) { // if message exists and does not meet previous conditions, we want it to clear
       newMessage('', 0)
     }
-  }, [userMessage, newMessage])
+  }, [userMessage, newMessage, message])
 
   const defaultConfirmationModalProperties = {
     shouldDisplay: false,
