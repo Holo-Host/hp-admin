@@ -8,12 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hosting card gets real data from HPOS for hosted happs and local source chain count
 
 ## [0.13.4] - 2020-08-03
-### Added
-- New failure message when unable to create new transaction
 ### Removed
 - Temporarily removed Number from Notification Badge
 ### Fixed
-- Redirect to Activity Tab on Inbox when attempt to create new transaction fails
 - Highlight & display of pending/inProcess transactions
 
 ## [0.13.3] - 2020-07-31
