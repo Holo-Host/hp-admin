@@ -40,9 +40,6 @@ function useUpdatedTransactionLists () {
 
   const updatedDisplayableActionable = holofuelActionableTransactions.filter(actionableTx => shouldShowTransactionInInbox(actionableTx, hiddenTransactionIds))
 
-  console.log('>>>>>>> hiddenTransactionIds : ', hiddenTransactionIds)
-  console.log('>>>>>>> updatedDisplayableActionable : ', updatedDisplayableActionable)
-
   // we don't show declined offers because they're handled automatically in the background (see PrimaryLayout.js)
   const updatedDeclinedTransactions = holofuelActionableTransactions.filter(actionableTx => actionableTx.status === STATUS.declined)
   const updatedNonPendingTransactions = holofuelNonPendingTransactions.concat(updatedDeclinedTransactions)

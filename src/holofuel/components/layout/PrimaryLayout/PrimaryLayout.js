@@ -78,8 +78,9 @@ function PrimaryLayout ({
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
   const actionableTransactionsCount = actionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds)).length
-  console.log('>>>>>>> ACTIONABLE ITEMS COUNT : ', actionableTransactionsCount)
   const newActionableItems = !!actionableTransactionsCount && !isHolofuelPage(INBOX_PATH, window)
+
+  console.log('isHolofuelPage(INBOX_PATH, window) : ', isHolofuelPage(INBOX_PATH, window));
 
   const { push } = useHistory()
   const [shouldRefetchMyUser, setShouldRefetchMyUser] = useState(false)

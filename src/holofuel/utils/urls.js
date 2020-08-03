@@ -9,7 +9,7 @@ export const HP_ADMIN_DASHBOARD_PATH = '/admin/dashboard'
 export const HP_ADMIN_LOGIN_PATH = '/admin/login'
 
 export function isHolofuelPage (page, window) {
-  const pageTest = window.location.pathname === `/${root}/${page}` || window.location.pathname === `/${root}/${page}/`
-  if (page === INBOX_PATH) return window.location.pathname === `/${root}` || window.location.pathname === `/${root}/` || pageTest
+  const pageTest = window.location.pathname === `${root}/${page}` || window.location.pathname === `${root}/${page}/`
+  if (page === INBOX_PATH) return window.location.pathname === `${root}` || window.location.pathname === `${root}/` || pageTest
   else return pageTest
 }

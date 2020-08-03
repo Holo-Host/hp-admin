@@ -16,7 +16,7 @@ function HFRoute (props) {
 }
 
 export const root = process.env.REACT_APP_HOLOFUEL_AT_ROOT === 'true'
-  ? ''
+  ? '/'
   : '/holofuel'
 
 export default function HFRouter () {
