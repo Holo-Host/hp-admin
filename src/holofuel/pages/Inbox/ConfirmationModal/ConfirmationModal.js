@@ -58,7 +58,7 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
   const declineTransaction = useDecline()
 
   const { newMessage } = useFlashMessageContext()
-  const { transaction, action, shouldDisplay, onConfirm, setIsLoading } = confirmationModalProperties
+  const { transaction, action, shouldDisplay, onConfirm, setIsLoading, onSignalInProcessEvent } = confirmationModalProperties
 
   const { id, amount, type, notes, counterparty = {} } = transaction
 
@@ -122,11 +122,12 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
       .then(result => {
         const { data } = result
         if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
+          onSignalInProcessEvent()
           newMessage('Timed out waiting for transaction confirmation from counterparty, will retry later', 5000)
         } else {
+          onConfirm()
           newMessage(flashMessage, 5000)
         }
-        onConfirm(action)
         setIsLoading(false)
       })
       .catch(() => {
