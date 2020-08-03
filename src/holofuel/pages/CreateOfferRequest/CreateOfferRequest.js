@@ -144,7 +144,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
               push(INBOX_PATH)
               newMessage(FAILED_TRANSACTION_MESSAGE, 10000)
             } else {
-              newMessage('Sorry, something went wrong', 5000)
+              newMessage('Sorry, something went wrong.', 5000)
             }
             setIsProcessing(false)
           })
@@ -161,7 +161,7 @@ export default function CreateOfferRequest ({ history: { push } }) {
               push(INBOX_PATH)
               newMessage(FAILED_TRANSACTION_MESSAGE, 10000)
             } else {
-              newMessage('Sorry, something went wrong', 5000)
+              newMessage('Sorry, something went wrong.', 5000)
             }
             setIsProcessing(false)
           })

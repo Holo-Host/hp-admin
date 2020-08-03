@@ -123,7 +123,7 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
         const { data } = result
         if (data.holofuelAcceptOffer && data.holofuelAcceptOffer.type === TYPE.offer && data.holofuelAcceptOffer.status === STATUS.pending) {
           onSignalInProcessEvent()
-          newMessage('Timed out waiting for transaction confirmation from counterparty, will retry later', 5000)
+          newMessage('Timed out waiting for transaction confirmation from counterparty, will retry later.', 5000)
         } else {
           onConfirm()
           newMessage(flashMessage, 5000)
@@ -131,7 +131,7 @@ export default function ConfirmationModal ({ confirmationModalProperties, setCon
         setIsLoading(false)
       })
       .catch(() => {
-        newMessage('Sorry, something went wrong', 5000)
+        newMessage('Sorry, something went wrong.', 5000)
       })
   }
 
