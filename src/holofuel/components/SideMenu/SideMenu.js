@@ -21,7 +21,7 @@ export default function SideMenu ({
   avatarUrl = '',
   agent,
   agentLoading,
-  inboxCount,
+  newActionableItems,
   closeMenu
 }) {
   const location = useLocation()
@@ -46,7 +46,7 @@ export default function SideMenu ({
         <ul styleName='nav-list'>
           <li styleName={cx({ 'active-link': currentPath === '/holofuel/inbox/' || currentPath === '/holofuel/inbox' || currentPath === '/holofuel/' || currentPath === '/holofuel' })}>
             <Link to={INBOX_PATH} styleName='nav-link'>
-              Inbox <InboxBadge count={inboxCount} />
+              Inbox <InboxBadge newActionableItems={newActionableItems} />
             </Link>
           </li>
           <li styleName={cx({ 'active-link': currentPath === '/holofuel/history/' || currentPath === '/holofuel/history' })}>
@@ -98,10 +98,7 @@ export default function SideMenu ({
   </aside>
 }
 
-function InboxBadge ({ count = 0 }) {
-  if (count === 0) return null
-
-  return <div styleName='inbox-badge'>
-    {count}
-  </div>
+function InboxBadge ({ newActionableItems = false }) {
+  if (!newActionableItems) return null
+  return <div styleName='inbox-badge' />
 }

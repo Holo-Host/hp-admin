@@ -15,11 +15,11 @@ function HFRoute (props) {
   }
 }
 
-export default function HFRouter () {
-  const root = process.env.REACT_APP_HOLOFUEL_AT_ROOT === 'true'
-    ? ''
-    : '/holofuel'
+export const root = process.env.REACT_APP_HOLOFUEL_AT_ROOT === 'true'
+  ? ''
+  : '/holofuel'
 
+export default function HFRouter () {
   return <Switch>
     <HFRoute path={`${root}/(|inbox)`} exact component={Inbox} />
     <HFRoute path={`${root}/history`} exact component={TransactionHistory} />
