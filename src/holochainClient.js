@@ -4,6 +4,9 @@ import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import wait from 'waait'
 
+export const HOSTED_HOLOFUEL_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true'
+export const HP_ADMIN_HOST_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true')
+
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
   ? false
@@ -111,7 +114,7 @@ export function conductorInstanceIdbyDnaAlias (instanceId) {
   }[instanceId]
 }
 
-export let holochainClient, hostContext
+export let holochainClient
 export let wsConnection = true
 
 let isInitiatingHcConnection = false
@@ -121,7 +124,7 @@ async function initHolochainClient () {
   isInitiatingHcConnection = true
   let url
   try {
-    if (!(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true') {
+    if (HOSTED_HOLOFUEL_CONTEXT) {
       console.log('Inside hosted holofuel environment...')
       console.log('Establishing Holo web-sdk connection...')
       // use the web-sdk instead of hc-web-client
@@ -130,17 +133,11 @@ async function initHolochainClient () {
       if (HOLOCHAIN_LOGGING) {
         webSdkConnection.on('🎉 Web SDK connected and ready for Zome Calls...', console.log.bind(console))
       }
-      // don't allow sign-in, if context returns an anonymous user
-      hostContext = await webSdkConnection.context()
-      // todo: the context is hard coded in chaperone right now to only return 2,
-      // update to only accept the int 3, after updated
-      if (hostContext >= 2) {
-        console.log('Signing in as an anonymous hosted agent...!  Don\'t allow once chaperone is updated')
-        await webSdkConnection.signIn()
-      }
+      await webSdkConnection.signOut()
+      await webSdkConnection.signIn()
       window.webSdkConnection = webSdkConnection
       holochainClient = webSdkConnection
-    } else if (!(process.env.REACT_APP_RAW_HOLOCHAIN === 'true')) {
+    } else if (HP_ADMIN_HOST_CONTEXT) {
       console.log('Inside hp-admin/host environment...')
       console.log('Establishing HPOS connection...')
       let url = process.env.NODE_ENV === 'production' ? ('wss://' + window.location.hostname + '/api/v1/ws/') : process.env.REACT_APP_DNA_INTERFACE_URL

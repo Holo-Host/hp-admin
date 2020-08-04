@@ -3,30 +3,33 @@ import cx from 'classnames'
 import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
 import { withRouter } from 'react-router'
-import { holochainClient as webSdkConnection, hostContext } from 'holochainClient'
+import { holochainClient as webSdkConnection, HOSTED_HOLOFUEL_CONTEXT } from 'holochainClient'
 import MenuButton from 'holofuel/components/MenuButton'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 
-export function Header ({ agent, history: { push }, hamburgerClick = () => push('/dashboard'), newActionableItems }) {
-  const [isSignedIn, setIsSignedIn] = useState(false)
+export function Header ({ agent, history: { push }, hamburgerClick = () => push('/dashboard'), newActionableItems, hostedAgentContext, isSignedInAsHostedAgent, setIsSignedInAsHostedAgent }) {
   const [shouldDisable, setShouldDisable] = useState()
-
+  console.log('SIGNED IN?? : ', isSignedInAsHostedAgent);
+  console.log('HOST CONTEXT ?? : ', hostedAgentContext);
+  
   useEffect(() => {
-    if (!(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true') {
+    if (HOSTED_HOLOFUEL_CONTEXT) {
       // once chaperone is updated, disable if the context is less than 3
-      setShouldDisable(!hostContext || hostContext < 2)
+      setShouldDisable(!hostedAgentContext || hostedAgentContext < 2)
     }
-  }, [])
+  }, [hostedAgentContext, setShouldDisable])
 
   const handleAppAccess = async () => {
-    if (isSignedIn) {
+    console.log('LOGGING IN/OUT: ');
+    console.log('SIGNED IN?? : ', isSignedInAsHostedAgent);
+    if (isSignedInAsHostedAgent) {
       await webSdkConnection.signOut()
-      setIsSignedIn(false)
+      setIsSignedInAsHostedAgent(false)
       // todo: the context is hard coded in chaperone right now to only return 2;
       // once chaperone is updated, update this sign in to only occur if the context is 3
-    } else if (!isSignedIn && hostContext >= 2) {
+    } else if (!isSignedInAsHostedAgent && hostedAgentContext >= 2) {
       await webSdkConnection.signIn()
-      setIsSignedIn(true)
+      setIsSignedInAsHostedAgent(true)
     }
   }
 
@@ -44,7 +47,7 @@ export function Header ({ agent, history: { push }, hamburgerClick = () => push(
         <CopyAgentId agent={agent} isMe>
           <HashAvatar seed={agent.id} size={32} dataTestId='hash-icon' />
         </CopyAgentId>
-        <button styleName='signout-button' disabled={shouldDisable} onClick={() => handleAppAccess()}>Sign Out</button>
+        {HOSTED_HOLOFUEL_CONTEXT && <button styleName='signout-button' disabled={shouldDisable} onClick={() => handleAppAccess()}>{isSignedInAsHostedAgent ? 'Sign Out' : ''}</button>}
       </div>
     </section>
   </header>

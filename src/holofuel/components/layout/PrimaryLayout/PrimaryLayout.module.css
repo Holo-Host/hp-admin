@@ -31,3 +31,8 @@
 .side-menu {
   padding-right: 10px;
 }
+
+.hosted-landing-overlay {
+  /* todo: ADD DESIGNS FOR LANDING OVERLAY HERE */
+ opacity: 0.1;
+}
