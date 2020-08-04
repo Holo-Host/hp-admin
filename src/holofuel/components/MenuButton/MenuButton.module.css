@@ -17,15 +17,15 @@
 .nav-badge {
   box-sizing: border-box;
   position: absolute;
-  top: -5px;
-  right: -15px;
+  top: 2px;
+  right: -5px;
   color: #FFF;
   background-color: var(--color-persimmon);
   font-size: .7em;
-  min-width: 30px;
+  min-width: 19px;
   line-height: 14px;
   text-align: center;
   border-radius: 9999px;
   font-weight: 700;
-  padding: 8px;
+  padding: 10px;
 }

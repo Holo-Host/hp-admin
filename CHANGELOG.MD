@@ -7,16 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Hosting card gets real data from HPOS for hosted happs and local source chain count
 - Hosting card gets real data from HPOS for aggregatee of hosted happ zome calls
+
+## [0.13.4] - 2020-08-03
+### Added
+- New failure message when unable to create new transaction
 ### Removed
-- Header Alpha Flag
+- Temporarily removed Number from Notification Badge
+### Fixed
+- Highlight & display of pending/inProcess transactions
+- Redirect to Activity Tab on Inbox when attempt to create new transaction fails
 
 ## [0.13.3] - 2020-07-31
 ### Added
+- Header Alpha Flag
 - Github Pages deploy process
 - Updated Github Pages deploy process for testfuel.holo.host
 - TestFuel card on Dashboard linking to Holofuel
+- Hosting card gets real data from HPOS for hosted happs and local source chain count
 ### Removed
 - Temporarily removed Hosting and Earnings cards on Dashboard
+- Header Alpha Flag
 - Removed refresh button
 - Removed separate Sidemenu behaviour in Desktop. 
 ### Fixed
