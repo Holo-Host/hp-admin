@@ -58,9 +58,9 @@ const data = {
           number_instances: 17,
           stats: {
             traffic: {
-             start_date: "2020-07-27T21:27:25Z",
-             total_zome_calls: 100,
-             values: [10,40,20,30]
+              start_date: '2020-07-27T21:27:25Z',
+              total_zome_calls: 100,
+              values: [10, 40, 20, 30]
             }
           }
         }
