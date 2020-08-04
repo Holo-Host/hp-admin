@@ -1,4 +1,4 @@
-mutation HposUpdateSettings ($hostPubKey: String, $hostName: String, $deviceName: String, $sshAccess: Boolean) {
+mutation HposUpdateSettingsMutation ($hostPubKey: String, $hostName: String, $deviceName: String, $sshAccess: Boolean) {
   hposUpdateSettings (hostPubKey: $hostPubKey, hostName: $hostName, deviceName: $deviceName, sshAccess: $sshAccess) {
     hostPubKey
     hostName

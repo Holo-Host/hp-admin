@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
+import { isNil } from 'lodash/fp'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import LocationIcon from 'components/icons/LocationIcon'
 import PhoneIcon from 'components/icons/PhoneIcon'
@@ -13,32 +14,36 @@ import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import { presentHolofuelAmount, POLLING_INTERVAL_GENERAL } from 'utils'
 import './Dashboard.module.css'
 
+// Temporary. This should be removed once we move to hosted release, as we will always show Hosting Card
+const SHOW_HOSTING_CARD = true
+
 export default function Dashboard () {
   // nb: we only call settings here to track hpos connection status (see apolloClient.js for use)
   useQuery(HposSettingsQuery)
   const { data: { hostingReport = {} } = {} } = useQuery(HostingReportQuery)
   const { data: { earningsReport = {} } = {} } = useQuery(EarningsReportQuery)
-  const { data: { holofuelLedger: { balance } = { balance: 0 } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL_GENERAL })
+  const { data: { holofuelLedger: { balance } = { balance: '--' } } = {} } = useQuery(HolofuelLedgerQuery, { fetchPolicy: 'cache-and-network', pollInterval: POLLING_INTERVAL_GENERAL })
+  const { localSourceChains } = hostingReport
 
   const hostedHapps = hostingReport.hostedHapps || []
 
   const [areHappsExpanded, setAreHappsExpanded] = useState(false)
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
-    {/* hiding this until hosting release */ false && <Card title='Hosting'>
+    {SHOW_HOSTING_CARD && <Card title='Hosting'>
       <div styleName='hosting-row'>
-        <LocationIcon styleName='hosting-icon' /> {hostingReport.localSourceChains || '--'} Local source chains
+        <LocationIcon styleName='hosting-icon' /> {isNil(localSourceChains) ? '--' : localSourceChains} Local source chains
       </div>
       <div styleName='hosting-row'>
         <PhoneIcon styleName='hosting-icon' /> {hostingReport.zomeCalls || '--'} Zome calls
       </div>
       <div styleName={areHappsExpanded ? 'hosting-row-expanded' : 'hosting-row'} onClick={() => setAreHappsExpanded(!areHappsExpanded)}>
-        <GridIcon styleName='hosting-icon' /> {hostedHapps.length || '--'} Hosted hApps
-        <ArrowRightIcon color='#979797' styleName={areHappsExpanded ? 'up-arrow' : 'down-arrow'} />
-        {areHappsExpanded && <div styleName='happ-list'>
-          {hostedHapps.map(({ name }) => <div styleName='happ-name'>{name}</div>)}
-        </div>}
+        <GridIcon styleName='hosting-icon' /> {hostedHapps.length} Hosted hApps
+        {!!hostedHapps.length && <ArrowRightIcon color='#979797' styleName={areHappsExpanded ? 'up-arrow' : 'down-arrow'} />}
       </div>
+      {areHappsExpanded && <div styleName='happ-list'>
+        {hostedHapps.map(({ name }) => <div styleName='happ-name'>{name}</div>)}
+      </div>}
     </Card>}
 
     {/* hiding this until earnings are available */ false && <Card title='Earnings'>

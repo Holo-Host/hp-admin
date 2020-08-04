@@ -62,21 +62,15 @@ export const resolvers = {
 
     hposStatus: HposInterface.os.status,
 
-    hostingReport: () => {
+    hostingReport: async () => {
+      const hostedHapps = await HposInterface.os.hostedHapps()
+
+      const localSourceChains = hostedHapps.reduce((total, happ) => total + happ.number_instances, 0)
+
       return {
-        localSourceChains: 18,
+        localSourceChains,
         zomeCalls: 588,
-        hostedHapps: [
-          {
-            name: 'Holofuel'
-          },
-          {
-            name: 'Communities'
-          },
-          {
-            name: 'H-Wiki'
-          }
-        ]
+        hostedHapps
       }
     },
 
@@ -120,9 +114,9 @@ export const resolvers = {
 
     holofuelUpdateUser: (_, { nickname, avatarUrl }) => HoloFuelDnaInterface.user.update(nickname, avatarUrl),
 
-    holofuelRequest: (_, { counterpartyId, amount, notes }) => HoloFuelDnaInterface.requests.create(counterpartyId, amount, notes),
+    holofuelRequest: (_, { request }) => HoloFuelDnaInterface.requests.create(request),
 
-    holofuelOffer: (_, { counterpartyId, amount, notes, requestId }) => HoloFuelDnaInterface.offers.create(counterpartyId, amount, notes, requestId),
+    holofuelOffer: (_, { offer }) => HoloFuelDnaInterface.offers.create(offer),
 
     holofuelAcceptOffer: (_, { transactionId }) => HoloFuelDnaInterface.offers.accept(transactionId),
 

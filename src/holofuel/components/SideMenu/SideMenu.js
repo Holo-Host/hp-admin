@@ -5,9 +5,8 @@ import { Link, useLocation } from 'react-router-dom'
 import HashAvatar from 'components/HashAvatar'
 import { presentAgentId } from 'utils'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
-import Button from 'components/UIButton'
-import Loading from 'components/Loading'
 import BackIcon from 'components/icons/BackIcon'
+import MenuButton from 'holofuel/components/MenuButton'
 
 import {
   INBOX_PATH,
@@ -19,14 +18,11 @@ import './SideMenu.module.css'
 
 export default function SideMenu ({
   isOpen,
-  isWide,
-  handleClose,
   avatarUrl = '',
   agent,
   agentLoading,
-  inboxCount,
-  isLoadingRefetchCalls,
-  refetchCalls
+  newActionableItems,
+  closeMenu
 }) {
   const location = useLocation()
   const [currentPath, setCurrentPath] = useState()
@@ -34,8 +30,9 @@ export default function SideMenu ({
     setCurrentPath(location.pathname)
   }, [location])
 
-  return <aside styleName={cx('drawer', { 'drawer--open': isOpen }, { desktop: isWide })}>
+  return <aside styleName={cx('drawer', { 'drawer--open': isOpen })}>
     <div styleName='container'>
+      <MenuButton onClick={closeMenu} styleName='menu-button' />
       <header styleName='header'>
         <CopyAgentId agent={{ id: agent.id }} isMe>
           <HashAvatar avatarUrl={avatarUrl} seed={agent.id} size={48} styleName='avatar' />
@@ -49,7 +46,7 @@ export default function SideMenu ({
         <ul styleName='nav-list'>
           <li styleName={cx({ 'active-link': currentPath === '/holofuel/inbox/' || currentPath === '/holofuel/inbox' || currentPath === '/holofuel/' || currentPath === '/holofuel' })}>
             <Link to={INBOX_PATH} styleName='nav-link'>
-              Inbox <InboxBadge count={inboxCount} />
+              Inbox <InboxBadge newActionableItems={newActionableItems} />
             </Link>
           </li>
           <li styleName={cx({ 'active-link': currentPath === '/holofuel/history/' || currentPath === '/holofuel/history' })}>
@@ -62,16 +59,7 @@ export default function SideMenu ({
               Profile
             </Link>
           </li>
-          <li>
-            <div styleName='loading-row'>
-              <Button onClick={() => refetchCalls()} styleName={cx('refresh-button', { 'btn-loading': isLoadingRefetchCalls })} variant='green'>
-                Refresh
-              </Button>
-              {isLoadingRefetchCalls && <Loading styleName='refresh-loading' width={20} height={20} />}
-            </div>
-          </li>
-
-          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='underline'>
+          {process.env.REACT_APP_HOLOFUEL_APP !== 'true' && <li styleName='back-link'>
             <Link to='/admin/' styleName='admin-nav-link'>
               <BackIcon styleName='back-icon' /> HP Admin
             </Link>
@@ -106,14 +94,11 @@ export default function SideMenu ({
       </footer>
 
     </div>
-    {!isWide && <div styleName='drawer-overlay' onClick={handleClose} />}
+    <div styleName='drawer-overlay' onClick={closeMenu} />
   </aside>
 }
 
-function InboxBadge ({ count = 0 }) {
-  if (count === 0) return null
-
-  return <div styleName='inbox-badge'>
-    {count}
-  </div>
+function InboxBadge ({ newActionableItems = false }) {
+  if (!newActionableItems) return null
+  return <div styleName='inbox-badge' />
 }

@@ -30,7 +30,7 @@ it('should render the title and a menu icon with update badge when inbox updates
   const props = {
     history: { push: jest.fn() },
     agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' },
-    inboxCount: 2
+    newActionableItems: 2
   }
   const { getByText, getByTestId } = render(<Header {...props} />)
 
@@ -46,7 +46,7 @@ it('should render the menu icon without update badge when no inbox updates exist
   const props = {
     history: { push: jest.fn() },
     agent: { id: 'QmAGENTHASH', nickname: 'AGENT NICKNAME' },
-    inboxCount: 0
+    newActionableItems: 0
   }
   const { getByText, getByTestId } = render(<Header {...props} />)
 

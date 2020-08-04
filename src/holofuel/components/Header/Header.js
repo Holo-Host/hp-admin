@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
-import Button from 'components/Button'
 import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
 import { withRouter } from 'react-router'
@@ -8,8 +7,9 @@ import { holochainClient as webSdkConnection, hostContext } from 'holochainClien
 
 import MenuIcon from 'components/icons/MenuIcon'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import MenuButton from '../MenuButton/MenuButton'
 
-export function Header ({ agent, agentLoading, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount, isWide }) {
+export function Header ({ agent, history: { push }, hamburgerClick = () => push('/dashboard'), newActionableItems }) {
   const [isSignedIn, setIsSignedIn] = useState(false)
   const [shouldDisable, setShouldDisable] = useState()
 
@@ -37,15 +37,13 @@ export function Header ({ agent, agentLoading, history: { push }, hamburgerClick
     {inboxCount > 0 && <span styleName='nav-badge' data-testid='inboxCount-badge'>{inboxCount}</span>}
   </Button>
 
-  if (agentLoading) agentLoading = <h4>Loading...</h4>
-
   return <header>
     <section styleName='header'>
       <div styleName='left-nav'>
-        {leftNav}
+        <MenuButton onClick={hamburgerClick} newActionableItems={newActionableItems} />
       </div>
       <div styleName='center-nav'>
-        <div styleName={cx('page-header', { desktop: isWide })}>
+        <div styleName={cx('page-header')}>
           <h1 styleName='page-title'>Test Fuel</h1>
         </div>
       </div>

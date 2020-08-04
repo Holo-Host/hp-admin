@@ -1,0 +1,21 @@
+.modal-message {
+  display: flex;
+  font-family: "Circular";
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--color-rhino-60);
+  margin-top: -10px;
+  margin-bottom: 40px;
+}
+
+.modal-checkbox {
+  margin: 0 auto;
+}
+
+.label {
+  display: flex;
+  font-family: "Circular";
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--color-rhino-60);
+}

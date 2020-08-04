@@ -87,6 +87,11 @@ const presentHposSettings = (hposSettings) => {
   }
 }
 
+const presentHostedHapp = hostedHapp => ({
+  name: hostedHapp['happ-title'],
+  number_instances: hostedHapp['number_instances']
+})
+
 const HposInterface = {
   os: {
     // HOLOPORT_OS SETTINGS
@@ -134,6 +139,11 @@ const HposInterface = {
     updateVersion: async () => {
       const result = await hposCall({ method: 'post', path: 'upgrade' })()
       return presentHposStatus(result)
+    },
+
+    hostedHapps: async () => {
+      const result = await hposCall({ method: 'get', path: 'hosted_happs' })()
+      return result.hosted_happs.map(presentHostedHapp)
     }
   }
 }

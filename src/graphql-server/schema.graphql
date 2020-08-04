@@ -66,14 +66,13 @@ enum TransactionDirection {
 
 type Transaction {
   id: ID # ID will be the origin commit hash
-  amount: Float
+  amount: String
   counterparty: HolofuelUser
   direction: TransactionDirection
   status: TransactionStatus
   type: TransactionType
   timestamp: String
-  fees: Float
-  presentBalance: Float
+  presentBalance: String
   notes: String
   happName: String
   isPayingARequest: Boolean
@@ -83,11 +82,10 @@ type Transaction {
 }
 
 type Ledger {
-  balance: Float
-  credit: Float
-  payable: Float
-  receivable: Float
-  fees: Float
+  balance: String
+  credit: String
+  payable: String
+  receivable: String
 }
 
 type HposSettings {
@@ -136,6 +134,20 @@ type EarningsReport {
   storage: Float
 }
 
+
+input HolofuelUserInput {
+  agentAddress: String
+  nickname: String
+  avatarUrl: String
+}
+
+input TransactionInput {
+  amount: String
+  counterparty: HolofuelUserInput
+  notes: String
+  requestId: ID
+}
+
 type Query {
   me: Me
   happStoreUser: HappStoreUser
@@ -165,8 +177,8 @@ type Mutation {
   disableHapp(appId: String): Happ
   updateHostPricing(units: String, pricePerUnit: String): HostPricing
   holofuelUpdateUser(nickname: String!, avatarUrl: String): MyHolofuelUser
-  holofuelRequest(counterpartyId: String, amount: Float, notes: String): Transaction
-  holofuelOffer(counterpartyId: String, amount: Float,  notes: String, requestId:ID): Transaction
+  holofuelRequest(request: TransactionInput): Transaction
+  holofuelOffer(offer: TransactionInput): Transaction
   holofuelAcceptOffer(transactionId: ID): Transaction
   holofuelDecline(transactionId: ID): Transaction
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings
