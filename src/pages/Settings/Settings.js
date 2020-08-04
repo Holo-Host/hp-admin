@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { isEmpty, get, pick } from 'lodash/fp'
+import React, { useState, useEffect } from 'react'
+import { isEmpty, get, pick, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import './Settings.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
@@ -12,6 +12,7 @@ import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
+import Input from 'components/Input'
 import { rhino } from 'utils/colors'
 
 // Dictionary of all relevant display ports
@@ -74,6 +75,33 @@ export function Settings () {
 
   const title = (settings.hostName ? `${settings.hostName}'s` : 'Your') + ' HoloPort'
 
+  const [sshAccess, setSshAccess] = useState(false)
+
+  useEffect(() => {
+    if (!isNil(settings.sshAccess)) {
+      setSshAccess(settings.sshAccess)
+    }
+  }, [setSshAccess, settings.sshAccess])
+
+  const saveSshAccess = sshAccess => {
+    updateSettings({
+      variables: {
+        ...pick(['hostPubKey', 'hostName', 'deviceName'], settings),
+        sshAccess
+      },
+      refetchQueries: [{
+        query: HposSettingsQuery
+      }]
+
+    })
+  }
+
+  const toggleSshAccess = (e) => {
+    e.preventDefault()
+    setSshAccess(e.target.checked)
+    saveSshAccess(e.target.checked)
+  }
+
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings', showBackButton: true }}>
     <div styleName='avatar'>
       <HashIcon hash={settings.hostPubKey} size={42} />
@@ -127,6 +155,14 @@ export function Settings () {
         value={!isEmpty(status) && status.networkId ? presentHash(status.networkId, 14) : 'Not Available'}
       />
       <div styleName='settings-header'>&nbsp;</div>
+
+      <SettingsFormInput
+        label='Access for HoloPort support (SSH)'
+        name='sshAccess'
+        type='checkbox'
+        checked={sshAccess}
+        onChange={toggleSshAccess} />
+
       <SettingsRow
         label={<a href='https://holo.host/holoport-reset' target='_blank' rel='noopener noreferrer' styleName='reset-link'>
           <Button name='factory-reset' variant='danger' wide styleName='factory-reset-button'>Factory Reset</Button>
@@ -163,6 +199,21 @@ function VersionUpdateButton ({ updateVersion }) {
   >
     Update Software
   </Button>
+}
+
+export function SettingsFormInput ({
+  name,
+  label,
+  type = 'number',
+  register,
+  errors = {},
+  ...inputProps
+}) {
+  return <div styleName='settings-row'>
+    {label && <label styleName='settings-label' htmlFor={name}>{label}</label>}
+    <Input name={name} id={name} type={type} placeholder={label} ref={register} {...inputProps} />
+    {errors[name] && <small styleName='field-error'>{errors[name].message}</small>}
+  </div>
 }
 
 export default props => <Settings {...props} />
