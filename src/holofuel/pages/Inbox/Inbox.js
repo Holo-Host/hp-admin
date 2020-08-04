@@ -85,8 +85,6 @@ export default function Inbox ({ history: { push } }) {
       newMessage(userMessage, 5000)
     } else if (typeof message === 'string' && message === FAILED_TRANSACTION_MESSAGE) {
       setInboxView(VIEW.recent)
-    } else if (message) { // if message exists and does not meet previous conditions, we want it to clear
-      newMessage('', 0)
     }
   }, [userMessage, newMessage, message])
 
