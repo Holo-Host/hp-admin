@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { isEmpty, get, pick } from 'lodash/fp'
+import React, { useState, useEffect } from 'react'
+import { isEmpty, get, pick, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import './Settings.module.css'
 import { sliceHash as presentHash, presentAgentId } from 'utils'
@@ -75,9 +75,15 @@ export function Settings () {
 
   const title = (settings.hostName ? `${settings.hostName}'s` : 'Your') + ' HoloPort'
 
-  const [sshAccess, setSshAccess] = useState(settings.sshAccess)
-  const saveSshAccess = () => {
-    console.log('sshAccess', sshAccess)
+  const [sshAccess, setSshAccess] = useState(false)
+
+  useEffect(() => {
+    if (!isNil(settings.sshAccess)) {
+      setSshAccess(settings.sshAccess)
+    }
+  }, [setSshAccess, settings.sshAccess])
+
+  const saveSshAccess = sshAccess => {
     updateSettings({
       variables: {
         ...pick(['hostPubKey', 'hostName', 'deviceName'], settings),
@@ -93,7 +99,7 @@ export function Settings () {
   const toggleSshAccess = (e) => {
     e.preventDefault()
     setSshAccess(e.target.checked)
-    saveSshAccess()
+    saveSshAccess(e.target.checked)
   }
 
   return <PrimaryLayout headerProps={{ title: 'HoloPort Settings', showBackButton: true }}>
