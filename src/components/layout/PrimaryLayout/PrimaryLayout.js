@@ -27,7 +27,7 @@ function PrimaryLayout ({
   const [isInsideApp, setIsInsideApp] = useState(true)
   const [isHposConnectionAlive, setIsHposConnectionAlive] = useState(true)
   const { connectionStatus, setConnectionStatus } = useConnectionContext()
-  const { isConnected: isHFConductorConnected } = useHFConnectionContext()
+  const { isConnected: isHFConductorConnected, setIsConnected: setIsHFConductorConnected } = useHFConnectionContext()
   const { setCurrentUser } = useCurrentUserContext()
   const { newMessage } = useFlashMessageContext()
   const { push } = useHistory()
@@ -42,14 +42,15 @@ function PrimaryLayout ({
 
   useInterval(() => {
     if (isLoginPage(window)) {
-      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
-    } else {
       // on login page, set holochain conductor connnection as false when hpos connection is false, or true when true
       setConnectionStatus({ hpos: isHposConnectionAlive, holochain: isHposConnectionAlive })
+      setIsHFConductorConnected(isHposConnectionAlive)
+    } else {
+      setConnectionStatus({ hpos: isHposConnectionAlive, holochain: wsConnection })
     }
   }, 5000)
 
-  const setConductorConnectionFalse = useCallback(() => setConnectionStatus({ ...connectionStatus, holochain: false }), [setConnectionStatus, connectionStatus])
+  const setConductorConnection = useCallback(connection => setConnectionStatus({ ...connectionStatus, holochain: connection }), [setConnectionStatus, connectionStatus])
 
   useEffect(() => {
     const setUser = () => {
@@ -60,7 +61,9 @@ function PrimaryLayout ({
     }
 
     if (!isHFConductorConnected && connectionStatus.holochain) {
-      setConductorConnectionFalse()
+      setConductorConnection(false)
+    } else if (isHFConductorConnected && !connectionStatus.holochain) {
+      setConductorConnection(true)
     }
 
     if (!connectionStatus.hpos && !isPausedConnectionCheckInterval) {
@@ -71,7 +74,7 @@ function PrimaryLayout ({
       newMessage('Connecting to your Holoport...', 0)
       setIsPausedConnectionCheckInterval(true)
       setTimeout(() => setIsPausedConnectionCheckInterval(false), 5000)
-    } else if (connectionStatus.hpos && !connectionStatus.holochain) {
+    } else if (connectionStatus.hpos && !connectionStatus.holochain && !isHFConductorConnected) {
       if (!isLoginPage(window)) {
         push(HP_ADMIN_LOGIN_PATH)
       }
@@ -95,7 +98,7 @@ function PrimaryLayout ({
     isHFConductorConnected,
     setIsHposConnectionAlive,
     setIsPausedConnectionCheckInterval,
-    setConductorConnectionFalse,
+    setConductorConnection,
     isInsideApp,
     setIsInsideApp])
 

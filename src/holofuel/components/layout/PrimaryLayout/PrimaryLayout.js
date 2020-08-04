@@ -18,7 +18,7 @@ import Header from 'holofuel/components/Header'
 import FlashMessage from 'holofuel/components/FlashMessage'
 import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { shouldShowTransactionAsActionable } from 'models/Transaction'
-import { INBOX_PATH } from 'holofuel/utils/urls'
+import { INBOX_PATH, isHolofuelPage } from 'holofuel/utils/urls'
 import { HP_ADMIN_LOGIN_PATH } from 'utils/urls'
 import { wsConnection } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
@@ -77,7 +77,8 @@ function PrimaryLayout ({
   const { newMessage } = useFlashMessageContext()
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
 
-  const inboxCount = actionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds)).length
+  const actionableTransactionsCount = actionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds)).length
+  const newActionableItems = !!actionableTransactionsCount && !isHolofuelPage(INBOX_PATH, window)
 
   const { push } = useHistory()
   const [shouldRefetchMyUser, setShouldRefetchMyUser] = useState(false)
@@ -123,13 +124,13 @@ function PrimaryLayout ({
   const closeMenu = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout')}>
-    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} inboxCount={inboxCount} />
+    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} newActionableItems={newActionableItems} />
     <SideMenu
       isOpen={isMenuOpen}
       closeMenu={closeMenu}
       agent={currentUser}
       agentLoading={currentUserLoading}
-      inboxCount={inboxCount}
+      newActionableItems={newActionableItems}
       holofuelBalance={holofuelBalance}
       ledgerLoading={isLoadingFirstLedger} />
     {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}

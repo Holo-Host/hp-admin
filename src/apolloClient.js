@@ -26,12 +26,12 @@ const mapGraphQLError = (graphQLErrors, response, { hposCheck, errorMessage }) =
 
 const errorLink = onError(({ graphQLErrors, response, operation }) => {
   if (graphQLErrors) {
-    if (operation.operationName === 'HposSettings') {
+    if (operation.operationName === 'HposSettingsQuery') {
       return mapGraphQLError(graphQLErrors, response, { hposCheck: true })
-    } else if (operation.operationName === 'HolofuelOffer') {
+    } else if (operation.operationName === 'HolofuelOfferMutation') {
       const offerErrorMessage = 'Offer unsuccessful'
       return mapGraphQLError(graphQLErrors, response, { hposCheck: false, errorMessage: offerErrorMessage })
-    } else if (operation.operationName === 'HolofuelRequest') {
+    } else if (operation.operationName === 'HolofuelRequestMutation') {
       const requestErrorMessage = 'Request unsuccessful'
       return mapGraphQLError(graphQLErrors, response, { hposCheck: false, errorMessage: requestErrorMessage })
     }

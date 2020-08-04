@@ -6,13 +6,11 @@ import { withRouter } from 'react-router'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
 import MenuButton from '../MenuButton/MenuButton'
 
-export function Header ({ agent, agentLoading, history: { push }, hamburgerClick = () => push('/dashboard'), inboxCount }) {
-  if (agentLoading) agentLoading = <h4>Loading...</h4>
-
+export function Header ({ agent, history: { push }, hamburgerClick = () => push('/dashboard'), newActionableItems }) {
   return <header>
     <section styleName='header'>
       <div styleName='left-nav'>
-        <MenuButton onClick={hamburgerClick} inboxCount={inboxCount} />
+        <MenuButton onClick={hamburgerClick} newActionableItems={newActionableItems} />
       </div>
       <div styleName='center-nav'>
         <div styleName={cx('page-header')}>
