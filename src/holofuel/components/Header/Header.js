@@ -4,10 +4,8 @@ import HashAvatar from 'components/HashAvatar'
 import './Header.module.css'
 import { withRouter } from 'react-router'
 import { holochainClient as webSdkConnection, hostContext } from 'holochainClient'
-
-import MenuIcon from 'components/icons/MenuIcon'
+import MenuButton from 'holofuel/components/MenuButton'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
-import MenuButton from '../MenuButton/MenuButton'
 
 export function Header ({ agent, history: { push }, hamburgerClick = () => push('/dashboard'), newActionableItems }) {
   const [isSignedIn, setIsSignedIn] = useState(false)
@@ -31,11 +29,6 @@ export function Header ({ agent, history: { push }, hamburgerClick = () => push(
       setIsSignedIn(true)
     }
   }
-
-  const leftNav = <Button onClick={hamburgerClick} styleName='menu-button' dataTestId='menu-button'>
-    <MenuIcon styleName='menu-icon' color='#000000' />
-    {inboxCount > 0 && <span styleName='nav-badge' data-testid='inboxCount-badge'>{inboxCount}</span>}
-  </Button>
 
   return <header>
     <section styleName='header'>
