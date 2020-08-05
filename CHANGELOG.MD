@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## unreleased
 ### Added
 - Hosting card gets real data from HPOS for hosted happs and local source chain count
+- Hosting card gets real data from HPOS for aggregatee of hosted happ zome calls
 
 ## [0.13.4] - 2020-08-03
 ### Added
