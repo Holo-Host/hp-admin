@@ -15,6 +15,13 @@
   padding-top: 36px;
 }
 
+.settings-section-narrow {
+}
+
+.settings-section-wide {
+  margin: 0 -53px;
+}
+
 .version-header-row {
   display: flex;
 }

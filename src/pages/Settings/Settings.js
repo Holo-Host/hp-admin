@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { isEmpty, get, pick, isNil } from 'lodash/fp'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import './Settings.module.css'
@@ -12,6 +12,7 @@ import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
 import useFlashMessageContext from 'contexts/useFlashMessageContext'
+import ScreenWidthContext from 'contexts/screenWidth'
 import Input from 'components/Input'
 import { rhino } from 'utils/colors'
 
@@ -102,13 +103,15 @@ export function Settings () {
     saveSshAccess(e.target.checked)
   }
 
+  const isWide = useContext(ScreenWidthContext)
+
   return <PrimaryLayout headerProps={{ title: 'Settings', showBackButton: true }}>
     <div styleName='avatar'>
       <HashIcon hash={settings.hostPubKey} size={42} />
     </div>
     <div styleName='title'>{title}</div>
 
-    <section styleName='settings-section'>
+    <section styleName={isWide ? 'settings-section-wide' : 'settings-section-narrow'}>
       <div styleName='version-header-row'>
         <div styleName='settings-header'>Software Version</div>
         {updateAvailable && <div styleName='update-available'>Update Available</div>}
