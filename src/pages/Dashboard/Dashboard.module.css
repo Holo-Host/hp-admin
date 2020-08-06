@@ -1,3 +1,19 @@
+.dashboard {
+  display: flex;
+  flex-shrink: 1;
+}
+
+.dashboard-wide {
+  composes: dashboard;
+  flex-direction: row;
+}
+
+.dashboard-narrow {
+  composes: dashboard;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 .hosting-row {
   display: flex;
   font-family: "Circular";
@@ -126,6 +142,16 @@
   position: relative;
   margin-bottom: 46px;
   text-decoration: none;
+}
+
+.card-wide {
+  composes: card;
+  width: 325px;
+  margin-right: 46px;
+}
+
+.card-narrow {
+  composes: card;
 }
 
 .card-title {

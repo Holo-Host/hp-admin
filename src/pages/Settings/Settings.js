@@ -102,7 +102,7 @@ export function Settings () {
     saveSshAccess(e.target.checked)
   }
 
-  return <PrimaryLayout headerProps={{ title: 'HoloPort Settings', showBackButton: true }}>
+  return <PrimaryLayout headerProps={{ title: 'Settings', showBackButton: true }}>
     <div styleName='avatar'>
       <HashIcon hash={settings.hostPubKey} size={42} />
     </div>

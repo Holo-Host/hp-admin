@@ -21,7 +21,18 @@
   flex-direction: column;
   flex-grow: 1;
   flex-shrink: 1;
+}
+
+.content-narrow {
+  composes: content;
   padding-top: 40px;
+}
+
+.content-wide {
+  composes: content;
+  padding-top: 70px;
+  margin-left: 78px;
+  margin-right: 78px;
 }
 
 .menu-link {
@@ -30,6 +41,14 @@
 }
 
 /* DesktopLayout */
+
+.desktop-title {
+  font-family: "Circular";
+  font-size: 14px;
+  line-height: 19px;
+  color: black; 
+  margin-bottom: 20px;
+}
 
 /* Footer */
 
@@ -95,7 +114,6 @@
   line-height: 16px;
   color: var(--color-rhino);
   background-color: #d2f2f5;
-  box-shadow: 1px -1.5px 14px rgba(163, 160, 160, 0.5);
 }
 
 .alpha-flag {

@@ -110,7 +110,7 @@ function PrimaryLayout ({
     {!isWide && <MobileLayout showHeader={showHeader} headerProps={headerProps} settings={settings}>
       {children}
     </MobileLayout>}
-    {isWide && <DesktopLayout settings={settings}>{children}</DesktopLayout>}
+    {isWide && <DesktopLayout settings={settings} title={headerProps.title}>{children}</DesktopLayout>}
   </div>
 }
 
@@ -120,7 +120,7 @@ export function MobileLayout ({ showHeader, headerProps, settings, children }) {
       {showHeader && <Header
         {...headerProps}
         settings={settings} />}
-      <div styleName='styles.content'>
+      <div styleName='styles.content-narrow'>
         <FlashMessage />
         {children}
       </div>
@@ -130,12 +130,13 @@ export function MobileLayout ({ showHeader, headerProps, settings, children }) {
   </>
 }
 
-export function DesktopLayout ({ children, settings }) {
+export function DesktopLayout ({ children, settings, title }) {
   return <>
     <div styleName='styles.wide'>
       {!isLoginPage(window) && <Sidebar settings={settings} />}
-      <div styleName='styles.content'>
+      <div styleName='styles.content-wide'>
         <FlashMessage />
+        <h2 styleName='styles.desktop-title'>{title}</h2>
         {children}
       </div>
     </div>
@@ -143,7 +144,7 @@ export function DesktopLayout ({ children, settings }) {
 }
 
 export function Footer ({ isWide }) {
-  return <div styleName={cx({'styles.wrapper-wide': isWide, 'styles.wrapper-narrow': !isWide})}>
+  return <div styleName={cx({ 'styles.wrapper-wide': isWide, 'styles.wrapper-narrow': !isWide })}>
     <div styleName='styles.container'>
       <footer styleName='styles.footer'>
         <div styleName='styles.alpha-info'>
