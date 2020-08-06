@@ -133,6 +133,7 @@ async function initHolochainClient () {
       if (HOLOCHAIN_LOGGING) {
         webSdkConnection.on('🎉 Web SDK connected and ready for Zome Calls...', console.log.bind(console))
       }
+
       window.webSdkConnection = webSdkConnection
       holochainClient = webSdkConnection
 
@@ -192,7 +193,7 @@ async function initAndGetHolochainClient () {
   // isInitiatingHcConnection is changed in a different call of this function running in parallel
   while (isInitiatingHcConnection) {
     counter++
-    await wait(100)
+    await wait(1000)
     if (counter === 10) {
       isInitiatingHcConnection = false
     }

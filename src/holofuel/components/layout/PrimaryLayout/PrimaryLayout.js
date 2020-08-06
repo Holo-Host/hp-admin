@@ -121,7 +121,7 @@ function PrimaryLayout ({
         // }
       }
     }
-  }, [hasWebSDKConnection, isSignedInAsHostedAgent])
+  }, [hasWebSDKConnection, isSignedInAsHostedAgent, setIsSignedInAsHostedAgent])
 
   useInterval(() => {
     setIsConnected(wsConnection)
@@ -151,7 +151,7 @@ function PrimaryLayout ({
       setHostedAgentDetails()
       if (isSignedInAsHostedAgent && hostedAgentContext <= 2) {
         // TODO: Block proceeding to main page if agent is at all anonymous...
-        console.log('Proceeding with an anonymous hosted agent context (even though signed in and not anonymous)...  Don\'t allow once chaperone is updated with non static contexts.')
+        console.log('Proceeding with a static anonymous hosted agent CONTEXT (even though agent has keys and not anonymous)...  Don\'t allow once chaperone is updated with non static contexts.')
       }
     }  
   }, [isConnected,
