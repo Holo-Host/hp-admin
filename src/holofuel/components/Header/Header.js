@@ -28,7 +28,7 @@ export function Header ({ agent, history: { push }, hamburgerClick = () => push(
       // todo: the context is hard coded in chaperone right now to only return 2;
       // once chaperone is updated, update this sign in to only occur if the context is 3
     } else if (!isSignedInAsHostedAgent && hostedAgentContext >= 2) {
-      await webSdkConnection.signIn()
+      // await webSdkConnection.signIn()
       setIsSignedInAsHostedAgent(true)
     }
   }

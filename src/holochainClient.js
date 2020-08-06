@@ -133,10 +133,18 @@ async function initHolochainClient () {
       if (HOLOCHAIN_LOGGING) {
         webSdkConnection.on('🎉 Web SDK connected and ready for Zome Calls...', console.log.bind(console))
       }
-      await webSdkConnection.signOut()
-      await webSdkConnection.signIn()
+      // const hostedAgentContext = await webSdkConnection.context()
+      // if (hostedAgentContext <= 2) {
+      //   await webSdkConnection.signOut()
+      //   await webSdkConnection.signIn()
+      // }
+
       window.webSdkConnection = webSdkConnection
       holochainClient = webSdkConnection
+
+      wsConnection = true
+      isInitiatingHcConnection = false
+      return holochainClient
     } else if (HP_ADMIN_HOST_CONTEXT) {
       console.log('Inside hp-admin/host environment...')
       console.log('Establishing HPOS connection...')
@@ -148,16 +156,9 @@ async function initHolochainClient () {
       params.sort()
       urlObj.search = params.toString()
       url = urlObj.toString()
-      holochainClient = await hcWebClientConnect({
-        url,
-        wsClient: { max_reconnects: 1 }
-      })
     } else {
       console.log('Defaulting to local holochain environment...')
-      holochainClient = await hcWebClientConnect({
-        url: process.env.REACT_APP_DNA_INTERFACE_URL,
-        wsClient: { max_reconnects: 1 }
-      })
+      url = process.env.REACT_APP_DNA_INTERFACE_URL
     }
 
     // if hc-web-client connection never completes promise
@@ -180,7 +181,7 @@ async function initHolochainClient () {
       })
       .catch(err => {
         throw (err)
-      })
+      }) 
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())
@@ -190,6 +191,7 @@ async function initHolochainClient () {
     throw (error)
   }
 }
+
 async function initAndGetHolochainClient () {
   let counter = 0
   // This code is to avoid multiple ws connections.
@@ -229,17 +231,20 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   return async function (args = {}) {
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
-      let zomeCall
+      let jsonResult
       if (MOCK_DNA_CONNECTION && MOCK_INDIVIDUAL_DNAS[instanceId]) {
-        zomeCall = mockCallZome(instanceId, zome, zomeFunc)
+        const rawResult = await mockCallZome(instanceId, zome, zomeFunc)(args)
+        jsonResult = JSON.parse(rawResult)
       } else {
         await initAndGetHolochainClient()
-        const dnaAliasInstanceId = conductorInstanceIdbyDnaAlias(instanceId)
-        zomeCall = holochainClient.callZome(dnaAliasInstanceId, zome, zomeFunc)
+        if (HOSTED_HOLOFUEL_CONTEXT) {
+          jsonResult = await holochainClient.zomeCall(instanceId, zome, zomeFunc, args)
+        } else {
+          const rawResult = await holochainClient.callZome(instanceId, zome, zomeFunc)(args)
+          jsonResult = JSON.parse(rawResult)
+        }
       }
 
-      const rawResult = await zomeCall(args)
-      const jsonResult = JSON.parse(rawResult)
       const error = get('Err', jsonResult) || get('SerializationError', jsonResult)
       const rawOk = get('Ok', jsonResult)
 

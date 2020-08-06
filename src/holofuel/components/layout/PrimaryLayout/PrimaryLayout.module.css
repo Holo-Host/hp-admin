@@ -32,7 +32,10 @@
   padding-right: 10px;
 }
 
+/* todo: ADD DESIGNS FOR LANDING OVERLAY HERE */
 .hosted-landing-overlay {
-  /* todo: ADD DESIGNS FOR LANDING OVERLAY HERE */
- opacity: 0.1;
+  opacity: 0.3;
+  /* nb: blur effect doesn't work in edge 12 or IE */
+  filter: blur(100px);
+  -webkit-filter: blur(100px);
 }

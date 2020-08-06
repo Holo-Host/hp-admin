@@ -96,26 +96,28 @@ function PrimaryLayout ({
   const [hostedAgentContext, setHostedAgentContext] = useState(0)
   // console.log('>>>>>>>>>>> isSignedInAsHostedAgent : ', isSignedInAsHostedAgent);
 
-  const setHostedAgentDetails = useCallback(async () => {
-    if (webSdkConnection) {
-      // nb: the context is hard coded in chaperone right now to only return 2,
-      const hostedAgentContext = await webSdkConnection.context()
-      console.log('>>>>>>>>>>> hostedAgentContext : ', hostedAgentContext);
-      setHostedAgentContext(hostedAgentContext)
+  // const setHostedAgentDetails = useCallback(async () => {
+  //   if (webSdkConnection) {
+  //     // nb: the context is hard coded in chaperone right now to only return 2,
+  //     const hostedAgentContext = await webSdkConnection.context()
+  //     console.log('>>>>>>>>>>> hostedAgentContext : ', hostedAgentContext);
+  //     setHostedAgentContext(hostedAgentContext)
       
-      // only require sign-in if hosted agent context returns a hosted anonymous agent/user
-      if (hostedAgentContext <= 2) {
-        const isHostedAgentSignedIn = await webSdkConnection.signIn()
-        console.log('>>>>>>>>>>> isHostedAgentSignedIn : ', isHostedAgentSignedIn);
-        setIsSignedInAsHostedAgent(isHostedAgentSignedIn)
-        // retrigger sign in if failed
-        if(!isHostedAgentSignedIn) {
-          await webSdkConnection.signOut()
-          await webSdkConnection.signIn()
-        }
-      }
-    }
-  }, [])
+  //     // only require sign-in if hosted agent context returns a hosted anonymous agent/user
+  //     if (hostedAgentContext <= 2) {
+  //       console.log('>>>>>>>>>>> hostedAgentContext is less than 2 : ');
+
+  //       // const isHostedAgentSignedIn = await webSdkConnection.signIn()
+  //       // console.log('>>>>>>>>>>> isHostedAgentSignedIn : ', isHostedAgentSignedIn);
+  //       // setIsSignedInAsHostedAgent(isHostedAgentSignedIn)
+  //       // // retrigger sign in if failed
+  //       // if(!isHostedAgentSignedIn) {
+  //       //   await webSdkConnection.signOut()
+  //       //   await webSdkConnection.signIn()
+  //       // }
+  //     }
+  //   }
+  // }, [])
 
   useEffect(() => {
     console.log('HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent : ', HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent);
@@ -138,7 +140,7 @@ function PrimaryLayout ({
     }
     // holo hosted specific
     if (HOSTED_HOLOFUEL_CONTEXT) {
-      setHostedAgentDetails()
+      // setHostedAgentDetails()
       if (isSignedInAsHostedAgent && hostedAgentContext <= 2) {
         // TODO: Block proceeding to main page if agent is at all anonymous...
         console.log('Proceeding as an anonymous hosted agent...!  Don\'t allow once chaperone is updated')
@@ -153,7 +155,7 @@ function PrimaryLayout ({
     refetchMyHolofuelUser,
     isSignedInAsHostedAgent,
     hostedAgentContext,
-    setHostedAgentDetails
+    // setHostedAgentDetails
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
