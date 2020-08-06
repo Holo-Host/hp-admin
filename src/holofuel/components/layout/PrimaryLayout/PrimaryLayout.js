@@ -7,6 +7,7 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
+import useHostedAgentAuthStatusContext from 'holofuel/contexts/useHostedAgentAuthStatusContext'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
@@ -88,8 +89,8 @@ function PrimaryLayout ({
   }, [setShouldRefetchMyUser, refetchMyUser])
   
   // holo hosted specific
+  const { isSignedInAsHostedAgent, setIsSignedInAsHostedAgent } = useHostedAgentAuthStatusContext()
   const [hasWebSDKConnection, setHasWebSDKConnection] = useState(false)
-  const [isSignedInAsHostedAgent, setIsSignedInAsHostedAgent] = useState(false)
   const [hostedAgentContext, setHostedAgentContext] = useState(0)
 
   const setHostedAgentDetails = useCallback(async () => {
@@ -124,7 +125,6 @@ function PrimaryLayout ({
 
   useInterval(() => {
     setIsConnected(wsConnection)
-    console.log('!!webSdkConnection ', !!webSdkConnection);
     setHasWebSDKConnection(!!webSdkConnection)
   }, 5000)
 
@@ -171,27 +171,29 @@ function PrimaryLayout ({
   const hamburgerClick = () => setMenuOpen(!isMenuOpen)
   const closeMenu = () => setMenuOpen(false)
 
-  return <div styleName={cx('styles.primary-layout', { 'styles.hosted-landing-overlay' : (HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) })}>
-    <Header {...headerProps} 
-      agent={currentUser}
-      agentLoading={currentUserLoading}
-      hamburgerClick={hamburgerClick}
-      newActionableItems={newActionableItems}
-      hostedAgentContext={hostedAgentContext}
-      isSignedInAsHostedAgent={isSignedInAsHostedAgent}
-      setIsSignedInAsHostedAgent={setIsSignedInAsHostedAgent} />
-    <SideMenu
-      isOpen={isMenuOpen}
-      closeMenu={closeMenu}
-      agent={currentUser}
-      agentLoading={currentUserLoading}
-      newActionableItems={newActionableItems}
-      holofuelBalance={holofuelBalance}
-      ledgerLoading={isLoadingFirstLedger} />
-    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName={cx('styles.content')}>
-      <FlashMessage />
-      {children}
+  return <div styleName={cx('styles.primary-layout')}>
+    {(HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) && <h2 styleName='styles.text'>Connecting to Holo...</ h2>}
+    <div styleName={cx('styles.content', { 'styles.hosted-landing-overlay' : (HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) })}>
+      <Header {...headerProps} 
+        agent={currentUser}
+        agentLoading={currentUserLoading}
+        hamburgerClick={hamburgerClick}
+        newActionableItems={newActionableItems}
+        hostedAgentContext={hostedAgentContext} />
+      <SideMenu
+        isOpen={isMenuOpen}
+        closeMenu={closeMenu}
+        agent={currentUser}
+        agentLoading={currentUserLoading}
+        newActionableItems={newActionableItems}
+        holofuelBalance={holofuelBalance}
+        ledgerLoading={isLoadingFirstLedger} />
+      {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
+
+      <div styleName={cx('styles.content')}>
+        <FlashMessage />
+        {children}
+      </div>
     </div>
   </div>
 }

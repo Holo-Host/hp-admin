@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import cx from 'classnames'
-import HashAvatar from 'components/HashAvatar'
-import './Header.module.css'
 import { withRouter } from 'react-router'
+import cx from 'classnames'
+import useHostedAgentAuthStatusContext from 'holofuel/contexts/useHostedAgentAuthStatusContext'
 import { holochainClient as webSdkConnection, HOSTED_HOLOFUEL_CONTEXT } from 'holochainClient'
 import MenuButton from 'holofuel/components/MenuButton'
 import CopyAgentId from 'holofuel/components/CopyAgentId'
+import HashAvatar from 'components/HashAvatar'
+import './Header.module.css'
 
-export function Header ({ agent, history: { push }, hamburgerClick = () => push('/dashboard'), newActionableItems, hostedAgentContext, isSignedInAsHostedAgent, setIsSignedInAsHostedAgent }) {
+export function Header ({ agent, history: { push }, hamburgerClick = () => push('/dashboard'), newActionableItems, hostedAgentContext }) {
+  const { isSignedInAsHostedAgent, setIsSignedInAsHostedAgent } = useHostedAgentAuthStatusContext()
   const [shouldDisable, setShouldDisable] = useState()
   
   useEffect(() => {
