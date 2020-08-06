@@ -90,13 +90,13 @@ function PrimaryLayout ({
 
   // holo hosted specific
   const { isSignedInAsHostedAgent, setIsSignedInAsHostedAgent } = useHostedAgentAuthStatusContext()
-  const [hasWebSDKConnection, setHasWebSDKConnection] = useState(false)
+  const [holoWebSDKConnection, setHoloWebSDKConnection] = useState()
   const [hostedAgentContext, setHostedAgentContext] = useState(0)
 
   const setHostedAgentDetails = useCallback(async () => {
-    if (hasWebSDKConnection) {
+    if (holoWebSDKConnection) {
       // nb: the context is hard coded in chaperone right now to only return 2,
-      const hostedAgentContext = await webSdkConnection.context()
+      const hostedAgentContext = await holoWebSDKConnection.context()
       setHostedAgentContext(hostedAgentContext)
 
       // TODO: Update to read as < 3, once chaperonse is updated with contexts...
@@ -121,11 +121,11 @@ function PrimaryLayout ({
         // }
       }
     }
-  }, [hasWebSDKConnection, isSignedInAsHostedAgent, setIsSignedInAsHostedAgent])
+  }, [holoWebSDKConnection, isSignedInAsHostedAgent, setIsSignedInAsHostedAgent])
 
   useInterval(() => {
     setIsConnected(wsConnection)
-    setHasWebSDKConnection(!!webSdkConnection)
+    setHoloWebSDKConnection(webSdkConnection)
   }, 5000)
 
   useEffect(() => {

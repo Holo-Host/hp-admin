@@ -2,10 +2,12 @@ import { Connection as HoloWebSdkConnection } from '@holo-host/web-sdk'
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
+import * as waitUntil from 'async-wait-until';
 import wait from 'waait'
 
 export const HOSTED_HOLOFUEL_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true'
 export const HP_ADMIN_HOST_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true')
+const CHAPERONE_SERVER_URL = 'http://198.199.73.20:8800/' // production_url: https://chaperone.holo.host/
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -128,10 +130,13 @@ async function initHolochainClient () {
       console.log('Inside hosted holofuel environment...')
       console.log('Establishing Holo web-sdk connection...')
       // use the web-sdk instead of hc-web-client
-      const webSdkConnection = new HoloWebSdkConnection('https://chaperone.holo.host/')
+      const webSdkConnection = process.env.NODE_ENV !== 'production'
+        ? new HoloWebSdkConnection()
+        : new HoloWebSdkConnection(CHAPERONE_SERVER_URL)
+      
       await webSdkConnection.ready()
       if (HOLOCHAIN_LOGGING) {
-        webSdkConnection.on('🎉 Web SDK connected and ready for Zome Calls...', console.log.bind(console))
+        console.log('🎉 Web SDK connected and ready for Zome Calls...')
       }
 
       window.webSdkConnection = webSdkConnection
@@ -211,7 +216,14 @@ async function initAndGetHolochainClient () {
   else return initHolochainClient()
 }
 
-export function createZomeCall (zomeCallPath, callOpts = {}) {
+const connectionReady = async () => {
+  await waitUntil(() => {
+    return holochainClient !== null;
+  }, 30000, 100 )
+  return holochainClient
+}
+
+export function createZomeCall (zomeCallPath, callOpts = {}) { 
   const DEFAULT_OPTS = {
     logging: HOLOCHAIN_LOGGING,
     resultParser: null
@@ -224,6 +236,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   const prevErr = []
 
   return async function (args = {}) {
+    await connectionReady()
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
       let jsonResult
@@ -233,6 +246,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
       } else {
         await initAndGetHolochainClient()
         if (HOSTED_HOLOFUEL_CONTEXT) {
+          if (!holochainClient) return
           jsonResult = await holochainClient.zomeCall(instanceId, zome, zomeFunc, args)
         } else {
           const rawResult = await holochainClient.callZome(instanceId, zome, zomeFunc)(args)
