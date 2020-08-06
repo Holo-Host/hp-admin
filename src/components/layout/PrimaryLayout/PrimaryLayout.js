@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { object } from 'prop-types'
-import cx from 'classnames'
 import { Link, useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
 import FlashMessage from 'components/FlashMessage'
@@ -144,7 +143,7 @@ export function DesktopLayout ({ children, settings, title }) {
 }
 
 export function Footer ({ isWide }) {
-  return <div styleName={cx({ 'styles.wrapper-wide': isWide, 'styles.wrapper-narrow': !isWide })}>
+  return <div styleName={isWide ? 'styles.wrapper-wide' : 'styles.wrapper-narrow'}>
     <div styleName='styles.container'>
       <footer styleName='styles.footer'>
         <div styleName='styles.alpha-info'>

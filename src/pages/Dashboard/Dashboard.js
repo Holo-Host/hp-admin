@@ -2,7 +2,6 @@ import React, { useState, useContext } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
 import { isNil } from 'lodash/fp'
-import cx from 'classnames'
 import PrimaryLayout from 'components/layout/PrimaryLayout'
 import LocationIcon from 'components/icons/LocationIcon'
 import PhoneIcon from 'components/icons/PhoneIcon'
@@ -31,7 +30,7 @@ export default function Dashboard () {
   const isWide = useContext(ScreenWidthContext)
 
   return <PrimaryLayout headerProps={{ title: 'Home' }}>
-    <div styleName={cx({ 'dashboard-narrow': !isWide, 'dashboard-wide': isWide })}>
+    <div styleName={isWide ? 'dashboard-wide' : 'dashboard-narrow'}>
       <Card title='Hosting' isWide={isWide}>
         <div styleName='hosting-row'>
           <LocationIcon styleName='hosting-icon' /> {isNil(localSourceChains) ? '--' : localSourceChains} Local source chains
