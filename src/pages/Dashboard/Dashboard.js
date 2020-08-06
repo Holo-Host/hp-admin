@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { Link } from 'react-router-dom'
 import { isNil } from 'lodash/fp'
@@ -6,6 +6,7 @@ import PrimaryLayout from 'components/layout/PrimaryLayout'
 import LocationIcon from 'components/icons/LocationIcon'
 import PhoneIcon from 'components/icons/PhoneIcon'
 import GridIcon from 'components/icons/GridIcon'
+import ScreenWidthContext from 'contexts/screenWidth'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HostingReportQuery from 'graphql/HostingReportQuery.gql'
@@ -28,6 +29,10 @@ export default function Dashboard () {
   const hostedHapps = hostingReport.hostedHapps || []
 
   const [areHappsExpanded, setAreHappsExpanded] = useState(false)
+
+  const isWide = useContext(ScreenWidthContext)
+
+  console.log('isWide', isWide)
 
   return <PrimaryLayout headerProps={{ title: 'HP Admin' }}>
     {SHOW_HOSTING_CARD && <Card title='Hosting'>

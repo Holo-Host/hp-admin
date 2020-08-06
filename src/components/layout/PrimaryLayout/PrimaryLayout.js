@@ -1,11 +1,13 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { object } from 'prop-types'
 import cx from 'classnames'
-import { useHistory } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
 import FlashMessage from 'components/FlashMessage'
 import Header from 'components/Header'
 import AlphaFlag from 'components/AlphaFlag'
+import GearIcon from 'components/icons/GearIcon'
+import HomeIcon from 'components/icons/HomeIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import ScreenWidthContext from 'contexts/screenWidth'
 import useConnectionContext from 'contexts/useConnectionContext'
@@ -105,47 +107,88 @@ function PrimaryLayout ({
   const isWide = useContext(ScreenWidthContext)
 
   return <div styleName='styles.primary-layout'>
-    <div styleName={cx({ 'styles.wide': isWide }, { 'styles.narrow': !isWide })}>
+    {!isWide && <MobileLayout showHeader={showHeader} headerProps={headerProps} settings={settings}>
+      {children}
+    </MobileLayout>}
+    {isWide && <DesktopLayout settings={settings}>{children}</DesktopLayout>}
+  </div>
+}
+
+export function MobileLayout ({ showHeader, headerProps, settings, children }) {
+  return <>
+    <div styleName='styles.narrow'>
       {showHeader && <Header
         {...headerProps}
-        settings={connectionStatus.hpos ? settings : {}} />}
+        settings={settings} />}
       <div styleName='styles.content'>
         <FlashMessage />
         {children}
       </div>
     </div>
 
-    {!isLoginPage(window) && <div styleName={cx('styles.wrapper', { 'styles.wrapper-narrow': !isWide })}>
-      <div styleName={cx('styles.container', { 'styles.container-wide': isWide })}>
-        <footer styleName='styles.footer'>
-          <div styleName='styles.alpha-info'>
-            <AlphaFlag variant='right' styleName='styles.alpha-flag-banner' />
-            <p>
-              HP Admin is in Alpha testing.
-            </p>
-            <p>
-              Learn more about out our&nbsp;
-              <a href='https://holo.host/holo-testnet' target='_blank' rel='noopener noreferrer' styleName='styles.alpha-link'>
-                Alpha Testnet.
-              </a>
-            </p>
-            <ul styleName='styles.footer-list'>
-              <li styleName='styles.footer-list-item'>
-                <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>Help</a>
-              </li>
-              <li styleName='styles.footer-list-item'>
-                <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>View Terms of Service</a>
-              </li>
-            </ul>
-          </div>
-        </footer>
+    {!isLoginPage(window) && <Footer />}
+  </>
+}
+
+export function DesktopLayout ({ children, settings }) {
+  return <>
+    <div styleName='styles.wide'>
+      {!isLoginPage(window) && <Sidebar settings={settings} />}
+      <div styleName='styles.content'>
+        <FlashMessage />
+        {children}
       </div>
-    </div>}
+    </div>
+  </>
+}
+
+export function Footer ({ isWide }) {
+  return <div styleName={cx({'styles.wrapper-wide': isWide, 'styles.wrapper-narrow': !isWide})}>
+    <div styleName='styles.container'>
+      <footer styleName='styles.footer'>
+        <div styleName='styles.alpha-info'>
+          <AlphaFlag variant='right' styleName='styles.alpha-flag-banner' />
+          <p>
+            HP Admin is in Alpha testing.
+          </p>
+          <p>
+            Learn more about out our&nbsp;
+            <a href='https://holo.host/holo-testnet' target='_blank' rel='noopener noreferrer' styleName='styles.alpha-link'>
+              Alpha Testnet.
+            </a>
+          </p>
+          <ul styleName='styles.footer-list'>
+            <li styleName='styles.footer-list-item'>
+              <a href='https://forum.holo.host' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>Help</a>
+            </li>
+            <li styleName='styles.footer-list-item'>
+              <a href='http://holo.host/alpha-terms' target='_blank' rel='noopener noreferrer' styleName='styles.footer-link'>View Terms of Service</a>
+            </li>
+          </ul>
+        </div>
+      </footer>
+    </div>
   </div>
 }
 
 PrimaryLayout.propTypes = {
   headerProps: object
+}
+
+export function Sidebar ({ settings = {} }) {
+  return <div styleName='styles.sidebar'>
+    <h1 styleName='styles.sidebar-title'>HP Admin</h1>
+    <Link to='/admin/settings' styleName='styles.settings-link'>
+      <GearIcon />
+    </Link>
+    <div styleName='styles.device-name'>
+      {settings.deviceName || 'Holoport'}
+    </div>
+    <Link to='/admin' styleName='styles.home-link'>
+      <HomeIcon /> <span styleName='styles.home-text'>Home</span>
+    </Link>
+    <Footer isWide />
+  </div>
 }
 
 export default PrimaryLayout

@@ -11,9 +11,7 @@ export default function Header ({ title, settings, showBackButton }) {
       <ArrowRightIcon styleName='arrow-icon' color={'#979797'} />
       <div styleName='back-text'>Back</div>
     </Link>}
-    {/* Q1: Why is the default for the agent's nicknae, 'HoloPort'? */}
-    {/* Q2: What happened to the option to rename your agent? */}
-    {!showBackButton && <div styleName='nickname'>{settings.hostName || 'HoloPort'}</div>}
+    {!showBackButton && <div styleName='nickname'>{settings.deviceName || 'HoloPort'}</div>}
     <h1 styleName='title'>{title}</h1>
     {!isPage('settings', window)
       ? <Link to='/admin/settings' styleName='settings-link' data-testid='settings-link'>
