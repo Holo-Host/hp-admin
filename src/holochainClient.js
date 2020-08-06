@@ -133,12 +133,6 @@ async function initHolochainClient () {
       if (HOLOCHAIN_LOGGING) {
         webSdkConnection.on('🎉 Web SDK connected and ready for Zome Calls...', console.log.bind(console))
       }
-      // const hostedAgentContext = await webSdkConnection.context()
-      // if (hostedAgentContext <= 2) {
-      //   await webSdkConnection.signOut()
-      //   await webSdkConnection.signIn()
-      // }
-
       window.webSdkConnection = webSdkConnection
       holochainClient = webSdkConnection
 
