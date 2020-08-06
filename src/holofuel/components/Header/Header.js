@@ -11,7 +11,7 @@ import './Header.module.css'
 export function Header ({ agent, history: { push }, hamburgerClick = () => push('/dashboard'), newActionableItems, hostedAgentContext }) {
   const { isSignedInAsHostedAgent, setIsSignedInAsHostedAgent } = useHostedAgentAuthStatusContext()
   const [shouldDisable, setShouldDisable] = useState()
-  
+
   useEffect(() => {
     if (HOSTED_HOLOFUEL_CONTEXT) {
       // once chaperone is updated, disable if the context is less than 3

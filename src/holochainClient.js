@@ -176,7 +176,7 @@ async function initHolochainClient () {
       })
       .catch(err => {
         throw (err)
-      }) 
+      })
   } catch (error) {
     if (HOLOCHAIN_LOGGING) {
       console.log('😞 Holochain client connection failed -- ', error.toString())

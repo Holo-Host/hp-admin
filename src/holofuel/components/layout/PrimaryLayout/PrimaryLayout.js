@@ -87,7 +87,7 @@ function PrimaryLayout ({
     setShouldRefetchMyUser(false)
     refetchMyUser()
   }, [setShouldRefetchMyUser, refetchMyUser])
-  
+
   // holo hosted specific
   const { isSignedInAsHostedAgent, setIsSignedInAsHostedAgent } = useHostedAgentAuthStatusContext()
   const [hasWebSDKConnection, setHasWebSDKConnection] = useState(false)
@@ -98,7 +98,7 @@ function PrimaryLayout ({
       // nb: the context is hard coded in chaperone right now to only return 2,
       const hostedAgentContext = await webSdkConnection.context()
       setHostedAgentContext(hostedAgentContext)
-      
+
       // TODO: Update to read as < 3, once chaperonse is updated with contexts...
       // (the context is hard coded in chaperone right now to only return 2)
       // require sign-in if hosted agent context returns a hosted anonymous agent/user
@@ -153,7 +153,7 @@ function PrimaryLayout ({
         // TODO: Block proceeding to main page if agent is at all anonymous...
         console.log('Proceeding with a static anonymous hosted agent CONTEXT (even though agent has keys and not anonymous)...  Don\'t allow once chaperone is updated with non static contexts.')
       }
-    }  
+    }
   }, [isConnected,
     push,
     newMessage,
@@ -172,9 +172,9 @@ function PrimaryLayout ({
   const closeMenu = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout')}>
-    {(HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) && <h2 styleName='styles.text'>Connecting to Holo...</ h2>}
-    <div styleName={cx('styles.content', { 'styles.hosted-landing-overlay' : (HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) })}>
-      <Header {...headerProps} 
+    {(HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) && <h2 styleName='styles.text'>Connecting to Holo...</h2>}
+    <div styleName={cx('styles.content', { 'styles.hosted-landing-overlay': (HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) })}>
+      <Header {...headerProps}
         agent={currentUser}
         agentLoading={currentUserLoading}
         hamburgerClick={hamburgerClick}
