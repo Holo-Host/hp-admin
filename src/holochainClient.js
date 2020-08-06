@@ -128,7 +128,7 @@ async function initHolochainClient () {
       console.log('Inside hosted holofuel environment...')
       console.log('Establishing Holo web-sdk connection...')
       // use the web-sdk instead of hc-web-client
-      const webSdkConnection = new HoloWebSdkConnection()
+      const webSdkConnection = new HoloWebSdkConnection('https://chaperone.holo.host/')
       await webSdkConnection.ready()
       if (HOLOCHAIN_LOGGING) {
         webSdkConnection.on('🎉 Web SDK connected and ready for Zome Calls...', console.log.bind(console))
