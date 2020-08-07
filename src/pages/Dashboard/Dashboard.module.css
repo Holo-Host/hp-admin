@@ -6,6 +6,7 @@
 .dashboard-wide {
   composes: dashboard;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .dashboard-narrow {
