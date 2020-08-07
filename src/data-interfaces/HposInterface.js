@@ -89,7 +89,8 @@ const presentHposSettings = (hposSettings) => {
 
 const presentHostedHapp = hostedHapp => ({
   name: hostedHapp['happ-title'],
-  number_instances: hostedHapp['number_instances']
+  number_instances: hostedHapp['number_instances'],
+  zomeCalls: hostedHapp['stats'].traffic.total_zome_calls
 })
 
 const HposInterface = {

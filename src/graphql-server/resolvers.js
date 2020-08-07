@@ -64,12 +64,11 @@ export const resolvers = {
 
     hostingReport: async () => {
       const hostedHapps = await HposInterface.os.hostedHapps()
-
       const localSourceChains = hostedHapps.reduce((total, happ) => total + happ.number_instances, 0)
-
+      const zomeCalls = hostedHapps.reduce((total, happ) => total + happ.zomeCalls, 0)
       return {
         localSourceChains,
-        zomeCalls: 588,
+        zomeCalls,
         hostedHapps
       }
     },
