@@ -83,7 +83,7 @@ const presentHposSettings = (hposSettings) => {
     registrationEmail: admin.email,
     networkStatus: holoportos.network || 'test', // ie: 'live'
     sshAccess: holoportos.sshAccess || false,
-    deviceName: name || 'My HoloPort'
+    deviceName: name || 'HoloPort'
   }
 }
 
