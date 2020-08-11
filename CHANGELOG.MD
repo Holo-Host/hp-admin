@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hosting card is enabled on Dashboard
 ### Changed
 - HP-Admin Layout changes between mobile and desktop views
+### Removed
+- HP-Admin Version update functionality
 ### Fixed
 - Device Name changes are reflected in the UI
 
