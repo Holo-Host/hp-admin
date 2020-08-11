@@ -9,9 +9,7 @@ import Button from 'components/UIButton'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
-import HposUpdateVersionMutation from 'graphql/HposUpdateVersionMutation.gql'
 import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
-import useFlashMessageContext from 'contexts/useFlashMessageContext'
 import ScreenWidthContext from 'contexts/screenWidth'
 import Input from 'components/Input'
 import { rhino } from 'utils/colors'
@@ -20,14 +18,6 @@ import { rhino } from 'utils/colors'
 export const getLabelFromPortName = portname => ({
   primaryPort: 'Primary Port'
 }[portname])
-
-// Data - Mutation hook
-function useUpdateVersion () {
-  const [hposUpdateVersion] = useMutation(HposUpdateVersionMutation)
-  return (availableVersion) => hposUpdateVersion({
-    variables: { availableVersion }
-  })
-}
 
 export function Settings () {
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
@@ -63,16 +53,7 @@ export function Settings () {
     setIsEditingDeviceName(false)
   }
 
-  const updateVersion = useUpdateVersion()
-  const { newMessage } = useFlashMessageContext()
-  const updateVersionWithMessage = () => {
-    updateVersion()
-    newMessage('Your software version has been updated.', 5000)
-  }
-
-  const availableVersion = get('versionInfo.availableVersion', status)
   const currentVersion = get('versionInfo.currentVersion', status)
-  const updateAvailable = (!isEmpty(availableVersion) && !isEmpty(currentVersion) && (availableVersion !== currentVersion))
 
   const title = (settings.hostName ? `${settings.hostName}'s` : 'Your') + ' HoloPort'
 
@@ -112,13 +93,9 @@ export function Settings () {
     <div styleName='title'>{title}</div>
 
     <section styleName={isWide ? 'settings-section-wide' : 'settings-section-narrow'}>
-      <div styleName='version-header-row'>
-        <div styleName='settings-header'>Software Version</div>
-        {updateAvailable && <div styleName='update-available'>Update Available</div>}
-      </div>
       <SettingsRow
-        label={presentAgentId(currentVersion)}
-        value={updateAvailable ? <VersionUpdateButton updateVersion={updateVersionWithMessage} /> : 'Your software is up to date.'}
+        label='HPOS Version'
+        value={presentAgentId(currentVersion)}
         bottomStyle
       />
       <div styleName='settings-header'>About this HoloPort</div>
@@ -192,16 +169,6 @@ export function SettingsRow ({ label, value, dataTestId, bottomStyle, onClick })
       ? <span styleName='settings-value'>{value}</span>
       : value}
   </div>
-}
-
-function VersionUpdateButton ({ updateVersion }) {
-  return <Button
-    variant='white'
-    onClick={updateVersion}
-    styleName='version-update-button'
-  >
-    Update Software
-  </Button>
 }
 
 export function SettingsFormInput ({
