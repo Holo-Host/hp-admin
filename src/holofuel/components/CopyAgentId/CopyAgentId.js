@@ -9,7 +9,7 @@ export default function CopyAgentId ({
   className,
   children
 }) {
-  const { id: hash, nickname } = agent
+  const { agentAddress: hash, nickname } = agent
 
   let messageText
 
