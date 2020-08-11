@@ -10,17 +10,16 @@ export default function CopyAgentId ({
   className,
   children
 }) {
-
   let happName, hash, nickname, messageText
 
   if (hpAdmin) {
     ({ id: hash, nickname } = agent)
-    happName = 'HP Admin' 
+    happName = 'HP Admin'
   } else {
     ({ agentAddress: hash, nickname } = agent)
-    happName = 'HoloFuel' 
+    happName = 'HoloFuel'
   }
-  
+
   if (isMe) {
     messageText = `Your ${happName} Agent ID has been copied!`
   } else if (nickname) {
