@@ -13,4 +13,4 @@ if [ $1 ]; then
 fi
 
 rm -rf ./node_modules/.cache/babel-loader
-REACT_APP_VERSION=$npm_package_version REACT_APP_HOLOFUEL_APP=true REACT_APP_RAW_HOLOCHAIN=true REACT_APP_CLI_POLLING_INTERVAL=$CLI_POLLING_INTERVAL node scripts/build.js
+REACT_APP_VERSION=$npm_package_version REACT_APP_HOLOFUEL_APP=true REACT_APP_RAW_HOLOCHAIN=true REACT_APP_CLI_POLLING_INTERVAL=$CLI_POLLING_INTERVAL REACT_APP_HOLOFUEL_AT_ROOT=true node scripts/build.js
