@@ -11,8 +11,8 @@
     "start:holofuel-ui-2": "PORT=3101 REACT_APP_DNA_INTERFACE_URL=ws://localhost:3401 npm run start:holofuel-live",
     "start:holofuel-conductor-1": "HC_IGNORE_SIM2H_URL_PROPERTY=true holochain -c conductor-config-1.toml",
     "start:holofuel-conductor-2": "HC_IGNORE_SIM2H_URL_PROPERTY=true holochain -c conductor-config-2.toml",
-    "start:holofuel-mock": "REACT_APP_HOLOFUEL_APP=true REACT_APP_HOLOFUEL_AT_ROOT=true REACT_APP_RAW_HOLOCHAIN=true npm run start:mock",
-    "start:holofuel-live": "REACT_APP_HOLOFUEL_APP=true REACT_APP_HOLOFUEL_AT_ROOT=true REACT_APP_RAW_HOLOCHAIN=true npm run start:live",
+    "start:holofuel-mock": "REACT_APP_HOLOFUEL_APP=true REACT_APP_RAW_HOLOCHAIN=true npm run start:mock",
+    "start:holofuel-live": "REACT_APP_HOLOFUEL_APP=true REACT_APP_RAW_HOLOCHAIN=true npm run start:live",
     "start:sim2h-server": "sim2h_server -p 9000",
     "build": "sh scripts/build.sh",
     "build:holofuel": "sh scripts/build-holofuel.sh",
@@ -30,7 +30,7 @@
     "test:preseed-data": "npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data",
     "test:integration": "nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "test:integration-with-setup": "npm run test:preseed-data && npm run test:integration",
-    "predeploy": "REACT_APP_HOLOFUEL_AT_ROOT=true npm run build:holofuel",
+    "predeploy": "npm run build:holofuel",
     "deploy": "gh-pages -d build -o static"
   },
   "dependencies": {
