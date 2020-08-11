@@ -29,7 +29,7 @@ If referencing **Live** Data :
 
 ---
 ### HoloFuel:
-  
+
 **Decide if you'll be using Mock or Live data.**
 
 If referencing **Mock** Data :
@@ -65,9 +65,11 @@ If referencing **Live** Data :
 
 To deploy a build to http://testfuel.holo.host
 
+> Note you will need admin access to the [holofuel-static-ui repo](https://github.com/Holo-Host/holofuel-static-ui) to successfully complete all the steps mentioned below
+
 Add the repo as a remote:
 
-`$ git add remote static https://github.com/Holo-Host/holofuel-static-ui.git`
+`$ git remote add static https://github.com/Holo-Host/holofuel-static-ui.git`
 
 Then `npm run deploy`
 
