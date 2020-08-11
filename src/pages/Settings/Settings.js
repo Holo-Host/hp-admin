@@ -93,9 +93,6 @@ export function Settings () {
     <div styleName='title'>{title}</div>
 
     <section styleName={isWide ? 'settings-section-wide' : 'settings-section-narrow'}>
-      <div styleName='version-header-row'>
-        <div styleName='settings-header'>HPOS Version</div>
-      </div>
       <SettingsRow
         label='HPOS Version'
         value={presentAgentId(currentVersion)}
