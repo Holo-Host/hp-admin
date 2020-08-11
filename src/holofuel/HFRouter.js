@@ -9,21 +9,13 @@ import FourOhFour from 'holofuel/pages/FourOhFour'
 
 function HFRoute (props) {
   if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-    console.log('good')
     return <Route {...props} />
   } else {
-    console.log('bad')
     return <AuthRoute {...props} />
   }
 }
 
-// export const root = process.env.REACT_APP_HOLOFUEL_AT_ROOT === 'true'
-//   ? '/'
-//   : '/holofuel'
-
 export const root = '/holofuel'
-
-console.log('root', root)
 
 export default function HFRouter () {
   return <Switch>
