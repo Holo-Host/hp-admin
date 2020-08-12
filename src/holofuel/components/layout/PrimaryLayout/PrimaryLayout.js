@@ -94,6 +94,7 @@ function PrimaryLayout ({
   const [hostedAgentContext, setHostedAgentContext] = useState(0)
 
   const setHostedAgentDetails = useCallback(async () => {
+    console.log('holoWebSDKConnection : ', holoWebSDKConnection)
     if (holoWebSDKConnection) {
       // nb: the context is hard coded in chaperone right now to only return 2,
       const hostedAgentContext = await holoWebSDKConnection.context()
@@ -120,6 +121,13 @@ function PrimaryLayout ({
         //   await webSdkConnection.signIn()
         // }
       }
+
+      // TODO: Handle case when ws disconnects > logout/sightout...
+      // holoWebSDKConnection.on('disconnect')
+      //   .then(() => {
+      //     await webSdkConnection.signOut()
+      //     setIsSignedInAsHostedAgent(false)
+      //   })
     }
   }, [holoWebSDKConnection, isSignedInAsHostedAgent, setIsSignedInAsHostedAgent])
 
@@ -172,7 +180,7 @@ function PrimaryLayout ({
   const closeMenu = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout')}>
-    {(HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) && <h2 styleName='styles.text'>Connecting to Holo...</h2>}
+    {(HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) && <h2 styleName='styles.text'>Connecting to the Holo network...</h2>}
     <div styleName={cx('styles.content', { 'styles.hosted-landing-overlay': (HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) })}>
       <Header {...headerProps}
         agent={currentUser}
