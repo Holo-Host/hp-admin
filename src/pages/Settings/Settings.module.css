@@ -4,7 +4,7 @@
 }
 
 .title {
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 24px;
   line-height: 22px;
   text-align: center;
@@ -35,7 +35,7 @@
 .settings-header {
   composes: header-padding;
   color: var(--color-outerspace);
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-weight: bold;
   font-size: 12px;
   line-height: 22px;
@@ -44,7 +44,7 @@
 
 .update-available {
   composes: header-padding;
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 12px;
   line-height: 22px;
   color: var(--color-amaranth);
@@ -52,7 +52,7 @@
 }
 
 .reset-link {
-  
+
 }
 
 /* SettingsRow */
@@ -74,14 +74,14 @@
 
 .settings-label {
   color: var(--color-rhino-50);
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 14px;
   flex: 1
 }
 
 .settings-value {
   color: var(--color-rhino);
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 14px;
   flex: 1
 }
@@ -93,7 +93,7 @@
 
 .device-name-input {
   color: var(--color-rhino);
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 14px;
   flex: 1;
 }
@@ -110,14 +110,14 @@
   line-height: 13px !important;
   padding: 5px 15px !important;
   text-transform: uppercase;
-  height: 22px;  
+  height: 22px;
   margin-left: 10px;
 }
 
 .factory-reset-button {
   color: var(--color-amaranth);
   background-color: transparent;
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 14px;
   line-height: 19px;
   font-weight: normal;

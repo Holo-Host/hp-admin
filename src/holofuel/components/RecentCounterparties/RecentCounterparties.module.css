@@ -21,11 +21,11 @@
   padding: 50px;
 }
 
-.no-peers {  
+.no-peers {
   padding-top: 80px;
   text-align: center;
   height: 100%;
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 18px;
   line-height: 24px;
   color: var(--color-rhino-60);
@@ -57,7 +57,7 @@
 
 .name {
   color: var(--color-rhino-80);
-  font-size: 14px;  
+  font-size: 14px;
 }
 
 .id {
