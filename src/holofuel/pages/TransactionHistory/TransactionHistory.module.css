@@ -11,6 +11,7 @@
 .balance-amount {
   font-family: "MPLUS1p";
   font-size: 36px;
+  font-weight: bold;
   color: var(--color-rhino);
   margin-bottom: 45px;
 }
@@ -62,6 +63,7 @@
 
 .selected {
   border-bottom: 2px solid var(--color-caribbean-green);
+  font-weight: bold;
   color: var(--color-rhino);
 }
 
