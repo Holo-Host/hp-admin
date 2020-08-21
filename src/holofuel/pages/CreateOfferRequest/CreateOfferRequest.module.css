@@ -22,11 +22,11 @@
 }
 
 .fee-notice {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 10px;
   line-height: 13px;
   height: 13px;
-  color: var(--color-rhino-50);  
+  color: var(--color-rhino-50);
 }
 
 .mode-toggle {
@@ -72,7 +72,7 @@
 }
 
 .form-label {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-weight: bold;
   font-size: 10px;
   letter-spacing: 0.6px;
@@ -148,7 +148,7 @@
 }
 
 .total {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 18px;
   color: var(--color-rhino);
   margin-top: 14px;
@@ -173,7 +173,7 @@
 }
 
 .error-text {
-  font-family: 'CircularStd', sans-serif;
+  font-family: 'MPLUS1p', sans-serif;
   font-size: 10px;
   line-height: 13px;
   letter-spacing: 0.4px;

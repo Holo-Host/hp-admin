@@ -43,10 +43,10 @@
 /* DesktopLayout */
 
 .desktop-title {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 14px;
   line-height: 19px;
-  color: black; 
+  color: black;
   margin-bottom: 20px;
 }
 
@@ -110,7 +110,7 @@
   position: relative;
   margin: 0 -34px 0px -34px;
   padding: 32px 10px 8px 10px;
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   line-height: 16px;
   color: var(--color-rhino);
   background-color: #d2f2f5;
@@ -143,8 +143,8 @@
 }
 
 .sidebar-title {
-  font-family: "Circular";
-  font-weight: 500;
+  font-family: "MPLUS1p";
+  font-weight: bold;
   font-size: 18px;
   line-height: 23px;
   text-align: center;
@@ -159,11 +159,11 @@
 }
 
 .device-name {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 10px;
   line-height: 13px;
   text-align: center;
-  letter-spacing: 0.4px;  
+  letter-spacing: 0.4px;
   color: black;
   margin-bottom: 62px;
 }
@@ -175,7 +175,7 @@
 .home-link {
   display: flex;
   align-self: center;
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 10px;
   line-height: 13px;
   text-decoration: none;

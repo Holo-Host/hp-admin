@@ -7,7 +7,7 @@
   left: 0px;
   padding: 20px 24px 0 24px;
   background: var(--color-iceberg);
-  font-family: 'CircularStd', sans-serif;
+  font-family: 'MPLUS1p', sans-serif;
   color: #2C405A;
   font-size: 16px;
   line-height: 22px;
@@ -25,7 +25,8 @@
   width: 321px;
   height: auto;
   font-size: 36px;
-  line-height: 28px; 
+  font-weight: bold;
+  line-height: 28px;
   text-align: left;
   margin-bottom: 20px;
 }
