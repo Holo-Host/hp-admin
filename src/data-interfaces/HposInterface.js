@@ -140,12 +140,10 @@ const HposInterface = {
     },
 
     enableSsh: () => {
-      console.log('enabling')
       return hposCall({ method: 'put', path: 'profiles/development/features/ssh' })()
     },
 
     disableSsh: () => {
-      console.log('disabling')
       return hposCall({ method: 'delete', path: 'profiles/development/features/ssh' })()
     },
 
