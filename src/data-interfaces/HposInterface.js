@@ -132,18 +132,18 @@ const HposInterface = {
     },
 
     sshSetting: async () => {
-      const result = await hposCall({ method: 'get', path: 'profile/development/features/ssh' })()
+      const result = await hposCall({ method: 'get', path: 'profiles/development/features/ssh' })()
       return result.enabled
     },
 
     enableSsh: () => {
       console.log('enabling')
-      return hposCall({ method: 'put', path: 'profile/development/features/ssh' })
+      return hposCall({ method: 'put', path: 'profiles/development/features/ssh' })()
     },
 
     disableSsh: () => {
       console.log('disabling')
-      hposCall({ method: 'delete', path: 'profile/development/features/ssh' })
+      return hposCall({ method: 'delete', path: 'profiles/development/features/ssh' })()
     },
 
     // HOLOPORT_OS STATUS

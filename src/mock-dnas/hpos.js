@@ -66,9 +66,9 @@ const data = {
         }
       ]
     },
-    '/v1/profile/development/features/ssh': {
+    '/v1/profiles/development/features/ssh': () => ({
       enabled: sshAccess
-    }
+    })
   },
   put: {
     '/v1/config': params => {
@@ -77,12 +77,12 @@ const data = {
         ...data.get['/v1/config']
       }
     },
-    'v1/profile/development/features/ssh': () => {
+    '/v1/profiles/development/features/ssh': () => {
       sshAccess = true
     }
   },
   delete: {
-    'v1/profile/development/features/ssh': () => {
+    '/v1/profiles/development/features/ssh': () => {
       sshAccess = false
     }
   },
