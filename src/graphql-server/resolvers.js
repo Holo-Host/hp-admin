@@ -60,6 +60,11 @@ export const resolvers = {
 
     hposSettings: (_) => HposInterface.os.settings(),
 
+    hposSshSetting: async () => {
+      const result = await HposInterface.os.sshSetting()
+      return result
+    },
+
     hposStatus: HposInterface.os.status,
 
     hostingReport: async () => {
@@ -124,6 +129,16 @@ export const resolvers = {
     hposUpdateSettings: (_, { hostPubKey, hostName, deviceName, sshAccess }) => HposInterface.os.updateSettings(hostPubKey, hostName, deviceName, sshAccess),
 
     hposUpdateVersion: () => HposInterface.os.updateVersion(),
+
+    hposUpdateSshSetting: async (_, { enabled }) => {
+      console.log('hposUpdateSsh', enabled)
+      if (enabled) {
+        await HposInterface.os.enableSsh()
+      } else {
+        await HposInterface.os.disableSsh()
+      }
+      return enabled
+    },
 
     hposCheckAuth: async () => {
       let settings

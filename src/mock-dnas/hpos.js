@@ -1,3 +1,5 @@
+var sshAccess = true
+
 const data = {
   get: {
     // Returns holo-config.json data with seed field filtered out.
@@ -9,7 +11,7 @@ const data = {
       },
       holoportos: {
         network: 'live',
-        sshAccess: true
+        sshAccess
       },
       name: 'My HoloPort'
     },
@@ -63,6 +65,9 @@ const data = {
           }
         }
       ]
+    },
+    '/v1/profile/development/features/ssh': {
+      enabled: sshAccess
     }
   },
   put: {
@@ -71,6 +76,14 @@ const data = {
       return {
         ...data.get['/v1/config']
       }
+    },
+    'v1/profile/development/features/ssh': () => {
+      sshAccess = true
+    }
+  },
+  delete: {
+    'v1/profile/development/features/ssh': () => {
+      sshAccess = false
     }
   },
   post: {
