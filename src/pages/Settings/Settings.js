@@ -27,7 +27,7 @@ export function Settings () {
   const { data: { hposSshSetting } = {} } = useQuery(HposSshSettingQuery)
 
   const [updateSettings] = useMutation(HposUpdateSettingsMutation)
-  // const [updateSshSetting] = useMutation(HposUpdateSshSettingMutation)
+  const [updateSshSetting] = useMutation(HposUpdateSshSettingMutation)
 
   const [editedDeviceName, setEditedDeviceName] = useState('')
   const [isEditingDeviceName, setIsEditingDeviceName] = useState(false)
@@ -62,33 +62,27 @@ export function Settings () {
 
   const [sshAccess, setSshAccess] = useState(false)
 
-  // useEffect(() => {
-  //   console.log('useEffect')
-  //   if (!isNil(hposSshSetting)) {
-  //     console.log('updating sshAccess', hposSshSetting)
-  //     setSshAccess(hposSshSetting)
-  //   }
-  // }, [setSshAccess, hposSshSetting])
+  useEffect(() => {
+    if (!isNil(hposSshSetting)) {
+      setSshAccess(hposSshSetting)
+    }
+  }, [setSshAccess, hposSshSetting])
 
-  // const saveSshAccess = enabled => {
-  //   updateSshSetting({
-  //     variables: {
-  //       enabled
-  //     },
-  //     refetchQueries: [{
-  //       query: HposSshSettingQuery
-  //     }]
-  //   })
-  // }
-
-  const toggleSshAccess = (e) => {
-    e.preventDefault()
-    setSshAccess(e.target.checked)
-    // saveSshAccess(e.target.checked)
+  const saveSshAccess = enabled => {
+    updateSshSetting({
+      variables: {
+        enabled
+      },
+      refetchQueries: [{
+        query: HposSshSettingQuery
+      }]
+    })
   }
 
-  console.log('hposSshSetting', hposSshSetting)
-  console.log('sshAccess', sshAccess)
+  const toggleSshAccess = (e) => {
+    setSshAccess(e.target.checked)
+    saveSshAccess(e.target.checked)
+  }
 
   const isWide = useContext(ScreenWidthContext)
 
