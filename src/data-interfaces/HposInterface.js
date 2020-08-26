@@ -54,6 +54,9 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
         case 'put':
           ({ data } = await axios.put(fullPath, params, { headers }))
           return data
+        case 'delete':
+          ({ data } = await axios.delete(fullPath, params, { headers }))
+          return data
         default:
           throw new Error(`No case in hposCall for ${method} method`)
       }
