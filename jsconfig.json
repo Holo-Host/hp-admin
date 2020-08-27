@@ -1,7 +1,8 @@
 {
   "typeAcquisition": {
       "include": [
-          "jest"
+          "jest",
+          "jest-puppeteer"
       ]
   }
 }

@@ -1,0 +1,4 @@
+export const DNA_INSTANCE = process.env.REACT_APP_TEST_DNA_INSTANCE_ID
+export const MOCK_EXPIRATION_DATE = '2025-01-02T03:04:05.678901234+00:00'
+
+export const TIMEOUT = 5000;
