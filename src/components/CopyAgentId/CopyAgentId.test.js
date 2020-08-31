@@ -36,7 +36,7 @@ it('render CopyToClipboard with "Your" in message when isMe', () => {
 
 it('render CopyToClipboard with nickname in message when nickname is available', async () => {
   const agent = {
-    id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
+    agentAddress: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r',
     nickname: 'Perry'
   }
 
@@ -54,18 +54,18 @@ it('render CopyToClipboard with nickname in message when nickname is available',
   expect(CopyToClipboard).toHaveBeenCalledWith(
     expect.objectContaining({
       children,
-      copyContent: agent.id,
+      copyContent: agent.agentAddress,
       messageText
     }), {})
 })
 
 it('render CopyToClipboard with last 6 of id in message when nickname is NOT available', async () => {
   const agent = {
-    id: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
+    agentAddress: 'HcSCIgoBpzRmvnvq538iqbu39h9whsr6agZa6c9WPh9xujkb4dXBydEPaikvc5r'
   }
 
-  const children = agent.id
-  const messageText = `Full Agent ID of ${presentAgentId(agent.id)} has been copied!`
+  const children = agent.agentAddress
+  const messageText = `Full Agent ID of ${presentAgentId(agent.agentAddress)} has been copied!`
 
   const props = {
     agent
@@ -78,7 +78,7 @@ it('render CopyToClipboard with last 6 of id in message when nickname is NOT ava
   expect(CopyToClipboard).toHaveBeenCalledWith(
     expect.objectContaining({
       children,
-      copyContent: agent.id,
+      copyContent: agent.agentAddress,
       messageText
     }), {})
 })
