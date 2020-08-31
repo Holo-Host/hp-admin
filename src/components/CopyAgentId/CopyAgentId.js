@@ -6,26 +6,19 @@ import { presentAgentId } from 'utils'
 export default function CopyAgentId ({
   agent,
   isMe,
-  hpAdmin,
   className,
   children
 }) {
-  let happName, hash, nickname, messageText
+  let messageText
 
-  if (hpAdmin) {
-    ({ id: hash, nickname } = agent)
-    happName = 'HP Admin'
-  } else {
-    ({ agentAddress: hash, nickname } = agent)
-    happName = 'HoloFuel'
-  }
+  const { id: hash, nickname } = agent
 
   if (isMe) {
-    messageText = `Your ${happName} Agent ID has been copied!`
+    messageText = `Your HP Admin Agent ID has been copied!`
   } else if (nickname) {
-    messageText = `${nickname}'s ${happName} Agent ID has been copied!`
+    messageText = `${nickname}'s HP Admin Agent ID has been copied!`
   } else {
-    messageText = `Full Agent ID of ${presentAgentId(hash)} has been copied!`
+    messageText = `Full HP Admin Agent ID of ${presentAgentId(hash)} has been copied!`
   }
 
   return <CopyToClipboard copyContent={hash} messageText={messageText} className={className}>
