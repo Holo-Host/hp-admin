@@ -16,8 +16,8 @@ export default function CopyAgentId ({
     ({ id: hash } = agent)
     messageText = 'Your HoloFuel Agent ID has been copied!'
   } else {
-      ({ agentAddress: hash } = agent)
-      if (nickname) {
+    ({ agentAddress: hash } = agent)
+    if (nickname) {
       messageText = `${nickname}'s HoloFuel Agent ID has been copied!`
     } else {
       messageText = `Full Agent ID of ${presentAgentId(hash)} has been copied!`
