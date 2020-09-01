@@ -8,8 +8,10 @@ import PrimaryLayout from 'components/layout/PrimaryLayout'
 import Button from 'components/UIButton'
 import ArrowRightIcon from 'components/icons/ArrowRightIcon'
 import HposSettingsQuery from 'graphql/HposSettingsQuery.gql'
+import HposSshSettingQuery from 'graphql/HposSshSettingQuery.gql'
 import HposStatusQuery from 'graphql/HposStatusQuery.gql'
 import HposUpdateSettingsMutation from 'graphql/HposUpdateSettingsMutation.gql'
+import HposUpdateSshSettingMutation from 'graphql/HposUpdateSshSettingMutation.gql'
 import ScreenWidthContext from 'contexts/screenWidth'
 import Input from 'components/Input'
 import { rhino } from 'utils/colors'
@@ -21,10 +23,11 @@ export const getLabelFromPortName = portname => ({
 
 export function Settings () {
   const { data: { hposSettings: settings = {} } = {} } = useQuery(HposSettingsQuery)
-
   const { data: { hposStatus: status = {} } = {} } = useQuery(HposStatusQuery)
+  const { data: { hposSshSetting } = {} } = useQuery(HposSshSettingQuery)
 
   const [updateSettings] = useMutation(HposUpdateSettingsMutation)
+  const [updateSshSetting] = useMutation(HposUpdateSshSettingMutation)
 
   const [editedDeviceName, setEditedDeviceName] = useState('')
   const [isEditingDeviceName, setIsEditingDeviceName] = useState(false)
@@ -37,7 +40,7 @@ export function Settings () {
   const saveDeviceName = () => {
     updateSettings({
       variables: {
-        ...pick(['hostPubKey', 'hostName', 'sshAccess'], settings),
+        ...pick(['hostPubKey', 'hostName'], settings),
         deviceName: editedDeviceName
       },
       refetchQueries: [{
@@ -60,26 +63,23 @@ export function Settings () {
   const [sshAccess, setSshAccess] = useState(false)
 
   useEffect(() => {
-    if (!isNil(settings.sshAccess)) {
-      setSshAccess(settings.sshAccess)
+    if (!isNil(hposSshSetting)) {
+      setSshAccess(hposSshSetting)
     }
-  }, [setSshAccess, settings.sshAccess])
+  }, [setSshAccess, hposSshSetting])
 
-  const saveSshAccess = sshAccess => {
-    updateSettings({
+  const saveSshAccess = enabled => {
+    updateSshSetting({
       variables: {
-        ...pick(['hostPubKey', 'hostName', 'deviceName'], settings),
-        sshAccess
+        enabled
       },
       refetchQueries: [{
-        query: HposSettingsQuery
+        query: HposSshSettingQuery
       }]
-
     })
   }
 
   const toggleSshAccess = (e) => {
-    e.preventDefault()
     setSshAccess(e.target.checked)
     saveSshAccess(e.target.checked)
   }

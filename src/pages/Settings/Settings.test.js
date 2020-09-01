@@ -61,7 +61,7 @@ describe('Settings', () => {
     request: {
       query: HposUpdateSettingsMutation,
       variables: {
-        ...pick(['hostPubKey', 'hostName', 'sshAccess'], hposSettings),
+        ...pick(['hostPubKey', 'hostName'], hposSettings),
         deviceName: newDeviceName
       }
     },
