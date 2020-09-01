@@ -14,6 +14,7 @@ import { FlashMessageProvider } from 'contexts/useFlashMessageContext'
 import HFScreenWidthContext from 'holofuel/contexts/screenWidth'
 import { FlashMessageProvider as HFFlashMessageProvider } from 'holofuel/contexts/useFlashMessageContext'
 import { CurrentUserProvider as HFCurrentUserProvider } from 'holofuel/contexts/useCurrentUserContext'
+import { HostedAgentAuthStatusProvider as HFHostedAgentProvider } from 'holofuel/contexts/useHostedAgentAuthStatusContext'
 import { ConnectionProvider as HFConnectionProvider } from 'holofuel/contexts/useConnectionContext'
 import { HiddenTransactionsProvider } from 'holofuel/contexts/useHiddenTransactionsContext'
 import AcceptRequestedOffers from 'holofuel/components/wrappers/AcceptRequestedOffers'
@@ -34,17 +35,19 @@ function HoloFuelAppCore () {
 
   return <HFScreenWidthContext.Provider value={isWide}>
     <HFCurrentUserProvider>
-      <HFFlashMessageProvider>
-        <HiddenTransactionsProvider>
-          <LoadCurrentUser>
-            <AcceptRequestedOffers>
-              <PromptForNickname>
-                <HFRouter />
-              </PromptForNickname>
-            </AcceptRequestedOffers>
-          </LoadCurrentUser>
-        </HiddenTransactionsProvider>
-      </HFFlashMessageProvider>
+      <HFHostedAgentProvider>
+        <HFFlashMessageProvider>
+          <HiddenTransactionsProvider>
+            <LoadCurrentUser>
+              <AcceptRequestedOffers>
+                <PromptForNickname>
+                  <HFRouter />
+                </PromptForNickname>
+              </AcceptRequestedOffers>
+            </LoadCurrentUser>
+          </HiddenTransactionsProvider>
+        </HFFlashMessageProvider>
+      </HFHostedAgentProvider>
     </HFCurrentUserProvider>
   </HFScreenWidthContext.Provider>
 }
