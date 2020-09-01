@@ -15,7 +15,7 @@ it('render CopyToClipboard with "Your" in message when isMe', () => {
   }
 
   const children = agent.nickname
-  const messageText = 'Your HoloFuel Agent ID has been copied!'
+  const messageText = 'Your HP Admin Agent ID has been copied!'
 
   const props = {
     agent,
@@ -41,7 +41,7 @@ it('render CopyToClipboard with nickname in message when nickname is available',
   }
 
   const children = agent.nickname
-  const messageText = "Perry's HoloFuel Agent ID has been copied!"
+  const messageText = "Perry's HP Admin Agent ID has been copied!"
 
   const props = {
     agent
@@ -65,7 +65,7 @@ it('render CopyToClipboard with last 6 of id in message when nickname is NOT ava
   }
 
   const children = agent.id
-  const messageText = `Full Agent ID of ${presentAgentId(agent.id)} has been copied!`
+  const messageText = `Full HP Admin Agent ID of ${presentAgentId(agent.id)} has been copied!`
 
   const props = {
     agent
