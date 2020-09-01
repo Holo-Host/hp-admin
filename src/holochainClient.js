@@ -2,7 +2,7 @@ import { Connection as HoloWebSdkConnection } from '@holo-host/web-sdk'
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
-import * as waitUntil from 'async-wait-until';
+import waitUntil from 'async-wait-until'
 import wait from 'waait'
 
 export const HOSTED_HOLOFUEL_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true'
@@ -133,7 +133,7 @@ async function initHolochainClient () {
       const webSdkConnection = process.env.NODE_ENV !== 'production'
         ? new HoloWebSdkConnection()
         : new HoloWebSdkConnection(CHAPERONE_SERVER_URL)
-      
+
       await webSdkConnection.ready()
       if (HOLOCHAIN_LOGGING) {
         console.log('🎉 Web SDK connected and ready for Zome Calls...')
@@ -218,12 +218,12 @@ async function initAndGetHolochainClient () {
 
 const connectionReady = async () => {
   await waitUntil(() => {
-    return holochainClient !== null;
-  }, 30000, 100 )
+    return holochainClient !== null
+  }, 30000, 100)
   return holochainClient
 }
 
-export function createZomeCall (zomeCallPath, callOpts = {}) { 
+export function createZomeCall (zomeCallPath, callOpts = {}) {
   const DEFAULT_OPTS = {
     logging: HOLOCHAIN_LOGGING,
     resultParser: null
