@@ -34,7 +34,7 @@
     "test:preseed-data": "npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data",
     "test:integration": "nix-shell --command 'REACT_APP_INTEGRATION_TEST=true node scripts/test.js --config=./jest.integration.config.js'",
     "test:integration-with-setup": "npm run test:preseed-data && npm run test:integration",
-    "predeploy": "REACT_APP_HOLOFUEL_AT_ROOT=false npm run build:holofuel-holo",
+    "predeploy": "npm run build:holofuel",
     "deploy": "gh-pages -d build -o static"
   },
   "dependencies": {

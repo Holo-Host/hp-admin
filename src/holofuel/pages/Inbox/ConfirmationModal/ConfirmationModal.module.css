@@ -1,7 +1,7 @@
 /* ConfirmationModal */
 
 .counterparty-message {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 14px;
   line-height: 24px;
   text-align: center;
@@ -17,7 +17,7 @@
 }
 
 .modal-amount {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 18px;
   line-height: 24px;
   text-align: center;
@@ -37,7 +37,7 @@
 }
 
 .modal-message {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 18px;
   line-height: 24px;
   text-align: center;
@@ -75,9 +75,9 @@
   background-color: var(--color-ocean-green);
 }
 
-.modal-button-return-funds {	
-  composes: modal-button;	
-  font-size: 1rem;	
+.modal-button-return-funds {
+  composes: modal-button;
+  font-size: 1rem;
   font-weight: bolder;
-  width: 15rem;	
+  width: 15rem;
 }

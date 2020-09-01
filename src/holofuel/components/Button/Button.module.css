@@ -18,7 +18,7 @@
 
 .plain {
   background-color: white;
-  color: black;  
+  color: black;
 }
 
 .primary {
@@ -44,7 +44,7 @@
   background-color: transparent;
   margin: 5px;
   color: rgba(44, 64, 90, 0.5);
-  font-family: 'CircularStd', sans-serif;
+  font-family: 'MPLUS1p', sans-serif;
   font-size: 16px;
   line-height: 22px;
   letter-spacing: -0.4px;
@@ -56,7 +56,7 @@
   border: none;
   background-color: transparent;
   margin: 5px;
-  font-family: 'CircularStd', sans-serif;
+  font-family: 'MPLUS1p', sans-serif;
   font-size: 16px;
   line-height: 22px;
   letter-spacing: -0.4px;

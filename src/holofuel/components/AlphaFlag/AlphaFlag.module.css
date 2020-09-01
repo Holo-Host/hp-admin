@@ -4,7 +4,7 @@
 
 .flag {
   background-color: var(--color-havelock-blue);
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-style: normal;
   font-weight: bold;
   font-size: 10px;
@@ -24,23 +24,23 @@
 }
 
 .right {
-  
+
 }
 
 .left-arrow {
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-top: 16px solid transparent;
   border-bottom: 16px solid transparent;
-  
+
   border-right: 16px solid var(--color-havelock-blue);
 }
 
 .right-arrow {
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-top: 16px solid transparent;
   border-bottom: 16px solid transparent;
-  
+
   border-left: 16px solid var(--color-havelock-blue);
 }

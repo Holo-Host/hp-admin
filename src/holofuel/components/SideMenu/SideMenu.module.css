@@ -72,12 +72,12 @@
 }
 
 .balance {
-  
+
 }
 
 .settings-link {
   margin-top: 12px;
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 14px;
   line-height: 16px;
   color: var(--color-cape-cod);
@@ -151,7 +151,7 @@
   color: var(--color-outerspace);
   text-decoration: none;
   font-size: 15px;
-  line-height: 22px;  
+  line-height: 22px;
   letter-spacing: -0.05px;
   font-weight: bold;
 }
@@ -174,7 +174,7 @@
   position: relative;
   margin: 0 -32px 10px -32px;
   padding: 30px 12px;
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 14px;
   line-height: 16px;
   color: var(--color-rhino);
@@ -219,7 +219,7 @@
 }
 
 .version-info {
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 10px;
   line-height: 13px;
   letter-spacing: 0.4px;

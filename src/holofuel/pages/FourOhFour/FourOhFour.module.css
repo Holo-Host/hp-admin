@@ -16,12 +16,12 @@
   text-align: center;
   font-size: 32px;
   color: var(--color-rhino-35);
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   margin-bottom: 10px;
 }
 
 .message {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   color: var(--color-rhino-80);
   margin-bottom: 20px;
 }

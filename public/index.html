@@ -23,6 +23,13 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script>
+       if (window.sessionStorage.path) {
+          let path = window.sessionStorage.path; // gets the path saved on sessionStorage
+          window.history.pushState(null, null, path); // push it on url
+          window.sessionStorage.removeItem('path'); // removes from session
+        }
+    </script>
     <div id="root"></div>
     <!--
       This HTML file is a template.

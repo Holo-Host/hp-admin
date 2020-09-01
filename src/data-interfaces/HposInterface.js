@@ -83,13 +83,14 @@ const presentHposSettings = (hposSettings) => {
     registrationEmail: admin.email,
     networkStatus: holoportos.network || 'test', // ie: 'live'
     sshAccess: holoportos.sshAccess || false,
-    deviceName: name || 'My HoloPort'
+    deviceName: name || 'HoloPort'
   }
 }
 
 const presentHostedHapp = hostedHapp => ({
   name: hostedHapp['happ-title'],
-  number_instances: hostedHapp['number_instances']
+  number_instances: hostedHapp['number_instances'],
+  zomeCalls: hostedHapp['stats'].traffic.total_zome_calls
 })
 
 const HposInterface = {
