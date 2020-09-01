@@ -236,7 +236,6 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   const prevErr = []
 
   return async function (args = {}) {
-    await connectionReady()
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
       let jsonResult
@@ -245,6 +244,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         jsonResult = JSON.parse(rawResult)
       } else {
         await initAndGetHolochainClient()
+        await connectionReady()
         if (HOSTED_HOLOFUEL_CONTEXT) {
           if (!holochainClient) return
           jsonResult = await holochainClient.zomeCall(instanceId, zome, zomeFunc, args)
