@@ -1,0 +1,3 @@
+mutation HposUpdateSshSettingMutation ($enabled: Boolean) {
+  hposUpdateSshSetting (enabled: $enabled)
+}
