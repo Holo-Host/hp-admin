@@ -96,13 +96,9 @@ function PrimaryLayout ({
       newMessage('Connecting to your Holochain Conductor...', 0)
       stopPolling()
       setShouldRefetchMyUser(true)
-      let defaultPath
-      if (process.env.REACT_APP_HOLOFUEL_APP === 'true') {
-        defaultPath = INBOX_PATH
-      } else {
-        defaultPath = HP_ADMIN_LOGIN_PATH
+      if (process.env.REACT_APP_HOLOFUEL_APP !== 'true') {
+        push(HP_ADMIN_LOGIN_PATH)
       }
-      push(defaultPath)
     } else {
       startPolling(POLLING_INTERVAL_GENERAL)
       if (shouldRefetchMyUser) {

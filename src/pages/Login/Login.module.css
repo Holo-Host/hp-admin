@@ -1,6 +1,6 @@
 .container {
   height: 100%;
-  width: 100%;  
+  width: 100%;
 }
 
 .backdrop {
@@ -54,10 +54,10 @@
 }
 
 .label {
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-weight: bold;
   font-size: 10px;
-  line-height: 13px;  
+  line-height: 13px;
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: var(--color-rhino-60);
@@ -69,7 +69,7 @@
   font-size: 18px;
   padding: 5px 5px;
   margin-bottom: 20px;
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   color: var(--color-rhino);
 }
 
@@ -89,7 +89,7 @@
 }
 
 .reminder-text {
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 10px;
   line-height: 13px;
   letter-spacing: 0.4px;

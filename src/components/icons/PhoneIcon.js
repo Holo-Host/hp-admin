@@ -1,9 +1,9 @@
 import React from 'react'
 import Icon from './Icon'
 
-export const title = 'Laptop Icon'
+export const title = 'Phone Icon'
 
-export default function LaptopIcon ({ className, color = '#000000' }) {
+export default function PhoneIcon ({ className, color = '#000000' }) {
   return <Icon
     color={color}
     title={title}

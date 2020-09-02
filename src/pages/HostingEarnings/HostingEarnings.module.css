@@ -3,7 +3,7 @@
 }
 
 .earnings-label {
-  color: var(--color-rhino-80);  
+  color: var(--color-rhino-80);
 }
 
 .earnings-amount {
@@ -30,7 +30,7 @@
 
 .transaction-list {
   font-size: 12px;
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 14px;
   line-height: 18px;
   margin: 0px -24px;
