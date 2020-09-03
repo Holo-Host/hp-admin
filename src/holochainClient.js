@@ -7,7 +7,12 @@ import wait from 'waait'
 
 export const HOSTED_HOLOFUEL_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true'
 export const HP_ADMIN_HOST_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true')
-const CHAPERONE_SERVER_URL = 'http://198.199.73.20:8800/' // production_url: https://chaperone.holo.host/
+
+const CHAPERONE_SERVER = {
+  test: 'http://198.199.73.20:8000/',
+  production: 'https://chaperone.holo.host/'
+}
+const CHAPERONE_SERVER_URL = CHAPERONE_SERVER.production
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
