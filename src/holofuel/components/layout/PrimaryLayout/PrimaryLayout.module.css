@@ -31,3 +31,18 @@
 .side-menu {
   padding-right: 10px;
 }
+
+.hosted-landing-overlay {
+  opacity: 0.3;
+  /* nb: blur effect doesn't work in edge 12 or IE */
+  filter: blur(100px);
+  -webkit-filter: blur(100px);
+}
+
+.text {
+  color: var(--color-caribbean-green);
+  font-family: 'Circular';
+  font-size: 20px;
+  margin: 0 auto;
+  margin-top: 75px;
+}

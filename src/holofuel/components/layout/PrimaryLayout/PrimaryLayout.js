@@ -7,6 +7,7 @@ import HolofuelActionableTransactionsQuery from 'graphql/HolofuelActionableTrans
 import HolofuelCompletedTransactionsQuery from 'graphql/HolofuelCompletedTransactionsQuery.gql'
 import HolofuelLedgerQuery from 'graphql/HolofuelLedgerQuery.gql'
 import MyHolofuelUserQuery from 'graphql/MyHolofuelUserQuery.gql'
+import useHostedAgentAuthStatusContext from 'holofuel/contexts/useHostedAgentAuthStatusContext'
 import HolofuelNonPendingTransactionsQuery from 'graphql/HolofuelNonPendingTransactionsQuery.gql'
 import HolofuelWaitingTransactionsQuery from 'graphql/HolofuelWaitingTransactionsQuery.gql'
 import useCurrentUserContext from 'holofuel/contexts/useCurrentUserContext'
@@ -20,7 +21,7 @@ import AlphaFlag from 'holofuel/components/AlphaFlag'
 import { shouldShowTransactionAsActionable } from 'models/Transaction'
 import { INBOX_PATH, isHolofuelPage } from 'holofuel/utils/urls'
 import { HP_ADMIN_LOGIN_PATH } from 'utils/urls'
-import { wsConnection } from 'holochainClient'
+import { wsConnection, holochainClient as webSdkConnection, HOSTED_HOLOFUEL_CONTEXT } from 'holochainClient'
 import styles from './PrimaryLayout.module.css' // eslint-disable-line no-unused-vars
 import 'holofuel/global-styles/colors.css'
 import 'holofuel/global-styles/index.css'
@@ -76,19 +77,55 @@ function PrimaryLayout ({
   const { isConnected, setIsConnected } = useConnectionContext()
   const { newMessage } = useFlashMessageContext()
   const { hiddenTransactionIds } = useHiddenTransactionsContext()
+  const { push } = useHistory()
 
   const actionableTransactionsCount = actionableTransactions.filter(actionableTx => shouldShowTransactionAsActionable(actionableTx, hiddenTransactionIds)).length
   const newActionableItems = !!actionableTransactionsCount && !isHolofuelPage(INBOX_PATH, window)
 
-  const { push } = useHistory()
   const [shouldRefetchMyUser, setShouldRefetchMyUser] = useState(false)
   const refetchMyHolofuelUser = useCallback(() => {
     setShouldRefetchMyUser(false)
     refetchMyUser()
   }, [setShouldRefetchMyUser, refetchMyUser])
 
+  // holo hosted specific
+  const { isSignedInAsHostedAgent, setIsSignedInAsHostedAgent } = useHostedAgentAuthStatusContext()
+  const [holoWebSDKConnection, setHoloWebSDKConnection] = useState()
+  const [hostedAgentContext, setHostedAgentContext] = useState(0)
+
+  const setHostedAgentDetails = useCallback(async () => {
+    if (holoWebSDKConnection) {
+      // nb: the context is hard coded in chaperone right now to only return 2,
+      const hostedAgentContext = await holoWebSDKConnection.context()
+      setHostedAgentContext(hostedAgentContext)
+
+      // TODO: Update to read as < 3, once chaperonse is updated with contexts...
+      // (the context is hard coded in chaperone right now to only return 2)
+      // require sign-in if hosted agent context returns a hosted anonymous agent/user
+      if (hostedAgentContext < 2) {
+        await webSdkConnection.signOut()
+        setIsSignedInAsHostedAgent(false)
+      }
+
+      if (!isSignedInAsHostedAgent) {
+        await webSdkConnection.signIn()
+        setIsSignedInAsHostedAgent(true)
+
+        // todo: set IsSignedInAsHostedAgent to isHostedAgentSignedIn response, once resolved have dynamic var from chaperone, informing if signed in...
+        // const isHostedAgentSignedIn = await webSdkConnection.signIn()
+        // setIsSignedInAsHostedAgent(!!isHostedAgentSignedIn)
+        // // retrigger sign in if failed
+        // if(!isHostedAgentSignedIn) {
+        //   await webSdkConnection.signOut()
+        //   await webSdkConnection.signIn()
+        // }
+      }
+    }
+  }, [holoWebSDKConnection, isSignedInAsHostedAgent, setIsSignedInAsHostedAgent])
+
   useInterval(() => {
     setIsConnected(wsConnection)
+    setHoloWebSDKConnection(webSdkConnection)
   }, 5000)
 
   useEffect(() => {
@@ -105,13 +142,24 @@ function PrimaryLayout ({
         refetchMyHolofuelUser()
       }
     }
+    // holo hosted specific
+    if (HOSTED_HOLOFUEL_CONTEXT) {
+      setHostedAgentDetails()
+      if (isSignedInAsHostedAgent && hostedAgentContext <= 2) {
+        // TODO: Block proceeding to main page if agent is at all anonymous...
+        console.log('Proceeding with a static anonymous hosted agent CONTEXT (even though agent has keys and not anonymous)...  Don\'t allow once chaperone is updated with non static contexts.')
+      }
+    }
   }, [isConnected,
     push,
     newMessage,
     startPolling,
     stopPolling,
     shouldRefetchMyUser,
-    refetchMyHolofuelUser
+    refetchMyHolofuelUser,
+    isSignedInAsHostedAgent,
+    hostedAgentContext,
+    setHostedAgentDetails
   ])
 
   const isLoadingFirstLedger = useLoadingFirstTime(ledgerLoading)
@@ -120,19 +168,28 @@ function PrimaryLayout ({
   const closeMenu = () => setMenuOpen(false)
 
   return <div styleName={cx('styles.primary-layout')}>
-    <Header {...headerProps} agent={currentUser} agentLoading={currentUserLoading} hamburgerClick={hamburgerClick} newActionableItems={newActionableItems} />
-    <SideMenu
-      isOpen={isMenuOpen}
-      closeMenu={closeMenu}
-      agent={currentUser}
-      agentLoading={currentUserLoading}
-      newActionableItems={newActionableItems}
-      holofuelBalance={holofuelBalance}
-      ledgerLoading={isLoadingFirstLedger} />
-    {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
-    <div styleName={cx('styles.content')}>
-      <FlashMessage />
-      {children}
+    {(HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) && <h2 styleName='styles.text'>Connecting to Holo...</h2>}
+    <div styleName={cx('styles.content', { 'styles.hosted-landing-overlay': (HOSTED_HOLOFUEL_CONTEXT && !isSignedInAsHostedAgent) })}>
+      <Header {...headerProps}
+        agent={currentUser}
+        agentLoading={currentUserLoading}
+        hamburgerClick={hamburgerClick}
+        newActionableItems={newActionableItems}
+        hostedAgentContext={hostedAgentContext} />
+      <SideMenu
+        isOpen={isMenuOpen}
+        closeMenu={closeMenu}
+        agent={currentUser}
+        agentLoading={currentUserLoading}
+        newActionableItems={newActionableItems}
+        holofuelBalance={holofuelBalance}
+        ledgerLoading={isLoadingFirstLedger} />
+      {showAlphaFlag && <AlphaFlag styleName='styles.alpha-flag' />}
+
+      <div styleName={cx('styles.content')}>
+        <FlashMessage />
+        {children}
+      </div>
     </div>
   </div>
 }

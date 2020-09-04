@@ -8,6 +8,7 @@ import { history } from 'react-router-dom'
 import { Header } from './Header'
 import { title as menuIconTitle } from 'components/icons/MenuIcon'
 
+jest.mock('holofuel/contexts/useHostedAgentAuthStatusContext')
 jest.mock('holofuel/contexts/useFlashMessageContext')
 jest.mock('holofuel/components/layout/PrimaryLayout')
 jest.mock('components/HashAvatar')
