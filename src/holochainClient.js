@@ -1,5 +1,6 @@
 import { Connection as HoloWebSdkConnection } from '@holo-host/web-sdk'
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
+import { isNil } from 'lodash'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import * as waitUntil from 'async-wait-until'
@@ -9,7 +10,7 @@ export const HOSTED_HOLOFUEL_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN ===
 export const HP_ADMIN_HOST_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true')
 
 const CHAPERONE_SERVER = {
-  test: 'http://198.199.73.20:8800/',
+  test: 'http://198.199.73.20:8000/',
   production: 'https://chaperone.holo.host/'
 }
 const CHAPERONE_SERVER_URL = CHAPERONE_SERVER.test
@@ -200,6 +201,13 @@ async function initHolochainClient () {
   }
 }
 
+const holochainConnectionReady = async () => {
+  await waitUntil(() => {
+    return !isNil(holochainClient)
+  }, 30000, 100)
+  return holochainClient
+}
+
 async function initAndGetHolochainClient () {
   let counter = 0
   // This code is to avoid multiple ws connections.
@@ -220,15 +228,9 @@ async function initAndGetHolochainClient () {
     wsConnection = false
   }
 
-  if (holochainClient) return holochainClient
-  else return initHolochainClient()
-}
-
-const holochainConnectionReady = async () => {
-  await waitUntil(() => {
-    return holochainClient !== null
-  }, 30000, 100)
-  return holochainClient
+  if (!holochainClient) return initHolochainClient()
+  // else return initHolochainClient()
+  await holochainConnectionReady()
 }
 
 export function createZomeCall (zomeCallPath, callOpts = {}) {
@@ -244,7 +246,6 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
   const prevErr = []
 
   return async function (args = {}) {
-    await holochainConnectionReady()
     try {
       const { instanceId, zome, zomeFunc } = parseZomeCallPath(zomeCallPath)
       let jsonResult
@@ -253,6 +254,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         jsonResult = JSON.parse(rawResult)
       } else {
         await initAndGetHolochainClient()
+        // await holochainConnectionReady()
         if (HOSTED_HOLOFUEL_CONTEXT) {
           if (!holochainClient) return
           jsonResult = await holochainClient.zomeCall(instanceId, zome, zomeFunc, args)

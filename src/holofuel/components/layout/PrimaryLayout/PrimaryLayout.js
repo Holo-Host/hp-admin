@@ -94,7 +94,7 @@ function PrimaryLayout ({
   const [hostedAgentContext, setHostedAgentContext] = useState(0)
 
   const setHostedAgentDetails = useCallback(async () => {
-    console.log('holoWebSDKConnection : ', holoWebSDKConnection)
+    console.log('isSignedInAsHostedAgent : ', isSignedInAsHostedAgent)
     if (holoWebSDKConnection) {
       // nb: the context is hard coded in chaperone right now to only return 2,
       const hostedAgentContext = await holoWebSDKConnection.context()
@@ -109,8 +109,16 @@ function PrimaryLayout ({
       }
 
       if (!isSignedInAsHostedAgent) {
-        await webSdkConnection.signIn()
-        setIsSignedInAsHostedAgent(true)
+        console.log('about to sign in... ')
+
+        try {
+          const isHostedAgentSignedIn = await webSdkConnection.signIn()
+          console.log('>>>>>>>>>>>> SIGN IN RESULT : ', isHostedAgentSignedIn)
+          setIsSignedInAsHostedAgent(true)
+        } catch (error) {
+          console.log('>>>>>>>>>>>> SIGN IN ERROR : ', error)
+          setIsSignedInAsHostedAgent(false)
+        }
 
         // todo: set IsSignedInAsHostedAgent to isHostedAgentSignedIn response, once resolved have dynamic var from chaperone, informing if signed in...
         // const isHostedAgentSignedIn = await webSdkConnection.signIn()

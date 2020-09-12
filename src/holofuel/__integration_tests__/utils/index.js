@@ -1,5 +1,3 @@
-import { fireEvent, wait, act } from '@testing-library/react'
-import waait from 'waait'
 import { DNA_INSTANCE, MOCK_EXPIRATION_DATE } from '../utils/global-vars'
 
 const getTimestamp = () => new Date().toISOString()
@@ -13,18 +11,39 @@ export const closeTestConductor = (agent, testName) => {
   }
 }
 
-// export const hostLogin = async (queries, email = '', password = '') => {
-//   return new Promise(resolve => {
-//     const loginResult = async () => await act(async () => { // eslint-disable-line no-return-await
-//       fireEvent.change(queries.getByLabelText('EMAIL:'), { target: { value: email } })
-//       fireEvent.change(queries.getByLabelText('PASSWORD:'), { target: { value: password } })
-//       fireEvent.click(queries.getByText('Login'))
-//       await waait(0)
-//       return wait(() => queries.getByText('HoloFuel'))
-//     })
-//     resolve(loginResult)
-//   })
-// }
+export const findIframe = async (page, url) => {                                                                  
+  return new Promise(async resolve => {
+    const pollingInterval = 1000;                                                                
+    const poll = setInterval(async function waitForIFrameToLoad() {   
+      const iFrame = page.frames().find(frame => frame.url().includes(url));                         
+      if (iFrame) {                                                                                    
+        clearInterval(poll);                                                                                  
+        resolve(iFrame);                                                                               
+      }                                                                                                                                                                         
+    }, pollingInterval);                                                                                          
+  });                                                                                                  
+}
+
+export const holoAuth = async (frame, userEmail = '', userPassword = '', type = 'signup', { asyncCallback }) => {
+  const pascalType = type === 'signup' ? 'SignUp' : 'SignIn'
+  await frame.click(`button[onclick="show${pascalType}()"]`)
+  await frame.type(`#${type}-email`, userEmail, { delay: 100 })
+  await frame.type(`#${type}-password`, userPassword, { delay: 100 })
+  await frame.type(`#${type}-password-confirm`, userPassword, { delay: 100 })
+  const email = await frame.$eval(`#${type}-email`, el => el.value)
+  const password = await frame.$eval(`#${type}-password`, el => el.value)
+  const confirmation = await frame.$eval(`#${type}-password-confirm`, el => el.value)      
+
+  
+  const buttonTypeIndex = type === 'signup' ? 1 : 0
+  const button = await frame.$$('button[onclick="formSubmit()"]')
+  const SignUpButton = button[buttonTypeIndex]
+  
+  await asyncCallback()
+  SignUpButton.click()
+
+  return { email, password, confirmation }
+}
 
 export const addNickname = async(tryoramaScenario, agent, nickname) => {
   const profile_args = {
@@ -34,7 +53,12 @@ export const addNickname = async(tryoramaScenario, agent, nickname) => {
     uniqueness: `${nickname}FirstEntry`
   }
   const result = await agent.callSync(DNA_INSTANCE, "profile", "update_my_profile", profile_args )
-  await tryoramaScenario.consistency()
+
+  // wait for DHT consistency
+  if (!await tryoramaScenario.simpleConsistency("app", [agent], [])) {
+    throw new Error("Failed to reach consistency after making new offer")
+  }
+
   return result
 }
 
@@ -52,7 +76,11 @@ export const preseedOffer = async(tryoramaScenario, spender, receiver, volume = 
       expiration_date: MOCK_EXPIRATION_DATE
     }
     await spender.callSync(DNA_INSTANCE, "transactor", "create_promise", offer_args )
-    await tryoramaScenario.consistency()
+    
+    // wait for DHT consistency
+    if (!await tryoramaScenario.simpleConsistency("app", [spender, receiver], [])) {
+      throw new Error("Failed to reach consistency after making new offer")
+    }
 
     const spenderLedger = await spender.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
     const receiverLedger = await receiver.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
@@ -75,7 +103,11 @@ export const preseedRequest = async (tryoramaScenario, receiver, spender, volume
       timestamp: getTimestamp()
     }
     await receiver.callSync(DNA_INSTANCE, "transactor", "create_invoice", request_args )
-    await tryoramaScenario.consistency()
+    
+    // wait for DHT consistency
+    if (!await tryoramaScenario.simpleConsistency("app", [receiver, spender, []])) {
+      throw new Error("Failed to reach consistency after making new request")
+    }
 
     const spenderLedger = await spender.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
     const receiverLedger = await receiver.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
