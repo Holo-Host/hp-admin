@@ -1,6 +1,7 @@
-import { DNA_INSTANCE, MOCK_EXPIRATION_DATE } from '../utils/global-vars'
+import { DNA_INSTANCE, MOCK_EXPIRATION_DATE, SCREENSHOT_PATH } from '../utils/global-vars'
 
 const getTimestamp = () => new Date().toISOString()
+export const takeSnapshot = async (page, fileName) => await page.screenshot({path: SCREENSHOT_PATH + `/${fileName}.png`})
 
 export const closeTestConductor = (agent, testName) => {
   try {
@@ -24,7 +25,7 @@ export const findIframe = async (page, url) => {
   });                                                                                                  
 }
 
-export const holoAuth = async (frame, userEmail = '', userPassword = '', type = 'signup', { asyncCallback }) => {
+export const holoAuth = async (frame, userEmail = '', userPassword = '', type = 'signup') => {
   const pascalType = type === 'signup' ? 'SignUp' : 'SignIn'
   await frame.click(`button[onclick="show${pascalType}()"]`)
   await frame.type(`#${type}-email`, userEmail, { delay: 100 })
@@ -32,14 +33,12 @@ export const holoAuth = async (frame, userEmail = '', userPassword = '', type = 
   await frame.type(`#${type}-password-confirm`, userPassword, { delay: 100 })
   const email = await frame.$eval(`#${type}-email`, el => el.value)
   const password = await frame.$eval(`#${type}-password`, el => el.value)
-  const confirmation = await frame.$eval(`#${type}-password-confirm`, el => el.value)      
+  const confirmation = await frame.$eval(`#${type}-password-confirm`, el => el.value)
 
-  
   const buttonTypeIndex = type === 'signup' ? 1 : 0
   const button = await frame.$$('button[onclick="formSubmit()"]')
   const SignUpButton = button[buttonTypeIndex]
-  
-  await asyncCallback()
+
   SignUpButton.click()
 
   return { email, password, confirmation }

@@ -1,12 +1,8 @@
-import waait from 'waait'
 import { closeTestConductor, addNickname, holoLogin } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
 import { DNA_INSTANCE, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
 import { presentHolofuelAmount, POLL_INTERVAL } from 'utils'
-
-jest.mock('react-media-hook')
-jest.mock('react-identicon-variety-pack')
-jest.unmock('react-router-dom')
+import waait from 'waait'
 
 orchestrator.registerScenario('Tryorama Runs Create Request Scenario', async scenario => {
   let page, agent1Instance, agent2Instance
@@ -45,8 +41,6 @@ orchestrator.registerScenario('Tryorama Runs Create Request Scenario', async sce
 
     it.skip('All endpoints work e2e with DNA', async (done) => {
       const agent1Nickname = 'Alice'
-
-
       
       const newOffer = {
         counterpartyId: agent2Instance.info(DNA_INSTANCE).agentAddress,
