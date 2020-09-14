@@ -2,9 +2,10 @@
 
 import { TIMEOUT, HOSTED_AGENT } from '../utils/global-vars'
 import { findIframe, holoAuthenticateUser, takeSnapshot } from '../utils/index'
+import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import wait from 'waait';
 
-describe.skip('Authentication Flow', () => {
+describe('Authentication Flow', () => {
     let page;
     beforeAll(async () => {
       page = await global.__BROWSER__.newPage();
@@ -32,7 +33,7 @@ describe.skip('Authentication Flow', () => {
       await wait(5000)
       await page.waitForSelector('iframe')
 
-      const iframe = await findIframe(page, 'chaperone.holo.host')
+      const iframe = await findIframe(page, CHAPERONE_SERVER_URL)
       const modalData = await iframe.$eval('.modal-open', el => el.innerHTML)
       expect(modalData).toContain('Login with Holo')
       expect(modalData).toContain('Sign Up')
@@ -73,7 +74,7 @@ describe.skip('Authentication Flow', () => {
       await wait(1000)
       await takeSnapshot(page, 'afterSignoutModal')
 
-      const newIframe = await findIframe(page, 'chaperone.holo.host')
+      const newIframe = await findIframe(page, CHAPERONE_SERVER_URL)
       const newModalData = await newIframe.$eval('.modal-open', el => el.innerHTML)
       expect(newModalData).toContain('Login with Holo')
     });

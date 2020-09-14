@@ -35,7 +35,7 @@
     "preseed:holofuel": "node scripts/prepareHoloFuelData/index.js",
     "preseed:hpadmin": "node scripts/prepareHpAdminData/index.js",
     "test:preseed-data": "npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data",
-    "test:integration-holo":   "npm run sim2h-server:start && REACT_APP_INTEGRATION_TEST='true' TRYORAMA_LOG_LEVEL=0 HC_IGNORE_SIM2H_URL_PROPERTY=true node scripts/test.js --config=./jest.holoIntegration.config.js --runInBand --testTimeout=9500000",
+    "test:integration-holo":   "REACT_APP_INTEGRATION_TEST='true' TRYORAMA_LOG_LEVEL=0 node scripts/test.js --config=./jest.holoIntegration.config.js --runInBand --testTimeout=9500000",
     "test:integration-holochain": "nix-shell --command 'REACT_APP_INTEGRATION_TEST='true' node scripts/test.js --config=./jest.hcIntegration.config.js'",
     "test:integration-with-setup": "npm run test:preseed-data && npm run test:integration",
     "predeploy": "REACT_APP_HOLOFUEL_AT_ROOT=false npm run build:holofuel-holo",

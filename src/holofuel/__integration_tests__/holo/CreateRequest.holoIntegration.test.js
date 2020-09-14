@@ -1,6 +1,7 @@
 import { closeTestConductor, findIframe, addNickname, holoAuthenticateUser, awaitSimpleConsistency } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
 import { TIMEOUT, DNA_INSTANCE, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
+import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import { presentHolofuelAmount, POLL_INTERVAL } from 'utils'
 import wait from 'waait'
 
@@ -38,7 +39,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
     closeTestConductor(counterpartyAgentInstance, 'Create Request e2e')
   })
 
-  describe('Create Request Flow e2e', () => {
+  describe.skip('Create Request Flow e2e', () => {
     it('All endpoints work e2e with DNA', async () => {
       // *********
       // Log into hApp
@@ -46,7 +47,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
         // wait for the modal to load
         await wait(4000)
         await page.waitForSelector('iframe')
-        const iframe = await findIframe(page, 'chaperone.holo.host')
+        const iframe = await findIframe(page, CHAPERONE_SERVER_URL)
         await iframe.$('.modal-open')
 
         const { email, password }  = await holoAuthenticateUser(page, iframe, HOSTED_AGENT.email, HOSTED_AGENT.password, 'signup')
@@ -59,19 +60,22 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
         // wait for home page to load
         await wait(3000)
         const buttons = await page.$$('button')
-        // const menuButton = buttons[2]
+        const menuButton = buttons[0]
         const newTransactionButton = buttons[3]
-        newTransactionButton.click()
 
-        // console.log(' >>>>>>>>>>>>>>> buttons : ', buttons)
+        await wait (4000)
+        menuButton.click()
+        await wait (4000)
+        const sideMenuButtons = await page.$$('.SideMenu-module__nav-link___-gvJ_')
+        const inboxButton = sideMenuButtons[0]
+        const historyButton = sideMenuButtons[1]
+        const profileButton = sideMenuButtons[2]
+        
+        console.log('historyButton', historyButton)
 
-        // menuButton.click()
-        // const sideMenuButtons = await page.$$('SideMenu-module__nav-link___-gvJ_')
-        // const inboxButton = sideMenuButtons[0]
-        // const historyButton = sideMenuButtons[1]
-        // const profileButton = sideMenuButtons[2]
-      
-      // *********
+        menuButton.click()
+
+        // *********
       // Name Players
       // *********
       // // hosted player updates name
@@ -108,64 +112,75 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // *********
         // menuButton.click()
         // inboxButton.click()
-        
+
+        await wait (4000)
         newTransactionButton.click()
-        console.log(' >>>>>>>>>>>>>>> newTransactionButton : ', newTransactionButton)
-
-        // await page.waitForSelector('button.AmountInput-module__numpad-button___2L0x3')
-        // const numpadButtons = await page.$$('button.AmountInput-module__numpad-button___2L0x3')        
-        // numpadButtons[0].click()
-        // numpadButtons[1].click()
-        // numpadButtons[2].click()
-        // numpadButtons[9].click()
-        // numpadButtons[3].click()
-        // numpadButtons[4].click()
-        // numpadButtons[5].click()
+        await page.waitForSelector('button.AmountInput-module__numpad-button___2L0x3')
+        const numpadButtons = await page.$$('button.AmountInput-module__numpad-button___2L0x3')        
+        numpadButtons[0].click()
+        await wait(100)
+        numpadButtons[1].click()
+        await wait(100)
+        numpadButtons[2].click()
+        await wait(100)
+        numpadButtons[9].click()
+        await wait(100)
+        numpadButtons[3].click()
+        await wait(100)
+        numpadButtons[4].click()
+        await wait(100)
+        numpadButtons[5].click()
+        await wait(100)
         
-        // await wait(1000)
+        await wait(1000)
 
-        // const actionButtons = await page.$$('button.AmountInput-module__action-button___HfE-d.UIButton-module__button___2eLXd.UIButton-module__white___3J1jF')
-        // const requestButton = actionButtons[1]
-        // requestButton.click()
+        const actionButtons = await page.$$('button.AmountInput-module__action-button___HfE-d.UIButton-module__button___2eLXd.UIButton-module__white___3J1jF')
+        const requestButton = actionButtons[1]
+        requestButton.click()
         
-        // await page.waitForSelector('form')
+        await wait(1000)
+        await page.waitForSelector('form')
 
-        // const conterpartyAgentAddress = counterpartyAgentInstance.info(DNA_INSTANCE).agentAddress
-        // const newOffer = {
-        //     amount: '123.456',
-        //     counterpartyId: conterpartyAgentAddress,
-        //     note: 'Taco Tuesday!'
-        //   }
+        const conterpartyAgentAddress = counterpartyAgentInstance.info(DNA_INSTANCE).agentAddress
+        const newOffer = {
+            amount: '123.456',
+            counterpartyId: conterpartyAgentAddress,
+            note: 'Taco Tuesday!'
+          }
 
-        //   await frame.type(`#counterpartyId`, newOffer.counterpartyId, { delay: 10 })
-        //   await frame.type(`#note`, newOffer.note, { delay: 100 })
+          await page.type(`#counterpartyId`, newOffer.counterpartyId, { delay: 10 })
+          await page.type(`#notes`, newOffer.note, { delay: 100 })
 
-        //   const amount = await frame.$eval(`input[data-testid="amount-input"]`, el => el.value)
-        //   const counterpartyId = await frame.$eval(`#counterpartyId`, el => el.value)
-        //   const note = await frame.$eval(`#notes`, el => el.value)
+          const amount = await page.$eval(`div.CreateOfferRequest-module__amount___YdE2C`, el => el.innerHTML)
+          const counterpartyId = await page.$eval(`#counterpartyId`, el => el.value)
+          const note = await page.$eval(`#notes`, el => el.value)
 
-        //   expect(amount).toBe(newOffer.amount)
-        //   expect(counterpartyId).toBe(newOffer.counterpartyId)
-        //   expect(note).toEqual(newOffer.note)
+          expect(amount).toContain(newOffer.amount)
+          expect(counterpartyId).toBe(newOffer.counterpartyId)
+          expect(note).toEqual(newOffer.note)
 
-        //   // wait for button to not be disabled
-        //   await wait(500)
+          // wait for button to not be disabled
+          await wait(1000)
 
-        //   const submitButton = await page.$('button[data-testid="submit-button"]')
-        //   console.log('++++++++++=', submitButton)
-        //   submitButton.click()
+          const submitButton = await page.$('button[data-testid="submit-button"]')
+          // console.log('++++++++++ submitButton ==', submitButton)
+          submitButton.click()
 
-        // wait for DHT consistency
+        // // wait for DHT consistency
         // await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
-          // menuButton.click()
-          // historyButton.click()
+          await wait(30000)
+          menuButton.click()
+          await wait(2000)
+          historyButton.click()
 
   //     // *********
   //     // Check History
   //     // *********
-  //     await page.waitForSelector('div.TransactionHistory-module__filter-button___31JRc TransactionHistory-module__selected___4WxOY')
-  //     await waait(POLL_INTERVAL)
+      await wait(1000)
+
+      await page.waitForSelector('div.TransactionHistory-module__filter-button___31JRc TransactionHistory-module__selected___4WxOY')
+      await wait(POLL_INTERVAL)
 
         // await page.waitForSelector('div[data-testid="transaction-row"]')
         // const transactionRows = await page.$$('div[data-testid="transaction-row"]')

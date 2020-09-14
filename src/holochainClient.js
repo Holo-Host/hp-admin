@@ -13,7 +13,7 @@ const CHAPERONE_SERVER = {
   test: 'http://198.199.73.20:8000/',
   production: 'https://chaperone.holo.host/'
 }
-const CHAPERONE_SERVER_URL = CHAPERONE_SERVER.test
+export const CHAPERONE_SERVER_URL = CHAPERONE_SERVER.test
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
