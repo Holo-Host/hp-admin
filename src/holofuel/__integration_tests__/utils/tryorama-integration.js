@@ -1,5 +1,6 @@
-export const dnaPath = process.env.REACT_APP_DNA_PATH
 const { Orchestrator, Config, combine, localOnly, callSync } = require('@holochain/tryorama')
+// export const dnaPath = process.env.REACT_APP_DNA_PATH
+export const dnaPath = '/nix/store/jinsv02qykq3l6kl7l8b857cs423658k-holofuel/holofuel.dna.json'
 
 export const orchestrator = new Orchestrator({
   middleware: combine(

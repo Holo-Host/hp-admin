@@ -24,4 +24,4 @@ export const HOSTED_AGENT = {
 }
 
 export const SCREENSHOT_PATH = './src/holofuel/__integration_tests__/holo/snapshots'
-export const TIMEOUT = 300000;
+export const TIMEOUT = 9500000;

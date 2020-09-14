@@ -1,14 +1,15 @@
 import { DNA_INSTANCE, MOCK_EXPIRATION_DATE, SCREENSHOT_PATH } from '../utils/global-vars'
 
 const getTimestamp = () => new Date().toISOString()
+
 export const takeSnapshot = async (page, fileName) => await page.screenshot({path: SCREENSHOT_PATH + `/${fileName}.png`})
 
 export const closeTestConductor = (agent, testName) => {
   try {
     agent.kill()
   }
-  catch(err){
-    throw new Error(`Error when killing conductor for the ${testName} test : ${err}`);
+  catch (err) {
+    throw new Error(`Error when killing conductor for the ${testName} test : ${err}`)
   }
 }
 
@@ -25,23 +26,38 @@ export const findIframe = async (page, url) => {
   });                                                                                                  
 }
 
-export const holoAuth = async (frame, userEmail = '', userPassword = '', type = 'signup') => {
-  const pascalType = type === 'signup' ? 'SignUp' : 'SignIn'
+export const holoAuthenticateUser = async (page, frame, userEmail = '', userPassword = '', type = 'signup') => {
+  const pascalType = type === 'signup' ? 'SignUp' : 'LogIn'
   await frame.click(`button[onclick="show${pascalType}()"]`)
   await frame.type(`#${type}-email`, userEmail, { delay: 100 })
   await frame.type(`#${type}-password`, userPassword, { delay: 100 })
-  await frame.type(`#${type}-password-confirm`, userPassword, { delay: 100 })
   const email = await frame.$eval(`#${type}-email`, el => el.value)
   const password = await frame.$eval(`#${type}-password`, el => el.value)
-  const confirmation = await frame.$eval(`#${type}-password-confirm`, el => el.value)
+
+  let confirmation
+  if (type === 'signup') {
+    await frame.type(`#${type}-password-confirm`, userPassword, { delay: 100 })
+    confirmation = await frame.$eval(`#${type}-password-confirm`, el => el.value)
+  }
+  
+  await takeSnapshot(page, `${type}Modal`)
 
   const buttonTypeIndex = type === 'signup' ? 1 : 0
-  const button = await frame.$$('button[onclick="formSubmit()"]')
-  const SignUpButton = button[buttonTypeIndex]
-
+  const submitButtons = await frame.$$('button[onclick="formSubmit()"]')
+  const SignUpButton = submitButtons[buttonTypeIndex]
   SignUpButton.click()
 
   return { email, password, confirmation }
+}
+
+export const awaitSimpleConsistency = async (s, hostInstanceId, holochainPlayers = [], hostedPlayers = []) => {
+  if (!instanceId) throw new Error('Attempted to await SimpleConsistency without providing a proper instance...')
+  try {
+    // await s.simpleConsistency('holofuel', [], [alice])
+    await s.simpleConsistency(hostInstanceId, holochainPlayers, hostedPlayers)
+  } catch (error) {
+    throw new Error(`Failed to reach consistency. ${err}`)
+  }
 }
 
 export const addNickname = async(tryoramaScenario, agent, nickname) => {
@@ -54,10 +70,7 @@ export const addNickname = async(tryoramaScenario, agent, nickname) => {
   const result = await agent.callSync(DNA_INSTANCE, "profile", "update_my_profile", profile_args )
 
   // wait for DHT consistency
-  if (!await tryoramaScenario.simpleConsistency("app", [agent], [])) {
-    throw new Error("Failed to reach consistency after making new offer")
-  }
-
+  // await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [agent], [])
   return result
 }
 
@@ -77,9 +90,7 @@ export const preseedOffer = async(tryoramaScenario, spender, receiver, volume = 
     await spender.callSync(DNA_INSTANCE, "transactor", "create_promise", offer_args )
     
     // wait for DHT consistency
-    if (!await tryoramaScenario.simpleConsistency("app", [spender, receiver], [])) {
-      throw new Error("Failed to reach consistency after making new offer")
-    }
+    await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [spender, receiver], [])
 
     const spenderLedger = await spender.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
     const receiverLedger = await receiver.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
@@ -104,9 +115,7 @@ export const preseedRequest = async (tryoramaScenario, receiver, spender, volume
     await receiver.callSync(DNA_INSTANCE, "transactor", "create_invoice", request_args )
     
     // wait for DHT consistency
-    if (!await tryoramaScenario.simpleConsistency("app", [receiver, spender, []])) {
-      throw new Error("Failed to reach consistency after making new request")
-    }
+    await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [receiver, spender], [])
 
     const spenderLedger = await spender.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
     const receiverLedger = await receiver.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
