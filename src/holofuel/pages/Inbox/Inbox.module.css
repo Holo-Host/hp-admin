@@ -36,7 +36,7 @@
 }
 
 .view-button {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 16px;
   color: var(--color-rhino-50);
   background-color: transparent;
@@ -46,6 +46,7 @@
 
 .view-button-selected {
   composes: view-button;
+  font-weight: bold;
   color: var(--color-rhino);
   border-bottom: 2px solid var(--color-caribbean-green);
 }
@@ -109,7 +110,7 @@
 
 .transaction-row-loading {
   margin-right: 6px;
-  margin-left: 6px;  
+  margin-left: 6px;
 }
 
 /* Avatar and Description Cells */
@@ -269,7 +270,7 @@
   color: white;
   height: 72px;
   width: 64px;
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 10px;
   text-align: center;
   text-transform: capitalize;

@@ -9,14 +9,14 @@ it('should render the title and a menu icon', async () => {
   const props = {
     title: 'the title',
     settings: {
-      hostName: 'hostname'
+      deviceName: 'devicename'
     }
   }
 
   const { getByText, getByTestId } = render(<Header {...props} />)
 
   expect(getByText(props.title)).toBeInTheDocument()
-  expect(getByText(props.settings.hostName)).toBeInTheDocument()
+  expect(getByText(props.settings.deviceName)).toBeInTheDocument()
 
   fireEvent.click(getByTestId('settings-link'))
   expect(mockNavigateTo).toHaveBeenCalledWith('/admin/settings')

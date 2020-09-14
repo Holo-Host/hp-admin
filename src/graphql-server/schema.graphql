@@ -168,6 +168,7 @@ type Query {
   hostingReport: HostingReport
   earningsReport: EarningsReport
   hposStatus: HposStatus
+  hposSshSetting: Boolean
 }
 
 type Mutation {
@@ -184,4 +185,5 @@ type Mutation {
   hposUpdateSettings(hostPubKey: String, hostName: String, deviceName: String, sshAccess: Boolean): HposSettings
   hposUpdateVersion: HposStatus
   hposCheckAuth: HposAuth
+  hposUpdateSshSetting(enabled: Boolean): Boolean
 }

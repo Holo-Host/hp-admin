@@ -9,8 +9,9 @@
 }
 
 .balance-amount {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 36px;
+  font-weight: bold;
   color: var(--color-rhino);
   margin-bottom: 45px;
 }
@@ -28,7 +29,7 @@
 }
 
 .transactions-empty-text {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 18px;
   text-align: center;
   color: var(--color-rhino-60);
@@ -51,9 +52,9 @@
 }
 
 .filter-button {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 16px;
-  line-height: 22px;  
+  line-height: 22px;
   letter-spacing: -0.4px;
   color: var(--color-rhino-50);
   padding-bottom: 7px;
@@ -62,6 +63,7 @@
 
 .selected {
   border-bottom: 2px solid var(--color-caribbean-green);
+  font-weight: bold;
   color: var(--color-rhino);
 }
 
@@ -71,7 +73,7 @@
   background-color: var(--color-rhino-10);
   margin: 0;
   padding: 0 24px;
-  height: 24px;  
+  height: 24px;
   display: flex;
   align-items: center;
 }
@@ -104,7 +106,7 @@
 }
 
 .name {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 14px;
   line-height: 19px;
   color: var(--color-rhino-80);
@@ -112,7 +114,7 @@
 
 .notes {
   font-style: italic;
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 10px;
   line-height: 13px;
   letter-spacing: 0.4px;
@@ -134,7 +136,7 @@
 }
 
 .transaction-balance {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 10px;
   line-height: 13px;
   letter-spacing: 0.4px;
@@ -150,14 +152,14 @@
   opacity: 0.8;
   pointer-events: none;
  }
- 
+
  .highlightGreen {
    background-color: #CFF3EC;
  }
- 
+
  .highlightRed {
    background-color: #FCE3E8;
- } 
+ }
 
 /* CancelButton */
 .cancel-button {
@@ -182,7 +184,7 @@
 }
 
 .modal-text {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 18px;
   line-height: 24px;
   text-align: center;
@@ -191,13 +193,13 @@
 }
 
 .modal-buttons {
-  display: flex;  
+  display: flex;
 }
 
 .modal-button {
   width: 130px;
   height: 42px;
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 16px;
   line-height: 19px;
   text-align: center;
@@ -207,7 +209,7 @@
 .modal-button-no {
   composes: modal-button;
   border-top-right-radius: 0;
-  border-bottom-right-radius: 0;  
+  border-bottom-right-radius: 0;
   background-color: var(--color-iceberg);
   color: var(--color-rhino-60);
 }

@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## unreleased
 ### Added
 - Hosting card gets real data from HPOS for hosted happs and local source chain count
+- Hosting card gets real data from HPOS for aggregatee of hosted happ zome calls
+- Hosting card is enabled on Dashboard
+### Changed
+- Use `profiles/features` endpoint for querying and updating SSH access
+- HP-Admin Layout changes between mobile and desktop views
+- Holofuel UI - simplified how routing works, and added a fix to a github pages routing issue
+### Removed
+- HP-Admin Version update functionality
+### Fixed
+- Device Name changes are reflected in the UI
 
 ## [0.13.4] - 2020-08-03
 ### Added

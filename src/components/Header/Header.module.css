@@ -16,7 +16,7 @@
 .back-button {
   display: flex;
   align-items: center;
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 10px;
   line-height: 13px;
   color: var(--color-rhino);
@@ -32,7 +32,7 @@
 }
 
 .nickname {
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 10px;
   line-height: 13px;
   letter-spacing: 0.4px;
@@ -67,7 +67,7 @@
 }
 
 .settings-link {
-  font-family: 'Circular';
+  font-family: 'MPLUS1p';
   font-size: 14px;
   line-height: 16px;
   color: var(--color-cape-cod);

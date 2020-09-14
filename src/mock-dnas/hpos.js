@@ -1,3 +1,5 @@
+var sshAccess = true
+
 const data = {
   get: {
     // Returns holo-config.json data with seed field filtered out.
@@ -9,7 +11,7 @@ const data = {
       },
       holoportos: {
         network: 'live',
-        sshAccess: true
+        sshAccess
       },
       name: 'My HoloPort'
     },
@@ -55,10 +57,18 @@ const data = {
       hosted_happs: [
         {
           'happ-title': 'HoloFuel',
-          number_instances: 17
+          number_instances: 17,
+          stats: {
+            traffic: {
+              total_zome_calls: 100
+            }
+          }
         }
       ]
-    }
+    },
+    '/v1/profiles/development/features/ssh': () => ({
+      enabled: sshAccess
+    })
   },
   put: {
     '/v1/config': params => {
@@ -66,6 +76,14 @@ const data = {
       return {
         ...data.get['/v1/config']
       }
+    },
+    '/v1/profiles/development/features/ssh': () => {
+      sshAccess = true
+    }
+  },
+  delete: {
+    '/v1/profiles/development/features/ssh': () => {
+      sshAccess = false
     }
   },
   post: {
