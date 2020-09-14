@@ -5,7 +5,7 @@ import { findIframe, holoAuthenticateUser, takeSnapshot } from '../utils/index'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import wait from 'waait';
 
-describe('Authentication Flow', () => {
+describe.skip('Authentication Flow', () => {
     let page;
     beforeAll(async () => {
       page = await global.__BROWSER__.newPage();
@@ -22,7 +22,7 @@ describe('Authentication Flow', () => {
     it('should locate the loading text', async () => {      
       const pageContent = await page.$eval('#root', el => el.innerHTML)
       await takeSnapshot(page, 'loadingPage')
-      expect(pageContent).toContain('Connecting to Holo')
+      expect(pageContent).toContain('Connecting to the Holo network')
     });
 
     it('should successfully sign up and sign out', async () => {
@@ -47,7 +47,7 @@ describe('Authentication Flow', () => {
       await takeSnapshot(page, 'afterSignupScreen')
 
       // TODO: Remove reload page trigger once resolve signIn/refresh after signUp bug..
-      await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })
+      // await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })
 
       // *********
       // Evaluate Home Page
@@ -59,6 +59,7 @@ describe('Authentication Flow', () => {
 
       await takeSnapshot(page, 'homePage')
 
+      await wait(3000)
       const appTitle = await page.evaluate(title => title.innerHTML, title)
       expect(appTitle).toBe('Test Fuel')
 

@@ -139,10 +139,6 @@ async function initHolochainClient () {
       const webSdkConnection = process.env.NODE_ENV !== 'production'
         ? new HoloWebSdkConnection()
         : new HoloWebSdkConnection(CHAPERONE_SERVER_URL)
-
-      console.log('in production env? : ', process.env.NODE_ENV === 'production')
-      console.log('CHAPERONE_SERVER_URL: ', CHAPERONE_SERVER_URL)
-
       await webSdkConnection.ready()
       if (HOLOCHAIN_LOGGING) {
         console.log('🎉 Web SDK connected and ready for Zome Calls...')
@@ -201,13 +197,6 @@ async function initHolochainClient () {
   }
 }
 
-const holochainConnectionReady = async () => {
-  await waitUntil(() => {
-    return !isNil(holochainClient)
-  }, 30000, 100)
-  return holochainClient
-}
-
 async function initAndGetHolochainClient () {
   let counter = 0
   // This code is to avoid multiple ws connections.
@@ -228,9 +217,15 @@ async function initAndGetHolochainClient () {
     wsConnection = false
   }
 
-  if (!holochainClient) return initHolochainClient()
-  // else return initHolochainClient()
-  await holochainConnectionReady()
+  if (holochainClient) return holochainClient
+  else return initHolochainClient()
+}
+
+const holochainConnectionReady = async () => {
+  await waitUntil(() => {
+    return holochainClient !== null
+  }, 30000, 100)
+  return holochainClient
 }
 
 export function createZomeCall (zomeCallPath, callOpts = {}) {
@@ -254,7 +249,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         jsonResult = JSON.parse(rawResult)
       } else {
         await initAndGetHolochainClient()
-        // await holochainConnectionReady()
+        await holochainConnectionReady()
         if (HOSTED_HOLOFUEL_CONTEXT) {
           if (!holochainClient) return
           jsonResult = await holochainClient.zomeCall(instanceId, zome, zomeFunc, args)

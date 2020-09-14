@@ -54,6 +54,9 @@ export function hposCall ({ method = 'get', path, apiVersion = 'v1', headers: us
         case 'put':
           ({ data } = await axios.put(fullPath, params, { headers }))
           return data
+        case 'delete':
+          ({ data } = await axios.delete(fullPath, { params, headers }))
+          return data
         default:
           throw new Error(`No case in hposCall for ${method} method`)
       }
@@ -83,13 +86,14 @@ const presentHposSettings = (hposSettings) => {
     registrationEmail: admin.email,
     networkStatus: holoportos.network || 'test', // ie: 'live'
     sshAccess: holoportos.sshAccess || false,
-    deviceName: name || 'My HoloPort'
+    deviceName: name || 'HoloPort'
   }
 }
 
 const presentHostedHapp = hostedHapp => ({
   name: hostedHapp['happ-title'],
-  number_instances: hostedHapp['number_instances']
+  number_instances: hostedHapp['number_instances'],
+  zomeCalls: hostedHapp['stats'].traffic.total_zome_calls
 })
 
 const HposInterface = {
@@ -128,6 +132,19 @@ const HposInterface = {
       await hposCall({ method: 'put', path: 'config', headers })(settingsConfig)
       // We don't assume the successful PUT /api/v1/config returns the current config
       return presentHposSettings(settingsConfig)
+    },
+
+    sshSetting: async () => {
+      const result = await hposCall({ method: 'get', path: 'profiles/development/features/ssh' })()
+      return result.enabled
+    },
+
+    enableSsh: () => {
+      return hposCall({ method: 'put', path: 'profiles/development/features/ssh' })()
+    },
+
+    disableSsh: () => {
+      return hposCall({ method: 'delete', path: 'profiles/development/features/ssh' })()
     },
 
     // HOLOPORT_OS STATUS

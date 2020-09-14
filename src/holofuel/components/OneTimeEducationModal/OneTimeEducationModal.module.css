@@ -1,6 +1,6 @@
 .modal-message {
   display: flex;
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 18px;
   line-height: 24px;
   color: var(--color-rhino-60);
@@ -14,7 +14,7 @@
 
 .label {
   display: flex;
-  font-family: "Circular";
+  font-family: "MPLUS1p";
   font-size: 18px;
   line-height: 24px;
   color: var(--color-rhino-60);

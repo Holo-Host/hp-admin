@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head />
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script>
+      // this page exists to make github pages work. Without it, if you navigate to a url within the app other than the root url you get a 404
+      let path = window.location.pathname; // get the path url
+      window.sessionStorage.path = path; // saves on sessionStorage
+      window.location.href = '/'; // go to index
+    </script>
+  </body>
+</html>

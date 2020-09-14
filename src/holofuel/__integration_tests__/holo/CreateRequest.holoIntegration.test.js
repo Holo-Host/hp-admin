@@ -39,7 +39,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
     closeTestConductor(counterpartyAgentInstance, 'Create Request e2e')
   })
 
-  describe.skip('Create Request Flow e2e', () => {
+  describe('Create Request Flow e2e', () => {
     it('All endpoints work e2e with DNA', async () => {
       // *********
       // Log into hApp
@@ -55,7 +55,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
         expect(password).toBe(HOSTED_AGENT.password)
 
         // TODO: Remove reload page trigger once resolve signIn/refresh after signUp bug..
-        await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })
+        // await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })
 
         // wait for home page to load
         await wait(3000)
