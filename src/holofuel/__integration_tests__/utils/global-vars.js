@@ -1,8 +1,14 @@
+export const HAPP_URL = 'http://testfuel.holo.host/'
 export const DNA_INSTANCE = process.env.REACT_APP_TEST_DNA_INSTANCE_ID
 export const MOCK_EXPIRATION_DATE = '2025-01-02T03:04:05.678901234+00:00'
 
 // note: These are test-hpos server instances running on a droplet
 export const TEST_HOSTS = [
+    {
+        host_id: '250ood7t7wevast9gmkdn91eg9r026o82itj2z50q6ljhctc43', // joel hpos pubkey
+        host_email: 'joel.ulahanna+hp1@holo.host', // joel hpos email
+        host_password: 'asdfasdf' // joel hpos pwd
+    },
     {
         host_id: '2zwc1vwrjav2199fwmrmirbyyhlj6hyxmkn1m0rojz98c259gq', // test host #1 pubkey
         host_email: 'joel+hpos1@holo.host', // test host #1 email

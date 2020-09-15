@@ -13,18 +13,46 @@ export const closeTestConductor = (agent, testName) => {
   }
 }
 
-export const findIframe = async (page, url) => {                                                                  
-  return new Promise(async resolve => {
-    const pollingInterval = 1000;                                                                
-    const poll = setInterval(async function waitForIFrameToLoad() {   
-      const iFrame = page.frames().find(frame => frame.url().includes(url));                         
+export const findIframe = async (page, url, pollingInterval = 1000) => {                                                                  
+  return new Promise(async resolve => {                                                           
+    const poll = setInterval(async () => {   
+      const iFrame = page.frames().find(frame => frame.url().includes(url))                        
       if (iFrame) {                                                                                    
-        clearInterval(poll);                                                                                  
-        resolve(iFrame);                                                                               
+        clearInterval(poll)                                                                                 
+        resolve(iFrame)                                                                              
       }                                                                                                                                                                         
-    }, pollingInterval);                                                                                          
-  });                                                                                                  
+    }, pollingInterval)                                                                                         
+  })                                                                                                 
 }
+
+export const waitForPageLoad = async (page, pollingInterval = 1000) => {                                                                
+    return new Promise(async resolve => {                                                               
+      const poll = setInterval(async () => {
+        // we check for h1 as 'Test Fuel' should always be present on rendered page
+        const pageTitle = await page.$$('h1')
+        const hasPageLoaded = !!pageTitle
+        if (hasPageLoaded) {                                                                                    
+          clearInterval(poll)                                                                                 
+          resolve(hasPageLoaded)                                                                              
+        }                                                                                                                                                                         
+      }, pollingInterval)                                                                                         
+    })
+}
+
+
+// export const waitForZomeCallResponse = async (page, pollingInterval = 1000) => {                                                                
+//   return new Promise(async resolve => {                                                               
+//     const poll = setInterval(async () => {
+//       const pageTitle = await page.$$('h1')
+//       // const receivedReponse = 
+//       if (receivedReponse) {                                                                                    
+//         clearInterval(poll)                                                                                 
+//         resolve(receivedReponse)                                                                              
+//       }                                                                                                                                                                         
+//     }, pollingInterval)                                                                                         
+//   })
+// }
+
 
 export const holoAuthenticateUser = async (page, frame, userEmail = '', userPassword = '', type = 'signup') => {
   const pascalType = type === 'signup' ? 'SignUp' : 'LogIn'
@@ -51,7 +79,8 @@ export const holoAuthenticateUser = async (page, frame, userEmail = '', userPass
 }
 
 export const awaitSimpleConsistency = async (s, hostInstanceId, holochainPlayers = [], hostedPlayers = []) => {
-  if (!instanceId) throw new Error('Attempted to await SimpleConsistency without providing a proper instance...')
+  console.log('>>>>>>>>>> INSIDE awaitSImpleConsistency <<<<<<<<<<< ')
+  if (!hostInstanceId) throw new Error('Attempted to await SimpleConsistency without providing a proper instance...')
   try {
     // await s.simpleConsistency('holofuel', [], [alice])
     await s.simpleConsistency(hostInstanceId, holochainPlayers, hostedPlayers)

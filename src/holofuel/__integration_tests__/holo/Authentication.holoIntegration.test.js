@@ -1,6 +1,4 @@
-// Authentication.holoIntegration.test.js
-
-import { TIMEOUT, HOSTED_AGENT } from '../utils/global-vars'
+import { TIMEOUT, HOSTED_AGENT, HAPP_URL } from '../utils/global-vars'
 import { findIframe, holoAuthenticateUser, takeSnapshot } from '../utils/index'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import wait from 'waait';
@@ -16,7 +14,7 @@ describe.skip('Authentication Flow', () => {
         height: 768,
         deviceScaleFactor: 1,
       });
-      await page.goto('http://testfuel.holo.host/');
+      await page.goto(HAPP_URL);
     }, TIMEOUT);
     
     it('should locate the loading text', async () => {      
@@ -46,9 +44,6 @@ describe.skip('Authentication Flow', () => {
 
       await takeSnapshot(page, 'afterSignupScreen')
 
-      // TODO: Remove reload page trigger once resolve signIn/refresh after signUp bug..
-      // await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })
-
       // *********
       // Evaluate Home Page
       // *********
@@ -56,10 +51,10 @@ describe.skip('Authentication Flow', () => {
       await wait(5000)
       const headers = await page.$$('h1')
       const title = headers[0]
-
+      
+      await wait(2000)
       await takeSnapshot(page, 'homePage')
-
-      await wait(3000)
+      
       const appTitle = await page.evaluate(title => title.innerHTML, title)
       expect(appTitle).toBe('Test Fuel')
 
