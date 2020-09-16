@@ -1,12 +1,14 @@
-import { closeTestConductor, findIframe, addNickname, holoAuthenticateUser, awaitSimpleConsistency } from '../utils/index'
+import { closeTestConductor, findIframe, waitLoad, addNickname, holoAuthenticateUser, awaitSimpleConsistency } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
 import { TIMEOUT, HAPP_URL, DNA_INSTANCE, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import { presentHolofuelAmount, POLL_INTERVAL } from 'utils'
 import wait from 'waait'
+import _ from 'lodash'
 
 orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario => {
-  let page, hostedAgentInstance, counterpartyAgentInstance
+  let page, hostedAgentInstance, counterpartyAgentInstance, wsConnected, completeFirstGet, frameLoaded
+  const outstandingRequestIds = []
   
   const hostedAgentDetails = {
     id: '', // hosted agent instanceId
@@ -33,10 +35,45 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
     });
     await page.goto(HAPP_URL)
     // await page.goto('http://localhost:3100')
+
+    const client = page._client 
+    client.on('Network.webSocketFrameSent', ({requestId, timestamp, response}) => {
+      console.log('CALL RESPONSE DATA >>>> ', response.payloadData)
+      wsConnected = !!response
+      const callId = JSON.parse(response.payloadData).id
+      outstandingRequestIds.push(callId)
+      if (callId === 5) {
+        completeFirstGet = false
+      }
+      console.log('REQUEST LOG ADD >>>> ', outstandingRequestIds)
+      // console.log('Network.webSocketFrameSent', requestId, timestamp, response.payloadData)
+    })    
+    client.on('Network.webSocketFrameReceived', ({requestId, timestamp, response}) => {
+      const callId = JSON.parse(response.payloadData).id
+      _.remove(outstandingRequestIds, id => id === callId)
+      if (callId === 5) {
+        completeFirstGet = true
+      }
+      console.log('REQUEST LOG REMOVE >>>> ', outstandingRequestIds)
+      // console.log('Network.webSocketFrameReceived', requestId, timestamp, response.payloadData)
+    })
+    
+    // client.on("Network.responseReceived", ({ response }) => {
+    //   if (response.url === 'https://resolver-dev.holo.host/resolve/hosts' && response.status === 404) {
+    //     frameLoaded = true
+    //     console.log('PAGE LOADED ..... frameLoaded :: ', frameLoaded)
+    //   }
+    //   console.log("responseReceived", response)
+    // })
+    // client.on("Network.loadingFinished", data => {
+    //   console.log("loadingFinished", [data])
+    // })
   }, TIMEOUT)
   
   afterAll(() => {
-    hostedAgentInstance.close()
+    if (hostedAgentInstance) {
+      hostedAgentInstance.close()
+    }
     closeTestConductor(counterpartyAgentInstance, 'Create Request e2e')
   })
   
@@ -47,6 +84,8 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // *********
         // wait for the modal to load
         await wait(4000)
+        // await waitLoad(() => frameLoaded)
+
         await page.waitForSelector('iframe')
         const iframe = await findIframe(page, CHAPERONE_SERVER_URL)
         await iframe.$('.modal-open')
@@ -71,7 +110,10 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
         const menuButton = buttons[0]
         const newTransactionButton = buttons[3]
 
-        await wait (8000)
+        // await wait (8000)
+        await waitLoad(() => wsConnected)
+        await waitLoad(() => completeFirstGet)
+
         menuButton.click()
  
         await wait (4000)
@@ -105,14 +147,12 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // use tryorama to mock Host (Holochain) Agent to montior DHT consistency
       hostedAgentDetails.agent_address = copiedText
       hostedAgentDetails.id = `hha::${copiedText}-${DNA_INSTANCE}`
-      console.log('about to assign hostedAgentInstance with these agent details >>: ', hostedAgentDetails)
-
       hostedAgentInstance = await scenario.hostedPlayers(hostedAgentDetails)
 
       console.log('hostedAgentInstance : ', hostedAgentInstance)
 
       // wait for DHT consistency
-      // await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
+      await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
       // // counterparty updates name
       // addNickname(scenario, counterpartyAgentInstance, 'Alice')

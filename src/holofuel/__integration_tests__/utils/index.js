@@ -1,8 +1,7 @@
+import wait from 'waait'
 import { DNA_INSTANCE, MOCK_EXPIRATION_DATE, SCREENSHOT_PATH } from '../utils/global-vars'
 
 const getTimestamp = () => new Date().toISOString()
-
-export const takeSnapshot = async (page, fileName) => await page.screenshot({path: SCREENSHOT_PATH + `/${fileName}.png`})
 
 export const closeTestConductor = (agent, testName) => {
   try {
@@ -25,38 +24,24 @@ export const findIframe = async (page, url, pollingInterval = 1000) => {
   })                                                                                                 
 }
 
-export const waitForPageLoad = async (page, pollingInterval = 1000) => {                                                                
-    return new Promise(async resolve => {                                                               
-      const poll = setInterval(async () => {
-        // we check for h1 as 'Test Fuel' should always be present on rendered page
-        const pageTitle = await page.$$('h1')
-        const hasPageLoaded = !!pageTitle
-        if (hasPageLoaded) {                                                                                    
-          clearInterval(poll)                                                                                 
-          resolve(hasPageLoaded)                                                                              
-        }                                                                                                                                                                         
-      }, pollingInterval)                                                                                         
-    })
+export const waitLoad = async (checkLoading, pollingInterval = 1000) => {                                                                  
+  return new Promise(async resolve => {                                                           
+    const poll = setInterval(async () => {   
+      const isLoaded = checkLoading()                       
+      if (isLoaded) {                                                                                    
+        clearInterval(poll)                                                                                 
+        resolve(isLoaded)                                                                              
+      }                                                                                                                                                                         
+    }, pollingInterval)                                                                                         
+  })                                                                                                 
 }
 
-
-// export const waitForZomeCallResponse = async (page, pollingInterval = 1000) => {                                                                
-//   return new Promise(async resolve => {                                                               
-//     const poll = setInterval(async () => {
-//       const pageTitle = await page.$$('h1')
-//       // const receivedReponse = 
-//       if (receivedReponse) {                                                                                    
-//         clearInterval(poll)                                                                                 
-//         resolve(receivedReponse)                                                                              
-//       }                                                                                                                                                                         
-//     }, pollingInterval)                                                                                         
-//   })
-// }
-
+export const takeSnapshot = async (page, fileName) => await page.screenshot({path: SCREENSHOT_PATH + `/${fileName}.png`})
 
 export const holoAuthenticateUser = async (page, frame, userEmail = '', userPassword = '', type = 'signup') => {
   const pascalType = type === 'signup' ? 'SignUp' : 'LogIn'
   await frame.click(`button[onclick="show${pascalType}()"]`)
+  await wait(100)
   await frame.type(`#${type}-email`, userEmail, { delay: 100 })
   await frame.type(`#${type}-password`, userPassword, { delay: 100 })
   const email = await frame.$eval(`#${type}-email`, el => el.value)
@@ -79,13 +64,14 @@ export const holoAuthenticateUser = async (page, frame, userEmail = '', userPass
 }
 
 export const awaitSimpleConsistency = async (s, hostInstanceId, holochainPlayers = [], hostedPlayers = []) => {
-  console.log('>>>>>>>>>> INSIDE awaitSImpleConsistency <<<<<<<<<<< ')
+  console.log('>>>>>>>>>> INSIDE awaitSImpleConsistency <<<<<<<<<<< hostInstanceId, holochainPlayers, hostedPlayers', hostInstanceId, holochainPlayers, hostedPlayers)
+  console.log('Tryorama S: ', s)
   if (!hostInstanceId) throw new Error('Attempted to await SimpleConsistency without providing a proper instance...')
   try {
     // await s.simpleConsistency('holofuel', [], [alice])
     await s.simpleConsistency(hostInstanceId, holochainPlayers, hostedPlayers)
   } catch (error) {
-    throw new Error(`Failed to reach consistency. ${err}`)
+    throw console.error('Failed to reach conistency. Err: ', error)
   }
 }
 
