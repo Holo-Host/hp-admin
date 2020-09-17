@@ -12,28 +12,28 @@ export const closeTestConductor = (agent, testName) => {
   }
 }
 
-export const findIframe = async (page, url, pollingInterval = 1000) => {                                                                  
-  return new Promise(async resolve => {                                                           
-    const poll = setInterval(async () => {   
-      const iFrame = page.frames().find(frame => frame.url().includes(url))                        
-      if (iFrame) {                                                                                    
-        clearInterval(poll)                                                                                 
-        resolve(iFrame)                                                                              
-      }                                                                                                                                                                         
-    }, pollingInterval)                                                                                         
-  })                                                                                                 
+export const findIframe = async (page, url, pollingInterval = 1000) => {
+  return new Promise(async resolve => {
+    const poll = setInterval(async () => {
+      const iFrame = page.frames().find(frame => frame.url().includes(url))
+      if (iFrame) {
+        clearInterval(poll)
+        resolve(iFrame)
+      }
+    }, pollingInterval)
+  })
 }
 
-export const waitLoad = async (checkLoading, pollingInterval = 1000) => {                                                                  
-  return new Promise(async resolve => {                                                           
-    const poll = setInterval(async () => {   
-      const isLoaded = checkLoading()                       
-      if (isLoaded) {                                                                                    
-        clearInterval(poll)                                                                                 
-        resolve(isLoaded)                                                                              
-      }                                                                                                                                                                         
-    }, pollingInterval)                                                                                         
-  })                                                                                                 
+export const waitLoad = async (checkLoading, pollingInterval = 1000) => {
+  return new Promise(async resolve => {
+    const poll = setInterval(async () => {
+      const isLoaded = checkLoading()
+      if (isLoaded) {
+        clearInterval(poll)
+        resolve(isLoaded)
+      }
+    }, pollingInterval)
+  })
 }
 
 export const takeSnapshot = async (page, fileName) => await page.screenshot({path: SCREENSHOT_PATH + `/${fileName}.png`})
@@ -52,7 +52,7 @@ export const holoAuthenticateUser = async (page, frame, userEmail = '', userPass
     await frame.type(`#${type}-password-confirm`, userPassword, { delay: 100 })
     confirmation = await frame.$eval(`#${type}-password-confirm`, el => el.value)
   }
-  
+
   await takeSnapshot(page, `${type}Modal`)
 
   const buttonTypeIndex = type === 'signup' ? 1 : 0
@@ -64,12 +64,12 @@ export const holoAuthenticateUser = async (page, frame, userEmail = '', userPass
 }
 
 export const awaitSimpleConsistency = async (s, hostInstanceId, holochainPlayers = [], hostedPlayers = []) => {
-  console.log('>>>>>>>>>> INSIDE awaitSImpleConsistency <<<<<<<<<<< hostInstanceId, holochainPlayers, hostedPlayers', hostInstanceId, holochainPlayers, hostedPlayers)
-  console.log('Tryorama S: ', s)
+  // console.log('>>>>>>>>>> INSIDE awaitSImpleConsistency <<<<<<<<<<< hostInstanceId, holochainPlayers, hostedPlayers', hostInstanceId, holochainPlayers, hostedPlayers)
+  // console.log('Tryorama S: ', s)
   if (!hostInstanceId) throw new Error('Attempted to await SimpleConsistency without providing a proper instance...')
   try {
     // await s.simpleConsistency('holofuel', [], [alice])
-    await s.simpleConsistency(hostInstanceId, holochainPlayers, hostedPlayers)
+    await s.simpleConsistency(hostInstanceId, holochainPlayers, [])
   } catch (error) {
     throw console.error('Failed to reach conistency. Err: ', error)
   }
@@ -90,7 +90,7 @@ export const addNickname = async(tryoramaScenario, agent, nickname) => {
 }
 
 export const preseedOffer = async(tryoramaScenario, spender, receiver, volume = 1) => {
-  let amountOffered = 0 
+  let amountOffered = 0
   for (let i = 0; i < volume; i++) {
     const amount = (volume * 100)
     amountOffered = amountOffered + amount
@@ -103,7 +103,7 @@ export const preseedOffer = async(tryoramaScenario, spender, receiver, volume = 
       expiration_date: MOCK_EXPIRATION_DATE
     }
     await spender.callSync(DNA_INSTANCE, "transactor", "create_promise", offer_args )
-    
+
     // wait for DHT consistency
     await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [spender, receiver], [])
 
@@ -128,7 +128,7 @@ export const preseedRequest = async (tryoramaScenario, receiver, spender, volume
       timestamp: getTimestamp()
     }
     await receiver.callSync(DNA_INSTANCE, "transactor", "create_invoice", request_args )
-    
+
     // wait for DHT consistency
     await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [receiver, spender], [])
 
@@ -139,4 +139,3 @@ export const preseedRequest = async (tryoramaScenario, receiver, spender, volume
     return { receiverBalance, spenderBalance, request_args }
   }
 }
-

@@ -1,6 +1,6 @@
 const { Orchestrator, Config, combine, localOnly, callSync } = require('@holochain/tryorama')
 // export const dnaPath = process.env.REACT_APP_DNA_PATH
-export const dnaPath = '/nix/store/jinsv02qykq3l6kl7l8b857cs423658k-holofuel/holofuel.dna.json'
+export const dnaPath = '/home/zo-el/Documents/GitRepo/Holochain/happy/hp-admin/dna/holofuel.dna.json'
 
 export const orchestrator = new Orchestrator({
   middleware: combine(
@@ -12,7 +12,7 @@ export const orchestrator = new Orchestrator({
     hardTimeout: 1500
   }
 })
-const dna = Config.dna(dnaPath, 'holofuel-dna')
+const dna = Config.dna(dnaPath, 'holofuel-dna',{uuid: "00000000-0000-0000-0000-000000000110", fixed_uuid: true})
 
 export const conductorConfig = Config.gen({[process.env.REACT_APP_TEST_DNA_INSTANCE_ID]: dna}, {
   logger: Config.logger(false),
