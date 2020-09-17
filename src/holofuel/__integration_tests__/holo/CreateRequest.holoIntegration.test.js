@@ -1,4 +1,4 @@
-import { closeTestConductor, findIframe, waitLoad, addNickname, holoAuthenticateUser, awaitSimpleConsistency } from '../utils/index'
+import { closeTestConductor, findIframe, waitLoad, addNickname, holoAuthenticateUser, awaitSimpleConsistency, waitZomeResult } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
 import { TIMEOUT, HAPP_URL, DNA_INSTANCE, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
@@ -11,8 +11,8 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
   const outstandingRequestIds = []
   
   const hostedAgentDetails = {
-    id: '', // hosted agent instanceId
-    agent_address: '', // hosted agent address (note: not needed in consistency function - remove after modfied in tryorama)
+    id: `hha::HcSCiq5N5p3887vKvj4SoVqKnssnufn9shmd7jMs593T398tr6649vy5Ozavwnr-${DNA_INSTANCE}`, // hosted agent instanceId
+    agent_address: 'HcSCiq5N5p3887vKvj4SoVqKnssnufn9shmd7jMs593T398tr6649vy5Ozavwnr', // hosted agent address (note: not needed in consistency function - remove after modfied in tryorama)
     dna_address: '', // note: unused in consistency function - remove after modfied in tryorama repo
     ...TEST_HOSTS[0]
   }
@@ -22,10 +22,11 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
     const { [process.env.REACT_APP_TEST_DNA_INSTANCE_ID]: counterpartyAgent } = await scenario.players({ [process.env.REACT_APP_TEST_DNA_INSTANCE_ID]: conductorConfig }, true)
     counterpartyAgentInstance = counterpartyAgent
 
-    // BUG: - Unable to override permissions in this context.  We need to override permissions to read the clipboard.
-    // await global.__BROWSER__.defaultBrowserContext().overridePermissions(HAPP_URL, ['clipboard-read'])
-    
-    // use pupeeteer to mock Holo Agent
+    // use tryorama to monitor Hosted agent DHT consistency (via Host (Holochain) Agent)
+    hostedAgentInstance = await scenario.hostedPlayers(hostedAgentDetails)
+    console.log('hostedAgentInstance : ', hostedAgentInstance)
+
+    // use pupeeteer to mock Holo Hosted Agent Actions
     page = await global.__BROWSER__.newPage()  
     // Emulates avg desktop viewport
     await page.setViewport({
@@ -57,17 +58,6 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       console.log('REQUEST LOG REMOVE >>>> ', outstandingRequestIds)
       // console.log('Network.webSocketFrameReceived', requestId, timestamp, response.payloadData)
     })
-    
-    // client.on("Network.responseReceived", ({ response }) => {
-    //   if (response.url === 'https://resolver-dev.holo.host/resolve/hosts' && response.status === 404) {
-    //     frameLoaded = true
-    //     console.log('PAGE LOADED ..... frameLoaded :: ', frameLoaded)
-    //   }
-    //   console.log("responseReceived", response)
-    // })
-    // client.on("Network.loadingFinished", data => {
-    //   console.log("loadingFinished", [data])
-    // })
   }, TIMEOUT)
   
   afterAll(() => {
@@ -83,8 +73,8 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // Log into hApp
       // *********
         // wait for the modal to load
-        await wait(4000)
         // await waitLoad(() => frameLoaded)
+        await wait(4000)
 
         await page.waitForSelector('iframe')
         const iframe = await findIframe(page, CHAPERONE_SERVER_URL)
@@ -119,53 +109,13 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
         await wait (4000)
         const sideMenuButtons = await page.$$('.SideMenu-module__nav-link___-gvJ_')
         const inboxButton = sideMenuButtons[0]
-        const historyButton = sideMenuButtons[1]
-        const profileButton = sideMenuButtons[2]
-        
-      // *********
-      // Name Players
-      // *********
-      // hosted player updates name
-      profileButton.click()
-
-      await wait (1000)
-      await page.waitForSelector('form')
-      const input = await page.$('input')
-      // click the target field 3 times so that the browser selects all the text in input box
-      await input.click({ clickCount: 3 })
-      await page.type('input', 'bobbo naut', { delay: 100 })
-      await page.click(`button[type="submit"]`)
-
-      const nicknameDisplay = await page.$eval('h3[data-testid="profile-nickname"]', el => el.innerHTML)
-      expect(nicknameDisplay).toBe('bobbo naut')
-      
-      await page.click(`div[data-testid="hash-icon"]`)
-      // const copiedText = await page.evaluate(`(async () => await navigator.clipboard.readText())()`)
-      // Note: Hard coding the user hash for now, as permission issues persist with reading clipboard
-      const copiedText = 'HcSCiq5N5p3887vKvj4SoVqKnssnufn9shmd7jMs593T398tr6649vy5Ozavwnr'
-      
-      // use tryorama to mock Host (Holochain) Agent to montior DHT consistency
-      hostedAgentDetails.agent_address = copiedText
-      hostedAgentDetails.id = `hha::${copiedText}-${DNA_INSTANCE}`
-      hostedAgentInstance = await scenario.hostedPlayers(hostedAgentDetails)
-
-      console.log('hostedAgentInstance : ', hostedAgentInstance)
 
       // wait for DHT consistency
       await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
-      // // counterparty updates name
-      // addNickname(scenario, counterpartyAgentInstance, 'Alice')
-   
-      // wait for DHT consistency
-      // await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
-      
       // *********
       // Create New Request
       // *********
-
-      console.log('MADE IT HERE!!!!!!!!!! ')
-
       menuButton.click()
       inboxButton.click()
 
@@ -222,20 +172,31 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       submitButton.click()
 
       // // wait for DHT consistency
-      // await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
+      await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
-      await wait(30000)
-      menuButton.click()
-      await wait(2000)
-      historyButton.click()
+      let isConsistent = false
+      const checkListPending = await counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {});
+      const listPending = await waitLoad(checkListPending, 90000, 10000)
+      if (listPending.requests.length === 1) {
+        isConsistent = true
+      }
 
-      // *********
-      // Check History
-      // *********
-      await wait(1000)
+      console.log('isConsistent...', isConsistent)
+      expect(isConsistent).toBe(true)
 
-      await page.waitForSelector('div.TransactionHistory-module__filter-button___31JRc TransactionHistory-module__selected___4WxOY')
-      await wait(POLL_INTERVAL)
+
+      // await wait(3000)
+      // menuButton.click()
+      // await wait(2000)
+      // historyButton.click()
+
+      // // *********
+      // // Check History
+      // // *********
+      // await wait(1000)
+
+      // await page.waitForSelector('div.TransactionHistory-module__filter-button___31JRc TransactionHistory-module__selected___4WxOY')
+      // await wait(POLL_INTERVAL)
 
       // await page.waitForSelector('div[data-testid="transaction-row"]')
       // const transactionRows = await page.$$('div[data-testid="transaction-row"]')
@@ -245,7 +206,6 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // expect(transactionData).toContain(newOffer.counterpartyId)
       // expect(transactionData).toContain(`+ ${presentHolofuelAmount(newOffer.amount)}`)
       // expect(transactionData).toContain(newOffer.note)
-
     })
   })
 })

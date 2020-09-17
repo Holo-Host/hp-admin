@@ -36,6 +36,22 @@ export const waitLoad = async (checkLoading, pollingInterval = 1000) => {
   })                                                                                                 
 }
 
+
+export const waitZomeResult = async (checkResult, timeout = TIMEOUT, pollingInterval = 1000) => {                                                                  
+  return setTimeout(new Promise(async resolve => {                                                           
+    const poll = setInterval(async () => {   
+      const callResultRaw = checkResult() 
+      console.log('callResultRaw >>>>>', callResultRaw)
+      console.log('callResultRaw.Ok :', callResultRaw.Ok) 
+      const callResult = callResultRaw.Ok                     
+      if (callResult) {                                                                                    
+        clearInterval(poll)                                                                                 
+        resolve(callResult)                                                                              
+      }                                                                                                                                                                         
+    }, pollingInterval)                                                                                         
+  }), timeout)                                                                                                
+}
+
 export const takeSnapshot = async (page, fileName) => await page.screenshot({path: SCREENSHOT_PATH + `/${fileName}.png`})
 
 export const holoAuthenticateUser = async (page, frame, userEmail = '', userPassword = '', type = 'signup') => {
