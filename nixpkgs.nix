@@ -1,5 +1,5 @@
 import (fetchTarball {
   # commit: 6506590fc254932b4a3b9ba5c9f965c042ab2941
-  url = "https://github.com/Holo-Host/holo-nixpkgs/archive/8b122836e8074c289abe49b80755e614125fb820.tar.gz";
-  sha256 = "1fnsnp5g7ylr8b1qpn0fgrk2pw477aah0s0s644svjd24qri62ks";
+  url = "https://github.com/Holo-Host/holo-nixpkgs/archive/07f726cee4dc6b9f55a6500f30fcbf60f3a4378b.tar.gz";
+  sha256 = "18ykysp6kb0fnmjpvchpawynl62p8i7cv8x9q6bxq29dzzxqqkpn";
 })
