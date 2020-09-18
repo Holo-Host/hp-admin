@@ -25,8 +25,8 @@ export const TEST_HOSTS = [
 ]
 
 export const HOSTED_AGENT = {
-    email: 'bobbo@holo.host',
-    password: '123454321testest'
+    email: 'alice@holo.host',
+    password: '12344321'
 }
 
 export const SCREENSHOT_PATH = './src/holofuel/__integration_tests__/holo/snapshots'

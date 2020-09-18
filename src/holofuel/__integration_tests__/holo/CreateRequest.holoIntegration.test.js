@@ -28,7 +28,6 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
 
     // use pupeeteer to mock Holo Hosted Agent Actions
     page = await global.__BROWSER__.newPage()
-    // page.setCacheEnabled(false)
 
     // Emulates avg desktop viewport
     await page.setViewport({
@@ -37,19 +36,15 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       deviceScaleFactor: 1,
     });
     await page.goto(HAPP_URL)
-    // await page.goto('http://localhost:3100')
 
     const client = page._client
     client.on('Network.webSocketFrameSent', ({requestId, timestamp, response}) => {
-      // console.log('CALL RESPONSE DATA >>>> ', response.payloadData)
       wsConnected = !!response
       const callId = JSON.parse(response.payloadData).id
       outstandingRequestIds.push(callId)
       if (callId === 5) {
         completeFirstGet = false
       }
-      // console.log('REQUEST LOG ADD >>>> ', outstandingRequestIds)
-      // console.log('Network.webSocketFrameSent', requestId, timestamp, response.payloadData)
     })
     client.on('Network.webSocketFrameReceived', ({requestId, timestamp, response}) => {
       const callId = JSON.parse(response.payloadData).id
@@ -57,8 +52,6 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       if (callId === 5) {
         completeFirstGet = true
       }
-      // console.log('REQUEST LOG REMOVE >>>> ', outstandingRequestIds)
-      // console.log('Network.webSocketFrameReceived', requestId, timestamp, response.payloadData)
     })
   }, TIMEOUT)
 
