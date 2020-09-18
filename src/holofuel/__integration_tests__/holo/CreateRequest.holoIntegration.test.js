@@ -1,6 +1,6 @@
 import { closeTestConductor, findIframe, waitLoad, addNickname, holoAuthenticateUser, awaitSimpleConsistency, waitZomeResult } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
-import { TIMEOUT, HAPP_URL, DNA_INSTANCE, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
+import { TIMEOUT, HAPP_URL, DNA_INSTANCE, HHA_ID, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import { presentHolofuelAmount, POLL_INTERVAL } from 'utils'
 import wait from 'waait'
@@ -11,7 +11,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
   const outstandingRequestIds = []
   
   const hostedAgentDetails = {
-    id: `hha::HcSCiq5N5p3887vKvj4SoVqKnssnufn9shmd7jMs593T398tr6649vy5Ozavwnr-${DNA_INSTANCE}`, // hosted agent instanceId
+    id: `hha::${HHA_ID}-${DNA_INSTANCE}`, // hosted agent instanceId
     agent_address: 'HcSCiq5N5p3887vKvj4SoVqKnssnufn9shmd7jMs593T398tr6649vy5Ozavwnr', // hosted agent address (note: not needed in consistency function - remove after modfied in tryorama)
     dna_address: '', // note: unused in consistency function - remove after modfied in tryorama repo
     ...TEST_HOSTS[0]
@@ -109,6 +109,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
         await wait (4000)
         const sideMenuButtons = await page.$$('.SideMenu-module__nav-link___-gvJ_')
         const inboxButton = sideMenuButtons[0]
+        const historyButton = sideMenuButtons[1]
 
       // wait for DHT consistency
       await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
@@ -174,16 +175,11 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // // wait for DHT consistency
       await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
-      let isConsistent = false
       const checkListPending = await counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {});
       const listPending = await waitLoad(checkListPending, 90000, 10000)
-      if (listPending.requests.length === 1) {
-        isConsistent = true
-      }
 
       console.log('isConsistent...', isConsistent)
-      expect(isConsistent).toBe(true)
-
+      expect(listPending.requests.length).toEqual(1)
 
       // await wait(3000)
       // menuButton.click()

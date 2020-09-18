@@ -1,8 +1,9 @@
 import { closeTestConductor, findIframe, waitLoad, addNickname, holoAuthenticateUser, awaitSimpleConsistency, waitZomeResult } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
-import { TIMEOUT, HAPP_URL, DNA_INSTANCE, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
+import { TIMEOUT, HAPP_URL, HHA_ID, DNA_INSTANCE, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import wait from 'waait'
+import _ from 'lodash'
 
 orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario => {
   let page, hostedAgentInstance, counterpartyAgentInstance, wsConnected, completeFirstGet, frameLoaded
@@ -139,7 +140,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       
       // use tryorama to mock Host (Holochain) Agent to montior DHT consistency
       hostedAgentDetails.agent_address = copiedText
-      hostedAgentDetails.id = `hha::${copiedText}-${DNA_INSTANCE}`
+      hostedAgentDetails.id = `${HHA_ID}::${copiedText}-${DNA_INSTANCE}`
       hostedAgentInstance = await scenario.hostedPlayers(hostedAgentDetails)
 
       console.log('hostedAgentInstance : ', hostedAgentInstance)
@@ -163,15 +164,15 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // wait for DHT consistency
       await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
-      let isMyProfileConsistent = false
+      let counterpartyProfile = false
       const checkGetProfile = await counterpartyAgentInstance.call('holofuel', 'profile', 'get_profile', { counterpartyId: counterpartyAgentInstance});
       const counterpartyProfile = await waitLoad(checkGetProfile, 90000, 10000)
       if (counterpartyProfile.nickname && counterpartyProfile.nickname === 'Alice') {
         isConsistent = true
       }
 
-      console.log('isMyProfileConsistent...', isMyProfileConsistent)
-      expect(isMyProfileConsistent).toBe(true)
+      console.log('counterpartyProfile...', counterpartyProfile)
+      expect(counterpartyProfile).toBe(true)
     })
   })
 })

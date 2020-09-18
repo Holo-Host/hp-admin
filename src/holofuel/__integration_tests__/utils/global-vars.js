@@ -29,5 +29,6 @@ export const HOSTED_AGENT = {
     password: '123454321testest'
 }
 
+export const HHA_ID= 'QmWvWtw1P2nduQqk8uKpfhAeUd72bSU2gFH7TLrQm1Bbfw'
 export const SCREENSHOT_PATH = './src/holofuel/__integration_tests__/holo/snapshots'
 export const TIMEOUT = 9500000;
