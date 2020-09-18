@@ -11,8 +11,8 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
   const outstandingRequestIds = []
 
   const hostedAgentDetails = {
-    id: `hha::${HHA_ID}-${DNA_INSTANCE}`, // hosted agent instanceId
-    agent_address: 'HcSCiq5N5p3887vKvj4SoVqKnssnufn9shmd7jMs593T398tr6649vy5Ozavwnr', // hosted agent address (note: not needed in consistency function - remove after modfied in tryorama)
+    id: `${HHA_ID}::HcSCJp5QzG5EG7yivgCTXBogaHxq8widw488MRBp7oBkMhhnQbJ57KQ9cdQtwmr-${DNA_INSTANCE}`, // hosted agent instanceId
+    agent_address: 'HcSCJp5QzG5EG7yivgCTXBogaHxq8widw488MRBp7oBkMhhnQbJ57KQ9cdQtwmr', // hosted agent address (note: not needed in consistency function - remove after modfied in tryorama)
     dna_address: '', // note: unused in consistency function - remove after modfied in tryorama repo
     ...TEST_HOSTS[0]
   }
@@ -24,7 +24,6 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
 
     // use tryorama to monitor Hosted agent DHT consistency (via Host (Holochain) Agent)
     hostedAgentInstance = await scenario.hostedPlayers(hostedAgentDetails)
-    console.log('hostedAgentInstance : ', hostedAgentInstance)
 
     // use pupeeteer to mock Holo Hosted Agent Actions
     page = await global.__BROWSER__.newPage()
@@ -38,18 +37,18 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
     await page.goto(HAPP_URL)
 
     const client = page._client
-    client.on('Network.webSocketFrameSent', ({requestId, timestamp, response}) => {
+    client.on('Network.webSocketFrameSent', ({ response }) => {
       wsConnected = !!response
       const callId = JSON.parse(response.payloadData).id
       outstandingRequestIds.push(callId)
-      if (callId === 5) {
+      if (callId === 8) {
         completeFirstGet = false
       }
     })
-    client.on('Network.webSocketFrameReceived', ({requestId, timestamp, response}) => {
+    client.on('Network.webSocketFrameReceived', ({ response }) => {
       const callId = JSON.parse(response.payloadData).id
       _.remove(outstandingRequestIds, id => id === callId)
-      if (callId === 5) {
+      if (callId === 8) {
         completeFirstGet = true
       }
     })
@@ -68,7 +67,6 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // Log into hApp
       // *********
         // wait for the modal to load
-        // await waitLoad(() => frameLoaded)
         await wait(4000)
 
         await page.waitForSelector('iframe')
@@ -90,12 +88,11 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
         // TODO: Remove reload page trigger and timeout once resolve signIn/refresh after signUp bug..
         await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })
 
-        await wait(5000)
+        await wait(3000)
         const buttons = await page.$$('button')
         const menuButton = buttons[0]
         const newTransactionButton = buttons[3]
 
-        // await wait (8000)
         await waitLoad(() => wsConnected)
         await waitLoad(() => completeFirstGet)
 
@@ -113,17 +110,8 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // Create New Request
       // *********
       menuButton.click()
-      // profileButton.click()
-      console.log("clicking on inbox...", inboxButton);
-      // inboxButton.click()
-      console.log("clicking on txbt...", newTransactionButton);
       newTransactionButton.click()
-      console.log("done");
-      try {
-        await page.waitForSelector('button.AmountInput-module__numpad-button___2L0x3')
-      } catch (e) {
-        console.log("--->", e);
-      }
+      await page.waitForSelector('button.AmountInput-module__numpad-button___2L0x3')
       const numpadButtons = await page.$$('button.AmountInput-module__numpad-button___2L0x3')
       numpadButtons[0].click()
       await wait(100)
@@ -167,10 +155,8 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       expect(counterpartyId).toBe(newOffer.counterpartyId)
       expect(note).toEqual(newOffer.note)
 
-
       // wait for button to not be disabled
       await wait(1000)
-      console.log('submiting--------')
 
       const submitButton = await page.$('button[data-testid="submit-button"]')
       submitButton.click()
@@ -178,7 +164,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // // wait for DHT consistency
       await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
-      const checkListPending = await counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {});
+      const checkListPending = async () => await counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {});
       const listPending = await waitZomeResult(checkListPending, 90000, 10000)
 
       console.log('isConsistent...', isConsistent)

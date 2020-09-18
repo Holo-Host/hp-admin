@@ -37,10 +37,10 @@ export const waitLoad = async (checkLoading, pollingInterval = 1000) => {
 }
 
 
-export const waitZomeResult = async (checkResult, timeout = TIMEOUT, pollingInterval = 1000) => {                                                                  
-  return setTimeout(new Promise(async resolve => {                                                           
+export const waitZomeResult = async (asyncCheck, timeout = TIMEOUT, pollingInterval = 1000) => {                                                                  
+  return setTimeout(await new Promise(async resolve => {                                                           
     const poll = setInterval(async () => {   
-      const callResultRaw = checkResult() 
+      const callResultRaw = await asyncCheck() 
       console.log('callResultRaw >>>>>', callResultRaw)
       console.log('callResultRaw.Ok :', callResultRaw.Ok) 
       const callResult = callResultRaw.Ok                     
