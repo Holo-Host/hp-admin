@@ -150,7 +150,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
 
       let isMyProfileConsistent = false
       const checkProfile = await counterpartyAgentInstance.call('holofuel', 'profile', 'get_my_profile', {});
-      const profile = await waitLoad(checkProfile, 90000, 10000)
+      const profile = await waitZomeResult(checkProfile, 90000, 10000)
       if (profile.nickname && profile.nickname === 'bobbo naut') {
         isConsistent = true
       }
@@ -166,7 +166,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
 
       let counterpartyProfile = false
       const checkGetProfile = await counterpartyAgentInstance.call('holofuel', 'profile', 'get_profile', { counterpartyId: counterpartyAgentInstance});
-      const counterpartyProfile = await waitLoad(checkGetProfile, 90000, 10000)
+      const counterpartyProfile = await waitZomeResult(checkGetProfile, 90000, 10000)
       if (counterpartyProfile.nickname && counterpartyProfile.nickname === 'Alice') {
         isConsistent = true
       }
