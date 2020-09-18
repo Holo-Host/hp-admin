@@ -1,5 +1,5 @@
 const { Orchestrator, Config, combine, localOnly, callSync } = require('@holochain/tryorama')
-export const dnaPath = '/nix/store/jinsv02qykq3l6kl7l8b857cs423658k-holofuel/holofuel.dna.json'
+export const dnaPath = '/nix/store/b98xs2vlmyscjpa2lsdqiw7l08yvhqsw-holofuel/holofuel.dna.json'
 
 export const orchestrator = new Orchestrator({
   middleware: combine(
