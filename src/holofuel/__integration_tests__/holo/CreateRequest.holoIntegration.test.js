@@ -101,7 +101,6 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
         await wait (4000)
         const sideMenuButtons = await page.$$('.SideMenu-module__nav-link___-gvJ_')
         const inboxButton = sideMenuButtons[0]
-        // const historyButton = sideMenuButtons[1]
 
       // wait for DHT consistency
       await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
@@ -167,30 +166,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       const checkListPending = async () => await counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {});
       const listPending = await waitZomeResult(checkListPending, 90000, 10000)
 
-      console.log('isConsistent...', isConsistent)
       expect(listPending.requests.length).toEqual(1)
-
-      // await wait(3000)
-      // menuButton.click()
-      // await wait(2000)
-      // historyButton.click()
-
-      // // *********
-      // // Check History
-      // // *********
-      // await wait(1000)
-
-      // await page.waitForSelector('div.TransactionHistory-module__filter-button___31JRc TransactionHistory-module__selected___4WxOY')
-      // await wait(POLL_INTERVAL)
-
-      // await page.waitForSelector('div[data-testid="transaction-row"]')
-      // const transactionRows = await page.$$('div[data-testid="transaction-row"]')
-      // const mostRecentTransaction = transactionRows[0]
-
-      // const transactionData = await page.evaluate(mostRecentTransaction => mostRecentTransaction.innerHTML, mostRecentTransaction)
-      // expect(transactionData).toContain(newOffer.counterpartyId)
-      // expect(transactionData).toContain(`+ ${presentHolofuelAmount(newOffer.amount)}`)
-      // expect(transactionData).toContain(newOffer.note)
     })
   })
 })
