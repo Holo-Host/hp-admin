@@ -1,6 +1,6 @@
+export const DNA_INSTANCE = 'holofuel'
 export const HAPP_URL = 'http://198.211.102.13:3000' //'http://testfuel.holo.host/'
-export const DNA_INSTANCE = process.env.REACT_APP_TEST_DNA_INSTANCE_ID
-export const MOCK_EXPIRATION_DATE = '2025-01-02T03:04:05.678901234+00:00'
+export const HHA_ID= 'QmWvWtw1P2nduQqk8uKpfhAeUd72bSU2gFH7TLrQm1Bbfw'
 
 // note: These are test-hpos server instances running on a droplet
 export const TEST_HOSTS = [
@@ -29,6 +29,7 @@ export const HOSTED_AGENT = {
     password: '123454321testest'
 }
 
-export const HHA_ID= 'QmWvWtw1P2nduQqk8uKpfhAeUd72bSU2gFH7TLrQm1Bbfw'
 export const SCREENSHOT_PATH = './src/holofuel/__integration_tests__/holo/snapshots'
 export const TIMEOUT = 9500000;
+
+export const MOCK_EXPIRATION_DATE = '2025-01-02T03:04:05.678901234+00:00'
