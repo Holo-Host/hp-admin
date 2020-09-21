@@ -2,7 +2,6 @@ import { closeTestConductor, findIframe, waitLoad, holoAuthenticateUser, simpleC
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
 import { TIMEOUT, HAPP_URL, DNA_INSTANCE, HHA_ID, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
-// import { presentHolofuelAmount, POLL_INTERVAL } from 'utils'
 import wait from 'waait'
 import _ from 'lodash'
 
