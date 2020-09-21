@@ -1,6 +1,5 @@
 import { Connection as HoloWebSdkConnection } from '@holo-host/web-sdk'
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
-import { isNil } from 'lodash'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import * as waitUntil from 'async-wait-until'
@@ -11,7 +10,8 @@ export const HP_ADMIN_HOST_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === '
 
 const CHAPERONE_SERVER = {
   test: 'http://198.199.73.20:8000/',
-  production: 'https://chaperone.holo.host/'
+  production: 'https://chaperone.holo.host/',
+  develop: 'http://localhost:8000'
 }
 export const CHAPERONE_SERVER_URL = CHAPERONE_SERVER.test
 
@@ -137,7 +137,7 @@ async function initHolochainClient () {
       console.log('Establishing Holo web-sdk connection...')
       // use the web-sdk instead of hc-web-client
       const webSdkConnection = process.env.NODE_ENV !== 'production'
-        ? new HoloWebSdkConnection()
+        ? new HoloWebSdkConnection(CHAPERONE_SERVER.develop)
         : new HoloWebSdkConnection(CHAPERONE_SERVER_URL)
       await webSdkConnection.ready()
       if (HOLOCHAIN_LOGGING) {
