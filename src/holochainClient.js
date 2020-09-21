@@ -1,6 +1,5 @@
 import { Connection as HoloWebSdkConnection } from '@holo-host/web-sdk'
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
-import { isNil } from 'lodash'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
 import * as waitUntil from 'async-wait-until'

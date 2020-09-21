@@ -11,9 +11,9 @@ export const orchestrator = new Orchestrator({
     hardTimeout: 1500
   }
 })
-const dna = Config.dna(dnaPath, 'holofuel-dna',{uuid: "00000000-0000-0000-0000-000000000111", fixed_uuid: true})
+const dna = Config.dna(dnaPath, 'holofuel-dna', { uuid: '00000000-0000-0000-0000-000000000111', fixed_uuid: true })
 
-export const conductorConfig = Config.gen({[process.env.REACT_APP_TEST_DNA_INSTANCE_ID]: dna}, {
+export const conductorConfig = Config.gen({ [process.env.REACT_APP_TEST_DNA_INSTANCE_ID]: dna }, {
   logger: Config.logger(false),
   network: {
     type: 'sim2h',

@@ -38,7 +38,7 @@ async function waitForConductor (interval = 10000) {
         console.log('')
         return wait(interval)
       } else {
-        // console.log('>>>>>> CALL TO CONDUCTOR DID NOT PASS :: error code : ', error.code)
+        console.log('>>>>>> CALL TO CONDUCTOR DID NOT PASS :: error code : ', error.code)
         await reattemptConnection(error)
       }
     }

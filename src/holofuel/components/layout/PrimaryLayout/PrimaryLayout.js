@@ -109,11 +109,9 @@ function PrimaryLayout ({
       }
 
       if (!isSignedInAsHostedAgent) {
-        console.log('about to sign in... ')
-
         try {
           const isHostedAgentSignedIn = await webSdkConnection.signIn()
-          // console.log('>>>>>>>>>>>> SIGN IN RESULT : ', isHostedAgentSignedIn)
+          console.log('>>>>>>>>>>>> SIGN IN RESULT : ', isHostedAgentSignedIn)
           setIsSignedInAsHostedAgent(true)
         } catch (error) {
           console.log('>>>>>>>>>>>> SIGN IN ERROR : ', error)
