@@ -19,7 +19,7 @@
     "start:dev-chaperone": "npx chaperone-server --config chaperone.json",
     "sim2h-server:start": "sim2h_server -p 9000 &> sim2h.log &",
     "sim2h-server:clear": "kill -9 $(lsof -t -i:9000)",
-    "refresh": "npm run hc:stop; npm run sim2h-server:clear; npm run hc:clean-storage",
+    "stop-all": "npm run hc:stop; npm run sim2h-server:clear; npm run hc:clean-storage",
     "build": "REACT_APP_VERSION=$npm_package_version node scripts/build.js",
     "build:holofuel-holo": "REACT_APP_VERSION=$npm_package_version REACT_APP_HOLOFUEL_APP=true node scripts/build.js",
     "build:holofuel-holochain": "REACT_APP_VERSION=$npm_package_version REACT_APP_HOLOFUEL_APP=true REACT_APP_RAW_HOLOCHAIN=true node scripts/build.js",
@@ -37,7 +37,6 @@
     "test:preseed-data": "npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data",
     "test:integration-holo": "REACT_APP_INTEGRATION_TEST='true' node scripts/test.js --config=./jest.holoIntegration.config.js --runInBand --testTimeout=95000000",
     "test:integration-holochain": "nix-shell --command 'REACT_APP_INTEGRATION_TEST='true' node scripts/test.js --config=./jest.hcIntegration.config.js'",
-    "test:integration-with-setup": "npm run test:preseed-data && npm run test:integration",
     "serve-test": "PORT=3100 npm run start:holofuel-holo-live",
     "predeploy": "npm run build:holofuel-holo",
     "deploy": "gh-pages -d build -o static"

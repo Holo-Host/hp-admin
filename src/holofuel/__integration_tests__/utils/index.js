@@ -1,20 +1,19 @@
 import wait from 'waait'
-import { DNA_INSTANCE, MOCK_EXPIRATION_DATE, SCREENSHOT_PATH } from '../utils/global-vars'
+import { DNA_INSTANCE, MOCK_EXPIRATION_DATE, SCREENSHOT_PATH, TIMEOUT } from '../utils/global-vars'
 
 const getTimestamp = () => new Date().toISOString()
 
 export const closeTestConductor = (agent, testName) => {
   try {
     agent.kill()
-  }
-  catch (err) {
+  } catch (err) {
     throw new Error(`Error when killing conductor for the ${testName} test : ${err}`)
   }
 }
 
 export const findIframe = async (page, url, pollingInterval = 1000) => {
-  return new Promise(async resolve => {
-    const poll = setInterval(async () => {
+  return new Promise(resolve => {
+    const poll = setInterval(() => {
       const iFrame = page.frames().find(frame => frame.url().includes(url))
       if (iFrame) {
         clearInterval(poll)
@@ -25,8 +24,8 @@ export const findIframe = async (page, url, pollingInterval = 1000) => {
 }
 
 export const waitLoad = async (checkLoading, pollingInterval = 1000) => {
-  return new Promise(async resolve => {
-    const poll = setInterval(async () => {
+  return new Promise(resolve => {
+    const poll = setInterval(() => {
       const isLoaded = checkLoading()
       if (isLoaded) {
         clearInterval(poll)
@@ -36,23 +35,22 @@ export const waitLoad = async (checkLoading, pollingInterval = 1000) => {
   })
 }
 
-
-export const waitZomeResult = async (asyncCheck, timeout = TIMEOUT, pollingInterval = 1000) => {                                                                  
-  return setTimeout(await new Promise(async resolve => {                                                           
-    const poll = setInterval(async () => {   
-      const callResultRaw = await asyncCheck() 
+export const waitZomeResult = async (asyncCheck, timeout = TIMEOUT, pollingInterval = 1000) => {
+  return setTimeout(new Promise(resolve => {
+    const poll = setInterval(async () => {
+      const callResultRaw = await asyncCheck()
       console.log('callResultRaw >>>>>', callResultRaw)
-      console.log('callResultRaw.Ok :', callResultRaw.Ok) 
-      const callResult = callResultRaw.Ok                     
-      if (callResult) {                                                                                    
-        clearInterval(poll)                                                                                 
-        resolve(callResult)                                                                              
-      }                                                                                                                                                                         
-    }, pollingInterval)                                                                                         
-  }), timeout)                                                                                                
+      console.log('callResultRaw.Ok :', callResultRaw.Ok)
+      const callResult = callResultRaw.Ok
+      if (callResult) {
+        clearInterval(poll)
+        resolve(callResult)
+      }
+    }, pollingInterval)
+  }), timeout)
 }
 
-export const takeSnapshot = async (page, fileName) => await page.screenshot({path: SCREENSHOT_PATH + `/${fileName}.png`})
+export const takeSnapshot = async (page, fileName) => page.screenshot({ path: SCREENSHOT_PATH + `/${fileName}.png` })
 
 export const holoAuthenticateUser = async (page, frame, userEmail = '', userPassword = '', type = 'signup') => {
   const pascalType = type === 'signup' ? 'SignUp' : 'LogIn'
@@ -91,43 +89,43 @@ export const awaitSimpleConsistency = async (s, hostInstanceId, holochainPlayers
   }
 }
 
-export const addNickname = async(tryoramaScenario, agent, nickname) => {
-  const profile_args = {
+export const addNickname = async (tryoramaScenario, agent, nickname) => {
+  const profileArgs = {
     nickname,
     agent_address: agent.info(DNA_INSTANCE).agentAddress,
     avatar_url: `https://cdn.pixabay.com/${nickname}-photo.png`,
     uniqueness: `${nickname}FirstEntry`
   }
-  const result = await agent.callSync(DNA_INSTANCE, "profile", "update_my_profile", profile_args )
+  const result = await agent.callSync(DNA_INSTANCE, 'profile', 'update_my_profile', profileArgs)
 
   // wait for DHT consistency
-  // await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [agent], [])
+  await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [agent], [])
   return result
 }
 
-export const preseedOffer = async(tryoramaScenario, spender, receiver, volume = 1) => {
+export const preseedOffer = async (tryoramaScenario, spender, receiver, volume = 1) => {
   let amountOffered = 0
   for (let i = 0; i < volume; i++) {
     const amount = (volume * 100)
     amountOffered = amountOffered + amount
 
-    const offer_args = {
+    const offerArgs = {
       receiver: receiver.info(DNA_INSTANCE).agentAddress,
       amount: amount.toString(),
       note: `Preseed: Offer #${volume}`,
       timestamp: getTimestamp(),
       expiration_date: MOCK_EXPIRATION_DATE
     }
-    await spender.callSync(DNA_INSTANCE, "transactor", "create_promise", offer_args )
+    await spender.callSync(DNA_INSTANCE, 'transactor', 'create_promise', offerArgs)
 
     // wait for DHT consistency
     await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [spender, receiver], [])
 
-    const spenderLedger = await spender.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
-    const receiverLedger = await receiver.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
+    const spenderLedger = await spender.callSync(DNA_INSTANCE, 'transactor', 'get_ledger', {})
+    const receiverLedger = await receiver.callSync(DNA_INSTANCE, 'transactor', 'get_ledger', {})
     const spenderBalance = spenderLedger.Ok.balance
     const receiverBalance = receiverLedger.Ok.balance
-    return { spenderBalance, receiverBalance, offer_args }
+    return { spenderBalance, receiverBalance, offerArgs }
   }
 }
 
@@ -137,21 +135,21 @@ export const preseedRequest = async (tryoramaScenario, receiver, spender, volume
     const amount = (volume * 100)
     amountRequested = amountRequested + amount
 
-    const request_args = {
+    const requestArgs = {
       spender: spender.info(DNA_INSTANCE).agentAddress,
       amount: amount.toString(),
       note: `Preseed: Request #${volume}`,
       timestamp: getTimestamp()
     }
-    await receiver.callSync(DNA_INSTANCE, "transactor", "create_invoice", request_args )
+    await receiver.callSync(DNA_INSTANCE, 'transactor', 'create_invoice', requestArgs)
 
     // wait for DHT consistency
     await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [receiver, spender], [])
 
-    const spenderLedger = await spender.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
-    const receiverLedger = await receiver.callSync(DNA_INSTANCE, "transactor", "get_ledger", {} )
+    const spenderLedger = await spender.callSync(DNA_INSTANCE, 'transactor', 'get_ledger', {})
+    const receiverLedger = await receiver.callSync(DNA_INSTANCE, 'transactor', 'get_ledger', {})
     const spenderBalance = spenderLedger.Ok.balance
     const receiverBalance = receiverLedger.Ok.balance
-    return { receiverBalance, spenderBalance, request_args }
+    return { receiverBalance, spenderBalance, requestArgs }
   }
 }
