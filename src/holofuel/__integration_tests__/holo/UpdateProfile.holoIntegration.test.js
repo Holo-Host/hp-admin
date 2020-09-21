@@ -1,4 +1,4 @@
-import { closeTestConductor, findIframe, waitLoad, addNickname, holoAuthenticateUser, awaitSimpleConsistency, waitZomeResult } from '../utils/index'
+import { closeTestConductor, findIframe, waitLoad, addNickname, holoAuthenticateUser, simpleConsistency, waitZomeResult } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
 import { TIMEOUT, HAPP_URL, HHA_ID, DNA_INSTANCE, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
@@ -128,7 +128,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       console.log('hostedAgentInstance : ', hostedAgentInstance)
 
       // wait for DHT consistency
-      await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
+      await simpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
       let isMyProfileConsistent = false
       const checkProfile = await counterpartyAgentInstance.call('holofuel', 'profile', 'get_my_profile', {})
@@ -144,7 +144,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       addNickname(scenario, counterpartyAgentInstance, 'Alice')
 
       // wait for DHT consistency
-      await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
+      await simpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
       let isCounterpartyProfile = false
       const checkGetProfile = await counterpartyAgentInstance.call('holofuel', 'profile', 'get_profile', { counterpartyId: counterpartyAgentInstance })

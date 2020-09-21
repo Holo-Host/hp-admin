@@ -1,7 +1,5 @@
 import wait from 'waait'
-import { DNA_INSTANCE, MOCK_EXPIRATION_DATE, SCREENSHOT_PATH, TIMEOUT } from '../utils/global-vars'
-
-const getTimestamp = () => new Date().toISOString()
+import { DNA_INSTANCE, SCREENSHOT_PATH, TIMEOUT } from '../utils/global-vars'
 
 export const closeTestConductor = (agent, testName) => {
   try {
@@ -77,13 +75,10 @@ export const holoAuthenticateUser = async (page, frame, userEmail = '', userPass
   return { email, password, confirmation }
 }
 
-export const awaitSimpleConsistency = async (s, hostInstanceId, holochainPlayers = [], hostedPlayers = []) => {
-  // console.log('>>>>>>>>>> INSIDE awaitSImpleConsistency <<<<<<<<<<< hostInstanceId, holochainPlayers, hostedPlayers', hostInstanceId, holochainPlayers, hostedPlayers)
-  // console.log('Tryorama S: ', s)
+export const simpleConsistency = async (s, hostInstanceId, holochainPlayers = [], hostedPlayers = []) => {
   if (!hostInstanceId) throw new Error('Attempted to await SimpleConsistency without providing a proper instance...')
   try {
-    // await s.simpleConsistency('holofuel', [], [alice])
-    await s.simpleConsistency(hostInstanceId, holochainPlayers, [])
+    await s.simpleConsistency(hostInstanceId, holochainPlayers, hostedPlayers)
   } catch (error) {
     throw console.error('Failed to reach conistency. Err: ', error)
   }
@@ -99,57 +94,6 @@ export const addNickname = async (tryoramaScenario, agent, nickname) => {
   const result = await agent.callSync(DNA_INSTANCE, 'profile', 'update_my_profile', profileArgs)
 
   // wait for DHT consistency
-  await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [agent], [])
+  await simpleConsistency(tryoramaScenario, DNA_INSTANCE, [agent], [])
   return result
-}
-
-export const preseedOffer = async (tryoramaScenario, spender, receiver, volume = 1) => {
-  let amountOffered = 0
-  for (let i = 0; i < volume; i++) {
-    const amount = (volume * 100)
-    amountOffered = amountOffered + amount
-
-    const offerArgs = {
-      receiver: receiver.info(DNA_INSTANCE).agentAddress,
-      amount: amount.toString(),
-      note: `Preseed: Offer #${volume}`,
-      timestamp: getTimestamp(),
-      expiration_date: MOCK_EXPIRATION_DATE
-    }
-    await spender.callSync(DNA_INSTANCE, 'transactor', 'create_promise', offerArgs)
-
-    // wait for DHT consistency
-    await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [spender, receiver], [])
-
-    const spenderLedger = await spender.callSync(DNA_INSTANCE, 'transactor', 'get_ledger', {})
-    const receiverLedger = await receiver.callSync(DNA_INSTANCE, 'transactor', 'get_ledger', {})
-    const spenderBalance = spenderLedger.Ok.balance
-    const receiverBalance = receiverLedger.Ok.balance
-    return { spenderBalance, receiverBalance, offerArgs }
-  }
-}
-
-export const preseedRequest = async (tryoramaScenario, receiver, spender, volume = 1) => {
-  let amountRequested = 0
-  for (let i = 0; i < volume; i++) {
-    const amount = (volume * 100)
-    amountRequested = amountRequested + amount
-
-    const requestArgs = {
-      spender: spender.info(DNA_INSTANCE).agentAddress,
-      amount: amount.toString(),
-      note: `Preseed: Request #${volume}`,
-      timestamp: getTimestamp()
-    }
-    await receiver.callSync(DNA_INSTANCE, 'transactor', 'create_invoice', requestArgs)
-
-    // wait for DHT consistency
-    await awaitSimpleConsistency(tryoramaScenario, DNA_INSTANCE, [receiver, spender], [])
-
-    const spenderLedger = await spender.callSync(DNA_INSTANCE, 'transactor', 'get_ledger', {})
-    const receiverLedger = await receiver.callSync(DNA_INSTANCE, 'transactor', 'get_ledger', {})
-    const spenderBalance = spenderLedger.Ok.balance
-    const receiverBalance = receiverLedger.Ok.balance
-    return { receiverBalance, spenderBalance, requestArgs }
-  }
 }

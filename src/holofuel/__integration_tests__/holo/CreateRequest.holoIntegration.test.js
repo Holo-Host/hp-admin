@@ -1,4 +1,4 @@
-import { closeTestConductor, findIframe, waitLoad, holoAuthenticateUser, awaitSimpleConsistency, waitZomeResult } from '../utils/index'
+import { closeTestConductor, findIframe, waitLoad, holoAuthenticateUser, simpleConsistency, waitZomeResult } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
 import { TIMEOUT, HAPP_URL, DNA_INSTANCE, HHA_ID, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
 import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
@@ -96,7 +96,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       await waitLoad(() => completeFirstGet)
 
       // wait for DHT consistency
-      await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
+      await simpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
       // *********
       // Create New Request
@@ -153,7 +153,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       submitButton.click()
 
       // // wait for DHT consistency
-      await awaitSimpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
+      await simpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
       const checkListPending = async () => counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {})
       const listPending = await waitZomeResult(checkListPending, 90000, 10000)
