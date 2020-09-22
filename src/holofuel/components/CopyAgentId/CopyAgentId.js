@@ -9,16 +9,19 @@ export default function CopyAgentId ({
   className,
   children
 }) {
-  const { id: hash, nickname } = agent
-
-  let messageText
+  const { nickname } = agent
+  let messageText, hash
 
   if (isMe) {
+    ({ id: hash } = agent)
     messageText = 'Your HoloFuel Agent ID has been copied!'
-  } else if (nickname) {
-    messageText = `${nickname}'s HoloFuel Agent ID has been copied!`
   } else {
-    messageText = `Full Agent ID of ${presentAgentId(hash)} has been copied!`
+    ({ agentAddress: hash } = agent)
+    if (nickname) {
+      messageText = `${nickname}'s HoloFuel Agent ID has been copied!`
+    } else {
+      messageText = `Full Agent ID of ${presentAgentId(hash)} has been copied!`
+    }
   }
 
   return <CopyToClipboard copyContent={hash} messageText={messageText} className={className}>
