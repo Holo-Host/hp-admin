@@ -11,9 +11,13 @@ export const HP_ADMIN_HOST_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === '
 const CHAPERONE_SERVER = {
   test: 'http://198.199.73.20:8000/',
   production: 'https://chaperone.holo.host/',
-  develop: 'http://localhost:8000'
+  develop: {
+    hosted: 'https://chaperone.holohost.dev/',
+    local: 'http://localhost:8000/'
+  }
 }
-export const CHAPERONE_SERVER_URL = CHAPERONE_SERVER.test
+export const PRODUCTION_CHAPERONE_SERVER_URL = CHAPERONE_SERVER.develop.hosted
+const DEVELOP_CHAPERONE_SERVER_URL = CHAPERONE_SERVER.develop.local
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -137,8 +141,8 @@ async function initHolochainClient () {
       console.log('Establishing Holo web-sdk connection...')
       // use the web-sdk instead of hc-web-client
       const webSdkConnection = process.env.NODE_ENV !== 'production'
-        ? new HoloWebSdkConnection(CHAPERONE_SERVER.develop)
-        : new HoloWebSdkConnection(CHAPERONE_SERVER_URL)
+        ? new HoloWebSdkConnection(DEVELOP_CHAPERONE_SERVER_URL)
+        : new HoloWebSdkConnection(PRODUCTION_CHAPERONE_SERVER_URL)
       await webSdkConnection.ready()
       if (HOLOCHAIN_LOGGING) {
         console.log('🎉 Web SDK connected and ready for Zome Calls...')
