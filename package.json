@@ -37,7 +37,6 @@
     "test:preseed-data": "npm run test:wait-for-conductor && NODE_ENV=test babel-node scripts/initialize-conductor-data",
     "test:integration-holo": "REACT_APP_INTEGRATION_TEST='true' node scripts/test.js --config=./jest.holoIntegration.config.js --runInBand --testTimeout=95000000",
     "test:integration-holochain": "nix-shell --command 'REACT_APP_INTEGRATION_TEST='true' node scripts/test.js --config=./jest.hcIntegration.config.js'",
-    "serve-test": "PORT=3100 npm run start:holofuel-holo-live",
     "predeploy": "npm run build:holofuel-holo",
     "deploy": "gh-pages -d build -o static"
   },
