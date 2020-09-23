@@ -1,5 +1,5 @@
 export const DNA_INSTANCE = 'holofuel'
-export const HAPP_URL = 'http://198.211.102.13:3000' // 'http://testfuel.holo.host/'
+export const HAPP_URL = 'http://testfuel.holo.host/'
 export const HHA_ID = 'QmNedTibHaD3K7ojqa7ZZfkMBbUWg39taK6oLBEPAswTKu'
 
 // note: These are test-hpos server instances running on a droplet
