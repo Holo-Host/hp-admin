@@ -148,16 +148,21 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // wait for button to not be disabled
       await wait(1000)
 
+      // verify that counterparty list_pending is 0 prior to request submission
+      const checkListPending = async () => counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {})
+      const listPendingPrior = await waitZomeResult(checkListPending, 90000, 10000)
+      expect(listPendingPrior.requests.length).toEqual(0)
+
+      // submit request
       const submitButton = await page.$("button[data-testid='submit-button']")
       submitButton.click()
 
       // // wait for DHT consistency
       await simpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
-      const checkListPending = async () => counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {})
-      const listPending = await waitZomeResult(checkListPending, 90000, 10000)
-
-      expect(listPending.requests.length).toEqual(1)
+      // verify that counterparty list_pending is 1 after request submission
+      const listPendingAfter = await waitZomeResult(checkListPending, 90000, 10000)
+      expect(listPendingAfter.requests.length).toEqual(1)
     })
   })
 })
