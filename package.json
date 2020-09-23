@@ -50,7 +50,7 @@
     "@holo-host/hp-admin-keypair": "0.1.2",
     "@holo-host/web-sdk": "^0.1.2",
     "@holochain/hc-web-client": "^0.5.3",
-    "@holochain/tryorama": "file:/home/lisa/Documents/gitrepos/holochain/holochain-old/tryorama",
+    "@holochain/tryorama": "^0.3.4-dev.0",
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-client": "^2.6.4",
     "apollo-link-error": "^1.1.12",

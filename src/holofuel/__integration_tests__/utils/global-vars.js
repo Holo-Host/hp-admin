@@ -16,9 +16,9 @@ export const TEST_HOSTS = [{
   host_email: 'joel+hpos1@holo.host', // test host #2 email
   host_password: 'asdfasdf' // test host #2 pwd
 }, {
-  host_id: '4h9v7kmbjqm75f0uh5v0i49jdatcgpnb9wy94oclzvh6l8jt7c', // test host # pubkey
-  host_email: 'joel+hpos1@holo.host', // test host # email
-  host_password: 'asdfasdf' // test host # pwd
+  host_id: '4h9v7kmbjqm75f0uh5v0i49jdatcgpnb9wy94oclzvh6l8jt7c', // test host #3 pubkey
+  host_email: 'joel+hpos1@holo.host', // test host #3 email
+  host_password: 'asdfasdf' // test host #3 pwd
 }]
 
 export const HOSTED_AGENT = {
@@ -26,7 +26,5 @@ export const HOSTED_AGENT = {
   password: '12344321'
 }
 
-export const SCREENSHOT_PATH = './src/holofuel/__integration_tests__/holo/snapshots'
 export const TIMEOUT = 9500000
-
-export const MOCK_EXPIRATION_DATE = '2025-01-02T03:04:05.678901234+00:00'
+export const SCREENSHOT_PATH = './src/holofuel/__integration_tests__/holo/snapshots'

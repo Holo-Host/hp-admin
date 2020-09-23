@@ -75,10 +75,10 @@ export const holoAuthenticateUser = async (page, frame, userEmail = '', userPass
   return { email, password, confirmation }
 }
 
-export const simpleConsistency = async (s, hostInstanceId, holochainPlayers = [], hostedPlayers = []) => {
+export const simpleConsistency = async (tryoramaScenario, hostInstanceId, holochainPlayers = [], hostedPlayers = []) => {
   if (!hostInstanceId) throw new Error('Attempted to await SimpleConsistency without providing a proper instance...')
   try {
-    await s.simpleConsistency(hostInstanceId, holochainPlayers, hostedPlayers)
+    await tryoramaScenario.simpleConsistency(hostInstanceId, holochainPlayers, hostedPlayers)
   } catch (error) {
     throw console.error('Failed to reach conistency. Err: ', error)
   }
@@ -94,6 +94,10 @@ export const addNickname = async (tryoramaScenario, agent, nickname) => {
   const result = await agent.callSync(DNA_INSTANCE, 'profile', 'update_my_profile', profileArgs)
 
   // wait for DHT consistency
-  await simpleConsistency(tryoramaScenario, DNA_INSTANCE, [agent], [])
+  try {
+    await tryoramaScenario.simpleConsistency(DNA_INSTANCE, [agent], [])
+  } catch (error) {
+    throw console.error('Failed to reach conistency. Err: ', error)
+  }
   return result
 }
