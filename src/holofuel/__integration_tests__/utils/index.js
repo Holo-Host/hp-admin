@@ -36,9 +36,8 @@ export const waitLoad = async (checkLoading, pollingInterval = 1000) => {
 export const waitZomeResult = async (asyncCheck, timeout = TIMEOUT, pollingInterval = 1000) => {
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
-	    reject( new TimeoutError("Waited for " + (timeout/1000) + " seconds", timeout ) )
-	}, timeout)
-
+      reject(new Error(`Waited for ${timeout / 1000} seconds`, timeout))
+    }, timeout)
     const poll = setInterval(async () => {
       const callResultRaw = await asyncCheck()
       console.log('callResultRaw >>>>>', callResultRaw)
@@ -46,7 +45,7 @@ export const waitZomeResult = async (asyncCheck, timeout = TIMEOUT, pollingInter
       const callResult = callResultRaw.Ok
       if (callResult) {
         clearInterval(poll)
-        clearTimeout( timeoutId )
+        clearTimeout(timeoutId)
         resolve(callResult)
       }
     }, pollingInterval)
