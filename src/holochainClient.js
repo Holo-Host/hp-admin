@@ -16,8 +16,8 @@ const CHAPERONE_SERVER = {
     local: 'http://localhost:8000/'
   }
 }
-export const PRODUCTION_CHAPERONE_SERVER_URL = CHAPERONE_SERVER.test
-const DEVELOP_CHAPERONE_SERVER_URL = CHAPERONE_SERVER.develop.local
+export const PRODUCTION_CHAPERONE_SERVER_URL = process.env.PRODUCTION_CHAPERONE_SERVER_URL || CHAPERONE_SERVER.test
+const DEVELOP_CHAPERONE_SERVER_URL = process.env.DEVELOP_CHAPERONE_SERVER_URL || CHAPERONE_SERVER.develop.local
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
