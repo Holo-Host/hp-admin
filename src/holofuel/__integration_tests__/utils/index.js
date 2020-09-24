@@ -34,7 +34,11 @@ export const waitLoad = async (checkLoading, pollingInterval = 1000) => {
 }
 
 export const waitZomeResult = async (asyncCheck, timeout = TIMEOUT, pollingInterval = 1000) => {
-  return setTimeout(new Promise(resolve => {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+	    reject( new TimeoutError("Waited for " + (timeout/1000) + " seconds", timeout ) )
+	}, timeout)
+
     const poll = setInterval(async () => {
       const callResultRaw = await asyncCheck()
       console.log('callResultRaw >>>>>', callResultRaw)
@@ -42,10 +46,11 @@ export const waitZomeResult = async (asyncCheck, timeout = TIMEOUT, pollingInter
       const callResult = callResultRaw.Ok
       if (callResult) {
         clearInterval(poll)
+        clearTimeout( timeoutId )
         resolve(callResult)
       }
     }, pollingInterval)
-  }), timeout)
+  })
 }
 
 export const takeSnapshot = async (page, fileName) => page.screenshot({ path: SCREENSHOT_PATH + `/${fileName}.png` })
@@ -93,7 +98,7 @@ export const addNickname = async (tryoramaScenario, agent, nickname) => {
   }
   const result = await agent.callSync(DNA_INSTANCE, 'profile', 'update_my_profile', profileArgs)
 
-  // wait for DHT consistency
+  // wait for DHT consistency (for only current agent)
   try {
     await tryoramaScenario.simpleConsistency(DNA_INSTANCE, [agent], [])
   } catch (error) {

@@ -1,7 +1,7 @@
 import { closeTestConductor, findIframe, waitLoad, holoAuthenticateUser, simpleConsistency, waitZomeResult } from '../utils/index'
 import { orchestrator, conductorConfig } from '../utils/tryorama-integration'
 import { TIMEOUT, HAPP_URL, DNA_INSTANCE, HHA_ID, TEST_HOSTS, HOSTED_AGENT } from '../utils/global-vars'
-import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
+import { PRODUCTION_CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import wait from 'waait'
 import _ from 'lodash'
 
@@ -10,8 +10,8 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
   const outstandingRequestIds = []
 
   const hostedAgentDetails = {
-    id: `${HHA_ID}::HcSCJp5QzG5EG7yivgCTXBogaHxq8widw488MRBp7oBkMhhnQbJ57KQ9cdQtwmr-${DNA_INSTANCE}`, // hosted agent instanceId
-    agent_address: 'HcSCJp5QzG5EG7yivgCTXBogaHxq8widw488MRBp7oBkMhhnQbJ57KQ9cdQtwmr', // hosted agent address (note: not needed in consistency function - remove after modfied in tryorama)
+    id: `${HHA_ID}::HcScIsBM74Uuwinkw9WcByIKrdrecjhm75XfAjMb8gOt7szsfOaX7msgPjc97ir-${DNA_INSTANCE}`, // hosted agent instanceId
+    agent_address: 'HcScIsBM74Uuwinkw9WcByIKrdrecjhm75XfAjMb8gOt7szsfOaX7msgPjc97ir', // hosted agent address (note: not needed in consistency function - remove after modfied in tryorama)
     dna_address: '', // note: unused in consistency function - remove after modfied in tryorama repo
     ...TEST_HOSTS[0]
   }
@@ -40,16 +40,18 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       wsConnected = !!response
       const callId = JSON.parse(response.payloadData).id
       outstandingRequestIds.push(callId)
-      if (callId === 8) {
+      if (callId === 28) {
         completeFirstGet = false
       }
+      // console.log('NETWORK FRAME SENT >>> : ', JSON.parse(response.payloadData))
     })
     client.on('Network.webSocketFrameReceived', ({ response }) => {
       const callId = JSON.parse(response.payloadData).id
       _.remove(outstandingRequestIds, id => id === callId)
-      if (callId === 8) {
+      if (callId === 28) {
         completeFirstGet = true
       }
+      // console.log('NETWORK RESPONSE <<< : ', JSON.parse(response.payloadData))
     })
   }, TIMEOUT)
 
@@ -69,7 +71,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       await wait(4000)
 
       await page.waitForSelector('iframe')
-      const iframe = await findIframe(page, CHAPERONE_SERVER_URL)
+      const iframe = await findIframe(page, PRODUCTION_CHAPERONE_SERVER_URL)
       await iframe.$('.modal-open')
 
       const { email, password } = await holoAuthenticateUser(page, iframe, HOSTED_AGENT.email, HOSTED_AGENT.password, 'signup')
@@ -87,20 +89,20 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       // TODO: Remove reload page trigger and timeout once resolve signIn/refresh after signUp bug..
       await page.reload({ waitUntil: ['networkidle0', 'domcontentloaded'] })
 
-      await wait(3000)
-      const buttons = await page.$$('button')
-      const newTransactionButton = buttons[3]
+      await wait(5000)
+      const newTransactionButton = await page.waitForSelector('button.Inbox-module__new-transaction-button___1gFQD.UIButton-module__button___2eLXd.UIButton-module__green___11ET2')
+      newTransactionButton.click()
 
       await waitLoad(() => wsConnected)
       await waitLoad(() => completeFirstGet)
 
       // wait for DHT consistency
+      console.log('Waiting for consistency...')
       await simpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
       // *********
       // Create New Request
       // *********
-      newTransactionButton.click()
       await page.waitForSelector('button.AmountInput-module__numpad-button___2L0x3')
       const numpadButtons = await page.$$('button.AmountInput-module__numpad-button___2L0x3')
       numpadButtons[0].click()
@@ -149,6 +151,7 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       await wait(1000)
 
       // verify that counterparty list_pending is 0 prior to request submission
+      console.log('Call to Holochain Player list_pending (first time)...')
       const checkListPending = async () => counterpartyAgentInstance.call('holofuel', 'transactions', 'list_pending', {})
       const listPendingPrior = await waitZomeResult(checkListPending, 90000, 10000)
       expect(listPendingPrior.requests.length).toEqual(0)
@@ -157,12 +160,26 @@ orchestrator.registerScenario('Tryorama Runs Create Request e2e', async scenario
       const submitButton = await page.$("button[data-testid='submit-button']")
       submitButton.click()
 
+      console.log('Waiting for consistency...')
       // // wait for DHT consistency
       await simpleConsistency(scenario, DNA_INSTANCE, [counterpartyAgentInstance], [hostedAgentInstance])
 
       // verify that counterparty list_pending is 1 after request submission
+      console.log('Call to Holochain Player list_pending (second time)...')
       const listPendingAfter = await waitZomeResult(checkListPending, 90000, 10000)
       expect(listPendingAfter.requests.length).toEqual(1)
+
+      console.log('------------ END OF REQUEST TEST ------------')
+
+      // *********
+      // Sign Out
+      // *********
+      const SignOutButton = await page.waitForSelector('button.Header-module__signout-button___1EkW_')
+      // clicking once to get outside of info modal.
+      SignOutButton.click()
+      // TODO: Remove duplicate click once resolve double-click bug...
+      SignOutButton.click()
+      SignOutButton.click()
     })
   })
 })

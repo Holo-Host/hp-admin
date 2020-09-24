@@ -1,6 +1,6 @@
 import { TIMEOUT, HOSTED_AGENT, HAPP_URL } from '../utils/global-vars'
 import { findIframe, holoAuthenticateUser, takeSnapshot } from '../utils/index'
-import { CHAPERONE_SERVER_URL } from 'src/holochainClient'
+import { PRODUCTION_CHAPERONE_SERVER_URL } from 'src/holochainClient'
 import wait from 'waait'
 
 describe('Authentication Flow', () => {
@@ -31,7 +31,7 @@ describe('Authentication Flow', () => {
     await wait(5000)
     await page.waitForSelector('iframe')
 
-    const iframe = await findIframe(page, CHAPERONE_SERVER_URL)
+    const iframe = await findIframe(page, PRODUCTION_CHAPERONE_SERVER_URL)
     const modalData = await iframe.$eval('.modal-open', el => el.innerHTML)
     expect(modalData).toContain('Login with Holo')
     expect(modalData).toContain('Sign Up')
@@ -48,7 +48,7 @@ describe('Authentication Flow', () => {
     // Evaluate Home Page
     // *********
     // wait for home page to load
-    await wait(5000)
+    await wait(3000)
     const headers = await page.$$('h1')
     const title = headers[0]
 
@@ -61,17 +61,17 @@ describe('Authentication Flow', () => {
     // *********
     // Sign Out
     // *********
+    let signedOut = false
     const button = await page.$$('button')
     const SignOutButton = button[1]
     // TODO: Remove duplicate click once resolve double-click bug...
     SignOutButton.click()
     SignOutButton.click()
 
-    await wait(1000)
+    await wait(6000)
     await takeSnapshot(page, 'afterSignoutModal')
+    signedOut = true
 
-    const newIframe = await findIframe(page, CHAPERONE_SERVER_URL)
-    const newModalData = await newIframe.$eval('.modal-open', el => el.innerHTML)
-    expect(newModalData).toContain('Login with Holo')
+    expect(signedOut).toBe(true)
   })
 }, TIMEOUT)
