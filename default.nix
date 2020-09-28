@@ -87,7 +87,6 @@ in
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
-      holochain-rust
       nodejs
       pkgconfig
       cairo
@@ -133,7 +132,6 @@ in
     src = gitignoreSource ./.;
 
     nativeBuildInputs = [
-      holochain-rust
       nodejs
       pkgconfig
       cairo
