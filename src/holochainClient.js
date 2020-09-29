@@ -2,7 +2,7 @@ import { Connection as HoloWebSdkConnection } from '@holo-host/web-sdk'
 import { connect as hcWebClientConnect } from '@holochain/hc-web-client'
 import { get } from 'lodash/fp'
 import mockCallZome from 'mock-dnas/mockCallZome'
-import waitUntil from 'async-wait-until'
+import * as waitUntil from 'async-wait-until'
 import wait from 'waait'
 
 export const HOSTED_HOLOFUEL_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === 'true') && process.env.REACT_APP_HOLOFUEL_APP === 'true'
@@ -10,9 +10,14 @@ export const HP_ADMIN_HOST_CONTEXT = !(process.env.REACT_APP_RAW_HOLOCHAIN === '
 
 const CHAPERONE_SERVER = {
   test: 'http://198.199.73.20:8000/',
-  production: 'https://chaperone.holo.host/'
+  production: 'https://chaperone.holo.host/',
+  develop: {
+    hosted: 'https://chaperone.holohost.dev/',
+    local: 'http://localhost:8000/'
+  }
 }
-const CHAPERONE_SERVER_URL = CHAPERONE_SERVER.production
+export const PRODUCTION_CHAPERONE_SERVER_URL = process.env.REACT_APP_PRODUCTION_CHAPERONE_SERVER_URL || CHAPERONE_SERVER.test
+const DEVELOP_CHAPERONE_SERVER_URL = process.env.REACT_APP_DEVELOP_CHAPERONE_SERVER_URL || CHAPERONE_SERVER.develop.local
 
 // This can be written as a boolean expression then it's even less readable
 export const MOCK_DNA_CONNECTION = process.env.REACT_APP_INTEGRATION_TEST
@@ -136,9 +141,8 @@ async function initHolochainClient () {
       console.log('Establishing Holo web-sdk connection...')
       // use the web-sdk instead of hc-web-client
       const webSdkConnection = process.env.NODE_ENV !== 'production'
-        ? new HoloWebSdkConnection()
-        : new HoloWebSdkConnection(CHAPERONE_SERVER_URL)
-
+        ? new HoloWebSdkConnection(DEVELOP_CHAPERONE_SERVER_URL)
+        : new HoloWebSdkConnection(PRODUCTION_CHAPERONE_SERVER_URL)
       await webSdkConnection.ready()
       if (HOLOCHAIN_LOGGING) {
         console.log('🎉 Web SDK connected and ready for Zome Calls...')
@@ -221,7 +225,7 @@ async function initAndGetHolochainClient () {
   else return initHolochainClient()
 }
 
-const connectionReady = async () => {
+const holochainConnectionReady = async () => {
   await waitUntil(() => {
     return holochainClient !== null
   }, 30000, 100)
@@ -249,7 +253,7 @@ export function createZomeCall (zomeCallPath, callOpts = {}) {
         jsonResult = JSON.parse(rawResult)
       } else {
         await initAndGetHolochainClient()
-        await connectionReady()
+        await holochainConnectionReady()
         if (HOSTED_HOLOFUEL_CONTEXT) {
           if (!holochainClient) return
           jsonResult = await holochainClient.zomeCall(instanceId, zome, zomeFunc, args)

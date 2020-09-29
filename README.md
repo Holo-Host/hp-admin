@@ -85,10 +85,40 @@ Then go to https://github.com/Holo-Host/holofuel-static-ui/settings and update t
  - start your ui by running: `npm run start:holofuel-holo-live`
  - start your conductor by running: `npm run start:conductor-1`
  - once your ui loads, you should see the web sdk sign up/sign in modal, sign up and log in
-  - notice in the console that you have generated keys and now have a new dna-instance
+    - notice in the console that you have generated keys and now have a new dna-instance
  - **manual update** : You will need to update your conductor config with the new dna-instance:
     - shut down your conductor only
     - update your instance with the new agent ID
     - start back up your conductor
     - refresh your browser page
  - notice that your zome calls should now be successful ..you are now runing a locally hosted instance!
+
+ ---
+
+ ### Run e2e Holo Hosting Tests
+This runs with a version of Tryorama that includes the consistency updates and hosted player addition (branch `2020-08-31/hosted-consistency`). **Before running, you will need to pull down a local copy and point the tryorama dependency path to your local copy.**
+
+ > Pro Tip: If the test fails prior to completing sign-in, cancel the running test and rerun.
+
+ - Verify that a non-corrupted hpos is up and registered as a host for the happ (`QmNedTibHaD3K7ojqa7ZZfkMBbUWg39taK6oLBEPAswTKu`) in the resolver-dev KV store (`250ood7t7wevast9gmkdn91eg9r026o82itj2z50q6ljhctc43` works well).
+ - run `npm i` to make sure you've installed all the lasted deps (notably the new @holo-host/web-sdk)
+ - enter `nix-shell` (NB: This is needed for the tryorama instances.)
+ - run `npm run test:integration-holo`
+
+ **Testing Details:**
+   - Puppeteer is used to emulate the Holo Hosted Player actions.
+   - The Holochain Player is spawned and managed by Tryorama.
+   - A Hosted Player is also created in Tryorama to monitor consistency. 
+   - Consistency is managed by connecting to the Host of the Holo Hosted User and contrasting the Hosted Agent's Instance state dump with that of the Holochain Instance to determine if both the Hosted Player and the Holochain Player agree on the current state (ie: `simpleConsistency`).
+
+ #### Sign Up / Sign out Test (Web SDK Test)
+ - This test emulates a Holo Hosted User signing up and signing out successfully.
+  - This test is considered successful once the Hosted Player's signs up, arrives at the HoloFuel Inbox page and is able to sign out, arriving back at the sign in modal.
+
+ #### Update ProfileTest (Zome Call Test)
+ - This test emulates a Holo Hosted User signing up, navigating to the profile page, and updating his/her agent nickname.
+  - This test is considered successful once the Hosted Player's new nickname is discoverable by the holochain player.
+
+ #### Send Request Test (Zome Call Test)
+ - This test emulates a Holo Hosted User signing up, navigating to the number pad/create request page, and initiating a request for HoloFuel from a Holochain instance.
+  - This test is considered successful once the Hosted Player's request is found in the counterparty's (the holochain player's) list of pending transactions.
