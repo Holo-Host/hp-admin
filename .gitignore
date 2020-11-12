@@ -29,7 +29,6 @@ dna
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-yarn.lock
 .holochain
 conductor.log
 conductor-1.log
